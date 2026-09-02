@@ -3,124 +3,210 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Avant-gardE — Une France libre</title>
 
 <style>
 * {
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
     font-family: Arial, Helvetica, sans-serif;
+    background: #f5f5f3;
     color: #111;
-    background: #f7f7f5;
 }
 
+/* =========================
+   HEADER
+========================= */
+
 header {
-    height: 80px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    height: 78px;
     padding: 0 6%;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #fff;
+
+    background: rgba(255,255,255,0.96);
     border-bottom: 1px solid #ddd;
 }
 
 .logo {
-    font-size: 26px;
+    font-size: 25px;
     font-weight: 900;
     letter-spacing: -1px;
 }
 
 .logo span {
-    color: #b21f2d;
+    color: #c82032;
+}
+
+nav {
+    display: flex;
+    gap: 28px;
 }
 
 nav a {
-    margin-left: 28px;
     text-decoration: none;
     color: #111;
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: .5px;
 }
 
+nav a:hover {
+    color: #c82032;
+}
+
+/* =========================
+   HERO
+========================= */
+
 .hero {
-    min-height: 620px;
+    min-height: 680px;
     padding: 100px 8%;
+
     display: flex;
     align-items: center;
-    background: #101820;
+
+    background:
+        linear-gradient(120deg, #101820 0%, #17232d 60%, #101820 100%);
+
     color: white;
 }
 
 .hero-content {
-    max-width: 900px;
+    max-width: 1050px;
 }
 
-.hero small {
-    text-transform: uppercase;
+.eyebrow {
+    font-size: 13px;
+    font-weight: 800;
     letter-spacing: 4px;
-    font-weight: bold;
+    text-transform: uppercase;
     color: #ddd;
 }
 
 .hero h1 {
-    font-size: clamp(60px, 10vw, 130px);
-    line-height: .88;
-    letter-spacing: -6px;
     margin: 25px 0;
+
+    font-size: clamp(70px, 11vw, 150px);
+    line-height: .84;
+    letter-spacing: -7px;
+    font-weight: 900;
 }
 
 .hero h1 span {
     color: #d52b3a;
 }
 
-.hero p {
-    font-size: 24px;
-    line-height: 1.4;
+.hero-description {
     max-width: 700px;
+
+    font-size: 23px;
+    line-height: 1.45;
     color: #ddd;
 }
 
 .button {
     display: inline-block;
+
     margin-top: 40px;
-    padding: 17px 28px;
+    padding: 17px 30px;
+
     background: #d52b3a;
     color: white;
+
     text-decoration: none;
-    font-weight: 800;
+    font-weight: 900;
+    font-size: 13px;
+    letter-spacing: .5px;
 }
+
+.button:hover {
+    background: #b51f2f;
+}
+
+/* =========================
+   INTRO
+========================= */
+
+.intro {
+    padding: 110px 8%;
+    background: #fff;
+}
+
+.intro h2 {
+    max-width: 900px;
+
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 1;
+    letter-spacing: -3px;
+}
+
+.intro p {
+    max-width: 750px;
+
+    margin-top: 35px;
+
+    font-size: 20px;
+    line-height: 1.7;
+    color: #555;
+}
+
+/* =========================
+   VALUES
+========================= */
 
 .values {
     padding: 90px 8%;
 }
 
-.values h2,
-.reforms h2 {
-    font-size: 48px;
-    margin-bottom: 50px;
-    letter-spacing: -2px;
+.section-label {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 25px;
 }
 
 .cards {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
+    gap: 2px;
+
+    background: #ccc;
 }
 
 .card {
     background: white;
     padding: 45px 35px;
-    min-height: 230px;
-    border: 1px solid #ddd;
+    min-height: 260px;
+}
+
+.card-number {
+    font-size: 12px;
+    font-weight: 900;
+    color: #c82032;
 }
 
 .card h3 {
-    font-size: 27px;
-    margin-bottom: 20px;
+    margin: 25px 0 18px;
+
+    font-size: 30px;
+    letter-spacing: -1px;
 }
 
 .card p {
@@ -128,123 +214,160 @@ nav a {
     color: #555;
 }
 
+/* =========================
+   MANIFESTO TEASER
+========================= */
+
 .manifesto {
-    padding: 100px 8%;
-    background: #d52b3a;
+    padding: 110px 8%;
+
+    background: #c82032;
     color: white;
 }
 
 .manifesto h2 {
-    font-size: clamp(40px, 6vw, 80px);
-    line-height: 1;
-    max-width: 1000px;
-    letter-spacing: -3px;
+    max-width: 1100px;
+
+    font-size: clamp(42px, 6vw, 82px);
+    line-height: .98;
+    letter-spacing: -4px;
 }
 
 .manifesto p {
     max-width: 700px;
-    margin-top: 35px;
+
+    margin-top: 40px;
+
     font-size: 20px;
     line-height: 1.6;
 }
 
-.reforms {
+/* =========================
+   RENDEZ-VOUS
+========================= */
+
+.events {
     padding: 90px 8%;
+    background: #f5f5f3;
 }
 
-.reform-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2px;
-    background: #ccc;
+.events h2 {
+    font-size: clamp(40px, 5vw, 60px);
+    margin-bottom: 45px;
+    letter-spacing: -2px;
 }
 
-.reform {
-    background: white;
-    padding: 35px;
-    min-height: 150px;
+.event {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 30px 0;
+
+    border-top: 1px solid #ccc;
 }
 
-.reform h3 {
-    margin-bottom: 12px;
-    font-size: 22px;
+.event:last-child {
+    border-bottom: 1px solid #ccc;
 }
 
-.reform p {
-    color: #555;
-    line-height: 1.5;
+.event-date {
+    font-weight: 900;
+    color: #c82032;
 }
+
+.event-title {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+/* =========================
+   JOIN
+========================= */
 
 .join {
-    padding: 100px 8%;
-    text-align: center;
+    padding: 110px 8%;
+
     background: #101820;
     color: white;
+
+    text-align: center;
 }
 
 .join h2 {
-    font-size: 55px;
-    margin-bottom: 20px;
+    font-size: clamp(45px, 7vw, 85px);
+    letter-spacing: -4px;
 }
 
 .join p {
-    font-size: 20px;
+    margin-top: 25px;
+
+    font-size: 19px;
     color: #ccc;
 }
 
+/* =========================
+   FOOTER
+========================= */
+
 footer {
     padding: 30px 8%;
+
     background: #080d11;
-    color: #999;
+    color: #888;
+
     text-align: center;
+    font-size: 13px;
 }
 
-@media (max-width: 700px) {
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 750px) {
 
     header {
         height: auto;
         padding: 20px 6%;
+
         flex-direction: column;
-        gap: 15px;
+        gap: 18px;
     }
 
     nav {
-        display: flex;
-        flex-wrap: wrap;
+        width: 100%;
+
         justify-content: center;
-        gap: 12px;
+        flex-wrap: wrap;
+        gap: 12px 18px;
     }
 
     nav a {
-        margin: 0;
+        font-size: 11px;
     }
 
     .hero {
-        min-height: 520px;
-        padding: 70px 7%;
+        min-height: 600px;
+        padding: 80px 7%;
     }
 
     .hero h1 {
-        font-size: 64px;
-        letter-spacing: -3px;
+        font-size: 68px;
+        letter-spacing: -4px;
     }
 
-    .hero p {
+    .hero-description {
         font-size: 19px;
     }
 
-    .cards,
-    .reform-grid {
+    .cards {
         grid-template-columns: 1fr;
     }
 
-    .values h2,
-    .reforms h2 {
-        font-size: 38px;
-    }
-
-    .join h2 {
-        font-size: 42px;
+    .event {
+        align-items: flex-start;
+        gap: 15px;
+        flex-direction: column;
     }
 }
 </style>
@@ -252,142 +375,247 @@ footer {
 
 <body>
 
+<!-- =========================
+     HEADER
+========================= -->
+
 <header>
-    <div class="logo">AVANT-GARD<span>E</span></div>
+
+    <div class="logo">
+        AVANT-GARD<span>E</span>
+    </div>
 
     <nav>
-        <a href="#">LE PROJET</a>
-        <a href="#">NOS IDÉES</a>
-        <a href="#">RÉFORMES</a>
-        <a href="#">ACTUALITÉS</a>
-        <a href="#">REJOINDRE</a>
+
+        <a href="index.html">ACCUEIL</a>
+
+        <a href="manifeste.html">MANIFESTE</a>
+
+        <a href="projet.html">NOTRE PROJET</a>
+
+        <a href="inspirations.html">NOS INSPIRATIONS</a>
+
+        <a href="equipe.html">NOTRE ÉQUIPE</a>
+
     </nav>
+
 </header>
 
+
+<!-- =========================
+     HERO
+========================= -->
+
 <section class="hero">
+
     <div class="hero-content">
-        <small>Souveraineté • Liberté • Responsabilité</small>
 
-        <h1>LA FRANCE<br><span>LIBRE.</span></h1>
+        <div class="eyebrow">
+            Souveraineté • Liberté • Responsabilité
+        </div>
 
-        <p>
+        <h1>
+            LA FRANCE<br>
+            <span>LIBRE.</span>
+        </h1>
+
+        <p class="hero-description">
             Redonner aux Français leur liberté
             en redonnant à la France sa souveraineté.
         </p>
 
-        <a class="button" href="#projet">
-            DÉCOUVRIR LE PROJET
+        <a href="manifeste.html" class="button">
+            DÉCOUVRIR NOTRE MANIFESTE
         </a>
+
     </div>
+
 </section>
 
-<section class="values" id="projet">
 
-    <h2>NOTRE BOULEVERSEMENT.</h2>
+<!-- =========================
+     INTRO
+========================= -->
+
+<section class="intro">
+
+    <div class="section-label">
+        AVANT-GARDE
+    </div>
+
+    <h2>
+        UNE AUTRE VOIE EST POSSIBLE.
+    </h2>
+
+    <p>
+        Avant-gardE veut dépasser les vieux clivages
+        politiques et proposer une nouvelle voie pour la France :
+        une nation souveraine, une société libre et des citoyens
+        responsables.
+    </p>
+
+</section>
+
+
+<!-- =========================
+     VALUES
+========================= -->
+
+<section class="values">
+
+    <div class="section-label">
+        NOS PRINCIPES
+    </div>
 
     <div class="cards">
 
         <div class="card">
-            <h3>SOUVERAINETÉ</h3>
+
+            <div class="card-number">
+                01
+            </div>
+
+            <h3>
+                SOUVERAINETÉ
+            </h3>
+
             <p>
-                Décider chez nous de ce qui concerne notre pays,
-                notre peuple et notre avenir.
+                La France doit pouvoir décider librement
+                de son destin et de ses choix fondamentaux.
             </p>
+
         </div>
 
-        <div class="card">
-            <h3>LIBERTÉ</h3>
-            <p>
-                Réduire l'emprise de l'État sur la vie des individus
-                et rendre à chacun la liberté de choisir.
-            </p>
-        </div>
 
         <div class="card">
-            <h3>RESPONSABILITÉ</h3>
+
+            <div class="card-number">
+                02
+            </div>
+
+            <h3>
+                LIBERTÉ
+            </h3>
+
             <p>
-                Une société libre repose sur des citoyens capables
-                d'assumer leurs choix et leurs conséquences.
+                L'État doit protéger les libertés,
+                pas organiser la vie des citoyens à leur place.
             </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-number">
+                03
+            </div>
+
+            <h3>
+                RESPONSABILITÉ
+            </h3>
+
+            <p>
+                Une société libre exige que chacun puisse
+                choisir, entreprendre et assumer ses décisions.
+            </p>
+
         </div>
 
     </div>
+
 </section>
+
+
+<!-- =========================
+     MANIFESTO
+========================= -->
 
 <section class="manifesto">
 
     <h2>
-        NOUS NE VOULONS PAS GÉRER LE SYSTÈME.
-        NOUS VOULONS CHANGER LES RÈGLES DU JEU.
+        NOUS NE VOULONS PAS
+        GÉRER LE SYSTÈME.
+        NOUS VOULONS
+        CHANGER LES RÈGLES.
     </h2>
 
     <p>
-        Avant-gardE veut dépasser les vieux clivages politiques
-        et proposer une nouvelle voie : une France souveraine,
-        une économie libre et une société fondée sur la responsabilité.
+        Parce que les mêmes recettes produisent les mêmes résultats,
+        Avant-gardE veut remettre en question les fondements
+        du modèle politique actuel.
     </p>
 
 </section>
 
-<section class="reforms">
 
-    <h2>NOS RÉFORMES</h2>
+<!-- =========================
+     RENDEZ-VOUS
+========================= -->
 
-    <div class="reform-grid">
+<section class="events">
 
-        <div class="reform">
-            <h3>🇫🇷 SOUVERAINETÉ</h3>
-            <p>
-                Reprendre la maîtrise des décisions fondamentales
-                qui engagent la France.
-            </p>
+    <div class="section-label">
+        ACTUALITÉS & RENDEZ-VOUS
+    </div>
+
+    <h2>
+        PROCHAINEMENT
+    </h2>
+
+    <div class="event">
+
+        <div class="event-date">
+            À VENIR
         </div>
 
-        <div class="reform">
-            <h3>💼 LIBÉRER L'ÉCONOMIE</h3>
-            <p>
-                Moins de normes, moins de contraintes,
-                davantage de liberté d'entreprendre.
-            </p>
+        <div class="event-title">
+            Présentation du projet Avant-gardE
         </div>
 
-        <div class="reform">
-            <h3>💰 FISCALITÉ</h3>
-            <p>
-                Simplifier et alléger la fiscalité pour
-                redonner du pouvoir d'action aux Français.
-            </p>
+    </div>
+
+    <div class="event">
+
+        <div class="event-date">
+            À VENIR
         </div>
 
-        <div class="reform">
-            <h3>🏛️ INSTITUTIONS</h3>
-            <p>
-                Transformer profondément les institutions
-                et renforcer le pouvoir démocratique.
-            </p>
+        <div class="event-title">
+            Nos prochains rendez-vous
         </div>
 
     </div>
 
 </section>
 
+
+<!-- =========================
+     JOIN
+========================= -->
+
 <section class="join">
 
-    <h2>REJOIGNEZ L'AVANT-GARDE.</h2>
+    <h2>
+        REJOIGNEZ<br>
+        L'AVANT-GARDE.
+    </h2>
 
     <p>
-        Le changement ne viendra pas de ceux qui
-        défendent le système.
+        Une nouvelle génération politique commence maintenant.
     </p>
 
-    <a class="button" href="#">
-        REJOINDRE LE MOUVEMENT
+    <a href="equipe.html" class="button">
+        DÉCOUVRIR LE MOUVEMENT
     </a>
 
 </section>
 
+
 <footer>
+
     © 2026 Avant-gardE — Tous droits réservés
+
 </footer>
 
 </body>
