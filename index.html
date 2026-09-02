@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Avant-gardE — La France libre</title>
 
 <style>
+
 :root {
     --navy: #07152d;
     --navy2: #0d2344;
@@ -30,6 +32,7 @@ body {
     color: var(--white);
     font-family: Georgia, "Times New Roman", serif;
 }
+
 
 /* =========================
    RENDEZ-VOUS
@@ -83,6 +86,7 @@ body {
     }
 }
 
+
 /* =========================
    HEADER
 ========================= */
@@ -97,15 +101,37 @@ header {
     background: rgba(7,21,45,.97);
 }
 
+
+/* LOGO */
+
 .logo {
     color: var(--white);
     text-decoration: none;
     font-size: 26px;
     font-weight: bold;
     letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 1px;
 }
 
-/* Couleurs du logo */
+.logo-a,
+.logo-e {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    background: #ffffff;
+    border-radius: 50%;
+
+    font-size: 20px;
+    line-height: 1;
+
+    vertical-align: middle;
+}
 
 .logo-a {
     color: #07152d;
@@ -135,6 +161,7 @@ nav a:hover {
     color: var(--gold);
 }
 
+
 /* =========================
    HERO
 ========================= */
@@ -142,10 +169,13 @@ nav a:hover {
 .hero {
     position: relative;
     min-height: 520px;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     text-align: center;
+
     overflow: hidden;
 
     background:
@@ -164,10 +194,14 @@ nav a:hover {
 .hero::before,
 .hero::after {
     content: "";
+
     position: absolute;
+
     width: 260px;
     height: 260px;
+
     border: 1px solid rgba(214,173,85,.18);
+
     transform: rotate(45deg);
 }
 
@@ -184,24 +218,35 @@ nav a:hover {
 .hero-content {
     position: relative;
     z-index: 2;
+
     max-width: 900px;
+
     padding: 50px 25px;
 }
 
 .eyebrow {
     color: var(--gold-light);
+
     font-family: Arial, sans-serif;
+
     font-size: 12px;
+
     letter-spacing: 4px;
+
     font-weight: bold;
+
     margin-bottom: 18px;
 }
 
 .hero h1 {
     margin: 0;
+
     font-size: clamp(48px, 8vw, 92px);
+
     letter-spacing: 4px;
+
     line-height: .95;
+
     text-transform: uppercase;
 }
 
@@ -212,25 +257,36 @@ nav a:hover {
 .hero-line {
     width: 100px;
     height: 2px;
+
     background: var(--gold);
+
     margin: 25px auto;
 }
 
 .hero h2 {
     margin: 0;
+
     font-size: clamp(18px, 3vw, 27px);
+
     font-weight: normal;
+
     letter-spacing: 2px;
 }
 
 .hero p {
     max-width: 680px;
+
     margin: 22px auto 0;
+
     color: #cbd1da;
+
     font-family: Arial, sans-serif;
+
     line-height: 1.7;
+
     font-size: 15px;
 }
+
 
 /* =========================
    INTRO
@@ -238,34 +294,50 @@ nav a:hover {
 
 .intro {
     max-width: 1050px;
+
     margin: auto;
+
     padding: 55px 25px 45px;
+
     text-align: center;
 }
 
 .section-kicker {
     color: var(--gold);
+
     font-family: Arial, sans-serif;
+
     font-size: 11px;
+
     font-weight: bold;
+
     letter-spacing: 3px;
+
     margin-bottom: 12px;
 }
 
 .intro h2 {
     margin: 0 0 18px;
+
     font-size: 31px;
+
     font-weight: normal;
 }
 
 .intro p {
     max-width: 760px;
+
     margin: auto;
+
     color: var(--muted);
+
     font-family: Arial, sans-serif;
+
     font-size: 15px;
+
     line-height: 1.7;
 }
+
 
 /* =========================
    PRINCIPES
@@ -273,39 +345,56 @@ nav a:hover {
 
 .principles {
     max-width: 1100px;
+
     margin: auto;
+
     padding: 15px 25px 55px;
+
     display: grid;
+
     grid-template-columns: repeat(3, 1fr);
+
     gap: 18px;
 }
 
 .principle {
     border: 1px solid rgba(214,173,85,.3);
+
     background: rgba(255,255,255,.025);
+
     padding: 28px 25px;
+
     text-align: center;
 }
 
 .symbol {
     color: var(--gold);
+
     font-size: 25px;
+
     margin-bottom: 12px;
 }
 
 .principle h3 {
     margin: 0 0 10px;
+
     font-size: 20px;
+
     letter-spacing: 1px;
 }
 
 .principle p {
     margin: 0;
+
     color: var(--muted);
+
     font-family: Arial, sans-serif;
+
     font-size: 13px;
+
     line-height: 1.6;
 }
+
 
 /* =========================
    MANIFESTE
@@ -313,46 +402,70 @@ nav a:hover {
 
 .manifesto {
     background: var(--navy2);
+
     border-top: 1px solid rgba(214,173,85,.2);
+
     border-bottom: 1px solid rgba(214,173,85,.2);
+
     padding: 50px 25px;
+
     text-align: center;
 }
 
 .manifesto h2 {
     margin: 0 auto 18px;
+
     max-width: 850px;
+
     font-size: clamp(25px, 4vw, 38px);
+
     line-height: 1.2;
+
     font-weight: normal;
 }
 
 .manifesto p {
     max-width: 720px;
+
     margin: auto;
+
     color: #c7ced8;
+
     font-family: Arial, sans-serif;
+
     line-height: 1.7;
 }
 
 .button {
     display: inline-block;
+
     margin-top: 25px;
+
     padding: 12px 25px;
+
     border: 1px solid var(--gold);
+
     color: var(--gold-light);
+
     text-decoration: none;
+
     font-family: Arial, sans-serif;
+
     font-size: 11px;
+
     font-weight: bold;
+
     letter-spacing: 1.5px;
+
     transition: .2s;
 }
 
 .button:hover {
     background: var(--gold);
+
     color: var(--navy);
 }
+
 
 /* =========================
    ACTUALITÉS
@@ -360,64 +473,90 @@ nav a:hover {
 
 .news {
     max-width: 1100px;
+
     margin: auto;
+
     padding: 55px 25px;
 }
 
 .news-title {
     display: flex;
+
     justify-content: space-between;
+
     align-items: end;
+
     border-bottom: 1px solid rgba(214,173,85,.3);
+
     padding-bottom: 15px;
+
     margin-bottom: 25px;
 }
 
 .news-title h2 {
     margin: 0;
+
     font-size: 28px;
+
     font-weight: normal;
 }
 
 .news-title span {
     color: var(--gold);
+
     font-family: Arial, sans-serif;
+
     font-size: 11px;
+
     letter-spacing: 2px;
 }
 
 .news-grid {
     display: grid;
+
     grid-template-columns: repeat(3, 1fr);
+
     gap: 18px;
 }
 
 .news-card {
     min-height: 150px;
+
     padding: 25px;
+
     border: 1px solid rgba(255,255,255,.1);
+
     background: rgba(255,255,255,.025);
 }
 
 .news-card small {
     color: var(--gold);
+
     font-family: Arial, sans-serif;
+
     font-size: 10px;
+
     letter-spacing: 1px;
 }
 
 .news-card h3 {
     margin: 12px 0 8px;
+
     font-size: 19px;
 }
 
 .news-card p {
     margin: 0;
+
     color: var(--muted);
+
     font-family: Arial, sans-serif;
+
     font-size: 13px;
+
     line-height: 1.5;
 }
+
 
 /* =========================
    REJOINDRE
@@ -425,21 +564,28 @@ nav a:hover {
 
 .join {
     background: #050f20;
+
     text-align: center;
+
     padding: 55px 25px;
+
     border-top: 1px solid rgba(214,173,85,.25);
 }
 
 .join h2 {
     margin: 0 0 10px;
+
     font-size: 31px;
 }
 
 .join p {
     margin: 0;
+
     color: var(--muted);
+
     font-family: Arial, sans-serif;
 }
+
 
 /* =========================
    FOOTER
@@ -447,12 +593,18 @@ nav a:hover {
 
 footer {
     padding: 25px;
+
     text-align: center;
+
     color: #7e8999;
+
     font-family: Arial, sans-serif;
+
     font-size: 11px;
+
     border-top: 1px solid rgba(255,255,255,.07);
 }
+
 
 /* =========================
    MOBILE
@@ -462,14 +614,19 @@ footer {
 
     header {
         height: auto;
+
         padding: 20px;
+
         flex-direction: column;
+
         gap: 18px;
     }
 
     nav {
         gap: 15px;
+
         flex-wrap: wrap;
+
         justify-content: center;
     }
 
@@ -492,13 +649,18 @@ footer {
 
     .news-title span {
         display: block;
+
         margin-top: 8px;
     }
+
 }
+
 </style>
 </head>
 
+
 <body>
+
 
 <!-- =========================
      RENDEZ-VOUS
@@ -549,8 +711,15 @@ footer {
 <header>
 
     <a href="index.html" class="logo">
-        <span class="logo-a">A</span>VANT-GARD<span class="logo-e">E</span>
+
+        <span class="logo-a">A</span>
+
+        VANT-GARD
+
+        <span class="logo-e">E</span>
+
     </a>
+
 
     <nav>
 
@@ -644,6 +813,7 @@ footer {
 
 <section class="principles">
 
+
     <div class="principle">
 
         <div class="symbol">
@@ -696,6 +866,7 @@ footer {
         </p>
 
     </div>
+
 
 </section>
 
@@ -750,6 +921,7 @@ footer {
 
     <div class="news-grid">
 
+
         <div class="news-card">
 
             <small>
@@ -803,6 +975,7 @@ footer {
 
         </div>
 
+
     </div>
 
 </section>
@@ -839,6 +1012,7 @@ footer {
     — Souveraineté · Liberté · Justice · Patriote
 
 </footer>
+
 
 </body>
 </html>
