@@ -3,27 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Avant-gardE — France</title>
+
+<title>Avant-gardE — La France libre</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 :root {
-    --blue: #0055A4;
-    --blue-dark: #003b73;
+    --navy: #07152d;
+    --navy2: #0d2344;
+    --gold: #d6ad55;
+    --gold-light: #f0d58a;
+    --white: #f5f3ed;
+    --muted: #b8c0cd;
+
+    /* Bleu français */
+    --blue-france: #0055A4;
+
+    /* Rouge français */
     --red: #EF4135;
-    --white: #ffffff;
-    --black: #10141a;
-    --grey: #68717d;
-    --light: #f4f6f8;
-    --border: #e2e6ea;
-    --shadow: 0 12px 35px rgba(0,0,0,0.08);
 }
 
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
 
 html {
@@ -31,1277 +34,1588 @@ html {
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f5f6f8;
-    color: var(--black);
-    line-height: 1.5;
+    margin: 0;
+    background: var(--navy);
+    color: var(--white);
+    font-family: Georgia, "Times New Roman", serif;
 }
 
-/* =========================
-   TOP HEADER
-========================= */
 
-.top-header {
-    background: #11161d;
-    color: white;
+/* =====================================================
+   RENDEZ-VOUS
+===================================================== */
+
+.events-bar {
+    height: 36px;
+    background: #050f20;
+    border-bottom: 1px solid rgba(214,173,85,.35);
+
+    display: flex;
+    align-items: center;
+
+    overflow: hidden;
+
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
+
+
+/* Titre fixe */
+
+.events-label {
+    flex-shrink: 0;
+
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 17px;
+
+    color: var(--gold-light);
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    border-right: 1px solid rgba(214,173,85,.3);
+
     position: relative;
-    z-index: 20;
+    z-index: 5;
+
+    background: #050f20;
 }
 
-.header-main {
-    max-width: 1200px;
-    margin: auto;
-    min-height: 82px;
+
+/*
+   Zone réelle de défilement.
+
+   IMPORTANT :
+   elle prend toute la largeur restante.
+*/
+
+.events-window {
+    flex: 1;
+
+    height: 100%;
+
+    overflow: hidden;
+
+    position: relative;
+}
+
+
+/*
+   Le contenu est positionné à gauche.
+
+   On ne met PAS de transform initial à 50%.
+*/
+
+.events-track {
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    height: 100%;
+
+    display: inline-flex;
+    align-items: center;
+
+    white-space: nowrap;
+
+    will-change: transform;
+}
+
+
+/* Chaque rendez-vous */
+
+.event {
+    display: inline-flex;
+    align-items: center;
+
+    height: 100%;
+
+    padding: 0 35px;
+
+    color: #e3e5e8;
+
+    cursor: pointer;
+
+    transition:
+        background .2s,
+        color .2s;
+}
+
+.event:hover {
+    background: rgba(214,173,85,.08);
+    color: white;
+}
+
+.event strong {
+    color: var(--gold-light);
+
+    margin-right: 7px;
+}
+
+.event-separator {
+    color: rgba(214,173,85,.5);
+
+    margin: 0 5px;
+}
+
+
+.events-empty {
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+
+    padding-left: 18px;
+
+    color: #8e98a6;
+}
+
+
+/*
+   Animation créée en Javascript.
+
+   Cela permet de calculer précisément la longueur
+   du contenu et donc d'éviter les doublons artificiels.
+*/
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+header {
+    height: 82px;
+
+    padding: 0 5%;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 25px;
+
+    border-bottom: 1px solid rgba(214,173,85,.25);
+
+    background: rgba(7,21,45,.97);
+
+    position: relative;
 }
 
+
+/* =====================================================
+   LOGO
+===================================================== */
+
 .logo {
+    color: var(--white);
+
+    text-decoration: none;
+
+    font-size: 26px;
+
+    font-weight: bold;
+
+    letter-spacing: 2px;
+
     display: flex;
     align-items: center;
-    gap: 0;
-    font-weight: 800;
-    letter-spacing: -1px;
-    font-size: 30px;
-    text-decoration: none;
-    color: white;
+
+    gap: 1px;
 }
+
+
+/*
+   Pastilles blanches derrière le A et le E
+*/
 
 .logo-a,
 .logo-e {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: white;
+
     display: inline-flex;
+
     align-items: center;
     justify-content: center;
-    font-size: 27px;
-    font-weight: 900;
+
+    width: 32px;
+    height: 32px;
+
+    background: #ffffff;
+
+    border-radius: 50%;
+
+    font-size: 20px;
+
+    line-height: 1;
+
+    vertical-align: middle;
 }
 
+
+/*
+   A = bleu français
+*/
+
 .logo-a {
-    color: var(--blue);
+    color: var(--blue-france);
 }
+
+
+/*
+   E = rouge
+*/
 
 .logo-e {
     color: var(--red);
 }
 
-.logo-middle {
-    color: white;
-    margin: 0 3px;
-}
 
-.logo-sub {
-    margin-left: 13px;
-    padding-left: 13px;
-    border-left: 1px solid rgba(255,255,255,0.25);
-    color: #bfc5cc;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
-
-/* Gear */
+/* =====================================================
+   ROUE ADMIN
+===================================================== */
 
 .admin-gear {
+
     position: absolute;
-    right: 18px;
-    top: 8px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
+
+    right: 14px;
+    top: 7px;
+
+    width: 23px;
+    height: 23px;
+
     display: flex;
+
     align-items: center;
     justify-content: center;
-    color: rgba(255,255,255,0.55);
+
+    color: rgba(255,255,255,.42);
+
     text-decoration: none;
-    font-size: 15px;
-    transition: 0.2s;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    border-radius: 50%;
+
+    transition:
+        color .2s,
+        background .2s,
+        transform .2s;
 }
 
 .admin-gear:hover {
-    color: white;
-    background: rgba(255,255,255,0.08);
+
+    color: var(--gold-light);
+
+    background: rgba(255,255,255,.06);
+
+    transform: rotate(20deg);
 }
 
-/* =========================
+
+/* =====================================================
    NAVIGATION
-========================= */
+===================================================== */
 
-.main-nav {
-    border-top: 1px solid rgba(255,255,255,0.08);
-    background: #151b23;
-}
+nav {
 
-.nav-inner {
-    max-width: 1200px;
-    margin: auto;
     display: flex;
+
+    gap: 28px;
+
     align-items: center;
-    justify-content: center;
-    padding: 0 20px;
 }
 
-.main-nav a {
-    color: #cfd4da;
+
+nav a {
+
+    color: #e7e7e7;
+
     text-decoration: none;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.4px;
-    padding: 14px 22px;
-    position: relative;
-    transition: 0.2s;
-}
 
-.main-nav a:hover {
-    color: white;
-}
+    font-family: Arial, sans-serif;
 
-.main-nav a::after {
-    content: "";
-    position: absolute;
-    left: 22px;
-    right: 22px;
-    bottom: 7px;
-    height: 2px;
-    background: var(--red);
-    transform: scaleX(0);
-    transition: 0.2s;
-}
-
-.main-nav a:hover::after {
-    transform: scaleX(1);
-}
-
-/* =========================
-   RENDEZ-VOUS TICKER
-========================= */
-
-.rdv-bar {
-    height: 42px;
-    background: white;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-    position: relative;
-    z-index: 10;
-}
-
-.rdv-label {
-    flex: 0 0 auto;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    padding: 0 18px;
-    background: var(--blue);
-    color: white;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1.3px;
-    z-index: 2;
-}
-
-.rdv-window {
-    flex: 1;
-    overflow: hidden;
-    height: 100%;
-    position: relative;
-}
-
-.rdv-track {
-    display: inline-flex;
-    align-items: center;
-    height: 100%;
-    white-space: nowrap;
-    animation: ticker 35s linear infinite;
-    padding-left: 0;
-}
-
-.rdv-item {
-    display: inline-flex;
-    align-items: center;
-    height: 100%;
-    padding: 0 32px;
-    border-right: 1px solid #e7e9ec;
-    color: #252b32;
     font-size: 12px;
-    cursor: pointer;
-    transition: background 0.2s;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    transition: color .2s;
 }
 
-.rdv-item:hover {
-    background: #f2f4f6;
+
+nav a:hover {
+    color: var(--gold);
 }
 
-.rdv-date {
-    color: var(--red);
-    font-weight: 800;
-    margin-right: 9px;
-}
 
-.rdv-title {
-    font-weight: 700;
-}
-
-@keyframes ticker {
-    from {
-        transform: translateX(0);
-    }
-
-    to {
-        transform: translateX(-50%);
-    }
-}
-
-.rdv-empty {
-    color: #89919a;
-    font-size: 12px;
-    padding-left: 15px;
-}
-
-/* =========================
+/* =====================================================
    HERO
-========================= */
+===================================================== */
 
 .hero {
+
     position: relative;
-    min-height: 440px;
-    background:
-        linear-gradient(100deg, rgba(8,16,26,0.96) 0%, rgba(8,16,26,0.80) 50%, rgba(8,16,26,0.45) 100%),
-        linear-gradient(135deg, #152b43, #07101a);
-    color: white;
-    overflow: hidden;
-}
 
-.hero::before {
-    content: "";
-    position: absolute;
-    width: 420px;
-    height: 420px;
-    right: -100px;
-    top: -130px;
-    border: 70px solid rgba(255,255,255,0.025);
-    border-radius: 50%;
-}
+    min-height: 520px;
 
-.hero::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 42%;
-    height: 5px;
-    background: var(--blue);
-    box-shadow: 42vw 0 0 var(--white), 84vw 0 0 var(--red);
-}
-
-.hero-inner {
-    max-width: 1200px;
-    margin: auto;
-    min-height: 440px;
     display: flex;
-    align-items: center;
-    padding: 50px 25px;
-    position: relative;
-    z-index: 2;
-}
 
-.hero-content {
-    max-width: 750px;
-}
-
-.hero-kicker {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    color: #d7dde4;
-    margin-bottom: 18px;
-    text-transform: uppercase;
-}
-
-.hero-kicker::before {
-    content: "";
-    width: 25px;
-    height: 2px;
-    background: var(--red);
-}
-
-.hero h1 {
-    font-size: clamp(42px, 6vw, 74px);
-    line-height: 0.95;
-    letter-spacing: -3px;
-    margin-bottom: 22px;
-}
-
-.hero h1 span {
-    color: var(--blue);
-}
-
-.hero h1 .red {
-    color: var(--red);
-}
-
-.hero-intro {
-    font-size: 18px;
-    color: #dce1e7;
-    max-width: 680px;
-    line-height: 1.6;
-    margin-bottom: 28px;
-}
-
-.hero-buttons {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.btn {
-    display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 20px;
-    text-decoration: none;
-    font-size: 12px;
-    font-weight: 800;
-    border-radius: 4px;
-    transition: 0.2s;
-}
 
-.btn-primary {
-    background: white;
-    color: #11161d;
-}
+    text-align: center;
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-}
-
-.btn-secondary {
-    border: 1px solid rgba(255,255,255,0.35);
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: rgba(255,255,255,0.08);
-}
-
-/* =========================
-   QUICK STRIP
-========================= */
-
-.quick-strip {
-    max-width: 1200px;
-    margin: -30px auto 0;
-    position: relative;
-    z-index: 5;
-    padding: 0 25px;
-}
-
-.quick-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    background: white;
-    box-shadow: var(--shadow);
-    border-radius: 7px;
     overflow: hidden;
+
+    background:
+        linear-gradient(
+            rgba(5,17,37,.67),
+            rgba(5,17,37,.82)
+        ),
+        radial-gradient(
+            circle at center,
+            #17345b 0%,
+            #08172f 60%,
+            #050e1d 100%
+        );
 }
 
-.quick-card {
-    padding: 22px 25px;
-    border-right: 1px solid var(--border);
-    text-decoration: none;
-    color: var(--black);
-    transition: 0.2s;
+
+.hero::before,
+.hero::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 260px;
+    height: 260px;
+
+    border: 1px solid rgba(214,173,85,.18);
+
+    transform: rotate(45deg);
 }
 
-.quick-card:last-child {
-    border-right: 0;
+
+.hero::before {
+
+    left: -150px;
+    top: 80px;
 }
 
-.quick-card:hover {
-    background: #fafbfc;
+
+.hero::after {
+
+    right: -150px;
+    bottom: 80px;
 }
 
-.quick-number {
-    font-size: 10px;
-    color: var(--red);
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    margin-bottom: 7px;
+
+.hero-content {
+
+    position: relative;
+
+    z-index: 2;
+
+    max-width: 900px;
+
+    padding: 50px 25px;
 }
 
-.quick-card h3 {
-    font-size: 16px;
-    margin-bottom: 5px;
-}
 
-.quick-card p {
-    color: var(--grey);
+.eyebrow {
+
+    color: var(--gold-light);
+
+    font-family: Arial, sans-serif;
+
     font-size: 12px;
+
+    letter-spacing: 4px;
+
+    font-weight: bold;
+
+    margin-bottom: 18px;
 }
 
-/* =========================
-   MAIN CONTENT
-========================= */
 
-main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 55px 25px 70px;
+.hero h1 {
+
+    margin: 0;
+
+    font-size: clamp(48px, 8vw, 92px);
+
+    letter-spacing: 4px;
+
+    line-height: .95;
+
+    text-transform: uppercase;
 }
 
-.section {
-    scroll-margin-top: 30px;
-    margin-bottom: 55px;
+
+.hero h1 span {
+    color: var(--gold);
 }
 
-.section-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 22px;
-    padding-bottom: 12px;
+
+.hero-line {
+
+    width: 100px;
+
+    height: 2px;
+
+    background: var(--gold);
+
+    margin: 25px auto;
 }
+
+
+.hero h2 {
+
+    margin: 0;
+
+    font-size: clamp(18px, 3vw, 27px);
+
+    font-weight: normal;
+
+    letter-spacing: 2px;
+}
+
+
+.hero p {
+
+    max-width: 680px;
+
+    margin: 22px auto 0;
+
+    color: #cbd1da;
+
+    font-family: Arial, sans-serif;
+
+    line-height: 1.7;
+
+    font-size: 15px;
+}
+
+
+/* =====================================================
+   INTRO
+===================================================== */
+
+.intro {
+
+    max-width: 1050px;
+
+    margin: auto;
+
+    padding: 55px 25px 45px;
+
+    text-align: center;
+}
+
 
 .section-kicker {
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    color: var(--red);
-    text-transform: uppercase;
-    margin-bottom: 4px;
-}
 
-.section h2 {
-    font-size: 28px;
-    letter-spacing: -0.8px;
-}
+    color: var(--gold);
 
-.section-heading p {
+    font-family: Arial, sans-serif;
+
     font-size: 11px;
-    color: var(--grey);
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 12px;
 }
 
-/* =========================
-   MANIFESTE
-========================= */
 
-.manifeste-layout {
-    display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 22px;
+.intro h2 {
+
+    margin: 0 0 18px;
+
+    font-size: 31px;
+
+    font-weight: normal;
 }
 
-.manifeste-main {
-    background: #11161d;
-    color: white;
-    padding: 34px;
-    border-radius: 7px;
-}
 
-.manifeste-main h3 {
-    font-size: 28px;
-    line-height: 1.15;
-    margin-bottom: 17px;
-}
+.intro p {
 
-.manifeste-main p {
-    color: #cdd3d9;
-    font-size: 14px;
-    line-height: 1.75;
-}
+    max-width: 760px;
 
-.manifeste-side {
-    display: grid;
-    gap: 12px;
-}
-
-.value-card {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 20px;
-}
-
-.value-card strong {
-    display: block;
-    font-size: 15px;
-    margin-bottom: 5px;
-}
-
-.value-card span {
-    color: var(--grey);
-    font-size: 12px;
-}
-
-/* =========================
-   PROJET
-========================= */
-
-.project-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-}
-
-.project-card {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 23px;
-    min-height: 150px;
-    position: relative;
-}
-
-.project-card::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 18px;
-    bottom: 18px;
-    width: 3px;
-    background: var(--blue);
-}
-
-.project-card:nth-child(2)::before {
-    background: white;
-    border-left: 3px solid #cfd3d8;
-}
-
-.project-card:nth-child(3)::before {
-    background: var(--red);
-}
-
-.project-card h3 {
-    font-size: 16px;
-    margin-bottom: 8px;
-}
-
-.project-card p {
-    font-size: 12px;
-    color: var(--grey);
-}
-
-/* =========================
-   INSPIRATIONS
-========================= */
-
-.inspirations {
-    background: white;
-    border-radius: 7px;
-    border: 1px solid var(--border);
-    padding: 27px;
-}
-
-.inspiration-list {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-}
-
-.inspiration {
-    padding: 18px;
-    background: var(--light);
-    border-radius: 5px;
-    font-size: 13px;
-    font-weight: 700;
-    border-left: 3px solid var(--blue);
-}
-
-.inspiration:nth-child(2) {
-    border-left-color: #aaa;
-}
-
-.inspiration:nth-child(3) {
-    border-left-color: var(--red);
-}
-
-.inspiration:nth-child(4) {
-    border-left-color: #11161d;
-}
-
-/* =========================
-   EQUIPE
-========================= */
-
-.team-box {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 25px;
-    background: #11161d;
-    color: white;
-    padding: 28px 32px;
-    border-radius: 7px;
-}
-
-.team-box h3 {
-    font-size: 22px;
-    margin-bottom: 5px;
-}
-
-.team-box p {
-    color: #bfc6ce;
-    font-size: 13px;
-}
-
-.team-badge {
-    border: 1px solid rgba(255,255,255,0.2);
-    padding: 13px 18px;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    white-space: nowrap;
-}
-
-/* =========================
-   FOOTER
-========================= */
-
-footer {
-    background: #0b0f14;
-    color: #929aa4;
-    padding: 28px 25px;
-}
-
-.footer-inner {
-    max-width: 1200px;
     margin: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 11px;
+
+    color: var(--muted);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 15px;
+
+    line-height: 1.7;
 }
 
-.footer-logo {
-    font-weight: 800;
-    color: white;
+
+/* =====================================================
+   PRINCIPES
+===================================================== */
+
+.principles {
+
+    max-width: 1100px;
+
+    margin: auto;
+
+    padding: 15px 25px 55px;
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 18px;
+}
+
+
+.principle {
+
+    border: 1px solid rgba(214,173,85,.3);
+
+    background: rgba(255,255,255,.025);
+
+    padding: 28px 25px;
+
+    text-align: center;
+}
+
+
+.symbol {
+
+    color: var(--gold);
+
+    font-size: 25px;
+
+    margin-bottom: 12px;
+}
+
+
+.principle h3 {
+
+    margin: 0 0 10px;
+
+    font-size: 20px;
+
     letter-spacing: 1px;
 }
 
-.footer-logo span:first-child {
-    color: var(--blue);
+
+.principle p {
+
+    margin: 0;
+
+    color: var(--muted);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 13px;
+
+    line-height: 1.6;
 }
 
-.footer-logo span:last-child {
-    color: var(--red);
+
+/* =====================================================
+   MANIFESTE
+===================================================== */
+
+.manifesto {
+
+    background: var(--navy2);
+
+    border-top: 1px solid rgba(214,173,85,.2);
+
+    border-bottom: 1px solid rgba(214,173,85,.2);
+
+    padding: 50px 25px;
+
+    text-align: center;
 }
 
-/* =========================
+
+.manifesto h2 {
+
+    margin: 0 auto 18px;
+
+    max-width: 850px;
+
+    font-size: clamp(25px, 4vw, 38px);
+
+    line-height: 1.2;
+
+    font-weight: normal;
+}
+
+
+.manifesto p {
+
+    max-width: 720px;
+
+    margin: auto;
+
+    color: #c7ced8;
+
+    font-family: Arial, sans-serif;
+
+    line-height: 1.7;
+}
+
+
+.button {
+
+    display: inline-block;
+
+    margin-top: 25px;
+
+    padding: 12px 25px;
+
+    border: 1px solid var(--gold);
+
+    color: var(--gold-light);
+
+    text-decoration: none;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    letter-spacing: 1.5px;
+
+    transition: .2s;
+}
+
+
+.button:hover {
+
+    background: var(--gold);
+
+    color: var(--navy);
+}
+
+
+/* =====================================================
+   ACTUALITÉS
+===================================================== */
+
+.news {
+
+    max-width: 1100px;
+
+    margin: auto;
+
+    padding: 55px 25px;
+}
+
+
+.news-title {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: end;
+
+    border-bottom: 1px solid rgba(214,173,85,.3);
+
+    padding-bottom: 15px;
+
+    margin-bottom: 25px;
+}
+
+
+.news-title h2 {
+
+    margin: 0;
+
+    font-size: 28px;
+
+    font-weight: normal;
+}
+
+
+.news-title span {
+
+    color: var(--gold);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 11px;
+
+    letter-spacing: 2px;
+}
+
+
+.news-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 18px;
+}
+
+
+.news-card {
+
+    min-height: 150px;
+
+    padding: 25px;
+
+    border: 1px solid rgba(255,255,255,.1);
+
+    background: rgba(255,255,255,.025);
+}
+
+
+.news-card small {
+
+    color: var(--gold);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 10px;
+
+    letter-spacing: 1px;
+}
+
+
+.news-card h3 {
+
+    margin: 12px 0 8px;
+
+    font-size: 19px;
+}
+
+
+.news-card p {
+
+    margin: 0;
+
+    color: var(--muted);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   REJOINDRE
+===================================================== */
+
+.join {
+
+    background: #050f20;
+
+    text-align: center;
+
+    padding: 55px 25px;
+
+    border-top: 1px solid rgba(214,173,85,.25);
+}
+
+
+.join h2 {
+
+    margin: 0 0 10px;
+
+    font-size: 31px;
+}
+
+
+.join p {
+
+    margin: 0;
+
+    color: var(--muted);
+
+    font-family: Arial, sans-serif;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+footer {
+
+    padding: 25px;
+
+    text-align: center;
+
+    color: #7e8999;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 11px;
+
+    border-top: 1px solid rgba(255,255,255,.07);
+}
+
+
+/* =====================================================
    MODALE RENDEZ-VOUS
-========================= */
+===================================================== */
 
-.modal-overlay {
+.rdv-modal {
+
     position: fixed;
+
     inset: 0;
-    background: rgba(5,10,16,0.72);
-    backdrop-filter: blur(4px);
+
     display: none;
+
     align-items: center;
     justify-content: center;
+
     padding: 20px;
-    z-index: 1000;
+
+    background: rgba(0,0,0,.72);
+
+    z-index: 99999;
 }
 
-.modal-overlay.active {
+
+.rdv-modal.active {
     display: flex;
 }
 
-.modal {
-    width: min(620px, 100%);
-    background: white;
-    border-radius: 9px;
-    box-shadow: 0 25px 80px rgba(0,0,0,0.28);
-    overflow: hidden;
-    animation: modalIn 0.2s ease-out;
+
+.rdv-modal-box {
+
+    position: relative;
+
+    width: min(600px, 100%);
+
+    max-height: 85vh;
+
+    overflow-y: auto;
+
+    background: var(--navy2);
+
+    border: 1px solid rgba(214,173,85,.45);
+
+    box-shadow: 0 25px 80px rgba(0,0,0,.55);
+
+    padding: 35px;
+
+    animation: modalAppear .2s ease-out;
 }
 
-@keyframes modalIn {
+
+@keyframes modalAppear {
+
     from {
         opacity: 0;
-        transform: translateY(15px) scale(0.98);
+        transform: translateY(15px);
     }
+
     to {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translateY(0);
     }
 }
 
-.modal-top {
-    height: 7px;
-    background: linear-gradient(
-        to right,
-        var(--blue) 0 33.33%,
-        white 33.33% 66.66%,
-        var(--red) 66.66%
-    );
-}
 
-.modal-content {
-    padding: 30px;
-}
+.rdv-modal-close {
 
-.modal-close {
-    float: right;
+    position: absolute;
+
+    right: 15px;
+    top: 12px;
+
     width: 30px;
     height: 30px;
+
     border: 0;
-    background: #f0f2f4;
-    border-radius: 50%;
-    font-size: 20px;
+
+    background: transparent;
+
+    color: #c5ccd5;
+
+    font-size: 25px;
+
     cursor: pointer;
-    color: #4c545c;
 }
 
-.modal-kicker {
-    color: var(--red);
+
+.rdv-modal-close:hover {
+    color: white;
+}
+
+
+.rdv-modal-kicker {
+
+    color: var(--gold);
+
+    font-family: Arial, sans-serif;
+
     font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    margin-bottom: 8px;
+
+    letter-spacing: 2px;
+
+    font-weight: bold;
+
+    margin-bottom: 12px;
 }
 
-.modal h2 {
-    font-size: 28px;
-    line-height: 1.15;
-    margin-bottom: 18px;
-    padding-right: 40px;
-}
 
-.modal-info {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+.rdv-modal-title {
+
+    font-size: 30px;
+
+    line-height: 1.2;
+
     margin-bottom: 20px;
 }
 
-.modal-info span {
-    background: var(--light);
-    border-radius: 4px;
-    padding: 7px 10px;
-    font-size: 11px;
-    font-weight: 700;
+
+.rdv-modal-info {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-bottom: 22px;
 }
 
-.modal-description {
-    color: #555e67;
+
+.rdv-modal-info span {
+
+    padding: 7px 10px;
+
+    background: rgba(255,255,255,.06);
+
+    border: 1px solid rgba(255,255,255,.08);
+
+    color: #d6dce3;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 11px;
+}
+
+
+.rdv-modal-description {
+
+    color: #c4ccd6;
+
+    font-family: Arial, sans-serif;
+
     font-size: 14px;
+
     line-height: 1.7;
+
     white-space: pre-line;
 }
 
-.modal-link {
-    display: inline-flex;
+
+.rdv-modal-link {
+
+    display: inline-block;
+
     margin-top: 22px;
-    background: var(--blue);
-    color: white;
+
+    padding: 10px 17px;
+
+    background: var(--gold);
+
+    color: var(--navy);
+
     text-decoration: none;
-    padding: 11px 17px;
-    border-radius: 4px;
+
+    font-family: Arial, sans-serif;
+
     font-size: 11px;
-    font-weight: 800;
+
+    font-weight: bold;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+
+/* =====================================================
+   MOBILE
+===================================================== */
 
 @media (max-width: 800px) {
 
-    .header-main {
-        min-height: 72px;
+    header {
+
+        height: auto;
+
+        padding: 20px;
+
+        flex-direction: column;
+
+        gap: 18px;
     }
 
-    .logo {
-        font-size: 24px;
+
+    nav {
+
+        gap: 15px;
+
+        flex-wrap: wrap;
+
+        justify-content: center;
     }
 
-    .logo-a,
-    .logo-e {
-        width: 31px;
-        height: 31px;
-        font-size: 22px;
+
+    nav a {
+
+        font-size: 10px;
     }
 
-    .logo-sub {
-        display: none;
-    }
-
-    .nav-inner {
-        overflow-x: auto;
-        justify-content: flex-start;
-    }
-
-    .main-nav a {
-        padding: 12px 14px;
-        white-space: nowrap;
-        font-size: 11px;
-    }
-
-    .main-nav a::after {
-        left: 14px;
-        right: 14px;
-    }
 
     .hero {
-        min-height: 390px;
+
+        min-height: 440px;
     }
 
-    .hero-inner {
-        min-height: 390px;
-        padding: 45px 22px;
-    }
 
-    .hero h1 {
-        font-size: 48px;
-        letter-spacing: -2px;
-    }
+    .principles,
+    .news-grid {
 
-    .hero-intro {
-        font-size: 15px;
-    }
-
-    .quick-strip {
-        margin-top: -20px;
-        padding: 0 15px;
-    }
-
-    .quick-grid {
         grid-template-columns: 1fr;
     }
 
-    .quick-card {
-        border-right: 0;
-        border-bottom: 1px solid var(--border);
+
+    .news-title {
+
+        display: block;
     }
 
-    .quick-card:last-child {
-        border-bottom: 0;
+
+    .news-title span {
+
+        display: block;
+
+        margin-top: 8px;
     }
 
-    main {
-        padding: 40px 15px;
+
+    .rdv-modal-box {
+
+        padding: 28px 22px;
     }
 
-    .manifeste-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .project-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .inspiration-list {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .team-box {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .footer-inner {
-        flex-direction: column;
-        gap: 8px;
-        align-items: flex-start;
-    }
 }
 
-@media (max-width: 500px) {
 
-    .rdv-label {
-        padding: 0 10px;
-        font-size: 9px;
-    }
-
-    .rdv-item {
-        padding: 0 20px;
-    }
-
-    .hero h1 {
-        font-size: 42px;
-    }
-
-    .inspiration-list {
-        grid-template-columns: 1fr;
-    }
-}
 </style>
 </head>
 
+
 <body>
 
-<header class="top-header">
 
-    <a href="admin.html" class="admin-gear" title="Administration">⚙</a>
+<!-- =====================================================
+     RENDEZ-VOUS
+===================================================== -->
 
-    <div class="header-main">
+<div class="events-bar">
 
-        <a href="#" class="logo">
-            <span class="logo-a">A</span>
-            <span class="logo-middle">VANT-GARD</span>
-            <span class="logo-e">E</span>
-            <span class="logo-sub">France</span>
-        </a>
-
-    </div>
-
-    <nav class="main-nav">
-        <div class="nav-inner">
-            <a href="#">Accueil</a>
-            <a href="#manifeste">Manifeste</a>
-            <a href="#projet">Notre projet</a>
-            <a href="#inspirations">Nos inspirations</a>
-            <a href="#equipe">Notre équipe</a>
-        </div>
-    </nav>
-
-</header>
-
-
-<!-- RENDEZ-VOUS -->
-
-<div class="rdv-bar">
-
-    <div class="rdv-label">
+    <div class="events-label">
         NOS RENDEZ-VOUS
     </div>
 
-    <div class="rdv-window">
-        <div id="rdvTrack" class="rdv-track">
-            <div class="rdv-empty">Chargement des rendez-vous...</div>
+    <div class="events-window">
+
+        <div id="eventsTrack" class="events-track">
+
+            <div class="events-empty">
+                Chargement...
+            </div>
+
         </div>
+
     </div>
 
 </div>
 
 
-<!-- HERO -->
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header>
+
+
+    <!-- Roue d'administration -->
+
+    <a
+        href="admin.html"
+        class="admin-gear"
+        title="Administration"
+        aria-label="Administration"
+    >
+        ⚙
+    </a>
+
+
+    <!-- Logo -->
+
+    <a href="index.html" class="logo">
+
+        <span class="logo-a">
+            A
+        </span>
+
+        VANT-GARD
+
+        <span class="logo-e">
+            E
+        </span>
+
+    </a>
+
+
+    <!-- Menu -->
+
+    <nav>
+
+        <a href="index.html">
+            ACCUEIL
+        </a>
+
+        <a href="manifeste.html">
+            MANIFESTE
+        </a>
+
+        <a href="projet.html">
+            NOTRE PROJET
+        </a>
+
+        <a href="inspirations.html">
+            NOS INSPIRATIONS
+        </a>
+
+        <a href="equipe.html">
+            NOTRE ÉQUIPE
+        </a>
+
+    </nav>
+
+</header>
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
 
 <section class="hero">
 
-    <div class="hero-inner">
+    <div class="hero-content">
 
-        <div class="hero-content">
 
-            <div class="hero-kicker">
-                Mouvement politique français
-            </div>
-
-            <h1>
-                Une France<br>
-                <span>libre</span>,
-                <span class="red">forte</span><br>
-                et responsable.
-            </h1>
-
-            <p class="hero-intro">
-                Avant-gardE défend une vision politique fondée sur
-                la souveraineté, la liberté, la responsabilité et
-                la justice.
-            </p>
-
-            <div class="hero-buttons">
-                <a href="#manifeste" class="btn btn-primary">
-                    Découvrir notre manifeste
-                </a>
-
-                <a href="#projet" class="btn btn-secondary">
-                    Notre projet
-                </a>
-            </div>
-
+        <div class="eyebrow">
+            SOUVERAINETÉ · LIBERTÉ · RESPONSABILITÉ
         </div>
+
+
+        <h1>
+            LA FRANCE <span>LIBRE.</span>
+        </h1>
+
+
+        <div class="hero-line"></div>
+
+
+        <h2>
+
+            Redonner aux Français leur liberté<br>
+
+            en redonnant à la France sa souveraineté.
+
+        </h2>
+
+
+        <p>
+
+            Avant-gardE veut dépasser les vieux clivages politiques
+            pour proposer une nouvelle voie : une France souveraine,
+            un État recentré sur l'essentiel et des citoyens libres
+            et responsables.
+
+        </p>
+
 
     </div>
 
 </section>
 
 
-<!-- ACCÈS RAPIDE -->
+<!-- =====================================================
+     INTRO
+===================================================== -->
 
-<div class="quick-strip">
+<section class="intro">
 
-    <div class="quick-grid">
+    <div class="section-kicker">
+        NOTRE RAISON D'ÊTRE
+    </div>
 
-        <a href="#manifeste" class="quick-card">
-            <div class="quick-number">01 — PRINCIPES</div>
-            <h3>Notre manifeste</h3>
-            <p>Les principes qui fondent Avant-gardE.</p>
-        </a>
 
-        <a href="#projet" class="quick-card">
-            <div class="quick-number">02 — ACTION</div>
-            <h3>Notre projet</h3>
-            <p>Nos propositions pour transformer la France.</p>
-        </a>
+    <h2>
+        Changer de paradigme.
+    </h2>
 
-        <a href="#equipe" class="quick-card">
-            <div class="quick-number">03 — COLLECTIF</div>
-            <h3>Notre équipe</h3>
-            <p>Découvrez celles et ceux qui portent le projet.</p>
-        </a>
+
+    <p>
+
+        Nous refusons de choisir entre la souveraineté et la liberté.
+
+        Entre l'attachement à notre pays et l'émancipation de l'individu.
+
+        Entre la responsabilité et la justice.
+
+        Nous voulons réconcilier ces principes dans un même projet politique.
+
+    </p>
+
+</section>
+
+
+<!-- =====================================================
+     PRINCIPES
+===================================================== -->
+
+<section class="principles">
+
+
+    <div class="principle">
+
+        <div class="symbol">
+            ⚖
+        </div>
+
+        <h3>
+            SOUVERAINETÉ
+        </h3>
+
+        <p>
+
+            La France doit décider librement de son destin
+            et retrouver la maîtrise de ses choix fondamentaux.
+
+        </p>
 
     </div>
 
-</div>
 
+    <div class="principle">
 
-<main>
-
-    <!-- MANIFESTE -->
-
-    <section id="manifeste" class="section">
-
-        <div class="section-heading">
-            <div>
-                <div class="section-kicker">01 — Notre vision</div>
-                <h2>Manifeste</h2>
-            </div>
-
-            <p>Liberté · Souveraineté · Responsabilité · Justice</p>
+        <div class="symbol">
+            ✦
         </div>
 
-        <div class="manifeste-layout">
+        <h3>
+            LIBERTÉ
+        </h3>
 
-            <div class="manifeste-main">
+        <p>
 
-                <h3>
-                    Redonner à la France
-                    la maîtrise de son destin.
-                </h3>
+            L'individu doit pouvoir choisir, entreprendre,
+            travailler et vivre sans un État omniprésent.
 
-                <p>
-                    Avant-gardE veut replacer la souveraineté,
-                    la liberté individuelle et la responsabilité
-                    au cœur de l'action publique.
-                    <br><br>
-                    Notre ambition est de construire une France
-                    capable de décider par elle-même, de protéger
-                    ses intérêts et de préparer son avenir.
-                </p>
+        </p>
 
-            </div>
+    </div>
 
-            <div class="manifeste-side">
 
-                <div class="value-card">
-                    <strong>Souveraineté</strong>
-                    <span>La capacité de décider de notre avenir.</span>
-                </div>
+    <div class="principle">
 
-                <div class="value-card">
-                    <strong>Liberté</strong>
-                    <span>Une société qui fait confiance aux citoyens.</span>
-                </div>
-
-                <div class="value-card">
-                    <strong>Responsabilité</strong>
-                    <span>Des droits accompagnés de devoirs.</span>
-                </div>
-
-                <div class="value-card">
-                    <strong>Justice</strong>
-                    <span>Une égalité réelle devant les règles communes.</span>
-                </div>
-
-            </div>
-
+        <div class="symbol">
+            ⚔
         </div>
 
-    </section>
+        <h3>
+            RESPONSABILITÉ
+        </h3>
+
+        <p>
+
+            La liberté n'existe que lorsque chacun assume
+            les conséquences de ses choix.
+
+        </p>
+
+    </div>
 
 
-    <!-- PROJET -->
-
-    <section id="projet" class="section">
-
-        <div class="section-heading">
-            <div>
-                <div class="section-kicker">02 — Transformer</div>
-                <h2>Notre projet</h2>
-            </div>
-
-            <p>Des idées concrètes pour la France</p>
-        </div>
-
-        <div class="project-grid">
-
-            <div class="project-card">
-                <h3>Une économie plus libre</h3>
-                <p>
-                    Libérer l'initiative, simplifier les règles
-                    et favoriser la création de richesse.
-                </p>
-            </div>
-
-            <div class="project-card">
-                <h3>Une nation souveraine</h3>
-                <p>
-                    Renforcer la capacité de la France à décider
-                    de ses choix stratégiques.
-                </p>
-            </div>
-
-            <div class="project-card">
-                <h3>Une société responsable</h3>
-                <p>
-                    Réconcilier liberté individuelle, devoirs
-                    collectifs et responsabilité.
-                </p>
-            </div>
-
-        </div>
-
-    </section>
+</section>
 
 
-    <!-- INSPIRATIONS -->
+<!-- =====================================================
+     MANIFESTE
+===================================================== -->
 
-    <section id="inspirations" class="section">
+<section class="manifesto">
 
-        <div class="section-heading">
-            <div>
-                <div class="section-kicker">03 — Références</div>
-                <h2>Nos inspirations</h2>
-            </div>
 
-            <p>Des courants, des idées, des expériences</p>
-        </div>
+    <div class="section-kicker">
+        L'AVANT-GARDE
+    </div>
 
-        <div class="inspirations">
 
-            <div class="inspiration-list">
+    <h2>
 
-                <div class="inspiration">
-                    Souveraineté
-                </div>
+        Ni retour en arrière.<br>
 
-                <div class="inspiration">
-                    Liberté
-                </div>
+        Ni statu quo.
 
-                <div class="inspiration">
-                    Responsabilité
-                </div>
+    </h2>
 
-                <div class="inspiration">
-                    République
-                </div>
 
-            </div>
+    <p>
+
+        Nous ne voulons pas restaurer le monde d'hier.
+
+        Nous voulons construire celui de demain.
+
+        Une France fière de ses racines, maîtresse de son destin
+        et confiante dans la liberté de ses citoyens.
+
+    </p>
+
+
+    <a
+        href="manifeste.html"
+        class="button"
+    >
+        DÉCOUVRIR LE MANIFESTE →
+    </a>
+
+
+</section>
+
+
+<!-- =====================================================
+     ACTUALITÉS
+===================================================== -->
+
+<section class="news">
+
+
+    <div class="news-title">
+
+        <h2>
+            Actualités & publications
+        </h2>
+
+        <span>
+            AVANT-GARDE
+        </span>
+
+    </div>
+
+
+    <div class="news-grid">
+
+
+        <div class="news-card">
+
+            <small>
+                BIENTÔT
+            </small>
+
+            <h3>
+                Nos prochaines publications
+            </h3>
+
+            <p>
+
+                Retrouvez ici nos analyses, propositions
+                et prises de position.
+
+            </p>
 
         </div>
 
-    </section>
 
+        <div class="news-card">
 
-    <!-- EQUIPE -->
+            <small>
+                ÉVÉNEMENT
+            </small>
 
-    <section id="equipe" class="section">
+            <h3>
+                Nos prochains rendez-vous
+            </h3>
 
-        <div class="section-heading">
-            <div>
-                <div class="section-kicker">04 — Collectif</div>
-                <h2>Notre équipe</h2>
-            </div>
+            <p>
 
-            <p>Celles et ceux qui font vivre le mouvement</p>
-        </div>
+                Rencontres, réunions et événements :
+                restez informés de la vie du mouvement.
 
-        <div class="team-box">
-
-            <div>
-                <h3>Avant-gardE</h3>
-                <p>
-                    Un collectif engagé autour d'une même ambition
-                    pour la France.
-                </p>
-            </div>
-
-            <div class="team-badge">
-                UBI PATRIA, IBI LIBERTAS
-            </div>
+            </p>
 
         </div>
 
-    </section>
 
-</main>
+        <div class="news-card">
 
+            <small>
+                À VENIR
+            </small>
+
+            <h3>
+                Le projet Avant-gardE
+            </h3>
+
+            <p>
+
+                Découvrez progressivement nos propositions
+                pour transformer la France.
+
+            </p>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     REJOINDRE
+===================================================== -->
+
+<section class="join">
+
+
+    <h2>
+        Rejoignez l'Avant-gardE.
+    </h2>
+
+
+    <p>
+
+        La politique ne changera pas sans ceux qui décident de la changer.
+
+    </p>
+
+
+    <a
+        href="equipe.html"
+        class="button"
+    >
+        NOUS REJOINDRE →
+    </a>
+
+
+</section>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
 
 <footer>
 
-    <div class="footer-inner">
+    © 2026 Avant-gardE
 
-        <div class="footer-logo">
-            <span>A</span>VANT-GARD<span>E</span>
-        </div>
-
-        <div>
-            Avant-gardE — France
-        </div>
-
-    </div>
+    — Souveraineté · Liberté · Justice · Patriote
 
 </footer>
 
 
-<!-- MODALE RENDEZ-VOUS -->
+<!-- =====================================================
+     MODALE RENDEZ-VOUS
+===================================================== -->
 
-<div id="rdvModal" class="modal-overlay">
+<div
+    id="rdvModal"
+    class="rdv-modal"
+>
 
-    <div class="modal">
 
-        <div class="modal-top"></div>
+    <div class="rdv-modal-box">
 
-        <div class="modal-content">
 
-            <button id="modalClose" class="modal-close" aria-label="Fermer">
-                ×
-            </button>
+        <button
+            id="rdvModalClose"
+            class="rdv-modal-close"
+            aria-label="Fermer"
+        >
+            ×
+        </button>
 
-            <div class="modal-kicker">
-                Rendez-vous
-            </div>
 
-            <h2 id="modalTitle"></h2>
+        <div class="rdv-modal-kicker">
+            NOS RENDEZ-VOUS
+        </div>
 
-            <div class="modal-info">
 
-                <span id="modalDate"></span>
+        <div
+            id="rdvModalTitle"
+            class="rdv-modal-title"
+        >
+        </div>
 
-                <span id="modalTime"></span>
 
-                <span id="modalLocation"></span>
+        <div class="rdv-modal-info">
 
-            </div>
 
-            <div id="modalDescription" class="modal-description"></div>
-
-            <a
-                id="modalLink"
-                class="modal-link"
-                href="#"
-                target="_blank"
-                rel="noopener"
-                style="display:none;"
+            <span
+                id="rdvModalDate"
             >
-                En savoir plus
-            </a>
+            </span>
+
+
+            <span
+                id="rdvModalTime"
+            >
+            </span>
+
+
+            <span
+                id="rdvModalLocation"
+            >
+            </span>
+
 
         </div>
+
+
+        <div
+            id="rdvModalDescription"
+            class="rdv-modal-description"
+        >
+        </div>
+
+
+        <a
+            id="rdvModalLink"
+            class="rdv-modal-link"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="display:none;"
+        >
+            EN SAVOIR PLUS →
+        </a>
+
 
     </div>
 
@@ -1310,168 +1624,479 @@ footer {
 
 <script>
 
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
 const SUPABASE_URL =
     "https://wlhtegrciehmtxqecopv.supabase.co";
+
 
 const SUPABASE_KEY =
     "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
 
+
 const supabaseClient =
-    supabase.createClient(
+    window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY
     );
 
 
-/* =========================
-   RENDEZ-VOUS
-========================= */
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+let rendezVous = [];
+
+let tickerAnimation = null;
+
+
+/* =====================================================
+   CHARGEMENT DES RENDEZ-VOUS
+===================================================== */
 
 async function chargerRendezVous() {
 
-    const track =
-        document.getElementById("rdvTrack");
 
-    const { data, error } =
-        await supabaseClient
-            .from("rendezvous")
-            .select("*")
-            .eq("actif", true)
-            .order("ordre", { ascending: true })
-            .order("date_evenement", { ascending: true });
+    const track =
+        document.getElementById(
+            "eventsTrack"
+        );
+
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+
+        .from("rendezvous")
+
+        .select("*")
+
+        .eq("actif", true)
+
+        .order(
+            "ordre",
+            {
+                ascending: true
+            }
+        )
+
+        .order(
+            "date_evenement",
+            {
+                ascending: true
+            }
+        );
+
 
     if (error) {
 
         console.error(
-            "Erreur rendez-vous :",
+            "Erreur Supabase :",
             error
         );
 
-        track.innerHTML =
-            '<div class="rdv-empty">Aucun rendez-vous disponible</div>';
-
-        return;
-    }
-
-    if (!data || data.length === 0) {
-
-        track.innerHTML =
-            '<div class="rdv-empty">Aucun rendez-vous annoncé pour le moment</div>';
-
-        return;
-    }
-
-
-    /*
-       On crée deux fois la liste afin que le défilement
-       puisse être continu sans espace vide.
-    */
-
-    const items = data.map(rdv => {
-
-        const date = rdv.date_evenement
-            ? new Date(
-                rdv.date_evenement + "T00:00:00"
-              ).toLocaleDateString(
-                "fr-FR",
-                {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric"
-                }
-              )
-            : "";
-
-        return `
-            <div
-                class="rdv-item"
-                data-id="${rdv.id}"
-            >
-                <span class="rdv-date">
-                    ${escapeHtml(date)}
-                    ${rdv.heure ? " — " + escapeHtml(rdv.heure) : ""}
-                </span>
-
-                <span class="rdv-title">
-                    ${escapeHtml(rdv.titre || "Rendez-vous")}
-                </span>
+        track.innerHTML = `
+            <div class="events-empty">
+                Aucun rendez-vous actuellement.
             </div>
         `;
 
-    }).join("");
+        return;
+    }
 
 
-    track.innerHTML =
-        items + items;
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        track.innerHTML = `
+            <div class="events-empty">
+                Aucun rendez-vous actuellement.
+            </div>
+        `;
+
+        return;
+    }
 
 
-    document
-        .querySelectorAll(".rdv-item")
-        .forEach(item => {
+    rendezVous = data;
 
-            item.addEventListener(
+
+    /*
+       Création d'un seul élément par rendez-vous.
+
+       Pas de duplication artificielle.
+    */
+
+    track.innerHTML = "";
+
+
+    data.forEach(
+        (rdv) => {
+
+            const element =
+                document.createElement(
+                    "div"
+                );
+
+
+            element.className =
+                "event";
+
+
+            element.dataset.id =
+                rdv.id;
+
+
+            const date =
+                formaterDateCourte(
+                    rdv.date_evenement
+                );
+
+
+            let contenu = "";
+
+
+            if (date) {
+
+                contenu +=
+                    `<strong>${escapeHtml(date)}</strong>`;
+
+            }
+
+
+            if (rdv.heure) {
+
+                if (contenu) {
+                    contenu += " — ";
+                }
+
+                contenu +=
+                    escapeHtml(
+                        rdv.heure
+                    );
+
+            }
+
+
+            if (rdv.titre) {
+
+                if (contenu) {
+                    contenu += " — ";
+                }
+
+                contenu +=
+                    `<strong>${escapeHtml(rdv.titre)}</strong>`;
+
+            }
+
+
+            if (rdv.lieu) {
+
+                contenu +=
+                    ` — ${escapeHtml(rdv.lieu)}`;
+
+            }
+
+
+            element.innerHTML =
+                contenu;
+
+
+            element.addEventListener(
                 "click",
-                () => {
+                function() {
 
-                    const id =
-                        item.dataset.id;
-
-                    const rdv =
-                        data.find(
-                            x =>
-                                String(x.id) ===
-                                String(id)
-                        );
-
-                    if (rdv) {
-                        ouvrirRendezVous(rdv);
-                    }
+                    ouvrirRendezVous(
+                        rdv
+                    );
 
                 }
             );
 
-        });
+
+            track.appendChild(
+                element
+            );
+
+        }
+    );
+
+
+    /*
+       Lancement du défilement.
+    */
+
+    demarrerDefilement();
 
 }
 
 
-/* =========================
-   MODALE
-========================= */
+/* =====================================================
+   DÉFILEMENT
+===================================================== */
 
-function ouvrirRendezVous(rdv) {
+function demarrerDefilement() {
 
-    const modal =
-        document.getElementById("rdvModal");
 
-    const title =
-        document.getElementById("modalTitle");
+    const track =
+        document.getElementById(
+            "eventsTrack"
+        );
+
+
+    const windowElement =
+        document.querySelector(
+            ".events-window"
+        );
+
+
+    if (!track || !windowElement) {
+        return;
+    }
+
+
+    if (
+        tickerAnimation
+    ) {
+
+        cancelAnimationFrame(
+            tickerAnimation
+        );
+
+    }
+
+
+    /*
+       Si le contenu est plus petit que la zone,
+       on le laisse simplement visible sans doublon.
+    */
+
+    const largeurContenu =
+        track.scrollWidth;
+
+
+    const largeurFenetre =
+        windowElement.clientWidth;
+
+
+    if (
+        largeurContenu <=
+        largeurFenetre
+    ) {
+
+        track.style.transform =
+            "translateX(0)";
+
+        return;
+
+    }
+
+
+    /*
+       Vitesse rapide :
+       environ 110 pixels/seconde.
+    */
+
+    const vitesse =
+        110;
+
+
+    let position =
+        0;
+
+
+    let dernierTemps =
+        performance.now();
+
+
+    function animation(
+        temps
+    ) {
+
+
+        const delta =
+            (temps - dernierTemps) /
+            1000;
+
+
+        dernierTemps =
+            temps;
+
+
+        position +=
+            vitesse * delta;
+
+
+        /*
+           Lorsque le contenu entier
+           a quitté la zone, on recommence
+           immédiatement au début.
+
+           Cela évite le deuxième exemplaire
+           visible simultanément.
+        */
+
+        if (
+            position >=
+            largeurContenu +
+            35
+        ) {
+
+            position =
+                -largeurFenetre;
+
+        }
+
+
+        track.style.transform =
+            `translateX(${-position}px)`;
+
+
+        tickerAnimation =
+            requestAnimationFrame(
+                animation
+            );
+
+    }
+
+
+    /*
+       Départ depuis le bord gauche
+       de la zone du bandeau.
+    */
+
+    position = 0;
+
+
+    dernierTemps =
+        performance.now();
+
+
+    tickerAnimation =
+        requestAnimationFrame(
+            animation
+        );
+
+}
+
+
+/* =====================================================
+   FORMAT DATE
+===================================================== */
+
+function formaterDateCourte(
+    dateString
+) {
+
+    if (!dateString) {
+        return "";
+    }
+
 
     const date =
-        document.getElementById("modalDate");
+        new Date(
+            dateString +
+            "T00:00:00"
+        );
+
+
+    if (
+        isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "";
+
+    }
+
+
+    return date.toLocaleDateString(
+        "fr-FR",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        }
+    );
+
+}
+
+
+/* =====================================================
+   MODALE
+===================================================== */
+
+function ouvrirRendezVous(
+    rdv
+) {
+
+
+    const modal =
+        document.getElementById(
+            "rdvModal"
+        );
+
+
+    const title =
+        document.getElementById(
+            "rdvModalTitle"
+        );
+
+
+    const date =
+        document.getElementById(
+            "rdvModalDate"
+        );
+
 
     const time =
-        document.getElementById("modalTime");
+        document.getElementById(
+            "rdvModalTime"
+        );
+
 
     const location =
-        document.getElementById("modalLocation");
+        document.getElementById(
+            "rdvModalLocation"
+        );
+
 
     const description =
-        document.getElementById("modalDescription");
+        document.getElementById(
+            "rdvModalDescription"
+        );
+
 
     const link =
-        document.getElementById("modalLink");
+        document.getElementById(
+            "rdvModalLink"
+        );
 
 
     title.textContent =
-        rdv.titre || "Rendez-vous";
+        rdv.titre ||
+        "Rendez-vous";
 
 
-    if (rdv.date_evenement) {
+    /*
+       DATE
+    */
 
-        const formattedDate =
+    if (
+        rdv.date_evenement
+    ) {
+
+        const dateLongue =
             new Date(
-                rdv.date_evenement + "T00:00:00"
+                rdv.date_evenement +
+                "T00:00:00"
             ).toLocaleDateString(
                 "fr-FR",
                 {
@@ -1482,8 +2107,9 @@ function ouvrirRendezVous(rdv) {
                 }
             );
 
+
         date.textContent =
-            formattedDate;
+            dateLongue;
 
         date.style.display =
             "inline-block";
@@ -1495,11 +2121,16 @@ function ouvrirRendezVous(rdv) {
 
     }
 
+
+    /*
+       HEURE
+    */
 
     if (rdv.heure) {
 
         time.textContent =
-            "Heure : " + rdv.heure;
+            "Heure : " +
+            rdv.heure;
 
         time.style.display =
             "inline-block";
@@ -1511,11 +2142,16 @@ function ouvrirRendezVous(rdv) {
 
     }
 
+
+    /*
+       LIEU
+    */
 
     if (rdv.lieu) {
 
         location.textContent =
-            "Lieu : " + rdv.lieu;
+            "Lieu : " +
+            rdv.lieu;
 
         location.style.display =
             "inline-block";
@@ -1528,10 +2164,22 @@ function ouvrirRendezVous(rdv) {
     }
 
 
+    /*
+       DESCRIPTION
+
+       Le panneau admin peut utiliser
+       "description" ou "texte".
+    */
+
     description.textContent =
+        rdv.description ||
         rdv.texte ||
         "Aucune description disponible.";
 
+
+    /*
+       LIEN
+    */
 
     if (rdv.lien) {
 
@@ -1539,7 +2187,7 @@ function ouvrirRendezVous(rdv) {
             rdv.lien;
 
         link.style.display =
-            "inline-flex";
+            "inline-block";
 
     } else {
 
@@ -1549,19 +2197,34 @@ function ouvrirRendezVous(rdv) {
     }
 
 
-    modal.classList.add("active");
+    modal.classList.add(
+        "active"
+    );
+
 
     document.body.style.overflow =
         "hidden";
+
 }
 
 
+/* =====================================================
+   FERMER MODALE
+===================================================== */
+
 function fermerRendezVous() {
 
-    const modal =
-        document.getElementById("rdvModal");
 
-    modal.classList.remove("active");
+    const modal =
+        document.getElementById(
+            "rdvModal"
+        );
+
+
+    modal.classList.remove(
+        "active"
+    );
+
 
     document.body.style.overflow =
         "";
@@ -1569,12 +2232,10 @@ function fermerRendezVous() {
 }
 
 
-/* =========================
-   FERMETURE MODALE
-========================= */
-
 document
-    .getElementById("modalClose")
+    .getElementById(
+        "rdvModalClose"
+    )
     .addEventListener(
         "click",
         fermerRendezVous
@@ -1582,7 +2243,9 @@ document
 
 
 document
-    .getElementById("rdvModal")
+    .getElementById(
+        "rdvModal"
+    )
     .addEventListener(
         "click",
         function(event) {
@@ -1605,7 +2268,8 @@ document.addEventListener(
     function(event) {
 
         if (
-            event.key === "Escape"
+            event.key ===
+            "Escape"
         ) {
 
             fermerRendezVous();
@@ -1616,37 +2280,77 @@ document.addEventListener(
 );
 
 
-/* =========================
-   SECURITE AFFICHAGE
-========================= */
+/* =====================================================
+   PROTECTION DU HTML
+===================================================== */
 
-function escapeHtml(value) {
+function escapeHtml(
+    value
+) {
 
-    if (value === null ||
-        value === undefined) {
+    if (
+        value === null ||
+        value === undefined
+    ) {
 
         return "";
 
     }
 
+
     return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
 
-/* =========================
-   DEMARRAGE
-========================= */
+/* =====================================================
+   REDIMENSIONNEMENT
+===================================================== */
+
+window.addEventListener(
+    "resize",
+    function() {
+
+        demarrerDefilement();
+
+    }
+);
+
+
+/* =====================================================
+   DÉMARRAGE
+===================================================== */
 
 chargerRendezVous();
 
+
 </script>
+
 
 </body>
 </html>
-```
