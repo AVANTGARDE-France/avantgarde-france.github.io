@@ -1,14 +1,30 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avant-gardE — France</title>
 
-<title>Avant-gardE</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+:root {
+    --blue: #0055A4;
+    --blue-dark: #003b73;
+    --red: #EF4135;
+    --white: #ffffff;
+    --black: #10141a;
+    --grey: #68717d;
+    --light: #f4f6f8;
+    --border: #e2e6ea;
+    --shadow: 0 12px 35px rgba(0,0,0,0.08);
+}
+
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 html {
@@ -16,338 +32,637 @@ html {
 }
 
 body {
-    margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    background: #07152d;
-    color: #f5f3ed;
+    background: #f5f6f8;
+    color: var(--black);
+    line-height: 1.5;
 }
 
 /* =========================
-   ROUE ADMIN
+   TOP HEADER
 ========================= */
 
-.admin-gear {
-    position: fixed;
-    top: 14px;
-    right: 18px;
-    z-index: 9999;
+.top-header {
+    background: #11161d;
+    color: white;
+    position: relative;
+    z-index: 20;
+}
 
-    width: 28px;
-    height: 28px;
-
+.header-main {
+    max-width: 1200px;
+    margin: auto;
+    min-height: 82px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 0 25px;
+}
 
-    color: rgba(255,255,255,0.55);
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    font-weight: 800;
+    letter-spacing: -1px;
+    font-size: 30px;
     text-decoration: none;
-
-    font-size: 17px;
-
-    opacity: 0.55;
-    transition: opacity 0.2s, color 0.2s, transform 0.2s;
-}
-
-.admin-gear:hover {
-    opacity: 1;
-    color: #d6ad55;
-    transform: rotate(20deg);
-}
-
-/* =========================
-   HEADER
-========================= */
-
-header {
-    min-height: 76vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 80px 20px 60px;
-
-    background:
-        linear-gradient(
-            rgba(7,21,45,0.72),
-            rgba(7,21,45,0.92)
-        ),
-        url("https://scontent.fnce2-1.fna.fbcdn.net/v/t39.30808-6/768615244_122134722015004562_1359865154943970301_n.jpg")
-        center / cover no-repeat;
-}
-
-.hero {
-    max-width: 900px;
-}
-
-.logo-title {
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(48px, 9vw, 92px);
-    font-weight: bold;
-    letter-spacing: 3px;
-    margin: 0;
+    color: white;
 }
 
 .logo-a,
 .logo-e {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: white;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
-    width: 1.05em;
-    height: 1.05em;
-
-    background: #ffffff;
-    border-radius: 50%;
+    font-size: 27px;
+    font-weight: 900;
 }
 
 .logo-a {
-    color: #07152d;
+    color: var(--blue);
 }
 
 .logo-e {
-    color: #c51f2a;
+    color: var(--red);
 }
 
-.hero-subtitle {
-    margin-top: 18px;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(20px, 3vw, 30px);
-    color: #d6ad55;
+.logo-middle {
+    color: white;
+    margin: 0 3px;
 }
 
-.hero-text {
-    max-width: 720px;
-    margin: 28px auto 0;
-    font-size: 17px;
-    line-height: 1.7;
-    color: #e0e3e8;
-}
-
-/* =========================
-   RENDEZ-VOUS
-========================= */
-
-.rdv-bar {
-    position: relative;
-    background: #050f20;
-    border-top: 1px solid rgba(214,173,85,0.3);
-    border-bottom: 1px solid rgba(214,173,85,0.3);
-
-    height: 48px;
-
-    display: flex;
-    align-items: center;
-
-    overflow: hidden;
-}
-
-.rdv-label {
-    flex: 0 0 auto;
-
-    padding: 0 18px;
-
+.logo-sub {
+    margin-left: 13px;
+    padding-left: 13px;
+    border-left: 1px solid rgba(255,255,255,0.25);
+    color: #bfc5cc;
     font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 1.5px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
 
-    color: #d6ad55;
+/* Gear */
 
-    border-right: 1px solid rgba(214,173,85,0.25);
-
-    height: 100%;
-
+.admin-gear {
+    position: absolute;
+    right: 18px;
+    top: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    font-size: 15px;
+    transition: 0.2s;
 }
 
-.rdv-track {
-    display: flex;
-    white-space: nowrap;
-    overflow: hidden;
-    width: 100%;
-}
-
-.rdv-content {
-    display: inline-block;
-    padding-left: 25px;
-
-    font-size: 13px;
-    color: #d9dde4;
-
-    animation: rdvScroll 24s linear infinite;
-}
-
-@keyframes rdvScroll {
-    from {
-        transform: translateX(100%);
-    }
-
-    to {
-        transform: translateX(-100%);
-    }
+.admin-gear:hover {
+    color: white;
+    background: rgba(255,255,255,0.08);
 }
 
 /* =========================
    NAVIGATION
 ========================= */
 
-nav {
-    background: #07152d;
+.main-nav {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    background: #151b23;
+}
 
+.nav-inner {
+    max-width: 1200px;
+    margin: auto;
     display: flex;
+    align-items: center;
     justify-content: center;
-    flex-wrap: wrap;
-
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    padding: 0 20px;
 }
 
-nav a {
-    color: #f5f3ed;
+.main-nav a {
+    color: #cfd4da;
     text-decoration: none;
-
-    padding: 19px 24px;
-
     font-size: 13px;
-    font-weight: bold;
-
-    letter-spacing: 0.8px;
-
-    transition: background 0.2s, color 0.2s;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    padding: 14px 22px;
+    position: relative;
+    transition: 0.2s;
 }
 
-nav a:hover {
-    color: #d6ad55;
-    background: rgba(255,255,255,0.04);
+.main-nav a:hover {
+    color: white;
 }
 
-/* =========================
-   SECTIONS
-========================= */
-
-section {
-    padding: 80px 20px;
-}
-
-.container {
-    max-width: 1100px;
-    margin: auto;
-}
-
-.section-title {
-    text-align: center;
-
-    font-family: Georgia, "Times New Roman", serif;
-
-    font-size: 38px;
-    font-weight: normal;
-
-    margin: 0 0 18px;
-
-    color: #f5f3ed;
-}
-
-.section-title::after {
+.main-nav a::after {
     content: "";
-
-    display: block;
-
-    width: 55px;
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    bottom: 7px;
     height: 2px;
-
-    background: #d6ad55;
-
-    margin: 17px auto 35px;
+    background: var(--red);
+    transform: scaleX(0);
+    transition: 0.2s;
 }
 
-.intro {
-    max-width: 800px;
-    margin: auto;
-
-    text-align: center;
-
-    line-height: 1.8;
-
-    color: #c8ced8;
+.main-nav a:hover::after {
+    transform: scaleX(1);
 }
 
 /* =========================
-   CARTES
+   RENDEZ-VOUS TICKER
 ========================= */
 
-.cards {
-    margin-top: 45px;
+.rdv-bar {
+    height: 42px;
+    background: white;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+}
 
+.rdv-label {
+    flex: 0 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    background: var(--blue);
+    color: white;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.3px;
+    z-index: 2;
+}
+
+.rdv-window {
+    flex: 1;
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+}
+
+.rdv-track {
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    white-space: nowrap;
+    animation: ticker 35s linear infinite;
+    padding-left: 0;
+}
+
+.rdv-item {
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 32px;
+    border-right: 1px solid #e7e9ec;
+    color: #252b32;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.rdv-item:hover {
+    background: #f2f4f6;
+}
+
+.rdv-date {
+    color: var(--red);
+    font-weight: 800;
+    margin-right: 9px;
+}
+
+.rdv-title {
+    font-weight: 700;
+}
+
+@keyframes ticker {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.rdv-empty {
+    color: #89919a;
+    font-size: 12px;
+    padding-left: 15px;
+}
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+    position: relative;
+    min-height: 440px;
+    background:
+        linear-gradient(100deg, rgba(8,16,26,0.96) 0%, rgba(8,16,26,0.80) 50%, rgba(8,16,26,0.45) 100%),
+        linear-gradient(135deg, #152b43, #07101a);
+    color: white;
+    overflow: hidden;
+}
+
+.hero::before {
+    content: "";
+    position: absolute;
+    width: 420px;
+    height: 420px;
+    right: -100px;
+    top: -130px;
+    border: 70px solid rgba(255,255,255,0.025);
+    border-radius: 50%;
+}
+
+.hero::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 42%;
+    height: 5px;
+    background: var(--blue);
+    box-shadow: 42vw 0 0 var(--white), 84vw 0 0 var(--red);
+}
+
+.hero-inner {
+    max-width: 1200px;
+    margin: auto;
+    min-height: 440px;
+    display: flex;
+    align-items: center;
+    padding: 50px 25px;
+    position: relative;
+    z-index: 2;
+}
+
+.hero-content {
+    max-width: 750px;
+}
+
+.hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #d7dde4;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+}
+
+.hero-kicker::before {
+    content: "";
+    width: 25px;
+    height: 2px;
+    background: var(--red);
+}
+
+.hero h1 {
+    font-size: clamp(42px, 6vw, 74px);
+    line-height: 0.95;
+    letter-spacing: -3px;
+    margin-bottom: 22px;
+}
+
+.hero h1 span {
+    color: var(--blue);
+}
+
+.hero h1 .red {
+    color: var(--red);
+}
+
+.hero-intro {
+    font-size: 18px;
+    color: #dce1e7;
+    max-width: 680px;
+    line-height: 1.6;
+    margin-bottom: 28px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 20px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    border-radius: 4px;
+    transition: 0.2s;
+}
+
+.btn-primary {
+    background: white;
+    color: #11161d;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    border: 1px solid rgba(255,255,255,0.35);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: rgba(255,255,255,0.08);
+}
+
+/* =========================
+   QUICK STRIP
+========================= */
+
+.quick-strip {
+    max-width: 1200px;
+    margin: -30px auto 0;
+    position: relative;
+    z-index: 5;
+    padding: 0 25px;
+}
+
+.quick-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    background: white;
+    box-shadow: var(--shadow);
+    border-radius: 7px;
+    overflow: hidden;
+}
 
+.quick-card {
+    padding: 22px 25px;
+    border-right: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--black);
+    transition: 0.2s;
+}
+
+.quick-card:last-child {
+    border-right: 0;
+}
+
+.quick-card:hover {
+    background: #fafbfc;
+}
+
+.quick-number {
+    font-size: 10px;
+    color: var(--red);
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    margin-bottom: 7px;
+}
+
+.quick-card h3 {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.quick-card p {
+    color: var(--grey);
+    font-size: 12px;
+}
+
+/* =========================
+   MAIN CONTENT
+========================= */
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 55px 25px 70px;
+}
+
+.section {
+    scroll-margin-top: 30px;
+    margin-bottom: 55px;
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 22px;
+    padding-bottom: 12px;
+}
+
+.section-kicker {
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.section h2 {
+    font-size: 28px;
+    letter-spacing: -0.8px;
+}
+
+.section-heading p {
+    font-size: 11px;
+    color: var(--grey);
+}
+
+/* =========================
+   MANIFESTE
+========================= */
+
+.manifeste-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
     gap: 22px;
 }
 
-.card {
-    padding: 30px;
-
-    background: #0d2344;
-
-    border: 1px solid rgba(214,173,85,0.18);
-
-    transition: transform 0.2s, border-color 0.2s;
+.manifeste-main {
+    background: #11161d;
+    color: white;
+    padding: 34px;
+    border-radius: 7px;
 }
 
-.card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(214,173,85,0.55);
+.manifeste-main h3 {
+    font-size: 28px;
+    line-height: 1.15;
+    margin-bottom: 17px;
 }
 
-.card h3 {
-    margin-top: 0;
-
-    font-family: Georgia, "Times New Roman", serif;
-
-    color: #d6ad55;
-
-    font-size: 22px;
-}
-
-.card p {
-    color: #c9ced7;
-    line-height: 1.65;
+.manifeste-main p {
+    color: #cdd3d9;
     font-size: 14px;
+    line-height: 1.75;
+}
+
+.manifeste-side {
+    display: grid;
+    gap: 12px;
+}
+
+.value-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+}
+
+.value-card strong {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 5px;
+}
+
+.value-card span {
+    color: var(--grey);
+    font-size: 12px;
 }
 
 /* =========================
    PROJET
 ========================= */
 
-.project {
-    background: #050f20;
-}
-
 .project-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 22px;
-    margin-top: 45px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
 }
 
-.project-item {
-    padding: 28px;
-
-    border-left: 3px solid #d6ad55;
-
-    background: rgba(255,255,255,0.025);
+.project-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 23px;
+    min-height: 150px;
+    position: relative;
 }
 
-.project-item h3 {
-    margin-top: 0;
-
-    font-family: Georgia, "Times New Roman", serif;
-
-    color: #ffffff;
+.project-card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 18px;
+    bottom: 18px;
+    width: 3px;
+    background: var(--blue);
 }
 
-.project-item p {
-    color: #c8ced8;
-    line-height: 1.65;
+.project-card:nth-child(2)::before {
+    background: white;
+    border-left: 3px solid #cfd3d8;
+}
+
+.project-card:nth-child(3)::before {
+    background: var(--red);
+}
+
+.project-card h3 {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.project-card p {
+    font-size: 12px;
+    color: var(--grey);
+}
+
+/* =========================
+   INSPIRATIONS
+========================= */
+
+.inspirations {
+    background: white;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    padding: 27px;
+}
+
+.inspiration-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.inspiration {
+    padding: 18px;
+    background: var(--light);
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: 700;
+    border-left: 3px solid var(--blue);
+}
+
+.inspiration:nth-child(2) {
+    border-left-color: #aaa;
+}
+
+.inspiration:nth-child(3) {
+    border-left-color: var(--red);
+}
+
+.inspiration:nth-child(4) {
+    border-left-color: #11161d;
+}
+
+/* =========================
+   EQUIPE
+========================= */
+
+.team-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    background: #11161d;
+    color: white;
+    padding: 28px 32px;
+    border-radius: 7px;
+}
+
+.team-box h3 {
+    font-size: 22px;
+    margin-bottom: 5px;
+}
+
+.team-box p {
+    color: #bfc6ce;
+    font-size: 13px;
+}
+
+.team-badge {
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 13px 18px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    white-space: nowrap;
 }
 
 /* =========================
@@ -355,53 +670,272 @@ section {
 ========================= */
 
 footer {
-    padding: 40px 20px;
-
-    text-align: center;
-
-    background: #030a15;
-
-    color: #858d9b;
-
-    font-size: 12px;
+    background: #0b0f14;
+    color: #929aa4;
+    padding: 28px 25px;
 }
 
-footer strong {
-    color: #d6ad55;
+.footer-inner {
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+}
+
+.footer-logo {
+    font-weight: 800;
+    color: white;
+    letter-spacing: 1px;
+}
+
+.footer-logo span:first-child {
+    color: var(--blue);
+}
+
+.footer-logo span:last-child {
+    color: var(--red);
 }
 
 /* =========================
-   MOBILE
+   MODALE RENDEZ-VOUS
 ========================= */
 
-@media (max-width: 750px) {
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5,10,16,0.72);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+}
 
-    header {
-        min-height: 68vh;
-        padding-top: 90px;
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    width: min(620px, 100%);
+    background: white;
+    border-radius: 9px;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.28);
+    overflow: hidden;
+    animation: modalIn 0.2s ease-out;
+}
+
+@keyframes modalIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-top {
+    height: 7px;
+    background: linear-gradient(
+        to right,
+        var(--blue) 0 33.33%,
+        white 33.33% 66.66%,
+        var(--red) 66.66%
+    );
+}
+
+.modal-content {
+    padding: 30px;
+}
+
+.modal-close {
+    float: right;
+    width: 30px;
+    height: 30px;
+    border: 0;
+    background: #f0f2f4;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    color: #4c545c;
+}
+
+.modal-kicker {
+    color: var(--red);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.modal h2 {
+    font-size: 28px;
+    line-height: 1.15;
+    margin-bottom: 18px;
+    padding-right: 40px;
+}
+
+.modal-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.modal-info span {
+    background: var(--light);
+    border-radius: 4px;
+    padding: 7px 10px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.modal-description {
+    color: #555e67;
+    font-size: 14px;
+    line-height: 1.7;
+    white-space: pre-line;
+}
+
+.modal-link {
+    display: inline-flex;
+    margin-top: 22px;
+    background: var(--blue);
+    color: white;
+    text-decoration: none;
+    padding: 11px 17px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 800px) {
+
+    .header-main {
+        min-height: 72px;
     }
 
-    .cards,
+    .logo {
+        font-size: 24px;
+    }
+
+    .logo-a,
+    .logo-e {
+        width: 31px;
+        height: 31px;
+        font-size: 22px;
+    }
+
+    .logo-sub {
+        display: none;
+    }
+
+    .nav-inner {
+        overflow-x: auto;
+        justify-content: flex-start;
+    }
+
+    .main-nav a {
+        padding: 12px 14px;
+        white-space: nowrap;
+        font-size: 11px;
+    }
+
+    .main-nav a::after {
+        left: 14px;
+        right: 14px;
+    }
+
+    .hero {
+        min-height: 390px;
+    }
+
+    .hero-inner {
+        min-height: 390px;
+        padding: 45px 22px;
+    }
+
+    .hero h1 {
+        font-size: 48px;
+        letter-spacing: -2px;
+    }
+
+    .hero-intro {
+        font-size: 15px;
+    }
+
+    .quick-strip {
+        margin-top: -20px;
+        padding: 0 15px;
+    }
+
+    .quick-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-card {
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .quick-card:last-child {
+        border-bottom: 0;
+    }
+
+    main {
+        padding: 40px 15px;
+    }
+
+    .manifeste-layout {
+        grid-template-columns: 1fr;
+    }
+
     .project-grid {
         grid-template-columns: 1fr;
     }
 
-    nav a {
-        padding: 15px 12px;
-        font-size: 11px;
+    .inspiration-list {
+        grid-template-columns: 1fr 1fr;
     }
 
-    section {
-        padding: 60px 18px;
+    .team-box {
+        flex-direction: column;
+        align-items: flex-start;
     }
+
+    .footer-inner {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 500px) {
 
     .rdv-label {
-        padding: 0 12px;
+        padding: 0 10px;
         font-size: 9px;
     }
 
-    .rdv-content {
-        font-size: 11px;
+    .rdv-item {
+        padding: 0 20px;
+    }
+
+    .hero h1 {
+        font-size: 42px;
+    }
+
+    .inspiration-list {
+        grid-template-columns: 1fr;
     }
 }
 </style>
@@ -409,49 +943,35 @@ footer strong {
 
 <body>
 
-<!-- =========================
-     ACCES ADMIN
-========================= -->
+<header class="top-header">
 
-<a
-    href="admin.html"
-    class="admin-gear"
-    title="Administration"
-    aria-label="Administration"
->
-    ⚙
-</a>
+    <a href="admin.html" class="admin-gear" title="Administration">⚙</a>
 
+    <div class="header-main">
 
-<!-- =========================
-     ACCUEIL
-========================= -->
-
-<header id="accueil">
-
-    <div class="hero">
-
-        <h1 class="logo-title">
-            <span class="logo-a">A</span>VANT-GARD<span class="logo-e">E</span>
-        </h1>
-
-        <div class="hero-subtitle">
-            Souveraineté · Liberté · Responsabilité · Justice
-        </div>
-
-        <p class="hero-text">
-            Un projet politique pour une France souveraine,
-            libre, responsable et tournée vers l'avenir.
-        </p>
+        <a href="#" class="logo">
+            <span class="logo-a">A</span>
+            <span class="logo-middle">VANT-GARD</span>
+            <span class="logo-e">E</span>
+            <span class="logo-sub">France</span>
+        </a>
 
     </div>
+
+    <nav class="main-nav">
+        <div class="nav-inner">
+            <a href="#">Accueil</a>
+            <a href="#manifeste">Manifeste</a>
+            <a href="#projet">Notre projet</a>
+            <a href="#inspirations">Nos inspirations</a>
+            <a href="#equipe">Notre équipe</a>
+        </div>
+    </nav>
 
 </header>
 
 
-<!-- =========================
-     RENDEZ-VOUS
-========================= -->
+<!-- RENDEZ-VOUS -->
 
 <div class="rdv-bar">
 
@@ -459,257 +979,335 @@ footer strong {
         NOS RENDEZ-VOUS
     </div>
 
-    <div class="rdv-track">
-
-        <div class="rdv-content" id="rdv-content">
-            Chargement des rendez-vous...
+    <div class="rdv-window">
+        <div id="rdvTrack" class="rdv-track">
+            <div class="rdv-empty">Chargement des rendez-vous...</div>
         </div>
+    </div>
+
+</div>
+
+
+<!-- HERO -->
+
+<section class="hero">
+
+    <div class="hero-inner">
+
+        <div class="hero-content">
+
+            <div class="hero-kicker">
+                Mouvement politique français
+            </div>
+
+            <h1>
+                Une France<br>
+                <span>libre</span>,
+                <span class="red">forte</span><br>
+                et responsable.
+            </h1>
+
+            <p class="hero-intro">
+                Avant-gardE défend une vision politique fondée sur
+                la souveraineté, la liberté, la responsabilité et
+                la justice.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="#manifeste" class="btn btn-primary">
+                    Découvrir notre manifeste
+                </a>
+
+                <a href="#projet" class="btn btn-secondary">
+                    Notre projet
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ACCÈS RAPIDE -->
+
+<div class="quick-strip">
+
+    <div class="quick-grid">
+
+        <a href="#manifeste" class="quick-card">
+            <div class="quick-number">01 — PRINCIPES</div>
+            <h3>Notre manifeste</h3>
+            <p>Les principes qui fondent Avant-gardE.</p>
+        </a>
+
+        <a href="#projet" class="quick-card">
+            <div class="quick-number">02 — ACTION</div>
+            <h3>Notre projet</h3>
+            <p>Nos propositions pour transformer la France.</p>
+        </a>
+
+        <a href="#equipe" class="quick-card">
+            <div class="quick-number">03 — COLLECTIF</div>
+            <h3>Notre équipe</h3>
+            <p>Découvrez celles et ceux qui portent le projet.</p>
+        </a>
 
     </div>
 
 </div>
 
 
-<!-- =========================
-     MENU
-========================= -->
+<main>
 
-<nav>
+    <!-- MANIFESTE -->
 
-    <a href="#accueil">
-        ACCUEIL
-    </a>
+    <section id="manifeste" class="section">
 
-    <a href="#manifeste">
-        MANIFESTE
-    </a>
+        <div class="section-heading">
+            <div>
+                <div class="section-kicker">01 — Notre vision</div>
+                <h2>Manifeste</h2>
+            </div>
 
-    <a href="#projet">
-        NOTRE PROJET
-    </a>
+            <p>Liberté · Souveraineté · Responsabilité · Justice</p>
+        </div>
 
-    <a href="#inspirations">
-        NOS INSPIRATIONS
-    </a>
+        <div class="manifeste-layout">
 
-    <a href="#equipe">
-        NOTRE ÉQUIPE
-    </a>
-
-</nav>
-
-
-<!-- =========================
-     MANIFESTE
-========================= -->
-
-<section id="manifeste">
-
-    <div class="container">
-
-        <h2 class="section-title">
-            Manifeste
-        </h2>
-
-        <p class="intro">
-            Avant-gardE veut replacer la souveraineté, la liberté,
-            la responsabilité et la justice au cœur de l'action politique.
-            Nous défendons une France maîtresse de ses décisions,
-            de ses frontières, de son économie et de son avenir.
-        </p>
-
-        <div class="cards">
-
-            <div class="card">
+            <div class="manifeste-main">
 
                 <h3>
-                    Souveraineté
+                    Redonner à la France
+                    la maîtrise de son destin.
                 </h3>
 
                 <p>
-                    La France doit pouvoir décider librement de son destin
-                    et défendre ses intérêts fondamentaux.
+                    Avant-gardE veut replacer la souveraineté,
+                    la liberté individuelle et la responsabilité
+                    au cœur de l'action publique.
+                    <br><br>
+                    Notre ambition est de construire une France
+                    capable de décider par elle-même, de protéger
+                    ses intérêts et de préparer son avenir.
                 </p>
 
             </div>
 
-            <div class="card">
+            <div class="manifeste-side">
 
-                <h3>
-                    Liberté
-                </h3>
+                <div class="value-card">
+                    <strong>Souveraineté</strong>
+                    <span>La capacité de décider de notre avenir.</span>
+                </div>
 
-                <p>
-                    La liberté individuelle constitue le fondement
-                    d'une société responsable et prospère.
-                </p>
+                <div class="value-card">
+                    <strong>Liberté</strong>
+                    <span>Une société qui fait confiance aux citoyens.</span>
+                </div>
 
-            </div>
+                <div class="value-card">
+                    <strong>Responsabilité</strong>
+                    <span>Des droits accompagnés de devoirs.</span>
+                </div>
 
-            <div class="card">
-
-                <h3>
-                    Responsabilité
-                </h3>
-
-                <p>
-                    Les droits vont de pair avec des devoirs,
-                    envers soi-même, les autres et la Nation.
-                </p>
+                <div class="value-card">
+                    <strong>Justice</strong>
+                    <span>Une égalité réelle devant les règles communes.</span>
+                </div>
 
             </div>
 
         </div>
 
-    </div>
-
-</section>
+    </section>
 
 
-<!-- =========================
-     NOTRE PROJET
-========================= -->
+    <!-- PROJET -->
 
-<section id="projet" class="project">
+    <section id="projet" class="section">
 
-    <div class="container">
+        <div class="section-heading">
+            <div>
+                <div class="section-kicker">02 — Transformer</div>
+                <h2>Notre projet</h2>
+            </div>
 
-        <h2 class="section-title">
-            Notre projet
-        </h2>
-
-        <p class="intro">
-            Découvrez progressivement nos propositions et les réformes
-            que nous souhaitons porter pour transformer la France.
-        </p>
+            <p>Des idées concrètes pour la France</p>
+        </div>
 
         <div class="project-grid">
 
-            <div class="project-item">
-
-                <h3>
-                    Institutions
-                </h3>
-
+            <div class="project-card">
+                <h3>Une économie plus libre</h3>
                 <p>
-                    Repenser nos institutions afin de renforcer
-                    la responsabilité démocratique et l'efficacité
-                    de l'État.
+                    Libérer l'initiative, simplifier les règles
+                    et favoriser la création de richesse.
                 </p>
-
             </div>
 
-            <div class="project-item">
-
-                <h3>
-                    Économie
-                </h3>
-
+            <div class="project-card">
+                <h3>Une nation souveraine</h3>
                 <p>
-                    Libérer l'initiative, encourager l'investissement
-                    et rendre notre économie plus compétitive.
+                    Renforcer la capacité de la France à décider
+                    de ses choix stratégiques.
                 </p>
-
             </div>
 
-            <div class="project-item">
-
-                <h3>
-                    Travail
-                </h3>
-
+            <div class="project-card">
+                <h3>Une société responsable</h3>
                 <p>
-                    Valoriser le travail, l'activité et la responsabilité
-                    individuelle.
+                    Réconcilier liberté individuelle, devoirs
+                    collectifs et responsabilité.
                 </p>
-
             </div>
 
-            <div class="project-item">
+        </div>
 
-                <h3>
-                    Famille
-                </h3>
+    </section>
 
-                <p>
-                    Placer la famille et la transmission au cœur
-                    de notre politique nationale.
-                </p>
+
+    <!-- INSPIRATIONS -->
+
+    <section id="inspirations" class="section">
+
+        <div class="section-heading">
+            <div>
+                <div class="section-kicker">03 — Références</div>
+                <h2>Nos inspirations</h2>
+            </div>
+
+            <p>Des courants, des idées, des expériences</p>
+        </div>
+
+        <div class="inspirations">
+
+            <div class="inspiration-list">
+
+                <div class="inspiration">
+                    Souveraineté
+                </div>
+
+                <div class="inspiration">
+                    Liberté
+                </div>
+
+                <div class="inspiration">
+                    Responsabilité
+                </div>
+
+                <div class="inspiration">
+                    République
+                </div>
 
             </div>
 
         </div>
 
-    </div>
-
-</section>
+    </section>
 
 
-<!-- =========================
-     INSPIRATIONS
-========================= -->
+    <!-- EQUIPE -->
 
-<section id="inspirations">
+    <section id="equipe" class="section">
 
-    <div class="container">
+        <div class="section-heading">
+            <div>
+                <div class="section-kicker">04 — Collectif</div>
+                <h2>Notre équipe</h2>
+            </div>
 
-        <h2 class="section-title">
-            Nos inspirations
-        </h2>
+            <p>Celles et ceux qui font vivre le mouvement</p>
+        </div>
 
-        <p class="intro">
-            Avant-gardE observe les expériences politiques,
-            économiques et institutionnelles menées en France
-            et à l'étranger afin d'en tirer des enseignements.
-        </p>
+        <div class="team-box">
 
-    </div>
+            <div>
+                <h3>Avant-gardE</h3>
+                <p>
+                    Un collectif engagé autour d'une même ambition
+                    pour la France.
+                </p>
+            </div>
 
-</section>
+            <div class="team-badge">
+                UBI PATRIA, IBI LIBERTAS
+            </div>
 
+        </div>
 
-<!-- =========================
-     EQUIPE
-========================= -->
+    </section>
 
-<section id="equipe" class="project">
+</main>
 
-    <div class="container">
-
-        <h2 class="section-title">
-            Notre équipe
-        </h2>
-
-        <p class="intro">
-            Une équipe ouverte à celles et ceux qui souhaitent
-            participer à la construction du projet Avant-gardE.
-        </p>
-
-    </div>
-
-</section>
-
-
-<!-- =========================
-     FOOTER
-========================= -->
 
 <footer>
 
-    <strong>AVANT-GARD<span style="color:#c51f2a;">E</span></strong>
+    <div class="footer-inner">
 
-    <br><br>
+        <div class="footer-logo">
+            <span>A</span>VANT-GARD<span>E</span>
+        </div>
 
-    Souveraineté · Liberté · Responsabilité · Justice
+        <div>
+            Avant-gardE — France
+        </div>
+
+    </div>
 
 </footer>
 
 
-<!-- =========================
-     SUPABASE
-========================= -->
+<!-- MODALE RENDEZ-VOUS -->
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<div id="rdvModal" class="modal-overlay">
+
+    <div class="modal">
+
+        <div class="modal-top"></div>
+
+        <div class="modal-content">
+
+            <button id="modalClose" class="modal-close" aria-label="Fermer">
+                ×
+            </button>
+
+            <div class="modal-kicker">
+                Rendez-vous
+            </div>
+
+            <h2 id="modalTitle"></h2>
+
+            <div class="modal-info">
+
+                <span id="modalDate"></span>
+
+                <span id="modalTime"></span>
+
+                <span id="modalLocation"></span>
+
+            </div>
+
+            <div id="modalDescription" class="modal-description"></div>
+
+            <a
+                id="modalLink"
+                class="modal-link"
+                href="#"
+                target="_blank"
+                rel="noopener"
+                style="display:none;"
+            >
+                En savoir plus
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
 
 <script>
 
@@ -720,94 +1318,336 @@ const SUPABASE_KEY =
     "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
 
 const supabaseClient =
-    window.supabase.createClient(
+    supabase.createClient(
         SUPABASE_URL,
         SUPABASE_KEY
     );
 
 
-async function loadRendezvous() {
+/* =========================
+   RENDEZ-VOUS
+========================= */
 
-    const element =
-        document.getElementById("rdv-content");
+async function chargerRendezVous() {
 
-    const {
-        data,
-        error
-    } = await supabaseClient
-        .from("rendezvous")
-        .select(
-            "titre,date_evenement,heure,lieu"
-        )
-        .eq("actif", true)
-        .order("ordre", {
-            ascending: true
-        })
-        .order("date_evenement", {
-            ascending: true
-        });
+    const track =
+        document.getElementById("rdvTrack");
+
+    const { data, error } =
+        await supabaseClient
+            .from("rendezvous")
+            .select("*")
+            .eq("actif", true)
+            .order("ordre", { ascending: true })
+            .order("date_evenement", { ascending: true });
 
     if (error) {
 
-        element.textContent =
-            "Aucun rendez-vous actuellement.";
+        console.error(
+            "Erreur rendez-vous :",
+            error
+        );
+
+        track.innerHTML =
+            '<div class="rdv-empty">Aucun rendez-vous disponible</div>';
 
         return;
     }
 
     if (!data || data.length === 0) {
 
-        element.textContent =
-            "Aucun rendez-vous actuellement.";
+        track.innerHTML =
+            '<div class="rdv-empty">Aucun rendez-vous annoncé pour le moment</div>';
 
         return;
     }
 
 
-    const textes = data.map(event => {
+    /*
+       On crée deux fois la liste afin que le défilement
+       puisse être continu sans espace vide.
+    */
 
-        let texte =
-            event.titre || "";
+    const items = data.map(rdv => {
 
-        if (event.date_evenement) {
+        const date = rdv.date_evenement
+            ? new Date(
+                rdv.date_evenement + "T00:00:00"
+              ).toLocaleDateString(
+                "fr-FR",
+                {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric"
+                }
+              )
+            : "";
 
-            const date =
-                new Date(
-                    event.date_evenement + "T00:00:00"
-                ).toLocaleDateString(
-                    "fr-FR",
-                    {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric"
+        return `
+            <div
+                class="rdv-item"
+                data-id="${rdv.id}"
+            >
+                <span class="rdv-date">
+                    ${escapeHtml(date)}
+                    ${rdv.heure ? " — " + escapeHtml(rdv.heure) : ""}
+                </span>
+
+                <span class="rdv-title">
+                    ${escapeHtml(rdv.titre || "Rendez-vous")}
+                </span>
+            </div>
+        `;
+
+    }).join("");
+
+
+    track.innerHTML =
+        items + items;
+
+
+    document
+        .querySelectorAll(".rdv-item")
+        .forEach(item => {
+
+            item.addEventListener(
+                "click",
+                () => {
+
+                    const id =
+                        item.dataset.id;
+
+                    const rdv =
+                        data.find(
+                            x =>
+                                String(x.id) ===
+                                String(id)
+                        );
+
+                    if (rdv) {
+                        ouvrirRendezVous(rdv);
                     }
-                );
 
-            texte += " — " + date;
-        }
+                }
+            );
 
-        if (event.heure) {
-            texte += " — " + event.heure;
-        }
-
-        if (event.lieu) {
-            texte += " — " + event.lieu;
-        }
-
-        return texte;
-
-    });
-
-
-    element.textContent =
-        textes.join("     •     ");
+        });
 
 }
 
 
-loadRendezvous();
+/* =========================
+   MODALE
+========================= */
+
+function ouvrirRendezVous(rdv) {
+
+    const modal =
+        document.getElementById("rdvModal");
+
+    const title =
+        document.getElementById("modalTitle");
+
+    const date =
+        document.getElementById("modalDate");
+
+    const time =
+        document.getElementById("modalTime");
+
+    const location =
+        document.getElementById("modalLocation");
+
+    const description =
+        document.getElementById("modalDescription");
+
+    const link =
+        document.getElementById("modalLink");
+
+
+    title.textContent =
+        rdv.titre || "Rendez-vous";
+
+
+    if (rdv.date_evenement) {
+
+        const formattedDate =
+            new Date(
+                rdv.date_evenement + "T00:00:00"
+            ).toLocaleDateString(
+                "fr-FR",
+                {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric"
+                }
+            );
+
+        date.textContent =
+            formattedDate;
+
+        date.style.display =
+            "inline-block";
+
+    } else {
+
+        date.style.display =
+            "none";
+
+    }
+
+
+    if (rdv.heure) {
+
+        time.textContent =
+            "Heure : " + rdv.heure;
+
+        time.style.display =
+            "inline-block";
+
+    } else {
+
+        time.style.display =
+            "none";
+
+    }
+
+
+    if (rdv.lieu) {
+
+        location.textContent =
+            "Lieu : " + rdv.lieu;
+
+        location.style.display =
+            "inline-block";
+
+    } else {
+
+        location.style.display =
+            "none";
+
+    }
+
+
+    description.textContent =
+        rdv.texte ||
+        "Aucune description disponible.";
+
+
+    if (rdv.lien) {
+
+        link.href =
+            rdv.lien;
+
+        link.style.display =
+            "inline-flex";
+
+    } else {
+
+        link.style.display =
+            "none";
+
+    }
+
+
+    modal.classList.add("active");
+
+    document.body.style.overflow =
+        "hidden";
+}
+
+
+function fermerRendezVous() {
+
+    const modal =
+        document.getElementById("rdvModal");
+
+    modal.classList.remove("active");
+
+    document.body.style.overflow =
+        "";
+
+}
+
+
+/* =========================
+   FERMETURE MODALE
+========================= */
+
+document
+    .getElementById("modalClose")
+    .addEventListener(
+        "click",
+        fermerRendezVous
+    );
+
+
+document
+    .getElementById("rdvModal")
+    .addEventListener(
+        "click",
+        function(event) {
+
+            if (
+                event.target ===
+                this
+            ) {
+
+                fermerRendezVous();
+
+            }
+
+        }
+    );
+
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            fermerRendezVous();
+
+        }
+
+    }
+);
+
+
+/* =========================
+   SECURITE AFFICHAGE
+========================= */
+
+function escapeHtml(value) {
+
+    if (value === null ||
+        value === undefined) {
+
+        return "";
+
+    }
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* =========================
+   DEMARRAGE
+========================= */
+
+chargerRendezVous();
 
 </script>
 
 </body>
 </html>
+```
