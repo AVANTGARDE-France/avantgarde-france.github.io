@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Administration — Avant-gardE</title>
+
+<style>
+:root {
+    --navy: #07152d;
+    --navy2: #0d2344;
+    --gold: #d6ad55;
+    --gold-light: #f0d58a;
+    --white: #f5f3ed;
+    --muted: #aeb7c5;
+    --red: #c51f2a;
+    --green: #4caf70;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--navy);
+    color: var(--white);
+    font-family: Arial, sans-serif;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* =========================
+   CONNEXION
+========================= */
+
+#login-screen {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 25px;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 430px;
+    padding: 40px;
+    background: var(--navy2);
+    border: 1px solid rgba(214,173,85,.35);
+}
+
+.login-logo {
+    text-align: center;
+    font-family: Georgia, serif;
+    font-size: 32px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.logo-a,
+.logo-e {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    background: white;
+    border-radius: 50%;
+    font-size: 24px;
+}
+
+.logo-a {
+    color: var(--navy);
+}
+
+.logo-e {
+    color: var(--red);
+}
+
+.login-subtitle {
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 30px;
+}
+
+label {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--gold-light);
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 18px;
+    border: 1px solid rgba(255,255,255,.15);
+    background: #050f20;
+    color: white;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+textarea {
+    min-height: 130px;
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--gold);
+}
+
+button {
+    border: 0;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 13px;
+    background: var(--gold);
+    color: var(--navy);
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.btn-primary:hover {
+    background: var(--gold-light);
+}
+
+.error {
+    color: #ff8585;
+    font-size: 13px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+/* =========================
+   ADMIN
+========================= */
+
+#admin-screen {
+    min-height: 100vh;
+}
+
+.admin-header {
+    height: 75px;
+    padding: 0 5%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #050f20;
+    border-bottom: 1px solid rgba(214,173,85,.3);
+}
+
+.admin-brand {
+    font-family: Georgia, serif;
+    font-size: 22px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.admin-brand span {
+    color: var(--gold);
+}
+
+.logout {
+    padding: 9px 16px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.25);
+    color: var(--white);
+}
+
+.logout:hover {
+    border-color: var(--red);
+    color: #ff8585;
+}
+
+.admin-container {
+    max-width: 1150px;
+    margin: auto;
+    padding: 35px 20px 60px;
+}
+
+.page-title {
+    margin-bottom: 30px;
+}
+
+.page-title h1 {
+    margin: 0 0 8px;
+    font-family: Georgia, serif;
+    font-size: 32px;
+    font-weight: normal;
+}
+
+.page-title p {
+    margin: 0;
+    color: var(--muted);
+}
+
+/* =========================
+   FORMULAIRE
+========================= */
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 25px;
+}
+
+.panel {
+    background: var(--navy2);
+    border: 1px solid rgba(214,173,85,.25);
+    padding: 25px;
+}
+
+.panel h2 {
+    margin: 0 0 22px;
+    font-family: Georgia, serif;
+    font-size: 22px;
+    font-weight: normal;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.checkbox-row input {
+    width: auto;
+    margin: 0;
+}
+
+.checkbox-row label {
+    margin: 0;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.save-btn {
+    flex: 1;
+    padding: 12px;
+    background: var(--gold);
+    color: var(--navy);
+    font-weight: bold;
+}
+
+.cancel-btn {
+    padding: 12px 20px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.25);
+    color: white;
+}
+
+.cancel-btn:hover {
+    border-color: var(--gold);
+}
+
+/* =========================
+   LISTE
+========================= */
+
+.events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.event-item {
+    padding: 17px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.025);
+}
+
+.event-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.event-title {
+    font-family: Georgia, serif;
+    font-size: 18px;
+    color: var(--gold-light);
+}
+
+.event-date {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.event-description {
+    margin-top: 10px;
+    color: #d2d7df;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.event-status {
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.status-active {
+    color: var(--green);
+}
+
+.status-inactive {
+    color: #888;
+}
+
+.event-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+.edit-btn,
+.delete-btn {
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.edit-btn {
+    background: rgba(214,173,85,.15);
+    border: 1px solid rgba(214,173,85,.5);
+    color: var(--gold-light);
+}
+
+.delete-btn {
+    background: rgba(197,31,42,.12);
+    border: 1px solid rgba(197,31,42,.5);
+    color: #ff8585;
+}
+
+.empty {
+    padding: 30px;
+    text-align: center;
+    color: var(--muted);
+    border: 1px dashed rgba(255,255,255,.15);
+}
+
+.message {
+    margin-bottom: 20px;
+    padding: 12px;
+    font-size: 13px;
+}
+
+.success {
+    background: rgba(76,175,112,.12);
+    border: 1px solid rgba(76,175,112,.35);
+    color: #8be0a7;
+}
+
+.message-error {
+    background: rgba(197,31,42,.12);
+    border: 1px solid rgba(197,31,42,.35);
+    color: #ff8585;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 800px) {
+
+    .admin-header {
+        height: auto;
+        padding: 18px 20px;
+        gap: 15px;
+    }
+
+    .admin-brand {
+        font-size: 18px;
+    }
+
+    .admin-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .login-box {
+        padding: 28px 22px;
+    }
+
+    .admin-container {
+        padding: 25px 15px 50px;
+    }
+
+    .event-top {
+        flex-direction: column;
+    }
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- =========================
+     CONNEXION
+========================= -->
+
+<section id="login-screen">
+
+```
+<div class="login-box">
+
+    <div class="login-logo">
+        <span class="logo-a">A</span>VANT-GARD<span class="logo-e">E</span>
+    </div>
+
+    <div class="login-subtitle">
+        Administration du site
+    </div>
+
+    <form id="login-form">
+
+        <label for="email">
+            ADRESSE E-MAIL
+        </label>
+
+        <input
+            type="email"
+            id="email"
+            required
+            autocomplete="email"
+        >
+
+        <label for="password">
+            MOT DE PASSE
+        </label>
+
+        <input
+            type="password"
+            id="password"
+            required
+            autocomplete="current-password"
+        >
+
+        <button type="submit" class="btn-primary">
+            SE CONNECTER
+        </button>
+
+        <div id="login-error" class="error"></div>
+
+    </form>
+
+</div>
+```
+
+</section>
+
+<!-- =========================
+     ADMINISTRATION
+========================= -->
+
+<section id="admin-screen" class="hidden">
+
+```
+<header class="admin-header">
+
+    <div class="admin-brand">
+        AVANT-GARD<span>E</span> — ADMINISTRATION
+    </div>
+
+    <button id="logout-btn" class="logout">
+        Déconnexion
+    </button>
+
+</header>
+
+
+<main class="admin-container">
+
+    <div class="page-title">
+
+        <h1>Nos rendez-vous</h1>
+
+        <p>
+            Gérez les rendez-vous affichés sur la page d'accueil.
+        </p>
+
+    </div>
+
+
+    <div id="message"></div>
+
+
+    <div class="admin-grid">
+
+        <!-- =========================
+             FORMULAIRE
+        ========================= -->
+
+        <div class="panel">
+
+            <h2 id="form-title">
+                Ajouter un rendez-vous
+            </h2>
+
+            <form id="event-form">
+
+                <input type="hidden" id="event-id">
+
+                <label for="titre">
+                    TITRE
+                </label>
+
+                <input
+                    type="text"
+                    id="titre"
+                    placeholder="Ex : Rencontre à Ajaccio"
+                    required
+                >
+
+
+                <label for="texte">
+                    DESCRIPTION DÉTAILLÉE
+                </label>
+
+                <textarea
+                    id="texte"
+                    placeholder="Informations qui apparaîtront dans la fenêtre détaillée..."
+                ></textarea>
+
+
+                <div class="form-row">
+
+                    <div>
+
+                        <label for="date_evenement">
+                            DATE
+                        </label>
+
+                        <input
+                            type="date"
+                            id="date_evenement"
+                        >
+
+                    </div>
+
+
+                    <div>
+
+                        <label for="heure">
+                            HEURE
+                        </label>
+
+                        <input
+                            type="text"
+                            id="heure"
+                            placeholder="18h00"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <label for="lieu">
+                    LIEU
+                </label>
+
+                <input
+                    type="text"
+                    id="lieu"
+                    placeholder="Ajaccio"
+                >
+
+
+                <label for="lien">
+                    LIEN
+                </label>
+
+                <input
+                    type="url"
+                    id="lien"
+                    placeholder="https://..."
+                >
+
+
+                <label for="ordre">
+                    ORDRE D'AFFICHAGE
+                </label>
+
+                <input
+                    type="number"
+                    id="ordre"
+                    value="0"
+                >
+
+
+                <div class="checkbox-row">
+
+                    <input
+                        type="checkbox"
+                        id="actif"
+                        checked
+                    >
+
+                    <label for="actif">
+                        AFFICHER SUR LE SITE
+                    </label>
+
+                </div>
+
+
+                <div class="form-buttons">
+
+                    <button
+                        type="submit"
+                        class="save-btn"
+                    >
+                        ENREGISTRER
+                    </button>
+
+                    <button
+                        type="button"
+                        id="cancel-btn"
+                        class="cancel-btn hidden"
+                    >
+                        ANNULER
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+
+        <!-- =========================
+             LISTE
+        ========================= -->
+
+        <div class="panel">
+
+            <h2>
+                Rendez-vous existants
+            </h2>
+
+            <div id="events-list" class="events-list">
+
+                <div class="empty">
+                    Chargement...
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+```
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+/* =========================
+   CONFIGURATION SUPABASE
+========================= */
+
+const SUPABASE_URL =
+    "https://wlhtegrciehmtxqecopv.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const loginScreen =
+    document.getElementById("login-screen");
+
+const adminScreen =
+    document.getElementById("admin-screen");
+
+const loginForm =
+    document.getElementById("login-form");
+
+const loginError =
+    document.getElementById("login-error");
+
+const logoutBtn =
+    document.getElementById("logout-btn");
+
+const eventForm =
+    document.getElementById("event-form");
+
+const eventsList =
+    document.getElementById("events-list");
+
+const message =
+    document.getElementById("message");
+
+const cancelBtn =
+    document.getElementById("cancel-btn");
+
+const formTitle =
+    document.getElementById("form-title");
+
+
+/* =========================
+   AFFICHAGE MESSAGE
+========================= */
+
+function showMessage(text, type = "success") {
+
+    message.innerHTML =
+        `<div class="message ${type === "success" ? "success" : "message-error"}">
+            ${text}
+        </div>`;
+
+    setTimeout(() => {
+        message.innerHTML = "";
+    }, 4000);
+}
+
+
+/* =========================
+   VERIFICATION ADMIN
+========================= */
+
+async function checkAdmin() {
+
+    const {
+        data: { user }
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+        showLogin();
+        return;
+    }
+
+    const { data: profile, error } =
+        await supabaseClient
+            .from("profiles")
+            .select("grade, nom")
+            .eq("id", user.id)
+            .single();
+
+    if (error || !profile || profile.grade !== "admin") {
+
+        await supabaseClient.auth.signOut();
+
+        loginError.textContent =
+            "Accès refusé : ce compte n'est pas administrateur.";
+
+        showLogin();
+
+        return;
+    }
+
+    showAdmin();
+
+    loadEvents();
+}
+
+
+/* =========================
+   AFFICHAGE
+========================= */
+
+function showLogin() {
+
+    loginScreen.classList.remove("hidden");
+    adminScreen.classList.add("hidden");
+}
+
+function showAdmin() {
+
+    loginScreen.classList.add("hidden");
+    adminScreen.classList.remove("hidden");
+}
+
+
+/* =========================
+   CONNEXION
+========================= */
+
+loginForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        loginError.textContent = "";
+
+        const email =
+            document.getElementById("email").value.trim();
+
+        const password =
+            document.getElementById("password").value;
+
+        const {
+            error
+        } = await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) {
+
+            loginError.textContent =
+                "Adresse e-mail ou mot de passe incorrect.";
+
+            return;
+        }
+
+        checkAdmin();
+    }
+);
+
+
+/* =========================
+   DECONNEXION
+========================= */
+
+logoutBtn.addEventListener(
+    "click",
+    async function() {
+
+        await supabaseClient.auth.signOut();
+
+        showLogin();
+    }
+);
+
+
+/* =========================
+   CHARGER LES RENDEZ-VOUS
+========================= */
+
+async function loadEvents() {
+
+    eventsList.innerHTML =
+        `<div class="empty">Chargement...</div>`;
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("rendezvous")
+        .select("*")
+        .order("ordre", { ascending: true })
+        .order("date_evenement", { ascending: true });
+
+    if (error) {
+
+        eventsList.innerHTML =
+            `<div class="empty">
+                Impossible de charger les rendez-vous.
+            </div>`;
+
+        return;
+    }
+
+    if (!data || data.length === 0) {
+
+        eventsList.innerHTML =
+            `<div class="empty">
+                Aucun rendez-vous enregistré.
+            </div>`;
+
+        return;
+    }
+
+    eventsList.innerHTML = "";
+
+    data.forEach(event => {
+
+        const item =
+            document.createElement("div");
+
+        item.className = "event-item";
+
+        const date =
+            event.date_evenement
+                ? new Date(
+                    event.date_evenement + "T00:00:00"
+                  ).toLocaleDateString(
+                    "fr-FR",
+                    {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                    }
+                  )
+                : "";
+
+        item.innerHTML = `
+
+            <div class="event-top">
+
+                <div>
+
+                    <div class="event-title">
+                        ${escapeHtml(event.titre || "Sans titre")}
+                    </div>
+
+                    <div class="event-date">
+                        ${date}
+                        ${event.heure ? " — " + escapeHtml(event.heure) : ""}
+                        ${event.lieu ? " — " + escapeHtml(event.lieu) : ""}
+                    </div>
+
+                </div>
+
+                <div class="event-status ${event.actif ? "status-active" : "status-inactive"}">
+                    ${event.actif ? "ACTIF" : "INACTIF"}
+                </div>
+
+            </div>
+
+            <div class="event-description">
+                ${escapeHtml(event.texte || "Aucune description")}
+            </div>
+
+            <div class="event-actions">
+
+                <button
+                    class="edit-btn"
+                    onclick="editEvent('${event.id}')"
+                >
+                    MODIFIER
+                </button>
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteEvent('${event.id}')"
+                >
+                    SUPPRIMER
+                </button>
+
+            </div>
+        `;
+
+        eventsList.appendChild(item);
+    });
+}
+
+
+/* =========================
+   AJOUT / MODIFICATION
+========================= */
+
+eventForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        const id =
+            document.getElementById("event-id").value;
+
+        const eventData = {
+
+            titre:
+                document.getElementById("titre").value.trim(),
+
+            texte:
+                document.getElementById("texte").value.trim(),
+
+            date_evenement:
+                document.getElementById("date_evenement").value || null,
+
+            heure:
+                document.getElementById("heure").value.trim() || null,
+
+            lieu:
+                document.getElementById("lieu").value.trim() || null,
+
+            lien:
+                document.getElementById("lien").value.trim() || null,
+
+            actif:
+                document.getElementById("actif").checked,
+
+            ordre:
+                parseInt(
+                    document.getElementById("ordre").value
+                ) || 0
+        };
+
+
+        let result;
+
+
+        if (id) {
+
+            result =
+                await supabaseClient
+                    .from("rendezvous")
+                    .update(eventData)
+                    .eq("id", id);
+
+        } else {
+
+            result =
+                await supabaseClient
+                    .from("rendezvous")
+                    .insert(eventData);
+        }
+
+
+        if (result.error) {
+
+            showMessage(
+                "Erreur : " + result.error.message,
+                "error"
+            );
+
+            return;
+        }
+
+
+        showMessage(
+            id
+                ? "Rendez-vous modifié."
+                : "Rendez-vous ajouté."
+        );
+
+        resetForm();
+
+        loadEvents();
+    }
+);
+
+
+/* =========================
+   MODIFIER
+========================= */
+
+async function editEvent(id) {
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("rendezvous")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+    if (error || !data) {
+
+        showMessage(
+            "Impossible de récupérer ce rendez-vous.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    document.getElementById("event-id").value =
+        data.id;
+
+    document.getElementById("titre").value =
+        data.titre || "";
+
+    document.getElementById("texte").value =
+        data.texte || "";
+
+    document.getElementById("date_evenement").value =
+        data.date_evenement || "";
+
+    document.getElementById("heure").value =
+        data.heure || "";
+
+    document.getElementById("lieu").value =
+        data.lieu || "";
+
+    document.getElementById("lien").value =
+        data.lien || "";
+
+    document.getElementById("actif").checked =
+        data.actif !== false;
+
+    document.getElementById("ordre").value =
+        data.ordre || 0;
+
+
+    formTitle.textContent =
+        "Modifier le rendez-vous";
+
+    cancelBtn.classList.remove("hidden");
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+
+/* =========================
+   SUPPRIMER
+========================= */
+
+async function deleteEvent(id) {
+
+    const confirmation =
+        confirm(
+            "Voulez-vous vraiment supprimer ce rendez-vous ?"
+        );
+
+    if (!confirmation) {
+        return;
+    }
+
+
+    const {
+        error
+    } = await supabaseClient
+        .from("rendezvous")
+        .delete()
+        .eq("id", id);
+
+
+    if (error) {
+
+        showMessage(
+            "Impossible de supprimer le rendez-vous.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    showMessage(
+        "Rendez-vous supprimé."
+    );
+
+    loadEvents();
+}
+
+
+/* =========================
+   ANNULER MODIFICATION
+========================= */
+
+cancelBtn.addEventListener(
+    "click",
+    resetForm
+);
+
+
+function resetForm() {
+
+    eventForm.reset();
+
+    document.getElementById("event-id").value =
+        "";
+
+    document.getElementById("actif").checked =
+        true;
+
+    document.getElementById("ordre").value =
+        0;
+
+    formTitle.textContent =
+        "Ajouter un rendez-vous";
+
+    cancelBtn.classList.add("hidden");
+}
+
+
+/* =========================
+   PROTECTION HTML
+========================= */
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =========================
+   DEMARRAGE
+========================= */
+
+checkAdmin();
+
+</script>
+
+</body>
+</html>
