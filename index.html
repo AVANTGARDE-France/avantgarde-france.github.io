@@ -4,20 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Avant-gardE — La France libre</title>
+<title>Avant-gardE</title>
 
 <style>
-
-:root {
-    --navy: #07152d;
-    --navy2: #0d2344;
-    --gold: #d6ad55;
-    --gold-light: #f0d58a;
-    --white: #f5f3ed;
-    --muted: #b8c0cd;
-    --red: #c51f2a;
-}
-
 * {
     box-sizing: border-box;
 }
@@ -28,91 +17,74 @@ html {
 
 body {
     margin: 0;
-    background: var(--navy);
-    color: var(--white);
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #07152d;
+    color: #f5f3ed;
 }
-
 
 /* =========================
-   RENDEZ-VOUS
+   ROUE ADMIN
 ========================= */
 
-.events-bar {
-    height: 34px;
-    background: #050f20;
-    border-bottom: 1px solid rgba(214,173,85,.35);
+.admin-gear {
+    position: fixed;
+    top: 14px;
+    right: 18px;
+    z-index: 9999;
+
+    width: 28px;
+    height: 28px;
+
     display: flex;
     align-items: center;
-    overflow: hidden;
-    white-space: nowrap;
-    font-family: Arial, sans-serif;
-    font-size: 12px;
+    justify-content: center;
+
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+
+    font-size: 17px;
+
+    opacity: 0.55;
+    transition: opacity 0.2s, color 0.2s, transform 0.2s;
 }
 
-.events-label {
-    flex-shrink: 0;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    padding: 0 18px;
-    color: var(--gold-light);
-    font-weight: bold;
-    letter-spacing: 1px;
-    border-right: 1px solid rgba(214,173,85,.3);
+.admin-gear:hover {
+    opacity: 1;
+    color: #d6ad55;
+    transform: rotate(20deg);
 }
-
-.events-track {
-    display: inline-flex;
-    animation: scroll 24s linear infinite;
-}
-
-.event {
-    padding: 0 28px;
-    color: #e3e5e8;
-}
-
-.event strong {
-    color: var(--gold-light);
-}
-
-@keyframes scroll {
-    from {
-        transform: translateX(0);
-    }
-
-    to {
-        transform: translateX(-50%);
-    }
-}
-
 
 /* =========================
    HEADER
 ========================= */
 
 header {
-    height: 82px;
-    padding: 0 5%;
+    min-height: 76vh;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid rgba(214,173,85,.25);
-    background: rgba(7,21,45,.97);
+    justify-content: center;
+    text-align: center;
+    padding: 80px 20px 60px;
+
+    background:
+        linear-gradient(
+            rgba(7,21,45,0.72),
+            rgba(7,21,45,0.92)
+        ),
+        url("https://scontent.fnce2-1.fna.fbcdn.net/v/t39.30808-6/768615244_122134722015004562_1359865154943970301_n.jpg")
+        center / cover no-repeat;
 }
 
+.hero {
+    max-width: 900px;
+}
 
-/* LOGO */
-
-.logo {
-    color: var(--white);
-    text-decoration: none;
-    font-size: 26px;
+.logo-title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(48px, 9vw, 92px);
     font-weight: bold;
-    letter-spacing: 2px;
-    display: flex;
-    align-items: center;
-    gap: 1px;
+    letter-spacing: 3px;
+    margin: 0;
 }
 
 .logo-a,
@@ -121,16 +93,11 @@ header {
     align-items: center;
     justify-content: center;
 
-    width: 32px;
-    height: 32px;
+    width: 1.05em;
+    height: 1.05em;
 
     background: #ffffff;
     border-radius: 50%;
-
-    font-size: 20px;
-    line-height: 1;
-
-    vertical-align: middle;
 }
 
 .logo-a {
@@ -138,565 +105,364 @@ header {
 }
 
 .logo-e {
-    color: var(--red);
+    color: #c51f2a;
 }
 
-nav {
+.hero-subtitle {
+    margin-top: 18px;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(20px, 3vw, 30px);
+    color: #d6ad55;
+}
+
+.hero-text {
+    max-width: 720px;
+    margin: 28px auto 0;
+    font-size: 17px;
+    line-height: 1.7;
+    color: #e0e3e8;
+}
+
+/* =========================
+   RENDEZ-VOUS
+========================= */
+
+.rdv-bar {
+    position: relative;
+    background: #050f20;
+    border-top: 1px solid rgba(214,173,85,0.3);
+    border-bottom: 1px solid rgba(214,173,85,0.3);
+
+    height: 48px;
+
     display: flex;
-    gap: 28px;
     align-items: center;
+
+    overflow: hidden;
+}
+
+.rdv-label {
+    flex: 0 0 auto;
+
+    padding: 0 18px;
+
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+
+    color: #d6ad55;
+
+    border-right: 1px solid rgba(214,173,85,0.25);
+
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+}
+
+.rdv-track {
+    display: flex;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+}
+
+.rdv-content {
+    display: inline-block;
+    padding-left: 25px;
+
+    font-size: 13px;
+    color: #d9dde4;
+
+    animation: rdvScroll 24s linear infinite;
+}
+
+@keyframes rdvScroll {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+
+nav {
+    background: #07152d;
+
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 nav a {
-    color: #e7e7e7;
+    color: #f5f3ed;
     text-decoration: none;
-    font-family: Arial, sans-serif;
-    font-size: 12px;
+
+    padding: 19px 24px;
+
+    font-size: 13px;
     font-weight: bold;
-    letter-spacing: 1px;
-    transition: color .2s;
+
+    letter-spacing: 0.8px;
+
+    transition: background 0.2s, color 0.2s;
 }
 
 nav a:hover {
-    color: var(--gold);
+    color: #d6ad55;
+    background: rgba(255,255,255,0.04);
 }
-
 
 /* =========================
-   HERO
+   SECTIONS
 ========================= */
 
-.hero {
-    position: relative;
-    min-height: 520px;
+section {
+    padding: 80px 20px;
+}
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.container {
+    max-width: 1100px;
+    margin: auto;
+}
 
+.section-title {
     text-align: center;
 
-    overflow: hidden;
+    font-family: Georgia, "Times New Roman", serif;
 
-    background:
-        linear-gradient(
-            rgba(5,17,37,.67),
-            rgba(5,17,37,.82)
-        ),
-        radial-gradient(
-            circle at center,
-            #17345b 0%,
-            #08172f 60%,
-            #050e1d 100%
-        );
-}
-
-.hero::before,
-.hero::after {
-    content: "";
-
-    position: absolute;
-
-    width: 260px;
-    height: 260px;
-
-    border: 1px solid rgba(214,173,85,.18);
-
-    transform: rotate(45deg);
-}
-
-.hero::before {
-    left: -150px;
-    top: 80px;
-}
-
-.hero::after {
-    right: -150px;
-    bottom: 80px;
-}
-
-.hero-content {
-    position: relative;
-    z-index: 2;
-
-    max-width: 900px;
-
-    padding: 50px 25px;
-}
-
-.eyebrow {
-    color: var(--gold-light);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 12px;
-
-    letter-spacing: 4px;
-
-    font-weight: bold;
-
-    margin-bottom: 18px;
-}
-
-.hero h1 {
-    margin: 0;
-
-    font-size: clamp(48px, 8vw, 92px);
-
-    letter-spacing: 4px;
-
-    line-height: .95;
-
-    text-transform: uppercase;
-}
-
-.hero h1 span {
-    color: var(--gold);
-}
-
-.hero-line {
-    width: 100px;
-    height: 2px;
-
-    background: var(--gold);
-
-    margin: 25px auto;
-}
-
-.hero h2 {
-    margin: 0;
-
-    font-size: clamp(18px, 3vw, 27px);
-
+    font-size: 38px;
     font-weight: normal;
 
-    letter-spacing: 2px;
-}
-
-.hero p {
-    max-width: 680px;
-
-    margin: 22px auto 0;
-
-    color: #cbd1da;
-
-    font-family: Arial, sans-serif;
-
-    line-height: 1.7;
-
-    font-size: 15px;
-}
-
-
-/* =========================
-   INTRO
-========================= */
-
-.intro {
-    max-width: 1050px;
-
-    margin: auto;
-
-    padding: 55px 25px 45px;
-
-    text-align: center;
-}
-
-.section-kicker {
-    color: var(--gold);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-    letter-spacing: 3px;
-
-    margin-bottom: 12px;
-}
-
-.intro h2 {
     margin: 0 0 18px;
 
-    font-size: 31px;
-
-    font-weight: normal;
+    color: #f5f3ed;
 }
 
-.intro p {
-    max-width: 760px;
+.section-title::after {
+    content: "";
 
+    display: block;
+
+    width: 55px;
+    height: 2px;
+
+    background: #d6ad55;
+
+    margin: 17px auto 35px;
+}
+
+.intro {
+    max-width: 800px;
     margin: auto;
-
-    color: var(--muted);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 15px;
-
-    line-height: 1.7;
-}
-
-
-/* =========================
-   PRINCIPES
-========================= */
-
-.principles {
-    max-width: 1100px;
-
-    margin: auto;
-
-    padding: 15px 25px 55px;
-
-    display: grid;
-
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 18px;
-}
-
-.principle {
-    border: 1px solid rgba(214,173,85,.3);
-
-    background: rgba(255,255,255,.025);
-
-    padding: 28px 25px;
 
     text-align: center;
+
+    line-height: 1.8;
+
+    color: #c8ced8;
 }
-
-.symbol {
-    color: var(--gold);
-
-    font-size: 25px;
-
-    margin-bottom: 12px;
-}
-
-.principle h3 {
-    margin: 0 0 10px;
-
-    font-size: 20px;
-
-    letter-spacing: 1px;
-}
-
-.principle p {
-    margin: 0;
-
-    color: var(--muted);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 13px;
-
-    line-height: 1.6;
-}
-
 
 /* =========================
-   MANIFESTE
+   CARTES
 ========================= */
 
-.manifesto {
-    background: var(--navy2);
+.cards {
+    margin-top: 45px;
 
-    border-top: 1px solid rgba(214,173,85,.2);
-
-    border-bottom: 1px solid rgba(214,173,85,.2);
-
-    padding: 50px 25px;
-
-    text-align: center;
-}
-
-.manifesto h2 {
-    margin: 0 auto 18px;
-
-    max-width: 850px;
-
-    font-size: clamp(25px, 4vw, 38px);
-
-    line-height: 1.2;
-
-    font-weight: normal;
-}
-
-.manifesto p {
-    max-width: 720px;
-
-    margin: auto;
-
-    color: #c7ced8;
-
-    font-family: Arial, sans-serif;
-
-    line-height: 1.7;
-}
-
-.button {
-    display: inline-block;
-
-    margin-top: 25px;
-
-    padding: 12px 25px;
-
-    border: 1px solid var(--gold);
-
-    color: var(--gold-light);
-
-    text-decoration: none;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-    letter-spacing: 1.5px;
-
-    transition: .2s;
-}
-
-.button:hover {
-    background: var(--gold);
-
-    color: var(--navy);
-}
-
-
-/* =========================
-   ACTUALITÉS
-========================= */
-
-.news {
-    max-width: 1100px;
-
-    margin: auto;
-
-    padding: 55px 25px;
-}
-
-.news-title {
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: end;
-
-    border-bottom: 1px solid rgba(214,173,85,.3);
-
-    padding-bottom: 15px;
-
-    margin-bottom: 25px;
-}
-
-.news-title h2 {
-    margin: 0;
-
-    font-size: 28px;
-
-    font-weight: normal;
-}
-
-.news-title span {
-    color: var(--gold);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    letter-spacing: 2px;
-}
-
-.news-grid {
     display: grid;
-
     grid-template-columns: repeat(3, 1fr);
 
-    gap: 18px;
+    gap: 22px;
 }
 
-.news-card {
-    min-height: 150px;
+.card {
+    padding: 30px;
 
-    padding: 25px;
+    background: #0d2344;
 
-    border: 1px solid rgba(255,255,255,.1);
+    border: 1px solid rgba(214,173,85,0.18);
 
-    background: rgba(255,255,255,.025);
+    transition: transform 0.2s, border-color 0.2s;
 }
 
-.news-card small {
-    color: var(--gold);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 10px;
-
-    letter-spacing: 1px;
+.card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(214,173,85,0.55);
 }
 
-.news-card h3 {
-    margin: 12px 0 8px;
+.card h3 {
+    margin-top: 0;
 
-    font-size: 19px;
+    font-family: Georgia, "Times New Roman", serif;
+
+    color: #d6ad55;
+
+    font-size: 22px;
 }
 
-.news-card p {
-    margin: 0;
-
-    color: var(--muted);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 13px;
-
-    line-height: 1.5;
+.card p {
+    color: #c9ced7;
+    line-height: 1.65;
+    font-size: 14px;
 }
-
 
 /* =========================
-   REJOINDRE
+   PROJET
 ========================= */
 
-.join {
+.project {
     background: #050f20;
-
-    text-align: center;
-
-    padding: 55px 25px;
-
-    border-top: 1px solid rgba(214,173,85,.25);
 }
 
-.join h2 {
-    margin: 0 0 10px;
-
-    font-size: 31px;
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 22px;
+    margin-top: 45px;
 }
 
-.join p {
-    margin: 0;
+.project-item {
+    padding: 28px;
 
-    color: var(--muted);
+    border-left: 3px solid #d6ad55;
 
-    font-family: Arial, sans-serif;
+    background: rgba(255,255,255,0.025);
 }
 
+.project-item h3 {
+    margin-top: 0;
+
+    font-family: Georgia, "Times New Roman", serif;
+
+    color: #ffffff;
+}
+
+.project-item p {
+    color: #c8ced8;
+    line-height: 1.65;
+}
 
 /* =========================
    FOOTER
 ========================= */
 
 footer {
-    padding: 25px;
+    padding: 40px 20px;
 
     text-align: center;
 
-    color: #7e8999;
+    background: #030a15;
 
-    font-family: Arial, sans-serif;
+    color: #858d9b;
 
-    font-size: 11px;
-
-    border-top: 1px solid rgba(255,255,255,.07);
+    font-size: 12px;
 }
 
+footer strong {
+    color: #d6ad55;
+}
 
 /* =========================
    MOBILE
 ========================= */
 
-@media (max-width: 800px) {
+@media (max-width: 750px) {
 
     header {
-        height: auto;
-
-        padding: 20px;
-
-        flex-direction: column;
-
-        gap: 18px;
+        min-height: 68vh;
+        padding-top: 90px;
     }
 
-    nav {
-        gap: 15px;
-
-        flex-wrap: wrap;
-
-        justify-content: center;
-    }
-
-    nav a {
-        font-size: 10px;
-    }
-
-    .hero {
-        min-height: 440px;
-    }
-
-    .principles,
-    .news-grid {
+    .cards,
+    .project-grid {
         grid-template-columns: 1fr;
     }
 
-    .news-title {
-        display: block;
+    nav a {
+        padding: 15px 12px;
+        font-size: 11px;
     }
 
-    .news-title span {
-        display: block;
-
-        margin-top: 8px;
+    section {
+        padding: 60px 18px;
     }
 
+    .rdv-label {
+        padding: 0 12px;
+        font-size: 9px;
+    }
+
+    .rdv-content {
+        font-size: 11px;
+    }
 }
-
 </style>
 </head>
 
-
 <body>
+
+<!-- =========================
+     ACCES ADMIN
+========================= -->
+
+<a
+    href="admin.html"
+    class="admin-gear"
+    title="Administration"
+    aria-label="Administration"
+>
+    ⚙
+</a>
+
+
+<!-- =========================
+     ACCUEIL
+========================= -->
+
+<header id="accueil">
+
+    <div class="hero">
+
+        <h1 class="logo-title">
+            <span class="logo-a">A</span>VANT-GARD<span class="logo-e">E</span>
+        </h1>
+
+        <div class="hero-subtitle">
+            Souveraineté · Liberté · Responsabilité · Justice
+        </div>
+
+        <p class="hero-text">
+            Un projet politique pour une France souveraine,
+            libre, responsable et tournée vers l'avenir.
+        </p>
+
+    </div>
+
+</header>
 
 
 <!-- =========================
      RENDEZ-VOUS
 ========================= -->
 
-<div class="events-bar">
+<div class="rdv-bar">
 
-    <div class="events-label">
+    <div class="rdv-label">
         NOS RENDEZ-VOUS
     </div>
 
-    <div class="events-track">
+    <div class="rdv-track">
 
-        <div class="event">
-            <strong>PROCHAINEMENT</strong>
-            — Les prochains rendez-vous d'Avant-gardE
-        </div>
-
-        <div class="event">
-            <strong>À VENIR</strong>
-            — Réunions, rencontres et événements
-        </div>
-
-        <div class="event">
-            <strong>REJOIGNEZ-NOUS</strong>
-            — Participez à l'Avant-gardE
-        </div>
-
-        <div class="event">
-            <strong>PROCHAINEMENT</strong>
-            — Les prochains rendez-vous d'Avant-gardE
-        </div>
-
-        <div class="event">
-            <strong>À VENIR</strong>
-            — Réunions, rencontres et événements
+        <div class="rdv-content" id="rdv-content">
+            Chargement des rendez-vous...
         </div>
 
     </div>
@@ -705,276 +471,95 @@ footer {
 
 
 <!-- =========================
-     HEADER
+     MENU
 ========================= -->
 
-<header>
+<nav>
 
-    <a href="index.html" class="logo">
-
-        <span class="logo-a">A</span>
-
-        VANT-GARD
-
-        <span class="logo-e">E</span>
-
+    <a href="#accueil">
+        ACCUEIL
     </a>
 
+    <a href="#manifeste">
+        MANIFESTE
+    </a>
 
-    <nav>
+    <a href="#projet">
+        NOTRE PROJET
+    </a>
 
-        <a href="index.html">
-            ACCUEIL
-        </a>
+    <a href="#inspirations">
+        NOS INSPIRATIONS
+    </a>
 
-        <a href="manifeste.html">
-            MANIFESTE
-        </a>
+    <a href="#equipe">
+        NOTRE ÉQUIPE
+    </a>
 
-        <a href="projet.html">
-            NOTRE PROJET
-        </a>
-
-        <a href="inspirations.html">
-            NOS INSPIRATIONS
-        </a>
-
-        <a href="equipe.html">
-            NOTRE ÉQUIPE
-        </a>
-
-    </nav>
-
-</header>
-
-
-<!-- =========================
-     HERO
-========================= -->
-
-<section class="hero">
-
-    <div class="hero-content">
-
-        <div class="eyebrow">
-            SOUVERAINETÉ · LIBERTÉ · RESPONSABILITÉ
-        </div>
-
-        <h1>
-            LA FRANCE <span>LIBRE.</span>
-        </h1>
-
-        <div class="hero-line"></div>
-
-        <h2>
-            Redonner aux Français leur liberté<br>
-            en redonnant à la France sa souveraineté.
-        </h2>
-
-        <p>
-            Avant-gardE veut dépasser les vieux clivages politiques
-            pour proposer une nouvelle voie : une France souveraine,
-            un État recentré sur l'essentiel et des citoyens libres
-            et responsables.
-        </p>
-
-    </div>
-
-</section>
-
-
-<!-- =========================
-     INTRO
-========================= -->
-
-<section class="intro">
-
-    <div class="section-kicker">
-        NOTRE RAISON D'ÊTRE
-    </div>
-
-    <h2>
-        Changer de paradigme.
-    </h2>
-
-    <p>
-        Nous refusons de choisir entre la souveraineté et la liberté.
-        Entre l'attachement à notre pays et l'émancipation de l'individu.
-        Entre la responsabilité et la justice.
-        Nous voulons réconcilier ces principes dans un même projet politique.
-    </p>
-
-</section>
-
-
-<!-- =========================
-     PRINCIPES
-========================= -->
-
-<section class="principles">
-
-
-    <div class="principle">
-
-        <div class="symbol">
-            ⚖
-        </div>
-
-        <h3>
-            SOUVERAINETÉ
-        </h3>
-
-        <p>
-            La France doit décider librement de son destin
-            et retrouver la maîtrise de ses choix fondamentaux.
-        </p>
-
-    </div>
-
-
-    <div class="principle">
-
-        <div class="symbol">
-            ✦
-        </div>
-
-        <h3>
-            LIBERTÉ
-        </h3>
-
-        <p>
-            L'individu doit pouvoir choisir, entreprendre,
-            travailler et vivre sans un État omniprésent.
-        </p>
-
-    </div>
-
-
-    <div class="principle">
-
-        <div class="symbol">
-            ⚔
-        </div>
-
-        <h3>
-            RESPONSABILITÉ
-        </h3>
-
-        <p>
-            La liberté n'existe que lorsque chacun assume
-            les conséquences de ses choix.
-        </p>
-
-    </div>
-
-
-</section>
+</nav>
 
 
 <!-- =========================
      MANIFESTE
 ========================= -->
 
-<section class="manifesto">
+<section id="manifeste">
 
-    <div class="section-kicker">
-        L'AVANT-GARDE
-    </div>
+    <div class="container">
 
-    <h2>
-        Ni retour en arrière.<br>
-        Ni statu quo.
-    </h2>
-
-    <p>
-        Nous ne voulons pas restaurer le monde d'hier.
-        Nous voulons construire celui de demain.
-        Une France fière de ses racines, maîtresse de son destin
-        et confiante dans la liberté de ses citoyens.
-    </p>
-
-    <a href="manifeste.html" class="button">
-        DÉCOUVRIR LE MANIFESTE →
-    </a>
-
-</section>
-
-
-<!-- =========================
-     ACTUALITÉS
-========================= -->
-
-<section class="news">
-
-    <div class="news-title">
-
-        <h2>
-            Actualités & publications
+        <h2 class="section-title">
+            Manifeste
         </h2>
 
-        <span>
-            AVANT-GARDE
-        </span>
+        <p class="intro">
+            Avant-gardE veut replacer la souveraineté, la liberté,
+            la responsabilité et la justice au cœur de l'action politique.
+            Nous défendons une France maîtresse de ses décisions,
+            de ses frontières, de son économie et de son avenir.
+        </p>
 
-    </div>
+        <div class="cards">
 
+            <div class="card">
 
-    <div class="news-grid">
+                <h3>
+                    Souveraineté
+                </h3>
 
+                <p>
+                    La France doit pouvoir décider librement de son destin
+                    et défendre ses intérêts fondamentaux.
+                </p>
 
-        <div class="news-card">
+            </div>
 
-            <small>
-                BIENTÔT
-            </small>
+            <div class="card">
 
-            <h3>
-                Nos prochaines publications
-            </h3>
+                <h3>
+                    Liberté
+                </h3>
 
-            <p>
-                Retrouvez ici nos analyses, propositions
-                et prises de position.
-            </p>
+                <p>
+                    La liberté individuelle constitue le fondement
+                    d'une société responsable et prospère.
+                </p>
 
-        </div>
+            </div>
 
+            <div class="card">
 
-        <div class="news-card">
+                <h3>
+                    Responsabilité
+                </h3>
 
-            <small>
-                ÉVÉNEMENT
-            </small>
+                <p>
+                    Les droits vont de pair avec des devoirs,
+                    envers soi-même, les autres et la Nation.
+                </p>
 
-            <h3>
-                Nos prochains rendez-vous
-            </h3>
-
-            <p>
-                Rencontres, réunions et événements :
-                restez informés de la vie du mouvement.
-            </p>
-
-        </div>
-
-
-        <div class="news-card">
-
-            <small>
-                À VENIR
-            </small>
-
-            <h3>
-                Le projet Avant-gardE
-            </h3>
-
-            <p>
-                Découvrez progressivement nos propositions
-                pour transformer la France.
-            </p>
+            </div>
 
         </div>
-
 
     </div>
 
@@ -982,22 +567,125 @@ footer {
 
 
 <!-- =========================
-     REJOINDRE
+     NOTRE PROJET
 ========================= -->
 
-<section class="join">
+<section id="projet" class="project">
 
-    <h2>
-        Rejoignez l'Avant-gardE.
-    </h2>
+    <div class="container">
 
-    <p>
-        La politique ne changera pas sans ceux qui décident de la changer.
-    </p>
+        <h2 class="section-title">
+            Notre projet
+        </h2>
 
-    <a href="equipe.html" class="button">
-        NOUS REJOINDRE →
-    </a>
+        <p class="intro">
+            Découvrez progressivement nos propositions et les réformes
+            que nous souhaitons porter pour transformer la France.
+        </p>
+
+        <div class="project-grid">
+
+            <div class="project-item">
+
+                <h3>
+                    Institutions
+                </h3>
+
+                <p>
+                    Repenser nos institutions afin de renforcer
+                    la responsabilité démocratique et l'efficacité
+                    de l'État.
+                </p>
+
+            </div>
+
+            <div class="project-item">
+
+                <h3>
+                    Économie
+                </h3>
+
+                <p>
+                    Libérer l'initiative, encourager l'investissement
+                    et rendre notre économie plus compétitive.
+                </p>
+
+            </div>
+
+            <div class="project-item">
+
+                <h3>
+                    Travail
+                </h3>
+
+                <p>
+                    Valoriser le travail, l'activité et la responsabilité
+                    individuelle.
+                </p>
+
+            </div>
+
+            <div class="project-item">
+
+                <h3>
+                    Famille
+                </h3>
+
+                <p>
+                    Placer la famille et la transmission au cœur
+                    de notre politique nationale.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     INSPIRATIONS
+========================= -->
+
+<section id="inspirations">
+
+    <div class="container">
+
+        <h2 class="section-title">
+            Nos inspirations
+        </h2>
+
+        <p class="intro">
+            Avant-gardE observe les expériences politiques,
+            économiques et institutionnelles menées en France
+            et à l'étranger afin d'en tirer des enseignements.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     EQUIPE
+========================= -->
+
+<section id="equipe" class="project">
+
+    <div class="container">
+
+        <h2 class="section-title">
+            Notre équipe
+        </h2>
+
+        <p class="intro">
+            Une équipe ouverte à celles et ceux qui souhaitent
+            participer à la construction du projet Avant-gardE.
+        </p>
+
+    </div>
 
 </section>
 
@@ -1008,11 +696,118 @@ footer {
 
 <footer>
 
-    © 2026 Avant-gardE
-    — Souveraineté · Liberté · Justice · Patriote
+    <strong>AVANT-GARD<span style="color:#c51f2a;">E</span></strong>
+
+    <br><br>
+
+    Souveraineté · Liberté · Responsabilité · Justice
 
 </footer>
 
+
+<!-- =========================
+     SUPABASE
+========================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+
+const SUPABASE_URL =
+    "https://wlhtegrciehmtxqecopv.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+async function loadRendezvous() {
+
+    const element =
+        document.getElementById("rdv-content");
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("rendezvous")
+        .select(
+            "titre,date_evenement,heure,lieu"
+        )
+        .eq("actif", true)
+        .order("ordre", {
+            ascending: true
+        })
+        .order("date_evenement", {
+            ascending: true
+        });
+
+    if (error) {
+
+        element.textContent =
+            "Aucun rendez-vous actuellement.";
+
+        return;
+    }
+
+    if (!data || data.length === 0) {
+
+        element.textContent =
+            "Aucun rendez-vous actuellement.";
+
+        return;
+    }
+
+
+    const textes = data.map(event => {
+
+        let texte =
+            event.titre || "";
+
+        if (event.date_evenement) {
+
+            const date =
+                new Date(
+                    event.date_evenement + "T00:00:00"
+                ).toLocaleDateString(
+                    "fr-FR",
+                    {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                    }
+                );
+
+            texte += " — " + date;
+        }
+
+        if (event.heure) {
+            texte += " — " + event.heure;
+        }
+
+        if (event.lieu) {
+            texte += " — " + event.lieu;
+        }
+
+        return texte;
+
+    });
+
+
+    element.textContent =
+        textes.join("     •     ");
+
+}
+
+
+loadRendezvous();
+
+</script>
 
 </body>
 </html>
