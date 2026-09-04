@@ -18,10 +18,7 @@
     --white: #f5f3ed;
     --muted: #b8c0cd;
 
-    /* Bleu français */
     --blue-france: #0055A4;
-
-    /* Rouge français */
     --red: #EF4135;
 }
 
@@ -87,12 +84,7 @@ body {
 }
 
 
-/*
-   Zone réelle de défilement.
-
-   IMPORTANT :
-   elle prend toute la largeur restante.
-*/
+/* Zone de défilement */
 
 .events-window {
     flex: 1;
@@ -105,11 +97,7 @@ body {
 }
 
 
-/*
-   Le contenu est positionné à gauche.
-
-   On ne met PAS de transform initial à 50%.
-*/
+/* Contenu animé */
 
 .events-track {
     position: absolute;
@@ -177,14 +165,6 @@ body {
 }
 
 
-/*
-   Animation créée en Javascript.
-
-   Cela permet de calculer précisément la longueur
-   du contenu et donc d'éviter les doublons artificiels.
-*/
-
-
 /* =====================================================
    HEADER
 ===================================================== */
@@ -228,9 +208,7 @@ header {
 }
 
 
-/*
-   Pastilles blanches derrière le A et le E
-*/
+/* Pastilles blanches derrière le A et le E */
 
 .logo-a,
 .logo-e {
@@ -255,18 +233,14 @@ header {
 }
 
 
-/*
-   A = bleu français
-*/
+/* A bleu français */
 
 .logo-a {
     color: var(--blue-france);
 }
 
 
-/*
-   E = rouge
-*/
+/* E rouge */
 
 .logo-e {
     color: var(--red);
@@ -1251,7 +1225,7 @@ footer {
 
         <p>
 
-            t-gardE veut dépasser les vieux clivages politiques
+            Avant-gardE veut dépasser les vieux clivages politiques
             pour proposer une nouvelle voie : une France souveraine,
             un État recentré sur l'essentiel et des citoyens libres
             et responsables.
@@ -1728,9 +1702,8 @@ async function chargerRendezVous() {
 
 
     /*
-       Création d'un seul élément par rendez-vous.
-
-       Pas de duplication artificielle.
+       Un seul élément HTML par rendez-vous.
+       Aucune duplication.
     */
 
     track.innerHTML = "";
@@ -1828,27 +1801,21 @@ async function chargerRendezVous() {
     );
 
 
-    /*
-       Lancement du défilement.
-    */
-
     demarrerDefilement();
 
 }
 
 
 /* =====================================================
-   DÉFILEMENT
+   DÉFILEMENT DE DROITE À GAUCHE
 ===================================================== */
 
 function demarrerDefilement() {
-
 
     const track =
         document.getElementById(
             "eventsTrack"
         );
-
 
     const windowElement =
         document.querySelector(
@@ -1861,20 +1828,23 @@ function demarrerDefilement() {
     }
 
 
-    if (
-        tickerAnimation
-    ) {
+    /*
+       Arrêt de l'animation précédente
+    */
+
+    if (tickerAnimation) {
 
         cancelAnimationFrame(
             tickerAnimation
         );
 
+        tickerAnimation = null;
+
     }
 
 
     /*
-       Si le contenu est plus petit que la zone,
-       on le laisse simplement visible sans doublon.
+       Largeur réelle du rendez-vous
     */
 
     const largeurContenu =
@@ -1885,35 +1855,44 @@ function demarrerDefilement() {
         windowElement.clientWidth;
 
 
-    if (
-        largeurContenu <=
-        largeurFenetre
-    ) {
-
-        track.style.transform =
-            "translateX(0)";
-
+    if (!largeurContenu) {
         return;
-
     }
 
 
     /*
-       Vitesse rapide :
-       environ 110 pixels/seconde.
+       Vitesse du défilement.
+
+       180 px/seconde.
     */
 
-    const vitesse =
-        110;
+    const vitesse = 180;
 
+
+    /*
+       Départ complètement
+       à droite de la fenêtre.
+    */
 
     let position =
-        0;
+        largeurFenetre;
 
 
     let dernierTemps =
         performance.now();
 
+
+    /*
+       Position initiale.
+    */
+
+    track.style.transform =
+        `translateX(${position}px)`;
+
+
+    /*
+       Animation
+    */
 
     function animation(
         temps
@@ -1929,33 +1908,33 @@ function demarrerDefilement() {
             temps;
 
 
-        position +=
+        /*
+           Déplacement vers la gauche.
+        */
+
+        position -=
             vitesse * delta;
 
 
         /*
-           Lorsque le contenu entier
-           a quitté la zone, on recommence
-           immédiatement au début.
-
-           Cela évite le deuxième exemplaire
-           visible simultanément.
+           Lorsque le rendez-vous
+           a complètement disparu
+           à gauche, retour à droite.
         */
 
         if (
-            position >=
-            largeurContenu +
-            35
+            position <=
+            -largeurContenu
         ) {
 
             position =
-                -largeurFenetre;
+                largeurFenetre;
 
         }
 
 
         track.style.transform =
-            `translateX(${-position}px)`;
+            `translateX(${position}px)`;
 
 
         tickerAnimation =
@@ -1964,18 +1943,6 @@ function demarrerDefilement() {
             );
 
     }
-
-
-    /*
-       Départ depuis le bord gauche
-       de la zone du bandeau.
-    */
-
-    position = 0;
-
-
-    dernierTemps =
-        performance.now();
 
 
     tickerAnimation =
@@ -2166,9 +2133,6 @@ function ouvrirRendezVous(
 
     /*
        DESCRIPTION
-
-       Le panneau admin peut utiliser
-       "description" ou "texte".
     */
 
     description.textContent =
@@ -2281,7 +2245,7 @@ document.addEventListener(
 
 
 /* =====================================================
-   PROTECTION DU HTML
+   PROTECTION HTML
 ===================================================== */
 
 function escapeHtml(
