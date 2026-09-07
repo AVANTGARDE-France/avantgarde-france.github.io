@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -113,22 +113,17 @@ body{
 
 
 /* =========================
-   HEADER — IDENTIQUE ACCUEIL
+   HEADER
 ========================= */
 
 header{
   height:82px;
-
   padding:0 5%;
-
   display:flex;
   align-items:center;
   justify-content:space-between;
-
   border-bottom:1px solid rgba(214,173,85,.25);
-
   background:rgba(7,21,45,.97);
-
   position:relative;
 }
 
@@ -139,28 +134,18 @@ header{
 
 .admin-gear{
   position:absolute;
-
   right:14px;
   top:7px;
-
   width:23px;
   height:23px;
-
   display:flex;
-
   align-items:center;
   justify-content:center;
-
   color:rgba(255,255,255,.42);
-
   text-decoration:none;
-
   font-family:Arial,sans-serif;
-
   font-size:14px;
-
   border-radius:50%;
-
   transition:
     color .2s,
     background .2s,
@@ -169,59 +154,40 @@ header{
 
 .admin-gear:hover{
   color:var(--gold-light);
-
   background:rgba(255,255,255,.06);
-
   transform:rotate(20deg);
 }
 
 
 /* =========================
-   LOGO — IDENTIQUE ACCUEIL
+   LOGO
 ========================= */
 
 .logo{
   color:var(--white);
-
   text-decoration:none;
-
   display:flex;
   align-items:center;
-
   font-family:Georgia,"Times New Roman",serif;
-
   font-size:28px;
-
   font-weight:bold;
-
   letter-spacing:-1.2px;
-
   line-height:1;
-
   font-kerning:normal;
-
   text-rendering:optimizeLegibility;
-
   white-space:nowrap;
 }
 
 .logo-a,
 .logo-e{
   display:inline;
-
   width:auto;
   height:auto;
-
   background:transparent;
-
   border-radius:0;
-
   font-family:Georgia,"Times New Roman",serif;
-
   font-size:inherit;
-
   font-weight:bold;
-
   line-height:inherit;
 }
 
@@ -235,30 +201,22 @@ header{
 
 
 /* =========================
-   NAVIGATION — IDENTIQUE ACCUEIL
+   NAVIGATION
 ========================= */
 
 nav{
   display:flex;
-
   gap:28px;
-
   align-items:center;
 }
 
 nav a{
   color:#e7e7e7;
-
   text-decoration:none;
-
   font-family:Arial,sans-serif;
-
   font-size:12px;
-
   font-weight:bold;
-
   letter-spacing:1px;
-
   transition:color .2s;
 }
 
@@ -662,6 +620,27 @@ textarea{
 
 
 /* =========================
+   COMPTEUR DESCRIPTION
+========================= */
+
+.description-counter{
+  text-align:right;
+  color:#8994a6;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  margin-top:6px;
+}
+
+.description-counter.warning{
+  color:var(--gold-light);
+}
+
+.description-counter.limit{
+  color:var(--red);
+}
+
+
+/* =========================
    CHOIX SYMPATHISANT / ANONYME
 ========================= */
 
@@ -834,26 +813,21 @@ footer{
 
 
 /* =========================
-   MOBILE — ADAPTÉ ACCUEIL
+   MOBILE
 ========================= */
 
 @media(max-width:800px){
 
   header{
     height:auto;
-
     padding:20px;
-
     flex-direction:column;
-
     gap:18px;
   }
 
   nav{
     gap:15px;
-
     flex-wrap:wrap;
-
     justify-content:center;
   }
 
@@ -1176,6 +1150,11 @@ footer{
 
     <form id="joinForm">
 
+
+      <!-- =========================
+           TYPE D'INSCRIPTION
+      ========================= -->
+
       <div class="form-group">
 
         <label class="main-label">
@@ -1244,6 +1223,10 @@ footer{
       </div>
 
 
+      <!-- =========================
+           NOM
+      ========================= -->
+
       <div class="form-group">
 
         <label
@@ -1263,6 +1246,10 @@ footer{
 
       </div>
 
+
+      <!-- =========================
+           EMAIL
+      ========================= -->
 
       <div class="form-group">
 
@@ -1286,6 +1273,10 @@ footer{
 
       </div>
 
+
+      <!-- =========================
+           REGION
+      ========================= -->
 
       <div class="form-group">
 
@@ -1352,6 +1343,10 @@ footer{
       </div>
 
 
+      <!-- =========================
+           IMAGE
+      ========================= -->
+
       <div class="form-group">
 
         <label
@@ -1374,6 +1369,10 @@ footer{
       </div>
 
 
+      <!-- =========================
+           DESCRIPTION
+      ========================= -->
+
       <div class="form-group">
 
         <label
@@ -1389,12 +1388,19 @@ footer{
           placeholder="Présentez-vous en quelques mots..."
         ></textarea>
 
-        <div class="help">
-          300 caractères maximum.
+        <div
+          class="description-counter"
+          id="descriptionCounter"
+        >
+          <span id="descriptionCount">0</span> / 300
         </div>
 
       </div>
 
+
+      <!-- =========================
+           COMPETENCES
+      ========================= -->
 
       <div class="form-section-title">
         Talents et compétences métier
@@ -1420,154 +1426,218 @@ footer{
 
 
         <div class="competence">
+
           <label>
+
             <input
               type="checkbox"
               name="competences"
               value="Maîtrise de doctrine"
             >
+
             <span>
+
               <span class="competence-name">
                 Maîtrise de doctrine
               </span>
+
               <span class="competence-description">
                 capacité à préserver la fidélité à l’idéologie d'Avant-Garde et sa cohérence dans l’action du mouvement.
               </span>
+
             </span>
+
           </label>
+
         </div>
 
 
         <div class="competence">
+
           <label>
+
             <input
               type="checkbox"
               name="competences"
               value="Tactique"
             >
+
             <span>
+
               <span class="competence-name">
                 Tactique
               </span>
+
               <span class="competence-description">
                 capacité à concevoir et mettre en œuvre des tactiques efficaces de développement d’audience, médiatique et électorale, sans renier l’idéologie.
               </span>
+
             </span>
+
           </label>
+
         </div>
 
 
         <div class="competence">
+
           <label>
+
             <input
               type="checkbox"
               name="competences"
               value="Prestance"
             >
+
             <span>
+
               <span class="competence-name">
                 Prestance
               </span>
+
               <span class="competence-description">
                 capacité à séduire et convaincre par la parole, le charisme, le charme ou la culture.
               </span>
+
             </span>
+
           </label>
+
         </div>
 
 
         <div class="competence">
+
           <label>
+
             <input
               type="checkbox"
               name="competences"
               value="Analyses pragmatiques"
             >
+
             <span>
+
               <span class="competence-name">
                 Analyses pragmatiques
               </span>
+
               <span class="competence-description">
                 capacité à analyser les données, les rendements, les conséquences et les rapports de force. anticipent les évolutions et privilégient les faits.
               </span>
+
             </span>
+
           </label>
+
         </div>
 
 
         <div class="competence">
+
           <label>
+
             <input
               type="checkbox"
               name="competences"
               value="Analyses populistes"
             >
+
             <span>
+
               <span class="competence-name">
                 Analyses populistes
               </span>
+
               <span class="competence-description">
                 capacité à analyser les ressentis, aspirations et frustrations populaires. anticipent les réactions naturelles et privilégient le vécu et l’opinion du peuple.
               </span>
+
             </span>
+
           </label>
+
         </div>
 
 
         <div class="competence">
+
           <label>
+
             <input
               type="checkbox"
               name="competences"
               value="Administration"
             >
+
             <span>
+
               <span class="competence-name">
                 Administration
               </span>
+
               <span class="competence-description">
                 maîtrise de la gestion des structures, des ressources techniques et opérationnelles et des équipes internes.
               </span>
+
             </span>
+
           </label>
+
         </div>
 
 
         <div class="competence">
+
           <label>
+
             <input
               type="checkbox"
               name="competences"
               value="Expertise et ingénierie juridique"
             >
+
             <span>
+
               <span class="competence-name">
                 Expertise et ingénierie juridique
               </span>
+
               <span class="competence-description">
                 maîtrise du droit français et européen ainsi que des mécanismes juridiques, avec capacité à en analyser les règles, les contraintes, les failles et les possibilités d’évolution.
               </span>
+
             </span>
+
           </label>
+
         </div>
 
 
         <div class="competence">
+
           <label>
+
             <input
               type="checkbox"
               name="competences"
               value="Expertise et ingénierie politique"
             >
+
             <span>
+
               <span class="competence-name">
                 Expertise et ingénierie politique
               </span>
+
               <span class="competence-description">
                 maîtrise d’un domaine politique ou institutionnel particulier et capacité à en apporter l’expertise.
               </span>
+
             </span>
+
           </label>
+
         </div>
 
       </div>
@@ -1644,6 +1714,7 @@ footer{
         CRÉER MON PROFIL
       </button>
 
+
       <div
         id="formMessage"
         class="form-message"
@@ -1696,7 +1767,9 @@ footer{
 
 
 <footer>
+
   © 2026 Avant-gardE — Souveraineté · Liberté · Justice · Patriote
+
 </footer>
 
 
@@ -1737,6 +1810,15 @@ const eventModal =
 
 const submitButton =
   document.getElementById("submitButton");
+
+const descriptionField =
+  document.getElementById("description");
+
+const descriptionCount =
+  document.getElementById("descriptionCount");
+
+const descriptionCounter =
+  document.getElementById("descriptionCounter");
 
 
 /* =========================================================
@@ -1807,6 +1889,49 @@ function normaliserCompetences(value){
   return [];
 
 }
+
+
+/* =========================================================
+   COMPTEUR DESCRIPTION
+========================================================= */
+
+function mettreAJourCompteurDescription(){
+
+  const longueur =
+    descriptionField.value.length;
+
+  descriptionCount.textContent =
+    longueur;
+
+  descriptionCounter.classList.remove(
+    "warning",
+    "limit"
+  );
+
+  if(longueur >= 300){
+
+    descriptionCounter.classList.add(
+      "limit"
+    );
+
+  }else if(longueur >= 270){
+
+    descriptionCounter.classList.add(
+      "warning"
+    );
+
+  }
+
+}
+
+
+descriptionField.addEventListener(
+  "input",
+  mettreAJourCompteurDescription
+);
+
+
+mettreAJourCompteurDescription();
 
 
 /* =========================================================
@@ -2178,6 +2303,8 @@ document
       message.textContent =
         "";
 
+      mettreAJourCompteurDescription();
+
       ouvrirModal(joinModal);
 
     }
@@ -2532,6 +2659,9 @@ document
         .getElementById("typeSympathisant")
         .checked =
           true;
+
+
+      mettreAJourCompteurDescription();
 
 
       submitButton.disabled =
