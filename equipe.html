@@ -1,2159 +1,2890 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Avant-gardE — La France libre</title>
+<title>Avant-gardE — Notre équipe</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 
-:root {
-    --navy: #07152d;
-    --navy2: #0d2344;
-    --gold: #d6ad55;
-    --gold-light: #f0d58a;
-    --white: #f5f3ed;
-    --muted: #b8c0cd;
-
-    --blue-france: #0055A4;
-    --red: #EF4135;
+:root{
+  --navy:#07152d;
+  --navy2:#0d2344;
+  --gold:#d6ad55;
+  --gold-light:#f0d58a;
+  --white:#f5f3ed;
+  --muted:#b8c0cd;
+  --blue-france:#0055A4;
+  --red:#EF4135;
+  --border:rgba(214,173,85,.28);
 }
 
-* {
-    box-sizing: border-box;
+*{
+  box-sizing:border-box;
 }
 
-html {
-    scroll-behavior: smooth;
+html{
+  scroll-behavior:smooth;
 }
 
-body {
-    margin: 0;
-    background: var(--navy);
-    color: var(--white);
-    font-family: Georgia, "Times New Roman", serif;
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(214,173,85,.07),transparent 35%),
+    var(--navy);
+  color:var(--white);
+  font-family:Georgia,"Times New Roman",serif;
 }
 
-
-/* =====================================================
+/* =========================
    RENDEZ-VOUS
-===================================================== */
+========================= */
 
-.events-bar {
-    height: 36px;
-    background: #050f20;
-    border-bottom: 1px solid rgba(214,173,85,.35);
-
-    display: flex;
-    align-items: center;
-
-    overflow: hidden;
-
-    font-family: Arial, sans-serif;
-    font-size: 12px;
+.events-bar{
+  height:38px;
+  background:#040d1d;
+  border-bottom:1px solid rgba(214,173,85,.18);
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  position:relative;
 }
 
-.events-label {
-    flex-shrink: 0;
-
-    height: 100%;
-
-    display: flex;
-    align-items: center;
-
-    padding: 0 17px;
-
-    color: var(--gold-light);
-
-    font-weight: bold;
-
-    letter-spacing: 1px;
-
-    border-right: 1px solid rgba(214,173,85,.3);
-
-    position: relative;
-    z-index: 5;
-
-    background: #050f20;
+.events-label{
+  flex:0 0 auto;
+  height:100%;
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+  background:var(--gold);
+  color:#07152d;
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1.3px;
+  z-index:3;
 }
 
-.events-window {
-    flex: 1;
-
-    height: 100%;
-
-    overflow: hidden;
-
-    position: relative;
+.events-window{
+  position:relative;
+  flex:1;
+  height:100%;
+  overflow:hidden;
 }
 
-.events-track {
-    position: absolute;
-
-    left: 0;
-    top: 0;
-
-    height: 100%;
-
-    display: inline-flex;
-    align-items: center;
-
-    white-space: nowrap;
-
-    will-change: transform;
+.events-track{
+  position:absolute;
+  left:0;
+  top:0;
+  height:100%;
+  display:flex;
+  align-items:center;
+  white-space:nowrap;
+  will-change:transform;
 }
 
-.event {
-    display: inline-flex;
-    align-items: center;
-
-    height: 100%;
-
-    padding: 0 35px;
-
-    color: #e3e5e8;
-
-    cursor: pointer;
-
-    transition:
-        background .2s,
-        color .2s;
+.event-item{
+  display:inline-flex;
+  align-items:center;
+  height:100%;
+  padding:0 25px;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  color:#e9edf3;
+  cursor:pointer;
 }
 
-.event:hover {
-    background: rgba(214,173,85,.08);
-    color: white;
+.event-item strong{
+  color:var(--gold-light);
+  margin-right:7px;
 }
 
-.event strong {
-    color: var(--gold-light);
-
-    margin-right: 7px;
+.event-separator{
+  color:var(--gold);
+  opacity:.55;
+  margin:0 4px;
 }
 
-.event-separator {
-    color: rgba(214,173,85,.5);
-
-    margin: 0 5px;
-}
-
-.events-empty {
-    height: 100%;
-
-    display: flex;
-    align-items: center;
-
-    padding-left: 18px;
-
-    color: #8e98a6;
-}
-
-
-/* =====================================================
+/* =========================
    HEADER
-===================================================== */
+========================= */
 
-header {
-    height: 82px;
-
-    padding: 0 5%;
-
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    border-bottom: 1px solid rgba(214,173,85,.25);
-
-    background: rgba(7,21,45,.97);
-
-    position: relative;
+header{
+  position:relative;
+  padding:25px 6% 20px;
+  border-bottom:1px solid rgba(214,173,85,.16);
+  background:rgba(7,21,45,.96);
 }
 
-
-/* =====================================================
-   LOGO — AVANT-GARDE
-===================================================== */
-
-.logo {
-
-    color: var(--white);
-
-    text-decoration: none;
-
-    /*
-       Même esprit typographique que le lettrage
-       validé : serif élégant, plus éditorial.
-    */
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-    font-size: 27px;
-
-    font-weight: bold;
-
-    letter-spacing: 1.2px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 1px;
-
-    line-height: 1;
-
+.admin-gear{
+  position:absolute;
+  top:17px;
+  right:25px;
+  color:rgba(255,255,255,.55);
+  text-decoration:none;
+  font-family:Arial,sans-serif;
+  font-size:18px;
+  transition:.2s;
 }
 
-
-/*
-   Pastilles blanches derrière le A et le E
-*/
-
-.logo-a,
-.logo-e {
-
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    width: 32px;
-    height: 32px;
-
-    background: #ffffff;
-
-    border-radius: 50%;
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-    font-size: 20px;
-
-    font-weight: bold;
-
-    line-height: 1;
-
-    vertical-align: middle;
-
+.admin-gear:hover{
+  color:var(--gold);
 }
 
-
-/*
-   A bleu français
-*/
-
-.logo-a {
-    color: var(--blue-france);
+.logo{
+  display:inline-block;
+  text-decoration:none;
+  color:var(--white);
+  font-size:30px;
+  font-weight:bold;
+  letter-spacing:-1px;
+  margin-bottom:16px;
 }
 
-
-/*
-   E rouge
-*/
-
-.logo-e {
-    color: var(--red);
+.logo-a{
+  color:var(--blue-france);
 }
 
-
-/* =====================================================
-   ROUE ADMIN
-===================================================== */
-
-.admin-gear {
-
-    position: absolute;
-
-    right: 14px;
-    top: 7px;
-
-    width: 23px;
-    height: 23px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    color: rgba(255,255,255,.42);
-
-    text-decoration: none;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 14px;
-
-    border-radius: 50%;
-
-    transition:
-        color .2s,
-        background .2s,
-        transform .2s;
+.logo-e{
+  color:var(--red);
 }
 
-.admin-gear:hover {
-
-    color: var(--gold-light);
-
-    background: rgba(255,255,255,.06);
-
-    transform: rotate(20deg);
+nav{
+  display:flex;
+  gap:26px;
+  align-items:center;
+  flex-wrap:wrap;
 }
 
-
-/* =====================================================
-   NAVIGATION
-===================================================== */
-
-nav {
-
-    display: flex;
-
-    gap: 28px;
-
-    align-items: center;
+nav a{
+  color:rgba(245,243,237,.72);
+  text-decoration:none;
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  letter-spacing:1.2px;
+  font-weight:bold;
+  transition:.2s;
 }
 
-nav a {
-
-    color: #e7e7e7;
-
-    text-decoration: none;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 12px;
-
-    font-weight: bold;
-
-    letter-spacing: 1px;
-
-    transition: color .2s;
+nav a:hover,
+nav a.active{
+  color:var(--gold-light);
 }
 
-nav a:hover {
-    color: var(--gold);
-}
-
-
-/* =====================================================
+/* =========================
    HERO
-===================================================== */
+========================= */
 
-.hero {
-
-    position: relative;
-
-    min-height: 520px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-
-    overflow: hidden;
-
-    background:
-        linear-gradient(
-            rgba(5,17,37,.67),
-            rgba(5,17,37,.82)
-        ),
-        radial-gradient(
-            circle at center,
-            #17345b 0%,
-            #08172f 60%,
-            #050e1d 100%
-        );
+.hero{
+  max-width:1100px;
+  margin:0 auto;
+  padding:75px 25px 45px;
+  text-align:center;
 }
 
-.hero::before,
-.hero::after {
-
-    content: "";
-
-    position: absolute;
-
-    width: 260px;
-    height: 260px;
-
-    border: 1px solid rgba(214,173,85,.18);
-
-    transform: rotate(45deg);
+.kicker{
+  font-family:Arial,sans-serif;
+  color:var(--gold);
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:3px;
+  margin-bottom:16px;
 }
 
-.hero::before {
-
-    left: -150px;
-    top: 80px;
+.hero h1{
+  margin:0;
+  font-size:clamp(42px,7vw,76px);
+  line-height:.95;
+  letter-spacing:-2px;
 }
 
-.hero::after {
-
-    right: -150px;
-    bottom: 80px;
+.hero h1 span{
+  color:var(--gold);
 }
 
-.hero-content {
-
-    position: relative;
-
-    z-index: 2;
-
-    max-width: 900px;
-
-    padding: 50px 25px;
+.hero p{
+  max-width:720px;
+  margin:25px auto 30px;
+  color:var(--muted);
+  font-size:17px;
+  line-height:1.65;
 }
 
-.eyebrow {
+/* =========================
+   BOUTON REJOINDRE
+========================= */
 
-    color: var(--gold-light);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 12px;
-
-    letter-spacing: 4px;
-
-    font-weight: bold;
-
-    margin-bottom: 18px;
+.join-button{
+  border:1px solid var(--gold);
+  background:var(--gold);
+  color:var(--navy);
+  padding:14px 26px;
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1.2px;
+  cursor:pointer;
+  transition:.25s;
 }
 
-.hero h1 {
-
-    margin: 0;
-
-    font-size: clamp(48px, 8vw, 92px);
-
-    letter-spacing: 4px;
-
-    line-height: .95;
-
-    text-transform: uppercase;
+.join-button:hover{
+  background:var(--gold-light);
+  transform:translateY(-2px);
+  box-shadow:0 8px 25px rgba(0,0,0,.25);
 }
 
-.hero h1 span {
-    color: var(--gold);
+/* =========================
+   MEMBRES
+========================= */
+
+.team-section{
+  max-width:1200px;
+  margin:0 auto;
+  padding:20px 25px 90px;
 }
 
-.hero-line {
-
-    width: 100px;
-
-    height: 2px;
-
-    background: var(--gold);
-
-    margin: 25px auto;
+.section-title{
+  text-align:center;
+  margin-bottom:35px;
 }
 
-.hero h2 {
-
-    margin: 0;
-
-    font-size: clamp(18px, 3vw, 27px);
-
-    font-weight: normal;
-
-    letter-spacing: 2px;
+.section-title h2{
+  margin:0 0 10px;
+  font-size:30px;
 }
 
-.hero p {
-
-    max-width: 680px;
-
-    margin: 22px auto 0;
-
-    color: #cbd1da;
-
-    font-family: Arial, sans-serif;
-
-    line-height: 1.7;
-
-    font-size: 15px;
+.section-title p{
+  margin:0;
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:13px;
 }
 
-
-/* =====================================================
-   INTRO
-===================================================== */
-
-.intro {
-
-    max-width: 1050px;
-
-    margin: auto;
-
-    padding: 55px 25px 45px;
-
-    text-align: center;
+.team-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(245px,1fr));
+  gap:20px;
 }
 
-.section-kicker {
-
-    color: var(--gold);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-    letter-spacing: 3px;
-
-    margin-bottom: 12px;
+.member-card{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.015));
+  border:1px solid var(--border);
+  padding:22px;
+  cursor:pointer;
+  transition:.25s;
+  min-height:280px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
 }
 
-.intro h2 {
-
-    margin: 0 0 18px;
-
-    font-size: 31px;
-
-    font-weight: normal;
+.member-card:hover{
+  border-color:rgba(214,173,85,.75);
+  transform:translateY(-4px);
+  box-shadow:0 12px 35px rgba(0,0,0,.25);
 }
 
-.intro p {
-
-    max-width: 760px;
-
-    margin: auto;
-
-    color: var(--muted);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 15px;
-
-    line-height: 1.7;
+.member-photo{
+  width:105px;
+  height:105px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--gold);
+  margin-bottom:16px;
+  background:var(--navy2);
 }
 
-
-/* =====================================================
-   PRINCIPES
-===================================================== */
-
-.principles {
-
-    max-width: 1100px;
-
-    margin: auto;
-
-    padding: 15px 25px 55px;
-
-    display: grid;
-
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 18px;
+.member-photo-placeholder{
+  width:105px;
+  height:105px;
+  border-radius:50%;
+  border:2px solid var(--gold);
+  margin-bottom:16px;
+  background:var(--navy2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--gold);
+  font-size:35px;
 }
 
-.principle {
-
-    border: 1px solid rgba(214,173,85,.3);
-
-    background: rgba(255,255,255,.025);
-
-    padding: 28px 25px;
-
-    text-align: center;
+.member-name{
+  font-size:22px;
+  margin-bottom:6px;
 }
 
-.symbol {
-
-    color: var(--gold);
-
-    font-size: 25px;
-
-    margin-bottom: 12px;
+.member-grade{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  font-weight:bold;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  margin-bottom:8px;
 }
 
-.principle h3 {
-
-    margin: 0 0 10px;
-
-    font-size: 20px;
-
-    letter-spacing: 1px;
+.member-region{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  margin-bottom:12px;
 }
 
-.principle p {
-
-    margin: 0;
-
-    color: var(--muted);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 13px;
-
-    line-height: 1.6;
+.member-description{
+  color:#c8ced8;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  line-height:1.5;
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
 }
 
-
-/* =====================================================
-   MANIFESTE
-===================================================== */
-
-.manifesto {
-
-    background: var(--navy2);
-
-    border-top: 1px solid rgba(214,173,85,.2);
-
-    border-bottom: 1px solid rgba(214,173,85,.2);
-
-    padding: 50px 25px;
-
-    text-align: center;
+.loading,
+.no-members{
+  grid-column:1/-1;
+  text-align:center;
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  padding:50px;
 }
 
-.manifesto h2 {
+/* =========================
+   MODALES
+========================= */
 
-    margin: 0 auto 18px;
-
-    max-width: 850px;
-
-    font-size: clamp(25px, 4vw, 38px);
-
-    line-height: 1.2;
-
-    font-weight: normal;
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(6px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:1000;
 }
 
-.manifesto p {
-
-    max-width: 720px;
-
-    margin: auto;
-
-    color: #c7ced8;
-
-    font-family: Arial, sans-serif;
-
-    line-height: 1.7;
+.modal.active{
+  display:flex;
 }
 
-.button {
-
-    display: inline-block;
-
-    margin-top: 25px;
-
-    padding: 12px 25px;
-
-    border: 1px solid var(--gold);
-
-    color: var(--gold-light);
-
-    text-decoration: none;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-    letter-spacing: 1.5px;
-
-    transition: .2s;
+.modal-box{
+  width:min(720px,100%);
+  max-height:92vh;
+  overflow-y:auto;
+  background:
+    linear-gradient(145deg,#0d2344,#07152d);
+  border:1px solid var(--border);
+  box-shadow:0 25px 80px rgba(0,0,0,.55);
+  position:relative;
+  padding:38px;
 }
 
-.button:hover {
-
-    background: var(--gold);
-
-    color: var(--navy);
+.modal-close{
+  position:absolute;
+  right:18px;
+  top:14px;
+  border:0;
+  background:none;
+  color:rgba(255,255,255,.65);
+  font-size:28px;
+  cursor:pointer;
+  line-height:1;
 }
 
-
-/* =====================================================
-   ACTUALITÉS
-===================================================== */
-
-.news {
-
-    max-width: 1100px;
-
-    margin: auto;
-
-    padding: 55px 25px;
+.modal-close:hover{
+  color:var(--gold);
 }
 
-.news-title {
+/* =========================
+   PROFIL
+========================= */
 
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: end;
-
-    border-bottom: 1px solid rgba(214,173,85,.3);
-
-    padding-bottom: 15px;
-
-    margin-bottom: 25px;
+.profile-modal-content{
+  text-align:center;
 }
 
-.news-title h2 {
-
-    margin: 0;
-
-    font-size: 28px;
-
-    font-weight: normal;
+.profile-modal-image{
+  width:135px;
+  height:135px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--gold);
+  margin:5px auto 18px;
+  display:none;
 }
 
-.news-title span {
-
-    color: var(--gold);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    letter-spacing: 2px;
+.profile-placeholder{
+  width:135px;
+  height:135px;
+  border-radius:50%;
+  border:2px solid var(--gold);
+  background:var(--navy2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:5px auto 18px;
+  color:var(--gold);
+  font-size:45px;
 }
 
-.news-grid {
-
-    display: grid;
-
-    grid-template-columns: repeat(3, 1fr);
-
-    gap: 18px;
+.profile-modal-content h2{
+  margin:0 0 8px;
+  font-size:32px;
 }
 
-.news-card {
-
-    min-height: 150px;
-
-    padding: 25px;
-
-    border: 1px solid rgba(255,255,255,.1);
-
-    background: rgba(255,255,255,.025);
+.profile-grade{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
 }
 
-.news-card small {
-
-    color: var(--gold);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 10px;
-
-    letter-spacing: 1px;
+.profile-region{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  margin:10px 0 25px;
 }
 
-.news-card h3 {
-
-    margin: 12px 0 8px;
-
-    font-size: 19px;
+.profile-description{
+  color:#d8dce3;
+  font-family:Arial,sans-serif;
+  font-size:14px;
+  line-height:1.65;
+  margin-bottom:25px;
 }
 
-.news-card p {
-
-    margin: 0;
-
-    color: var(--muted);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 13px;
-
-    line-height: 1.5;
+.profile-competences{
+  border-top:1px solid rgba(214,173,85,.2);
+  padding-top:22px;
 }
 
-
-/* =====================================================
-   REJOINDRE
-===================================================== */
-
-.join {
-
-    background: #050f20;
-
-    text-align: center;
-
-    padding: 55px 25px;
-
-    border-top: 1px solid rgba(214,173,85,.25);
+.profile-competences h3{
+  color:var(--gold);
+  font-size:17px;
+  margin:0 0 15px;
 }
 
-.join h2 {
-
-    margin: 0 0 10px;
-
-    font-size: 31px;
+.competence-list{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px;
 }
 
-.join p {
-
-    margin: 0;
-
-    color: var(--muted);
-
-    font-family: Arial, sans-serif;
+.competence-tag{
+  border:1px solid rgba(214,173,85,.4);
+  color:#e6d49e;
+  padding:7px 10px;
+  font-family:Arial,sans-serif;
+  font-size:11px;
 }
 
+/* =========================
+   FORMULAIRE
+========================= */
 
-/* =====================================================
+.form-title{
+  margin:0 0 8px;
+  font-size:32px;
+}
+
+.form-intro{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:13px;
+  line-height:1.5;
+  margin-bottom:28px;
+}
+
+.form-group{
+  margin-bottom:21px;
+}
+
+.form-group label.main-label{
+  display:block;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  font-weight:bold;
+  letter-spacing:.4px;
+  margin-bottom:8px;
+}
+
+.required{
+  color:var(--gold);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="url"],
+textarea,
+select{
+  width:100%;
+  border:1px solid rgba(255,255,255,.15);
+  background:#061329;
+  color:var(--white);
+  padding:12px 13px;
+  font-family:Arial,sans-serif;
+  font-size:13px;
+  outline:none;
+  border-radius:0;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:var(--gold);
+}
+
+textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+.help{
+  color:#8994a6;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  margin-top:6px;
+}
+
+/* =========================
+   CHOIX SYMPATHISANT / ANONYME
+========================= */
+
+.registration-choice{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.choice-option{
+  position:relative;
+}
+
+.choice-option input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.choice-label{
+  display:block;
+  height:100%;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(0,0,0,.12);
+  padding:15px 17px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.choice-label strong{
+  display:block;
+  color:var(--white);
+  font-family:Arial,sans-serif;
+  font-size:13px;
+  margin-bottom:5px;
+}
+
+.choice-label span{
+  display:block;
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  line-height:1.5;
+}
+
+.choice-option input:checked + .choice-label{
+  border-color:var(--gold);
+  background:rgba(214,173,85,.08);
+}
+
+.choice-option input:checked + .choice-label strong{
+  color:var(--gold-light);
+}
+
+.form-section-title{
+  color:var(--gold);
+  font-size:19px;
+  margin:35px 0 20px;
+  padding-bottom:9px;
+  border-bottom:1px solid rgba(214,173,85,.2);
+}
+
+.competence-group{
+  margin-bottom:25px;
+}
+
+.competence-group-title{
+  font-family:Arial,sans-serif;
+  color:#eee;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:13px;
+}
+
+.competence{
+  border:1px solid rgba(255,255,255,.1);
+  margin-bottom:8px;
+  padding:12px;
+  background:rgba(0,0,0,.12);
+}
+
+.competence label{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  cursor:pointer;
+}
+
+.competence input{
+  margin-top:3px;
+  accent-color:var(--gold);
+}
+
+.competence-name{
+  color:var(--white);
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.competence-description{
+  display:block;
+  color:#929dad;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  line-height:1.45;
+  margin-top:5px;
+}
+
+.submit-button{
+  width:100%;
+  border:0;
+  background:var(--gold);
+  color:var(--navy);
+  padding:15px;
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1.2px;
+  cursor:pointer;
+  margin-top:15px;
+}
+
+.submit-button:hover{
+  background:var(--gold-light);
+}
+
+.submit-button:disabled{
+  opacity:.6;
+  cursor:wait;
+}
+
+.form-message{
+  display:none;
+  padding:13px;
+  margin-top:15px;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.form-message.success{
+  display:block;
+  border:1px solid rgba(100,200,130,.4);
+  color:#b9e5c4;
+  background:rgba(50,130,70,.1);
+}
+
+.form-message.error{
+  display:block;
+  border:1px solid rgba(239,65,53,.4);
+  color:#ffb5ae;
+  background:rgba(180,30,20,.1);
+}
+
+/* =========================
    FOOTER
-===================================================== */
+========================= */
 
-footer {
-
-    padding: 25px;
-
-    text-align: center;
-
-    color: #7e8999;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    border-top: 1px solid rgba(255,255,255,.07);
+footer{
+  border-top:1px solid rgba(214,173,85,.15);
+  text-align:center;
+  padding:30px 20px;
+  color:#7f8998;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  letter-spacing:.5px;
 }
 
-
-/* =====================================================
-   MODALE RENDEZ-VOUS
-===================================================== */
-
-.rdv-modal {
-
-    position: fixed;
-
-    inset: 0;
-
-    display: none;
-
-    align-items: center;
-    justify-content: center;
-
-    padding: 20px;
-
-    background: rgba(0,0,0,.72);
-
-    z-index: 99999;
-}
-
-.rdv-modal.active {
-    display: flex;
-}
-
-.rdv-modal-box {
-
-    position: relative;
-
-    width: min(600px, 100%);
-
-    max-height: 85vh;
-
-    overflow-y: auto;
-
-    background: var(--navy2);
-
-    border: 1px solid rgba(214,173,85,.45);
-
-    box-shadow: 0 25px 80px rgba(0,0,0,.55);
-
-    padding: 35px;
-
-    animation: modalAppear .2s ease-out;
-}
-
-@keyframes modalAppear {
-
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.rdv-modal-close {
-
-    position: absolute;
-
-    right: 15px;
-    top: 12px;
-
-    width: 30px;
-    height: 30px;
-
-    border: 0;
-
-    background: transparent;
-
-    color: #c5ccd5;
-
-    font-size: 25px;
-
-    cursor: pointer;
-}
-
-.rdv-modal-close:hover {
-    color: white;
-}
-
-.rdv-modal-kicker {
-
-    color: var(--gold);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 10px;
-
-    letter-spacing: 2px;
-
-    font-weight: bold;
-
-    margin-bottom: 12px;
-}
-
-.rdv-modal-title {
-
-    font-size: 30px;
-
-    line-height: 1.2;
-
-    margin-bottom: 20px;
-}
-
-.rdv-modal-info {
-
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 8px;
-
-    margin-bottom: 22px;
-}
-
-.rdv-modal-info span {
-
-    padding: 7px 10px;
-
-    background: rgba(255,255,255,.06);
-
-    border: 1px solid rgba(255,255,255,.08);
-
-    color: #d6dce3;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-}
-
-.rdv-modal-description {
-
-    color: #c4ccd6;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 14px;
-
-    line-height: 1.7;
-
-    white-space: pre-line;
-}
-
-.rdv-modal-link {
-
-    display: inline-block;
-
-    margin-top: 22px;
-
-    padding: 10px 17px;
-
-    background: var(--gold);
-
-    color: var(--navy);
-
-    text-decoration: none;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    font-weight: bold;
-}
-
-
-/* =====================================================
+/* =========================
    MOBILE
-===================================================== */
+========================= */
 
-@media (max-width: 800px) {
+@media(max-width:650px){
 
-    header {
+  header{
+    padding:22px 20px 18px;
+  }
 
-        height: auto;
+  nav{
+    gap:14px;
+  }
 
-        padding: 20px;
+  nav a{
+    font-size:9px;
+  }
 
-        flex-direction: column;
+  .hero{
+    padding:55px 20px 35px;
+  }
 
-        gap: 18px;
-    }
+  .hero p{
+    font-size:15px;
+  }
 
-    nav {
+  .team-section{
+    padding-left:15px;
+    padding-right:15px;
+  }
 
-        gap: 15px;
+  .modal{
+    padding:8px;
+  }
 
-        flex-wrap: wrap;
+  .modal-box{
+    padding:28px 20px;
+    max-height:95vh;
+  }
 
-        justify-content: center;
-    }
+  .events-label{
+    padding:0 10px;
+    font-size:9px;
+  }
 
-    nav a {
+  .event-item{
+    font-size:10px;
+    padding:0 16px;
+  }
 
-        font-size: 10px;
-    }
+  .registration-choice{
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
 
-    .hero {
+  .choice-label{
+    padding:13px 11px;
+  }
 
-        min-height: 440px;
-    }
+  .choice-label strong{
+    font-size:12px;
+  }
 
-    .principles,
-    .news-grid {
+  .choice-label span{
+    font-size:10px;
+  }
 
-        grid-template-columns: 1fr;
-    }
-
-    .news-title {
-
-        display: block;
-    }
-
-    .news-title span {
-
-        display: block;
-
-        margin-top: 8px;
-    }
-
-    .rdv-modal-box {
-
-        padding: 28px 22px;
-    }
-
-    /*
-       Ajustement du logo sur mobile
-    */
-
-    .logo {
-
-        font-size: 25px;
-
-        letter-spacing: 1px;
-    }
-
-}
-
-
-/* =====================================================
-   LOGO — FINITION TYPOGRAPHIQUE
-===================================================== */
-
-/*
-   Le lettrage Avant-gardE utilise maintenant
-   une typographie serif élégante et cohérente
-   avec l'identité éditoriale du site.
-*/
-
-.logo {
-    font-variant-ligatures: common-ligatures;
-    text-rendering: optimizeLegibility;
 }
 
 </style>
-</head>
 
+</head>
 
 <body>
 
-
-<!-- =====================================================
+<!-- =========================
      RENDEZ-VOUS
-===================================================== -->
+========================= -->
 
 <div class="events-bar">
 
-    <div class="events-label">
-        NOS RENDEZ-VOUS
-    </div>
+  <div class="events-label">
+    NOS RENDEZ-VOUS
+  </div>
 
-    <div class="events-window">
+  <div class="events-window" id="eventsWindow">
 
-        <div id="eventsTrack" class="events-track">
+<div
+  class="events-track"
+  id="eventsTrack">
+</div>
 
-            <div class="events-empty">
-                Chargement...
-            </div>
-
-        </div>
-
-    </div>
+  </div>
 
 </div>
 
-
-<!-- =====================================================
+<!-- =========================
      HEADER
-===================================================== -->
+========================= -->
 
 <header>
 
-
-    <a
-        href="admin.html"
-        class="admin-gear"
-        title="Administration"
-        aria-label="Administration"
-    >
-        ⚙
-    </a>
+<a
+href="admin.html"
+class="admin-gear"
+title="Administration"
+aria-label="Administration"
 
 
-    <!-- LOGO AVANT-GARDE -->
 
-    <a href="index.html" class="logo">
+⚙
 
-        <span class="logo-a">
-            A
-        </span>
+  </a>
 
-        vant-gard
-
-        <span class="logo-e">
-            E
-        </span>
-
-    </a>
+<a
+href="index.html"
+class="logo"
 
 
-    <nav>
 
-        <a href="index.html">
-            ACCUEIL
-        </a>
+<span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
 
-        <a href="manifeste.html">
-            MANIFESTE
-        </a>
+  </a>
 
-        <a href="projet.html">
-            NOTRE PROJET
-        </a>
+  <nav>
 
-        <a href="inspirations.html">
-            NOS INSPIRATIONS
-        </a>
+<a href="index.html">
+  ACCUEIL
+</a>
 
-        <a href="equipe.html">
-            NOTRE ÉQUIPE
-        </a>
+<a href="manifeste.html">
+  MANIFESTE
+</a>
 
-    </nav>
+<a href="projet.html">
+  NOTRE PROJET
+</a>
+
+<a href="inspirations.html">
+  NOS INSPIRATIONS
+</a>
+
+<a
+href="equipe.html"
+class="active"
+
+
+
+NOTRE ÉQUIPE
+</a>
+
+  </nav>
 
 </header>
 
-
-<!-- =====================================================
+<!-- =========================
      HERO
-===================================================== -->
+========================= -->
 
 <section class="hero">
 
-    <div class="hero-content">
+  <div class="kicker">
+    L’AVANT-GARDE
+  </div>
 
-        <div class="eyebrow">
-            SOUVERAINETÉ · LIBERTÉ · RESPONSABILITÉ
-        </div>
+  <h1>
+    NOTRE <span>ÉQUIPE.</span>
+  </h1>
 
-        <h1>
-            LA FRANCE <span>LIBRE.</span>
-        </h1>
+  <p>
+    L’Avant-gardE rassemble des femmes et des hommes qui souhaitent
+    contribuer, chacun selon ses compétences, son influence et ses moyens,
+    à la construction d’une France libre, souveraine et responsable.
+  </p>
 
-        <div class="hero-line"></div>
+<button
+class="join-button"
+id="openJoin"
 
-        <h2>
-            Redonner aux Français leur liberté<br>
-            en redonnant à la France sa souveraineté.
-        </h2>
 
-        <p>
-            Avant-gardE veut dépasser les vieux clivages politiques
-            pour proposer une nouvelle voie : une France souveraine,
-            un État recentré sur l'essentiel et des citoyens libres
-            et responsables.
-        </p>
 
-    </div>
+REJOINDRE L’AVANT-GARDE
+
+  </button>
 
 </section>
 
+<!-- =========================
+     EQUIPE
+========================= -->
 
-<!-- =====================================================
-     INTRO
-===================================================== -->
+<section class="team-section">
 
-<section class="intro">
+  <div class="section-title">
 
-    <div class="section-kicker">
-        NOTRE RAISON D'ÊTRE
-    </div>
+<h2>
+  Les membres
+</h2>
 
-    <h2>
-        Changer de paradigme.
-    </h2>
+<p>
+  Découvrez celles et ceux qui ont choisi de rendre leur engagement public.
+</p>
 
-    <p>
-        Nous refusons de choisir entre la souveraineté et la liberté.
+  </div>
 
-        Entre l'attachement à notre pays et l'émancipation de l'individu.
-
-        Entre la responsabilité et la justice.
-
-        Nous voulons réconcilier ces principes dans un même projet politique.
-    </p>
-
-</section>
-
-
-<!-- =====================================================
-     PRINCIPES
-===================================================== -->
-
-<section class="principles">
-
-    <div class="principle">
-
-        <div class="symbol">
-            ⚖
-        </div>
-
-        <h3>
-            SOUVERAINETÉ
-        </h3>
-
-        <p>
-            La France doit décider librement de son destin
-            et retrouver la maîtrise de ses choix fondamentaux.
-        </p>
-
-    </div>
-
-
-    <div class="principle">
-
-        <div class="symbol">
-            ✦
-        </div>
-
-        <h3>
-            LIBERTÉ
-        </h3>
-
-        <p>
-            L'individu doit pouvoir choisir, entreprendre,
-            travailler et vivre sans un État omniprésent.
-        </p>
-
-    </div>
-
-
-    <div class="principle">
-
-        <div class="symbol">
-            ⚔
-        </div>
-
-        <h3>
-            RESPONSABILITÉ
-        </h3>
-
-        <p>
-            La liberté n'existe que lorsque chacun assume
-            les conséquences de ses choix.
-        </p>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     MANIFESTE
-===================================================== -->
-
-<section class="manifesto">
-
-    <div class="section-kicker">
-        L'Avant-gardE
-    </div>
-
-    <h2>
-        Ni retour en arrière.<br>
-        Ni statu quo.
-    </h2>
-
-    <p>
-        Nous ne voulons pas restaurer le monde d'hier.
-
-        Nous voulons construire celui de demain.
-
-        Une France fière de ses racines, maîtresse de son destin
-        et confiante dans la liberté de ses citoyens.
-    </p>
-
-    <a
-        href="manifeste.html"
-        class="button"
-    >
-        DÉCOUVRIR LE MANIFESTE →
-    </a>
-
-</section>
-
-
-<!-- =====================================================
-     ACTUALITÉS
-===================================================== -->
-
-<section class="news">
-
-    <div class="news-title">
-
-        <h2>
-            Actualités & publications
-        </h2>
-
-        <span>
-            Avant-gardE
-        </span>
-
-    </div>
-
-
-    <div class="news-grid">
-
-        <div class="news-card">
-
-            <small>
-                BIENTÔT
-            </small>
-
-            <h3>
-                Nos prochaines publications
-            </h3>
-
-            <p>
-                Retrouvez ici nos analyses, propositions
-                et prises de position.
-            </p>
-
-        </div>
-
-
-        <div class="news-card">
-
-            <small>
-                ÉVÉNEMENT
-            </small>
-
-            <h3>
-                Nos prochains rendez-vous
-            </h3>
-
-            <p>
-                Rencontres, réunions et événements :
-                restez informés de la vie du mouvement.
-            </p>
-
-        </div>
-
-
-        <div class="news-card">
-
-            <small>
-                À VENIR
-            </small>
-
-            <h3>
-                Le projet Avant-gardE
-            </h3>
-
-            <p>
-                Découvrez progressivement nos propositions
-                pour transformer la France.
-            </p>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<!-- =====================================================
-     REJOINDRE
-===================================================== -->
-
-<section class="join">
-
-    <h2>
-        Rejoignez l'Avant-gardE.
-    </h2>
-
-    <p>
-        La politique ne changera pas sans ceux qui décident de la changer.
-    </p>
-
-    <a
-        href="equipe.html"
-        class="button"
-    >
-        NOUS REJOINDRE →
-    </a>
-
-</section>
-
-
-<!-- =====================================================
-     FOOTER
-===================================================== -->
-
-<footer>
-
-    © 2026 Avant-gardE
-
-    — Souveraineté · Liberté · Justice · Patriote
-
-</footer>
-
-
-<!-- =====================================================
-     MODALE RENDEZ-VOUS
-===================================================== -->
+  <div
+    class="team-grid"
+    id="teamGrid"
+  >
 
 <div
-    id="rdvModal"
-    class="rdv-modal"
+  class="loading"
+  id="loadingMembers"
+>
+  Chargement des membres…
+</div>
+
+  </div>
+
+</section>
+
+<!-- =========================
+     MODAL MEMBRE
+========================= -->
+
+<div
+  class="modal"
+  id="memberModal"
 >
 
-    <div class="rdv-modal-box">
+  <div class="modal-box">
 
-        <button
-            id="rdvModalClose"
-            class="rdv-modal-close"
-            aria-label="Fermer"
-        >
-            ×
-        </button>
+<button
+class="modal-close"
+id="closeMember"
+aria-label="Fermer"
 
-        <div class="rdv-modal-kicker">
-            NOS RENDEZ-VOUS
-        </div>
 
-        <div
-            id="rdvModalTitle"
-            class="rdv-modal-title"
-        >
-        </div>
 
-        <div class="rdv-modal-info">
+×
+</button>
 
-            <span id="rdvModalDate"></span>
+<div class="profile-modal-content">
 
-            <span id="rdvModalTime"></span>
+<img
+id="profileModalImage"
+class="profile-modal-image"
+alt=""
 
-            <span id="rdvModalLocation"></span>
 
-        </div>
 
-        <div
-            id="rdvModalDescription"
-            class="rdv-modal-description"
-        >
-        </div>
+  <div
+    id="profilePlaceholder"
+    class="profile-placeholder"
+  >
+    ★
+  </div>
 
-        <a
-            id="rdvModalLink"
-            class="rdv-modal-link"
-            href="#"
-            target="_blank"
-            rel="noopener noreferrer"
-            style="display:none;"
-        >
-            EN SAVOIR PLUS →
-        </a>
+  <h2 id="profileModalName"></h2>
 
-    </div>
+  <div
+    id="profileModalGrade"
+    class="profile-grade"
+  ></div>
+
+  <div
+    id="profileModalRegion"
+    class="profile-region"
+  ></div>
+
+  <div
+    id="profileModalDescription"
+    class="profile-description"
+  ></div>
+
+  <div class="profile-competences">
+
+<h3>
+  Compétences
+</h3>
+
+<div
+  class="competence-list"
+  id="profileModalCompetences"
+></div>
+
+  </div>
+
+</div>
+
+  </div>
+
+</div>
+
+<!-- =========================
+     MODAL INSCRIPTION
+========================= -->
+
+<div
+  class="modal"
+  id="joinModal"
+>
+
+  <div class="modal-box">
+
+<button
+class="modal-close"
+id="closeJoin"
+aria-label="Fermer"
+
+
+
+×
+</button>
+
+<h2 class="form-title">
+  Rejoindre l’Avant-gardE
+</h2>
+
+<p class="form-intro">
+  Créez votre profil et choisissez la manière dont vous souhaitez
+  apparaître au sein du mouvement.
+</p>
+
+<form id="joinForm">
+
+  <!-- VISIBILITE -->
+
+  <div class="form-group">
+
+<label class="main-label">
+  S’inscrire en tant que
+  <span class="required">*</span>
+</label>
+
+<div class="registration-choice">
+
+  <div class="choice-option">
+
+    <input
+      type="radio"
+      id="typeSympathisant"
+      name="type_inscription"
+      value="sympathisant"
+      checked
+    >
+
+    <label
+      for="typeSympathisant"
+      class="choice-label"
+    >
+
+      <strong>
+        Sympathisant
+      </strong>
+
+      <span>
+        Votre profil sera affiché dans la liste des membres.
+      </span>
+
+    </label>
+
+  </div>
+
+
+  <div class="choice-option">
+
+    <input
+      type="radio"
+      id="typeAnonyme"
+      name="type_inscription"
+      value="anonyme"
+    >
+
+    <label
+      for="typeAnonyme"
+      class="choice-label"
+    >
+
+      <strong>
+        Anonyme
+      </strong>
+
+      <span>
+        Votre profil sera enregistré mais caché de la liste des membres.
+      </span>
+
+    </label>
+
+  </div>
+
+</div>
+
+  </div>
+
+  <!-- IDENTITE -->
+
+  <div class="form-group">
+
+<label
+  class="main-label"
+  for="nom"
+>
+  Pseudo ou nom prénom
+  <span class="required">*</span>
+</label>
+
+<input
+  type="text"
+  id="nom"
+  maxlength="100"
+  required
+>
+
+  </div>
+
+  <!-- EMAIL -->
+
+  <div class="form-group">
+
+<label
+  class="main-label"
+  for="email"
+>
+  Email
+  <span class="required">*</span>
+</label>
+
+<input
+  type="email"
+  id="email"
+  required
+>
+
+<div class="help">
+  Une seule inscription est autorisée par adresse e-mail.
+</div>
+
+  </div>
+
+  <!-- REGION -->
+
+  <div class="form-group">
+
+<label
+  class="main-label"
+  for="region"
+>
+  Région
+  <span class="required">*</span>
+</label>
+
+<select
+  id="region"
+  required
+>
+
+  <option value="">
+    Sélectionnez votre région
+  </option>
+
+  <optgroup label="France métropolitaine">
+
+    <option>
+      Auvergne-Rhône-Alpes
+    </option>
+
+    <option>
+      Bourgogne-Franche-Comté
+    </option>
+
+    <option>
+      Bretagne
+    </option>
+
+    <option>
+      Centre-Val de Loire
+    </option>
+
+    <option>
+      Corse
+    </option>
+
+    <option>
+      Grand Est
+    </option>
+
+    <option>
+      Hauts-de-France
+    </option>
+
+    <option>
+      Île-de-France
+    </option>
+
+    <option>
+      Normandie
+    </option>
+
+    <option>
+      Nouvelle-Aquitaine
+    </option>
+
+    <option>
+      Occitanie
+    </option>
+
+    <option>
+      Pays de la Loire
+    </option>
+
+    <option>
+      Provence-Alpes-Côte d’Azur
+    </option>
+
+  </optgroup>
+
+  <optgroup label="Outre-mer">
+
+    <option>
+      Guadeloupe
+    </option>
+
+    <option>
+      Martinique
+    </option>
+
+    <option>
+      Guyane
+    </option>
+
+    <option>
+      La Réunion
+    </option>
+
+    <option>
+      Mayotte
+    </option>
+
+  </optgroup>
+
+  <optgroup label="Étranger">
+
+    <option>
+      Europe
+    </option>
+
+    <option>
+      Amérique du Nord
+    </option>
+
+    <option>
+      Amérique centrale et Caraïbes
+    </option>
+
+    <option>
+      Amérique du Sud
+    </option>
+
+    <option>
+      Afrique
+    </option>
+
+    <option>
+      Asie
+    </option>
+
+    <option>
+      Océanie
+    </option>
+
+    <option>
+      Autre
+    </option>
+
+  </optgroup>
+
+</select>
+
+  </div>
+
+  <!-- IMAGE -->
+
+  <div class="form-group">
+
+<label
+  class="main-label"
+  for="image_url"
+>
+  Image
+</label>
+
+<input
+  type="url"
+  id="image_url"
+  placeholder="https://..."
+>
+
+<div class="help">
+  Indiquez l’URL d’une image déjà hébergée en ligne.
+</div>
+
+  </div>
+
+  <!-- DESCRIPTION -->
+
+  <div class="form-group">
+
+<label
+  class="main-label"
+  for="description"
+>
+  Description
+</label>
+
+<textarea
+  id="description"
+  maxlength="300"
+  placeholder="Présentez-vous en quelques mots..."
+></textarea>
+
+<div class="help">
+  300 caractères maximum.
+</div>
+
+  </div>
+
+  <!-- COMPETENCES -->
+
+  <div class="form-section-title">
+    Talents et compétences métier
+  </div>
+
+  <div class="form-group">
+
+<label class="main-label">
+
+  Compétence
+
+  <span
+    style="font-weight:normal;color:#8994a6;"
+  >
+    (auto-évaluation de vos compétences)
+  </span>
+
+</label>
+
+  </div>
+
+  <div class="competence-group">
+
+<div class="competence-group-title">
+  Compétences métier
+</div>
+
+
+<!-- 1 -->
+
+<div class="competence">
+
+  <label>
+
+    <input
+      type="checkbox"
+      name="competences"
+      value="Maîtrise de doctrine"
+    >
+
+    <span>
+
+      <span class="competence-name">
+        Maîtrise de doctrine
+      </span>
+
+      <span class="competence-description">
+        capacité à préserver la fidélité à l’idéologie d'Avant-Garde et sa cohérence dans l’action du mouvement.
+      </span>
+
+    </span>
+
+  </label>
 
 </div>
 
 
+<!-- 2 -->
+
+<div class="competence">
+
+  <label>
+
+    <input
+      type="checkbox"
+      name="competences"
+      value="Tactique"
+    >
+
+    <span>
+
+      <span class="competence-name">
+        Tactique
+      </span>
+
+      <span class="competence-description">
+        capacité à concevoir et mettre en œuvre des tactiques efficaces de développement d’audience, médiatique et électorale, sans renier l’idéologie.
+      </span>
+
+    </span>
+
+  </label>
+
+</div>
+
+
+<!-- 3 -->
+
+<div class="competence">
+
+  <label>
+
+    <input
+      type="checkbox"
+      name="competences"
+      value="Prestance"
+    >
+
+    <span>
+
+      <span class="competence-name">
+        Prestance
+      </span>
+
+      <span class="competence-description">
+        capacité à séduire et convaincre par la parole, le charisme, le charme ou la culture.
+      </span>
+
+    </span>
+
+  </label>
+
+</div>
+
+
+<!-- 4 -->
+
+<div class="competence">
+
+  <label>
+
+    <input
+      type="checkbox"
+      name="competences"
+      value="Analyses pragmatiques"
+    >
+
+    <span>
+
+      <span class="competence-name">
+        Analyses pragmatiques
+      </span>
+
+      <span class="competence-description">
+        capacité à analyser les données, les rendements, les conséquences et les rapports de force. anticipent les évolutions et privilégient les faits.
+      </span>
+
+    </span>
+
+  </label>
+
+</div>
+
+
+<!-- 5 -->
+
+<div class="competence">
+
+  <label>
+
+    <input
+      type="checkbox"
+      name="competences"
+      value="Analyses populistes"
+    >
+
+    <span>
+
+      <span class="competence-name">
+        Analyses populistes
+      </span>
+
+      <span class="competence-description">
+        capacité à analyser les ressentis, aspirations et frustrations populaires. anticipent les réactions naturelles et privilégient le vécu et l’opinion du peuple.
+      </span>
+
+    </span>
+
+  </label>
+
+</div>
+
+
+<!-- 6 -->
+
+<div class="competence">
+
+  <label>
+
+    <input
+      type="checkbox"
+      name="competences"
+      value="Administration"
+    >
+
+    <span>
+
+      <span class="competence-name">
+        Administration
+      </span>
+
+      <span class="competence-description">
+        maîtrise de la gestion des structures, des ressources techniques et opérationnelles et des équipes internes.
+      </span>
+
+    </span>
+
+  </label>
+
+</div>
+
+
+<!-- 7 -->
+
+<div class="competence">
+
+  <label>
+
+    <input
+      type="checkbox"
+      name="competences"
+      value="Expertise et ingénierie juridique"
+    >
+
+    <span>
+
+      <span class="competence-name">
+        Expertise et ingénierie juridique
+      </span>
+
+      <span class="competence-description">
+        maîtrise du droit français et européen ainsi que des mécanismes juridiques, avec capacité à en analyser les règles, les contraintes, les failles et les possibilités d’évolution.
+      </span>
+
+    </span>
+
+  </label>
+
+</div>
+
+
+<!-- 8 -->
+
+<div class="competence">
+
+  <label>
+
+    <input
+      type="checkbox"
+      name="competences"
+      value="Expertise et ingénierie politique"
+    >
+
+    <span>
+
+      <span class="competence-name">
+        Expertise et ingénierie politique
+      </span>
+
+      <span class="competence-description">
+        maîtrise d’un domaine politique ou institutionnel particulier et capacité à en apporter l’expertise.
+      </span>
+
+    </span>
+
+  </label>
+
+</div>
+
+  </div>
+
+  <!-- SYMPATHISANTS OU PLUS -->
+
+  <div class="competence-group">
+
+<div class="competence-group-title">
+  Sympathisants ou plus
+</div>
+
+
+<!-- INFLUENCEURS -->
+
+<div class="competence">
+
+  <label>
+
+    <input
+      type="checkbox"
+      name="competences"
+      value="Influenceurs / debunkers / créateurs de contenu"
+    >
+
+    <span>
+
+      <span class="competence-name">
+        Influenceurs / debunkers / créateurs de contenu
+      </span>
+
+      <span class="competence-description">
+        dans le milieu médiatique et sur les réseaux sociaux, développent spontanément une audience, influencent les comportements, déconstruisent les arguments ou manipulations et produisent des contenus permettant de diffuser et de défendre les idées du mouvement. peuvent conserver une forte indépendance éditoriale.
+      </span>
+
+    </span>
+
+  </label>
+
+</div>
+
+
+<!-- BIENFAITEURS -->
+
+<div class="competence">
+
+  <label>
+
+    <input
+      type="checkbox"
+      name="competences"
+      value="Bienfaiteurs"
+    >
+
+    <span>
+
+      <span class="competence-name">
+        Bienfaiteurs
+      </span>
+
+      <span class="competence-description">
+        dans les autres milieux, mettent spontanément leur influence, leur réseau, leur carnet d’adresses, leurs moyens, leur expertise ou leur notoriété au service du développement et du rayonnement du mouvement. peuvent conserver une forte indépendance.
+      </span>
+
+    </span>
+
+  </label>
+
+</div>
+
+  </div>
+
+<button
+type="submit"
+class="submit-button"
+id="submitButton"
+
+
+
+CRÉER MON PROFIL
+
+  </button>
+
+  <div
+    id="formMessage"
+    class="form-message"
+  ></div>
+
+</form>
+
+  </div>
+
+</div>
+
+<!-- =========================
+     MODAL RENDEZ-VOUS
+========================= -->
+
+<div
+  class="modal"
+  id="eventModal"
+>
+
+  <div class="modal-box">
+
+<button
+class="modal-close"
+id="closeEvent"
+aria-label="Fermer"
+
+
+
+×
+</button>
+
+<h2
+  id="eventModalTitle"
+  class="form-title"
+></h2>
+
+<div
+  id="eventModalDate"
+  class="profile-region"
+></div>
+
+<div
+  id="eventModalDescription"
+  class="profile-description"
+></div>
+
+  </div>
+
+</div>
+
+<footer>
+  © 2026 Avant-gardE — Souveraineté · Liberté · Justice · Patriote
+</footer>
+
 <script>
 
-
-/* =====================================================
+/* =========================================================
    SUPABASE
-===================================================== */
+========================================================= */
 
 const SUPABASE_URL =
-    "https://wlhtegrciehmtxqecopv.supabase.co";
+  "https://wlhtegrciehmtxqecopv.supabase.co";
 
 const SUPABASE_KEY =
-    "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
+  "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const teamGrid =
+  document.getElementById("teamGrid");
+
+const memberModal =
+  document.getElementById("memberModal");
+
+const joinModal =
+  document.getElementById("joinModal");
+
+const eventModal =
+  document.getElementById("eventModal");
+
+const submitButton =
+  document.getElementById("submitButton");
+
+
+/* =========================================================
+   OUTILS
+========================================================= */
+
+function fermerModal(modal){
+
+  modal.classList.remove("active");
+
+  document.body.style.overflow = "";
+
+}
+
+
+function ouvrirModal(modal){
+
+  modal.classList.add("active");
+
+  document.body.style.overflow = "hidden";
+
+}
+
+
+function imageValide(url){
+
+  if(!url) return false;
+
+  try{
+
+    const u = new URL(url);
+
+    return (
+      u.protocol === "http:" ||
+      u.protocol === "https:"
+    );
+
+  }catch{
+
+    return false;
+
+  }
+
+}
+
+
+function normaliserCompetences(value){
+
+  if(Array.isArray(value)){
+
+    return value;
+
+  }
+
+  if(typeof value === "string"){
+
+    return value
+      .replace(/^\{|\}$/g,"")
+      .split(",")
+      .map(x =>
+        x.trim()
+         .replace(/^"|"$/g,"")
+      )
+      .filter(Boolean);
+
+  }
+
+  return [];
+
+}
+
+
+/* =========================================================
+   CHARGEMENT MEMBRES
+========================================================= */
+
+async function chargerMembres(){
+
+  teamGrid.innerHTML = `
+    <div class="loading">
+      Chargement des membres…
+    </div>
+  `;
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("profiles")
+    .select(`
+      id,
+      created_at,
+      nom,
+      grade,
+      image_url,
+      description,
+      region,
+      competences,
+      anonyme
+    `)
+    .eq("anonyme", false)
+    .order("created_at", {
+      ascending:true
+    });
+
+  if(error){
+
+    console.error(
+      "Erreur chargement profils :",
+      error
+    );
+
+    teamGrid.innerHTML = `
+      <div class="no-members">
+        Impossible de charger les membres.
+      </div>
+    `;
+
+    return;
+
+  }
+
+  teamGrid.innerHTML = "";
+
+  if(!data || data.length === 0){
+
+    teamGrid.innerHTML = `
+      <div class="no-members">
+        Aucun membre public pour le moment.
+      </div>
+    `;
+
+    return;
+
+  }
+
+  data.forEach(membre => {
+
+    const card =
+      document.createElement("article");
+
+    card.className =
+      "member-card";
+
+    card.tabIndex = 0;
+
+
+    /* IMAGE */
+
+    if(imageValide(membre.image_url)){
+
+      const img =
+        document.createElement("img");
+
+      img.className =
+        "member-photo";
+
+      img.src =
+        membre.image_url;
+
+      img.alt =
+        membre.nom || "Membre";
+
+      img.onerror = function(){
+
+        this.replaceWith(
+          creerPlaceholder()
+        );
+
+      };
+
+      card.appendChild(img);
+
+    }else{
+
+      card.appendChild(
+        creerPlaceholder()
+      );
+
+    }
+
+
+    /* NOM */
+
+    const name =
+      document.createElement("div");
+
+    name.className =
+      "member-name";
+
+    name.textContent =
+      membre.nom || "Membre";
+
+    card.appendChild(name);
+
+
+    /* GRADE */
+
+    const grade =
+      document.createElement("div");
+
+    grade.className =
+      "member-grade";
+
+    grade.textContent =
+      membre.grade || "user";
+
+    card.appendChild(grade);
+
+
+    /* REGION */
+
+    if(membre.region){
+
+      const region =
+        document.createElement("div");
+
+      region.className =
+        "member-region";
+
+      region.textContent =
+        membre.region;
+
+      card.appendChild(region);
+
+    }
+
+
+    /* DESCRIPTION */
+
+    if(membre.description){
+
+      const description =
+        document.createElement("div");
+
+      description.className =
+        "member-description";
+
+      description.textContent =
+        membre.description;
+
+      card.appendChild(description);
+
+    }
+
+
+    /* CLICK */
+
+    card.addEventListener(
+      "click",
+      () => ouvrirProfil(membre)
     );
 
 
-/* =====================================================
-   VARIABLES
-===================================================== */
+    card.addEventListener(
+      "keydown",
+      event => {
 
-let rendezVous = [];
+        if(
+          event.key === "Enter" ||
+          event.key === " "
+        ){
 
-let tickerAnimation = null;
+          event.preventDefault();
 
-
-/* =====================================================
-   CHARGEMENT DES RENDEZ-VOUS
-===================================================== */
-
-async function chargerRendezVous() {
-
-    const track =
-        document.getElementById(
-            "eventsTrack"
-        );
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-
-        .from("rendezvous")
-
-        .select("*")
-
-        .eq("actif", true)
-
-        .order(
-            "ordre",
-            {
-                ascending: true
-            }
-        )
-
-        .order(
-            "date_evenement",
-            {
-                ascending: true
-            }
-        );
-
-
-    if (error) {
-
-        console.error(
-            "Erreur Supabase :",
-            error
-        );
-
-        track.innerHTML = `
-            <div class="events-empty">
-                Aucun rendez-vous actuellement.
-            </div>
-        `;
-
-        return;
-    }
-
-
-    if (
-        !data ||
-        data.length === 0
-    ) {
-
-        track.innerHTML = `
-            <div class="events-empty">
-                Aucun rendez-vous actuellement.
-            </div>
-        `;
-
-        return;
-    }
-
-
-    rendezVous = data;
-
-    track.innerHTML = "";
-
-
-    data.forEach(
-        (rdv) => {
-
-            const element =
-                document.createElement(
-                    "div"
-                );
-
-            element.className =
-                "event";
-
-            element.dataset.id =
-                rdv.id;
-
-
-            const date =
-                formaterDateCourte(
-                    rdv.date_evenement
-                );
-
-
-            let contenu = "";
-
-
-            if (date) {
-
-                contenu +=
-                    `<strong>${escapeHtml(date)}</strong>`;
-
-            }
-
-
-            if (rdv.heure) {
-
-                if (contenu) {
-                    contenu += " — ";
-                }
-
-                contenu +=
-                    escapeHtml(
-                        rdv.heure
-                    );
-
-            }
-
-
-            if (rdv.titre) {
-
-                if (contenu) {
-                    contenu += " — ";
-                }
-
-                contenu +=
-                    `<strong>${escapeHtml(rdv.titre)}</strong>`;
-
-            }
-
-
-            if (rdv.lieu) {
-
-                contenu +=
-                    ` — ${escapeHtml(rdv.lieu)}`;
-
-            }
-
-
-            element.innerHTML =
-                contenu;
-
-
-            element.addEventListener(
-                "click",
-                function() {
-
-                    ouvrirRendezVous(
-                        rdv
-                    );
-
-                }
-            );
-
-
-            track.appendChild(
-                element
-            );
+          ouvrirProfil(membre);
 
         }
+
+      }
     );
 
 
-    demarrerDefilement();
+    teamGrid.appendChild(card);
+
+  });
 
 }
 
 
-/* =====================================================
-   DÉFILEMENT
-===================================================== */
+function creerPlaceholder(){
 
-function demarrerDefilement() {
+  const placeholder =
+    document.createElement("div");
 
-    const track =
-        document.getElementById(
-            "eventsTrack"
-        );
+  placeholder.className =
+    "member-photo-placeholder";
 
-    const windowElement =
-        document.querySelector(
-            ".events-window"
-        );
+  placeholder.textContent =
+    "★";
 
-
-    if (!track || !windowElement) {
-        return;
-    }
-
-
-    if (tickerAnimation) {
-
-        cancelAnimationFrame(
-            tickerAnimation
-        );
-
-        tickerAnimation = null;
-
-    }
-
-
-    const largeurContenu =
-        track.scrollWidth;
-
-    const largeurFenetre =
-        windowElement.clientWidth;
-
-
-    if (!largeurContenu) {
-        return;
-    }
-
-
-    const vitesse = 180;
-
-
-    let position =
-        largeurFenetre;
-
-
-    let dernierTemps =
-        performance.now();
-
-
-    track.style.transform =
-        `translateX(${position}px)`;
-
-
-    function animation(
-        temps
-    ) {
-
-        const delta =
-            (temps - dernierTemps) /
-            1000;
-
-
-        dernierTemps =
-            temps;
-
-
-        position -=
-            vitesse * delta;
-
-
-        if (
-            position <=
-            -largeurContenu
-        ) {
-
-            position =
-                largeurFenetre;
-
-        }
-
-
-        track.style.transform =
-            `translateX(${position}px)`;
-
-
-        tickerAnimation =
-            requestAnimationFrame(
-                animation
-            );
-
-    }
-
-
-    tickerAnimation =
-        requestAnimationFrame(
-            animation
-        );
+  return placeholder;
 
 }
 
 
-/* =====================================================
-   FORMAT DATE
-===================================================== */
+/* =========================================================
+   POPUP PROFIL
+========================================================= */
 
-function formaterDateCourte(
-    dateString
-) {
+function ouvrirProfil(membre){
 
-    if (!dateString) {
-        return "";
-    }
-
-
-    const date =
-        new Date(
-            dateString +
-            "T00:00:00"
-        );
-
-
-    if (
-        isNaN(
-            date.getTime()
-        )
-    ) {
-
-        return "";
-
-    }
-
-
-    return date.toLocaleDateString(
-        "fr-FR",
-        {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-        }
+  const image =
+    document.getElementById(
+      "profileModalImage"
     );
+
+  const placeholder =
+    document.getElementById(
+      "profilePlaceholder"
+    );
+
+  const name =
+    document.getElementById(
+      "profileModalName"
+    );
+
+  const grade =
+    document.getElementById(
+      "profileModalGrade"
+    );
+
+  const region =
+    document.getElementById(
+      "profileModalRegion"
+    );
+
+  const description =
+    document.getElementById(
+      "profileModalDescription"
+    );
+
+  const competences =
+    document.getElementById(
+      "profileModalCompetences"
+    );
+
+
+  name.textContent =
+    membre.nom || "Membre";
+
+
+  grade.textContent =
+    membre.grade || "user";
+
+
+  region.textContent =
+    membre.region || "";
+
+
+  description.textContent =
+    membre.description || "";
+
+
+  if(imageValide(membre.image_url)){
+
+    image.src =
+      membre.image_url;
+
+    image.alt =
+      membre.nom || "Membre";
+
+    image.style.display =
+      "block";
+
+    placeholder.style.display =
+      "none";
+
+  }else{
+
+    image.style.display =
+      "none";
+
+    placeholder.style.display =
+      "flex";
+
+  }
+
+
+  competences.innerHTML = "";
+
+
+  const liste =
+    normaliserCompetences(
+      membre.competences
+    );
+
+
+  if(liste.length === 0){
+
+    const empty =
+      document.createElement("span");
+
+    empty.style.color =
+      "#8994a6";
+
+    empty.style.fontFamily =
+      "Arial,sans-serif";
+
+    empty.style.fontSize =
+      "11px";
+
+    empty.textContent =
+      "Aucune compétence renseignée.";
+
+    competences.appendChild(empty);
+
+  }else{
+
+    liste.forEach(comp => {
+
+      const tag =
+        document.createElement("span");
+
+      tag.className =
+        "competence-tag";
+
+      tag.textContent =
+        comp;
+
+      competences.appendChild(tag);
+
+    });
+
+  }
+
+
+  ouvrirModal(memberModal);
 
 }
 
 
-/* =====================================================
-   MODALE
-===================================================== */
+/* =========================================================
+   OUVERTURE FORMULAIRE
+========================================================= */
 
-function ouvrirRendezVous(
-    rdv
-) {
+document
+  .getElementById("openJoin")
+  .addEventListener(
+    "click",
+    () => {
 
-    const modal =
+      const message =
         document.getElementById(
-            "rdvModal"
+          "formMessage"
         );
 
-    const title =
-        document.getElementById(
-            "rdvModalTitle"
-        );
+      message.className =
+        "form-message";
 
-    const date =
-        document.getElementById(
-            "rdvModalDate"
-        );
-
-    const time =
-        document.getElementById(
-            "rdvModalTime"
-        );
-
-    const location =
-        document.getElementById(
-            "rdvModalLocation"
-        );
-
-    const description =
-        document.getElementById(
-            "rdvModalDescription"
-        );
-
-    const link =
-        document.getElementById(
-            "rdvModalLink"
-        );
-
-
-    title.textContent =
-        rdv.titre ||
-        "Rendez-vous";
-
-
-    if (
-        rdv.date_evenement
-    ) {
-
-        const dateLongue =
-            new Date(
-                rdv.date_evenement +
-                "T00:00:00"
-            ).toLocaleDateString(
-                "fr-FR",
-                {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric"
-                }
-            );
-
-
-        date.textContent =
-            dateLongue;
-
-        date.style.display =
-            "inline-block";
-
-    } else {
-
-        date.style.display =
-            "none";
-
-    }
-
-
-    if (rdv.heure) {
-
-        time.textContent =
-            "Heure : " +
-            rdv.heure;
-
-        time.style.display =
-            "inline-block";
-
-    } else {
-
-        time.style.display =
-            "none";
-
-    }
-
-
-    if (rdv.lieu) {
-
-        location.textContent =
-            "Lieu : " +
-            rdv.lieu;
-
-        location.style.display =
-            "inline-block";
-
-    } else {
-
-        location.style.display =
-            "none";
-
-    }
-
-
-    description.textContent =
-        rdv.description ||
-        rdv.texte ||
-        "Aucune description disponible.";
-
-
-    if (rdv.lien) {
-
-        link.href =
-            rdv.lien;
-
-        link.style.display =
-            "inline-block";
-
-    } else {
-
-        link.style.display =
-            "none";
-
-    }
-
-
-    modal.classList.add(
-        "active"
-    );
-
-
-    document.body.style.overflow =
-        "hidden";
-
-}
-
-
-/* =====================================================
-   FERMER MODALE
-===================================================== */
-
-function fermerRendezVous() {
-
-    const modal =
-        document.getElementById(
-            "rdvModal"
-        );
-
-
-    modal.classList.remove(
-        "active"
-    );
-
-
-    document.body.style.overflow =
+      message.textContent =
         "";
 
-}
+      ouvrirModal(joinModal);
+
+    }
+  );
+
+
+/* =========================================================
+   FERMETURE MODALES
+========================================================= */
+
+document
+  .getElementById("closeMember")
+  .addEventListener(
+    "click",
+    () => fermerModal(memberModal)
+  );
 
 
 document
-    .getElementById(
-        "rdvModalClose"
-    )
-    .addEventListener(
-        "click",
-        fermerRendezVous
-    );
+  .getElementById("closeJoin")
+  .addEventListener(
+    "click",
+    () => fermerModal(joinModal)
+  );
 
 
 document
-    .getElementById(
-        "rdvModal"
-    )
-    .addEventListener(
-        "click",
-        function(event) {
+  .getElementById("closeEvent")
+  .addEventListener(
+    "click",
+    () => fermerModal(eventModal)
+  );
 
-            if (
-                event.target ===
-                this
-            ) {
 
-                fermerRendezVous();
+memberModal.addEventListener(
+  "click",
+  event => {
 
-            }
+    if(event.target === memberModal){
 
-        }
-    );
+      fermerModal(memberModal);
+
+    }
+
+  }
+);
+
+
+joinModal.addEventListener(
+  "click",
+  event => {
+
+    if(event.target === joinModal){
+
+      fermerModal(joinModal);
+
+    }
+
+  }
+);
+
+
+eventModal.addEventListener(
+  "click",
+  event => {
+
+    if(event.target === eventModal){
+
+      fermerModal(eventModal);
+
+    }
+
+  }
+);
 
 
 document.addEventListener(
-    "keydown",
-    function(event) {
+  "keydown",
+  event => {
 
-        if (
-            event.key ===
-            "Escape"
-        ) {
+    if(event.key === "Escape"){
 
-            fermerRendezVous();
+      fermerModal(memberModal);
 
-        }
+      fermerModal(joinModal);
+
+      fermerModal(eventModal);
 
     }
+
+  }
 );
 
 
-/* =====================================================
-   PROTECTION HTML
-===================================================== */
+/* =========================================================
+   FORMULAIRE
+========================================================= */
 
-function escapeHtml(
-    value
-) {
+document
+  .getElementById("joinForm")
+  .addEventListener(
+    "submit",
+    async event => {
 
-    if (
-        value === null ||
-        value === undefined
-    ) {
+      event.preventDefault();
 
-        return "";
+
+      const message =
+        document.getElementById(
+          "formMessage"
+        );
+
+
+      message.className =
+        "form-message";
+
+      message.textContent =
+        "";
+
+
+      submitButton.disabled =
+        true;
+
+      submitButton.textContent =
+        "VÉRIFICATION EN COURS…";
+
+
+      const nom =
+        document
+          .getElementById("nom")
+          .value
+          .trim();
+
+
+      const email =
+        document
+          .getElementById("email")
+          .value
+          .trim()
+          .toLowerCase();
+
+
+      const region =
+        document
+          .getElementById("region")
+          .value;
+
+
+      const image_url =
+        document
+          .getElementById("image_url")
+          .value
+          .trim();
+
+
+      const description =
+        document
+          .getElementById("description")
+          .value
+          .trim();
+
+
+      const typeInscription =
+        document.querySelector(
+          'input[name="type_inscription"]:checked'
+        )?.value;
+
+
+      const anonyme =
+        typeInscription === "anonyme";
+
+
+      const competences =
+        Array.from(
+          document.querySelectorAll(
+            'input[name="competences"]:checked'
+          )
+        )
+        .map(
+          input => input.value
+        );
+
+
+      if(!nom || !email || !region){
+
+        message.className =
+          "form-message error";
+
+        message.textContent =
+          "Merci de remplir tous les champs obligatoires.";
+
+        submitButton.disabled =
+          false;
+
+        submitButton.textContent =
+          "CRÉER MON PROFIL";
+
+        return;
+
+      }
+
+
+      /*
+       * Vérification préalable de l'e-mail.
+       *
+       * Cette vérification améliore le message affiché
+       * à l'utilisateur.
+       *
+       * La contrainte UNIQUE de Supabase reste la
+       * véritable protection contre les doublons.
+       */
+
+      const {
+        data: emailExistant,
+        error: emailCheckError
+      } = await supabaseClient
+        .from("profiles")
+        .select("id")
+        .ilike("email", email)
+        .limit(1);
+
+
+      if(emailCheckError){
+
+        console.error(
+          "Erreur vérification email :",
+          emailCheckError
+        );
+
+        /*
+         * On ne bloque pas nécessairement ici :
+         * la contrainte UNIQUE de la base reste active.
+         */
+
+      }
+
+
+      if(
+        !emailCheckError &&
+        emailExistant &&
+        emailExistant.length > 0
+      ){
+
+        message.className =
+          "form-message error";
+
+        message.textContent =
+          "Cette adresse e-mail est déjà utilisée. " +
+          "Un seul profil peut être créé avec cette adresse.";
+
+        submitButton.disabled =
+          false;
+
+        submitButton.textContent =
+          "CRÉER MON PROFIL";
+
+        return;
+
+      }
+
+
+      const profil = {
+
+        id:
+          crypto.randomUUID(),
+
+        nom:
+          nom,
+
+        grade:
+          "user",
+
+        email:
+          email,
+
+        image_url:
+          image_url || null,
+
+        description:
+          description || null,
+
+        region:
+          region,
+
+        competences:
+          competences,
+
+        anonyme:
+          anonyme
+
+      };
+
+
+      submitButton.textContent =
+        "CRÉATION DU PROFIL…";
+
+
+      const {
+        error
+      } = await supabaseClient
+        .from("profiles")
+        .insert(profil);
+
+
+      if(error){
+
+        console.error(
+          "Erreur création profil :",
+          error
+        );
+
+
+        /*
+         * 23505 = violation d'une contrainte UNIQUE.
+         *
+         * C'est notamment ce qui protège contre
+         * deux inscriptions avec le même e-mail
+         * si l'index UNIQUE a bien été créé.
+         */
+
+        if(error.code === "23505"){
+
+          message.className =
+            "form-message error";
+
+          message.textContent =
+            "Cette adresse e-mail est déjà utilisée. " +
+            "Un seul profil peut être créé avec cette adresse.";
+
+        }else{
+
+          message.className =
+            "form-message error";
+
+          message.textContent =
+            "Impossible de créer le profil pour le moment. " +
+            "Veuillez réessayer.";
+
+        }
+
+
+        submitButton.disabled =
+          false;
+
+        submitButton.textContent =
+          "CRÉER MON PROFIL";
+
+        return;
+
+      }
+
+
+      message.className =
+        "form-message success";
+
+
+      if(anonyme){
+
+        message.textContent =
+          "Votre profil a bien été créé. " +
+          "Il restera caché de la liste publique des membres.";
+
+      }else{
+
+        message.textContent =
+          "Votre profil a bien été créé. " +
+          "Il apparaît désormais dans la liste des membres.";
+
+      }
+
+
+      document
+        .getElementById("joinForm")
+        .reset();
+
+
+      document
+        .getElementById("typeSympathisant")
+        .checked =
+          true;
+
+
+      submitButton.disabled =
+        false;
+
+      submitButton.textContent =
+        "CRÉER MON PROFIL";
+
+
+      setTimeout(
+        () => {
+
+          fermerModal(joinModal);
+
+          chargerMembres();
+
+        },
+        1800
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   RENDEZ-VOUS
+========================================================= */
+
+async function chargerRendezVous(){
+
+  const track =
+    document.getElementById(
+      "eventsTrack"
+    );
+
+  const windowEl =
+    document.getElementById(
+      "eventsWindow"
+    );
+
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("rendezvous")
+    .select("*")
+    .eq("actif", true)
+    .order("ordre", {
+      ascending:true
+    })
+    .order("date_evenement", {
+      ascending:true
+    });
+
+
+  if(error){
+
+    console.error(
+      "Erreur rendez-vous :",
+      error
+    );
+
+    return;
+
+  }
+
+
+  if(!data || data.length === 0){
+
+    track.innerHTML = `
+      <div class="event-item">
+        Aucun rendez-vous à venir
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  track.innerHTML = "";
+
+
+  data.forEach(event => {
+
+    const item =
+      document.createElement("div");
+
+    item.className =
+      "event-item";
+
+
+    const strong =
+      document.createElement("strong");
+
+    strong.textContent =
+      event.titre ||
+      event.nom ||
+      "Rendez-vous";
+
+
+    const separator =
+      document.createElement("span");
+
+    separator.className =
+      "event-separator";
+
+    separator.textContent =
+      "•";
+
+
+    const date =
+      document.createElement("span");
+
+
+    if(event.date_evenement){
+
+      const d =
+        new Date(
+          event.date_evenement
+        );
+
+
+      date.textContent =
+        d.toLocaleDateString(
+          "fr-FR",
+          {
+            day:"2-digit",
+            month:"2-digit"
+          }
+        );
 
     }
 
 
-    return String(value)
+    item.appendChild(strong);
 
-        .replace(
-            /&/g,
-            "&amp;"
-        )
+    item.appendChild(separator);
 
-        .replace(
-            /</g,
-            "&lt;"
-        )
+    item.appendChild(date);
 
-        .replace(
-            />/g,
-            "&gt;"
-        )
 
-        .replace(
-            /"/g,
-            "&quot;"
-        )
+    item.addEventListener(
+      "click",
+      () => {
 
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+        document
+          .getElementById(
+            "eventModalTitle"
+          )
+          .textContent =
+            event.titre ||
+            event.nom ||
+            "Rendez-vous";
+
+
+        const d =
+          event.date_evenement
+            ? new Date(
+                event.date_evenement
+              )
+            : null;
+
+
+        document
+          .getElementById(
+            "eventModalDate"
+          )
+          .textContent =
+            d
+              ? d.toLocaleString(
+                  "fr-FR",
+                  {
+                    dateStyle:"full",
+                    timeStyle:"short"
+                  }
+                )
+              : "";
+
+
+        document
+          .getElementById(
+            "eventModalDescription"
+          )
+          .textContent =
+            event.description ||
+            "";
+
+
+        ouvrirModal(eventModal);
+
+      }
+    );
+
+
+    track.appendChild(item);
+
+  });
+
+
+  /* Animation */
+
+  let position = 0;
+
+  const vitesse = 110;
+
+  let dernierTemps =
+    performance.now();
+
+
+  function animation(temps){
+
+    const delta =
+      (temps - dernierTemps) / 1000;
+
+    dernierTemps =
+      temps;
+
+
+    position +=
+      vitesse * delta;
+
+
+    const largeur =
+      track.scrollWidth;
+
+
+    if(position >= largeur + 35){
+
+      position =
+        -windowEl.clientWidth;
+
+    }
+
+
+    track.style.transform =
+      `translateX(${-position}px)`;
+
+
+    requestAnimationFrame(
+      animation
+    );
+
+  }
+
+
+  requestAnimationFrame(
+    animation
+  );
 
 }
 
 
-/* =====================================================
-   REDIMENSIONNEMENT
-===================================================== */
+/* =========================================================
+   INITIALISATION
+========================================================= */
 
-window.addEventListener(
-    "resize",
-    function() {
-
-        demarrerDefilement();
-
-    }
-);
-
-
-/* =====================================================
-   DÉMARRAGE
-===================================================== */
+chargerMembres();
 
 chargerRendezVous();
 
-
 </script>
-
 
 </body>
 </html>
