@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-
 <html lang="fr">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,7 @@
 <title>Administration — Avant-gardE</title>
 
 <style>
+
 :root {
     --navy: #07152d;
     --navy2: #0d2344;
@@ -17,6 +18,7 @@
     --muted: #aeb7c5;
     --red: #c51f2a;
     --green: #4caf70;
+    --blue-france: #0055A4;
 }
 
 * {
@@ -34,9 +36,10 @@ body {
     display: none !important;
 }
 
-/* =========================
+
+/* =========================================================
    CONNEXION
-========================= */
+========================================================= */
 
 #login-screen {
     min-height: 100vh;
@@ -76,7 +79,7 @@ body {
 }
 
 .logo-a {
-    color: var(--navy);
+    color: var(--blue-france);
 }
 
 .logo-e {
@@ -88,6 +91,11 @@ body {
     color: var(--muted);
     margin-bottom: 30px;
 }
+
+
+/* =========================================================
+   FORMULAIRES
+========================================================= */
 
 label {
     display: block;
@@ -149,16 +157,17 @@ button {
     text-align: center;
 }
 
-/* =========================
-   ADMIN
-========================= */
+
+/* =========================================================
+   ADMINISTRATION
+========================================================= */
 
 #admin-screen {
     min-height: 100vh;
 }
 
 .admin-header {
-    height: 75px;
+    min-height: 75px;
     padding: 0 5%;
     display: flex;
     align-items: center;
@@ -190,6 +199,51 @@ button {
     color: #ff8585;
 }
 
+
+/* =========================================================
+   ONGLETS
+========================================================= */
+
+.admin-tabs {
+    display: flex;
+    padding: 0 5%;
+    background: #050f20;
+    border-bottom: 1px solid rgba(214,173,85,.18);
+}
+
+.admin-tab {
+    position: relative;
+    padding: 17px 28px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+}
+
+.admin-tab:hover {
+    color: var(--gold-light);
+}
+
+.admin-tab.active {
+    color: var(--gold-light);
+}
+
+.admin-tab.active::after {
+    content: "";
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 0;
+    height: 2px;
+    background: var(--gold);
+}
+
+
+/* =========================================================
+   CONTENU
+========================================================= */
+
 .admin-container {
     max-width: 1150px;
     margin: auto;
@@ -212,9 +266,10 @@ button {
     color: var(--muted);
 }
 
-/* =========================
-   FORMULAIRE
-========================= */
+
+/* =========================================================
+   PANELS
+========================================================= */
 
 .admin-grid {
     display: grid;
@@ -234,6 +289,11 @@ button {
     font-size: 22px;
     font-weight: normal;
 }
+
+
+/* =========================================================
+   FORMULAIRE RDV
+========================================================= */
 
 .form-row {
     display: grid;
@@ -281,9 +341,10 @@ button {
     border-color: var(--gold);
 }
 
-/* =========================
-   LISTE
-========================= */
+
+/* =========================================================
+   LISTE RDV
+========================================================= */
 
 .events-list {
     display: flex;
@@ -369,6 +430,90 @@ button {
     border: 1px dashed rgba(255,255,255,.15);
 }
 
+
+/* =========================================================
+   PROFIL
+========================================================= */
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.profile-avatar {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 25px;
+    border: 2px solid rgba(214,173,85,.5);
+    background: #050f20;
+}
+
+.profile-avatar-placeholder {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+    border: 2px solid rgba(214,173,85,.5);
+    background: #050f20;
+    color: var(--gold);
+    font-family: Georgia, serif;
+    font-size: 42px;
+}
+
+.profile-grade {
+    text-align: center;
+    color: var(--gold-light);
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+    margin-bottom: 25px;
+}
+
+.competences-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.competence-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid rgba(255,255,255,.1);
+    background: rgba(255,255,255,.025);
+    font-size: 12px;
+    color: #d2d7df;
+}
+
+.competence-item input {
+    width: auto;
+    margin: 0;
+}
+
+.profile-info {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.profile-info strong {
+    color: var(--gold-light);
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
 .message {
     margin-bottom: 20px;
     padding: 12px;
@@ -387,9 +532,10 @@ button {
     color: #ff8585;
 }
 
-/* =========================
+
+/* =========================================================
    MOBILE
-========================= */
+========================================================= */
 
 @media (max-width: 800px) {
 
@@ -403,13 +549,26 @@ button {
         font-size: 18px;
     }
 
-    .admin-grid {
+    .admin-tabs {
+        padding: 0 20px;
+    }
+
+    .admin-tab {
+        padding: 15px 20px;
+    }
+
+    .admin-grid,
+    .profile-grid {
         grid-template-columns: 1fr;
     }
 
     .form-row {
         grid-template-columns: 1fr;
         gap: 0;
+    }
+
+    .competences-box {
+        grid-template-columns: 1fr;
     }
 
     .login-box {
@@ -424,73 +583,75 @@ button {
         flex-direction: column;
     }
 }
-</style>
 
+</style>
 </head>
+
 
 <body>
 
-<!-- =========================
+
+<!-- =========================================================
      CONNEXION
-========================= -->
+========================================================= -->
 
 <section id="login-screen">
 
-```
-<div class="login-box">
+    <div class="login-box">
 
-    <div class="login-logo">
-        <span class="logo-a">A</span>VANT-GARD<span class="logo-e">E</span>
+        <div class="login-logo">
+            <span class="logo-a">A</span>VANT-GARD<span class="logo-e">E</span>
+        </div>
+
+        <div class="login-subtitle">
+            Administration du site
+        </div>
+
+        <form id="login-form">
+
+            <label for="email">
+                ADRESSE E-MAIL
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                required
+                autocomplete="email"
+            >
+
+            <label for="password">
+                MOT DE PASSE
+            </label>
+
+            <input
+                type="password"
+                id="password"
+                required
+                autocomplete="current-password"
+            >
+
+            <button type="submit" class="btn-primary">
+                SE CONNECTER
+            </button>
+
+            <div id="login-error" class="error"></div>
+
+        </form>
+
     </div>
-
-    <div class="login-subtitle">
-        Administration du site
-    </div>
-
-    <form id="login-form">
-
-        <label for="email">
-            ADRESSE E-MAIL
-        </label>
-
-        <input
-            type="email"
-            id="email"
-            required
-            autocomplete="email"
-        >
-
-        <label for="password">
-            MOT DE PASSE
-        </label>
-
-        <input
-            type="password"
-            id="password"
-            required
-            autocomplete="current-password"
-        >
-
-        <button type="submit" class="btn-primary">
-            SE CONNECTER
-        </button>
-
-        <div id="login-error" class="error"></div>
-
-    </form>
-
-</div>
-```
 
 </section>
 
-<!-- =========================
+
+
+<!-- =========================================================
      ADMINISTRATION
-========================= -->
+========================================================= -->
 
 <section id="admin-screen" class="hidden">
 
-```
+
 <header class="admin-header">
 
     <div class="admin-brand">
@@ -504,7 +665,46 @@ button {
 </header>
 
 
+
+<!-- =========================================================
+     ONGLETS
+========================================================= -->
+
+<nav class="admin-tabs">
+
+    <button
+        type="button"
+        class="admin-tab active"
+        data-tab="rdv"
+        id="tab-rdv"
+    >
+        RDV
+    </button>
+
+    <button
+        type="button"
+        class="admin-tab"
+        data-tab="profil"
+    >
+        PROFIL
+    </button>
+
+</nav>
+
+
+
 <main class="admin-container">
+
+
+<div id="message"></div>
+
+
+
+<!-- =========================================================
+     ONGLET RDV
+========================================================= -->
+
+<section id="tab-content-rdv">
 
     <div class="page-title">
 
@@ -517,14 +717,10 @@ button {
     </div>
 
 
-    <div id="message"></div>
-
-
     <div class="admin-grid">
 
-        <!-- =========================
-             FORMULAIRE
-        ========================= -->
+
+        <!-- FORMULAIRE -->
 
         <div class="panel">
 
@@ -535,6 +731,7 @@ button {
             <form id="event-form">
 
                 <input type="hidden" id="event-id">
+
 
                 <label for="titre">
                     TITRE
@@ -663,9 +860,8 @@ button {
         </div>
 
 
-        <!-- =========================
-             LISTE
-        ========================= -->
+
+        <!-- LISTE -->
 
         <div class="panel">
 
@@ -685,18 +881,307 @@ button {
 
     </div>
 
-</main>
-```
+</section>
+
+
+
+<!-- =========================================================
+     ONGLET PROFIL
+========================================================= -->
+
+<section id="tab-content-profil" class="hidden">
+
+    <div class="page-title">
+
+        <h1>Mon profil</h1>
+
+        <p>
+            Modifiez les informations associées à votre profil.
+        </p>
+
+    </div>
+
+
+    <div class="profile-grid">
+
+
+        <!-- APERCU -->
+
+        <div class="panel">
+
+            <h2>
+                Mon identité
+            </h2>
+
+            <div id="profile-preview">
+
+                <div class="profile-avatar-placeholder">
+                    A
+                </div>
+
+                <div class="profile-grade">
+                    CHARGEMENT...
+                </div>
+
+            </div>
+
+            <div class="profile-info">
+
+                <p>
+                    <strong>Adresse e-mail</strong><br>
+                    <span id="profile-email-preview">
+                        —
+                    </span>
+                </p>
+
+                <p>
+                    <strong>Grade</strong><br>
+                    <span id="profile-grade-preview">
+                        —
+                    </span>
+                </p>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- FORMULAIRE PROFIL -->
+
+        <div class="panel">
+
+            <h2>
+                Modifier mon profil
+            </h2>
+
+            <form id="profile-form">
+
+
+                <label for="profile-nom">
+                    NOM
+                </label>
+
+                <input
+                    type="text"
+                    id="profile-nom"
+                    required
+                >
+
+
+                <label for="profile-email">
+                    ADRESSE E-MAIL
+                </label>
+
+                <input
+                    type="email"
+                    id="profile-email"
+                    disabled
+                >
+
+
+                <label for="profile-image">
+                    PHOTO / IMAGE
+                </label>
+
+                <input
+                    type="url"
+                    id="profile-image"
+                    placeholder="https://..."
+                >
+
+
+                <label for="profile-region">
+                    RÉGION
+                </label>
+
+                <input
+                    type="text"
+                    id="profile-region"
+                    placeholder="Ex : Corse"
+                >
+
+
+                <label for="profile-description">
+                    PRÉSENTATION
+                </label>
+
+                <textarea
+                    id="profile-description"
+                    placeholder="Présentez-vous..."
+                ></textarea>
+
+
+                <label>
+                    COMPÉTENCES
+                </label>
+
+                <div class="competences-box">
+
+
+                    <label class="competence-item">
+
+                        <input
+                            type="checkbox"
+                            value="Maîtrise de doctrine"
+                            class="competence-checkbox"
+                        >
+
+                        Maîtrise de doctrine
+
+                    </label>
+
+
+                    <label class="competence-item">
+
+                        <input
+                            type="checkbox"
+                            value="Tactique"
+                            class="competence-checkbox"
+                        >
+
+                        Tactique
+
+                    </label>
+
+
+                    <label class="competence-item">
+
+                        <input
+                            type="checkbox"
+                            value="Prestance"
+                            class="competence-checkbox"
+                        >
+
+                        Prestance
+
+                    </label>
+
+
+                    <label class="competence-item">
+
+                        <input
+                            type="checkbox"
+                            value="Analyses pragmatiques"
+                            class="competence-checkbox"
+                        >
+
+                        Analyses pragmatiques
+
+                    </label>
+
+
+                    <label class="competence-item">
+
+                        <input
+                            type="checkbox"
+                            value="Analyses populistes"
+                            class="competence-checkbox"
+                        >
+
+                        Analyses populistes
+
+                    </label>
+
+
+                    <label class="competence-item">
+
+                        <input
+                            type="checkbox"
+                            value="Administration"
+                            class="competence-checkbox"
+                        >
+
+                        Administration
+
+                    </label>
+
+
+                    <label class="competence-item">
+
+                        <input
+                            type="checkbox"
+                            value="Expertise et ingénierie juridique"
+                            class="competence-checkbox"
+                        >
+
+                        Expertise et ingénierie juridique
+
+                    </label>
+
+
+                    <label class="competence-item">
+
+                        <input
+                            type="checkbox"
+                            value="Expertise et ingénierie politique"
+                            class="competence-checkbox"
+                        >
+
+                        Expertise et ingénierie politique
+
+                    </label>
+
+
+                    <label class="competence-item">
+
+                        <input
+                            type="checkbox"
+                            value="Influenceurs / debunkers / créateurs de contenu"
+                            class="competence-checkbox"
+                        >
+
+                        Influenceurs / debunkers / créateurs de contenu
+
+                    </label>
+
+
+                    <label class="competence-item">
+
+                        <input
+                            type="checkbox"
+                            value="Bienfaiteurs"
+                            class="competence-checkbox"
+                        >
+
+                        Bienfaiteurs
+
+                    </label>
+
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="save-btn"
+                    style="width:100%;"
+                >
+                    ENREGISTRER LE PROFIL
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
 
 </section>
+
+
+</main>
+
+</section>
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
-/* =========================
-   CONFIGURATION SUPABASE
-========================= */
+/* =========================================================
+   SUPABASE
+========================================================= */
 
 const SUPABASE_URL =
     "https://wlhtegrciehmtxqecopv.supabase.co";
@@ -711,9 +1196,9 @@ const supabaseClient =
     );
 
 
-/* =========================
+/* =========================================================
    ELEMENTS
-========================= */
+========================================================= */
 
 const loginScreen =
     document.getElementById("login-screen");
@@ -746,15 +1231,23 @@ const formTitle =
     document.getElementById("form-title");
 
 
-/* =========================
-   AFFICHAGE MESSAGE
-========================= */
+let currentUser = null;
+let currentProfile = null;
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
 
 function showMessage(text, type = "success") {
 
     message.innerHTML =
-        `<div class="message ${type === "success" ? "success" : "message-error"}">
-            ${text}
+        `<div class="message ${
+            type === "success"
+                ? "success"
+                : "message-error"
+        }">
+            ${escapeHtml(text)}
         </div>`;
 
     setTimeout(() => {
@@ -763,55 +1256,16 @@ function showMessage(text, type = "success") {
 }
 
 
-/* =========================
-   VERIFICATION ADMIN
-========================= */
-
-async function checkAdmin() {
-
-    const {
-        data: { user }
-    } = await supabaseClient.auth.getUser();
-
-    if (!user) {
-        showLogin();
-        return;
-    }
-
-    const { data: profile, error } =
-        await supabaseClient
-            .from("profiles")
-            .select("grade, nom")
-            .eq("id", user.id)
-            .single();
-
-    if (error || !profile || profile.grade !== "admin") {
-
-        await supabaseClient.auth.signOut();
-
-        loginError.textContent =
-            "Accès refusé : ce compte n'est pas administrateur.";
-
-        showLogin();
-
-        return;
-    }
-
-    showAdmin();
-
-    loadEvents();
-}
-
-
-/* =========================
+/* =========================================================
    AFFICHAGE
-========================= */
+========================================================= */
 
 function showLogin() {
 
     loginScreen.classList.remove("hidden");
     adminScreen.classList.add("hidden");
 }
+
 
 function showAdmin() {
 
@@ -820,9 +1274,102 @@ function showAdmin() {
 }
 
 
-/* =========================
+/* =========================================================
+   VERIFICATION UTILISATEUR
+========================================================= */
+
+async function checkUser() {
+
+    const {
+        data: { user }
+    } = await supabaseClient.auth.getUser();
+
+
+    if (!user) {
+
+        showLogin();
+
+        return;
+    }
+
+
+    currentUser = user;
+
+
+    const {
+        data: profile,
+        error
+    } = await supabaseClient
+        .from("profiles")
+        .select(`
+            id,
+            nom,
+            grade,
+            email,
+            image_url,
+            description,
+            region,
+            competences
+        `)
+        .eq("id", user.id)
+        .single();
+
+
+    if (error || !profile) {
+
+        await supabaseClient.auth.signOut();
+
+        loginError.textContent =
+            "Impossible de récupérer votre profil.";
+
+        showLogin();
+
+        return;
+    }
+
+
+    currentProfile = profile;
+
+
+    showAdmin();
+
+
+    /*
+       Le RDV est réservé aux administrateurs.
+       Le profil est disponible pour tous les utilisateurs.
+    */
+
+    if (profile.grade !== "admin") {
+
+        document.getElementById("tab-rdv")
+            .classList.add("hidden");
+
+        document.getElementById("tab-content-rdv")
+            .classList.add("hidden");
+
+        document.getElementById("tab-content-profil")
+            .classList.remove("hidden");
+
+        document.querySelectorAll(".admin-tab")
+            .forEach(tab => tab.classList.remove("active"));
+
+        document.querySelector(
+            '[data-tab="profil"]'
+        ).classList.add("active");
+
+    } else {
+
+        loadEvents();
+    }
+
+
+    loadProfile();
+}
+
+
+/* =========================================================
    CONNEXION
-========================= */
+========================================================= */
 
 loginForm.addEventListener(
     "submit",
@@ -832,11 +1379,16 @@ loginForm.addEventListener(
 
         loginError.textContent = "";
 
+
         const email =
-            document.getElementById("email").value.trim();
+            document.getElementById("email")
+                .value
+                .trim();
+
 
         const password =
             document.getElementById("password").value;
+
 
         const {
             error
@@ -844,6 +1396,7 @@ loginForm.addEventListener(
             email,
             password
         });
+
 
         if (error) {
 
@@ -853,14 +1406,15 @@ loginForm.addEventListener(
             return;
         }
 
-        checkAdmin();
+
+        checkUser();
     }
 );
 
 
-/* =========================
+/* =========================================================
    DECONNEXION
-========================= */
+========================================================= */
 
 logoutBtn.addEventListener(
     "click",
@@ -868,19 +1422,77 @@ logoutBtn.addEventListener(
 
         await supabaseClient.auth.signOut();
 
+        currentUser = null;
+        currentProfile = null;
+
         showLogin();
     }
 );
 
 
-/* =========================
+/* =========================================================
+   ONGLETS
+========================================================= */
+
+document.querySelectorAll(".admin-tab")
+    .forEach(tab => {
+
+        tab.addEventListener(
+            "click",
+            function() {
+
+                const target =
+                    this.dataset.tab;
+
+
+                document.querySelectorAll(".admin-tab")
+                    .forEach(t =>
+                        t.classList.remove("active")
+                    );
+
+
+                this.classList.add("active");
+
+
+                document.getElementById(
+                    "tab-content-rdv"
+                ).classList.toggle(
+                    "hidden",
+                    target !== "rdv"
+                );
+
+
+                document.getElementById(
+                    "tab-content-profil"
+                ).classList.toggle(
+                    "hidden",
+                    target !== "profil"
+                );
+
+
+                if (target === "profil") {
+
+                    loadProfile();
+
+                }
+
+            }
+        );
+
+    });
+
+
+/* =========================================================
    CHARGER LES RENDEZ-VOUS
-========================= */
+========================================================= */
 
 async function loadEvents() {
 
     eventsList.innerHTML =
-        `<div class="empty">Chargement...</div>`;
+        `<div class="empty">
+            Chargement...
+        </div>`;
+
 
     const {
         data,
@@ -888,8 +1500,13 @@ async function loadEvents() {
     } = await supabaseClient
         .from("rendezvous")
         .select("*")
-        .order("ordre", { ascending: true })
-        .order("date_evenement", { ascending: true });
+        .order("ordre", {
+            ascending: true
+        })
+        .order("date_evenement", {
+            ascending: true
+        });
+
 
     if (error) {
 
@@ -901,6 +1518,7 @@ async function loadEvents() {
         return;
     }
 
+
     if (!data || data.length === 0) {
 
         eventsList.innerHTML =
@@ -911,7 +1529,9 @@ async function loadEvents() {
         return;
     }
 
+
     eventsList.innerHTML = "";
+
 
     data.forEach(event => {
 
@@ -920,10 +1540,12 @@ async function loadEvents() {
 
         item.className = "event-item";
 
+
         const date =
             event.date_evenement
                 ? new Date(
-                    event.date_evenement + "T00:00:00"
+                    event.date_evenement +
+                    "T00:00:00"
                   ).toLocaleDateString(
                     "fr-FR",
                     {
@@ -934,6 +1556,7 @@ async function loadEvents() {
                   )
                 : "";
 
+
         item.innerHTML = `
 
             <div class="event-top">
@@ -941,25 +1564,49 @@ async function loadEvents() {
                 <div>
 
                     <div class="event-title">
-                        ${escapeHtml(event.titre || "Sans titre")}
+                        ${escapeHtml(
+                            event.titre ||
+                            "Sans titre"
+                        )}
                     </div>
 
                     <div class="event-date">
                         ${date}
-                        ${event.heure ? " — " + escapeHtml(event.heure) : ""}
-                        ${event.lieu ? " — " + escapeHtml(event.lieu) : ""}
+                        ${
+                            event.heure
+                            ? " — " +
+                              escapeHtml(event.heure)
+                            : ""
+                        }
+                        ${
+                            event.lieu
+                            ? " — " +
+                              escapeHtml(event.lieu)
+                            : ""
+                        }
                     </div>
 
                 </div>
 
-                <div class="event-status ${event.actif ? "status-active" : "status-inactive"}">
-                    ${event.actif ? "ACTIF" : "INACTIF"}
+                <div class="event-status ${
+                    event.actif
+                        ? "status-active"
+                        : "status-inactive"
+                }">
+                    ${
+                        event.actif
+                            ? "ACTIF"
+                            : "INACTIF"
+                    }
                 </div>
 
             </div>
 
             <div class="event-description">
-                ${escapeHtml(event.texte || "Aucune description")}
+                ${escapeHtml(
+                    event.texte ||
+                    "Aucune description"
+                )}
             </div>
 
             <div class="event-actions">
@@ -981,14 +1628,16 @@ async function loadEvents() {
             </div>
         `;
 
+
         eventsList.appendChild(item);
+
     });
 }
 
 
-/* =========================
-   AJOUT / MODIFICATION
-========================= */
+/* =========================================================
+   AJOUT / MODIFICATION RDV
+========================================================= */
 
 eventForm.addEventListener(
     "submit",
@@ -996,35 +1645,55 @@ eventForm.addEventListener(
 
         event.preventDefault();
 
+
         const id =
-            document.getElementById("event-id").value;
+            document.getElementById(
+                "event-id"
+            ).value;
+
 
         const eventData = {
 
             titre:
-                document.getElementById("titre").value.trim(),
+                document.getElementById(
+                    "titre"
+                ).value.trim(),
 
             texte:
-                document.getElementById("texte").value.trim(),
+                document.getElementById(
+                    "texte"
+                ).value.trim(),
 
             date_evenement:
-                document.getElementById("date_evenement").value || null,
+                document.getElementById(
+                    "date_evenement"
+                ).value || null,
 
             heure:
-                document.getElementById("heure").value.trim() || null,
+                document.getElementById(
+                    "heure"
+                ).value.trim() || null,
 
             lieu:
-                document.getElementById("lieu").value.trim() || null,
+                document.getElementById(
+                    "lieu"
+                ).value.trim() || null,
 
             lien:
-                document.getElementById("lien").value.trim() || null,
+                document.getElementById(
+                    "lien"
+                ).value.trim() || null,
 
             actif:
-                document.getElementById("actif").checked,
+                document.getElementById(
+                    "actif"
+                ).checked,
 
             ordre:
                 parseInt(
-                    document.getElementById("ordre").value
+                    document.getElementById(
+                        "ordre"
+                    ).value
                 ) || 0
         };
 
@@ -1052,7 +1721,8 @@ eventForm.addEventListener(
         if (result.error) {
 
             showMessage(
-                "Erreur : " + result.error.message,
+                "Erreur : " +
+                result.error.message,
                 "error"
             );
 
@@ -1066,16 +1736,18 @@ eventForm.addEventListener(
                 : "Rendez-vous ajouté."
         );
 
+
         resetForm();
 
         loadEvents();
+
     }
 );
 
 
-/* =========================
-   MODIFIER
-========================= */
+/* =========================================================
+   MODIFIER RDV
+========================================================= */
 
 async function editEvent(id) {
 
@@ -1088,6 +1760,7 @@ async function editEvent(id) {
         .eq("id", id)
         .single();
 
+
     if (error || !data) {
 
         showMessage(
@@ -1099,38 +1772,68 @@ async function editEvent(id) {
     }
 
 
-    document.getElementById("event-id").value =
-        data.id;
+    document.getElementById(
+        "event-id"
+    ).value = data.id;
 
-    document.getElementById("titre").value =
-        data.titre || "";
 
-    document.getElementById("texte").value =
-        data.texte || "";
+    document.getElementById(
+        "titre"
+    ).value = data.titre || "";
 
-    document.getElementById("date_evenement").value =
+
+    document.getElementById(
+        "texte"
+    ).value = data.texte || "";
+
+
+    document.getElementById(
+        "date_evenement"
+    ).value =
         data.date_evenement || "";
 
-    document.getElementById("heure").value =
+
+    document.getElementById(
+        "heure"
+    ).value =
         data.heure || "";
 
-    document.getElementById("lieu").value =
+
+    document.getElementById(
+        "lieu"
+    ).value =
         data.lieu || "";
 
-    document.getElementById("lien").value =
+
+    document.getElementById(
+        "lien"
+    ).value =
         data.lien || "";
 
-    document.getElementById("actif").checked =
+
+    document.getElementById(
+        "actif"
+    ).checked =
         data.actif !== false;
 
-    document.getElementById("ordre").value =
+
+    document.getElementById(
+        "ordre"
+    ).value =
         data.ordre || 0;
 
 
     formTitle.textContent =
         "Modifier le rendez-vous";
 
+
     cancelBtn.classList.remove("hidden");
+
+
+    document.querySelector(
+        '[data-tab="rdv"]'
+    ).click();
+
 
     window.scrollTo({
         top: 0,
@@ -1139,9 +1842,9 @@ async function editEvent(id) {
 }
 
 
-/* =========================
-   SUPPRIMER
-========================= */
+/* =========================================================
+   SUPPRIMER RDV
+========================================================= */
 
 async function deleteEvent(id) {
 
@@ -1149,6 +1852,7 @@ async function deleteEvent(id) {
         confirm(
             "Voulez-vous vraiment supprimer ce rendez-vous ?"
         );
+
 
     if (!confirmation) {
         return;
@@ -1178,13 +1882,14 @@ async function deleteEvent(id) {
         "Rendez-vous supprimé."
     );
 
+
     loadEvents();
 }
 
 
-/* =========================
-   ANNULER MODIFICATION
-========================= */
+/* =========================================================
+   ANNULER RDV
+========================================================= */
 
 cancelBtn.addEventListener(
     "click",
@@ -1196,42 +1901,356 @@ function resetForm() {
 
     eventForm.reset();
 
-    document.getElementById("event-id").value =
-        "";
 
-    document.getElementById("actif").checked =
-        true;
+    document.getElementById(
+        "event-id"
+    ).value = "";
 
-    document.getElementById("ordre").value =
-        0;
+
+    document.getElementById(
+        "actif"
+    ).checked = true;
+
+
+    document.getElementById(
+        "ordre"
+    ).value = 0;
+
 
     formTitle.textContent =
         "Ajouter un rendez-vous";
+
 
     cancelBtn.classList.add("hidden");
 }
 
 
-/* =========================
+/* =========================================================
+   CHARGER PROFIL
+========================================================= */
+
+async function loadProfile() {
+
+    if (!currentUser) {
+        return;
+    }
+
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("profiles")
+        .select(`
+            id,
+            nom,
+            grade,
+            email,
+            image_url,
+            description,
+            region,
+            competences
+        `)
+        .eq("id", currentUser.id)
+        .single();
+
+
+    if (error || !data) {
+
+        showMessage(
+            "Impossible de charger votre profil.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    currentProfile = data;
+
+
+    document.getElementById(
+        "profile-nom"
+    ).value =
+        data.nom || "";
+
+
+    document.getElementById(
+        "profile-email"
+    ).value =
+        data.email ||
+        currentUser.email ||
+        "";
+
+
+    document.getElementById(
+        "profile-image"
+    ).value =
+        data.image_url || "";
+
+
+    document.getElementById(
+        "profile-region"
+    ).value =
+        data.region || "";
+
+
+    document.getElementById(
+        "profile-description"
+    ).value =
+        data.description || "";
+
+
+    document.getElementById(
+        "profile-email-preview"
+    ).textContent =
+        data.email ||
+        currentUser.email ||
+        "—";
+
+
+    document.getElementById(
+        "profile-grade-preview"
+    ).textContent =
+        data.grade ||
+        "user";
+
+
+    document.querySelector(
+        ".profile-grade"
+    ).textContent =
+        String(data.grade || "USER")
+            .toUpperCase();
+
+
+    /*
+       Gestion des compétences.
+       La base peut contenir plusieurs valeurs.
+    */
+
+    const competences =
+        Array.isArray(data.competences)
+            ? data.competences
+            : [];
+
+
+    document.querySelectorAll(
+        ".competence-checkbox"
+    ).forEach(checkbox => {
+
+        checkbox.checked =
+            competences.includes(
+                checkbox.value
+            );
+
+    });
+
+
+    updateProfilePreview(data);
+}
+
+
+/* =========================================================
+   APERCU PHOTO
+========================================================= */
+
+function updateProfilePreview(profile) {
+
+    const preview =
+        document.getElementById(
+            "profile-preview"
+        );
+
+
+    if (profile.image_url) {
+
+        preview.innerHTML = `
+
+            <img
+                src="${escapeHtml(profile.image_url)}"
+                class="profile-avatar"
+                alt="Photo de profil"
+                onerror="this.outerHTML='<div class=&quot;profile-avatar-placeholder&quot;>A</div>'"
+            >
+
+            <div class="profile-grade">
+                ${escapeHtml(
+                    String(
+                        profile.grade ||
+                        "user"
+                    ).toUpperCase()
+                )}
+            </div>
+
+        `;
+
+    } else {
+
+        const initial =
+            profile.nom
+                ? profile.nom
+                    .charAt(0)
+                    .toUpperCase()
+                : "A";
+
+
+        preview.innerHTML = `
+
+            <div class="profile-avatar-placeholder">
+                ${escapeHtml(initial)}
+            </div>
+
+            <div class="profile-grade">
+                ${escapeHtml(
+                    String(
+                        profile.grade ||
+                        "user"
+                    ).toUpperCase()
+                )}
+            </div>
+
+        `;
+    }
+}
+
+
+/* =========================================================
+   ENREGISTRER PROFIL
+========================================================= */
+
+document.getElementById(
+    "profile-form"
+).addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        if (!currentUser) {
+
+            showMessage(
+                "Vous devez être connecté.",
+                "error"
+            );
+
+            return;
+        }
+
+
+        const competences = [];
+
+
+        document.querySelectorAll(
+            ".competence-checkbox:checked"
+        ).forEach(checkbox => {
+
+            competences.push(
+                checkbox.value
+            );
+
+        });
+
+
+        const profileData = {
+
+            nom:
+                document.getElementById(
+                    "profile-nom"
+                ).value.trim(),
+
+            image_url:
+                document.getElementById(
+                    "profile-image"
+                ).value.trim() || null,
+
+            region:
+                document.getElementById(
+                    "profile-region"
+                ).value.trim() || null,
+
+            description:
+                document.getElementById(
+                    "profile-description"
+                ).value.trim() || null,
+
+            competences:
+                competences
+        };
+
+
+        const {
+            data,
+            error
+        } = await supabaseClient
+            .from("profiles")
+            .update(profileData)
+            .eq("id", currentUser.id)
+            .select()
+            .single();
+
+
+        if (error) {
+
+            showMessage(
+                "Erreur : " +
+                error.message,
+                "error"
+            );
+
+            return;
+        }
+
+
+        currentProfile = data;
+
+
+        updateProfilePreview(data);
+
+
+        showMessage(
+            "Profil enregistré."
+        );
+
+    }
+);
+
+
+/* =========================================================
    PROTECTION HTML
-========================= */
+========================================================= */
 
 function escapeHtml(value) {
 
     return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 }
 
 
-/* =========================
+/* =========================================================
    DEMARRAGE
-========================= */
+========================================================= */
 
-checkAdmin();
+checkUser();
 
 </script>
 
