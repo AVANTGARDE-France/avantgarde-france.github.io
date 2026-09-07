@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -597,6 +598,47 @@ nav a.active{
   margin-bottom:25px;
 }
 
+
+/* =========================
+   RESEAUX SOCIAUX
+========================= */
+
+.profile-socials{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:0 0 28px;
+}
+
+.profile-social-link{
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(214,173,85,.28);
+  background:rgba(0,0,0,.12);
+  transition:
+    transform .2s,
+    border-color .2s,
+    background .2s;
+}
+
+.profile-social-link:hover{
+  transform:translateY(-2px);
+  border-color:var(--gold);
+  background:rgba(214,173,85,.08);
+}
+
+.profile-social-link img{
+  width:21px;
+  height:21px;
+  display:block;
+  object-fit:contain;
+}
+
 .profile-competences{
   border-top:1px solid rgba(214,173,85,.2);
   padding-top:22px;
@@ -1181,6 +1223,18 @@ footer{
         id="profileModalDescription"
         class="profile-description"
       ></div>
+
+
+      <!-- =========================
+           RESEAUX SOCIAUX
+      ========================= -->
+
+      <div
+        id="profileModalSocials"
+        class="profile-socials"
+        style="display:none;"
+      ></div>
+
 
       <div class="profile-competences">
 
@@ -2007,6 +2061,154 @@ function normaliserCompetences(value){
 
 
 /* =========================================================
+   RESEAUX SOCIAUX
+========================================================= */
+
+const reseauxSociaux = [
+
+  {
+    champ:"facebook_url",
+    nom:"Facebook",
+    logo:"https://cdn.simpleicons.org/facebook/1877F2"
+  },
+
+  {
+    champ:"x_url",
+    nom:"X",
+    logo:"https://cdn.simpleicons.org/x/FFFFFF"
+  },
+
+  {
+    champ:"instagram_url",
+    nom:"Instagram",
+    logo:"https://cdn.simpleicons.org/instagram/E4405F"
+  },
+
+  {
+    champ:"youtube_url",
+    nom:"YouTube",
+    logo:"https://cdn.simpleicons.org/youtube/FF0000"
+  },
+
+  {
+    champ:"tiktok_url",
+    nom:"TikTok",
+    logo:"https://cdn.simpleicons.org/tiktok/FFFFFF"
+  }
+
+];
+
+
+function urlValide(url){
+
+  if(!url) return false;
+
+  try{
+
+    const u =
+      new URL(url);
+
+    return (
+      u.protocol === "http:" ||
+      u.protocol === "https:"
+    );
+
+  }catch{
+
+    return false;
+
+  }
+
+}
+
+
+function afficherReseauxSociaux(membre){
+
+  const container =
+    document.getElementById(
+      "profileModalSocials"
+    );
+
+  container.innerHTML = "";
+
+  let nombreReseaux = 0;
+
+
+  reseauxSociaux.forEach(reseau => {
+
+    const url =
+      membre[reseau.champ];
+
+
+    if(!urlValide(url)){
+
+      return;
+
+    }
+
+
+    nombreReseaux++;
+
+
+    const lien =
+      document.createElement("a");
+
+    lien.className =
+      "profile-social-link";
+
+    lien.href =
+      url;
+
+    lien.target =
+      "_blank";
+
+    lien.rel =
+      "noopener noreferrer";
+
+    lien.title =
+      reseau.nom;
+
+    lien.setAttribute(
+      "aria-label",
+      reseau.nom
+    );
+
+
+    const logo =
+      document.createElement("img");
+
+    logo.src =
+      reseau.logo;
+
+    logo.alt =
+      reseau.nom;
+
+
+    logo.onerror =
+      function(){
+
+        lien.style.display =
+          "none";
+
+      };
+
+
+    lien.appendChild(logo);
+
+    container.appendChild(lien);
+
+  });
+
+
+  container.style.display =
+    nombreReseaux > 0
+      ? "flex"
+      : "none";
+
+}
+
+
+/* =========================================================
    COMPTEUR DESCRIPTION
 ========================================================= */
 
@@ -2075,7 +2277,12 @@ async function chargerMembres(){
       description,
       region,
       competences,
-      anonyme
+      anonyme,
+      facebook_url,
+      x_url,
+      instagram_url,
+      youtube_url,
+      tiktok_url
     `)
     .eq("anonyme", false)
     .order("created_at", {
@@ -2342,6 +2549,13 @@ function ouvrirProfil(membre){
       "flex";
 
   }
+
+
+  /* =========================
+     RESEAUX SOCIAUX
+  ========================= */
+
+  afficherReseauxSociaux(membre);
 
 
   competences.innerHTML = "";
@@ -3144,3 +3358,4 @@ chargerRendezVous();
 
 </body>
 </html>
+```
