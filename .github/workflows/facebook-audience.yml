@@ -1,0 +1,612 @@
+name: Mise à jour audience Facebook
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "0 3 * * *"
+
+jobs:
+
+  update-facebook:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Initialiser le projet
+        run: |
+          npm init -y
+          npm install playwright
+
+      - name: Installer Chromium
+        run: |
+          npx playwright install --with-deps chromium
+
+      - name: Mettre à jour les audiences Facebook
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+        run: |
+
+          node <<'EOF'
+
+          const { chromium } = require("playwright");
+
+          const SUPABASE_URL =
+            process.env.SUPABASE_URL;
+
+          const SUPABASE_KEY =
+            process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+
+          async function supabaseFetch(
+            path,
+            options = {}
+          ){
+
+            const response =
+              await fetch(
+                SUPABASE_URL + path,
+                {
+                  ...options,
+                  headers:{
+                    "apikey":
+                      SUPABASE_KEY,
+
+                    "Authorization":
+                      "Bearer " +
+                      SUPABASE_KEY,
+
+                    "Content-Type":
+                      "application/json",
+
+                    ...(options.headers || {})
+                  }
+                }
+              );
+
+            const text =
+              await response.text();
+
+            let data = null;
+
+            try{
+              data =
+                text
+                  ? JSON.parse(text)
+                  : null;
+            }catch{
+              data = text;
+            }
+
+            if(!response.ok){
+
+              throw new Error(
+                `Supabase ${response.status}: ${text}`
+              );
+            }
+
+            return data;
+          }
+
+
+          function extraireAudienceFacebook(
+            texte
+          ){
+
+            const propre =
+              texte
+                .replace(/\u00a0/g, " ")
+                .replace(/\s+/g, " ");
+
+            const expressions = [
+
+              /([\d\s.,]+)\s+followers\b/i,
+
+              /([\d\s.,]+)\s+abonn(?:é|e)s\b/i
+
+            ];
+
+            for(
+              const expression
+              of expressions
+            ){
+
+              const match =
+                propre.match(
+                  expression
+                );
+
+              if(match){
+
+                const nombre =
+                  match[1]
+                    .replace(/[^\d]/g, "");
+
+                if(nombre){
+
+                  return parseInt(
+                    nombre,
+                    10
+                  );
+
+                }
+              }
+            }
+
+            return null;
+          }
+
+
+          function pageIntrouvable(
+            texte,
+            url
+          ){
+
+            const t =
+              texte
+                .toLowerCase();
+
+            const erreurs = [
+
+              "this content isn't available",
+
+              "this content isn't available right now",
+
+              "the link you followed may be broken",
+
+              "cette page n’est pas disponible",
+
+              "cette page n'est pas disponible",
+
+              "ce contenu n’est pas disponible",
+
+              "ce contenu n'est pas disponible",
+
+              "page introuvable"
+
+            ];
+
+            return erreurs.some(
+              message =>
+                t.includes(message)
+            );
+          }
+
+
+          function calculerAudienceMax(
+            profil
+          ){
+
+            const reseaux = [
+
+              {
+                nom:"Facebook",
+                valeur:
+                  profil.facebook_audience
+              },
+
+              {
+                nom:"Instagram",
+                valeur:
+                  profil.instagram_audience
+              },
+
+              {
+                nom:"X",
+                valeur:
+                  profil.x_audience
+              },
+
+              {
+                nom:"YouTube",
+                valeur:
+                  profil.youtube_audience
+              },
+
+              {
+                nom:"TikTok",
+                valeur:
+                  profil.tiktok_audience
+              }
+
+            ];
+
+            const valides =
+              reseaux.filter(
+                r =>
+                  Number.isFinite(
+                    r.valeur
+                  )
+              );
+
+            if(
+              valides.length === 0
+            ){
+
+              return {
+                audience_max:null,
+                audience_reseau:null
+              };
+
+            }
+
+            valides.sort(
+              (a,b) =>
+                b.valeur -
+                a.valeur
+            );
+
+            return {
+
+              audience_max:
+                valides[0].valeur,
+
+              audience_reseau:
+                valides[0].nom
+
+            };
+
+          }
+
+
+          (async () => {
+
+            if(
+              !SUPABASE_URL ||
+              !SUPABASE_KEY
+            ){
+
+              throw new Error(
+                "Secrets Supabase manquants."
+              );
+
+            }
+
+
+            console.log(
+              "Récupération des profils..."
+            );
+
+
+            const profils =
+              await supabaseFetch(
+                "/rest/v1/profiles" +
+                "?select=" +
+                [
+                  "id",
+                  "nom",
+                  "facebook_url",
+                  "facebook_audience",
+                  "instagram_audience",
+                  "x_audience",
+                  "youtube_audience",
+                  "tiktok_audience"
+                ].join(",") +
+                "&facebook_url=not.is.null"
+              );
+
+
+            console.log(
+              "Profils Facebook :",
+              profils.length
+            );
+
+
+            const browser =
+              await chromium.launch({
+                headless:true
+              });
+
+
+            const page =
+              await browser.newPage({
+
+                locale:"fr-FR",
+
+                viewport:{
+                  width:1366,
+                  height:768
+                }
+
+              });
+
+
+            for(
+              const profil
+              of profils
+            ){
+
+              console.log("");
+              console.log(
+                "================================"
+              );
+
+              console.log(
+                "Profil :",
+                profil.nom ||
+                profil.id
+              );
+
+              console.log(
+                "URL :",
+                profil.facebook_url
+              );
+
+
+              let statut =
+                "error";
+
+              let audience =
+                null;
+
+
+              try{
+
+                const response =
+                  await page.goto(
+                    profil.facebook_url,
+                    {
+                      waitUntil:
+                        "domcontentloaded",
+
+                      timeout:
+                        60000
+                    }
+                  );
+
+
+                console.log(
+                  "HTTP :",
+                  response
+                    ? response.status()
+                    : "inconnu"
+                );
+
+
+                await page.waitForTimeout(
+                  4000
+                );
+
+
+                const urlFinale =
+                  page.url();
+
+                const titre =
+                  await page.title();
+
+                const texte =
+                  await page
+                    .locator("body")
+                    .innerText();
+
+
+                console.log(
+                  "URL finale :",
+                  urlFinale
+                );
+
+                console.log(
+                  "Titre :",
+                  titre
+                );
+
+
+                if(
+                  pageIntrouvable(
+                    texte,
+                    urlFinale
+                  )
+                ){
+
+                  statut =
+                    "not_found";
+
+                  audience =
+                    null;
+
+                  console.log(
+                    "Facebook : page introuvable"
+                  );
+
+                }else{
+
+                  audience =
+                    extraireAudienceFacebook(
+                      texte
+                    );
+
+
+                  if(
+                    audience !== null
+                  ){
+
+                    statut =
+                      "ok";
+
+                    console.log(
+                      "Audience trouvée :",
+                      audience
+                    );
+
+                  }else{
+
+                    statut =
+                      "error";
+
+                    console.log(
+                      "Audience non trouvée."
+                    );
+
+                  }
+
+                }
+
+
+              }catch(error){
+
+                statut =
+                  "error";
+
+                console.log(
+                  "Erreur technique :",
+                  error.message
+                );
+
+              }
+
+
+              /*
+               * IMPORTANT :
+               *
+               * not_found :
+               * on efface l'ancienne valeur.
+               *
+               * ok :
+               * on remplace par la nouvelle valeur.
+               *
+               * error :
+               * on ne modifie PAS
+               * l'ancienne valeur.
+               */
+
+
+              if(
+                statut === "ok"
+              ){
+
+                await supabaseFetch(
+                  "/rest/v1/profiles?id=eq." +
+                  profil.id,
+                  {
+                    method:"PATCH",
+
+                    body:
+                      JSON.stringify({
+                        facebook_audience:
+                          audience,
+
+                        audience_updated_at:
+                          new Date()
+                            .toISOString()
+                      })
+                  }
+                );
+
+              }
+
+
+              else if(
+                statut === "not_found"
+              ){
+
+                await supabaseFetch(
+                  "/rest/v1/profiles?id=eq." +
+                  profil.id,
+                  {
+                    method:"PATCH",
+
+                    body:
+                      JSON.stringify({
+                        facebook_audience:
+                          null,
+
+                        audience_updated_at:
+                          new Date()
+                            .toISOString()
+                      })
+                  }
+                );
+
+              }
+
+
+              /*
+               * Recalcul de l'audience maximale.
+               */
+
+              const profilMisAJour =
+                await supabaseFetch(
+                  "/rest/v1/profiles" +
+                  "?select=" +
+                  [
+                    "facebook_audience",
+                    "instagram_audience",
+                    "x_audience",
+                    "youtube_audience",
+                    "tiktok_audience"
+                  ].join(",") +
+                  "&id=eq." +
+                  profil.id
+                );
+
+
+              if(
+                profilMisAJour &&
+                profilMisAJour.length
+              ){
+
+                const max =
+                  calculerAudienceMax(
+                    profilMisAJour[0]
+                  );
+
+
+                await supabaseFetch(
+                  "/rest/v1/profiles?id=eq." +
+                  profil.id,
+                  {
+                    method:"PATCH",
+
+                    body:
+                      JSON.stringify({
+
+                        audience_max:
+                          max.audience_max,
+
+                        audience_reseau:
+                          max.audience_reseau
+
+                      })
+                  }
+                );
+
+
+                console.log(
+                  "Audience maximale :",
+                  max.audience_max,
+
+                  max.audience_reseau
+                    ? "(" +
+                      max.audience_reseau +
+                      ")"
+                    : ""
+                );
+
+              }
+
+            }
+
+
+            await browser.close();
+
+
+            console.log("");
+            console.log(
+              "================================"
+            );
+
+            console.log(
+              "MISE À JOUR FACEBOOK TERMINÉE"
+            );
+
+          })();
+
+          EOF
