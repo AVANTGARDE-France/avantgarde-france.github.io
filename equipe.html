@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -12,30 +13,52 @@
 
 <style>
 
+/* =====================================================
+   VARIABLES
+===================================================== */
+
 :root {
+
     --navy: #07152d;
     --navy2: #0d2344;
+
     --gold: #d6ad55;
     --gold-light: #f0d58a;
+
     --white: #f5f3ed;
     --muted: #b8c0cd;
+
     --blue-france: #0055A4;
     --red: #EF4135;
 }
+
+
+/* =====================================================
+   RESET
+===================================================== */
 
 * {
     box-sizing: border-box;
 }
 
+
 html {
     scroll-behavior: smooth;
 }
 
+
 body {
+
     margin: 0;
+
     background: var(--navy);
+
     color: var(--white);
-    font-family: Georgia, "Times New Roman", serif;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 }
 
 
@@ -50,12 +73,16 @@ header {
     padding: 0 5%;
 
     display: flex;
+
     align-items: center;
+
     justify-content: space-between;
 
-    border-bottom: 1px solid rgba(214,173,85,.25);
+    border-bottom:
+        1px solid rgba(214,173,85,.25);
 
-    background: rgba(7,21,45,.97);
+    background:
+        rgba(7,21,45,.97);
 
     position: relative;
 }
@@ -95,10 +122,9 @@ header {
     justify-content: center;
 
     width: 32px;
-
     height: 32px;
 
-    background: white;
+    background: #ffffff;
 
     border-radius: 50%;
 
@@ -155,7 +181,8 @@ header {
 
     color: var(--gold-light);
 
-    background: rgba(255,255,255,.06);
+    background:
+        rgba(255,255,255,.06);
 
     transform: rotate(20deg);
 }
@@ -194,74 +221,74 @@ nav a {
 
 
 nav a:hover {
-
     color: var(--gold);
 }
 
 
 /* =====================================================
-   INTRO PAGE
+   PAGE INTRO
 ===================================================== */
 
-.team-intro {
+.page-intro {
+
+    text-align: center;
 
     max-width: 850px;
 
     margin: auto;
 
-    padding: 70px 25px 35px;
-
-    text-align: center;
+    padding: 65px 25px 35px;
 }
 
 
 .page-kicker {
 
-    color: var(--gold-light);
+    color: var(--gold);
 
     font-family: Arial, sans-serif;
 
     font-size: 11px;
 
-    letter-spacing: 4px;
-
     font-weight: bold;
 
-    margin-bottom: 18px;
+    letter-spacing: 3px;
+
+    margin-bottom: 15px;
 }
 
 
-.team-intro h1 {
+.page-intro h1 {
 
     margin: 0;
 
-    font-size: clamp(42px, 7vw, 72px);
-
-    line-height: .95;
+    font-size:
+        clamp(42px, 7vw, 70px);
 
     letter-spacing: 3px;
+
+    line-height: 1;
 }
 
 
-.team-intro h1 span {
-
+.page-intro h1 span {
     color: var(--gold);
 }
 
 
-.team-intro p {
+.page-intro p {
 
     max-width: 700px;
 
-    margin: 25px auto 0;
+    margin:
+        22px auto 0;
 
     color: var(--muted);
 
     font-family: Arial, sans-serif;
 
-    line-height: 1.7;
-
     font-size: 15px;
+
+    line-height: 1.7;
 }
 
 
@@ -269,23 +296,33 @@ nav a:hover {
    BOUTON REJOINDRE
 ===================================================== */
 
-.join-button-zone {
+.join-button-container {
 
     text-align: center;
 
-    padding: 10px 25px 45px;
+    padding:
+        10px 25px 45px;
 }
 
 
 .join-button {
 
-    display: inline-block;
+    display: inline-flex;
 
-    padding: 14px 30px;
+    align-items: center;
 
-    border: 1px solid var(--gold);
+    justify-content: center;
 
-    background: transparent;
+    gap: 12px;
+
+    padding:
+        14px 28px;
+
+    border:
+        1px solid var(--gold);
+
+    background:
+        rgba(214,173,85,.08);
 
     color: var(--gold-light);
 
@@ -293,11 +330,11 @@ nav a:hover {
 
     font-family: Arial, sans-serif;
 
-    font-size: 11px;
+    font-size: 12px;
 
     font-weight: bold;
 
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
 
     transition: .2s;
 }
@@ -308,11 +345,18 @@ nav a:hover {
     background: var(--gold);
 
     color: var(--navy);
+
+    transform: translateY(-1px);
+}
+
+
+.join-arrow {
+    font-size: 17px;
 }
 
 
 /* =====================================================
-   EQUIPE
+   MEMBRES
 ===================================================== */
 
 .team-section {
@@ -321,51 +365,10 @@ nav a:hover {
 
     margin: auto;
 
-    padding: 10px 25px 70px;
+    padding:
+        10px 25px 70px;
 }
 
-
-.team-section-title {
-
-    display: flex;
-
-    justify-content: space-between;
-
-    align-items: end;
-
-    border-bottom: 1px solid rgba(214,173,85,.3);
-
-    padding-bottom: 15px;
-
-    margin-bottom: 25px;
-}
-
-
-.team-section-title h2 {
-
-    margin: 0;
-
-    font-size: 28px;
-
-    font-weight: normal;
-}
-
-
-.team-section-title span {
-
-    color: var(--gold);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 10px;
-
-    letter-spacing: 2px;
-}
-
-
-/* =====================================================
-   CARTES MEMBRES
-===================================================== */
 
 .team-grid {
 
@@ -374,15 +377,21 @@ nav a:hover {
     grid-template-columns:
         repeat(3, 1fr);
 
-    gap: 18px;
+    gap: 20px;
 }
 
 
+/* =====================================================
+   CARTE MEMBRE
+===================================================== */
+
 .member-card {
 
-    border: 1px solid rgba(214,173,85,.25);
+    border:
+        1px solid rgba(214,173,85,.25);
 
-    background: rgba(255,255,255,.025);
+    background:
+        rgba(255,255,255,.025);
 
     overflow: hidden;
 
@@ -407,12 +416,20 @@ nav a:hover {
 
     height: 220px;
 
+    object-fit: cover;
+
+    display: block;
+
     background:
-        linear-gradient(
-            135deg,
-            #0d2344,
-            #07152d
-        );
+        #0a1b34;
+}
+
+
+.member-image-placeholder {
+
+    width: 100%;
+
+    height: 220px;
 
     display: flex;
 
@@ -420,43 +437,23 @@ nav a:hover {
 
     justify-content: center;
 
-    overflow: hidden;
-}
+    background:
+        linear-gradient(
+            135deg,
+            #0d2344,
+            #07152d
+        );
 
+    color:
+        rgba(240,213,138,.5);
 
-.member-image img {
-
-    width: 100%;
-
-    height: 100%;
-
-    object-fit: cover;
-}
-
-
-.member-no-image {
-
-    color: rgba(255,255,255,.25);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    letter-spacing: 2px;
+    font-size: 52px;
 }
 
 
 .member-content {
 
     padding: 22px;
-}
-
-
-.member-name {
-
-    font-size: 22px;
-
-    margin-bottom: 6px;
 }
 
 
@@ -468,23 +465,33 @@ nav a:hover {
 
     font-size: 10px;
 
+    font-weight: bold;
+
     letter-spacing: 2px;
 
     text-transform: uppercase;
 
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+}
+
+
+.member-name {
+
+    font-size: 25px;
+
+    margin-bottom: 8px;
 }
 
 
 .member-region {
 
-    color: #9ea8b7;
+    color: #9da8b7;
 
     font-family: Arial, sans-serif;
 
     font-size: 11px;
 
-    margin-bottom: 13px;
+    margin-bottom: 15px;
 }
 
 
@@ -497,49 +504,60 @@ nav a:hover {
     font-size: 13px;
 
     line-height: 1.6;
+
+    margin-bottom: 15px;
 }
 
 
-.member-talents {
+/* =====================================================
+   COMPETENCES CARTE
+===================================================== */
+
+.member-competences {
 
     display: flex;
 
     flex-wrap: wrap;
 
     gap: 6px;
-
-    margin-top: 15px;
 }
 
 
-.member-talent {
+.competence-tag {
 
-    padding: 5px 7px;
+    padding:
+        5px 8px;
 
-    border: 1px solid
-        rgba(214,173,85,.25);
+    border:
+        1px solid rgba(214,173,85,.25);
 
-    color: #d8c48d;
+    color:
+        #d8c28b;
 
     font-family: Arial, sans-serif;
 
     font-size: 9px;
+
+    line-height: 1.2;
 }
 
 
 /* =====================================================
-   CHARGEMENT
+   MESSAGE AUCUN MEMBRE
 ===================================================== */
 
-.team-loading {
+.no-members {
 
     grid-column: 1 / -1;
 
     text-align: center;
 
-    padding: 50px 20px;
+    padding: 45px 20px;
 
-    color: #929cab;
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    color: #8f9aaa;
 
     font-family: Arial, sans-serif;
 
@@ -548,7 +566,7 @@ nav a:hover {
 
 
 /* =====================================================
-   FORMULAIRE / MODALE
+   MODALE REJOINDRE
 ===================================================== */
 
 .join-modal {
@@ -573,7 +591,6 @@ nav a:hover {
 
 
 .join-modal.active {
-
     display: flex;
 }
 
@@ -582,34 +599,57 @@ nav a:hover {
 
     position: relative;
 
-    width: min(760px, 100%);
+    width:
+        min(700px, 100%);
 
     max-height: 90vh;
 
     overflow-y: auto;
 
-    background: var(--navy2);
+    background:
+        var(--navy2);
 
-    border: 1px solid
-        rgba(214,173,85,.45);
+    border:
+        1px solid rgba(214,173,85,.45);
 
     box-shadow:
         0 25px 80px rgba(0,0,0,.55);
 
     padding: 35px;
+
+    animation:
+        modalAppear .2s ease-out;
 }
 
 
-.join-modal-close {
+@keyframes modalAppear {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(15px);
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+
+.modal-close {
 
     position: absolute;
 
     right: 14px;
-
     top: 10px;
 
     width: 32px;
-
     height: 32px;
 
     border: 0;
@@ -624,23 +664,25 @@ nav a:hover {
 }
 
 
-.join-modal-close:hover {
-
+.modal-close:hover {
     color: white;
 }
 
 
+/* =====================================================
+   FORMULAIRE
+===================================================== */
+
 .form-intro {
 
-    text-align: center;
-
-    margin-bottom: 30px;
+    margin-bottom: 28px;
 }
 
 
 .form-intro h2 {
 
-    margin: 0 0 12px;
+    margin:
+        0 0 10px;
 
     font-size: 30px;
 
@@ -650,9 +692,7 @@ nav a:hover {
 
 .form-intro p {
 
-    margin: auto;
-
-    max-width: 600px;
+    margin: 0;
 
     color: var(--muted);
 
@@ -664,13 +704,9 @@ nav a:hover {
 }
 
 
-/* =====================================================
-   FORMULAIRE
-===================================================== */
-
 .form-group {
 
-    margin-bottom: 22px;
+    margin-bottom: 20px;
 }
 
 
@@ -680,7 +716,7 @@ nav a:hover {
 
     margin-bottom: 8px;
 
-    color: #eee;
+    color: #e6e7e9;
 
     font-family: Arial, sans-serif;
 
@@ -696,20 +732,24 @@ nav a:hover {
 
     width: 100%;
 
-    border: 1px solid
-        rgba(255,255,255,.14);
+    padding:
+        12px 13px;
 
-    background: #07152d;
+    border:
+        1px solid rgba(255,255,255,.14);
+
+    background:
+        rgba(0,0,0,.18);
 
     color: white;
-
-    padding: 12px 13px;
 
     font-family: Arial, sans-serif;
 
     font-size: 13px;
 
     outline: none;
+
+    border-radius: 0;
 }
 
 
@@ -718,7 +758,16 @@ nav a:hover {
 .form-group textarea:focus {
 
     border-color:
-        rgba(214,173,85,.7);
+        rgba(214,173,85,.65);
+}
+
+
+.form-group select option {
+
+    background:
+        #0d2344;
+
+    color: white;
 }
 
 
@@ -736,7 +785,7 @@ nav a:hover {
 
     margin-top: 6px;
 
-    color: #8994a4;
+    color: #7f8a99;
 
     font-family: Arial, sans-serif;
 
@@ -745,7 +794,7 @@ nav a:hover {
 
 
 /* =====================================================
-   TALENTS
+   COMPETENCES
 ===================================================== */
 
 .competences-section {
@@ -754,50 +803,51 @@ nav a:hover {
 
     padding-top: 25px;
 
-    border-top: 1px solid
-        rgba(214,173,85,.25);
+    border-top:
+        1px solid rgba(214,173,85,.2);
 }
 
 
 .competences-title {
 
+    display: inline;
+
     color: var(--gold-light);
 
-    font-family: Arial, sans-serif;
+    font-size: 22px;
 
-    font-size: 18px;
-
-    font-weight: bold;
-
-    letter-spacing: 1px;
+    font-weight: normal;
 }
 
 
 .competences-subtitle {
 
-    color: #9ca6b4;
+    display: inline;
+
+    margin-left: 7px;
+
+    color: #9da8b7;
 
     font-family: Arial, sans-serif;
 
     font-size: 11px;
-
-    margin-top: 4px;
-
-    margin-bottom: 25px;
 }
 
 
 .competence-group-title {
 
-    margin: 25px 0 12px;
+    margin:
+        28px 0 12px;
 
     color: var(--gold);
 
     font-family: Arial, sans-serif;
 
-    font-size: 13px;
+    font-size: 11px;
 
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
 }
 
 
@@ -807,11 +857,23 @@ nav a:hover {
         1px solid rgba(255,255,255,.08);
 
     background:
-        rgba(255,255,255,.025);
+        rgba(255,255,255,.02);
 
     margin-bottom: 8px;
 
-    padding: 12px;
+    transition:
+        background .2s,
+        border-color .2s;
+}
+
+
+.competence:hover {
+
+    background:
+        rgba(214,173,85,.04);
+
+    border-color:
+        rgba(214,173,85,.25);
 }
 
 
@@ -821,7 +883,9 @@ nav a:hover {
 
     align-items: flex-start;
 
-    gap: 11px;
+    gap: 12px;
+
+    padding: 13px;
 
     cursor: pointer;
 }
@@ -829,17 +893,18 @@ nav a:hover {
 
 .competence input {
 
-    margin-top: 4px;
+    flex-shrink: 0;
 
-    accent-color: var(--gold);
+    margin-top: 3px;
+
+    accent-color:
+        var(--gold);
 }
 
 
 .competence-text {
 
     display: block;
-
-    flex: 1;
 }
 
 
@@ -847,11 +912,11 @@ nav a:hover {
 
     display: block;
 
-    color: #f0f0f0;
+    color: #e8e9eb;
 
     font-family: Arial, sans-serif;
 
-    font-size: 12px;
+    font-size: 13px;
 
     font-weight: bold;
 
@@ -874,24 +939,26 @@ nav a:hover {
 
 
 /* =====================================================
-   SUBMIT
+   BOUTON FORMULAIRE
 ===================================================== */
 
 .form-submit {
 
-    display: block;
-
     width: 100%;
 
-    margin-top: 30px;
+    margin-top: 25px;
 
-    padding: 14px;
+    padding:
+        14px;
 
-    border: 1px solid var(--gold);
+    border:
+        1px solid var(--gold);
 
-    background: var(--gold);
+    background:
+        var(--gold);
 
-    color: var(--navy);
+    color:
+        var(--navy);
 
     font-family: Arial, sans-serif;
 
@@ -902,12 +969,23 @@ nav a:hover {
     letter-spacing: 1.5px;
 
     cursor: pointer;
+
+    transition: .2s;
 }
 
 
 .form-submit:hover {
 
-    background: var(--gold-light);
+    background:
+        var(--gold-light);
+}
+
+
+.form-submit:disabled {
+
+    opacity: .55;
+
+    cursor: wait;
 }
 
 
@@ -920,6 +998,8 @@ nav a:hover {
     font-family: Arial, sans-serif;
 
     font-size: 12px;
+
+    line-height: 1.5;
 }
 
 
@@ -984,15 +1064,10 @@ footer {
     }
 
 
-    .team-intro {
-
-        padding-top: 50px;
-    }
-
-
     .join-modal-box {
 
-        padding: 28px 20px;
+        padding:
+            28px 20px;
     }
 
 }
@@ -1011,62 +1086,67 @@ footer {
 
 <header>
 
-    <a
-        href="admin.html"
-        class="admin-gear"
-        title="Administration"
-        aria-label="Administration"
-    >
-        ⚙
+
+<a
+    href="admin.html"
+    class="admin-gear"
+    title="Administration"
+    aria-label="Administration"
+>
+    ⚙
+</a>
+
+
+<a
+    href="index.html"
+    class="logo"
+>
+
+    <span class="logo-a">
+        A
+    </span>
+
+    vant-gard
+
+    <span class="logo-e">
+        E
+    </span>
+
+</a>
+
+
+<nav>
+
+    <a href="index.html">
+        ACCUEIL
     </a>
 
-
-    <a
-        href="index.html"
-        class="logo"
-    >
-
-        <span class="logo-a">A</span>
-
-        vant-gard
-
-        <span class="logo-e">E</span>
-
+    <a href="manifeste.html">
+        MANIFESTE
     </a>
 
+    <a href="projet.html">
+        NOTRE PROJET
+    </a>
 
-    <nav>
+    <a href="inspirations.html">
+        NOS INSPIRATIONS
+    </a>
 
-        <a href="index.html">
-            ACCUEIL
-        </a>
+    <a href="equipe.html">
+        NOTRE ÉQUIPE
+    </a>
 
-        <a href="manifeste.html">
-            MANIFESTE
-        </a>
-
-        <a href="projet.html">
-            NOTRE PROJET
-        </a>
-
-        <a href="inspirations.html">
-            NOS INSPIRATIONS
-        </a>
-
-        <a href="equipe.html">
-            NOTRE ÉQUIPE
-        </a>
-
-    </nav>
+</nav>
 
 </header>
 
 
 <!-- =====================================================
-     INTRO
+     INTRODUCTION
 ===================================================== -->
 
-<section class="team-intro">
+<section class="page-intro">
 
     <div class="page-kicker">
         L'AVANT-GARDE
@@ -1094,44 +1174,37 @@ footer {
      REJOINDRE
 ===================================================== -->
 
-<div class="join-button-zone">
+<div class="join-button-container">
 
     <a
         href="#"
         id="openJoin"
         class="join-button"
     >
-        NOUS REJOINDRE
+
+        REJOINDRE L'AVANT-GARDE
+
+        <span class="join-arrow">
+            →
+        </span>
+
     </a>
 
 </div>
 
 
 <!-- =====================================================
-     MEMBRES
+     EQUIPE
 ===================================================== -->
 
 <section class="team-section">
-
-    <div class="team-section-title">
-
-        <h2>
-            Les membres
-        </h2>
-
-        <span>
-            AVANT-GARDE
-        </span>
-
-    </div>
-
 
     <div
         id="teamGrid"
         class="team-grid"
     >
 
-        <div class="team-loading">
+        <div class="no-members">
             Chargement des membres...
         </div>
 
@@ -1154,7 +1227,7 @@ footer {
 
         <button
             id="closeJoin"
-            class="join-modal-close"
+            class="modal-close"
             aria-label="Fermer"
         >
             ×
@@ -1169,9 +1242,11 @@ footer {
 
             <p>
 
-                Présentez-vous, indiquez votre région
-                et sélectionnez les talents dans lesquels
+                Présentez-vous, indiquez votre région et
+                sélectionnez les compétences dans lesquelles
                 vous souhaitez vous auto-évaluer.
+
+                Votre profil pourra ensuite être intégré à l'équipe.
 
             </p>
 
@@ -1240,53 +1315,29 @@ footer {
 
                     <optgroup label="France métropolitaine">
 
-                        <option>
-                            Auvergne-Rhône-Alpes
-                        </option>
+                        <option>Auvergne-Rhône-Alpes</option>
 
-                        <option>
-                            Bourgogne-Franche-Comté
-                        </option>
+                        <option>Bourgogne-Franche-Comté</option>
 
-                        <option>
-                            Bretagne
-                        </option>
+                        <option>Bretagne</option>
 
-                        <option>
-                            Centre-Val de Loire
-                        </option>
+                        <option>Centre-Val de Loire</option>
 
-                        <option>
-                            Corse
-                        </option>
+                        <option>Corse</option>
 
-                        <option>
-                            Grand Est
-                        </option>
+                        <option>Grand Est</option>
 
-                        <option>
-                            Hauts-de-France
-                        </option>
+                        <option>Hauts-de-France</option>
 
-                        <option>
-                            Île-de-France
-                        </option>
+                        <option>Île-de-France</option>
 
-                        <option>
-                            Normandie
-                        </option>
+                        <option>Normandie</option>
 
-                        <option>
-                            Nouvelle-Aquitaine
-                        </option>
+                        <option>Nouvelle-Aquitaine</option>
 
-                        <option>
-                            Occitanie
-                        </option>
+                        <option>Occitanie</option>
 
-                        <option>
-                            Pays de la Loire
-                        </option>
+                        <option>Pays de la Loire</option>
 
                         <option>
                             Provence-Alpes-Côte d'Azur
@@ -1314,17 +1365,13 @@ footer {
 
                         <option>Europe</option>
 
-                        <option>
-                            Amérique du Nord
-                        </option>
+                        <option>Amérique du Nord</option>
 
                         <option>
                             Amérique centrale et Caraïbes
                         </option>
 
-                        <option>
-                            Amérique du Sud
-                        </option>
+                        <option>Amérique du Sud</option>
 
                         <option>Afrique</option>
 
@@ -1357,8 +1404,7 @@ footer {
 
                 <span class="form-help">
 
-                    Indiquez l'URL d'une image
-                    déjà hébergée en ligne.
+                    Indiquez l'URL d'une image déjà hébergée en ligne.
 
                 </span>
 
@@ -1386,13 +1432,17 @@ footer {
             </div>
 
 
-            <!-- TALENTS -->
+            <!-- =================================================
+                 COMPETENCES
+            ================================================== -->
 
             <div class="competences-section">
 
+
                 <div class="competences-title">
-                    talent(s)
+                    Compétences
                 </div>
+
 
                 <div class="competences-subtitle">
                     (auto-évaluation de vos compétences)
@@ -1637,7 +1687,7 @@ footer {
 
 
                 <!-- =================================================
-                     SYMPATHISANTS OU PLUS
+                     SYMPATHISANTS
                 ================================================== -->
 
                 <h3 class="competence-group-title">
@@ -1702,12 +1752,14 @@ footer {
 
                 </div>
 
+
             </div>
 
 
             <button
                 type="submit"
                 class="form-submit"
+                id="formSubmit"
             >
                 CRÉER MON PROFIL
             </button>
@@ -1733,6 +1785,7 @@ footer {
 <footer>
 
     © 2026 Avant-gardE
+
     — Souveraineté · Liberté · Justice · Patriote
 
 </footer>
@@ -1747,8 +1800,10 @@ footer {
 const SUPABASE_URL =
     "https://wlhtegrciehmtxqecopv.supabase.co";
 
+
 const SUPABASE_KEY =
     "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
+
 
 const supabaseClient =
     window.supabase.createClient(
@@ -1758,43 +1813,309 @@ const supabaseClient =
 
 
 /* =====================================================
-   ELEMENTS
+   CHARGEMENT DES MEMBRES
 ===================================================== */
 
-const teamGrid =
-    document.getElementById(
-        "teamGrid"
+async function chargerMembres() {
+
+    const teamGrid =
+        document.getElementById("teamGrid");
+
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+
+        .from("profiles")
+
+        .select(`
+            id,
+            nom,
+            grade,
+            image_url,
+            description,
+            region,
+            competences
+        `)
+
+        .order(
+            "created_at",
+            {
+                ascending: true
+            }
+        );
+
+
+    if (error) {
+
+        console.error(
+            "Erreur chargement profiles :",
+            error
+        );
+
+        teamGrid.innerHTML = `
+            <div class="no-members">
+                Impossible de charger les membres.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    if (
+        !data ||
+        data.length === 0
+    ) {
+
+        teamGrid.innerHTML = `
+            <div class="no-members">
+                Aucun membre à afficher pour le moment.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    teamGrid.innerHTML = "";
+
+
+    data.forEach(
+        membre => {
+
+            const card =
+                document.createElement("article");
+
+
+            card.className =
+                "member-card";
+
+
+            /* IMAGE */
+
+            if (membre.image_url) {
+
+                const image =
+                    document.createElement("img");
+
+                image.className =
+                    "member-image";
+
+                image.src =
+                    membre.image_url;
+
+                image.alt =
+                    membre.nom || "Membre";
+
+                image.onerror =
+                    function() {
+
+                        this.replaceWith(
+                            creerPlaceholder()
+                        );
+
+                    };
+
+                card.appendChild(
+                    image
+                );
+
+            } else {
+
+                card.appendChild(
+                    creerPlaceholder()
+                );
+
+            }
+
+
+            /* CONTENU */
+
+            const content =
+                document.createElement("div");
+
+            content.className =
+                "member-content";
+
+
+            /* GRADE */
+
+            if (membre.grade) {
+
+                const grade =
+                    document.createElement("div");
+
+                grade.className =
+                    "member-grade";
+
+                grade.textContent =
+                    membre.grade;
+
+                content.appendChild(
+                    grade
+                );
+
+            }
+
+
+            /* NOM */
+
+            const name =
+                document.createElement("div");
+
+            name.className =
+                "member-name";
+
+            name.textContent =
+                membre.nom ||
+                "Membre";
+
+            content.appendChild(
+                name
+            );
+
+
+            /* REGION */
+
+            if (membre.region) {
+
+                const region =
+                    document.createElement("div");
+
+                region.className =
+                    "member-region";
+
+                region.textContent =
+                    membre.region;
+
+                content.appendChild(
+                    region
+                );
+
+            }
+
+
+            /* DESCRIPTION */
+
+            if (membre.description) {
+
+                const description =
+                    document.createElement("div");
+
+                description.className =
+                    "member-description";
+
+                description.textContent =
+                    membre.description;
+
+                content.appendChild(
+                    description
+                );
+
+            }
+
+
+            /* COMPETENCES */
+
+            if (
+                Array.isArray(
+                    membre.competences
+                ) &&
+                membre.competences.length > 0
+            ) {
+
+                const competences =
+                    document.createElement("div");
+
+                competences.className =
+                    "member-competences";
+
+
+                membre.competences.forEach(
+                    competence => {
+
+                        const tag =
+                            document.createElement("span");
+
+                        tag.className =
+                            "competence-tag";
+
+                        tag.textContent =
+                            competence;
+
+                        competences.appendChild(
+                            tag
+                        );
+
+                    }
+                );
+
+
+                content.appendChild(
+                    competences
+                );
+
+            }
+
+
+            card.appendChild(
+                content
+            );
+
+
+            teamGrid.appendChild(
+                card
+            );
+
+        }
     );
+
+}
+
+
+/* =====================================================
+   PLACEHOLDER IMAGE
+===================================================== */
+
+function creerPlaceholder() {
+
+    const placeholder =
+        document.createElement("div");
+
+    placeholder.className =
+        "member-image-placeholder";
+
+    placeholder.textContent =
+        "A";
+
+    return placeholder;
+
+}
+
+
+/* =====================================================
+   MODALE
+===================================================== */
 
 const joinModal =
     document.getElementById(
         "joinModal"
     );
 
+
 const openJoin =
     document.getElementById(
         "openJoin"
     );
+
 
 const closeJoin =
     document.getElementById(
         "closeJoin"
     );
 
-const joinForm =
-    document.getElementById(
-        "joinForm"
-    );
-
-const formMessage =
-    document.getElementById(
-        "formMessage"
-    );
-
-
-/* =====================================================
-   OUVRIR FORMULAIRE
-===================================================== */
 
 openJoin.addEventListener(
     "click",
@@ -1813,25 +2134,13 @@ openJoin.addEventListener(
 );
 
 
-/* =====================================================
-   FERMER FORMULAIRE
-===================================================== */
-
-function fermerFormulaire() {
-
-    joinModal.classList.remove(
-        "active"
-    );
-
-    document.body.style.overflow =
-        "";
-
-}
-
-
 closeJoin.addEventListener(
     "click",
-    fermerFormulaire
+    function() {
+
+        fermerModal();
+
+    }
 );
 
 
@@ -1844,7 +2153,7 @@ joinModal.addEventListener(
             joinModal
         ) {
 
-            fermerFormulaire();
+            fermerModal();
 
         }
 
@@ -1857,11 +2166,10 @@ document.addEventListener(
     function(event) {
 
         if (
-            event.key ===
-            "Escape"
+            event.key === "Escape"
         ) {
 
-            fermerFormulaire();
+            fermerModal();
 
         }
 
@@ -1869,308 +2177,14 @@ document.addEventListener(
 );
 
 
-/* =====================================================
-   CHARGER LES MEMBRES
-===================================================== */
+function fermerModal() {
 
-async function chargerMembres() {
-
-    /*
-       On ne demande volontairement pas l'email
-       pour l'affichage public.
-    */
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-
-        .from("profils")
-
-        .select(
-            "id,nom,grade,image_url,description,region,competences"
-        )
-
-        .order(
-            "created_at",
-            {
-                ascending: true
-            }
-        );
-
-
-    if (error) {
-
-        console.error(
-            "Erreur chargement profils :",
-            error
-        );
-
-        teamGrid.innerHTML = `
-            <div class="team-loading">
-                Impossible de charger les membres.
-            </div>
-        `;
-
-        return;
-    }
-
-
-    if (
-        !data ||
-        data.length === 0
-    ) {
-
-        teamGrid.innerHTML = `
-            <div class="team-loading">
-                Aucun membre à afficher pour le moment.
-            </div>
-        `;
-
-        return;
-    }
-
-
-    teamGrid.innerHTML = "";
-
-
-    data.forEach(
-        afficherMembre
+    joinModal.classList.remove(
+        "active"
     );
 
-}
-
-
-/* =====================================================
-   AFFICHER UN MEMBRE
-===================================================== */
-
-function afficherMembre(
-    membre
-) {
-
-    const card =
-        document.createElement(
-            "article"
-        );
-
-    card.className =
-        "member-card";
-
-
-    /* IMAGE */
-
-    const imageContainer =
-        document.createElement(
-            "div"
-        );
-
-    imageContainer.className =
-        "member-image";
-
-
-    if (
-        membre.image_url
-    ) {
-
-        const image =
-            document.createElement(
-                "img"
-            );
-
-        image.src =
-            membre.image_url;
-
-        image.alt =
-            membre.nom ||
-            "Membre de l'équipe";
-
-        image.loading =
-            "lazy";
-
-        image.onerror =
-            function() {
-
-                image.remove();
-
-                imageContainer.innerHTML = `
-                    <span class="member-no-image">
-                        AVANT-GARDE
-                    </span>
-                `;
-
-            };
-
-
-        imageContainer.appendChild(
-            image
-        );
-
-    } else {
-
-        imageContainer.innerHTML = `
-            <span class="member-no-image">
-                AVANT-GARDE
-            </span>
-        `;
-
-    }
-
-
-    /* CONTENU */
-
-    const content =
-        document.createElement(
-            "div"
-        );
-
-    content.className =
-        "member-content";
-
-
-    const name =
-        document.createElement(
-            "div"
-        );
-
-    name.className =
-        "member-name";
-
-    name.textContent =
-        membre.nom ||
-        "Membre";
-
-
-    const grade =
-        document.createElement(
-            "div"
-        );
-
-    grade.className =
-        "member-grade";
-
-    grade.textContent =
-        membre.grade ||
-        "Membre";
-
-
-    const region =
-        document.createElement(
-            "div"
-        );
-
-    region.className =
-        "member-region";
-
-    region.textContent =
-        membre.region
-        ? membre.region
-        : "";
-
-
-    const description =
-        document.createElement(
-            "div"
-        );
-
-    description.className =
-        "member-description";
-
-    description.textContent =
-        membre.description ||
+    document.body.style.overflow =
         "";
-
-
-    content.appendChild(
-        name
-    );
-
-    content.appendChild(
-        grade
-    );
-
-
-    if (
-        membre.region
-    ) {
-
-        content.appendChild(
-            region
-        );
-
-    }
-
-
-    if (
-        membre.description
-    ) {
-
-        content.appendChild(
-            description
-        );
-
-    }
-
-
-    /* TALENTS */
-
-    if (
-        Array.isArray(
-            membre.competences
-        ) &&
-        membre.competences.length
-    ) {
-
-        const talents =
-            document.createElement(
-                "div"
-            );
-
-        talents.className =
-            "member-talents";
-
-
-        membre.competences.forEach(
-            function(competence) {
-
-                const talent =
-                    document.createElement(
-                        "span"
-                    );
-
-                talent.className =
-                    "member-talent";
-
-                talent.textContent =
-                    competence;
-
-                talents.appendChild(
-                    talent
-                );
-
-            }
-        );
-
-
-        content.appendChild(
-            talents
-        );
-
-    }
-
-
-    card.appendChild(
-        imageContainer
-    );
-
-    card.appendChild(
-        content
-    );
-
-
-    teamGrid.appendChild(
-        card
-    );
 
 }
 
@@ -2179,148 +2193,205 @@ function afficherMembre(
    CREATION DU PROFIL
 ===================================================== */
 
-joinForm.addEventListener(
-    "submit",
-    async function(event) {
+document
+    .getElementById("joinForm")
+    .addEventListener(
+        "submit",
+        async function(event) {
 
-        event.preventDefault();
-
-
-        formMessage.textContent =
-            "Création du profil...";
-
-        formMessage.style.color =
-            "#d6ad55";
+            event.preventDefault();
 
 
-        const nom =
-            document.getElementById(
-                "nom"
-            ).value.trim();
+            const submit =
+                document.getElementById(
+                    "formSubmit"
+                );
 
 
-        const email =
-            document.getElementById(
-                "email"
-            ).value.trim();
+            const message =
+                document.getElementById(
+                    "formMessage"
+                );
 
 
-        const region =
-            document.getElementById(
-                "region"
-            ).value;
+            submit.disabled =
+                true;
 
 
-        const image_url =
-            document.getElementById(
-                "image_url"
-            ).value.trim();
+            message.textContent =
+                "Création de votre profil...";
 
 
-        const description =
-            document.getElementById(
-                "description"
-            ).value.trim();
+            message.style.color =
+                "#d6ad55";
 
 
-        const competences =
-            Array.from(
-                document.querySelectorAll(
-                    'input[name="competences"]:checked'
-                )
-            ).map(
-                function(input) {
-                    return input.value;
-                }
-            );
+            /* DONNEES */
+
+            const nom =
+                document
+                    .getElementById("nom")
+                    .value
+                    .trim();
 
 
-        /*
-           Création du profil.
-        */
-
-        const {
-            error
-        } = await supabaseClient
-
-            .from("profils")
-
-            .insert({
-
-                nom:
-                    nom,
-
-                grade:
-                    "membre",
-
-                email:
-                    email || null,
-
-                image_url:
-                    image_url || null,
-
-                description:
-                    description || null,
-
-                region:
-                    region || null,
-
-                competences:
-                    competences.length
-                    ? competences
-                    : null
-
-            });
+            const email =
+                document
+                    .getElementById("email")
+                    .value
+                    .trim();
 
 
-        if (error) {
+            const region =
+                document
+                    .getElementById("region")
+                    .value;
 
-            console.error(
-                "Erreur création profil :",
+
+            const image_url =
+                document
+                    .getElementById("image_url")
+                    .value
+                    .trim();
+
+
+            const description =
+                document
+                    .getElementById("description")
+                    .value
+                    .trim();
+
+
+            const competences =
+                Array.from(
+                    document.querySelectorAll(
+                        'input[name="competences"]:checked'
+                    )
+                ).map(
+                    checkbox =>
+                        checkbox.value
+                );
+
+
+            /* =================================================
+               INSERTION DANS profiles
+            ================================================= */
+
+            const id =
+                crypto.randomUUID();
+
+
+            const {
+                data,
                 error
+            } = await supabaseClient
+
+                .from("profiles")
+
+                .insert([
+                    {
+
+                        id: id,
+
+                        nom: nom,
+
+                        grade: "membre",
+
+                        email:
+                            email ||
+                            null,
+
+                        image_url:
+                            image_url ||
+                            null,
+
+                        description:
+                            description ||
+                            null,
+
+                        region:
+                            region ||
+                            null,
+
+                        competences:
+                            competences.length
+                                ? competences
+                                : null
+
+                    }
+                ])
+
+                .select()
+                .single();
+
+
+            if (error) {
+
+                console.error(
+                    "Erreur création profil :",
+                    error
+                );
+
+
+                message.textContent =
+                    "Impossible de créer le profil : " +
+                    error.message;
+
+
+                message.style.color =
+                    "#EF4135";
+
+
+                submit.disabled =
+                    false;
+
+                return;
+
+            }
+
+
+            /* =================================================
+               SUCCES
+            ================================================= */
+
+            message.textContent =
+                "Votre profil a bien été créé.";
+
+
+            message.style.color =
+                "#8fd694";
+
+
+            document
+                .getElementById("joinForm")
+                .reset();
+
+
+            /*
+               Actualisation immédiate
+               de la liste des membres.
+            */
+
+            await chargerMembres();
+
+
+            setTimeout(
+                function() {
+
+                    fermerModal();
+
+                    message.textContent =
+                        "";
+
+                    submit.disabled =
+                        false;
+
+                },
+                1800
             );
-
-
-            formMessage.textContent =
-                "Une erreur est survenue lors de la création du profil.";
-
-            formMessage.style.color =
-                "#ef6b6b";
-
-            return;
 
         }
-
-
-        formMessage.textContent =
-            "Votre profil a bien été créé.";
-
-
-        formMessage.style.color =
-            "#8fcf9b";
-
-
-        joinForm.reset();
-
-
-        /*
-           Actualise immédiatement
-           la liste des membres.
-        */
-
-        setTimeout(
-            function() {
-
-                fermerFormulaire();
-
-                chargerMembres();
-
-            },
-            1000
-        );
-
-    }
-);
+    );
 
 
 /* =====================================================
@@ -2335,3 +2406,4 @@ chargerMembres();
 </body>
 
 </html>
+```
