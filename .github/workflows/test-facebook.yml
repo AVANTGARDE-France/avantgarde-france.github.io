@@ -1,0 +1,114 @@
+name: Test Facebook
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-facebook:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Initialiser le projet
+        run: |
+          npm init -y
+          npm install playwright
+
+      - name: Installer Chromium
+        run: |
+          npx playwright install --with-deps chromium
+
+      - name: Tester Facebook
+        run: |
+          node <<'EOF'
+          const { chromium } = require("playwright");
+
+          (async () => {
+
+            const browser =
+              await chromium.launch({
+                headless: true
+              });
+
+            const page =
+              await browser.newPage({
+                locale: "fr-FR",
+                viewport: {
+                  width: 1366,
+                  height: 768
+                }
+              });
+
+            const url =
+              "https://www.facebook.com/avant.garde.officiel";
+
+            console.log("Ouverture :", url);
+
+            const response =
+              await page.goto(
+                url,
+                {
+                  waitUntil: "domcontentloaded",
+                  timeout: 60000
+                }
+              );
+
+            console.log(
+              "HTTP status :",
+              response
+                ? response.status()
+                : "inconnu"
+            );
+
+            console.log(
+              "URL finale :",
+              page.url()
+            );
+
+            await page.waitForTimeout(5000);
+
+            console.log(
+              "Titre :",
+              await page.title()
+            );
+
+            const texte =
+              await page.loc
+                .locator("body")
+                .innerText();
+
+            console.log(
+              "----- CONTENU FACEBOOK -----"
+            );
+
+            console.log(
+              texte.substring(0, 20000)
+            );
+
+            console.log(
+              "----- FIN CONTENU -----"
+            );
+
+            await page.screenshot({
+              path:
+                "facebook-test.png",
+                fullPage: true
+            });
+
+            await browser.close();
+
+          })();
+          EOF
+
+      - name: Sauvegarder la capture
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: facebook-test
+          path: facebook-test.png
+          retention-days: 1
