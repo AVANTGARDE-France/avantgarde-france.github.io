@@ -412,6 +412,33 @@ textarea{
 
 
 /* =========================================================
+   RESEAUX SOCIAUX
+========================================================= */
+
+.social-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px 16px;
+}
+
+.social-title{
+  color:var(--gold);
+  font-size:17px;
+  margin:22px 0 6px;
+  padding-bottom:7px;
+  border-bottom:1px solid rgba(214,173,85,.2);
+}
+
+.social-intro{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:9px;
+  line-height:1.45;
+  margin-bottom:14px;
+}
+
+
+/* =========================================================
    VISIBILITÉ
 ========================================================= */
 
@@ -774,6 +801,10 @@ footer{
   }
 
   .profile-grid{
+    grid-template-columns:1fr;
+  }
+
+  .social-grid{
     grid-template-columns:1fr;
   }
 
@@ -1177,6 +1208,112 @@ footer{
             </div>
 
           </div>
+
+        </div>
+
+
+        <!-- =================================================
+             RESEAUX SOCIAUX
+        ================================================== -->
+
+        <div class="social-title">
+          Réseaux sociaux
+        </div>
+
+        <div class="social-intro">
+          Ajoutez les liens vers vos réseaux sociaux.
+          Ils apparaîtront sous forme d’icônes sur votre profil public.
+          Laissez un champ vide si vous ne souhaitez pas afficher ce réseau.
+        </div>
+
+
+        <div class="social-grid">
+
+
+          <!-- FACEBOOK -->
+
+          <div class="form-group">
+
+            <label for="profileFacebook">
+              FACEBOOK
+            </label>
+
+            <input
+              type="url"
+              id="profileFacebook"
+              placeholder="https://www.facebook.com/..."
+            >
+
+          </div>
+
+
+          <!-- X -->
+
+          <div class="form-group">
+
+            <label for="profileX">
+              X
+            </label>
+
+            <input
+              type="url"
+              id="profileX"
+              placeholder="https://x.com/..."
+            >
+
+          </div>
+
+
+          <!-- INSTAGRAM -->
+
+          <div class="form-group">
+
+            <label for="profileInstagram">
+              INSTAGRAM
+            </label>
+
+            <input
+              type="url"
+              id="profileInstagram"
+              placeholder="https://www.instagram.com/..."
+            >
+
+          </div>
+
+
+          <!-- YOUTUBE -->
+
+          <div class="form-group">
+
+            <label for="profileYoutube">
+              YOUTUBE
+            </label>
+
+            <input
+              type="url"
+              id="profileYoutube"
+              placeholder="https://www.youtube.com/..."
+            >
+
+          </div>
+
+
+          <!-- TIKTOK -->
+
+          <div class="form-group">
+
+            <label for="profileTiktok">
+              TIKTOK
+            </label>
+
+            <input
+              type="url"
+              id="profileTiktok"
+              placeholder="https://www.tiktok.com/@..."
+            >
+
+          </div>
+
 
         </div>
 
@@ -1942,7 +2079,12 @@ async function verifierUtilisateur(){
         description,
         region,
         competences,
-        anonyme
+        anonyme,
+        facebook_url,
+        x_url,
+        instagram_url,
+        youtube_url,
+        tiktok_url
       `)
       .eq("id",user.id)
       .single();
@@ -2035,6 +2177,7 @@ function afficherAdmin(){
   /* Boutons de l'espace membre */
 
   ajouterActionsHeader();
+
 
 }
 
@@ -2210,6 +2353,38 @@ function remplirProfil(profile){
       profile.description || "";
 
 
+  /* RESEAUX SOCIAUX */
+
+  document
+    .getElementById("profileFacebook")
+    .value =
+      profile.facebook_url || "";
+
+
+  document
+    .getElementById("profileX")
+    .value =
+      profile.x_url || "";
+
+
+  document
+    .getElementById("profileInstagram")
+    .value =
+      profile.instagram_url || "";
+
+
+  document
+    .getElementById("profileYoutube")
+    .value =
+      profile.youtube_url || "";
+
+
+  document
+    .getElementById("profileTiktok")
+    .value =
+      profile.tiktok_url || "";
+
+
   if(profile.anonyme){
 
     document
@@ -2295,6 +2470,43 @@ profileForm.addEventListener(
         .trim();
 
 
+    /* RESEAUX SOCIAUX */
+
+    const facebook_url =
+      document
+        .getElementById("profileFacebook")
+        .value
+        .trim();
+
+
+    const x_url =
+      document
+        .getElementById("profileX")
+        .value
+        .trim();
+
+
+    const instagram_url =
+      document
+        .getElementById("profileInstagram")
+        .value
+        .trim();
+
+
+    const youtube_url =
+      document
+        .getElementById("profileYoutube")
+        .value
+        .trim();
+
+
+    const tiktok_url =
+      document
+        .getElementById("profileTiktok")
+        .value
+        .trim();
+
+
     const anonyme =
       document
         .getElementById("profileAnonyme")
@@ -2370,7 +2582,22 @@ profileForm.addEventListener(
             competences,
 
           anonyme:
-            anonyme
+            anonyme,
+
+          facebook_url:
+            facebook_url || null,
+
+          x_url:
+            x_url || null,
+
+          instagram_url:
+            instagram_url || null,
+
+          youtube_url:
+            youtube_url || null,
+
+          tiktok_url:
+            tiktok_url || null
 
         })
         .eq(
