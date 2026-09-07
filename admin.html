@@ -293,6 +293,18 @@ textarea{
 
 
 /* =========================================================
+   BOUTON HOME CONNEXION
+========================================================= */
+
+.login-home-button{
+  display:block;
+  width:100%;
+  margin-top:9px;
+  text-align:center;
+}
+
+
+/* =========================================================
    MESSAGES
 ========================================================= */
 
@@ -854,6 +866,13 @@ footer{
         SE CONNECTER
       </button>
 
+      <a
+        href="index.html"
+        class="secondary-button login-home-button"
+      >
+        HOME
+      </a>
+
       <div id="loginMessage" class="message"></div>
 
     </form>
@@ -1311,7 +1330,7 @@ footer{
         <div class="competence-group">
 
           <div class="competence-group-title">
-            Sympathisants ou plus
+            Je peux vous aider en tant que
           </div>
 
 
@@ -1325,7 +1344,7 @@ footer{
               >
 
               <span class="competence-name">
-                Influenceurs / debunkers / créateurs de contenu
+                Influenceur / debunker / créateur de contenu
               </span>
 
             </label>
@@ -1335,7 +1354,7 @@ footer{
               développent spontanément une audience, influencent les
               comportements, déconstruisent les arguments ou manipulations
               et produisent des contenus permettant de diffuser et de
-              défendre les idées du mouvement. peuvent conserver une forte
+              défendre les idées du mouvement. Je conserver mon
               indépendance éditoriale.
             </div>
 
@@ -1353,7 +1372,7 @@ footer{
               >
 
               <span class="competence-name">
-                Bienfaiteurs
+                Bienfaiteur
               </span>
 
             </label>
@@ -1362,8 +1381,7 @@ footer{
               dans les autres milieux, mettent spontanément leur influence,
               leur réseau, leur carnet d’adresses, leurs moyens, leur
               expertise ou leur notoriété au service du développement et
-              du rayonnement du mouvement. peuvent conserver une forte
-              indépendance.
+              du rayonnement du mouvement.
             </div>
 
           </div>
@@ -1430,6 +1448,7 @@ footer{
       >
         Vous êtes connectés en tant qu’administrateur.
         Ajoutez, modifiez ou supprimez les évènements affichés sur le site.
+        Les évènements sont automatiquement classés par ordre chronologique.
       </p>
 
 
@@ -1521,21 +1540,6 @@ footer{
               type="url"
               id="eventLink"
               placeholder="https://..."
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="eventOrder">
-              ORDRE
-            </label>
-
-            <input
-              type="text"
-              id="eventOrder"
-              value="0"
             >
 
           </div>
@@ -2079,11 +2083,6 @@ function ajouterActionsHeader(){
   `;
 
 
-  /*
-    On place les boutons au-dessus de l'espace membre,
-    directement dans la page.
-  */
-
   const adminHeader =
     document.querySelector(".admin-header");
 
@@ -2484,6 +2483,7 @@ document
 
 /* =========================================================
    EVENEMENTS
+   CLASSEMENT AUTOMATIQUE PAR DATE
 ========================================================= */
 
 async function chargerRendezVous(){
@@ -2508,8 +2508,12 @@ async function chargerRendezVous(){
     await supabaseClient
       .from("rendezvous")
       .select("*")
-      .order("ordre",{ascending:true})
-      .order("date_evenement",{ascending:true});
+      .order(
+        "date_evenement",
+        {
+          ascending:true
+        }
+      );
 
 
   if(error){
@@ -2720,12 +2724,6 @@ function modifierEvenement(event){
 
 
   document
-    .getElementById("eventOrder")
-    .value =
-      event.ordre ?? 0;
-
-
-  document
     .getElementById("eventActive")
     .checked =
       event.actif !== false;
@@ -2779,11 +2777,6 @@ function resetEventForm(){
   document
     .getElementById("eventActive")
     .checked = true;
-
-
-  document
-    .getElementById("eventOrder")
-    .value = "0";
 
 
   document
@@ -2876,14 +2869,7 @@ document
         actif:
           document
             .getElementById("eventActive")
-            .checked,
-
-        ordre:
-          Number(
-            document
-              .getElementById("eventOrder")
-              .value
-          ) || 0
+            .checked
 
       };
 
