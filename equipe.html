@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Notre équipe — Avant-gardE</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+:root {
+    --navy: #07152d;
+    --navy2: #0d2344;
+    --navy3: #050f20;
+
+    --gold: #d6ad55;
+    --gold-light: #f0d58a;
+
+    --white: #f5f3ed;
+    --muted: #b8c0cd;
+
+    --blue-france: #0055A4;
+    --red: #EF4135;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: var(--navy);
+    color: var(--white);
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+
+/* =====================================================
+   BARRE RENDEZ-VOUS
+===================================================== */
+
+.events-bar {
+    height: 36px;
+    background: #050f20;
+    border-bottom: 1px solid rgba(214,173,85,.35);
+
+    display: flex;
+    align-items: center;
+
+    overflow: hidden;
+
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
+
+.events-label {
+    flex-shrink: 0;
+
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 17px;
+
+    color: var(--gold-light);
+
+    font-weight: bold;
+    letter-spacing: 1px;
+
+    border-right: 1px solid rgba(214,173,85,.3);
+
+    position: relative;
+    z-index: 5;
+
+    background: #050f20;
+}
+
+.events-window {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.events-track {
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    height: 100%;
+
+    display: inline-flex;
+    align-items: center;
+
+    white-space: nowrap;
+
+    will-change: transform;
+}
+
+.event {
+    display: inline-flex;
+    align-items: center;
+
+    height: 100%;
+
+    padding: 0 35px;
+
+    color: #e3e5e8;
+
+    cursor: pointer;
+
+    transition: background .2s, color .2s;
+}
+
+.event:hover {
+    background: rgba(214,173,85,.08);
+    color: white;
+}
+
+.event strong {
+    color: var(--gold-light);
+    margin-right: 7px;
+}
+
+.events-empty {
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+
+    padding-left: 18px;
+
+    color: #8e98a6;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+header {
+    height: 82px;
+
+    padding: 0 5%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    border-bottom: 1px solid rgba(214,173,85,.25);
+
+    background: rgba(7,21,45,.97);
+
+    position: relative;
+}
+
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.logo {
+    color: var(--white);
+
+    text-decoration: none;
+
+    font-size: 26px;
+
+    font-weight: bold;
+
+    letter-spacing: 2px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 1px;
+}
+
+.logo-a,
+.logo-e {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    background: #ffffff;
+
+    border-radius: 50%;
+
+    font-size: 20px;
+
+    line-height: 1;
+}
+
+.logo-a {
+    color: var(--blue-france);
+}
+
+.logo-e {
+    color: var(--red);
+}
+
+
+/* =====================================================
+   ROUE ADMIN
+===================================================== */
+
+.admin-gear {
+
+    position: absolute;
+
+    right: 14px;
+    top: 7px;
+
+    width: 23px;
+    height: 23px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: rgba(255,255,255,.42);
+
+    text-decoration: none;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    border-radius: 50%;
+
+    transition: color .2s, background .2s, transform .2s;
+}
+
+.admin-gear:hover {
+
+    color: var(--gold-light);
+
+    background: rgba(255,255,255,.06);
+
+    transform: rotate(20deg);
+}
+
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+nav {
+    display: flex;
+
+    gap: 28px;
+
+    align-items: center;
+}
+
+nav a {
+
+    color: #e7e7e7;
+
+    text-decoration: none;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    transition: color .2s;
+}
+
+nav a:hover {
+    color: var(--gold);
+}
+
+nav a.active {
+    color: var(--gold-light);
+}
+
+
+/* =====================================================
+   TITRE DE PAGE
+===================================================== */
+
+.page-header {
+
+    text-align: center;
+
+    padding: 55px 25px 35px;
+
+    border-bottom: 1px solid rgba(214,173,85,.18);
+
+    background:
+        radial-gradient(
+            circle at center,
+            #17345b 0%,
+            #08172f 55%,
+            #050e1d 100%
+        );
+}
+
+.page-kicker {
+
+    color: var(--gold-light);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    letter-spacing: 4px;
+
+    margin-bottom: 13px;
+}
+
+.page-header h1 {
+
+    margin: 0;
+
+    font-size: clamp(36px, 6vw, 58px);
+
+    font-weight: normal;
+
+    letter-spacing: 3px;
+}
+
+.page-header p {
+
+    max-width: 680px;
+
+    margin: 17px auto 0;
+
+    color: var(--muted);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =====================================================
+   ZONE REJOINDRE
+===================================================== */
+
+.join-zone {
+
+    max-width: 1100px;
+
+    margin: auto;
+
+    padding: 28px 25px 5px;
+
+    display: flex;
+
+    justify-content: flex-end;
+}
+
+.join-button {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 11px 18px;
+
+    border: 1px solid rgba(214,173,85,.55);
+
+    color: var(--gold-light);
+
+    background: rgba(255,255,255,.025);
+
+    text-decoration: none;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    letter-spacing: 1.5px;
+
+    transition: .2s;
+}
+
+.join-button:hover {
+
+    background: var(--gold);
+
+    color: var(--navy);
+
+}
+
+
+/* =====================================================
+   FORMULAIRE
+===================================================== */
+
+.form-container {
+
+    max-width: 850px;
+
+    margin: 30px auto 65px;
+
+    padding: 0 25px;
+}
+
+.join-form {
+
+    display: none;
+
+    background: rgba(255,255,255,.025);
+
+    border: 1px solid rgba(214,173,85,.28);
+
+    padding: 35px;
+}
+
+.join-form.active {
+    display: block;
+}
+
+.form-title {
+
+    margin: 0 0 8px;
+
+    font-size: 27px;
+
+    font-weight: normal;
+}
+
+.form-intro {
+
+    margin: 0 0 28px;
+
+    color: var(--muted);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+.form-group {
+    margin-bottom: 21px;
+}
+
+.form-group label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #e9e9e9;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+
+    width: 100%;
+
+    padding: 12px 13px;
+
+    border: 1px solid rgba(255,255,255,.13);
+
+    background: #07162e;
+
+    color: var(--white);
+
+    outline: none;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 13px;
+
+    border-radius: 0;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+
+    border-color: rgba(214,173,85,.65);
+}
+
+.form-group textarea {
+
+    min-height: 125px;
+
+    resize: vertical;
+}
+
+.form-help {
+
+    display: block;
+
+    margin-top: 6px;
+
+    color: #7f8998;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 10px;
+}
+
+.description-counter {
+
+    text-align: right;
+
+    margin-top: 5px;
+
+    color: #7f8998;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 10px;
+}
+
+
+/* =====================================================
+   COMPETENCES
+===================================================== */
+
+.skills-title {
+
+    margin: 30px 0 8px;
+
+    font-size: 21px;
+
+    font-weight: normal;
+}
+
+.skills-intro {
+
+    margin: 0 0 18px;
+
+    color: var(--muted);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+.skills-section-title {
+
+    margin: 22px 0 10px;
+
+    color: var(--gold-light);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+}
+
+.skills-list {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 8px;
+}
+
+.skill {
+
+    border: 1px solid rgba(255,255,255,.09);
+
+    background: rgba(255,255,255,.025);
+
+    padding: 11px;
+
+    cursor: pointer;
+
+    transition: border-color .2s, background .2s;
+}
+
+.skill:hover {
+
+    border-color: rgba(214,173,85,.35);
+
+    background: rgba(214,173,85,.04);
+}
+
+.skill input {
+
+    width: auto;
+
+    margin-right: 8px;
+
+    accent-color: var(--gold);
+}
+
+.skill-name {
+
+    color: #e8e9eb;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 12px;
+
+    font-weight: bold;
+}
+
+.skill-description {
+
+    display: block;
+
+    margin: 6px 0 0 24px;
+
+    color: #8f99a8;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 10px;
+
+    line-height: 1.45;
+}
+
+
+/* =====================================================
+   MESSAGE FORMULAIRE
+===================================================== */
+
+.form-message {
+
+    display: none;
+
+    margin-bottom: 20px;
+
+    padding: 12px 14px;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+.form-message.success {
+
+    display: block;
+
+    border: 1px solid rgba(70,180,100,.4);
+
+    background: rgba(70,180,100,.08);
+
+    color: #bde8c8;
+}
+
+.form-message.error {
+
+    display: block;
+
+    border: 1px solid rgba(239,65,53,.4);
+
+    background: rgba(239,65,53,.08);
+
+    color: #f5b5ae;
+}
+
+
+/* =====================================================
+   BOUTONS
+===================================================== */
+
+.form-actions {
+
+    display: flex;
+
+    gap: 12px;
+
+    margin-top: 30px;
+}
+
+.button {
+
+    display: inline-block;
+
+    padding: 12px 22px;
+
+    border: 1px solid var(--gold);
+
+    background: transparent;
+
+    color: var(--gold-light);
+
+    text-decoration: none;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    letter-spacing: 1.5px;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.button:hover {
+
+    background: var(--gold);
+
+    color: var(--navy);
+}
+
+.button-cancel {
+
+    border-color: rgba(255,255,255,.18);
+
+    color: #aeb6c1;
+}
+
+.button-cancel:hover {
+
+    background: rgba(255,255,255,.08);
+
+    color: white;
+}
+
+
+/* =====================================================
+   EQUIPE
+===================================================== */
+
+.team {
+
+    max-width: 1100px;
+
+    margin: auto;
+
+    padding: 20px 25px 70px;
+}
+
+.team-title {
+
+    border-bottom: 1px solid rgba(214,173,85,.3);
+
+    padding-bottom: 14px;
+
+    margin-bottom: 25px;
+}
+
+.team-title h2 {
+
+    margin: 0;
+
+    font-size: 28px;
+
+    font-weight: normal;
+}
+
+.team-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 18px;
+}
+
+.profile-card {
+
+    border: 1px solid rgba(255,255,255,.1);
+
+    background: rgba(255,255,255,.025);
+
+    padding: 20px;
+
+    min-height: 180px;
+}
+
+.profile-image {
+
+    width: 75px;
+    height: 75px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    display: block;
+
+    margin-bottom: 15px;
+
+    border: 1px solid rgba(214,173,85,.4);
+}
+
+.profile-name {
+
+    margin: 0 0 5px;
+
+    font-size: 19px;
+}
+
+.profile-region {
+
+    color: var(--gold);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 10px;
+
+    letter-spacing: 1px;
+}
+
+.profile-description {
+
+    margin: 12px 0 0;
+
+    color: var(--muted);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+.profile-skills {
+
+    margin-top: 13px;
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 5px;
+}
+
+.profile-skill {
+
+    padding: 4px 7px;
+
+    border: 1px solid rgba(214,173,85,.25);
+
+    color: #c8cdd4;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 9px;
+}
+
+.team-empty {
+
+    color: #87919f;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 13px;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+footer {
+
+    padding: 25px;
+
+    text-align: center;
+
+    color: #7e8999;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 11px;
+
+    border-top: 1px solid rgba(255,255,255,.07);
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 800px) {
+
+    header {
+
+        height: auto;
+
+        padding: 20px;
+
+        flex-direction: column;
+
+        gap: 18px;
+    }
+
+    nav {
+
+        gap: 15px;
+
+        flex-wrap: wrap;
+
+        justify-content: center;
+    }
+
+    nav a {
+        font-size: 10px;
+    }
+
+    .join-zone {
+        justify-content: center;
+    }
+
+    .skills-list {
+        grid-template-columns: 1fr;
+    }
+
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .join-form {
+        padding: 25px 20px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .button {
+        text-align: center;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     RENDEZ-VOUS
+===================================================== -->
+
+<div class="events-bar">
+
+    <div class="events-label">
+        NOS RENDEZ-VOUS
+    </div>
+
+    <div class="events-window">
+
+        <div id="eventsTrack" class="events-track">
+
+            <div class="events-empty">
+                Chargement...
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header>
+
+    <a
+        href="admin.html"
+        class="admin-gear"
+        title="Administration"
+        aria-label="Administration"
+    >
+        ⚙
+    </a>
+
+    <a href="index.html" class="logo">
+
+        <span class="logo-a">A</span>
+
+        vant-gard
+
+        <span class="logo-e">E</span>
+
+    </a>
+
+    <nav>
+
+        <a href="index.html">
+            ACCUEIL
+        </a>
+
+        <a href="manifeste.html">
+            MANIFESTE
+        </a>
+
+        <a href="projet.html">
+            NOTRE PROJET
+        </a>
+
+        <a href="inspirations.html">
+            NOS INSPIRATIONS
+        </a>
+
+        <a href="equipe.html" class="active">
+            NOTRE ÉQUIPE
+        </a>
+
+    </nav>
+
+</header>
+
+
+<!-- =====================================================
+     TITRE
+===================================================== -->
+
+<section class="page-header">
+
+    <div class="page-kicker">
+        AVANT-GARDE
+    </div>
+
+    <h1>
+        Notre équipe
+    </h1>
+
+    <p>
+        Une force politique ne se construit pas seulement autour
+        d'idées, mais autour de celles et ceux qui les portent.
+    </p>
+
+</section>
+
+
+<!-- =====================================================
+     REJOINDRE
+===================================================== -->
+
+<div class="join-zone">
+
+    <a
+        href="#"
+        id="openJoin"
+        class="join-button"
+    >
+        + REJOINDRE
+    </a>
+
+</div>
+
+
+<!-- =====================================================
+     FORMULAIRE
+===================================================== -->
+
+<section class="form-container">
+
+    <form
+        id="joinForm"
+        class="join-form"
+    >
+
+        <h2 class="form-title">
+            Rejoindre l'Avant-gardE
+        </h2>
+
+        <p class="form-intro">
+            Créez votre profil et indiquez les compétences
+            que vous souhaitez mettre au service du mouvement.
+        </p>
+
+
+        <div
+            id="formMessage"
+            class="form-message"
+        ></div>
+
+
+        <!-- NOM -->
+
+        <div class="form-group">
+
+            <label for="nom">
+                PSEUDO OU NOM PRÉNOM *
+            </label>
+
+            <input
+                type="text"
+                id="nom"
+                maxlength="100"
+                required
+                placeholder="Votre pseudo ou nom et prénom"
+            >
+
+        </div>
+
+
+        <!-- EMAIL -->
+
+        <div class="form-group">
+
+            <label for="email">
+                EMAIL *
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                required
+                placeholder="votre@email.fr"
+            >
+
+        </div>
+
+
+        <!-- IMAGE -->
+
+        <div class="form-group">
+
+            <label for="image_url">
+                IMAGE / PHOTO
+            </label>
+
+            <input
+                type="url"
+                id="image_url"
+                placeholder="https://..."
+            >
+
+            <span class="form-help">
+                Indiquez l'URL d'une image déjà hébergée sur Internet.
+            </span>
+
+        </div>
+
+
+        <!-- REGION -->
+
+        <div class="form-group">
+
+            <label for="region">
+                RÉGION *
+            </label>
+
+            <select
+                id="region"
+                required
+            >
+
+                <option value="">
+                    Sélectionnez votre région
+                </option>
+
+                <optgroup label="France métropolitaine">
+
+                    <option>Auvergne-Rhône-Alpes</option>
+                    <option>Bourgogne-Franche-Comté</option>
+                    <option>Bretagne</option>
+                    <option>Centre-Val de Loire</option>
+                    <option>Corse</option>
+                    <option>Grand Est</option>
+                    <option>Hauts-de-France</option>
+                    <option>Île-de-France</option>
+                    <option>Normandie</option>
+                    <option>Nouvelle-Aquitaine</option>
+                    <option>Occitanie</option>
+                    <option>Pays de la Loire</option>
+                    <option>Provence-Alpes-Côte d'Azur</option>
+
+                </optgroup>
+
+                <optgroup label="Outre-mer">
+
+                    <option>Guadeloupe</option>
+                    <option>Martinique</option>
+                    <option>Guyane</option>
+                    <option>La Réunion</option>
+                    <option>Mayotte</option>
+
+                </optgroup>
+
+                <option>Étranger</option>
+
+            </select>
+
+        </div>
+
+
+        <!-- DESCRIPTION -->
+
+        <div class="form-group">
+
+            <label for="description">
+                DESCRIPTION
+            </label>
+
+            <textarea
+                id="description"
+                maxlength="300"
+                placeholder="Présentez-vous en quelques mots..."
+            ></textarea>
+
+            <div
+                id="descriptionCounter"
+                class="description-counter"
+            >
+                0 / 300
+            </div>
+
+        </div>
+
+
+        <!-- COMPETENCES -->
+
+        <h3 class="skills-title">
+            Talents et compétences
+        </h3>
+
+        <p class="skills-intro">
+            Vous pouvez sélectionner plusieurs compétences.
+            Elles pourront être modifiées ultérieurement.
+        </p>
+
+
+        <div class="skills-section-title">
+            Talents et compétences métier
+        </div>
+
+
+        <div class="skills-list">
+
+
+            <label class="skill">
+
+                <input
+                    type="checkbox"
+                    value="Maîtrise de doctrine"
+                    class="skill-checkbox"
+                >
+
+                <span class="skill-name">
+                    Maîtrise de doctrine
+                </span>
+
+                <span class="skill-description">
+                    Capacité à préserver la fidélité à l'idéologie
+                    et sa cohérence dans l'action du mouvement.
+                </span>
+
+            </label>
+
+
+            <label class="skill">
+
+                <input
+                    type="checkbox"
+                    value="Tactique"
+                    class="skill-checkbox"
+                >
+
+                <span class="skill-name">
+                    Tactique
+                </span>
+
+                <span class="skill-description">
+                    Capacité à concevoir et mettre en œuvre des tactiques
+                    efficaces de développement d'audience, médiatique
+                    et électorale, sans renier l'idéologie.
+                </span>
+
+            </label>
+
+
+            <label class="skill">
+
+                <input
+                    type="checkbox"
+                    value="Prestance"
+                    class="skill-checkbox"
+                >
+
+                <span class="skill-name">
+                    Prestance
+                </span>
+
+                <span class="skill-description">
+                    Capacité à séduire et convaincre par la parole,
+                    le charisme, le charme ou la culture.
+                </span>
+
+            </label>
+
+
+            <label class="skill">
+
+                <input
+                    type="checkbox"
+                    value="Analyses pragmatiques"
+                    class="skill-checkbox"
+                >
+
+                <span class="skill-name">
+                    Analyses pragmatiques
+                </span>
+
+                <span class="skill-description">
+                    Analyse des données, rendements, conséquences
+                    et rapports de force. Privilégie les faits.
+                </span>
+
+            </label>
+
+
+            <label class="skill">
+
+                <input
+                    type="checkbox"
+                    value="Analyses populistes"
+                    class="skill-checkbox"
+                >
+
+                <span class="skill-name">
+                    Analyses populistes
+                </span>
+
+                <span class="skill-description">
+                    Analyse des ressentis, aspirations et frustrations
+                    populaires. Privilégie le vécu et l'opinion du peuple.
+                </span>
+
+            </label>
+
+
+            <label class="skill">
+
+                <input
+                    type="checkbox"
+                    value="Administration"
+                    class="skill-checkbox"
+                >
+
+                <span class="skill-name">
+                    Administration
+                </span>
+
+                <span class="skill-description">
+                    Maîtrise de la gestion des structures, ressources
+                    techniques et opérationnelles et équipes internes.
+                </span>
+
+            </label>
+
+
+            <label class="skill">
+
+                <input
+                    type="checkbox"
+                    value="Expertise et ingénierie juridique"
+                    class="skill-checkbox"
+                >
+
+                <span class="skill-name">
+                    Expertise et ingénierie juridique
+                </span>
+
+                <span class="skill-description">
+                    Maîtrise du droit français et européen et capacité
+                    à analyser règles, contraintes, failles et évolutions.
+                </span>
+
+            </label>
+
+
+            <label class="skill">
+
+                <input
+                    type="checkbox"
+                    value="Expertise et ingénierie politique"
+                    class="skill-checkbox"
+                >
+
+                <span class="skill-name">
+                    Expertise et ingénierie politique
+                </span>
+
+                <span class="skill-description">
+                    Maîtrise d'un domaine politique ou institutionnel
+                    particulier et capacité à en apporter l'expertise.
+                </span>
+
+            </label>
+
+        </div>
+
+
+        <div class="skills-section-title">
+            Sympathisants ou plus
+        </div>
+
+
+        <div class="skills-list">
+
+
+            <label class="skill">
+
+                <input
+                    type="checkbox"
+                    value="Influenceurs / debunkers / créateurs de contenu"
+                    class="skill-checkbox"
+                >
+
+                <span class="skill-name">
+                    Influenceurs / debunkers / créateurs de contenu
+                </span>
+
+                <span class="skill-description">
+                    Développent une audience, influencent les comportements,
+                    déconstruisent les arguments ou manipulations et produisent
+                    des contenus pour diffuser et défendre les idées du mouvement.
+                </span>
+
+            </label>
+
+
+            <label class="skill">
+
+                <input
+                    type="checkbox"
+                    value="Bienfaiteurs"
+                    class="skill-checkbox"
+                >
+
+                <span class="skill-name">
+                    Bienfaiteurs
+                </span>
+
+                <span class="skill-description">
+                    Mettent leur influence, réseau, carnet d'adresses,
+                    moyens, expertise ou notoriété au service du mouvement.
+                </span>
+
+            </label>
+
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="button"
+                id="submitButton"
+            >
+                CRÉER MON PROFIL
+            </button>
+
+            <button
+                type="button"
+                class="button button-cancel"
+                id="cancelJoin"
+            >
+                ANNULER
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
+
+<!-- =====================================================
+     EQUIPE
+===================================================== -->
+
+<section class="team">
+
+    <div class="team-title">
+
+        <h2>
+            Les membres
+        </h2>
+
+    </div>
+
+    <div
+        id="teamGrid"
+        class="team-grid"
+    >
+
+        <div class="team-empty">
+            Chargement des profils...
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer>
+
+    © 2026 Avant-gardE
+
+    — Souveraineté · Liberté · Justice · Patriote
+
+</footer>
+
+
+<script>
+
+
+/* =====================================================
+   SUPABASE
+===================================================== */
+
+const SUPABASE_URL =
+    "https://wlhtegrciehmtxqecopv.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =====================================================
+   VARIABLES
+===================================================== */
+
+let tickerAnimation = null;
+
+
+/* =====================================================
+   RENDEZ-VOUS
+===================================================== */
+
+async function chargerRendezVous() {
+
+    const track =
+        document.getElementById("eventsTrack");
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+
+        .from("rendezvous")
+
+        .select("*")
+
+        .eq("actif", true)
+
+        .order("ordre", {
+            ascending: true
+        })
+
+        .order("date_evenement", {
+            ascending: true
+        });
+
+
+    if (
+        error ||
+        !data ||
+        data.length === 0
+    ) {
+
+        track.innerHTML = `
+            <div class="events-empty">
+                Aucun rendez-vous actuellement.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    track.innerHTML = "";
+
+
+    data.forEach(rdv => {
+
+        const element =
+            document.createElement("div");
+
+        element.className = "event";
+
+
+        const date =
+            formaterDateCourte(
+                rdv.date_evenement
+            );
+
+
+        let contenu = "";
+
+
+        if (date) {
+
+            contenu +=
+                `<strong>${escapeHtml(date)}</strong>`;
+
+        }
+
+
+        if (rdv.heure) {
+
+            if (contenu) {
+                contenu += " — ";
+            }
+
+            contenu +=
+                escapeHtml(rdv.heure);
+        }
+
+
+        if (rdv.titre) {
+
+            if (contenu) {
+                contenu += " — ";
+            }
+
+            contenu +=
+                `<strong>${escapeHtml(rdv.titre)}</strong>`;
+        }
+
+
+        if (rdv.lieu) {
+
+            contenu +=
+                ` — ${escapeHtml(rdv.lieu)}`;
+
+        }
+
+
+        element.innerHTML = contenu;
+
+
+        track.appendChild(element);
+
+    });
+
+
+    demarrerDefilement();
+}
+
+
+/* =====================================================
+   DEFILEMENT
+===================================================== */
+
+function demarrerDefilement() {
+
+    const track =
+        document.getElementById("eventsTrack");
+
+    const windowElement =
+        document.querySelector(".events-window");
+
+
+    if (!track || !windowElement) {
+        return;
+    }
+
+
+    if (tickerAnimation) {
+
+        cancelAnimationFrame(
+            tickerAnimation
+        );
+
+    }
+
+
+    const largeurContenu =
+        track.scrollWidth;
+
+    const largeurFenetre =
+        windowElement.clientWidth;
+
+
+    if (
+        largeurContenu <= largeurFenetre
+    ) {
+
+        track.style.transform =
+            "translateX(0)";
+
+        return;
+    }
+
+
+    const vitesse = 110;
+
+    let position = 0;
+
+    let dernierTemps =
+        performance.now();
+
+
+    function animation(temps) {
+
+        const delta =
+            (temps - dernierTemps) / 1000;
+
+        dernierTemps = temps;
+
+        position +=
+            vitesse * delta;
+
+
+        if (
+            position >= largeurContenu
+        ) {
+
+            position =
+                -largeurFenetre;
+
+        }
+
+
+        track.style.transform =
+            `translateX(${-position}px)`;
+
+
+        tickerAnimation =
+            requestAnimationFrame(animation);
+
+    }
+
+
+    tickerAnimation =
+        requestAnimationFrame(animation);
+}
+
+
+/* =====================================================
+   DATE
+===================================================== */
+
+function formaterDateCourte(dateString) {
+
+    if (!dateString) {
+        return "";
+    }
+
+    const date =
+        new Date(
+            dateString + "T00:00:00"
+        );
+
+    if (isNaN(date.getTime())) {
+        return "";
+    }
+
+    return date.toLocaleDateString(
+        "fr-FR",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        }
+    );
+}
+
+
+/* =====================================================
+   OUVERTURE FORMULAIRE
+===================================================== */
+
+const openJoin =
+    document.getElementById("openJoin");
+
+const joinForm =
+    document.getElementById("joinForm");
+
+const cancelJoin =
+    document.getElementById("cancelJoin");
+
+
+openJoin.addEventListener(
+    "click",
+    function(event) {
+
+        event.preventDefault();
+
+        joinForm.classList.add("active");
+
+        joinForm.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    }
+);
+
+
+cancelJoin.addEventListener(
+    "click",
+    function() {
+
+        joinForm.classList.remove("active");
+
+    }
+);
+
+
+/* =====================================================
+   COMPTEUR DESCRIPTION
+===================================================== */
+
+const description =
+    document.getElementById("description");
+
+const descriptionCounter =
+    document.getElementById(
+        "descriptionCounter"
+    );
+
+
+description.addEventListener(
+    "input",
+    function() {
+
+        descriptionCounter.textContent =
+            `${this.value.length} / 300`;
+
+    }
+);
+
+
+/* =====================================================
+   CREATION DU PROFIL
+===================================================== */
+
+joinForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const message =
+            document.getElementById(
+                "formMessage"
+            );
+
+        const submitButton =
+            document.getElementById(
+                "submitButton"
+            );
+
+
+        message.className =
+            "form-message";
+
+        message.textContent = "";
+
+
+        const nom =
+            document.getElementById(
+                "nom"
+            ).value.trim();
+
+
+        const email =
+            document.getElementById(
+                "email"
+            ).value.trim();
+
+
+        const imageUrl =
+            document.getElementById(
+                "image_url"
+            ).value.trim();
+
+
+        const region =
+            document.getElementById(
+                "region"
+            ).value;
+
+
+        const descriptionValue =
+            document.getElementById(
+                "description"
+            ).value.trim();
+
+
+        const competences =
+            Array.from(
+                document.querySelectorAll(
+                    ".skill-checkbox:checked"
+                )
+            ).map(
+                checkbox =>
+                    checkbox.value
+            );
+
+
+        if (!nom || !email || !region) {
+
+            message.className =
+                "form-message error";
+
+            message.textContent =
+                "Veuillez remplir tous les champs obligatoires.";
+
+            return;
+        }
+
+
+        if (
+            descriptionValue.length > 300
+        ) {
+
+            message.className =
+                "form-message error";
+
+            message.textContent =
+                "La description ne peut pas dépasser 300 caractères.";
+
+            return;
+        }
+
+
+        submitButton.disabled = true;
+
+        submitButton.textContent =
+            "CRÉATION EN COURS...";
+
+
+        /*
+           Le grade est volontairement fixé
+           automatiquement à USER.
+
+           Un membre qui rejoint le mouvement
+           ne peut donc pas créer lui-même
+           un compte administrateur.
+        */
+
+        const profil = {
+
+            nom: nom,
+
+            email: email,
+
+            image_url:
+                imageUrl || null,
+
+            description:
+                descriptionValue || null,
+
+            region: region,
+
+            competences:
+                competences,
+
+            grade: "user"
+
+        };
+
+
+        const {
+            error
+        } = await supabaseClient
+
+            .from("profils")
+
+            .insert([profil]);
+
+
+        submitButton.disabled = false;
+
+        submitButton.textContent =
+            "CRÉER MON PROFIL";
+
+
+        if (error) {
+
+            console.error(error);
+
+
+            message.className =
+                "form-message error";
+
+
+            /*
+               Message volontairement
+               générique pour ne pas afficher
+               d'informations techniques.
+            */
+
+            if (
+                error.code === "23505"
+            ) {
+
+                message.textContent =
+                    "Un profil utilisant déjà ces informations existe.";
+
+            } else {
+
+                message.textContent =
+                    "Impossible de créer le profil pour le moment. Vérifiez les informations saisies.";
+
+            }
+
+            return;
+        }
+
+
+        message.className =
+            "form-message success";
+
+
+        message.textContent =
+            "Votre profil a bien été créé. Bienvenue dans l'Avant-gardE.";
+
+
+        joinForm.reset();
+
+
+        descriptionCounter.textContent =
+            "0 / 300";
+
+
+        setTimeout(
+            chargerProfils,
+            500
+        );
+
+    }
+);
+
+
+/* =====================================================
+   CHARGEMENT DES PROFILS
+===================================================== */
+
+async function chargerProfils() {
+
+    const teamGrid =
+        document.getElementById(
+            "teamGrid"
+        );
+
+
+    const {
+        data,
+        error
+    } = await supabaseClient
+
+        .from("profils")
+
+        .select(
+            "id, grade, nom, image_url, description, region, competences"
+        )
+
+        .eq("grade", "user")
+
+        .order(
+            "created_at",
+            {
+                ascending: false
+            }
+        );
+
+
+    if (error) {
+
+        console.error(error);
+
+        teamGrid.innerHTML = `
+            <div class="team-empty">
+                Les profils ne peuvent pas être chargés actuellement.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    if (!data || data.length === 0) {
+
+        teamGrid.innerHTML = `
+            <div class="team-empty">
+                Aucun membre à afficher pour le moment.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    teamGrid.innerHTML = "";
+
+
+    data.forEach(profil => {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "profile-card";
+
+
+        if (profil.image_url) {
+
+            const image =
+                document.createElement("img");
+
+            image.className =
+                "profile-image";
+
+            image.src =
+                profil.image_url;
+
+            image.alt =
+                profil.nom || "Profil";
+
+            image.onerror =
+                function() {
+                    this.style.display = "none";
+                };
+
+            card.appendChild(image);
+
+        }
+
+
+        const name =
+            document.createElement("h3");
+
+        name.className =
+            "profile-name";
+
+        name.textContent =
+            profil.nom || "Membre";
+
+        card.appendChild(name);
+
+
+        if (profil.region) {
+
+            const region =
+                document.createElement("div");
+
+            region.className =
+                "profile-region";
+
+            region.textContent =
+                profil.region;
+
+            card.appendChild(region);
+
+        }
+
+
+        if (profil.description) {
+
+            const descriptionElement =
+                document.createElement("p");
+
+            descriptionElement.className =
+                "profile-description";
+
+            descriptionElement.textContent =
+                profil.description;
+
+            card.appendChild(
+                descriptionElement
+            );
+
+        }
+
+
+        if (
+            Array.isArray(
+                profil.competences
+            ) &&
+            profil.competences.length > 0
+        ) {
+
+            const skills =
+                document.createElement("div");
+
+            skills.className =
+                "profile-skills";
+
+
+            profil.competences.forEach(
+                competence => {
+
+                    const skill =
+                        document.createElement(
+                            "span"
+                        );
+
+                    skill.className =
+                        "profile-skill";
+
+                    skill.textContent =
+                        competence;
+
+                    skills.appendChild(
+                        skill
+                    );
+
+                }
+            );
+
+
+            card.appendChild(skills);
+
+        }
+
+
+        teamGrid.appendChild(card);
+
+    });
+
+}
+
+
+/* =====================================================
+   PROTECTION HTML
+===================================================== */
+
+function escapeHtml(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+/* =====================================================
+   REDIMENSIONNEMENT
+===================================================== */
+
+window.addEventListener(
+    "resize",
+    function() {
+
+        demarrerDefilement();
+
+    }
+);
+
+
+/* =====================================================
+   DEMARRAGE
+===================================================== */
+
+chargerRendezVous();
+
+chargerProfils();
+
+</script>
+
+</body>
+</html>
