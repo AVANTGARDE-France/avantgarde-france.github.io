@@ -93,22 +93,29 @@ body{
   display:inline-flex;
   align-items:center;
   height:100%;
-  padding:0 25px;
+  padding:0 35px;
   font-family:Arial,sans-serif;
   font-size:12px;
-  color:#e9edf3;
+  color:#e3e5e8;
   cursor:pointer;
+  transition:
+    background .2s,
+    color .2s;
+}
+
+.event-item:hover{
+  background:rgba(214,173,85,.08);
+  color:white;
 }
 
 .event-item strong{
   color:var(--gold-light);
-  margin-right:7px;
+  margin-right:0;
 }
 
 .event-separator{
-  color:var(--gold);
-  opacity:.55;
-  margin:0 4px;
+  color:rgba(214,173,85,.5);
+  margin:0 7px;
 }
 
 
@@ -1409,7 +1416,7 @@ footer{
       <div class="form-group">
 
         <label class="main-label">
-          Compétence
+          Compétences
           <span style="font-weight:normal;color:#8994a6;">
             (auto-évaluation de vos compétences)
           </span>
@@ -1417,6 +1424,10 @@ footer{
 
       </div>
 
+
+      <!-- =========================
+           COMPETENCES METIER
+      ========================= -->
 
       <div class="competence-group">
 
@@ -1643,59 +1654,62 @@ footer{
       </div>
 
 
+      <!-- =========================
+           INFLUENCE / BIENFAITEUR
+      ========================= -->
+
       <div class="competence-group">
-            Je peux vous aider en tant que
-          </div>
+
+        <div class="competence-group-title">
+          Je peux vous aider en tant que
+        </div>
 
 
-          <div class="competence">
+        <div class="competence">
 
-            <label>
-              <input
-                type="checkbox"
-                name="competences"
-                value="Influenceurs / debunkers / créateurs de contenu"
-              >
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Influenceurs / debunkers / créateurs de contenu"
+            >
+
+            <span>
 
               <span class="competence-name">
                 Influenceur / debunker / créateur de contenu
               </span>
 
-            </label>
+              <span class="competence-description">
+                dans le milieu médiatique et sur les réseaux sociaux, développent spontanément une audience, influencent les comportements, déconstruisent les arguments ou manipulations et produisent des contenus permettant de diffuser et de défendre les idées du mouvement. peuvent conserver une forte indépendance éditoriale.
+              </span>
 
-            <div class="competence-info">
-              dans le milieu médiatique et sur les réseaux sociaux,
-              développent spontanément une audience, influencent les
-              comportements, déconstruisent les arguments ou manipulations
-              et produisent des contenus permettant de diffuser et de
-              défendre les idées du mouvement. Je conserver mon
-              indépendance éditoriale.
-            </div>
+            </span>
 
-          </div>
+          </label>
+
+        </div>
 
 
-          <div class="competence">
+        <div class="competence">
 
-            <label>
+          <label>
 
-              <input
-                type="checkbox"
-                name="competences"
-                value="Bienfaiteurs"
-              >
+            <input
+              type="checkbox"
+              name="competences"
+              value="Bienfaiteurs"
+            >
+
+            <span>
 
               <span class="competence-name">
                 Bienfaiteur
               </span>
 
-            </label>
-
-            <div class="competence-info">
-              dans les autres milieux, mettent spontanément leur influence,
-              leur réseau, leur carnet d’adresses, leurs moyens, leur
-              expertise ou leur notoriété au service du développement et
-              du rayonnement du mouvement.
+              <span class="competence-description">
+                dans les autres milieux, mettent spontanément leur influence, leur réseau, leur carnet d’adresses, leurs moyens, leur expertise ou leur notoriété au service du développement et du rayonnement du mouvement. peuvent conserver une forte indépendance.
               </span>
 
             </span>
@@ -2711,9 +2725,6 @@ async function chargerRendezVous(){
     .from("rendezvous")
     .select("*")
     .eq("actif", true)
-    .order("ordre", {
-      ascending:true
-    })
     .order("date_evenement", {
       ascending:true
     });
@@ -2756,34 +2767,20 @@ async function chargerRendezVous(){
       "event-item";
 
 
-    const strong =
-      document.createElement("strong");
-
-    strong.textContent =
-      event.titre ||
-      event.nom ||
-      "Rendez-vous";
-
-
-    const separator =
-      document.createElement("span");
-
-    separator.className =
-      "event-separator";
-
-    separator.textContent =
-      "•";
-
+    /* =========================
+       DATE
+    ========================= */
 
     const date =
-      document.createElement("span");
+      document.createElement("strong");
 
 
     if(event.date_evenement){
 
       const d =
         new Date(
-          event.date_evenement
+          event.date_evenement +
+          "T00:00:00"
         );
 
       date.textContent =
@@ -2791,19 +2788,85 @@ async function chargerRendezVous(){
           "fr-FR",
           {
             day:"2-digit",
-            month:"2-digit"
+            month:"2-digit",
+            year:"numeric"
           }
         );
 
     }
 
 
-    item.appendChild(strong);
+    /* =========================
+       TITRE
+    ========================= */
 
-    item.appendChild(separator);
+    const titre =
+      document.createElement("strong");
+
+    titre.textContent =
+      event.titre ||
+      event.nom ||
+      "Rendez-vous";
+
+
+    /* =========================
+       LIEU
+    ========================= */
+
+    const lieu =
+      document.createElement("span");
+
+    lieu.textContent =
+      event.lieu ||
+      "";
+
+
+    /* =========================
+       SEPARATEURS
+    ========================= */
+
+    const separateur1 =
+      document.createElement("span");
+
+    separateur1.className =
+      "event-separator";
+
+    separateur1.textContent =
+      "—";
+
+
+    const separateur2 =
+      document.createElement("span");
+
+    separateur2.className =
+      "event-separator";
+
+    separateur2.textContent =
+      "—";
+
+
+    /* =========================
+       CONSTRUCTION
+    ========================= */
 
     item.appendChild(date);
 
+    item.appendChild(separateur1);
+
+    item.appendChild(titre);
+
+    if(event.lieu){
+
+      item.appendChild(separateur2);
+
+      item.appendChild(lieu);
+
+    }
+
+
+    /* =========================
+       CLIC
+    ========================= */
 
     item.addEventListener(
       "click",
@@ -2822,7 +2885,8 @@ async function chargerRendezVous(){
         const d =
           event.date_evenement
             ? new Date(
-                event.date_evenement
+                event.date_evenement +
+                "T00:00:00"
               )
             : null;
 
@@ -2849,6 +2913,7 @@ async function chargerRendezVous(){
           )
           .textContent =
             event.description ||
+            event.texte ||
             "";
 
 
@@ -2863,11 +2928,15 @@ async function chargerRendezVous(){
   });
 
 
-  /* Animation */
+  /* =========================
+     ANIMATION
+  ========================= */
 
-  let position = 0;
+  let position =
+    windowEl.clientWidth;
 
-  const vitesse = 110;
+  const vitesse =
+    180;
 
   let dernierTemps =
     performance.now();
@@ -2882,7 +2951,7 @@ async function chargerRendezVous(){
       temps;
 
 
-    position +=
+    position -=
       vitesse * delta;
 
 
@@ -2890,16 +2959,16 @@ async function chargerRendezVous(){
       track.scrollWidth;
 
 
-    if(position >= largeur + 35){
+    if(position <= -largeur){
 
       position =
-        -windowEl.clientWidth;
+        windowEl.clientWidth;
 
     }
 
 
     track.style.transform =
-      `translateX(${-position}px)`;
+      `translateX(${position}px)`;
 
 
     requestAnimationFrame(
