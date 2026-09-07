@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -56,9 +57,6 @@ body {
     font-size: 12px;
 }
 
-
-/* Titre fixe */
-
 .events-label {
     flex-shrink: 0;
 
@@ -83,9 +81,6 @@ body {
     background: #050f20;
 }
 
-
-/* Zone de défilement */
-
 .events-window {
     flex: 1;
 
@@ -95,9 +90,6 @@ body {
 
     position: relative;
 }
-
-
-/* Contenu animé */
 
 .events-track {
     position: absolute;
@@ -114,9 +106,6 @@ body {
 
     will-change: transform;
 }
-
-
-/* Chaque rendez-vous */
 
 .event {
     display: inline-flex;
@@ -142,16 +131,13 @@ body {
 
 .event strong {
     color: var(--gold-light);
-
     margin-right: 7px;
 }
 
 .event-separator {
     color: rgba(214,173,85,.5);
-
     margin: 0 5px;
 }
-
 
 .events-empty {
     height: 100%;
@@ -187,7 +173,7 @@ header {
 
 
 /* =====================================================
-   LOGO
+   LOGO — NOUVEAU LETTRAGE
 ===================================================== */
 
 .logo {
@@ -195,41 +181,51 @@ header {
 
     text-decoration: none;
 
-    font-size: 26px;
-
-    font-weight: bold;
-
-    letter-spacing: 2px;
-
     display: flex;
     align-items: center;
 
-    gap: 1px;
-}
+    font-family: Georgia, "Times New Roman", serif;
 
+    font-size: 28px;
 
-/* Pastilles blanches derrière le A et le E */
+    font-weight: bold;
 
-.logo-a,
-.logo-e {
-
-    display: inline-flex;
-
-    align-items: center;
-    justify-content: center;
-
-    width: 32px;
-    height: 32px;
-
-    background: #ffffff;
-
-    border-radius: 50%;
-
-    font-size: 20px;
+    letter-spacing: -1.2px;
 
     line-height: 1;
 
-    vertical-align: middle;
+    font-kerning: normal;
+
+    text-rendering: optimizeLegibility;
+
+    white-space: nowrap;
+}
+
+
+/*
+   Le A et le E deviennent des lettres
+   intégrées naturellement au mot,
+   sans pastilles.
+*/
+
+.logo-a,
+.logo-e {
+    display: inline;
+
+    width: auto;
+    height: auto;
+
+    background: transparent;
+
+    border-radius: 0;
+
+    font-family: Georgia, "Times New Roman", serif;
+
+    font-size: inherit;
+
+    font-weight: bold;
+
+    line-height: inherit;
 }
 
 
@@ -305,7 +301,6 @@ nav {
     align-items: center;
 }
 
-
 nav a {
 
     color: #e7e7e7;
@@ -322,7 +317,6 @@ nav a {
 
     transition: color .2s;
 }
-
 
 nav a:hover {
     color: var(--gold);
@@ -361,7 +355,6 @@ nav a:hover {
         );
 }
 
-
 .hero::before,
 .hero::after {
 
@@ -377,20 +370,15 @@ nav a:hover {
     transform: rotate(45deg);
 }
 
-
 .hero::before {
-
     left: -150px;
     top: 80px;
 }
 
-
 .hero::after {
-
     right: -150px;
     bottom: 80px;
 }
-
 
 .hero-content {
 
@@ -402,7 +390,6 @@ nav a:hover {
 
     padding: 50px 25px;
 }
-
 
 .eyebrow {
 
@@ -419,7 +406,6 @@ nav a:hover {
     margin-bottom: 18px;
 }
 
-
 .hero h1 {
 
     margin: 0;
@@ -433,11 +419,9 @@ nav a:hover {
     text-transform: uppercase;
 }
 
-
 .hero h1 span {
     color: var(--gold);
 }
-
 
 .hero-line {
 
@@ -450,7 +434,6 @@ nav a:hover {
     margin: 25px auto;
 }
 
-
 .hero h2 {
 
     margin: 0;
@@ -461,7 +444,6 @@ nav a:hover {
 
     letter-spacing: 2px;
 }
-
 
 .hero p {
 
@@ -494,7 +476,6 @@ nav a:hover {
     text-align: center;
 }
 
-
 .section-kicker {
 
     color: var(--gold);
@@ -510,7 +491,6 @@ nav a:hover {
     margin-bottom: 12px;
 }
 
-
 .intro h2 {
 
     margin: 0 0 18px;
@@ -519,7 +499,6 @@ nav a:hover {
 
     font-weight: normal;
 }
-
 
 .intro p {
 
@@ -556,7 +535,6 @@ nav a:hover {
     gap: 18px;
 }
 
-
 .principle {
 
     border: 1px solid rgba(214,173,85,.3);
@@ -568,7 +546,6 @@ nav a:hover {
     text-align: center;
 }
 
-
 .symbol {
 
     color: var(--gold);
@@ -578,7 +555,6 @@ nav a:hover {
     margin-bottom: 12px;
 }
 
-
 .principle h3 {
 
     margin: 0 0 10px;
@@ -587,7 +563,6 @@ nav a:hover {
 
     letter-spacing: 1px;
 }
-
 
 .principle p {
 
@@ -620,7 +595,6 @@ nav a:hover {
     text-align: center;
 }
 
-
 .manifesto h2 {
 
     margin: 0 auto 18px;
@@ -634,7 +608,6 @@ nav a:hover {
     font-weight: normal;
 }
 
-
 .manifesto p {
 
     max-width: 720px;
@@ -647,7 +620,6 @@ nav a:hover {
 
     line-height: 1.7;
 }
-
 
 .button {
 
@@ -674,7 +646,6 @@ nav a:hover {
     transition: .2s;
 }
 
-
 .button:hover {
 
     background: var(--gold);
@@ -696,7 +667,6 @@ nav a:hover {
     padding: 55px 25px;
 }
 
-
 .news-title {
 
     display: flex;
@@ -712,7 +682,6 @@ nav a:hover {
     margin-bottom: 25px;
 }
 
-
 .news-title h2 {
 
     margin: 0;
@@ -721,7 +690,6 @@ nav a:hover {
 
     font-weight: normal;
 }
-
 
 .news-title span {
 
@@ -734,7 +702,6 @@ nav a:hover {
     letter-spacing: 2px;
 }
 
-
 .news-grid {
 
     display: grid;
@@ -743,7 +710,6 @@ nav a:hover {
 
     gap: 18px;
 }
-
 
 .news-card {
 
@@ -756,7 +722,6 @@ nav a:hover {
     background: rgba(255,255,255,.025);
 }
 
-
 .news-card small {
 
     color: var(--gold);
@@ -768,14 +733,12 @@ nav a:hover {
     letter-spacing: 1px;
 }
 
-
 .news-card h3 {
 
     margin: 12px 0 8px;
 
     font-size: 19px;
 }
-
 
 .news-card p {
 
@@ -806,14 +769,12 @@ nav a:hover {
     border-top: 1px solid rgba(214,173,85,.25);
 }
 
-
 .join h2 {
 
     margin: 0 0 10px;
 
     font-size: 31px;
 }
-
 
 .join p {
 
@@ -867,11 +828,9 @@ footer {
     z-index: 99999;
 }
 
-
 .rdv-modal.active {
     display: flex;
 }
-
 
 .rdv-modal-box {
 
@@ -894,7 +853,6 @@ footer {
     animation: modalAppear .2s ease-out;
 }
 
-
 @keyframes modalAppear {
 
     from {
@@ -907,7 +865,6 @@ footer {
         transform: translateY(0);
     }
 }
-
 
 .rdv-modal-close {
 
@@ -930,11 +887,9 @@ footer {
     cursor: pointer;
 }
 
-
 .rdv-modal-close:hover {
     color: white;
 }
-
 
 .rdv-modal-kicker {
 
@@ -951,7 +906,6 @@ footer {
     margin-bottom: 12px;
 }
 
-
 .rdv-modal-title {
 
     font-size: 30px;
@@ -960,7 +914,6 @@ footer {
 
     margin-bottom: 20px;
 }
-
 
 .rdv-modal-info {
 
@@ -972,7 +925,6 @@ footer {
 
     margin-bottom: 22px;
 }
-
 
 .rdv-modal-info span {
 
@@ -989,7 +941,6 @@ footer {
     font-size: 11px;
 }
 
-
 .rdv-modal-description {
 
     color: #c4ccd6;
@@ -1002,7 +953,6 @@ footer {
 
     white-space: pre-line;
 }
-
 
 .rdv-modal-link {
 
@@ -1043,7 +993,6 @@ footer {
         gap: 18px;
     }
 
-
     nav {
 
         gap: 15px;
@@ -1053,18 +1002,19 @@ footer {
         justify-content: center;
     }
 
-
     nav a {
 
         font-size: 10px;
     }
 
+    .logo {
+        font-size: 27px;
+    }
 
     .hero {
 
         min-height: 440px;
     }
-
 
     .principles,
     .news-grid {
@@ -1072,12 +1022,10 @@ footer {
         grid-template-columns: 1fr;
     }
 
-
     .news-title {
 
         display: block;
     }
-
 
     .news-title span {
 
@@ -1086,7 +1034,6 @@ footer {
         margin-top: 8px;
     }
 
-
     .rdv-modal-box {
 
         padding: 28px 22px;
@@ -1094,6 +1041,24 @@ footer {
 
 }
 
+
+/* =====================================================
+   PETIT ÉCRAN
+===================================================== */
+
+@media (max-width: 420px) {
+
+    .logo {
+        font-size: 24px;
+        letter-spacing: -1px;
+    }
+
+}
+
+
+/* =====================================================
+   SCRIPT
+===================================================== */
 
 </style>
 </head>
@@ -1133,9 +1098,6 @@ footer {
 
 <header>
 
-
-    <!-- Roue d'administration -->
-
     <a
         href="admin.html"
         class="admin-gear"
@@ -1146,24 +1108,16 @@ footer {
     </a>
 
 
-    <!-- Logo -->
+    <!-- LOGO -->
 
     <a href="index.html" class="logo">
 
-        <span class="logo-a">
-            A
-        </span>
-
-        vant-gard
-
-        <span class="logo-e">
-            E
-        </span>
+        <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
 
     </a>
 
 
-    <!-- Menu -->
+    <!-- MENU -->
 
     <nav>
 
@@ -1200,38 +1154,27 @@ footer {
 
     <div class="hero-content">
 
-
         <div class="eyebrow">
             SOUVERAINETÉ · LIBERTÉ · RESPONSABILITÉ
         </div>
-
 
         <h1>
             LA FRANCE <span>LIBRE.</span>
         </h1>
 
-
         <div class="hero-line"></div>
 
-
         <h2>
-
             Redonner aux Français leur liberté<br>
-
             en redonnant à la France sa souveraineté.
-
         </h2>
 
-
         <p>
-
             Avant-gardE veut dépasser les vieux clivages politiques
             pour proposer une nouvelle voie : une France souveraine,
             un État recentré sur l'essentiel et des citoyens libres
             et responsables.
-
         </p>
-
 
     </div>
 
@@ -1248,22 +1191,15 @@ footer {
         NOTRE RAISON D'ÊTRE
     </div>
 
-
     <h2>
         Changer de paradigme.
     </h2>
 
-
     <p>
-
         Nous refusons de choisir entre la souveraineté et la liberté.
-
         Entre l'attachement à notre pays et l'émancipation de l'individu.
-
         Entre la responsabilité et la justice.
-
         Nous voulons réconcilier ces principes dans un même projet politique.
-
     </p>
 
 </section>
@@ -1274,7 +1210,6 @@ footer {
 ===================================================== -->
 
 <section class="principles">
-
 
     <div class="principle">
 
@@ -1287,10 +1222,8 @@ footer {
         </h3>
 
         <p>
-
             La France doit décider librement de son destin
             et retrouver la maîtrise de ses choix fondamentaux.
-
         </p>
 
     </div>
@@ -1307,10 +1240,8 @@ footer {
         </h3>
 
         <p>
-
             L'individu doit pouvoir choisir, entreprendre,
             travailler et vivre sans un État omniprésent.
-
         </p>
 
     </div>
@@ -1327,14 +1258,11 @@ footer {
         </h3>
 
         <p>
-
             La liberté n'existe que lorsque chacun assume
             les conséquences de ses choix.
-
         </p>
 
     </div>
-
 
 </section>
 
@@ -1345,32 +1273,21 @@ footer {
 
 <section class="manifesto">
 
-
     <div class="section-kicker">
         L'Avant-gardE
     </div>
 
-
     <h2>
-
         Ni retour en arrière.<br>
-
         Ni statu quo.
-
     </h2>
 
-
     <p>
-
         Nous ne voulons pas restaurer le monde d'hier.
-
         Nous voulons construire celui de demain.
-
         Une France fière de ses racines, maîtresse de son destin
         et confiante dans la liberté de ses citoyens.
-
     </p>
-
 
     <a
         href="manifeste.html"
@@ -1378,7 +1295,6 @@ footer {
     >
         DÉCOUVRIR LE MANIFESTE →
     </a>
-
 
 </section>
 
@@ -1388,7 +1304,6 @@ footer {
 ===================================================== -->
 
 <section class="news">
-
 
     <div class="news-title">
 
@@ -1405,7 +1320,6 @@ footer {
 
     <div class="news-grid">
 
-
         <div class="news-card">
 
             <small>
@@ -1417,10 +1331,8 @@ footer {
             </h3>
 
             <p>
-
                 Retrouvez ici nos analyses, propositions
                 et prises de position.
-
             </p>
 
         </div>
@@ -1437,10 +1349,8 @@ footer {
             </h3>
 
             <p>
-
                 Rencontres, réunions et événements :
                 restez informés de la vie du mouvement.
-
             </p>
 
         </div>
@@ -1457,14 +1367,11 @@ footer {
             </h3>
 
             <p>
-
                 Découvrez progressivement nos propositions
                 pour transformer la France.
-
             </p>
 
         </div>
-
 
     </div>
 
@@ -1477,18 +1384,13 @@ footer {
 
 <section class="join">
 
-
     <h2>
         Rejoignez l'Avant-gardE.
     </h2>
 
-
     <p>
-
         La politique ne changera pas sans ceux qui décident de la changer.
-
     </p>
-
 
     <a
         href="equipe.html"
@@ -1496,7 +1398,6 @@ footer {
     >
         NOUS REJOINDRE →
     </a>
-
 
 </section>
 
@@ -1508,7 +1409,6 @@ footer {
 <footer>
 
     © 2026 Avant-gardE
-
     — Souveraineté · Liberté · Justice · Patriote
 
 </footer>
@@ -1523,9 +1423,7 @@ footer {
     class="rdv-modal"
 >
 
-
     <div class="rdv-modal-box">
-
 
         <button
             id="rdvModalClose"
@@ -1535,11 +1433,9 @@ footer {
             ×
         </button>
 
-
         <div class="rdv-modal-kicker">
             NOS RENDEZ-VOUS
         </div>
-
 
         <div
             id="rdvModalTitle"
@@ -1547,37 +1443,21 @@ footer {
         >
         </div>
 
-
         <div class="rdv-modal-info">
 
+            <span id="rdvModalDate"></span>
 
-            <span
-                id="rdvModalDate"
-            >
-            </span>
+            <span id="rdvModalTime"></span>
 
-
-            <span
-                id="rdvModalTime"
-            >
-            </span>
-
-
-            <span
-                id="rdvModalLocation"
-            >
-            </span>
-
+            <span id="rdvModalLocation"></span>
 
         </div>
-
 
         <div
             id="rdvModalDescription"
             class="rdv-modal-description"
         >
         </div>
-
 
         <a
             id="rdvModalLink"
@@ -1589,7 +1469,6 @@ footer {
         >
             EN SAVOIR PLUS →
         </a>
-
 
     </div>
 
@@ -1606,10 +1485,8 @@ footer {
 const SUPABASE_URL =
     "https://wlhtegrciehmtxqecopv.supabase.co";
 
-
 const SUPABASE_KEY =
     "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
-
 
 const supabaseClient =
     window.supabase.createClient(
@@ -1633,12 +1510,10 @@ let tickerAnimation = null;
 
 async function chargerRendezVous() {
 
-
     const track =
         document.getElementById(
             "eventsTrack"
         );
-
 
     const {
         data,
@@ -1700,12 +1575,6 @@ async function chargerRendezVous() {
 
     rendezVous = data;
 
-
-    /*
-       Un seul élément HTML par rendez-vous.
-       Aucune duplication.
-    */
-
     track.innerHTML = "";
 
 
@@ -1717,10 +1586,8 @@ async function chargerRendezVous() {
                     "div"
                 );
 
-
             element.className =
                 "event";
-
 
             element.dataset.id =
                 rdv.id;
@@ -1828,10 +1695,6 @@ function demarrerDefilement() {
     }
 
 
-    /*
-       Arrêt de l'animation précédente
-    */
-
     if (tickerAnimation) {
 
         cancelAnimationFrame(
@@ -1843,13 +1706,8 @@ function demarrerDefilement() {
     }
 
 
-    /*
-       Largeur réelle du rendez-vous
-    */
-
     const largeurContenu =
         track.scrollWidth;
-
 
     const largeurFenetre =
         windowElement.clientWidth;
@@ -1860,44 +1718,23 @@ function demarrerDefilement() {
     }
 
 
-    /*
-       Vitesse du défilement.
-
-       180 px/seconde.
-    */
-
     const vitesse = 180;
 
 
-    /*
-       Départ complètement
-       à droite de la fenêtre.
-    */
-
     let position =
         largeurFenetre;
-
 
     let dernierTemps =
         performance.now();
 
 
-    /*
-       Position initiale.
-    */
-
     track.style.transform =
         `translateX(${position}px)`;
 
 
-    /*
-       Animation
-    */
-
     function animation(
         temps
     ) {
-
 
         const delta =
             (temps - dernierTemps) /
@@ -1908,19 +1745,9 @@ function demarrerDefilement() {
             temps;
 
 
-        /*
-           Déplacement vers la gauche.
-        */
-
         position -=
             vitesse * delta;
 
-
-        /*
-           Lorsque le rendez-vous
-           a complètement disparu
-           à gauche, retour à droite.
-        */
 
         if (
             position <=
@@ -2004,42 +1831,35 @@ function ouvrirRendezVous(
     rdv
 ) {
 
-
     const modal =
         document.getElementById(
             "rdvModal"
         );
-
 
     const title =
         document.getElementById(
             "rdvModalTitle"
         );
 
-
     const date =
         document.getElementById(
             "rdvModalDate"
         );
-
 
     const time =
         document.getElementById(
             "rdvModalTime"
         );
 
-
     const location =
         document.getElementById(
             "rdvModalLocation"
         );
 
-
     const description =
         document.getElementById(
             "rdvModalDescription"
         );
-
 
     const link =
         document.getElementById(
@@ -2051,10 +1871,6 @@ function ouvrirRendezVous(
         rdv.titre ||
         "Rendez-vous";
 
-
-    /*
-       DATE
-    */
 
     if (
         rdv.date_evenement
@@ -2089,10 +1905,6 @@ function ouvrirRendezVous(
     }
 
 
-    /*
-       HEURE
-    */
-
     if (rdv.heure) {
 
         time.textContent =
@@ -2109,10 +1921,6 @@ function ouvrirRendezVous(
 
     }
 
-
-    /*
-       LIEU
-    */
 
     if (rdv.lieu) {
 
@@ -2131,19 +1939,11 @@ function ouvrirRendezVous(
     }
 
 
-    /*
-       DESCRIPTION
-    */
-
     description.textContent =
         rdv.description ||
         rdv.texte ||
         "Aucune description disponible.";
 
-
-    /*
-       LIEN
-    */
 
     if (rdv.lien) {
 
@@ -2177,7 +1977,6 @@ function ouvrirRendezVous(
 ===================================================== */
 
 function fermerRendezVous() {
-
 
     const modal =
         document.getElementById(
@@ -2318,3 +2117,4 @@ chargerRendezVous();
 
 </body>
 </html>
+```
