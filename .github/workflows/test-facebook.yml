@@ -78,16 +78,14 @@ jobs:
             );
 
             const texte =
-              await page.loc
-                .locator("body")
-                .innerText();
+              await page.locator("body").innerText();
 
             console.log(
               "----- CONTENU FACEBOOK -----"
             );
 
             console.log(
-              texte.substring(0, 20000)
+              texte.substring(0, 30000)
             );
 
             console.log(
@@ -107,7 +105,7 @@ jobs:
 
       - name: Sauvegarder la capture
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: facebook-test
           path: facebook-test.png
