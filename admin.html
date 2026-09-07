@@ -2,511 +2,482 @@
 <html lang="fr">
 
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Administration — Avant-gardE</title>
+<title>Avant-gardE — Administration</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 
-:root {
-    --navy: #07152d;
-    --navy2: #0d2344;
-    --gold: #d6ad55;
-    --gold-light: #f0d58a;
-    --white: #f5f3ed;
-    --muted: #aeb7c5;
-    --red: #c51f2a;
-    --green: #4caf70;
-    --blue-france: #0055A4;
+:root{
+  --navy:#07152d;
+  --navy2:#0d2344;
+  --gold:#d6ad55;
+  --gold-light:#f0d58a;
+  --white:#f5f3ed;
+  --muted:#b8c0cd;
+  --blue-france:#0055A4;
+  --red:#EF4135;
+  --border:rgba(214,173,85,.28);
 }
 
-* {
-    box-sizing: border-box;
+*{
+  box-sizing:border-box;
 }
 
-body {
-    margin: 0;
-    background: var(--navy);
-    color: var(--white);
-    font-family: Arial, sans-serif;
+html{
+  scroll-behavior:smooth;
 }
 
-.hidden {
-    display: none !important;
+body{
+  margin:0;
+
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(214,173,85,.07),
+      transparent 35%
+    ),
+    var(--navy);
+
+  color:var(--white);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
 }
 
 
 /* =========================================================
-   CONNEXION
+   HEADER
 ========================================================= */
 
-#login-screen {
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 25px;
+header{
+
+  min-height:82px;
+
+  padding:0 5%;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  border-bottom:
+    1px solid rgba(214,173,85,.25);
+
+  background:
+    rgba(7,21,45,.97);
+
+  position:relative;
+
 }
 
-.login-box {
-    width: 100%;
-    max-width: 430px;
-    padding: 40px;
-    background: var(--navy2);
-    border: 1px solid rgba(214,173,85,.35);
-}
 
-.login-logo {
-    text-align: center;
-    font-family: Georgia, serif;
-    font-size: 32px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
+/* LOGO */
+
+.logo{
+
+  color:var(--white);
+
+  text-decoration:none;
+
+  display:flex;
+
+  align-items:center;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:28px;
+
+  font-weight:bold;
+
+  letter-spacing:-1.2px;
+
+  line-height:1;
+
+  white-space:nowrap;
+
 }
 
 .logo-a,
-.logo-e {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    background: white;
-    border-radius: 50%;
-    font-size: 24px;
+.logo-e{
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:inherit;
+
+  font-weight:bold;
+
 }
 
-.logo-a {
-    color: var(--blue-france);
+.logo-a{
+  color:var(--blue-france);
 }
 
-.logo-e {
-    color: var(--red);
+.logo-e{
+  color:var(--red);
 }
 
-.login-subtitle {
-    text-align: center;
-    color: var(--muted);
-    margin-bottom: 30px;
+
+/* HEADER ACTIONS */
+
+.header-actions{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+}
+
+.header-button{
+
+  border:
+    1px solid rgba(214,173,85,.45);
+
+  background:
+    rgba(255,255,255,.025);
+
+  color:#e7e7e7;
+
+  padding:9px 13px;
+
+  font-family:Arial,sans-serif;
+
+  font-size:10px;
+
+  font-weight:bold;
+
+  letter-spacing:1px;
+
+  cursor:pointer;
+
+  text-decoration:none;
+
+  transition:.2s;
+
+}
+
+.header-button:hover{
+
+  border-color:var(--gold);
+
+  color:var(--gold-light);
+
+  background:
+    rgba(214,173,85,.07);
+
 }
 
 
 /* =========================================================
-   FORMULAIRES
+   PAGE
 ========================================================= */
 
-label {
-    display: block;
-    margin-bottom: 7px;
-    color: var(--gold-light);
-    font-size: 12px;
-    font-weight: bold;
-    letter-spacing: 1px;
+.page{
+
+  width:min(1100px,94%);
+
+  margin:0 auto;
+
+  padding:60px 0 90px;
+
 }
 
-input,
+.page-kicker{
+
+  color:var(--gold);
+
+  font-family:Arial,sans-serif;
+
+  font-size:11px;
+
+  font-weight:bold;
+
+  letter-spacing:3px;
+
+  margin-bottom:12px;
+
+  text-align:center;
+
+}
+
+.page-title{
+
+  text-align:center;
+
+  font-size:
+    clamp(36px,6vw,58px);
+
+  margin:0;
+
+}
+
+.page-title span{
+  color:var(--gold);
+}
+
+.page-intro{
+
+  max-width:650px;
+
+  margin:18px auto 40px;
+
+  text-align:center;
+
+  color:var(--muted);
+
+  font-family:Arial,sans-serif;
+
+  font-size:13px;
+
+  line-height:1.6;
+
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+.login-container{
+
+  width:min(440px,100%);
+
+  margin:80px auto;
+
+}
+
+.login-box{
+
+  background:
+    linear-gradient(
+      145deg,
+      #0d2344,
+      #07152d
+    );
+
+  border:
+    1px solid var(--border);
+
+  padding:40px;
+
+  box-shadow:
+    0 25px 80px rgba(0,0,0,.45);
+
+}
+
+.login-logo{
+
+  text-align:center;
+
+  margin-bottom:35px;
+
+}
+
+.login-logo .logo{
+
+  justify-content:center;
+
+  font-size:34px;
+
+}
+
+.login-subtitle{
+
+  color:var(--muted);
+
+  text-align:center;
+
+  font-family:Arial,sans-serif;
+
+  font-size:11px;
+
+  letter-spacing:1px;
+
+  margin-top:10px;
+
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.form-group{
+
+  margin-bottom:21px;
+
+}
+
+.form-group label{
+
+  display:block;
+
+  font-family:Arial,sans-serif;
+
+  font-size:11px;
+
+  font-weight:bold;
+
+  letter-spacing:.5px;
+
+  margin-bottom:8px;
+
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="url"],
 textarea,
-select {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 18px;
-    border: 1px solid rgba(255,255,255,.15);
-    background: #050f20;
-    color: white;
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-}
+select{
 
-textarea {
-    min-height: 130px;
-    resize: vertical;
+  width:100%;
+
+  border:
+    1px solid rgba(255,255,255,.15);
+
+  background:#061329;
+
+  color:var(--white);
+
+  padding:12px 13px;
+
+  font-family:Arial,sans-serif;
+
+  font-size:13px;
+
+  outline:none;
+
+  border-radius:0;
+
 }
 
 input:focus,
 textarea:focus,
-select:focus {
-    outline: none;
-    border-color: var(--gold);
+select:focus{
+
+  border-color:var(--gold);
+
 }
 
-button {
-    border: 0;
-    cursor: pointer;
-    font-family: Arial, sans-serif;
+input:disabled{
+
+  opacity:.55;
+
+  cursor:not-allowed;
+
 }
 
-.btn-primary {
-    width: 100%;
-    padding: 13px;
-    background: var(--gold);
-    color: var(--navy);
-    font-weight: bold;
-    letter-spacing: 1px;
+textarea{
+
+  min-height:120px;
+
+  resize:vertical;
+
 }
 
-.btn-primary:hover {
-    background: var(--gold-light);
-}
+.help{
 
-.error {
-    color: #ff8585;
-    font-size: 13px;
-    margin-top: 15px;
-    text-align: center;
-}
+  color:#8994a6;
 
+  font-family:Arial,sans-serif;
 
-/* =========================================================
-   ADMINISTRATION
-========================================================= */
+  font-size:10px;
 
-#admin-screen {
-    min-height: 100vh;
-}
+  line-height:1.45;
 
-.admin-header {
-    min-height: 75px;
-    padding: 0 5%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #050f20;
-    border-bottom: 1px solid rgba(214,173,85,.3);
-}
+  margin-top:6px;
 
-.admin-brand {
-    font-family: Georgia, serif;
-    font-size: 22px;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-.admin-brand span {
-    color: var(--gold);
-}
-
-.logout {
-    padding: 9px 16px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,.25);
-    color: var(--white);
-}
-
-.logout:hover {
-    border-color: var(--red);
-    color: #ff8585;
 }
 
 
 /* =========================================================
-   ONGLETS
+   BOUTONS
 ========================================================= */
 
-.admin-tabs {
-    display: flex;
-    padding: 0 5%;
-    background: #050f20;
-    border-bottom: 1px solid rgba(214,173,85,.18);
+.primary-button{
+
+  width:100%;
+
+  border:0;
+
+  background:var(--gold);
+
+  color:var(--navy);
+
+  padding:15px;
+
+  font-family:Arial,sans-serif;
+
+  font-size:11px;
+
+  font-weight:bold;
+
+  letter-spacing:1.2px;
+
+  cursor:pointer;
+
+  transition:.2s;
+
 }
 
-.admin-tab {
-    position: relative;
-    padding: 17px 28px;
-    background: transparent;
-    color: var(--muted);
-    font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 1.5px;
+.primary-button:hover{
+
+  background:var(--gold-light);
+
 }
 
-.admin-tab:hover {
-    color: var(--gold-light);
+.primary-button:disabled{
+
+  opacity:.6;
+
+  cursor:wait;
+
 }
 
-.admin-tab.active {
-    color: var(--gold-light);
+.secondary-button{
+
+  border:
+    1px solid rgba(214,173,85,.5);
+
+  background:transparent;
+
+  color:var(--gold-light);
+
+  padding:12px 18px;
+
+  font-family:Arial,sans-serif;
+
+  font-size:10px;
+
+  font-weight:bold;
+
+  letter-spacing:1px;
+
+  cursor:pointer;
+
 }
 
-.admin-tab.active::after {
-    content: "";
-    position: absolute;
-    left: 20px;
-    right: 20px;
-    bottom: 0;
-    height: 2px;
-    background: var(--gold);
-}
+.secondary-button:hover{
 
+  background:
+    rgba(214,173,85,.08);
 
-/* =========================================================
-   CONTENU
-========================================================= */
-
-.admin-container {
-    max-width: 1150px;
-    margin: auto;
-    padding: 35px 20px 60px;
-}
-
-.page-title {
-    margin-bottom: 30px;
-}
-
-.page-title h1 {
-    margin: 0 0 8px;
-    font-family: Georgia, serif;
-    font-size: 32px;
-    font-weight: normal;
-}
-
-.page-title p {
-    margin: 0;
-    color: var(--muted);
-}
-
-
-/* =========================================================
-   PANELS
-========================================================= */
-
-.admin-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.2fr;
-    gap: 25px;
-}
-
-.panel {
-    background: var(--navy2);
-    border: 1px solid rgba(214,173,85,.25);
-    padding: 25px;
-}
-
-.panel h2 {
-    margin: 0 0 22px;
-    font-family: Georgia, serif;
-    font-size: 22px;
-    font-weight: normal;
-}
-
-
-/* =========================================================
-   FORMULAIRE RDV
-========================================================= */
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-
-.checkbox-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.checkbox-row input {
-    width: auto;
-    margin: 0;
-}
-
-.checkbox-row label {
-    margin: 0;
-}
-
-.form-buttons {
-    display: flex;
-    gap: 10px;
-}
-
-.save-btn {
-    flex: 1;
-    padding: 12px;
-    background: var(--gold);
-    color: var(--navy);
-    font-weight: bold;
-}
-
-.cancel-btn {
-    padding: 12px 20px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,.25);
-    color: white;
-}
-
-.cancel-btn:hover {
-    border-color: var(--gold);
-}
-
-
-/* =========================================================
-   LISTE RDV
-========================================================= */
-
-.events-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.event-item {
-    padding: 17px;
-    border: 1px solid rgba(255,255,255,.1);
-    background: rgba(255,255,255,.025);
-}
-
-.event-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 15px;
-}
-
-.event-title {
-    font-family: Georgia, serif;
-    font-size: 18px;
-    color: var(--gold-light);
-}
-
-.event-date {
-    margin-top: 5px;
-    color: var(--muted);
-    font-size: 12px;
-}
-
-.event-description {
-    margin-top: 10px;
-    color: #d2d7df;
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.event-status {
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
-
-.status-active {
-    color: var(--green);
-}
-
-.status-inactive {
-    color: #888;
-}
-
-.event-actions {
-    margin-top: 15px;
-    display: flex;
-    gap: 8px;
-}
-
-.edit-btn,
-.delete-btn {
-    padding: 8px 12px;
-    font-size: 11px;
-    font-weight: bold;
-}
-
-.edit-btn {
-    background: rgba(214,173,85,.15);
-    border: 1px solid rgba(214,173,85,.5);
-    color: var(--gold-light);
-}
-
-.delete-btn {
-    background: rgba(197,31,42,.12);
-    border: 1px solid rgba(197,31,42,.5);
-    color: #ff8585;
-}
-
-.empty {
-    padding: 30px;
-    text-align: center;
-    color: var(--muted);
-    border: 1px dashed rgba(255,255,255,.15);
-}
-
-
-/* =========================================================
-   PROFIL
-========================================================= */
-
-.profile-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
-}
-
-.profile-avatar {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
-    margin: 0 auto 25px;
-    border: 2px solid rgba(214,173,85,.5);
-    background: #050f20;
-}
-
-.profile-avatar-placeholder {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 25px;
-    border: 2px solid rgba(214,173,85,.5);
-    background: #050f20;
-    color: var(--gold);
-    font-family: Georgia, serif;
-    font-size: 42px;
-}
-
-.profile-grade {
-    text-align: center;
-    color: var(--gold-light);
-    font-size: 11px;
-    font-weight: bold;
-    letter-spacing: 1.5px;
-    margin-bottom: 25px;
-}
-
-.competences-box {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.competence-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px;
-    border: 1px solid rgba(255,255,255,.1);
-    background: rgba(255,255,255,.025);
-    font-size: 12px;
-    color: #d2d7df;
-}
-
-.competence-item input {
-    width: auto;
-    margin: 0;
-}
-
-.profile-info {
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.6;
-}
-
-.profile-info strong {
-    color: var(--gold-light);
 }
 
 
@@ -514,22 +485,793 @@ button {
    MESSAGES
 ========================================================= */
 
-.message {
-    margin-bottom: 20px;
-    padding: 12px;
-    font-size: 13px;
+.message{
+
+  display:none;
+
+  padding:13px;
+
+  margin-top:15px;
+
+  font-family:Arial,sans-serif;
+
+  font-size:12px;
+
+  line-height:1.5;
+
 }
 
-.success {
-    background: rgba(76,175,112,.12);
-    border: 1px solid rgba(76,175,112,.35);
-    color: #8be0a7;
+.message.success{
+
+  display:block;
+
+  border:
+    1px solid rgba(100,200,130,.4);
+
+  color:#b9e5c4;
+
+  background:
+    rgba(50,130,70,.1);
+
 }
 
-.message-error {
-    background: rgba(197,31,42,.12);
-    border: 1px solid rgba(197,31,42,.35);
-    color: #ff8585;
+.message.error{
+
+  display:block;
+
+  border:
+    1px solid rgba(239,65,53,.4);
+
+  color:#ffb5ae;
+
+  background:
+    rgba(180,30,20,.1);
+
+}
+
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
+#adminScreen{
+
+  display:none;
+
+}
+
+.admin-header{
+
+  margin-bottom:30px;
+
+}
+
+.admin-user{
+
+  text-align:center;
+
+  color:var(--muted);
+
+  font-family:Arial,sans-serif;
+
+  font-size:12px;
+
+}
+
+.admin-user strong{
+
+  color:var(--gold-light);
+
+}
+
+
+/* =========================================================
+   ONGLETS
+========================================================= */
+
+.tabs{
+
+  display:flex;
+
+  border-bottom:
+    1px solid rgba(214,173,85,.25);
+
+  margin-bottom:30px;
+
+}
+
+.tab{
+
+  flex:1;
+
+  border:0;
+
+  border-bottom:
+    2px solid transparent;
+
+  background:transparent;
+
+  color:#8f9aaa;
+
+  padding:14px;
+
+  font-family:Arial,sans-serif;
+
+  font-size:11px;
+
+  font-weight:bold;
+
+  letter-spacing:1.3px;
+
+  cursor:pointer;
+
+}
+
+.tab:hover{
+
+  color:var(--gold-light);
+
+}
+
+.tab.active{
+
+  color:var(--gold-light);
+
+  border-bottom-color:
+    var(--gold);
+
+}
+
+.tab-content{
+
+  display:none;
+
+}
+
+.tab-content.active{
+
+  display:block;
+
+}
+
+
+/* =========================================================
+   CARTES
+========================================================= */
+
+.panel{
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255,255,255,.035),
+      rgba(255,255,255,.015)
+    );
+
+  border:
+    1px solid var(--border);
+
+  padding:30px;
+
+  margin-bottom:25px;
+
+}
+
+.panel-title{
+
+  font-size:25px;
+
+  margin:0 0 7px;
+
+}
+
+.panel-intro{
+
+  color:var(--muted);
+
+  font-family:Arial,sans-serif;
+
+  font-size:12px;
+
+  line-height:1.5;
+
+  margin:0 0 25px;
+
+}
+
+
+/* =========================================================
+   PROFIL
+========================================================= */
+
+.profile-grid{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:20px;
+
+}
+
+.full-width{
+
+  grid-column:1/-1;
+
+}
+
+
+/* =========================================================
+   AFFICHAGE / ANONYME
+========================================================= */
+
+.registration-choice{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:10px;
+
+}
+
+.choice-option{
+
+  position:relative;
+
+}
+
+.choice-option input{
+
+  position:absolute;
+
+  opacity:0;
+
+  pointer-events:none;
+
+}
+
+.choice-label{
+
+  display:block;
+
+  height:100%;
+
+  border:
+    1px solid rgba(255,255,255,.14);
+
+  background:
+    rgba(0,0,0,.12);
+
+  padding:15px 17px;
+
+  cursor:pointer;
+
+  transition:.2s;
+
+}
+
+.choice-label strong{
+
+  display:block;
+
+  color:var(--white);
+
+  font-family:Arial,sans-serif;
+
+  font-size:13px;
+
+  margin-bottom:5px;
+
+}
+
+.choice-label span{
+
+  display:block;
+
+  color:var(--muted);
+
+  font-family:Arial,sans-serif;
+
+  font-size:11px;
+
+  line-height:1.5;
+
+}
+
+.choice-option input:checked + .choice-label{
+
+  border-color:var(--gold);
+
+  background:
+    rgba(214,173,85,.08);
+
+}
+
+.choice-option input:checked + .choice-label strong{
+
+  color:var(--gold-light);
+
+}
+
+
+/* =========================================================
+   COMPETENCES
+========================================================= */
+
+.section-title{
+
+  color:var(--gold);
+
+  font-size:19px;
+
+  margin:35px 0 20px;
+
+  padding-bottom:9px;
+
+  border-bottom:
+    1px solid rgba(214,173,85,.2);
+
+}
+
+.competence-group{
+
+  margin-bottom:25px;
+
+}
+
+.competence-group-title{
+
+  font-family:Arial,sans-serif;
+
+  color:#eee;
+
+  font-size:13px;
+
+  font-weight:bold;
+
+  margin-bottom:13px;
+
+}
+
+.competence{
+
+  position:relative;
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  margin-bottom:8px;
+
+  padding:12px;
+
+  background:
+    rgba(0,0,0,.12);
+
+  transition:.2s;
+
+}
+
+.competence:hover{
+
+  border-color:
+    rgba(214,173,85,.45);
+
+}
+
+.competence label{
+
+  display:flex;
+
+  align-items:flex-start;
+
+  gap:10px;
+
+  cursor:pointer;
+
+}
+
+.competence input{
+
+  margin-top:3px;
+
+  accent-color:var(--gold);
+
+}
+
+.competence-name{
+
+  color:var(--white);
+
+  font-family:Arial,sans-serif;
+
+  font-size:12px;
+
+  font-weight:bold;
+
+}
+
+
+/* INFO BUBBLE */
+
+.competence-info{
+
+  display:none;
+
+  position:absolute;
+
+  z-index:20;
+
+  left:30px;
+
+  right:15px;
+
+  top:calc(100% + 7px);
+
+  padding:13px 15px;
+
+  background:#061329;
+
+  border:
+    1px solid var(--gold);
+
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.55);
+
+  color:#cfd5df;
+
+  font-family:Arial,sans-serif;
+
+  font-size:10px;
+
+  line-height:1.5;
+
+}
+
+.competence-info::before{
+
+  content:"";
+
+  position:absolute;
+
+  top:-6px;
+
+  left:20px;
+
+  width:10px;
+
+  height:10px;
+
+  background:#061329;
+
+  border-left:
+    1px solid var(--gold);
+
+  border-top:
+    1px solid var(--gold);
+
+  transform:rotate(45deg);
+
+}
+
+.competence:hover .competence-info{
+
+  display:block;
+
+}
+
+
+/* =========================================================
+   SUPPRESSION
+========================================================= */
+
+.delete-panel{
+
+  border:
+    1px solid rgba(239,65,53,.28);
+
+  background:
+    rgba(100,20,20,.08);
+
+}
+
+.delete-panel h3{
+
+  color:#ffb5ae;
+
+  margin-top:0;
+
+  font-size:18px;
+
+}
+
+.delete-panel p{
+
+  color:#aeb7c5;
+
+  font-family:Arial,sans-serif;
+
+  font-size:11px;
+
+  line-height:1.6;
+
+}
+
+.delete-button{
+
+  border:
+    1px solid rgba(239,65,53,.6);
+
+  background:
+    rgba(180,30,20,.08);
+
+  color:#ffaaa2;
+
+  padding:12px 18px;
+
+  font-family:Arial,sans-serif;
+
+  font-size:10px;
+
+  font-weight:bold;
+
+  letter-spacing:1px;
+
+  cursor:pointer;
+
+}
+
+.delete-button:hover{
+
+  background:
+    rgba(180,30,20,.18);
+
+}
+
+
+/* =========================================================
+   RDV
+========================================================= */
+
+.event-list{
+
+  display:grid;
+
+  gap:12px;
+
+  margin-top:25px;
+
+}
+
+.event-card{
+
+  border:
+    1px solid rgba(255,255,255,.1);
+
+  background:
+    rgba(0,0,0,.12);
+
+  padding:18px;
+
+}
+
+.event-card-header{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  gap:15px;
+
+  align-items:flex-start;
+
+}
+
+.event-card h3{
+
+  margin:0 0 7px;
+
+  font-size:18px;
+
+}
+
+.event-card-date{
+
+  color:var(--gold);
+
+  font-family:Arial,sans-serif;
+
+  font-size:10px;
+
+  font-weight:bold;
+
+}
+
+.event-card-text{
+
+  color:#c8ced8;
+
+  font-family:Arial,sans-serif;
+
+  font-size:12px;
+
+  line-height:1.5;
+
+  margin:10px 0;
+
+}
+
+.event-actions{
+
+  display:flex;
+
+  gap:8px;
+
+  margin-top:14px;
+
+}
+
+.event-actions button{
+
+  padding:8px 12px;
+
+  font-family:Arial,sans-serif;
+
+  font-size:9px;
+
+  font-weight:bold;
+
+  letter-spacing:.7px;
+
+  cursor:pointer;
+
+}
+
+.edit-button{
+
+  border:
+    1px solid rgba(214,173,85,.5);
+
+  background:transparent;
+
+  color:var(--gold-light);
+
+}
+
+.delete-event-button{
+
+  border:
+    1px solid rgba(239,65,53,.45);
+
+  background:transparent;
+
+  color:#ffaaa2;
+
+}
+
+
+/* =========================================================
+   MODAL CONFIRMATION
+========================================================= */
+
+.modal{
+
+  position:fixed;
+
+  inset:0;
+
+  background:
+    rgba(0,0,0,.78);
+
+  backdrop-filter:blur(6px);
+
+  display:none;
+
+  align-items:center;
+
+  justify-content:center;
+
+  padding:20px;
+
+  z-index:1000;
+
+}
+
+.modal.active{
+
+  display:flex;
+
+}
+
+.modal-box{
+
+  width:min(500px,100%);
+
+  background:
+    linear-gradient(
+      145deg,
+      #0d2344,
+      #07152d
+    );
+
+  border:
+    1px solid var(--border);
+
+  box-shadow:
+    0 25px 80px rgba(0,0,0,.55);
+
+  position:relative;
+
+  padding:35px;
+
+}
+
+.modal-box h2{
+
+  margin-top:0;
+
+}
+
+.modal-box p{
+
+  color:var(--muted);
+
+  font-family:Arial,sans-serif;
+
+  font-size:12px;
+
+  line-height:1.6;
+
+}
+
+.modal-close{
+
+  position:absolute;
+
+  right:18px;
+
+  top:14px;
+
+  border:0;
+
+  background:none;
+
+  color:rgba(255,255,255,.65);
+
+  font-size:28px;
+
+  cursor:pointer;
+
+}
+
+.modal-close:hover{
+
+  color:var(--gold);
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+footer{
+
+  border-top:
+    1px solid rgba(214,173,85,.15);
+
+  text-align:center;
+
+  padding:30px 20px;
+
+  color:#7f8998;
+
+  font-family:Arial,sans-serif;
+
+  font-size:10px;
+
 }
 
 
@@ -537,645 +1279,1113 @@ button {
    MOBILE
 ========================================================= */
 
-@media (max-width: 800px) {
+@media(max-width:800px){
 
-    .admin-header {
-        height: auto;
-        padding: 18px 20px;
-        gap: 15px;
-    }
+  header{
 
-    .admin-brand {
-        font-size: 18px;
-    }
+    padding:20px;
 
-    .admin-tabs {
-        padding: 0 20px;
-    }
+    flex-direction:column;
 
-    .admin-tab {
-        padding: 15px 20px;
-    }
+    gap:18px;
 
-    .admin-grid,
-    .profile-grid {
-        grid-template-columns: 1fr;
-    }
+  }
 
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 0;
-    }
+  .profile-grid{
 
-    .competences-box {
-        grid-template-columns: 1fr;
-    }
+    grid-template-columns:1fr;
 
-    .login-box {
-        padding: 28px 22px;
-    }
+  }
 
-    .admin-container {
-        padding: 25px 15px 50px;
-    }
+  .full-width{
 
-    .event-top {
-        flex-direction: column;
-    }
+    grid-column:auto;
+
+  }
+
+  .panel{
+
+    padding:22px 17px;
+
+  }
+
+  .registration-choice{
+
+    grid-template-columns:1fr 1fr;
+
+  }
+
+  .header-actions{
+
+    flex-wrap:wrap;
+
+    justify-content:center;
+
+  }
+
+}
+
+@media(max-width:420px){
+
+  .logo{
+
+    font-size:24px;
+
+  }
+
+  .registration-choice{
+
+    grid-template-columns:1fr;
+
+  }
+
 }
 
 </style>
+
 </head>
 
 
 <body>
 
 
-<!-- =========================================================
+<!-- =======================================================
      CONNEXION
-========================================================= -->
+======================================================= -->
 
-<section id="login-screen">
+<section
+  id="loginScreen"
+  class="login-container"
+>
 
-    <div class="login-box">
+  <div class="login-box">
 
-        <div class="login-logo">
-            <span class="logo-a">A</span>VANT-GARD<span class="logo-e">E</span>
+    <div class="login-logo">
+
+      <a
+        href="index.html"
+        class="logo"
+      >
+        <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
+      </a>
+
+      <div class="login-subtitle">
+        ESPACE MEMBRE
+      </div>
+
+    </div>
+
+
+    <form id="loginForm">
+
+      <div class="form-group">
+
+        <label for="loginEmail">
+          EMAIL
+        </label>
+
+        <input
+          type="email"
+          id="loginEmail"
+          required
+          autocomplete="email"
+        >
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="loginPassword">
+          MOT DE PASSE
+        </label>
+
+        <input
+          type="password"
+          id="loginPassword"
+          required
+          autocomplete="current-password"
+        >
+
+      </div>
+
+
+      <button
+        type="submit"
+        class="primary-button"
+        id="loginButton"
+      >
+        SE CONNECTER
+      </button>
+
+      <div
+        id="loginMessage"
+        class="message"
+      ></div>
+
+    </form>
+
+  </div>
+
+</section>
+
+
+<!-- =======================================================
+     ADMIN
+======================================================= -->
+
+<section
+  id="adminScreen"
+  class="page"
+>
+
+  <div class="admin-header">
+
+    <div class="page-kicker">
+      ESPACE MEMBRE
+    </div>
+
+    <h1 class="page-title">
+      MON <span>ESPACE.</span>
+    </h1>
+
+    <div
+      class="admin-user"
+      id="adminUser"
+    ></div>
+
+  </div>
+
+
+  <!-- ONGLETS -->
+
+  <div class="tabs">
+
+    <button
+      class="tab active"
+      data-tab="profileTab"
+    >
+      PROFIL
+    </button>
+
+    <button
+      class="tab"
+      id="rdvTabButton"
+      data-tab="rdvTab"
+    >
+      RDV
+    </button>
+
+  </div>
+
+
+  <!-- =====================================================
+       PROFIL
+  ====================================================== -->
+
+  <div
+    id="profileTab"
+    class="tab-content active"
+  >
+
+    <div class="panel">
+
+      <h2 class="panel-title">
+        Mon profil
+      </h2>
+
+      <p class="panel-intro">
+        Modifiez les informations qui apparaissent sur votre profil.
+        Les modifications sont enregistrées directement dans votre profil
+        Supabase.
+      </p>
+
+
+      <form id="profileForm">
+
+
+        <!-- AFFICHAGE -->
+
+        <div class="form-group">
+
+          <label>
+            VISIBILITÉ DU PROFIL
+          </label>
+
+          <div class="registration-choice">
+
+
+            <div class="choice-option">
+
+              <input
+                type="radio"
+                id="profileAffiche"
+                name="profileVisibility"
+                value="affiche"
+              >
+
+              <label
+                for="profileAffiche"
+                class="choice-label"
+              >
+
+                <strong>
+                  Affiché
+                </strong>
+
+                <span>
+                  Votre profil apparaît dans la liste publique
+                  des membres.
+                </span>
+
+              </label>
+
+            </div>
+
+
+            <div class="choice-option">
+
+              <input
+                type="radio"
+                id="profileAnonyme"
+                name="profileVisibility"
+                value="anonyme"
+              >
+
+              <label
+                for="profileAnonyme"
+                class="choice-label"
+              >
+
+                <strong>
+                  Anonyme
+                </strong>
+
+                <span>
+                  Votre profil est enregistré mais caché
+                  de la liste publique.
+                </span>
+
+              </label>
+
+            </div>
+
+
+          </div>
+
         </div>
 
-        <div class="login-subtitle">
-            Administration du site
-        </div>
 
-        <form id="login-form">
+        <div class="profile-grid">
 
-            <label for="email">
-                ADRESSE E-MAIL
+
+          <!-- NOM -->
+
+          <div class="form-group">
+
+            <label for="profileNom">
+              PSEUDO OU NOM PRÉNOM
             </label>
 
             <input
-                type="email"
-                id="email"
-                required
-                autocomplete="email"
+              type="text"
+              id="profileNom"
+              maxlength="100"
+              required
             >
 
-            <label for="password">
-                MOT DE PASSE
+          </div>
+
+
+          <!-- EMAIL -->
+
+          <div class="form-group">
+
+            <label for="profileEmail">
+              EMAIL
             </label>
 
             <input
-                type="password"
-                id="password"
-                required
-                autocomplete="current-password"
+              type="email"
+              id="profileEmail"
+              disabled
             >
 
-            <button type="submit" class="btn-primary">
-                SE CONNECTER
-            </button>
+            <div class="help">
+              L'adresse e-mail ne peut pas être modifiée ici.
+            </div>
 
-            <div id="login-error" class="error"></div>
+          </div>
 
-        </form>
+
+          <!-- GRADE -->
+
+          <div class="form-group">
+
+            <label for="profileGrade">
+              GRADE
+            </label>
+
+            <input
+              type="text"
+              id="profileGrade"
+              disabled
+            >
+
+            <div class="help">
+              Le grade est attribué par l'administration.
+            </div>
+
+          </div>
+
+
+          <!-- REGION -->
+
+          <div class="form-group">
+
+            <label for="profileRegion">
+              RÉGION
+            </label>
+
+            <select
+              id="profileRegion"
+              required
+            >
+
+              <option value="">
+                Sélectionnez votre région
+              </option>
+
+
+              <optgroup label="France métropolitaine">
+
+                <option>Auvergne-Rhône-Alpes</option>
+                <option>Bourgogne-Franche-Comté</option>
+                <option>Bretagne</option>
+                <option>Centre-Val de Loire</option>
+                <option>Corse</option>
+                <option>Grand Est</option>
+                <option>Hauts-de-France</option>
+                <option>Île-de-France</option>
+                <option>Normandie</option>
+                <option>Nouvelle-Aquitaine</option>
+                <option>Occitanie</option>
+                <option>Pays de la Loire</option>
+                <option>Provence-Alpes-Côte d’Azur</option>
+
+              </optgroup>
+
+
+              <optgroup label="Outre-mer">
+
+                <option>Guadeloupe</option>
+                <option>Martinique</option>
+                <option>Guyane</option>
+                <option>La Réunion</option>
+                <option>Mayotte</option>
+
+              </optgroup>
+
+
+              <optgroup label="Étranger">
+
+                <option>Europe</option>
+                <option>Amérique du Nord</option>
+                <option>Amérique centrale et Caraïbes</option>
+                <option>Amérique du Sud</option>
+                <option>Afrique</option>
+                <option>Asie</option>
+                <option>Océanie</option>
+                <option>Autre</option>
+
+              </optgroup>
+
+            </select>
+
+          </div>
+
+
+          <!-- IMAGE -->
+
+          <div class="form-group full-width">
+
+            <label for="profileImage">
+              IMAGE
+            </label>
+
+            <input
+              type="url"
+              id="profileImage"
+              placeholder="https://..."
+            >
+
+            <div class="help">
+              Indiquez l’URL d’une image déjà hébergée en ligne.
+            </div>
+
+          </div>
+
+
+          <!-- DESCRIPTION -->
+
+          <div class="form-group full-width">
+
+            <label for="profileDescription">
+              DESCRIPTION
+            </label>
+
+            <textarea
+              id="profileDescription"
+              maxlength="300"
+              placeholder="Présentez-vous en quelques mots..."
+            ></textarea>
+
+            <div class="help">
+              300 caractères maximum.
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- COMPETENCES -->
+
+        <div class="section-title">
+          Talents et compétences métier
+        </div>
+
+        <div class="form-group">
+
+          <div class="help">
+            Sélectionnez les compétences que vous souhaitez
+            mettre en avant. Passez la souris sur une compétence
+            pour afficher son détail.
+          </div>
+
+        </div>
+
+
+        <div class="competence-group">
+
+          <div class="competence-group-title">
+            Compétences métier
+          </div>
+
+
+          <!-- DOCTRINE -->
+
+          <div class="competence">
+
+            <label>
+
+              <input
+                type="checkbox"
+                name="competences"
+                value="Maîtrise de doctrine"
+              >
+
+              <span class="competence-name">
+                Maîtrise de doctrine
+              </span>
+
+            </label>
+
+            <div class="competence-info">
+              capacité à préserver la fidélité à l’idéologie
+              d'Avant-Garde et sa cohérence dans l’action du mouvement.
+            </div>
+
+          </div>
+
+
+          <!-- TACTIQUE -->
+
+          <div class="competence">
+
+            <label>
+
+              <input
+                type="checkbox"
+                name="competences"
+                value="Tactique"
+              >
+
+              <span class="competence-name">
+                Tactique
+              </span>
+
+            </label>
+
+            <div class="competence-info">
+              capacité à concevoir et mettre en œuvre des tactiques
+              efficaces de développement d’audience, médiatique et
+              électorale, sans renier l’idéologie.
+            </div>
+
+          </div>
+
+
+          <!-- PRESTANCE -->
+
+          <div class="competence">
+
+            <label>
+
+              <input
+                type="checkbox"
+                name="competences"
+                value="Prestance"
+              >
+
+              <span class="competence-name">
+                Prestance
+              </span>
+
+            </label>
+
+            <div class="competence-info">
+              capacité à séduire et convaincre par la parole,
+              le charisme, le charme ou la culture.
+            </div>
+
+          </div>
+
+
+          <!-- ANALYSES PRAGMATIQUES -->
+
+          <div class="competence">
+
+            <label>
+
+              <input
+                type="checkbox"
+                name="competences"
+                value="Analyses pragmatiques"
+              >
+
+              <span class="competence-name">
+                Analyses pragmatiques
+              </span>
+
+            </label>
+
+            <div class="competence-info">
+              capacité à analyser les données, les rendements,
+              les conséquences et les rapports de force. anticipent
+              les évolutions et privilégient les faits.
+            </div>
+
+          </div>
+
+
+          <!-- ANALYSES POPULISTES -->
+
+          <div class="competence">
+
+            <label>
+
+              <input
+                type="checkbox"
+                name="competences"
+                value="Analyses populistes"
+              >
+
+              <span class="competence-name">
+                Analyses populistes
+              </span>
+
+            </label>
+
+            <div class="competence-info">
+              capacité à analyser les ressentis, aspirations et
+              frustrations populaires. anticipent les réactions
+              naturelles et privilégient le vécu et l’opinion du peuple.
+            </div>
+
+          </div>
+
+
+          <!-- ADMINISTRATION -->
+
+          <div class="competence">
+
+            <label>
+
+              <input
+                type="checkbox"
+                name="competences"
+                value="Administration"
+              >
+
+              <span class="competence-name">
+                Administration
+              </span>
+
+            </label>
+
+            <div class="competence-info">
+              maîtrise de la gestion des structures, des ressources
+              techniques et opérationnelles et des équipes internes.
+            </div>
+
+          </div>
+
+
+          <!-- JURIDIQUE -->
+
+          <div class="competence">
+
+            <label>
+
+              <input
+                type="checkbox"
+                name="competences"
+                value="Expertise et ingénierie juridique"
+              >
+
+              <span class="competence-name">
+                Expertise et ingénierie juridique
+              </span>
+
+            </label>
+
+            <div class="competence-info">
+              maîtrise du droit français et européen ainsi que des
+              mécanismes juridiques, avec capacité à en analyser les
+              règles, les contraintes, les failles et les possibilités
+              d’évolution.
+            </div>
+
+          </div>
+
+
+          <!-- POLITIQUE -->
+
+          <div class="competence">
+
+            <label>
+
+              <input
+                type="checkbox"
+                name="competences"
+                value="Expertise et ingénierie politique"
+              >
+
+              <span class="competence-name">
+                Expertise et ingénierie politique
+              </span>
+
+            </label>
+
+            <div class="competence-info">
+              maîtrise d’un domaine politique ou institutionnel
+              particulier et capacité à en apporter l’expertise.
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="competence-group">
+
+          <div class="competence-group-title">
+            Sympathisants ou plus
+          </div>
+
+
+          <!-- INFLUENCEURS -->
+
+          <div class="competence">
+
+            <label>
+
+              <input
+                type="checkbox"
+                name="competences"
+                value="Influenceurs / debunkers / créateurs de contenu"
+              >
+
+              <span class="competence-name">
+                Influenceurs / debunkers / créateurs de contenu
+              </span>
+
+            </label>
+
+            <div class="competence-info">
+              dans le milieu médiatique et sur les réseaux sociaux,
+              développent spontanément une audience, influencent les
+              comportements, déconstruisent les arguments ou manipulations
+              et produisent des contenus permettant de diffuser et de
+              défendre les idées du mouvement. peuvent conserver une forte
+              indépendance éditoriale.
+            </div>
+
+          </div>
+
+
+          <!-- BIENFAITEURS -->
+
+          <div class="competence">
+
+            <label>
+
+              <input
+                type="checkbox"
+                name="competences"
+                value="Bienfaiteurs"
+              >
+
+              <span class="competence-name">
+                Bienfaiteurs
+              </span>
+
+            </label>
+
+            <div class="competence-info">
+              dans les autres milieux, mettent spontanément leur influence,
+              leur réseau, leur carnet d’adresses, leurs moyens, leur
+              expertise ou leur notoriété au service du développement et
+              du rayonnement du mouvement. peuvent conserver une forte
+              indépendance.
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="primary-button"
+          id="saveProfileButton"
+        >
+          ENREGISTRER LES MODIFICATIONS
+        </button>
+
+
+        <div
+          id="profileMessage"
+          class="message"
+        ></div>
+
+
+      </form>
 
     </div>
+
+
+    <!-- SUPPRESSION -->
+
+    <div class="panel delete-panel">
+
+      <h3>
+        Supprimer ma page
+      </h3>
+
+      <p>
+        Cette action supprimera définitivement votre profil public
+        de l’Avant-gardE. Cette opération est irréversible.
+      </p>
+
+      <button
+        type="button"
+        class="delete-button"
+        id="openDeleteModal"
+      >
+        SUPPRIMER MA PAGE
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       RDV
+  ====================================================== -->
+
+  <div
+    id="rdvTab"
+    class="tab-content"
+  >
+
+    <div class="panel">
+
+      <h2 class="panel-title">
+        Rendez-vous
+      </h2>
+
+      <p class="panel-intro">
+        Ajouter, modifier ou supprimer les rendez-vous affichés
+        sur le site.
+      </p>
+
+
+      <form id="eventForm">
+
+        <input
+          type="hidden"
+          id="eventId"
+        >
+
+
+        <div class="profile-grid">
+
+
+          <div class="form-group">
+
+            <label for="eventTitle">
+              TITRE
+            </label>
+
+            <input
+              type="text"
+              id="eventTitle"
+              required
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="eventDate">
+              DATE
+            </label>
+
+            <input
+              type="date"
+              id="eventDate"
+              required
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="eventTime">
+              HEURE
+            </label>
+
+            <input
+              type="text"
+              id="eventTime"
+              placeholder="20h00"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="eventPlace">
+              LIEU
+            </label>
+
+            <input
+              type="text"
+              id="eventPlace"
+            >
+
+          </div>
+
+
+          <div class="form-group full-width">
+
+            <label for="eventText">
+              DESCRIPTION
+            </label>
+
+            <textarea
+              id="eventText"
+            ></textarea>
+
+          </div>
+
+
+          <div class="form-group full-width">
+
+            <label for="eventLink">
+              LIEN
+            </label>
+
+            <input
+              type="url"
+              id="eventLink"
+              placeholder="https://..."
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="eventOrder">
+              ORDRE
+            </label>
+
+            <input
+              type="text"
+              id="eventOrder"
+              value="0"
+            >
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label>
+              STATUT
+            </label>
+
+            <label
+              style="
+                display:flex;
+                align-items:center;
+                gap:10px;
+                font-weight:normal;
+                margin-top:13px;
+              "
+            >
+
+              <input
+                type="checkbox"
+                id="eventActive"
+                checked
+              >
+
+              <span>
+                Rendez-vous actif
+              </span>
+
+            </label>
+
+          </div>
+
+
+        </div>
+
+
+        <button
+          type="submit"
+          class="primary-button"
+          id="eventSubmitButton"
+        >
+          AJOUTER LE RENDEZ-VOUS
+        </button>
+
+
+        <button
+          type="button"
+          class="secondary-button"
+          id="eventCancelButton"
+          style="display:none;margin-top:10px;width:100%;"
+        >
+          ANNULER LA MODIFICATION
+        </button>
+
+
+        <div
+          id="eventMessage"
+          class="message"
+        ></div>
+
+      </form>
+
+
+      <div
+        class="event-list"
+        id="eventList"
+      ></div>
+
+    </div>
+
+  </div>
+
 
 </section>
 
 
+<!-- =======================================================
+     MODAL SUPPRESSION
+======================================================= -->
 
-<!-- =========================================================
-     ADMINISTRATION
-========================================================= -->
+<div
+  class="modal"
+  id="deleteModal"
+>
 
-<section id="admin-screen" class="hidden">
-
-
-<header class="admin-header">
-
-    <div class="admin-brand">
-        AVANT-GARD<span>E</span> — ADMINISTRATION
-    </div>
-
-    <button id="logout-btn" class="logout">
-        Déconnexion
-    </button>
-
-</header>
-
-
-
-<!-- =========================================================
-     ONGLETS
-========================================================= -->
-
-<nav class="admin-tabs">
+  <div class="modal-box">
 
     <button
-        type="button"
-        class="admin-tab active"
-        data-tab="rdv"
-        id="tab-rdv"
+      class="modal-close"
+      id="closeDeleteModal"
     >
-        RDV
+      ×
     </button>
+
+    <h2>
+      Supprimer ma page ?
+    </h2>
+
+    <p>
+      Cette action est définitive. Votre profil sera supprimé
+      de la table <strong>profiles</strong>.
+    </p>
+
+    <p>
+      Pour confirmer, saisissez exactement :
+    </p>
+
+    <p
+      style="
+        text-align:center;
+        color:var(--gold-light);
+        font-family:Arial,sans-serif;
+        font-weight:bold;
+        letter-spacing:2px;
+      "
+    >
+      SUPPRIMER
+    </p>
+
+
+    <input
+      type="text"
+      id="deleteConfirmation"
+      placeholder="SUPPRIMER"
+      autocomplete="off"
+    >
+
 
     <button
-        type="button"
-        class="admin-tab"
-        data-tab="profil"
+      type="button"
+      class="delete-button"
+      id="confirmDelete"
+      style="width:100%;margin-top:15px;"
     >
-        PROFIL
+      CONFIRMER LA SUPPRESSION
     </button>
 
-</nav>
 
+    <div
+      id="deleteMessage"
+      class="message"
+    ></div>
 
+  </div>
 
-<main class="admin-container">
+</div>
 
 
-<div id="message"></div>
+<footer>
+  © 2026 Avant-gardE — Souveraineté · Liberté · Justice · Patriote
+</footer>
 
-
-
-<!-- =========================================================
-     ONGLET RDV
-========================================================= -->
-
-<section id="tab-content-rdv">
-
-    <div class="page-title">
-
-        <h1>Nos rendez-vous</h1>
-
-        <p>
-            Gérez les rendez-vous affichés sur la page d'accueil.
-        </p>
-
-    </div>
-
-
-    <div class="admin-grid">
-
-
-        <!-- FORMULAIRE -->
-
-        <div class="panel">
-
-            <h2 id="form-title">
-                Ajouter un rendez-vous
-            </h2>
-
-            <form id="event-form">
-
-                <input type="hidden" id="event-id">
-
-
-                <label for="titre">
-                    TITRE
-                </label>
-
-                <input
-                    type="text"
-                    id="titre"
-                    placeholder="Ex : Rencontre à Ajaccio"
-                    required
-                >
-
-
-                <label for="texte">
-                    DESCRIPTION DÉTAILLÉE
-                </label>
-
-                <textarea
-                    id="texte"
-                    placeholder="Informations qui apparaîtront dans la fenêtre détaillée..."
-                ></textarea>
-
-
-                <div class="form-row">
-
-                    <div>
-
-                        <label for="date_evenement">
-                            DATE
-                        </label>
-
-                        <input
-                            type="date"
-                            id="date_evenement"
-                        >
-
-                    </div>
-
-
-                    <div>
-
-                        <label for="heure">
-                            HEURE
-                        </label>
-
-                        <input
-                            type="text"
-                            id="heure"
-                            placeholder="18h00"
-                        >
-
-                    </div>
-
-                </div>
-
-
-                <label for="lieu">
-                    LIEU
-                </label>
-
-                <input
-                    type="text"
-                    id="lieu"
-                    placeholder="Ajaccio"
-                >
-
-
-                <label for="lien">
-                    LIEN
-                </label>
-
-                <input
-                    type="url"
-                    id="lien"
-                    placeholder="https://..."
-                >
-
-
-                <label for="ordre">
-                    ORDRE D'AFFICHAGE
-                </label>
-
-                <input
-                    type="number"
-                    id="ordre"
-                    value="0"
-                >
-
-
-                <div class="checkbox-row">
-
-                    <input
-                        type="checkbox"
-                        id="actif"
-                        checked
-                    >
-
-                    <label for="actif">
-                        AFFICHER SUR LE SITE
-                    </label>
-
-                </div>
-
-
-                <div class="form-buttons">
-
-                    <button
-                        type="submit"
-                        class="save-btn"
-                    >
-                        ENREGISTRER
-                    </button>
-
-                    <button
-                        type="button"
-                        id="cancel-btn"
-                        class="cancel-btn hidden"
-                    >
-                        ANNULER
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-
-
-        <!-- LISTE -->
-
-        <div class="panel">
-
-            <h2>
-                Rendez-vous existants
-            </h2>
-
-            <div id="events-list" class="events-list">
-
-                <div class="empty">
-                    Chargement...
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-
-<!-- =========================================================
-     ONGLET PROFIL
-========================================================= -->
-
-<section id="tab-content-profil" class="hidden">
-
-    <div class="page-title">
-
-        <h1>Mon profil</h1>
-
-        <p>
-            Modifiez les informations associées à votre profil.
-        </p>
-
-    </div>
-
-
-    <div class="profile-grid">
-
-
-        <!-- APERCU -->
-
-        <div class="panel">
-
-            <h2>
-                Mon identité
-            </h2>
-
-            <div id="profile-preview">
-
-                <div class="profile-avatar-placeholder">
-                    A
-                </div>
-
-                <div class="profile-grade">
-                    CHARGEMENT...
-                </div>
-
-            </div>
-
-            <div class="profile-info">
-
-                <p>
-                    <strong>Adresse e-mail</strong><br>
-                    <span id="profile-email-preview">
-                        —
-                    </span>
-                </p>
-
-                <p>
-                    <strong>Grade</strong><br>
-                    <span id="profile-grade-preview">
-                        —
-                    </span>
-                </p>
-
-            </div>
-
-        </div>
-
-
-
-        <!-- FORMULAIRE PROFIL -->
-
-        <div class="panel">
-
-            <h2>
-                Modifier mon profil
-            </h2>
-
-            <form id="profile-form">
-
-
-                <label for="profile-nom">
-                    NOM
-                </label>
-
-                <input
-                    type="text"
-                    id="profile-nom"
-                    required
-                >
-
-
-                <label for="profile-email">
-                    ADRESSE E-MAIL
-                </label>
-
-                <input
-                    type="email"
-                    id="profile-email"
-                    disabled
-                >
-
-
-                <label for="profile-image">
-                    PHOTO / IMAGE
-                </label>
-
-                <input
-                    type="url"
-                    id="profile-image"
-                    placeholder="https://..."
-                >
-
-
-                <label for="profile-region">
-                    RÉGION
-                </label>
-
-                <input
-                    type="text"
-                    id="profile-region"
-                    placeholder="Ex : Corse"
-                >
-
-
-                <label for="profile-description">
-                    PRÉSENTATION
-                </label>
-
-                <textarea
-                    id="profile-description"
-                    placeholder="Présentez-vous..."
-                ></textarea>
-
-
-                <label>
-                    COMPÉTENCES
-                </label>
-
-                <div class="competences-box">
-
-
-                    <label class="competence-item">
-
-                        <input
-                            type="checkbox"
-                            value="Maîtrise de doctrine"
-                            class="competence-checkbox"
-                        >
-
-                        Maîtrise de doctrine
-
-                    </label>
-
-
-                    <label class="competence-item">
-
-                        <input
-                            type="checkbox"
-                            value="Tactique"
-                            class="competence-checkbox"
-                        >
-
-                        Tactique
-
-                    </label>
-
-
-                    <label class="competence-item">
-
-                        <input
-                            type="checkbox"
-                            value="Prestance"
-                            class="competence-checkbox"
-                        >
-
-                        Prestance
-
-                    </label>
-
-
-                    <label class="competence-item">
-
-                        <input
-                            type="checkbox"
-                            value="Analyses pragmatiques"
-                            class="competence-checkbox"
-                        >
-
-                        Analyses pragmatiques
-
-                    </label>
-
-
-                    <label class="competence-item">
-
-                        <input
-                            type="checkbox"
-                            value="Analyses populistes"
-                            class="competence-checkbox"
-                        >
-
-                        Analyses populistes
-
-                    </label>
-
-
-                    <label class="competence-item">
-
-                        <input
-                            type="checkbox"
-                            value="Administration"
-                            class="competence-checkbox"
-                        >
-
-                        Administration
-
-                    </label>
-
-
-                    <label class="competence-item">
-
-                        <input
-                            type="checkbox"
-                            value="Expertise et ingénierie juridique"
-                            class="competence-checkbox"
-                        >
-
-                        Expertise et ingénierie juridique
-
-                    </label>
-
-
-                    <label class="competence-item">
-
-                        <input
-                            type="checkbox"
-                            value="Expertise et ingénierie politique"
-                            class="competence-checkbox"
-                        >
-
-                        Expertise et ingénierie politique
-
-                    </label>
-
-
-                    <label class="competence-item">
-
-                        <input
-                            type="checkbox"
-                            value="Influenceurs / debunkers / créateurs de contenu"
-                            class="competence-checkbox"
-                        >
-
-                        Influenceurs / debunkers / créateurs de contenu
-
-                    </label>
-
-
-                    <label class="competence-item">
-
-                        <input
-                            type="checkbox"
-                            value="Bienfaiteurs"
-                            class="competence-checkbox"
-                        >
-
-                        Bienfaiteurs
-
-                    </label>
-
-
-                </div>
-
-
-                <button
-                    type="submit"
-                    class="save-btn"
-                    style="width:100%;"
-                >
-                    ENREGISTRER LE PROFIL
-                </button>
-
-            </form>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-</main>
-
-</section>
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
 
@@ -1184,16 +2394,25 @@ button {
 ========================================================= */
 
 const SUPABASE_URL =
-    "https://wlhtegrciehmtxqecopv.supabase.co";
+  "https://wlhtegrciehmtxqecopv.supabase.co";
 
 const SUPABASE_KEY =
-    "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
+  "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+let currentUser = null;
+
+let currentProfile = null;
 
 
 /* =========================================================
@@ -1201,58 +2420,257 @@ const supabaseClient =
 ========================================================= */
 
 const loginScreen =
-    document.getElementById("login-screen");
+  document.getElementById("loginScreen");
 
 const adminScreen =
-    document.getElementById("admin-screen");
+  document.getElementById("adminScreen");
 
 const loginForm =
-    document.getElementById("login-form");
+  document.getElementById("loginForm");
 
-const loginError =
-    document.getElementById("login-error");
+const loginButton =
+  document.getElementById("loginButton");
 
-const logoutBtn =
-    document.getElementById("logout-btn");
+const loginMessage =
+  document.getElementById("loginMessage");
 
-const eventForm =
-    document.getElementById("event-form");
+const profileForm =
+  document.getElementById("profileForm");
 
-const eventsList =
-    document.getElementById("events-list");
+const profileMessage =
+  document.getElementById("profileMessage");
 
-const message =
-    document.getElementById("message");
+const saveProfileButton =
+  document.getElementById("saveProfileButton");
 
-const cancelBtn =
-    document.getElementById("cancel-btn");
-
-const formTitle =
-    document.getElementById("form-title");
-
-
-let currentUser = null;
-let currentProfile = null;
+const deleteModal =
+  document.getElementById("deleteModal");
 
 
 /* =========================================================
-   MESSAGES
+   OUTILS
 ========================================================= */
 
-function showMessage(text, type = "success") {
+function afficherMessage(
+  element,
+  type,
+  texte
+){
 
-    message.innerHTML =
-        `<div class="message ${
-            type === "success"
-                ? "success"
-                : "message-error"
-        }">
-            ${escapeHtml(text)}
-        </div>`;
+  element.className =
+    "message " + type;
 
-    setTimeout(() => {
-        message.innerHTML = "";
-    }, 4000);
+  element.textContent =
+    texte;
+
+}
+
+
+function viderMessage(element){
+
+  element.className =
+    "message";
+
+  element.textContent =
+    "";
+
+}
+
+
+function normaliserCompetences(value){
+
+  if(Array.isArray(value)){
+    return value;
+  }
+
+  if(typeof value === "string"){
+
+    return value
+      .replace(/^\{|\}$/g,"")
+      .split(",")
+      .map(x =>
+        x.trim()
+         .replace(/^"|"$/g,"")
+      )
+      .filter(Boolean);
+
+  }
+
+  return [];
+
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+loginForm.addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+    viderMessage(loginMessage);
+
+    loginButton.disabled = true;
+
+    loginButton.textContent =
+      "CONNEXION…";
+
+
+    const email =
+      document
+        .getElementById("loginEmail")
+        .value
+        .trim()
+        .toLowerCase();
+
+
+    const password =
+      document
+        .getElementById("loginPassword")
+        .value;
+
+
+    const {
+      error
+    } =
+      await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+
+    if(error){
+
+      console.error(
+        "Erreur connexion :",
+        error
+      );
+
+      afficherMessage(
+        loginMessage,
+        "error",
+        "Adresse e-mail ou mot de passe incorrect."
+      );
+
+      loginButton.disabled = false;
+
+      loginButton.textContent =
+        "SE CONNECTER";
+
+      return;
+
+    }
+
+
+    await verifierUtilisateur();
+
+  }
+);
+
+
+/* =========================================================
+   VERIFICATION UTILISATEUR
+========================================================= */
+
+async function verifierUtilisateur(){
+
+  const {
+    data:{
+      user
+    }
+  } =
+    await supabaseClient.auth.getUser();
+
+
+  if(!user){
+
+    afficherConnexion();
+
+    return;
+
+  }
+
+
+  currentUser =
+    user;
+
+
+  const {
+    data:profile,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select(`
+        id,
+        nom,
+        grade,
+        email,
+        image_url,
+        description,
+        region,
+        competences,
+        anonyme
+      `)
+      .eq("id", user.id)
+      .single();
+
+
+  if(error || !profile){
+
+    console.error(
+      "Erreur chargement profil :",
+      error
+    );
+
+    await supabaseClient.auth.signOut();
+
+    afficherMessage(
+      loginMessage,
+      "error",
+      "Impossible de charger votre profil."
+    );
+
+    afficherConnexion();
+
+    return;
+
+  }
+
+
+  currentProfile =
+    profile;
+
+
+  afficherAdmin();
+
+
+  remplirProfil(
+    profile
+  );
+
+
+  if(profile.grade === "admin"){
+
+    document
+      .getElementById("rdvTabButton")
+      .style.display =
+        "block";
+
+    chargerRendezVous();
+
+  }else{
+
+    document
+      .getElementById("rdvTabButton")
+      .style.display =
+        "none";
+
+  }
+
 }
 
 
@@ -1260,173 +2678,280 @@ function showMessage(text, type = "success") {
    AFFICHAGE
 ========================================================= */
 
-function showLogin() {
+function afficherConnexion(){
 
-    loginScreen.classList.remove("hidden");
-    adminScreen.classList.add("hidden");
+  loginScreen.style.display =
+    "block";
+
+  adminScreen.style.display =
+    "none";
+
 }
 
 
-function showAdmin() {
+function afficherAdmin(){
 
-    loginScreen.classList.add("hidden");
-    adminScreen.classList.remove("hidden");
+  loginScreen.style.display =
+    "none";
+
+  adminScreen.style.display =
+    "block";
+
+
+  document
+    .getElementById("adminUser")
+    .innerHTML =
+      "Connecté en tant que <strong>" +
+      (currentProfile.nom || currentUser.email) +
+      "</strong>";
+
 }
 
 
 /* =========================================================
-   VERIFICATION UTILISATEUR
+   REMPLIR PROFIL
 ========================================================= */
 
-async function checkUser() {
+function remplirProfil(profile){
 
-    const {
-        data: { user }
-    } = await supabaseClient.auth.getUser();
+  document
+    .getElementById("profileNom")
+    .value =
+      profile.nom || "";
 
 
-    if (!user) {
+  document
+    .getElementById("profileEmail")
+    .value =
+      profile.email ||
+      currentUser.email ||
+      "";
 
-        showLogin();
 
-        return;
+  document
+    .getElementById("profileGrade")
+    .value =
+      profile.grade || "user";
+
+
+  document
+    .getElementById("profileRegion")
+    .value =
+      profile.region || "";
+
+
+  document
+    .getElementById("profileImage")
+    .value =
+      profile.image_url || "";
+
+
+  document
+    .getElementById("profileDescription")
+    .value =
+      profile.description || "";
+
+
+  if(profile.anonyme){
+
+    document
+      .getElementById("profileAnonyme")
+      .checked = true;
+
+  }else{
+
+    document
+      .getElementById("profileAffiche")
+      .checked = true;
+
+  }
+
+
+  const competences =
+    normaliserCompetences(
+      profile.competences
+    );
+
+
+  document
+    .querySelectorAll(
+      'input[name="competences"]'
+    )
+    .forEach(input => {
+
+      input.checked =
+        competences.includes(
+          input.value
+        );
+
+    });
+
+}
+
+
+/* =========================================================
+   SAUVEGARDE PROFIL
+========================================================= */
+
+profileForm.addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+    viderMessage(profileMessage);
+
+    saveProfileButton.disabled = true;
+
+    saveProfileButton.textContent =
+      "ENREGISTREMENT…";
+
+
+    const nom =
+      document
+        .getElementById("profileNom")
+        .value
+        .trim();
+
+
+    const region =
+      document
+        .getElementById("profileRegion")
+        .value;
+
+
+    const image_url =
+      document
+        .getElementById("profileImage")
+        .value
+        .trim();
+
+
+    const description =
+      document
+        .getElementById("profileDescription")
+        .value
+        .trim();
+
+
+    const anonyme =
+      document
+        .getElementById("profileAnonyme")
+        .checked;
+
+
+    const competences =
+      Array.from(
+        document.querySelectorAll(
+          'input[name="competences"]:checked'
+        )
+      )
+      .map(
+        input => input.value
+      );
+
+
+    if(!nom || !region){
+
+      afficherMessage(
+        profileMessage,
+        "error",
+        "Le nom et la région sont obligatoires."
+      );
+
+      saveProfileButton.disabled = false;
+
+      saveProfileButton.textContent =
+        "ENREGISTRER LES MODIFICATIONS";
+
+      return;
+
     }
 
 
-    currentUser = user;
-
-
     const {
-        data: profile,
-        error
-    } = await supabaseClient
+      data,
+      error
+    } =
+      await supabaseClient
         .from("profiles")
-        .select(`
-            id,
+        .update({
+
+          nom:
             nom,
-            grade,
-            email,
-            image_url,
-            description,
+
+          image_url:
+            image_url || null,
+
+          description:
+            description || null,
+
+          region:
             region,
-            competences
-        `)
-        .eq("id", user.id)
+
+          competences:
+            competences,
+
+          anonyme:
+            anonyme
+
+        })
+        .eq(
+          "id",
+          currentUser.id
+        )
+        .select()
         .single();
 
 
-    if (error || !profile) {
+    if(error){
 
-        await supabaseClient.auth.signOut();
+      console.error(
+        "Erreur sauvegarde profil :",
+        error
+      );
 
-        loginError.textContent =
-            "Impossible de récupérer votre profil.";
+      afficherMessage(
+        profileMessage,
+        "error",
+        "Impossible d'enregistrer les modifications. Vérifiez les droits de la table profiles dans Supabase."
+      );
 
-        showLogin();
+      saveProfileButton.disabled = false;
 
-        return;
+      saveProfileButton.textContent =
+        "ENREGISTRER LES MODIFICATIONS";
+
+      return;
+
     }
 
 
-    currentProfile = profile;
+    currentProfile =
+      data;
 
 
-    showAdmin();
+    afficherMessage(
+      profileMessage,
+      "success",
+      "Votre profil a bien été mis à jour."
+    );
 
 
-    /*
-       Le RDV est réservé aux administrateurs.
-       Le profil est disponible pour tous les utilisateurs.
-    */
-
-    if (profile.grade !== "admin") {
-
-        document.getElementById("tab-rdv")
-            .classList.add("hidden");
-
-        document.getElementById("tab-content-rdv")
-            .classList.add("hidden");
-
-        document.getElementById("tab-content-profil")
-            .classList.remove("hidden");
-
-        document.querySelectorAll(".admin-tab")
-            .forEach(tab => tab.classList.remove("active"));
-
-        document.querySelector(
-            '[data-tab="profil"]'
-        ).classList.add("active");
-
-    } else {
-
-        loadEvents();
-    }
+    document
+      .getElementById("adminUser")
+      .innerHTML =
+        "Connecté en tant que <strong>" +
+        (data.nom || currentUser.email) +
+        "</strong>";
 
 
-    loadProfile();
-}
+    saveProfileButton.disabled = false;
 
+    saveProfileButton.textContent =
+      "ENREGISTRER LES MODIFICATIONS";
 
-/* =========================================================
-   CONNEXION
-========================================================= */
-
-loginForm.addEventListener(
-    "submit",
-    async function(event) {
-
-        event.preventDefault();
-
-        loginError.textContent = "";
-
-
-        const email =
-            document.getElementById("email")
-                .value
-                .trim();
-
-
-        const password =
-            document.getElementById("password").value;
-
-
-        const {
-            error
-        } = await supabaseClient.auth.signInWithPassword({
-            email,
-            password
-        });
-
-
-        if (error) {
-
-            loginError.textContent =
-                "Adresse e-mail ou mot de passe incorrect.";
-
-            return;
-        }
-
-
-        checkUser();
-    }
-);
-
-
-/* =========================================================
-   DECONNEXION
-========================================================= */
-
-logoutBtn.addEventListener(
-    "click",
-    async function() {
-
-        await supabaseClient.auth.signOut();
-
-        currentUser = null;
-        currentProfile = null;
-
-        showLogin();
-    }
+  }
 );
 
 
@@ -1434,204 +2959,371 @@ logoutBtn.addEventListener(
    ONGLETS
 ========================================================= */
 
-document.querySelectorAll(".admin-tab")
-    .forEach(tab => {
+document
+  .querySelectorAll(".tab")
+  .forEach(tab => {
 
-        tab.addEventListener(
-            "click",
-            function() {
+    tab.addEventListener(
+      "click",
+      () => {
 
-                const target =
-                    this.dataset.tab;
+        if(
+          tab.id === "rdvTabButton" &&
+          currentProfile?.grade !== "admin"
+        ){
 
+          return;
 
-                document.querySelectorAll(".admin-tab")
-                    .forEach(t =>
-                        t.classList.remove("active")
-                    );
-
-
-                this.classList.add("active");
+        }
 
 
-                document.getElementById(
-                    "tab-content-rdv"
-                ).classList.toggle(
-                    "hidden",
-                    target !== "rdv"
-                );
+        document
+          .querySelectorAll(".tab")
+          .forEach(t =>
+            t.classList.remove("active")
+          );
 
 
-                document.getElementById(
-                    "tab-content-profil"
-                ).classList.toggle(
-                    "hidden",
-                    target !== "profil"
-                );
+        document
+          .querySelectorAll(".tab-content")
+          .forEach(content =>
+            content.classList.remove("active")
+          );
 
 
-                if (target === "profil") {
+        tab.classList.add("active");
 
-                    loadProfile();
 
-                }
+        document
+          .getElementById(
+            tab.dataset.tab
+          )
+          .classList.add("active");
 
-            }
-        );
+      }
+    );
 
-    });
+  });
 
 
 /* =========================================================
-   CHARGER LES RENDEZ-VOUS
+   RENDEZ-VOUS
 ========================================================= */
 
-async function loadEvents() {
+async function chargerRendezVous(){
 
-    eventsList.innerHTML =
-        `<div class="empty">
-            Chargement...
-        </div>`;
-
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-        .from("rendezvous")
-        .select("*")
-        .order("ordre", {
-            ascending: true
-        })
-        .order("date_evenement", {
-            ascending: true
-        });
+  if(currentProfile?.grade !== "admin"){
+    return;
+  }
 
 
-    if (error) {
-
-        eventsList.innerHTML =
-            `<div class="empty">
-                Impossible de charger les rendez-vous.
-            </div>`;
-
-        return;
-    }
+  const eventList =
+    document.getElementById("eventList");
 
 
-    if (!data || data.length === 0) {
-
-        eventsList.innerHTML =
-            `<div class="empty">
-                Aucun rendez-vous enregistré.
-            </div>`;
-
-        return;
-    }
+  eventList.innerHTML =
+    "Chargement…";
 
 
-    eventsList.innerHTML = "";
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("rendezvous")
+      .select("*")
+      .order("ordre",{
+        ascending:true
+      })
+      .order("date_evenement",{
+        ascending:true
+      });
 
 
-    data.forEach(event => {
+  if(error){
 
-        const item =
-            document.createElement("div");
+    console.error(
+      "Erreur RDV :",
+      error
+    );
 
-        item.className = "event-item";
+    eventList.innerHTML =
+      "<div class='message error' style='display:block'>Impossible de charger les rendez-vous.</div>";
+
+    return;
+
+  }
 
 
-        const date =
+  eventList.innerHTML = "";
+
+
+  if(!data || data.length === 0){
+
+    eventList.innerHTML =
+      "<div style='color:#8994a6;font-family:Arial,sans-serif;font-size:12px;'>Aucun rendez-vous.</div>";
+
+    return;
+
+  }
+
+
+  data.forEach(event => {
+
+    const card =
+      document.createElement("div");
+
+    card.className =
+      "event-card";
+
+
+    const date =
+      event.date_evenement
+        ? new Date(
             event.date_evenement
-                ? new Date(
-                    event.date_evenement +
-                    "T00:00:00"
-                  ).toLocaleDateString(
-                    "fr-FR",
-                    {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric"
-                    }
-                  )
-                : "";
+          ).toLocaleDateString(
+            "fr-FR",
+            {
+              day:"2-digit",
+              month:"2-digit",
+              year:"numeric"
+            }
+          )
+        : "";
 
 
-        item.innerHTML = `
+    card.innerHTML = `
 
-            <div class="event-top">
+      <div class="event-card-header">
 
-                <div>
+        <div>
 
-                    <div class="event-title">
-                        ${escapeHtml(
-                            event.titre ||
-                            "Sans titre"
-                        )}
-                    </div>
+          <h3>
+            ${escapeHtml(event.titre || "Rendez-vous")}
+          </h3>
 
-                    <div class="event-date">
-                        ${date}
-                        ${
-                            event.heure
-                            ? " — " +
-                              escapeHtml(event.heure)
-                            : ""
-                        }
-                        ${
-                            event.lieu
-                            ? " — " +
-                              escapeHtml(event.lieu)
-                            : ""
-                        }
-                    </div>
+          <div class="event-card-date">
+            ${escapeHtml(date)}
+            ${event.heure ? " · " + escapeHtml(event.heure) : ""}
+            ${event.lieu ? " · " + escapeHtml(event.lieu) : ""}
+          </div>
 
-                </div>
+        </div>
 
-                <div class="event-status ${
-                    event.actif
-                        ? "status-active"
-                        : "status-inactive"
-                }">
-                    ${
-                        event.actif
-                            ? "ACTIF"
-                            : "INACTIF"
-                    }
-                </div>
+        <div
+          style="
+            color:${event.actif ? '#b9e5c4' : '#ffb5ae'};
+            font-family:Arial,sans-serif;
+            font-size:9px;
+            font-weight:bold;
+          "
+        >
+          ${event.actif ? "ACTIF" : "INACTIF"}
+        </div>
 
-            </div>
+      </div>
 
-            <div class="event-description">
-                ${escapeHtml(
-                    event.texte ||
-                    "Aucune description"
-                )}
-            </div>
+      <div class="event-card-text">
+        ${escapeHtml(event.texte || event.description || "")}
+      </div>
 
-            <div class="event-actions">
+      <div class="event-actions">
 
-                <button
-                    class="edit-btn"
-                    onclick="editEvent('${event.id}')"
-                >
-                    MODIFIER
-                </button>
+        <button
+          class="edit-button"
+          data-id="${event.id}"
+        >
+          MODIFIER
+        </button>
 
-                <button
-                    class="delete-btn"
-                    onclick="deleteEvent('${event.id}')"
-                >
-                    SUPPRIMER
-                </button>
+        <button
+          class="delete-event-button"
+          data-id="${event.id}"
+        >
+          SUPPRIMER
+        </button>
 
-            </div>
-        `;
+      </div>
+
+    `;
 
 
-        eventsList.appendChild(item);
+    card
+      .querySelector(".edit-button")
+      .addEventListener(
+        "click",
+        () => modifierEvenement(event)
+      );
 
+
+    card
+      .querySelector(".delete-event-button")
+      .addEventListener(
+        "click",
+        () => supprimerEvenement(event.id)
+      );
+
+
+    eventList.appendChild(card);
+
+  });
+
+}
+
+
+/* =========================================================
+   ECHAPPEMENT HTML
+========================================================= */
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* =========================================================
+   MODIFIER RDV
+========================================================= */
+
+function modifierEvenement(event){
+
+  document
+    .getElementById("eventId")
+    .value =
+      event.id;
+
+
+  document
+    .getElementById("eventTitle")
+    .value =
+      event.titre || "";
+
+
+  document
+    .getElementById("eventDate")
+    .value =
+      event.date_evenement
+        ? String(
+            event.date_evenement
+          ).substring(0,10)
+        : "";
+
+
+  document
+    .getElementById("eventTime")
+    .value =
+      event.heure || "";
+
+
+  document
+    .getElementById("eventPlace")
+    .value =
+      event.lieu || "";
+
+
+  document
+    .getElementById("eventText")
+    .value =
+      event.texte ||
+      event.description ||
+      "";
+
+
+  document
+    .getElementById("eventLink")
+    .value =
+      event.lien || "";
+
+
+  document
+    .getElementById("eventOrder")
+    .value =
+      event.ordre ?? 0;
+
+
+  document
+    .getElementById("eventActive")
+    .checked =
+      event.actif !== false;
+
+
+  document
+    .getElementById("eventSubmitButton")
+    .textContent =
+      "ENREGISTRER LA MODIFICATION";
+
+
+  document
+    .getElementById("eventCancelButton")
+    .style.display =
+      "block";
+
+
+  document
+    .getElementById("rdvTab")
+    .scrollIntoView({
+      behavior:"smooth"
     });
+
+}
+
+
+/* =========================================================
+   ANNULER MODIFICATION
+========================================================= */
+
+document
+  .getElementById("eventCancelButton")
+  .addEventListener(
+    "click",
+    resetEventForm
+  );
+
+
+function resetEventForm(){
+
+  document
+    .getElementById("eventForm")
+    .reset();
+
+
+  document
+    .getElementById("eventId")
+    .value = "";
+
+
+  document
+    .getElementById("eventActive")
+    .checked = true;
+
+
+  document
+    .getElementById("eventOrder")
+    .value = "0";
+
+
+  document
+    .getElementById("eventSubmitButton")
+    .textContent =
+      "AJOUTER LE RENDEZ-VOUS";
+
+
+  document
+    .getElementById("eventCancelButton")
+    .style.display =
+      "none";
+
+
+  viderMessage(
+    document.getElementById("eventMessage")
+  );
+
 }
 
 
@@ -1639,618 +3331,380 @@ async function loadEvents() {
    AJOUT / MODIFICATION RDV
 ========================================================= */
 
-eventForm.addEventListener(
+document
+  .getElementById("eventForm")
+  .addEventListener(
     "submit",
-    async function(event) {
+    async event => {
 
-        event.preventDefault();
-
-
-        const id =
-            document.getElementById(
-                "event-id"
-            ).value;
+      event.preventDefault();
 
 
-        const eventData = {
-
-            titre:
-                document.getElementById(
-                    "titre"
-                ).value.trim(),
-
-            texte:
-                document.getElementById(
-                    "texte"
-                ).value.trim(),
-
-            date_evenement:
-                document.getElementById(
-                    "date_evenement"
-                ).value || null,
-
-            heure:
-                document.getElementById(
-                    "heure"
-                ).value.trim() || null,
-
-            lieu:
-                document.getElementById(
-                    "lieu"
-                ).value.trim() || null,
-
-            lien:
-                document.getElementById(
-                    "lien"
-                ).value.trim() || null,
-
-            actif:
-                document.getElementById(
-                    "actif"
-                ).checked,
-
-            ordre:
-                parseInt(
-                    document.getElementById(
-                        "ordre"
-                    ).value
-                ) || 0
-        };
+      if(currentProfile?.grade !== "admin"){
+        return;
+      }
 
 
-        let result;
-
-
-        if (id) {
-
-            result =
-                await supabaseClient
-                    .from("rendezvous")
-                    .update(eventData)
-                    .eq("id", id);
-
-        } else {
-
-            result =
-                await supabaseClient
-                    .from("rendezvous")
-                    .insert(eventData);
-        }
-
-
-        if (result.error) {
-
-            showMessage(
-                "Erreur : " +
-                result.error.message,
-                "error"
-            );
-
-            return;
-        }
-
-
-        showMessage(
-            id
-                ? "Rendez-vous modifié."
-                : "Rendez-vous ajouté."
+      const message =
+        document.getElementById(
+          "eventMessage"
         );
 
 
-        resetForm();
-
-        loadEvents();
-
-    }
-);
+      viderMessage(message);
 
 
-/* =========================================================
-   MODIFIER RDV
-========================================================= */
-
-async function editEvent(id) {
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-        .from("rendezvous")
-        .select("*")
-        .eq("id", id)
-        .single();
+      const id =
+        document
+          .getElementById("eventId")
+          .value;
 
 
-    if (error || !data) {
+      const payload = {
 
-        showMessage(
-            "Impossible de récupérer ce rendez-vous.",
-            "error"
+        titre:
+          document
+            .getElementById("eventTitle")
+            .value
+            .trim(),
+
+        texte:
+          document
+            .getElementById("eventText")
+            .value
+            .trim(),
+
+        date_evenement:
+          document
+            .getElementById("eventDate")
+            .value,
+
+        heure:
+          document
+            .getElementById("eventTime")
+            .value
+            .trim(),
+
+        lieu:
+          document
+            .getElementById("eventPlace")
+            .value
+            .trim(),
+
+        lien:
+          document
+            .getElementById("eventLink")
+            .value
+            .trim(),
+
+        actif:
+          document
+            .getElementById("eventActive")
+            .checked,
+
+        ordre:
+          Number(
+            document
+              .getElementById("eventOrder")
+              .value
+          ) || 0
+
+      };
+
+
+      let result;
+
+
+      if(id){
+
+        result =
+          await supabaseClient
+            .from("rendezvous")
+            .update(payload)
+            .eq("id",id);
+
+      }else{
+
+        result =
+          await supabaseClient
+            .from("rendezvous")
+            .insert(payload);
+
+      }
+
+
+      if(result.error){
+
+        console.error(
+          "Erreur RDV :",
+          result.error
+        );
+
+        afficherMessage(
+          message,
+          "error",
+          "Impossible d'enregistrer le rendez-vous."
         );
 
         return;
+
+      }
+
+
+      afficherMessage(
+        message,
+        "success",
+        id
+          ? "Le rendez-vous a été modifié."
+          : "Le rendez-vous a été ajouté."
+      );
+
+
+      resetEventForm();
+
+      chargerRendezVous();
+
     }
-
-
-    document.getElementById(
-        "event-id"
-    ).value = data.id;
-
-
-    document.getElementById(
-        "titre"
-    ).value = data.titre || "";
-
-
-    document.getElementById(
-        "texte"
-    ).value = data.texte || "";
-
-
-    document.getElementById(
-        "date_evenement"
-    ).value =
-        data.date_evenement || "";
-
-
-    document.getElementById(
-        "heure"
-    ).value =
-        data.heure || "";
-
-
-    document.getElementById(
-        "lieu"
-    ).value =
-        data.lieu || "";
-
-
-    document.getElementById(
-        "lien"
-    ).value =
-        data.lien || "";
-
-
-    document.getElementById(
-        "actif"
-    ).checked =
-        data.actif !== false;
-
-
-    document.getElementById(
-        "ordre"
-    ).value =
-        data.ordre || 0;
-
-
-    formTitle.textContent =
-        "Modifier le rendez-vous";
-
-
-    cancelBtn.classList.remove("hidden");
-
-
-    document.querySelector(
-        '[data-tab="rdv"]'
-    ).click();
-
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
+  );
 
 
 /* =========================================================
    SUPPRIMER RDV
 ========================================================= */
 
-async function deleteEvent(id) {
+async function supprimerEvenement(id){
 
-    const confirmation =
-        confirm(
-            "Voulez-vous vraiment supprimer ce rendez-vous ?"
-        );
+  if(
+    !confirm(
+      "Supprimer définitivement ce rendez-vous ?"
+    )
+  ){
 
+    return;
 
-    if (!confirmation) {
-        return;
-    }
-
-
-    const {
-        error
-    } = await supabaseClient
-        .from("rendezvous")
-        .delete()
-        .eq("id", id);
+  }
 
 
-    if (error) {
-
-        showMessage(
-            "Impossible de supprimer le rendez-vous.",
-            "error"
-        );
-
-        return;
-    }
+  const {
+    error
+  } =
+    await supabaseClient
+      .from("rendezvous")
+      .delete()
+      .eq("id",id);
 
 
-    showMessage(
-        "Rendez-vous supprimé."
+  if(error){
+
+    console.error(
+      "Erreur suppression RDV :",
+      error
     );
 
+    alert(
+      "Impossible de supprimer le rendez-vous."
+    );
 
-    loadEvents();
+    return;
+
+  }
+
+
+  chargerRendezVous();
+
 }
 
 
 /* =========================================================
-   ANNULER RDV
+   SUPPRESSION PROFIL
 ========================================================= */
 
-cancelBtn.addEventListener(
+document
+  .getElementById("openDeleteModal")
+  .addEventListener(
     "click",
-    resetForm
-);
+    () => {
 
+      document
+        .getElementById("deleteConfirmation")
+        .value = "";
 
-function resetForm() {
-
-    eventForm.reset();
-
-
-    document.getElementById(
-        "event-id"
-    ).value = "";
-
-
-    document.getElementById(
-        "actif"
-    ).checked = true;
-
-
-    document.getElementById(
-        "ordre"
-    ).value = 0;
-
-
-    formTitle.textContent =
-        "Ajouter un rendez-vous";
-
-
-    cancelBtn.classList.add("hidden");
-}
-
-
-/* =========================================================
-   CHARGER PROFIL
-========================================================= */
-
-async function loadProfile() {
-
-    if (!currentUser) {
-        return;
-    }
-
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-        .from("profiles")
-        .select(`
-            id,
-            nom,
-            grade,
-            email,
-            image_url,
-            description,
-            region,
-            competences
-        `)
-        .eq("id", currentUser.id)
-        .single();
-
-
-    if (error || !data) {
-
-        showMessage(
-            "Impossible de charger votre profil.",
-            "error"
-        );
-
-        return;
-    }
-
-
-    currentProfile = data;
-
-
-    document.getElementById(
-        "profile-nom"
-    ).value =
-        data.nom || "";
-
-
-    document.getElementById(
-        "profile-email"
-    ).value =
-        data.email ||
-        currentUser.email ||
-        "";
-
-
-    document.getElementById(
-        "profile-image"
-    ).value =
-        data.image_url || "";
-
-
-    document.getElementById(
-        "profile-region"
-    ).value =
-        data.region || "";
-
-
-    document.getElementById(
-        "profile-description"
-    ).value =
-        data.description || "";
-
-
-    document.getElementById(
-        "profile-email-preview"
-    ).textContent =
-        data.email ||
-        currentUser.email ||
-        "—";
-
-
-    document.getElementById(
-        "profile-grade-preview"
-    ).textContent =
-        data.grade ||
-        "user";
-
-
-    document.querySelector(
-        ".profile-grade"
-    ).textContent =
-        String(data.grade || "USER")
-            .toUpperCase();
-
-
-    /*
-       Gestion des compétences.
-       La base peut contenir plusieurs valeurs.
-    */
-
-    const competences =
-        Array.isArray(data.competences)
-            ? data.competences
-            : [];
-
-
-    document.querySelectorAll(
-        ".competence-checkbox"
-    ).forEach(checkbox => {
-
-        checkbox.checked =
-            competences.includes(
-                checkbox.value
-            );
-
-    });
-
-
-    updateProfilePreview(data);
-}
-
-
-/* =========================================================
-   APERCU PHOTO
-========================================================= */
-
-function updateProfilePreview(profile) {
-
-    const preview =
+      viderMessage(
         document.getElementById(
-            "profile-preview"
-        );
+          "deleteMessage"
+        )
+      );
 
+      deleteModal.classList.add(
+        "active"
+      );
 
-    if (profile.image_url) {
+      document.body.style.overflow =
+        "hidden";
 
-        preview.innerHTML = `
-
-            <img
-                src="${escapeHtml(profile.image_url)}"
-                class="profile-avatar"
-                alt="Photo de profil"
-                onerror="this.outerHTML='<div class=&quot;profile-avatar-placeholder&quot;>A</div>'"
-            >
-
-            <div class="profile-grade">
-                ${escapeHtml(
-                    String(
-                        profile.grade ||
-                        "user"
-                    ).toUpperCase()
-                )}
-            </div>
-
-        `;
-
-    } else {
-
-        const initial =
-            profile.nom
-                ? profile.nom
-                    .charAt(0)
-                    .toUpperCase()
-                : "A";
-
-
-        preview.innerHTML = `
-
-            <div class="profile-avatar-placeholder">
-                ${escapeHtml(initial)}
-            </div>
-
-            <div class="profile-grade">
-                ${escapeHtml(
-                    String(
-                        profile.grade ||
-                        "user"
-                    ).toUpperCase()
-                )}
-            </div>
-
-        `;
     }
+  );
+
+
+document
+  .getElementById("closeDeleteModal")
+  .addEventListener(
+    "click",
+    fermerDeleteModal
+  );
+
+
+function fermerDeleteModal(){
+
+  deleteModal.classList.remove(
+    "active"
+  );
+
+  document.body.style.overflow =
+    "";
+
 }
 
 
 /* =========================================================
-   ENREGISTRER PROFIL
+   CONFIRMATION SUPPRESSION
 ========================================================= */
 
-document.getElementById(
-    "profile-form"
-).addEventListener(
-    "submit",
-    async function(event) {
+document
+  .getElementById("confirmDelete")
+  .addEventListener(
+    "click",
+    async () => {
 
-        event.preventDefault();
-
-
-        if (!currentUser) {
-
-            showMessage(
-                "Vous devez être connecté.",
-                "error"
-            );
-
-            return;
-        }
+      const confirmation =
+        document
+          .getElementById(
+            "deleteConfirmation"
+          )
+          .value
+          .trim();
 
 
-        const competences = [];
-
-
-        document.querySelectorAll(
-            ".competence-checkbox:checked"
-        ).forEach(checkbox => {
-
-            competences.push(
-                checkbox.value
-            );
-
-        });
-
-
-        const profileData = {
-
-            nom:
-                document.getElementById(
-                    "profile-nom"
-                ).value.trim(),
-
-            image_url:
-                document.getElementById(
-                    "profile-image"
-                ).value.trim() || null,
-
-            region:
-                document.getElementById(
-                    "profile-region"
-                ).value.trim() || null,
-
-            description:
-                document.getElementById(
-                    "profile-description"
-                ).value.trim() || null,
-
-            competences:
-                competences
-        };
-
-
-        const {
-            data,
-            error
-        } = await supabaseClient
-            .from("profiles")
-            .update(profileData)
-            .eq("id", currentUser.id)
-            .select()
-            .single();
-
-
-        if (error) {
-
-            showMessage(
-                "Erreur : " +
-                error.message,
-                "error"
-            );
-
-            return;
-        }
-
-
-        currentProfile = data;
-
-
-        updateProfilePreview(data);
-
-
-        showMessage(
-            "Profil enregistré."
+      const message =
+        document.getElementById(
+          "deleteMessage"
         );
 
+
+      if(confirmation !== "SUPPRIMER"){
+
+        afficherMessage(
+          message,
+          "error",
+          "La confirmation est incorrecte."
+        );
+
+        return;
+
+      }
+
+
+      const button =
+        document.getElementById(
+          "confirmDelete"
+        );
+
+
+      button.disabled = true;
+
+      button.textContent =
+        "SUPPRESSION…";
+
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("profiles")
+          .delete()
+          .eq(
+            "id",
+            currentUser.id
+          );
+
+
+      if(error){
+
+        console.error(
+          "Erreur suppression profil :",
+          error
+        );
+
+        afficherMessage(
+          message,
+          "error",
+          "Impossible de supprimer votre page. Vérifiez les politiques RLS de Supabase."
+        );
+
+        button.disabled = false;
+
+        button.textContent =
+          "CONFIRMER LA SUPPRESSION";
+
+        return;
+
+      }
+
+
+      /*
+        Le profil public est maintenant supprimé.
+        On déconnecte également la session.
+      */
+
+      await supabaseClient.auth.signOut();
+
+
+      fermerDeleteModal();
+
+
+      adminScreen.style.display =
+        "none";
+
+
+      loginScreen.style.display =
+        "block";
+
+
+      afficherMessage(
+        loginMessage,
+        "success",
+        "Votre page a été supprimée."
+      );
+
     }
+  );
+
+
+/* =========================================================
+   FERMETURE MODAL
+========================================================= */
+
+deleteModal.addEventListener(
+  "click",
+  event => {
+
+    if(
+      event.target === deleteModal
+    ){
+
+      fermerDeleteModal();
+
+    }
+
+  }
 );
 
 
 /* =========================================================
-   PROTECTION HTML
+   INITIALISATION
 ========================================================= */
 
-function escapeHtml(value) {
-
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-}
-
-
-/* =========================================================
-   DEMARRAGE
-========================================================= */
-
-checkUser();
+verifierUtilisateur();
 
 </script>
 
