@@ -39,7 +39,7 @@ body {
 
 
 /* =====================================================
-   -VOUS
+   ÉVÉNEMENTS
 ===================================================== */
 
 .events-bar {
@@ -172,7 +172,7 @@ header {
 
 
 /* =====================================================
-   LOGO — NOUVEAU LETTRAGE
+   LOGO
 ===================================================== */
 
 .logo {
@@ -200,13 +200,6 @@ header {
     white-space: nowrap;
 }
 
-
-/*
-   Le A et le E deviennent des lettres
-   intégrées naturellement au mot,
-   sans pastilles.
-*/
-
 .logo-a,
 .logo-e {
     display: inline;
@@ -227,15 +220,9 @@ header {
     line-height: inherit;
 }
 
-
-/* A bleu français */
-
 .logo-a {
     color: var(--blue-france);
 }
-
-
-/* E rouge */
 
 .logo-e {
     color: var(--red);
@@ -457,6 +444,273 @@ nav a:hover {
     line-height: 1.7;
 
     font-size: 15px;
+}
+
+
+/* =====================================================
+   IA D'AVANT-GARDE
+===================================================== */
+
+.ai-section {
+
+    position: relative;
+
+    background:
+        linear-gradient(
+            rgba(13,35,68,.92),
+            rgba(7,21,45,.98)
+        );
+
+    border-top: 1px solid rgba(214,173,85,.35);
+
+    border-bottom: 1px solid rgba(214,173,85,.25);
+
+    padding: 58px 25px 62px;
+
+    text-align: center;
+
+    overflow: hidden;
+}
+
+.ai-section::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 500px;
+    height: 500px;
+
+    border: 1px solid rgba(214,173,85,.08);
+
+    transform: rotate(45deg);
+
+    left: -300px;
+    top: -220px;
+
+    pointer-events: none;
+}
+
+.ai-section::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 380px;
+    height: 380px;
+
+    border: 1px solid rgba(214,173,85,.06);
+
+    transform: rotate(45deg);
+
+    right: -240px;
+    bottom: -220px;
+
+    pointer-events: none;
+}
+
+.ai-content {
+
+    position: relative;
+
+    z-index: 2;
+
+    max-width: 850px;
+
+    margin: auto;
+}
+
+.ai-kicker {
+
+    color: var(--gold);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 12px;
+}
+
+.ai-section h2 {
+
+    margin: 0 0 12px;
+
+    font-size: clamp(28px, 4vw, 40px);
+
+    font-weight: normal;
+
+    letter-spacing: .5px;
+}
+
+.ai-intro {
+
+    max-width: 680px;
+
+    margin: 0 auto 27px;
+
+    color: var(--muted);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    line-height: 1.65;
+}
+
+.ai-box {
+
+    max-width: 760px;
+
+    margin: auto;
+
+    padding: 5px;
+
+    background: rgba(0,0,0,.18);
+
+    border: 1px solid rgba(214,173,85,.35);
+
+    box-shadow: 0 15px 45px rgba(0,0,0,.2);
+}
+
+.ai-question {
+
+    display: block;
+
+    width: 100%;
+
+    min-height: 105px;
+
+    resize: vertical;
+
+    padding: 17px 18px;
+
+    border: 0;
+
+    outline: none;
+
+    background: #050f20;
+
+    color: var(--white);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+.ai-question::placeholder {
+    color: #7e8999;
+}
+
+.ai-question:focus {
+    box-shadow: inset 0 0 0 1px rgba(214,173,85,.35);
+}
+
+.ai-actions {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    padding: 14px 8px 9px;
+}
+
+.ai-button {
+
+    padding: 11px 17px;
+
+    border: 1px solid rgba(214,173,85,.55);
+
+    background: transparent;
+
+    color: var(--gold-light);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: 1.3px;
+
+    cursor: pointer;
+
+    transition:
+        background .2s,
+        color .2s,
+        border-color .2s,
+        transform .2s;
+}
+
+.ai-button:hover {
+
+    background: var(--gold);
+
+    color: var(--navy);
+
+    border-color: var(--gold);
+
+    transform: translateY(-1px);
+}
+
+.ai-button.copy {
+
+    border-color: rgba(255,255,255,.2);
+
+    color: #cbd1da;
+}
+
+.ai-button.copy:hover {
+
+    background: rgba(255,255,255,.1);
+
+    color: white;
+
+    border-color: rgba(255,255,255,.35);
+}
+
+.ai-help {
+
+    margin: 13px 5px 2px;
+
+    color: #7f8a9b;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+.ai-status {
+
+    min-height: 17px;
+
+    margin-top: 9px;
+
+    color: var(--gold-light);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 10px;
+
+    opacity: 0;
+
+    transition: opacity .2s;
+}
+
+.ai-status.visible {
+    opacity: 1;
 }
 
 
@@ -806,7 +1060,7 @@ footer {
 
 
 /* =====================================================
-   MODALE -VOUS
+   MODALE RENDEZ-VOUS
 ===================================================== */
 
 .rdv-modal {
@@ -1038,18 +1292,30 @@ footer {
         padding: 28px 22px;
     }
 
+    .ai-section {
+        padding: 48px 18px 52px;
+    }
+
+    .ai-actions {
+        gap: 7px;
+    }
+
+    .ai-button {
+        flex: 1 1 calc(50% - 7px);
+    }
+
 }
 
-
-/* =====================================================
-   PETIT ÉCRAN
-===================================================== */
 
 @media (max-width: 420px) {
 
     .logo {
         font-size: 24px;
         letter-spacing: -1px;
+    }
+
+    .ai-button {
+        flex: 1 1 100%;
     }
 
 }
@@ -1067,7 +1333,7 @@ footer {
 
 
 <!-- =====================================================
-     -VOUS
+     ÉVÉNEMENTS
 ===================================================== -->
 
 <div class="events-bar">
@@ -1107,16 +1373,12 @@ footer {
     </a>
 
 
-    <!-- LOGO -->
-
     <a href="index.html" class="logo">
 
         <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
 
     </a>
 
-
-    <!-- MENU -->
 
     <nav>
 
@@ -1174,6 +1436,100 @@ footer {
             un État recentré sur l'essentiel et des citoyens libres
             et responsables.
         </p>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     IA D'AVANT-GARDE
+===================================================== -->
+
+<section class="ai-section">
+
+    <div class="ai-content">
+
+        <div class="ai-kicker">
+            L'IA D'AVANT-GARDE
+        </div>
+
+        <h2>
+            Une question sur Avant-gardE ?
+        </h2>
+
+        <p class="ai-intro">
+            Posez votre question. Nous préparons automatiquement une
+            requête destinée aux principales IA afin qu'elles recherchent
+            prioritairement les informations et positions publiées par
+            Avant-gardE.
+        </p>
+
+        <div class="ai-box">
+
+            <textarea
+                id="aiQuestion"
+                class="ai-question"
+                placeholder="Exemple : Quelle est la position d'Avant-gardE sur l'Union européenne ?"
+                aria-label="Votre question sur Avant-gardE"
+            ></textarea>
+
+            <div class="ai-actions">
+
+                <button
+                    type="button"
+                    class="ai-button"
+                    onclick="envoyerVersIA('chatgpt')"
+                >
+                    CHATGPT
+                </button>
+
+                <button
+                    type="button"
+                    class="ai-button"
+                    onclick="envoyerVersIA('gemini')"
+                >
+                    GEMINI
+                </button>
+
+                <button
+                    type="button"
+                    class="ai-button"
+                    onclick="envoyerVersIA('claude')"
+                >
+                    CLAUDE
+                </button>
+
+                <button
+                    type="button"
+                    class="ai-button"
+                    onclick="envoyerVersIA('perplexity')"
+                >
+                    PERPLEXITY
+                </button>
+
+                <button
+                    type="button"
+                    class="ai-button copy"
+                    onclick="copierPromptIA()"
+                >
+                    COPIER LE PROMPT
+                </button>
+
+            </div>
+
+        </div>
+
+        <div
+            id="aiStatus"
+            class="ai-status"
+            aria-live="polite"
+        ></div>
+
+        <div class="ai-help">
+            Les réponses sont produites par le service d'IA choisi.
+            Avant-gardE ne contrôle ni leur formulation ni leur interprétation.
+        </div>
 
     </div>
 
@@ -1408,7 +1764,7 @@ footer {
 <footer>
 
     © 2026 Avant-gardE
-    — Liberté · Souveraineté · Patrie · Justice 
+    — Liberté · Souveraineté · Patrie · Justice
 
 </footer>
 
@@ -2088,6 +2444,257 @@ function escapeHtml(
         );
 
 }
+
+
+/* =====================================================
+   IA D'AVANT-GARDE
+===================================================== */
+
+function construirePromptIA() {
+
+    const question =
+        document
+            .getElementById("aiQuestion")
+            .value
+            .trim();
+
+
+    if (!question) {
+
+        afficherStatutIA(
+            "Écrivez d'abord votre question."
+        );
+
+        return null;
+
+    }
+
+
+    return `Tu es interrogé au sujet d’Avant-gardE — La France libre.
+
+Je souhaite que tu répondes à la question ci-dessous en tenant compte au plus proche des positions d’Avant-gardE.
+
+Pour cela, recherche prioritairement les informations publiées sur le site officiel d’Avant-gardE :
+
+https://avantgarde-france.github.io/
+
+Lorsque plusieurs pages du site sont pertinentes, consulte-les avant de répondre.
+
+Pour toute question concernant Avant-gardE, distingue clairement :
+
+- les positions officiellement exprimées par le mouvement ;
+- les informations extérieures au mouvement ;
+- les déductions que tu peux faire à partir des principes et positions publiés.
+
+Ne présente jamais une déduction comme une position officielle.
+
+Si le site ne permet pas de déterminer précisément la position d’Avant-gardE sur un sujet, indique-le clairement au lieu d’inventer une position.
+
+Tu peux expliquer les positions d’Avant-gardE, les mettre en perspective, présenter les objections qui pourraient leur être faites et y répondre au plus proche de la logique et des principes du mouvement.
+
+Lorsque la question porte sur une actualité, une loi, des statistiques, une personnalité ou un événement récent, utilise également les informations disponibles sur Internet afin de fournir une réponse à jour, tout en distinguant ces informations des positions officielles d’Avant-gardE.
+
+Question de l’utilisateur :
+
+${question}`;
+
+
+}
+
+
+/* =====================================================
+   OUVERTURE DES IA
+===================================================== */
+
+function envoyerVersIA(
+    service
+) {
+
+    const prompt =
+        construirePromptIA();
+
+
+    if (!prompt) {
+        return;
+    }
+
+
+    const encodedPrompt =
+        encodeURIComponent(
+            prompt
+        );
+
+
+    let url = "";
+
+
+    switch (service) {
+
+        case "chatgpt":
+
+            url =
+                "https://chatgpt.com/?q=" +
+                encodedPrompt;
+
+            break;
+
+
+        case "gemini":
+
+            url =
+                "https://gemini.google.com/app?prompt=" +
+                encodedPrompt;
+
+            break;
+
+
+        case "claude":
+
+            url =
+                "https://claude.ai/new?q=" +
+                encodedPrompt;
+
+            break;
+
+
+        case "perplexity":
+
+            url =
+                "https://www.perplexity.ai/search/new?q=" +
+                encodedPrompt;
+
+            break;
+
+    }
+
+
+    if (!url) {
+        return;
+    }
+
+
+    window.open(
+        url,
+        "_blank",
+        "noopener,noreferrer"
+    );
+
+}
+
+
+/* =====================================================
+   COPIER LE PROMPT
+===================================================== */
+
+async function copierPromptIA() {
+
+    const prompt =
+        construirePromptIA();
+
+
+    if (!prompt) {
+        return;
+    }
+
+
+    try {
+
+        await navigator.clipboard.writeText(
+            prompt
+        );
+
+
+        afficherStatutIA(
+            "Prompt copié. Vous pouvez maintenant le coller dans l’IA de votre choix."
+        );
+
+
+    } catch (error) {
+
+        const zone =
+            document.getElementById(
+                "aiQuestion"
+            );
+
+
+        zone.focus();
+
+        afficherStatutIA(
+            "La copie automatique n'a pas fonctionné. Utilisez le bouton Copier de votre navigateur."
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   MESSAGE IA
+===================================================== */
+
+function afficherStatutIA(
+    message
+) {
+
+    const status =
+        document.getElementById(
+            "aiStatus"
+        );
+
+
+    status.textContent =
+        message;
+
+    status.classList.add(
+        "visible"
+    );
+
+
+    clearTimeout(
+        afficherStatutIA.timer
+    );
+
+
+    afficherStatutIA.timer =
+        setTimeout(
+            function() {
+
+                status.classList.remove(
+                    "visible"
+                );
+
+            },
+            5000
+        );
+
+}
+
+
+/* =====================================================
+   ENTRÉE CLAVIER IA
+===================================================== */
+
+document
+    .getElementById("aiQuestion")
+    .addEventListener(
+        "keydown",
+        function(event) {
+
+            if (
+                event.key === "Enter" &&
+                event.ctrlKey
+            ) {
+
+                event.preventDefault();
+
+                envoyerVersIA(
+                    "chatgpt"
+                );
+
+            }
+
+        }
+    );
 
 
 /* =====================================================
