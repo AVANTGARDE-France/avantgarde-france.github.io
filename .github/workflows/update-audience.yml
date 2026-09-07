@@ -1,12 +1,12 @@
 name: Mise à jour audiences réseaux
 
 on:
-  # Toutes les heures de 01h00 à 06h00, heure de Paris
   schedule:
-    - cron: "0 1-6 * * *"
+    # 10 lancements entre 01h07 et 05h37
+    # On évite pile le début de l'heure pour limiter les retards GitHub
+    - cron: "7,37 1-5 * * *"
       timezone: "Europe/Paris"
 
-  # Permet de lancer manuellement depuis GitHub
   workflow_dispatch:
 
 concurrency:
@@ -16,8 +16,7 @@ concurrency:
 jobs:
   update-audience:
     runs-on: ubuntu-latest
-
-    timeout-minutes: 60
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -32,6 +31,7 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
         run: |
           node <<'EOF'
 
@@ -47,46 +47,57 @@ jobs:
             throw new Error("SUPABASE_SERVICE_ROLE_KEY manquant");
           }
 
-          const PULSE_URL = "https://pulse.walls.sh/profile/batch";
+          // ============================================================
+          // CONFIGURATION
+          // ============================================================
 
-          /*
-           * Pulse autorise actuellement jusqu'à 120 appels/minute.
-           *
-           * On ne colle volontairement pas à 120.
-           * 100 appels/minute laisse une marge de sécurité.
-           */
+          const PULSE_URL =
+            "https://pulse.walls.sh/profile/batch";
+
+          // Pulse : on reste volontairement sous la limite supposée
           const MAX_CALLS_PER_MINUTE = 100;
 
-          /*
-           * Pulse accepte jusqu'à 50 profils dans /profile/batch.
-           */
+          // 50 URLs maximum par appel Pulse
           const PULSE_BATCH_SIZE = 50;
 
-          /*
-           * Petit délai entre les appels.
-           * 600 ms ≈ 100 appels/minute.
-           */
+          // 400 appels maximum par lancement
+          //
+          // 400 x 50 = 20 000 URLs maximum
+          //
+          // Avec 5 réseaux par profil :
+          // 20 000 / 5 = 4 000 profils par lancement
+          //
+          // 10 lancements = jusqu'à ~40 000 profils/nuit
+          const MAX_PULSE_CALLS_PER_RUN = 400;
+
+          // 100 appels/minute => 600 ms
           const BASE_DELAY_MS = 600;
 
-          /*
-           * Pause utilitaire
-           */
+          // Taille de la sélection Supabase
+          //
+          // On récupère davantage de profils que nécessaire pour
+          // pouvoir filtrer ceux qui possèdent réellement un réseau.
+          const CANDIDATE_LIMIT = 1000;
+
+          // ============================================================
+          // OUTILS
+          // ============================================================
+
           function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
           }
 
-          /*
-           * Headers Supabase
-           */
           const supabaseHeaders = {
             "apikey": SUPABASE_SERVICE_ROLE_KEY,
-            "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+            "Authorization":
+              `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
             "Content-Type": "application/json"
           };
 
-          /*
-           * GET Supabase
-           */
+          // ============================================================
+          // SUPABASE GET
+          // ============================================================
+
           async function supabaseGet(path) {
 
             const response = await fetch(
@@ -112,19 +123,22 @@ jobs:
             return response.json();
           }
 
-          /*
-           * PATCH Supabase
-           */
+          // ============================================================
+          // SUPABASE PATCH
+          // ============================================================
+
           async function supabasePatch(id, values) {
 
             const response = await fetch(
               `${SUPABASE_URL}/rest/v1/profiles?id=eq.${encodeURIComponent(id)}`,
               {
                 method: "PATCH",
+
                 headers: {
                   ...supabaseHeaders,
                   "Prefer": "return=minimal"
                 },
+
                 body: JSON.stringify(values)
               }
             );
@@ -139,71 +153,87 @@ jobs:
             }
           }
 
-          /*
-           * Récupération de TOUS les profils.
-           *
-           * Supabase/PostgREST limite généralement les réponses.
-           * On utilise donc une pagination de 1000.
-           */
-          async function getAllProfiles() {
+          // ============================================================
+          // RÉCUPÉRATION DES PROFILS À TRAITER
+          // ============================================================
+          //
+          // PRIORITÉ :
+          //
+          // 1. audience_updated_at NULL
+          //    => nouveaux profils jamais traités
+          //
+          // 2. profils les plus anciens
+          //
+          // Ainsi, les profils tournent automatiquement.
+          //
+          // ============================================================
 
-            const profiles = [];
+          async function getProfilesToProcess() {
 
-            const PAGE_SIZE = 1000;
+            const fields = [
+              "id",
+              "nom",
 
-            let offset = 0;
+              "facebook_url",
+              "instagram_url",
+              "x_url",
+              "youtube_url",
+              "tiktok_url",
 
-            while (true) {
+              "facebook_audience",
+              "instagram_audience",
+              "x_audience",
+              "youtube_audience",
+              "tiktok_audience",
 
-              const fields = [
-                "id",
-                "nom",
+              "audience_max",
+              "audience_reseau",
+              "audience_updated_at"
+            ].join(",");
 
-                "facebook_url",
-                "instagram_url",
-                "x_url",
-                "youtube_url",
-                "tiktok_url",
+            const path =
+              `profiles?select=${fields}` +
+              `&order=audience_updated_at.asc.nullsfirst,id.asc` +
+              `&limit=${CANDIDATE_LIMIT}`;
 
-                "facebook_audience",
-                "instagram_audience",
-                "x_audience",
-                "youtube_audience",
-                "tiktok_audience",
+            const candidates = await supabaseGet(path);
 
-                "audience_max",
-                "audience_reseau",
-                "audience_updated_at"
-              ].join(",");
+            console.log(
+              `Profils candidats récupérés : ${candidates.length}`
+            );
 
-              const path =
-                `profiles?select=${fields}` +
-                `&order=id.asc` +
-                `&limit=${PAGE_SIZE}` +
-                `&offset=${offset}`;
+            // ----------------------------------------------------------
+            // On ne garde que les profils possédant au moins
+            // un réseau social.
+            // ----------------------------------------------------------
 
-              const page = await supabaseGet(path);
+            const profiles = candidates.filter(profile => {
 
-              profiles.push(...page);
-
-              console.log(
-                `Supabase : ${profiles.length} profils récupérés`
+              return [
+                profile.facebook_url,
+                profile.instagram_url,
+                profile.x_url,
+                profile.youtube_url,
+                profile.tiktok_url
+              ].some(
+                url =>
+                  typeof url === "string" &&
+                  url.trim() !== ""
               );
 
-              if (page.length < PAGE_SIZE) {
-                break;
-              }
+            });
 
-              offset += PAGE_SIZE;
-            }
+            console.log(
+              `Profils avec au moins un réseau : ${profiles.length}`
+            );
 
             return profiles;
           }
 
-          /*
-           * Détermine le nom du champ audience correspondant
-           * à une plateforme Pulse.
-           */
+          // ============================================================
+          // CHOIX DU CHAMP SUPABASE
+          // ============================================================
+
           function audienceField(platform) {
 
             switch (platform) {
@@ -229,9 +259,10 @@ jobs:
             }
           }
 
-          /*
-           * Vérifie qu'une audience est exploitable.
-           */
+          // ============================================================
+          // NORMALISATION FOLLOWERS
+          // ============================================================
+
           function normalizeFollowers(value) {
 
             if (
@@ -244,50 +275,37 @@ jobs:
 
             const number = Number(value);
 
-            if (!Number.isFinite(number)) {
-              return null;
-            }
-
-            if (number < 0) {
+            if (
+              !Number.isFinite(number) ||
+              number < 0
+            ) {
               return null;
             }
 
             return Math.round(number);
           }
 
-          /*
-           * Pulse peut renvoyer un objet d'erreur
-           * à l'intérieur d'un batch.
-           */
-          function isUnavailableError(item) {
+          // ============================================================
+          // ERREURS QUI AUTORISENT UNE SUPPRESSION
+          // ============================================================
+          //
+          // IMPORTANT :
+          //
+          // Une erreur temporaire NE SUPPRIME PAS l'ancien nombre.
+          //
+          // On efface uniquement lorsqu'on a une indication
+          // explicite que le compte n'existe plus.
+          //
+          // ============================================================
 
-            if (!item || !item.error) {
-              return false;
-            }
-
-            const error = String(item.error).toLowerCase();
-
-            return [
-              "not_found",
-              "deleted",
-              "suspended"
-            ].includes(error);
-          }
-
-          /*
-           * Nous NE supprimons PAS une audience simplement parce
-           * qu'une requête échoue techniquement.
-           *
-           * Un login_required ou content_unavailable peut signifier
-           * page privée, blocage régional ou problème temporaire.
-           */
           function shouldClearAudience(item) {
 
             if (!item || !item.error) {
               return false;
             }
 
-            const error = String(item.error).toLowerCase();
+            const error =
+              String(item.error).toLowerCase();
 
             return [
               "not_found",
@@ -296,143 +314,10 @@ jobs:
             ].includes(error);
           }
 
-          /*
-           * Appel Pulse batch.
-           */
-          async function pulseBatch(urls, attempt = 1) {
+          // ============================================================
+          // CALCUL DU MAXIMUM
+          // ============================================================
 
-            const params = new URLSearchParams();
-
-            /*
-             * On utilise plusieurs paramètres url=.
-             * C'est officiellement supporté par Pulse.
-             */
-            for (const url of urls) {
-              params.append("url", url);
-            }
-
-            const response = await fetch(
-              `${PULSE_URL}?${params.toString()}`,
-              {
-                method: "GET",
-                headers: {
-                  "Accept": "application/json",
-                  "User-Agent": "Avant-Garde-Audience-Bot/1.0"
-                }
-              }
-            );
-
-            /*
-             * Rate limit Pulse.
-             */
-            if (response.status === 429) {
-
-              if (attempt >= 5) {
-                throw new Error(
-                  "Pulse: trop de 429 après 5 tentatives"
-                );
-              }
-
-              const retryAfter =
-                Number(response.headers.get("Retry-After")) || 10;
-
-              console.log(
-                `Pulse 429 → attente ${retryAfter}s`
-              );
-
-              await sleep(
-                (retryAfter + 1) * 1000
-              );
-
-              return pulseBatch(
-                urls,
-                attempt + 1
-              );
-            }
-
-            /*
-             * Erreur serveur Pulse.
-             */
-            if (
-              response.status === 500 ||
-              response.status === 502 ||
-              response.status === 503
-            ) {
-
-              if (attempt >= 5) {
-                throw new Error(
-                  `Pulse ${response.status} après 5 tentatives`
-                );
-              }
-
-              console.log(
-                `Pulse ${response.status} → retry`
-              );
-
-              await sleep(
-                Math.min(
-                  30000,
-                  2000 * attempt
-                )
-              );
-
-              return pulseBatch(
-                urls,
-                attempt + 1
-              );
-            }
-
-            const text = await response.text();
-
-            if (!response.ok) {
-
-              throw new Error(
-                `Pulse HTTP ${response.status}: ${text}`
-              );
-            }
-
-            let data;
-
-            try {
-              data = JSON.parse(text);
-            } catch {
-
-              throw new Error(
-                `Pulse réponse JSON invalide: ${text.slice(0, 500)}`
-              );
-            }
-
-            /*
-             * Format actuel :
-             *
-             * {
-             *   count: 2,
-             *   results: [...]
-             * }
-             */
-            if (Array.isArray(data)) {
-              return data;
-            }
-
-            if (Array.isArray(data.results)) {
-              return data.results;
-            }
-
-            /*
-             * Sécurité si Pulse modifie légèrement le format.
-             */
-            if (Array.isArray(data.profiles)) {
-              return data.profiles;
-            }
-
-            throw new Error(
-              "Format Pulse inattendu"
-            );
-          }
-
-          /*
-           * Recalcul de l'audience maximale.
-           */
           function calculateMaximum(profile) {
 
             const values = [
@@ -465,13 +350,16 @@ jobs:
             ];
 
             const valid = values
-              .filter(x =>
-                Number.isFinite(Number(x.value))
+              .filter(
+                x =>
+                  Number.isFinite(Number(x.value))
               )
-              .map(x => ({
-                network: x.network,
-                value: Number(x.value)
-              }));
+              .map(
+                x => ({
+                  network: x.network,
+                  value: Number(x.value)
+                })
+              );
 
             if (!valid.length) {
 
@@ -491,51 +379,238 @@ jobs:
             };
           }
 
-          /*
-           * PROGRAMME PRINCIPAL
-           */
+          // ============================================================
+          // APPEL PULSE
+          // ============================================================
+
+          async function pulseBatch(urls, attempt = 1) {
+
+            const params = new URLSearchParams();
+
+            for (const url of urls) {
+              params.append("url", url);
+            }
+
+            const response = await fetch(
+              `${PULSE_URL}?${params.toString()}`,
+              {
+                method: "GET",
+
+                headers: {
+                  "Accept": "application/json",
+
+                  "User-Agent":
+                    "Avant-Garde-Audience-Bot/1.0"
+                }
+              }
+            );
+
+            // ----------------------------------------------------------
+            // RATE LIMIT
+            // ----------------------------------------------------------
+
+            if (response.status === 429) {
+
+              if (attempt >= 5) {
+
+                throw new Error(
+                  "Pulse : trop de 429 après 5 tentatives"
+                );
+              }
+
+              const retryAfter =
+                Number(
+                  response.headers.get("Retry-After")
+                ) || 10;
+
+              console.log(
+                `Pulse 429 → attente ${retryAfter}s`
+              );
+
+              await sleep(
+                (retryAfter + 1) * 1000
+              );
+
+              return pulseBatch(
+                urls,
+                attempt + 1
+              );
+            }
+
+            // ----------------------------------------------------------
+            // ERREURS SERVEUR
+            // ----------------------------------------------------------
+
+            if (
+              [500, 502, 503, 504]
+                .includes(response.status)
+            ) {
+
+              if (attempt >= 5) {
+
+                throw new Error(
+                  `Pulse ${response.status} après 5 tentatives`
+                );
+              }
+
+              const delay =
+                Math.min(
+                  30000,
+                  2000 * attempt
+                );
+
+              console.log(
+                `Pulse ${response.status} → retry dans ${delay}ms`
+              );
+
+              await sleep(delay);
+
+              return pulseBatch(
+                urls,
+                attempt + 1
+              );
+            }
+
+            // ----------------------------------------------------------
+            // AUTRE ERREUR HTTP
+            // ----------------------------------------------------------
+
+            const text =
+              await response.text();
+
+            if (!response.ok) {
+
+              throw new Error(
+                `Pulse HTTP ${response.status}: ${text}`
+              );
+            }
+
+            // ----------------------------------------------------------
+            // JSON
+            // ----------------------------------------------------------
+
+            let data;
+
+            try {
+
+              data = JSON.parse(text);
+
+            } catch {
+
+              throw new Error(
+                "Pulse réponse JSON invalide : " +
+                text.slice(0, 500)
+              );
+            }
+
+            // ----------------------------------------------------------
+            // FORMATS ACCEPTÉS
+            // ----------------------------------------------------------
+
+            if (Array.isArray(data)) {
+              return data;
+            }
+
+            if (Array.isArray(data.results)) {
+              return data.results;
+            }
+
+            if (Array.isArray(data.profiles)) {
+              return data.profiles;
+            }
+
+            throw new Error(
+              "Format Pulse inattendu"
+            );
+          }
+
+          // ============================================================
+          // MAIN
+          // ============================================================
+
           async function main() {
 
             console.log("");
-            console.log("========================================");
-            console.log("AVANT-GARDE — UPDATE AUDIENCE");
-            console.log("========================================");
+            console.log(
+              "========================================"
+            );
+            console.log(
+              "AVANT-GARDE — UPDATE AUDIENCE ROTATIF"
+            );
+            console.log(
+              "========================================"
+            );
             console.log("");
 
             const startTime = Date.now();
 
-            /*
-             * 1. Récupération des profils
-             */
+            // ----------------------------------------------------------
+            // 1. PROFILS
+            // ----------------------------------------------------------
+
             const profiles =
-              await getAllProfiles();
+              await getProfilesToProcess();
 
             console.log("");
+
+            if (!profiles.length) {
+
+              console.log(
+                "Aucun profil à traiter."
+              );
+
+              console.log(
+                "========================================"
+              );
+
+              return;
+            }
+
             console.log(
-              `TOTAL PROFILS : ${profiles.length}`
+              `PROFILS SÉLECTIONNÉS : ${profiles.length}`
             );
 
-            /*
-             * 2. Construction d'une liste unique de toutes
-             * les URLs de réseaux.
-             *
-             * Pulse accepte les plateformes mélangées.
-             */
+            // ----------------------------------------------------------
+            // 2. CONSTRUCTION DES URLS
+            // ----------------------------------------------------------
+
             const urlEntries = [];
 
             for (const profile of profiles) {
 
               const networks = [
 
-                ["facebook", profile.facebook_url],
-                ["instagram", profile.instagram_url],
-                ["x", profile.x_url],
-                ["youtube", profile.youtube_url],
-                ["tiktok", profile.tiktok_url]
+                [
+                  "facebook",
+                  profile.facebook_url
+                ],
+
+                [
+                  "instagram",
+                  profile.instagram_url
+                ],
+
+                [
+                  "x",
+                  profile.x_url
+                ],
+
+                [
+                  "youtube",
+                  profile.youtube_url
+                ],
+
+                [
+                  "tiktok",
+                  profile.tiktok_url
+                ]
 
               ];
 
-              for (const [network, url] of networks) {
+              for (
+                const [network, url]
+                of networks
+              ) {
 
                 if (
                   typeof url !== "string" ||
@@ -545,31 +620,56 @@ jobs:
                 }
 
                 urlEntries.push({
+
                   profileId: profile.id,
-                  profileName: profile.nom,
+
+                  profileName:
+                    profile.nom,
+
                   network,
-                  url: url.trim()
+
+                  url:
+                    url.trim()
                 });
               }
             }
 
             console.log(
-              `TOTAL URLS RÉSEAUX : ${urlEntries.length}`
+              `URLS RÉSEAUX DISPONIBLES : ${urlEntries.length}`
             );
 
-            /*
-             * 3. Découpage en lots de 50.
-             */
+            // ----------------------------------------------------------
+            // 3. LIMITATION DU TRAVAIL PAR LANCEMENT
+            // ----------------------------------------------------------
+
+            const maxUrlsThisRun =
+              MAX_PULSE_CALLS_PER_RUN *
+              PULSE_BATCH_SIZE;
+
+            const selectedUrls =
+              urlEntries.slice(
+                0,
+                maxUrlsThisRun
+              );
+
+            console.log(
+              `URLS TRAITÉES CE LANCEMENT : ${selectedUrls.length}`
+            );
+
+            // ----------------------------------------------------------
+            // 4. LOTS DE 50
+            // ----------------------------------------------------------
+
             const batches = [];
 
             for (
               let i = 0;
-              i < urlEntries.length;
+              i < selectedUrls.length;
               i += PULSE_BATCH_SIZE
             ) {
 
               batches.push(
-                urlEntries.slice(
+                selectedUrls.slice(
                   i,
                   i + PULSE_BATCH_SIZE
                 )
@@ -580,16 +680,18 @@ jobs:
               `LOTS PULSE : ${batches.length}`
             );
 
-            /*
-             * Statistiques
-             */
+            // ----------------------------------------------------------
+            // 5. STATISTIQUES
+            // ----------------------------------------------------------
+
             let pulseSuccess = 0;
             let pulseErrors = 0;
             let supabaseUpdates = 0;
 
-            /*
-             * 4. Traitement des lots
-             */
+            // ----------------------------------------------------------
+            // 6. TRAITEMENT DES LOTS
+            // ----------------------------------------------------------
+
             for (
               let batchIndex = 0;
               batchIndex < batches.length;
@@ -600,6 +702,7 @@ jobs:
                 batches[batchIndex];
 
               console.log("");
+
               console.log(
                 `----- LOT ${batchIndex + 1}/${batches.length} -----`
               );
@@ -609,11 +712,10 @@ jobs:
               );
 
               const urls =
-                batch.map(item => item.url);
+                batch.map(
+                  item => item.url
+                );
 
-              /*
-               * Appel Pulse
-               */
               let results;
 
               try {
@@ -628,15 +730,9 @@ jobs:
                   error.message
                 );
 
-                /*
-                 * On ne détruit aucune donnée
-                 * en cas d'erreur technique.
-                 */
-                pulseErrors += batch.length;
+                pulseErrors +=
+                  batch.length;
 
-                /*
-                 * On passe au lot suivant.
-                 */
                 await sleep(
                   BASE_DELAY_MS
                 );
@@ -644,13 +740,16 @@ jobs:
                 continue;
               }
 
-              /*
-               * Création d'une map URL → résultat
-               */
+              // --------------------------------------------------------
+              // MAP DES RÉSULTATS
+              // --------------------------------------------------------
+
               const resultMap =
                 new Map();
 
-              for (const result of results) {
+              for (
+                const result of results
+              ) {
 
                 if (
                   result &&
@@ -664,17 +763,25 @@ jobs:
                 }
               }
 
-              /*
-               * Pour chaque profil du lot,
-               * on regroupe les résultats.
-               */
+              // --------------------------------------------------------
+              // UPDATES PAR PROFIL
+              // --------------------------------------------------------
+
               const updatesByProfile =
                 new Map();
 
-              for (const entry of batch) {
+              for (
+                const entry of batch
+              ) {
 
                 const result =
-                  resultMap.get(entry.url);
+                  resultMap.get(
+                    entry.url
+                  );
+
+                // ------------------------------------------------------
+                // PAS DE RÉSULTAT
+                // ------------------------------------------------------
 
                 if (!result) {
 
@@ -686,6 +793,10 @@ jobs:
 
                   continue;
                 }
+
+                // ------------------------------------------------------
+                // CHAMP SUPABASE
+                // ------------------------------------------------------
 
                 const field =
                   audienceField(
@@ -704,19 +815,16 @@ jobs:
                   continue;
                 }
 
-                /*
-                 * Erreur explicite Pulse
-                 */
+                // ------------------------------------------------------
+                // ERREUR PULSE
+                // ------------------------------------------------------
+
                 if (result.error) {
 
                   console.log(
                     `[${entry.network}] ${entry.profileName} → ${result.error}`
                   );
 
-                  /*
-                   * Seulement certaines erreurs explicites
-                   * autorisent la suppression.
-                   */
                   if (
                     shouldClearAudience(result)
                   ) {
@@ -730,17 +838,22 @@ jobs:
                       updatesByProfile.set(
                         entry.profileId,
                         {
-                          profile: profiles.find(
-                            p =>
-                              p.id === entry.profileId
-                          ),
+                          profile:
+                            profiles.find(
+                              p =>
+                                p.id ===
+                                entry.profileId
+                            ),
+
                           values: {}
                         }
                       );
                     }
 
                     updatesByProfile
-                      .get(entry.profileId)
+                      .get(
+                        entry.profileId
+                      )
                       .values[field] = null;
                   }
 
@@ -749,16 +862,18 @@ jobs:
                   continue;
                 }
 
+                // ------------------------------------------------------
+                // FOLLOWERS
+                // ------------------------------------------------------
+
                 const followers =
                   normalizeFollowers(
                     result.followers
                   );
 
-                /*
-                 * Pas de compteur valide :
-                 * on conserve l'ancien.
-                 */
-                if (followers === null) {
+                if (
+                  followers === null
+                ) {
 
                   console.log(
                     `[${entry.network}] ${entry.profileName} → followers absent`
@@ -782,33 +897,38 @@ jobs:
                   updatesByProfile.set(
                     entry.profileId,
                     {
-                      profile: profiles.find(
-                        p =>
-                          p.id === entry.profileId
-                      ),
+                      profile:
+                        profiles.find(
+                          p =>
+                            p.id ===
+                            entry.profileId
+                        ),
+
                       values: {}
                     }
                   );
                 }
 
                 updatesByProfile
-                  .get(entry.profileId)
-                  .values[field] = followers;
+                  .get(
+                    entry.profileId
+                  )
+                  .values[field] =
+                    followers;
 
                 pulseSuccess++;
               }
 
-              /*
-               * 5. Mise à jour Supabase.
-               *
-               * Un seul PATCH par profil pour les réseaux
-               * trouvés dans ce lot.
-               */
+              // --------------------------------------------------------
+              // 7. ÉCRITURE SUPABASE
+              // --------------------------------------------------------
+
               for (
                 const [
                   profileId,
                   update
-                ] of updatesByProfile
+                ]
+                of updatesByProfile
               ) {
 
                 const profile =
@@ -818,9 +938,10 @@ jobs:
                   continue;
                 }
 
-                /*
-                 * Fusion avec les anciennes audiences.
-                 */
+                // ------------------------------------------------------
+                // Fusion ancienne + nouvelle valeur
+                // ------------------------------------------------------
+
                 const merged = {
 
                   facebook_audience:
@@ -839,16 +960,20 @@ jobs:
                     profile.tiktok_audience,
 
                   ...update.values
-
                 };
 
-                /*
-                 * Calcul audience maximale.
-                 */
+                // ------------------------------------------------------
+                // MAXIMUM
+                // ------------------------------------------------------
+
                 const maximum =
                   calculateMaximum(
                     merged
                   );
+
+                // ------------------------------------------------------
+                // DONNÉES À ÉCRIRE
+                // ------------------------------------------------------
 
                 const values = {
 
@@ -862,7 +987,6 @@ jobs:
 
                   audience_updated_at:
                     new Date().toISOString()
-
                 };
 
                 try {
@@ -883,10 +1007,10 @@ jobs:
                 }
               }
 
-              /*
-               * Limitation volontaire :
-               * ~100 appels Pulse/minute maximum.
-               */
+              // --------------------------------------------------------
+              // PAUSE ENTRE LOTS
+              // --------------------------------------------------------
+
               if (
                 batchIndex <
                 batches.length - 1
@@ -898,25 +1022,40 @@ jobs:
               }
             }
 
-            /*
-             * Résumé final
-             */
+            // ----------------------------------------------------------
+            // 8. FIN
+            // ----------------------------------------------------------
+
             const duration =
               Math.round(
-                (Date.now() - startTime) / 1000
+                (Date.now() - startTime) /
+                1000
               );
 
             console.log("");
-            console.log("========================================");
-            console.log("MISE À JOUR TERMINÉE");
-            console.log("========================================");
 
             console.log(
-              `Profils : ${profiles.length}`
+              "========================================"
             );
 
             console.log(
-              `URLs réseaux : ${urlEntries.length}`
+              "MISE À JOUR TERMINÉE"
+            );
+
+            console.log(
+              "========================================"
+            );
+
+            console.log(
+              `Profils candidats : ${profiles.length}`
+            );
+
+            console.log(
+              `URLs disponibles : ${urlEntries.length}`
+            );
+
+            console.log(
+              `URLs traitées : ${selectedUrls.length}`
             );
 
             console.log(
@@ -939,17 +1078,37 @@ jobs:
               `Durée : ${duration}s`
             );
 
-            console.log("========================================");
+            console.log(
+              "========================================"
+            );
+
           }
+
+          // ============================================================
+          // LANCEMENT
+          // ============================================================
 
           main().catch(error => {
 
             console.error("");
-            console.error("========================================");
-            console.error("ERREUR FATALE");
-            console.error("========================================");
+
+            console.error(
+              "========================================"
+            );
+
+            console.error(
+              "ERREUR FATALE"
+            );
+
+            console.error(
+              "========================================"
+            );
+
             console.error(error);
-            console.error("========================================");
+
+            console.error(
+              "========================================"
+            );
 
             process.exit(1);
           });
