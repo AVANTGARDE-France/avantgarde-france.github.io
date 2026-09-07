@@ -1,9 +1,6 @@
-```html
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -12,2398 +9,2433 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
-/* =====================================================
-   VARIABLES
-===================================================== */
-
-:root {
-
-    --navy: #07152d;
-    --navy2: #0d2344;
-
-    --gold: #d6ad55;
-    --gold-light: #f0d58a;
-
-    --white: #f5f3ed;
-    --muted: #b8c0cd;
-
-    --blue-france: #0055A4;
-    --red: #EF4135;
+:root{
+  --navy:#07152d;
+  --navy2:#0d2344;
+  --gold:#d6ad55;
+  --gold-light:#f0d58a;
+  --white:#f5f3ed;
+  --muted:#b8c0cd;
+  --blue-france:#0055A4;
+  --red:#EF4135;
+  --border:rgba(214,173,85,.28);
 }
 
-
-/* =====================================================
-   RESET
-===================================================== */
-
-* {
-    box-sizing: border-box;
+*{
+  box-sizing:border-box;
 }
 
-
-html {
-    scroll-behavior: smooth;
+html{
+  scroll-behavior:smooth;
 }
 
-
-body {
-
-    margin: 0;
-
-    background: var(--navy);
-
-    color: var(--white);
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
+body{
+  margin:0;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(214,173,85,.07),transparent 35%),
+    var(--navy);
+  color:var(--white);
+  font-family:Georgia,"Times New Roman",serif;
 }
 
+/* =========================
+   RENDEZ-VOUS
+========================= */
 
-/* =====================================================
+.events-bar{
+  height:38px;
+  background:#040d1d;
+  border-bottom:1px solid rgba(214,173,85,.18);
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  position:relative;
+}
+
+.events-label{
+  flex:0 0 auto;
+  height:100%;
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+  background:var(--gold);
+  color:#07152d;
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1.3px;
+  z-index:3;
+}
+
+.events-window{
+  position:relative;
+  flex:1;
+  height:100%;
+  overflow:hidden;
+}
+
+.events-track{
+  position:absolute;
+  left:0;
+  top:0;
+  height:100%;
+  display:flex;
+  align-items:center;
+  white-space:nowrap;
+  will-change:transform;
+}
+
+.event-item{
+  display:inline-flex;
+  align-items:center;
+  height:100%;
+  padding:0 25px;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  color:#e9edf3;
+  cursor:pointer;
+}
+
+.event-item strong{
+  color:var(--gold-light);
+  margin-right:7px;
+}
+
+.event-separator{
+  color:var(--gold);
+  opacity:.55;
+  margin:0 4px;
+}
+
+/* =========================
    HEADER
-===================================================== */
+========================= */
 
-header {
-
-    height: 82px;
-
-    padding: 0 5%;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    border-bottom:
-        1px solid rgba(214,173,85,.25);
-
-    background:
-        rgba(7,21,45,.97);
-
-    position: relative;
+header{
+  position:relative;
+  padding:25px 6% 20px;
+  border-bottom:1px solid rgba(214,173,85,.16);
+  background:rgba(7,21,45,.96);
 }
 
-
-/* =====================================================
-   LOGO
-===================================================== */
-
-.logo {
-
-    color: var(--white);
-
-    text-decoration: none;
-
-    font-size: 26px;
-
-    font-weight: bold;
-
-    letter-spacing: 2px;
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 1px;
+.admin-gear{
+  position:absolute;
+  top:17px;
+  right:25px;
+  color:rgba(255,255,255,.55);
+  text-decoration:none;
+  font-family:Arial,sans-serif;
+  font-size:18px;
+  transition:.2s;
 }
 
-
-.logo-a,
-.logo-e {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    width: 32px;
-    height: 32px;
-
-    background: #ffffff;
-
-    border-radius: 50%;
-
-    font-size: 20px;
-
-    line-height: 1;
+.admin-gear:hover{
+  color:var(--gold);
 }
 
-
-.logo-a {
-    color: var(--blue-france);
+.logo{
+  display:inline-block;
+  text-decoration:none;
+  color:var(--white);
+  font-size:30px;
+  font-weight:bold;
+  letter-spacing:-1px;
+  margin-bottom:16px;
 }
 
-
-.logo-e {
-    color: var(--red);
+.logo-a{
+  color:var(--blue-france);
 }
 
-
-/* =====================================================
-   ADMIN
-===================================================== */
-
-.admin-gear {
-
-    position: absolute;
-
-    right: 14px;
-    top: 7px;
-
-    width: 23px;
-    height: 23px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    color: rgba(255,255,255,.42);
-
-    text-decoration: none;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 14px;
-
-    border-radius: 50%;
-
-    transition: .2s;
+.logo-e{
+  color:var(--red);
 }
 
-
-.admin-gear:hover {
-
-    color: var(--gold-light);
-
-    background:
-        rgba(255,255,255,.06);
-
-    transform: rotate(20deg);
+nav{
+  display:flex;
+  gap:26px;
+  align-items:center;
+  flex-wrap:wrap;
 }
 
-
-/* =====================================================
-   NAVIGATION
-===================================================== */
-
-nav {
-
-    display: flex;
-
-    gap: 28px;
-
-    align-items: center;
+nav a{
+  color:rgba(245,243,237,.72);
+  text-decoration:none;
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  letter-spacing:1.2px;
+  font-weight:bold;
+  transition:.2s;
 }
 
-
-nav a {
-
-    color: #e7e7e7;
-
-    text-decoration: none;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 12px;
-
-    font-weight: bold;
-
-    letter-spacing: 1px;
-
-    transition: color .2s;
+nav a:hover,
+nav a.active{
+  color:var(--gold-light);
 }
 
+/* =========================
+   HERO
+========================= */
 
-nav a:hover {
-    color: var(--gold);
+.hero{
+  max-width:1100px;
+  margin:0 auto;
+  padding:75px 25px 45px;
+  text-align:center;
 }
 
-
-/* =====================================================
-   PAGE INTRO
-===================================================== */
-
-.page-intro {
-
-    text-align: center;
-
-    max-width: 850px;
-
-    margin: auto;
-
-    padding: 65px 25px 35px;
+.kicker{
+  font-family:Arial,sans-serif;
+  color:var(--gold);
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:3px;
+  margin-bottom:16px;
 }
 
-
-.page-kicker {
-
-    color: var(--gold);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-    letter-spacing: 3px;
-
-    margin-bottom: 15px;
+.hero h1{
+  margin:0;
+  font-size:clamp(42px,7vw,76px);
+  line-height:.95;
+  letter-spacing:-2px;
 }
 
-
-.page-intro h1 {
-
-    margin: 0;
-
-    font-size:
-        clamp(42px, 7vw, 70px);
-
-    letter-spacing: 3px;
-
-    line-height: 1;
+.hero h1 span{
+  color:var(--gold);
 }
 
-
-.page-intro h1 span {
-    color: var(--gold);
+.hero p{
+  max-width:720px;
+  margin:25px auto 30px;
+  color:var(--muted);
+  font-size:17px;
+  line-height:1.65;
 }
 
-
-.page-intro p {
-
-    max-width: 700px;
-
-    margin:
-        22px auto 0;
-
-    color: var(--muted);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 15px;
-
-    line-height: 1.7;
-}
-
-
-/* =====================================================
+/* =========================
    BOUTON REJOINDRE
-===================================================== */
+========================= */
 
-.join-button-container {
-
-    text-align: center;
-
-    padding:
-        10px 25px 45px;
+.join-button{
+  border:1px solid var(--gold);
+  background:var(--gold);
+  color:var(--navy);
+  padding:14px 26px;
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1.2px;
+  cursor:pointer;
+  transition:.25s;
 }
 
-
-.join-button {
-
-    display: inline-flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    gap: 12px;
-
-    padding:
-        14px 28px;
-
-    border:
-        1px solid var(--gold);
-
-    background:
-        rgba(214,173,85,.08);
-
-    color: var(--gold-light);
-
-    text-decoration: none;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 12px;
-
-    font-weight: bold;
-
-    letter-spacing: 1.5px;
-
-    transition: .2s;
+.join-button:hover{
+  background:var(--gold-light);
+  transform:translateY(-2px);
+  box-shadow:0 8px 25px rgba(0,0,0,.25);
 }
 
-
-.join-button:hover {
-
-    background: var(--gold);
-
-    color: var(--navy);
-
-    transform: translateY(-1px);
-}
-
-
-.join-arrow {
-    font-size: 17px;
-}
-
-
-/* =====================================================
+/* =========================
    MEMBRES
-===================================================== */
+========================= */
 
-.team-section {
-
-    max-width: 1100px;
-
-    margin: auto;
-
-    padding:
-        10px 25px 70px;
+.team-section{
+  max-width:1200px;
+  margin:0 auto;
+  padding:20px 25px 90px;
 }
 
-
-.team-grid {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
-    gap: 20px;
+.section-title{
+  text-align:center;
+  margin-bottom:35px;
 }
 
-
-/* =====================================================
-   CARTE MEMBRE
-===================================================== */
-
-.member-card {
-
-    border:
-        1px solid rgba(214,173,85,.25);
-
-    background:
-        rgba(255,255,255,.025);
-
-    overflow: hidden;
-
-    transition:
-        transform .2s,
-        border-color .2s;
+.section-title h2{
+  margin:0 0 10px;
+  font-size:30px;
 }
 
-
-.member-card:hover {
-
-    transform: translateY(-3px);
-
-    border-color:
-        rgba(214,173,85,.55);
+.section-title p{
+  margin:0;
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:13px;
 }
 
-
-.member-image {
-
-    width: 100%;
-
-    height: 220px;
-
-    object-fit: cover;
-
-    display: block;
-
-    background:
-        #0a1b34;
+.team-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(245px,1fr));
+  gap:20px;
 }
 
-
-.member-image-placeholder {
-
-    width: 100%;
-
-    height: 220px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-    background:
-        linear-gradient(
-            135deg,
-            #0d2344,
-            #07152d
-        );
-
-    color:
-        rgba(240,213,138,.5);
-
-    font-size: 52px;
+.member-card{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.015));
+  border:1px solid var(--border);
+  padding:22px;
+  cursor:pointer;
+  transition:.25s;
+  min-height:280px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
 }
 
-
-.member-content {
-
-    padding: 22px;
+.member-card:hover{
+  border-color:rgba(214,173,85,.75);
+  transform:translateY(-4px);
+  box-shadow:0 12px 35px rgba(0,0,0,.25);
 }
 
-
-.member-grade {
-
-    color: var(--gold);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 10px;
-
-    font-weight: bold;
-
-    letter-spacing: 2px;
-
-    text-transform: uppercase;
-
-    margin-bottom: 8px;
+.member-photo{
+  width:105px;
+  height:105px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--gold);
+  margin-bottom:16px;
+  background:var(--navy2);
 }
 
-
-.member-name {
-
-    font-size: 25px;
-
-    margin-bottom: 8px;
+.member-photo-placeholder{
+  width:105px;
+  height:105px;
+  border-radius:50%;
+  border:2px solid var(--gold);
+  margin-bottom:16px;
+  background:var(--navy2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--gold);
+  font-size:35px;
 }
 
-
-.member-region {
-
-    color: #9da8b7;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    margin-bottom: 15px;
+.member-name{
+  font-size:22px;
+  margin-bottom:6px;
 }
 
-
-.member-description {
-
-    color: var(--muted);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 13px;
-
-    line-height: 1.6;
-
-    margin-bottom: 15px;
+.member-grade{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  font-weight:bold;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  margin-bottom:8px;
 }
 
-
-/* =====================================================
-   COMPETENCES CARTE
-===================================================== */
-
-.member-competences {
-
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 6px;
+.member-region{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  margin-bottom:12px;
 }
 
-
-.competence-tag {
-
-    padding:
-        5px 8px;
-
-    border:
-        1px solid rgba(214,173,85,.25);
-
-    color:
-        #d8c28b;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 9px;
-
-    line-height: 1.2;
+.member-description{
+  color:#c8ced8;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  line-height:1.5;
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
 }
 
-
-/* =====================================================
-   MESSAGE AUCUN MEMBRE
-===================================================== */
-
-.no-members {
-
-    grid-column: 1 / -1;
-
-    text-align: center;
-
-    padding: 45px 20px;
-
-    border:
-        1px solid rgba(255,255,255,.08);
-
-    color: #8f9aaa;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 13px;
+.loading{
+  text-align:center;
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  padding:40px;
 }
 
-
-/* =====================================================
-   MODALE REJOINDRE
-===================================================== */
-
-.join-modal {
-
-    position: fixed;
-
-    inset: 0;
-
-    display: none;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 20px;
-
-    background:
-        rgba(0,0,0,.76);
-
-    z-index: 99999;
+.no-members{
+  grid-column:1/-1;
+  text-align:center;
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  padding:50px;
 }
 
+/* =========================
+   MODALES
+========================= */
 
-.join-modal.active {
-    display: flex;
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(6px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:1000;
 }
 
-
-.join-modal-box {
-
-    position: relative;
-
-    width:
-        min(700px, 100%);
-
-    max-height: 90vh;
-
-    overflow-y: auto;
-
-    background:
-        var(--navy2);
-
-    border:
-        1px solid rgba(214,173,85,.45);
-
-    box-shadow:
-        0 25px 80px rgba(0,0,0,.55);
-
-    padding: 35px;
-
-    animation:
-        modalAppear .2s ease-out;
+.modal.active{
+  display:flex;
 }
 
-
-@keyframes modalAppear {
-
-    from {
-
-        opacity: 0;
-
-        transform:
-            translateY(15px);
-    }
-
-    to {
-
-        opacity: 1;
-
-        transform:
-            translateY(0);
-    }
+.modal-box{
+  width:min(720px,100%);
+  max-height:92vh;
+  overflow-y:auto;
+  background:
+    linear-gradient(145deg,#0d2344,#07152d);
+  border:1px solid var(--border);
+  box-shadow:0 25px 80px rgba(0,0,0,.55);
+  position:relative;
+  padding:38px;
 }
 
-
-.modal-close {
-
-    position: absolute;
-
-    right: 14px;
-    top: 10px;
-
-    width: 32px;
-    height: 32px;
-
-    border: 0;
-
-    background: transparent;
-
-    color: #c5ccd5;
-
-    font-size: 25px;
-
-    cursor: pointer;
+.modal-close{
+  position:absolute;
+  right:18px;
+  top:14px;
+  border:0;
+  background:none;
+  color:rgba(255,255,255,.65);
+  font-size:28px;
+  cursor:pointer;
+  line-height:1;
 }
 
-
-.modal-close:hover {
-    color: white;
+.modal-close:hover{
+  color:var(--gold);
 }
 
+/* =========================
+   POPUP MEMBRE
+========================= */
 
-/* =====================================================
+.profile-modal-content{
+  text-align:center;
+}
+
+.profile-modal-image{
+  width:135px;
+  height:135px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--gold);
+  margin:5px auto 18px;
+  display:none;
+}
+
+.profile-placeholder{
+  width:135px;
+  height:135px;
+  border-radius:50%;
+  border:2px solid var(--gold);
+  background:var(--navy2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:5px auto 18px;
+  color:var(--gold);
+  font-size:45px;
+}
+
+.profile-modal-content h2{
+  margin:0 0 8px;
+  font-size:32px;
+}
+
+.profile-grade{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+
+.profile-region{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  margin:10px 0 25px;
+}
+
+.profile-description{
+  color:#d8dce3;
+  font-family:Arial,sans-serif;
+  font-size:14px;
+  line-height:1.65;
+  margin-bottom:25px;
+}
+
+.profile-competences{
+  border-top:1px solid rgba(214,173,85,.2);
+  padding-top:22px;
+}
+
+.profile-competences h3{
+  color:var(--gold);
+  font-size:17px;
+  margin:0 0 15px;
+}
+
+.competence-list{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:8px;
+}
+
+.competence-tag{
+  border:1px solid rgba(214,173,85,.4);
+  color:#e6d49e;
+  padding:7px 10px;
+  font-family:Arial,sans-serif;
+  font-size:11px;
+}
+
+/* =========================
    FORMULAIRE
-===================================================== */
+========================= */
 
-.form-intro {
-
-    margin-bottom: 28px;
+.form-title{
+  margin:0 0 8px;
+  font-size:32px;
 }
 
-
-.form-intro h2 {
-
-    margin:
-        0 0 10px;
-
-    font-size: 30px;
-
-    font-weight: normal;
+.form-intro{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:13px;
+  line-height:1.5;
+  margin-bottom:28px;
 }
 
-
-.form-intro p {
-
-    margin: 0;
-
-    color: var(--muted);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 13px;
-
-    line-height: 1.6;
+.form-group{
+  margin-bottom:21px;
 }
 
-
-.form-group {
-
-    margin-bottom: 20px;
+.form-group label.main-label{
+  display:block;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  font-weight:bold;
+  letter-spacing:.4px;
+  margin-bottom:8px;
 }
 
-
-.form-group label {
-
-    display: block;
-
-    margin-bottom: 8px;
-
-    color: #e6e7e9;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 12px;
-
-    font-weight: bold;
+.required{
+  color:var(--gold);
 }
 
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-
-    width: 100%;
-
-    padding:
-        12px 13px;
-
-    border:
-        1px solid rgba(255,255,255,.14);
-
-    background:
-        rgba(0,0,0,.18);
-
-    color: white;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 13px;
-
-    outline: none;
-
-    border-radius: 0;
+input[type="text"],
+input[type="email"],
+input[type="url"],
+textarea,
+select{
+  width:100%;
+  border:1px solid rgba(255,255,255,.15);
+  background:#061329;
+  color:var(--white);
+  padding:12px 13px;
+  font-family:Arial,sans-serif;
+  font-size:13px;
+  outline:none;
+  border-radius:0;
 }
 
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-
-    border-color:
-        rgba(214,173,85,.65);
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:var(--gold);
 }
 
-
-.form-group select option {
-
-    background:
-        #0d2344;
-
-    color: white;
+textarea{
+  min-height:110px;
+  resize:vertical;
 }
 
-
-.form-group textarea {
-
-    min-height: 110px;
-
-    resize: vertical;
+.help{
+  color:#8994a6;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  margin-top:6px;
 }
 
+/* Choix Sympathisant / Anonyme */
 
-.form-help {
-
-    display: block;
-
-    margin-top: 6px;
-
-    color: #7f8a99;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 10px;
+.registration-choice{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
-
-/* =====================================================
-   COMPETENCES
-===================================================== */
-
-.competences-section {
-
-    margin-top: 30px;
-
-    padding-top: 25px;
-
-    border-top:
-        1px solid rgba(214,173,85,.2);
+.choice-option{
+  position:relative;
 }
 
-
-.competences-title {
-
-    display: inline;
-
-    color: var(--gold-light);
-
-    font-size: 22px;
-
-    font-weight: normal;
+.choice-option input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
 }
 
-
-.competences-subtitle {
-
-    display: inline;
-
-    margin-left: 7px;
-
-    color: #9da8b7;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
+.choice-label{
+  display:block;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(0,0,0,.12);
+  padding:15px 17px;
+  cursor:pointer;
+  transition:.2s;
 }
 
-
-.competence-group-title {
-
-    margin:
-        28px 0 12px;
-
-    color: var(--gold);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    letter-spacing: 1.5px;
-
-    text-transform: uppercase;
+.choice-label strong{
+  display:block;
+  color:var(--white);
+  font-family:Arial,sans-serif;
+  font-size:13px;
+  margin-bottom:5px;
 }
 
-
-.competence {
-
-    border:
-        1px solid rgba(255,255,255,.08);
-
-    background:
-        rgba(255,255,255,.02);
-
-    margin-bottom: 8px;
-
-    transition:
-        background .2s,
-        border-color .2s;
+.choice-label span{
+  display:block;
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  line-height:1.5;
 }
 
-
-.competence:hover {
-
-    background:
-        rgba(214,173,85,.04);
-
-    border-color:
-        rgba(214,173,85,.25);
+.choice-option input:checked + .choice-label{
+  border-color:var(--gold);
+  background:rgba(214,173,85,.08);
 }
 
-
-.competence label {
-
-    display: flex;
-
-    align-items: flex-start;
-
-    gap: 12px;
-
-    padding: 13px;
-
-    cursor: pointer;
+.choice-option input:checked + .choice-label strong{
+  color:var(--gold-light);
 }
 
-
-.competence input {
-
-    flex-shrink: 0;
-
-    margin-top: 3px;
-
-    accent-color:
-        var(--gold);
+.form-section-title{
+  color:var(--gold);
+  font-size:19px;
+  margin:35px 0 20px;
+  padding-bottom:9px;
+  border-bottom:1px solid rgba(214,173,85,.2);
 }
 
-
-.competence-text {
-
-    display: block;
+.competence-group{
+  margin-bottom:25px;
 }
 
-
-.competence-name {
-
-    display: block;
-
-    color: #e8e9eb;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 13px;
-
-    font-weight: bold;
-
-    margin-bottom: 4px;
+.competence-group-title{
+  font-family:Arial,sans-serif;
+  color:#eee;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:13px;
 }
 
-
-.competence-description {
-
-    display: block;
-
-    color: #9da7b5;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    line-height: 1.5;
+.competence{
+  border:1px solid rgba(255,255,255,.1);
+  margin-bottom:8px;
+  padding:12px;
+  background:rgba(0,0,0,.12);
 }
 
-
-/* =====================================================
-   BOUTON FORMULAIRE
-===================================================== */
-
-.form-submit {
-
-    width: 100%;
-
-    margin-top: 25px;
-
-    padding:
-        14px;
-
-    border:
-        1px solid var(--gold);
-
-    background:
-        var(--gold);
-
-    color:
-        var(--navy);
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-    letter-spacing: 1.5px;
-
-    cursor: pointer;
-
-    transition: .2s;
+.competence label{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  cursor:pointer;
 }
 
-
-.form-submit:hover {
-
-    background:
-        var(--gold-light);
+.competence input{
+  margin-top:3px;
+  accent-color:var(--gold);
 }
 
-
-.form-submit:disabled {
-
-    opacity: .55;
-
-    cursor: wait;
+.competence-name{
+  color:var(--white);
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  font-weight:bold;
 }
 
-
-.form-message {
-
-    margin-top: 15px;
-
-    text-align: center;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 12px;
-
-    line-height: 1.5;
+.competence-description{
+  display:block;
+  color:#929dad;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  line-height:1.45;
+  margin-top:5px;
 }
 
+.submit-button{
+  width:100%;
+  border:0;
+  background:var(--gold);
+  color:var(--navy);
+  padding:15px;
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1.2px;
+  cursor:pointer;
+  margin-top:15px;
+}
 
-/* =====================================================
+.submit-button:hover{
+  background:var(--gold-light);
+}
+
+.form-message{
+  display:none;
+  padding:13px;
+  margin-top:15px;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  line-height:1.5;
+}
+
+.form-message.success{
+  display:block;
+  border:1px solid rgba(100,200,130,.4);
+  color:#b9e5c4;
+  background:rgba(50,130,70,.1);
+}
+
+.form-message.error{
+  display:block;
+  border:1px solid rgba(239,65,53,.4);
+  color:#ffb5ae;
+  background:rgba(180,30,20,.1);
+}
+
+/* =========================
    FOOTER
-===================================================== */
+========================= */
 
-footer {
-
-    padding: 25px;
-
-    text-align: center;
-
-    color: #7e8999;
-
-    font-family: Arial, sans-serif;
-
-    font-size: 11px;
-
-    border-top:
-        1px solid rgba(255,255,255,.07);
+footer{
+  border-top:1px solid rgba(214,173,85,.15);
+  text-align:center;
+  padding:30px 20px;
+  color:#7f8998;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  letter-spacing:.5px;
 }
 
-
-/* =====================================================
+/* =========================
    MOBILE
-===================================================== */
+========================= */
 
-@media (max-width: 800px) {
+@media(max-width:650px){
 
-    header {
+  header{
+    padding:22px 20px 18px;
+  }
 
-        height: auto;
+  nav{
+    gap:14px;
+  }
 
-        padding: 20px;
+  nav a{
+    font-size:9px;
+  }
 
-        flex-direction: column;
+  .hero{
+    padding:55px 20px 35px;
+  }
 
-        gap: 18px;
-    }
+  .hero p{
+    font-size:15px;
+  }
 
+  .team-section{
+    padding-left:15px;
+    padding-right:15px;
+  }
 
-    nav {
+  .modal{
+    padding:8px;
+  }
 
-        gap: 15px;
+  .modal-box{
+    padding:28px 20px;
+    max-height:95vh;
+  }
 
-        flex-wrap: wrap;
+  .events-label{
+    padding:0 10px;
+    font-size:9px;
+  }
 
-        justify-content: center;
-    }
-
-
-    nav a {
-
-        font-size: 10px;
-    }
-
-
-    .team-grid {
-
-        grid-template-columns: 1fr;
-    }
-
-
-    .join-modal-box {
-
-        padding:
-            28px 20px;
-    }
-
+  .event-item{
+    font-size:10px;
+    padding:0 16px;
+  }
 }
-
 </style>
-
 </head>
-
 
 <body>
 
+<!-- =========================
+     RENDEZ-VOUS
+========================= -->
 
-<!-- =====================================================
+<div class="events-bar">
+  <div class="events-label">NOS RENDEZ-VOUS</div>
+  <div class="events-window" id="eventsWindow">
+    <div class="events-track" id="eventsTrack"></div>
+  </div>
+</div>
+
+<!-- =========================
      HEADER
-===================================================== -->
+========================= -->
 
 <header>
 
+  <a href="admin.html"
+     class="admin-gear"
+     title="Administration"
+     aria-label="Administration">⚙</a>
 
-<a
-    href="admin.html"
-    class="admin-gear"
-    title="Administration"
-    aria-label="Administration"
->
-    ⚙
-</a>
+  <a href="index.html" class="logo">
+    <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
+  </a>
 
-
-<a
-    href="index.html"
-    class="logo"
->
-
-    <span class="logo-a">
-        A
-    </span>
-
-    vant-gard
-
-    <span class="logo-e">
-        E
-    </span>
-
-</a>
-
-
-<nav>
-
-    <a href="index.html">
-        ACCUEIL
-    </a>
-
-    <a href="manifeste.html">
-        MANIFESTE
-    </a>
-
-    <a href="projet.html">
-        NOTRE PROJET
-    </a>
-
-    <a href="inspirations.html">
-        NOS INSPIRATIONS
-    </a>
-
-    <a href="equipe.html">
-        NOTRE ÉQUIPE
-    </a>
-
-</nav>
+  <nav>
+    <a href="index.html">ACCUEIL</a>
+    <a href="manifeste.html">MANIFESTE</a>
+    <a href="projet.html">NOTRE PROJET</a>
+    <a href="inspirations.html">NOS INSPIRATIONS</a>
+    <a href="equipe.html" class="active">NOTRE ÉQUIPE</a>
+  </nav>
 
 </header>
 
+<!-- =========================
+     HERO
+========================= -->
 
-<!-- =====================================================
-     INTRODUCTION
-===================================================== -->
+<section class="hero">
 
-<section class="page-intro">
+  <div class="kicker">L’AVANT-GARDE</div>
 
-    <div class="page-kicker">
-        L'AVANT-GARDE
-    </div>
+  <h1>
+    NOTRE <span>ÉQUIPE.</span>
+  </h1>
 
+  <p>
+    L’Avant-gardE rassemble des femmes et des hommes qui souhaitent
+    contribuer, chacun selon ses compétences, son influence et ses moyens,
+    à la construction d’une France libre, souveraine et responsable.
+  </p>
 
-    <h1>
-        NOTRE <span>ÉQUIPE.</span>
-    </h1>
-
-
-    <p>
-
-        Un mouvement ne se construit pas seulement avec des idées.
-
-        Il se construit avec celles et ceux qui les portent,
-        les défendent et les transforment en action.
-
-    </p>
+  <button class="join-button" id="openJoin">
+    REJOINDRE L’AVANT-GARDE
+  </button>
 
 </section>
 
-
-<!-- =====================================================
-     REJOINDRE
-===================================================== -->
-
-<div class="join-button-container">
-
-    <a
-        href="#"
-        id="openJoin"
-        class="join-button"
-    >
-
-        REJOINDRE L'AVANT-GARDE
-
-        <span class="join-arrow">
-            →
-        </span>
-
-    </a>
-
-</div>
-
-
-<!-- =====================================================
+<!-- =========================
      EQUIPE
-===================================================== -->
+========================= -->
 
 <section class="team-section">
 
-    <div
-        id="teamGrid"
-        class="team-grid"
-    >
+  <div class="section-title">
+    <h2>Les membres</h2>
+    <p>Découvrez celles et ceux qui ont choisi de rendre leur engagement public.</p>
+  </div>
 
-        <div class="no-members">
-            Chargement des membres...
-        </div>
+  <div class="team-grid" id="teamGrid">
 
+    <div class="loading" id="loadingMembers">
+      Chargement des membres…
     </div>
+
+  </div>
 
 </section>
 
+<!-- =========================
+     MODAL MEMBRE
+========================= -->
 
-<!-- =====================================================
-     MODALE REJOINDRE
-===================================================== -->
+<div class="modal" id="memberModal">
 
-<div
-    id="joinModal"
-    class="join-modal"
->
+  <div class="modal-box">
 
-    <div class="join-modal-box">
+    <button class="modal-close" id="closeMember" aria-label="Fermer">
+      ×
+    </button>
 
+    <div class="profile-modal-content">
 
-        <button
-            id="closeJoin"
-            class="modal-close"
-            aria-label="Fermer"
-        >
-            ×
-        </button>
+      <img
+        id="profileModalImage"
+        class="profile-modal-image"
+        alt=""
+      >
 
+      <div id="profilePlaceholder" class="profile-placeholder">
+        ★
+      </div>
 
-        <div class="form-intro">
+      <h2 id="profileModalName"></h2>
 
-            <h2>
-                Rejoindre l'équipe
-            </h2>
+      <div id="profileModalGrade" class="profile-grade"></div>
 
-            <p>
+      <div id="profileModalRegion" class="profile-region"></div>
 
-                Présentez-vous, indiquez votre région et
-                sélectionnez les compétences dans lesquelles
-                vous souhaitez vous auto-évaluer.
+      <div id="profileModalDescription" class="profile-description"></div>
 
-                Votre profil pourra ensuite être intégré à l'équipe.
+      <div class="profile-competences">
 
-            </p>
+        <h3>Compétences</h3>
 
+        <div
+          class="competence-list"
+          id="profileModalCompetences">
         </div>
 
-
-        <form
-            id="joinForm"
-        >
-
-
-            <!-- NOM -->
-
-            <div class="form-group">
-
-                <label for="nom">
-                    Pseudo ou nom prénom
-                </label>
-
-                <input
-                    type="text"
-                    id="nom"
-                    maxlength="100"
-                    required
-                    placeholder="Votre pseudo ou prénom et nom"
-                >
-
-            </div>
-
-
-            <!-- EMAIL -->
-
-            <div class="form-group">
-
-                <label for="email">
-                    Email
-                </label>
-
-                <input
-                    type="email"
-                    id="email"
-                    required
-                    placeholder="votre@email.fr"
-                >
-
-            </div>
-
-
-            <!-- REGION -->
-
-            <div class="form-group">
-
-                <label for="region">
-                    Région
-                </label>
-
-                <select
-                    id="region"
-                    required
-                >
-
-                    <option value="">
-                        Sélectionnez votre région
-                    </option>
-
-
-                    <optgroup label="France métropolitaine">
-
-                        <option>Auvergne-Rhône-Alpes</option>
-
-                        <option>Bourgogne-Franche-Comté</option>
-
-                        <option>Bretagne</option>
-
-                        <option>Centre-Val de Loire</option>
-
-                        <option>Corse</option>
-
-                        <option>Grand Est</option>
-
-                        <option>Hauts-de-France</option>
-
-                        <option>Île-de-France</option>
-
-                        <option>Normandie</option>
-
-                        <option>Nouvelle-Aquitaine</option>
-
-                        <option>Occitanie</option>
-
-                        <option>Pays de la Loire</option>
-
-                        <option>
-                            Provence-Alpes-Côte d'Azur
-                        </option>
-
-                    </optgroup>
-
-
-                    <optgroup label="Outre-mer">
-
-                        <option>Guadeloupe</option>
-
-                        <option>Martinique</option>
-
-                        <option>Guyane</option>
-
-                        <option>La Réunion</option>
-
-                        <option>Mayotte</option>
-
-                    </optgroup>
-
-
-                    <optgroup label="Étranger">
-
-                        <option>Europe</option>
-
-                        <option>Amérique du Nord</option>
-
-                        <option>
-                            Amérique centrale et Caraïbes
-                        </option>
-
-                        <option>Amérique du Sud</option>
-
-                        <option>Afrique</option>
-
-                        <option>Asie</option>
-
-                        <option>Océanie</option>
-
-                        <option>Autre</option>
-
-                    </optgroup>
-
-                </select>
-
-            </div>
-
-
-            <!-- IMAGE -->
-
-            <div class="form-group">
-
-                <label for="image_url">
-                    Image
-                </label>
-
-                <input
-                    type="url"
-                    id="image_url"
-                    placeholder="https://..."
-                >
-
-                <span class="form-help">
-
-                    Indiquez l'URL d'une image déjà hébergée en ligne.
-
-                </span>
-
-            </div>
-
-
-            <!-- DESCRIPTION -->
-
-            <div class="form-group">
-
-                <label for="description">
-                    Description
-                </label>
-
-                <textarea
-                    id="description"
-                    maxlength="300"
-                    placeholder="Présentez-vous en quelques mots..."
-                ></textarea>
-
-                <span class="form-help">
-                    300 caractères maximum.
-                </span>
-
-            </div>
-
-
-            <!-- =================================================
-                 COMPETENCES
-            ================================================== -->
-
-            <div class="competences-section">
-
-
-                <div class="competences-title">
-                    Compétences
-                </div>
-
-
-                <div class="competences-subtitle">
-                    (auto-évaluation de vos compétences)
-                </div>
-
-
-                <h3 class="competence-group-title">
-                    Talents et compétences métier
-                </h3>
-
-
-                <!-- 1 -->
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Maîtrise de doctrine"
-                        >
-
-                        <span class="competence-text">
-
-                            <span class="competence-name">
-                                Maîtrise de doctrine
-                            </span>
-
-                            <span class="competence-description">
-                                capacité à préserver la fidélité à l’idéologie d'Avant-Garde et sa cohérence dans l’action du mouvement.
-                            </span>
-
-                        </span>
-
-                    </label>
-
-                </div>
-
-
-                <!-- 2 -->
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Tactique"
-                        >
-
-                        <span class="competence-text">
-
-                            <span class="competence-name">
-                                Tactique
-                            </span>
-
-                            <span class="competence-description">
-                                capacité à concevoir et mettre en œuvre des tactiques efficaces de développement d’audience, médiatique et électorale, sans renier l’idéologie.
-                            </span>
-
-                        </span>
-
-                    </label>
-
-                </div>
-
-
-                <!-- 3 -->
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Prestance"
-                        >
-
-                        <span class="competence-text">
-
-                            <span class="competence-name">
-                                Prestance
-                            </span>
-
-                            <span class="competence-description">
-                                capacité à séduire et convaincre par la parole, le charisme, le charme ou la culture.
-                            </span>
-
-                        </span>
-
-                    </label>
-
-                </div>
-
-
-                <!-- 4 -->
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Analyses pragmatiques"
-                        >
-
-                        <span class="competence-text">
-
-                            <span class="competence-name">
-                                Analyses pragmatiques
-                            </span>
-
-                            <span class="competence-description">
-                                capacité à analyser les données, les rendements, les conséquences et les rapports de force. anticipent les évolutions et privilégient les faits.
-                            </span>
-
-                        </span>
-
-                    </label>
-
-                </div>
-
-
-                <!-- 5 -->
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Analyses populistes"
-                        >
-
-                        <span class="competence-text">
-
-                            <span class="competence-name">
-                                Analyses populistes
-                            </span>
-
-                            <span class="competence-description">
-                                capacité à analyser les ressentis, aspirations et frustrations populaires. anticipent les réactions naturelles et privilégient le vécu et l’opinion du peuple.
-                            </span>
-
-                        </span>
-
-                    </label>
-
-                </div>
-
-
-                <!-- 6 -->
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Administration"
-                        >
-
-                        <span class="competence-text">
-
-                            <span class="competence-name">
-                                Administration
-                            </span>
-
-                            <span class="competence-description">
-                                maîtrise de la gestion des structures, des ressources techniques et opérationnelles et des équipes internes.
-                            </span>
-
-                        </span>
-
-                    </label>
-
-                </div>
-
-
-                <!-- 7 -->
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Expertise et ingénierie juridique"
-                        >
-
-                        <span class="competence-text">
-
-                            <span class="competence-name">
-                                Expertise et ingénierie juridique
-                            </span>
-
-                            <span class="competence-description">
-                                maîtrise du droit français et européen ainsi que des mécanismes juridiques, avec capacité à en analyser les règles, les contraintes, les failles et les possibilités d’évolution.
-                            </span>
-
-                        </span>
-
-                    </label>
-
-                </div>
-
-
-                <!-- 8 -->
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Expertise et ingénierie politique"
-                        >
-
-                        <span class="competence-text">
-
-                            <span class="competence-name">
-                                Expertise et ingénierie politique
-                            </span>
-
-                            <span class="competence-description">
-                                maîtrise d’un domaine politique ou institutionnel particulier et capacité à en apporter l’expertise.
-                            </span>
-
-                        </span>
-
-                    </label>
-
-                </div>
-
-
-                <!-- =================================================
-                     SYMPATHISANTS
-                ================================================== -->
-
-                <h3 class="competence-group-title">
-                    Sympathisants ou plus
-                </h3>
-
-
-                <!-- 9 -->
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Influenceurs / debunkers / créateurs de contenu"
-                        >
-
-                        <span class="competence-text">
-
-                            <span class="competence-name">
-                                Influenceurs / debunkers / créateurs de contenu
-                            </span>
-
-                            <span class="competence-description">
-                                dans le milieu médiatique et sur les réseaux sociaux, développent spontanément une audience, influencent les comportements, déconstruisent les arguments ou manipulations et produisent des contenus permettant de diffuser et de défendre les idées du mouvement. peuvent conserver une forte indépendance éditoriale.
-                            </span>
-
-                        </span>
-
-                    </label>
-
-                </div>
-
-
-                <!-- 10 -->
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Bienfaiteurs"
-                        >
-
-                        <span class="competence-text">
-
-                            <span class="competence-name">
-                                Bienfaiteurs
-                            </span>
-
-                            <span class="competence-description">
-                                dans les autres milieux, mettent spontanément leur influence, leur réseau, leur carnet d’adresses, leurs moyens, leur expertise ou leur notoriété au service du développement et du rayonnement du mouvement. peuvent conserver une forte indépendance.
-                            </span>
-
-                        </span>
-
-                    </label>
-
-                </div>
-
-
-            </div>
-
-
-            <button
-                type="submit"
-                class="form-submit"
-                id="formSubmit"
-            >
-                CRÉER MON PROFIL
-            </button>
-
-
-            <div
-                id="formMessage"
-                class="form-message"
-            ></div>
-
-
-        </form>
+      </div>
 
     </div>
 
+  </div>
+
 </div>
 
+<!-- =========================
+     MODAL INSCRIPTION
+========================= -->
 
-<!-- =====================================================
-     FOOTER
-===================================================== -->
+<div class="modal" id="joinModal">
+
+  <div class="modal-box">
+
+    <button class="modal-close" id="closeJoin" aria-label="Fermer">
+      ×
+    </button>
+
+    <h2 class="form-title">
+      Rejoindre l’Avant-gardE
+    </h2>
+
+    <p class="form-intro">
+      Créez votre profil et choisissez la manière dont vous souhaitez
+      apparaître au sein du mouvement.
+    </p>
+
+    <form id="joinForm">
+
+      <!-- =====================
+           VISIBILITE
+      ====================== -->
+
+      <div class="form-group">
+
+        <label class="main-label">
+          S’inscrire en tant que <span class="required">*</span>
+        </label>
+
+        <div class="registration-choice">
+
+          <div class="choice-option">
+
+            <input
+              type="radio"
+              id="typeSympathisant"
+              name="type_inscription"
+              value="sympathisant"
+              checked
+            >
+
+            <label
+              for="typeSympathisant"
+              class="choice-label"
+            >
+
+              <strong>Sympathisant</strong>
+
+              <span>
+                Votre profil sera affiché dans la liste des membres.
+              </span>
+
+            </label>
+
+          </div>
+
+          <div class="choice-option">
+
+            <input
+              type="radio"
+              id="typeAnonyme"
+              name="type_inscription"
+              value="anonyme"
+            >
+
+            <label
+              for="typeAnonyme"
+              class="choice-label"
+            >
+
+              <strong>Anonyme</strong>
+
+              <span>
+                Votre profil sera enregistré mais caché de la liste des membres.
+              </span>
+
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- =====================
+           IDENTITE
+      ====================== -->
+
+      <div class="form-group">
+
+        <label class="main-label" for="nom">
+          Pseudo ou nom prénom <span class="required">*</span>
+        </label>
+
+        <input
+          type="text"
+          id="nom"
+          maxlength="100"
+          required
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label class="main-label" for="email">
+          Email <span class="required">*</span>
+        </label>
+
+        <input
+          type="email"
+          id="email"
+          required
+        >
+
+      </div>
+
+      <div class="form-group">
+
+        <label class="main-label" for="region">
+          Région <span class="required">*</span>
+        </label>
+
+        <select id="region" required>
+
+          <option value="">Sélectionnez votre région</option>
+
+          <optgroup label="France métropolitaine">
+            <option>Auvergne-Rhône-Alpes</option>
+            <option>Bourgogne-Franche-Comté</option>
+            <option>Bretagne</option>
+            <option>Centre-Val de Loire</option>
+            <option>Corse</option>
+            <option>Grand Est</option>
+            <option>Hauts-de-France</option>
+            <option>Île-de-France</option>
+            <option>Normandie</option>
+            <option>Nouvelle-Aquitaine</option>
+            <option>Occitanie</option>
+            <option>Pays de la Loire</option>
+            <option>Provence-Alpes-Côte d’Azur</option>
+          </optgroup>
+
+          <optgroup label="Outre-mer">
+            <option>Guadeloupe</option>
+            <option>Martinique</option>
+            <option>Guyane</option>
+            <option>La Réunion</option>
+            <option>Mayotte</option>
+          </optgroup>
+
+          <optgroup label="Étranger">
+            <option>Europe</option>
+            <option>Amérique du Nord</option>
+            <option>Amérique centrale et Caraïbes</option>
+            <option>Amérique du Sud</option>
+            <option>Afrique</option>
+            <option>Asie</option>
+            <option>Océanie</option>
+            <option>Autre</option>
+          </optgroup>
+
+        </select>
+
+      </div>
+
+      <!-- =====================
+           IMAGE
+      ====================== -->
+
+      <div class="form-group">
+
+        <label class="main-label" for="image_url">
+          Image
+        </label>
+
+        <input
+          type="url"
+          id="image_url"
+          placeholder="https://..."
+        >
+
+        <div class="help">
+          Indiquez l’URL d’une image déjà hébergée en ligne.
+        </div>
+
+      </div>
+
+      <!-- =====================
+           DESCRIPTION
+      ====================== -->
+
+      <div class="form-group">
+
+        <label class="main-label" for="description">
+          Description
+        </label>
+
+        <textarea
+          id="description"
+          maxlength="300"
+          placeholder="Présentez-vous en quelques mots..."
+        ></textarea>
+
+        <div class="help">
+          300 caractères maximum.
+        </div>
+
+      </div>
+
+      <!-- =====================
+           COMPETENCES
+      ====================== -->
+
+      <div class="form-section-title">
+        Talents et compétences métier
+      </div>
+
+      <div class="form-group">
+
+        <label class="main-label">
+          Compétence
+          <span style="font-weight:normal;color:#8994a6;">
+            (auto-évaluation de vos compétences)
+          </span>
+        </label>
+
+      </div>
+
+      <div class="competence-group">
+
+        <div class="competence-group-title">
+          Compétences métier
+        </div>
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Maîtrise de doctrine"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Maîtrise de doctrine
+              </span>
+
+              <span class="competence-description">
+                capacité à préserver la fidélité à l’idéologie d'Avant-Garde et sa cohérence dans l’action du mouvement.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Tactique"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Tactique
+              </span>
+
+              <span class="competence-description">
+                capacité à concevoir et mettre en œuvre des tactiques efficaces de développement d’audience, médiatique et électorale, sans renier l’idéologie.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Prestance"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Prestance
+              </span>
+
+              <span class="competence-description">
+                capacité à séduire et convaincre par la parole, le charisme, le charme ou la culture.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Analyses pragmatiques"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Analyses pragmatiques
+              </span>
+
+              <span class="competence-description">
+                capacité à analyser les données, les rendements, les conséquences et les rapports de force. anticipent les évolutions et privilégient les faits.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Analyses populistes"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Analyses populistes
+              </span>
+
+              <span class="competence-description">
+                capacité à analyser les ressentis, aspirations et frustrations populaires. anticipent les réactions naturelles et privilégient le vécu et l’opinion du peuple.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Administration"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Administration
+              </span>
+
+              <span class="competence-description">
+                maîtrise de la gestion des structures, des ressources techniques et opérationnelles et des équipes internes.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Expertise et ingénierie juridique"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Expertise et ingénierie juridique
+              </span>
+
+              <span class="competence-description">
+                maîtrise du droit français et européen ainsi que des mécanismes juridiques, avec capacité à en analyser les règles, les contraintes, les failles et les possibilités d’évolution.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Expertise et ingénierie politique"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Expertise et ingénierie politique
+              </span>
+
+              <span class="competence-description">
+                maîtrise d’un domaine politique ou institutionnel particulier et capacité à en apporter l’expertise.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+      </div>
+
+      <!-- =====================
+           SYMPATHISANTS OU PLUS
+      ====================== -->
+
+      <div class="competence-group">
+
+        <div class="competence-group-title">
+          Sympathisants ou plus
+        </div>
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Influenceurs / debunkers / créateurs de contenu"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Influenceurs / debunkers / créateurs de contenu
+              </span>
+
+              <span class="competence-description">
+                dans le milieu médiatique et sur les réseaux sociaux, développent spontanément une audience, influencent les comportements, déconstruisent les arguments ou manipulations et produisent des contenus permettant de diffuser et de défendre les idées du mouvement. peuvent conserver une forte indépendance éditoriale.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Bienfaiteurs"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Bienfaiteurs
+              </span>
+
+              <span class="competence-description">
+                dans les autres milieux, mettent spontanément leur influence, leur réseau, leur carnet d’adresses, leurs moyens, leur expertise ou leur notoriété au service du développement et du rayonnement du mouvement. peuvent conserver une forte indépendance.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+      </div>
+
+      <button
+        type="submit"
+        class="submit-button"
+      >
+        CRÉER MON PROFIL
+      </button>
+
+      <div id="formMessage" class="form-message"></div>
+
+    </form>
+
+  </div>
+
+</div>
+
+<!-- =========================
+     MODAL RENDEZ-VOUS
+========================= -->
+
+<div class="modal" id="eventModal">
+
+  <div class="modal-box">
+
+    <button class="modal-close" id="closeEvent" aria-label="Fermer">
+      ×
+    </button>
+
+    <h2 id="eventModalTitle" class="form-title"></h2>
+
+    <div id="eventModalDate" class="profile-region"></div>
+
+    <div id="eventModalDescription" class="profile-description"></div>
+
+  </div>
+
+</div>
 
 <footer>
-
-    © 2026 Avant-gardE
-
-    — Souveraineté · Liberté · Justice · Patriote
-
+  © 2026 Avant-gardE — Souveraineté · Liberté · Justice · Patriote
 </footer>
-
 
 <script>
 
-/* =====================================================
+/* =========================================================
    SUPABASE
-===================================================== */
+========================================================= */
 
 const SUPABASE_URL =
-    "https://wlhtegrciehmtxqecopv.supabase.co";
-
+  "https://wlhtegrciehmtxqecopv.supabase.co";
 
 const SUPABASE_KEY =
-    "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
-
+  "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
 
 const supabaseClient =
-    window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-    );
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
 
-/* =====================================================
-   CHARGEMENT DES MEMBRES
-===================================================== */
+/* =========================================================
+   ELEMENTS
+========================================================= */
 
-async function chargerMembres() {
+const teamGrid =
+  document.getElementById("teamGrid");
 
-    const teamGrid =
-        document.getElementById("teamGrid");
-
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-
-        .from("profiles")
-
-        .select(`
-            id,
-            nom,
-            grade,
-            image_url,
-            description,
-            region,
-            competences
-        `)
-
-        .order(
-            "created_at",
-            {
-                ascending: true
-            }
-        );
-
-
-    if (error) {
-
-        console.error(
-            "Erreur chargement profiles :",
-            error
-        );
-
-        teamGrid.innerHTML = `
-            <div class="no-members">
-                Impossible de charger les membres.
-            </div>
-        `;
-
-        return;
-    }
-
-
-    if (
-        !data ||
-        data.length === 0
-    ) {
-
-        teamGrid.innerHTML = `
-            <div class="no-members">
-                Aucun membre à afficher pour le moment.
-            </div>
-        `;
-
-        return;
-    }
-
-
-    teamGrid.innerHTML = "";
-
-
-    data.forEach(
-        membre => {
-
-            const card =
-                document.createElement("article");
-
-
-            card.className =
-                "member-card";
-
-
-            /* IMAGE */
-
-            if (membre.image_url) {
-
-                const image =
-                    document.createElement("img");
-
-                image.className =
-                    "member-image";
-
-                image.src =
-                    membre.image_url;
-
-                image.alt =
-                    membre.nom || "Membre";
-
-                image.onerror =
-                    function() {
-
-                        this.replaceWith(
-                            creerPlaceholder()
-                        );
-
-                    };
-
-                card.appendChild(
-                    image
-                );
-
-            } else {
-
-                card.appendChild(
-                    creerPlaceholder()
-                );
-
-            }
-
-
-            /* CONTENU */
-
-            const content =
-                document.createElement("div");
-
-            content.className =
-                "member-content";
-
-
-            /* GRADE */
-
-            if (membre.grade) {
-
-                const grade =
-                    document.createElement("div");
-
-                grade.className =
-                    "member-grade";
-
-                grade.textContent =
-                    membre.grade;
-
-                content.appendChild(
-                    grade
-                );
-
-            }
-
-
-            /* NOM */
-
-            const name =
-                document.createElement("div");
-
-            name.className =
-                "member-name";
-
-            name.textContent =
-                membre.nom ||
-                "Membre";
-
-            content.appendChild(
-                name
-            );
-
-
-            /* REGION */
-
-            if (membre.region) {
-
-                const region =
-                    document.createElement("div");
-
-                region.className =
-                    "member-region";
-
-                region.textContent =
-                    membre.region;
-
-                content.appendChild(
-                    region
-                );
-
-            }
-
-
-            /* DESCRIPTION */
-
-            if (membre.description) {
-
-                const description =
-                    document.createElement("div");
-
-                description.className =
-                    "member-description";
-
-                description.textContent =
-                    membre.description;
-
-                content.appendChild(
-                    description
-                );
-
-            }
-
-
-            /* COMPETENCES */
-
-            if (
-                Array.isArray(
-                    membre.competences
-                ) &&
-                membre.competences.length > 0
-            ) {
-
-                const competences =
-                    document.createElement("div");
-
-                competences.className =
-                    "member-competences";
-
-
-                membre.competences.forEach(
-                    competence => {
-
-                        const tag =
-                            document.createElement("span");
-
-                        tag.className =
-                            "competence-tag";
-
-                        tag.textContent =
-                            competence;
-
-                        competences.appendChild(
-                            tag
-                        );
-
-                    }
-                );
-
-
-                content.appendChild(
-                    competences
-                );
-
-            }
-
-
-            card.appendChild(
-                content
-            );
-
-
-            teamGrid.appendChild(
-                card
-            );
-
-        }
-    );
-
-}
-
-
-/* =====================================================
-   PLACEHOLDER IMAGE
-===================================================== */
-
-function creerPlaceholder() {
-
-    const placeholder =
-        document.createElement("div");
-
-    placeholder.className =
-        "member-image-placeholder";
-
-    placeholder.textContent =
-        "A";
-
-    return placeholder;
-
-}
-
-
-/* =====================================================
-   MODALE
-===================================================== */
+const memberModal =
+  document.getElementById("memberModal");
 
 const joinModal =
-    document.getElementById(
-        "joinModal"
+  document.getElementById("joinModal");
+
+const eventModal =
+  document.getElementById("eventModal");
+
+
+/* =========================================================
+   OUTILS
+========================================================= */
+
+function fermerModal(modal){
+  modal.classList.remove("active");
+  document.body.style.overflow = "";
+}
+
+
+function ouvrirModal(modal){
+  modal.classList.add("active");
+  document.body.style.overflow = "hidden";
+}
+
+
+function imageValide(url){
+
+  if(!url) return false;
+
+  try{
+    const u = new URL(url);
+
+    return (
+      u.protocol === "http:" ||
+      u.protocol === "https:"
     );
 
+  }catch{
+    return false;
+  }
+}
 
-const openJoin =
-    document.getElementById(
-        "openJoin"
+
+function normaliserCompetences(value){
+
+  if(Array.isArray(value)){
+    return value;
+  }
+
+  if(typeof value === "string"){
+
+    return value
+      .replace(/^\{|\}$/g,"")
+      .split(",")
+      .map(x =>
+        x.trim()
+          .replace(/^"|"$/g,"")
+      )
+      .filter(Boolean);
+
+  }
+
+  return [];
+}
+
+
+/* =========================================================
+   CHARGEMENT DES MEMBRES
+========================================================= */
+
+async function chargerMembres(){
+
+  teamGrid.innerHTML = `
+    <div class="loading">
+      Chargement des membres…
+    </div>
+  `;
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("profiles")
+    .select(`
+      id,
+      created_at,
+      nom,
+      grade,
+      image_url,
+      description,
+      region,
+      competences,
+      anonyme
+    `)
+    .eq("anonyme", false)
+    .order("created_at", {
+      ascending:true
+    });
+
+  if(error){
+
+    console.error(
+      "Erreur chargement profils :",
+      error
     );
 
+    teamGrid.innerHTML = `
+      <div class="no-members">
+        Impossible de charger les membres.
+      </div>
+    `;
 
-const closeJoin =
-    document.getElementById(
-        "closeJoin"
-    );
+    return;
+  }
 
+  teamGrid.innerHTML = "";
 
-openJoin.addEventListener(
-    "click",
-    function(event) {
+  if(!data || data.length === 0){
 
-        event.preventDefault();
+    teamGrid.innerHTML = `
+      <div class="no-members">
+        Aucun membre public pour le moment.
+      </div>
+    `;
 
-        joinModal.classList.add(
-            "active"
+    return;
+  }
+
+  data.forEach(membre => {
+
+    const card =
+      document.createElement("article");
+
+    card.className = "member-card";
+
+    card.tabIndex = 0;
+
+    /* IMAGE */
+
+    if(imageValide(membre.image_url)){
+
+      const img =
+        document.createElement("img");
+
+      img.className =
+        "member-photo";
+
+      img.src =
+        membre.image_url;
+
+      img.alt =
+        membre.nom || "Membre";
+
+      img.onerror = function(){
+
+        this.replaceWith(
+          creerPlaceholder()
         );
 
-        document.body.style.overflow =
-            "hidden";
+      };
+
+      card.appendChild(img);
+
+    }else{
+
+      card.appendChild(
+        creerPlaceholder()
+      );
 
     }
-);
+
+    /* NOM */
+
+    const name =
+      document.createElement("div");
+
+    name.className =
+      "member-name";
+
+    name.textContent =
+      membre.nom || "Membre";
+
+    card.appendChild(name);
 
 
-closeJoin.addEventListener(
+    /* GRADE */
+
+    const grade =
+      document.createElement("div");
+
+    grade.className =
+      "member-grade";
+
+    grade.textContent =
+      membre.grade || "user";
+
+    card.appendChild(grade);
+
+
+    /* REGION */
+
+    if(membre.region){
+
+      const region =
+        document.createElement("div");
+
+      region.className =
+        "member-region";
+
+      region.textContent =
+        membre.region;
+
+      card.appendChild(region);
+
+    }
+
+
+    /* DESCRIPTION */
+
+    if(membre.description){
+
+      const description =
+        document.createElement("div");
+
+      description.className =
+        "member-description";
+
+      description.textContent =
+        membre.description;
+
+      card.appendChild(description);
+
+    }
+
+
+    /* CLICK */
+
+    card.addEventListener(
+      "click",
+      () => ouvrirProfil(membre)
+    );
+
+    card.addEventListener(
+      "keydown",
+      event => {
+
+        if(
+          event.key === "Enter" ||
+          event.key === " "
+        ){
+
+          event.preventDefault();
+
+          ouvrirProfil(membre);
+
+        }
+
+      }
+    );
+
+    teamGrid.appendChild(card);
+
+  });
+
+}
+
+
+function creerPlaceholder(){
+
+  const placeholder =
+    document.createElement("div");
+
+  placeholder.className =
+    "member-photo-placeholder";
+
+  placeholder.textContent =
+    "★";
+
+  return placeholder;
+}
+
+
+/* =========================================================
+   POPUP PROFIL
+========================================================= */
+
+function ouvrirProfil(membre){
+
+  const image =
+    document.getElementById(
+      "profileModalImage"
+    );
+
+  const placeholder =
+    document.getElementById(
+      "profilePlaceholder"
+    );
+
+  const name =
+    document.getElementById(
+      "profileModalName"
+    );
+
+  const grade =
+    document.getElementById(
+      "profileModalGrade"
+    );
+
+  const region =
+    document.getElementById(
+      "profileModalRegion"
+    );
+
+  const description =
+    document.getElementById(
+      "profileModalDescription"
+    );
+
+  const competences =
+    document.getElementById(
+      "profileModalCompetences"
+    );
+
+
+  name.textContent =
+    membre.nom || "Membre";
+
+
+  grade.textContent =
+    membre.grade || "user";
+
+
+  region.textContent =
+    membre.region || "";
+
+
+  description.textContent =
+    membre.description || "";
+
+
+  if(imageValide(membre.image_url)){
+
+    image.src =
+      membre.image_url;
+
+    image.alt =
+      membre.nom || "Membre";
+
+    image.style.display =
+      "block";
+
+    placeholder.style.display =
+      "none";
+
+  }else{
+
+    image.style.display =
+      "none";
+
+    placeholder.style.display =
+      "flex";
+
+  }
+
+
+  competences.innerHTML = "";
+
+  const liste =
+    normaliserCompetences(
+      membre.competences
+    );
+
+  if(liste.length === 0){
+
+    const empty =
+      document.createElement("span");
+
+    empty.style.color =
+      "#8994a6";
+
+    empty.style.fontFamily =
+      "Arial,sans-serif";
+
+    empty.style.fontSize =
+      "11px";
+
+    empty.textContent =
+      "Aucune compétence renseignée.";
+
+    competences.appendChild(empty);
+
+  }else{
+
+    liste.forEach(comp => {
+
+      const tag =
+        document.createElement("span");
+
+      tag.className =
+        "competence-tag";
+
+      tag.textContent =
+        comp;
+
+      competences.appendChild(tag);
+
+    });
+
+  }
+
+  ouvrirModal(memberModal);
+}
+
+
+/* =========================================================
+   MODAL REJOINDRE
+========================================================= */
+
+document
+  .getElementById("openJoin")
+  .addEventListener(
     "click",
-    function() {
+    () => {
 
-        fermerModal();
+      document
+        .getElementById("formMessage")
+        .className =
+          "form-message";
+
+      document
+        .getElementById("formMessage")
+        .textContent = "";
+
+      ouvrirModal(joinModal);
 
     }
+  );
+
+
+/* =========================================================
+   FERMETURE MODALES
+========================================================= */
+
+document
+  .getElementById("closeMember")
+  .addEventListener(
+    "click",
+    () => fermerModal(memberModal)
+  );
+
+
+document
+  .getElementById("closeJoin")
+  .addEventListener(
+    "click",
+    () => fermerModal(joinModal)
+  );
+
+
+document
+  .getElementById("closeEvent")
+  .addEventListener(
+    "click",
+    () => fermerModal(eventModal)
+  );
+
+
+memberModal.addEventListener(
+  "click",
+  event => {
+
+    if(event.target === memberModal){
+      fermerModal(memberModal);
+    }
+
+  }
 );
 
 
 joinModal.addEventListener(
-    "click",
-    function(event) {
+  "click",
+  event => {
 
-        if (
-            event.target ===
-            joinModal
-        ) {
-
-            fermerModal();
-
-        }
-
+    if(event.target === joinModal){
+      fermerModal(joinModal);
     }
+
+  }
+);
+
+
+eventModal.addEventListener(
+  "click",
+  event => {
+
+    if(event.target === eventModal){
+      fermerModal(eventModal);
+    }
+
+  }
 );
 
 
 document.addEventListener(
-    "keydown",
-    function(event) {
+  "keydown",
+  event => {
 
-        if (
-            event.key === "Escape"
-        ) {
+    if(event.key === "Escape"){
 
-            fermerModal();
-
-        }
+      fermerModal(memberModal);
+      fermerModal(joinModal);
+      fermerModal(eventModal);
 
     }
+
+  }
 );
 
 
-function fermerModal() {
+/* =========================================================
+   FORMULAIRE
+========================================================= */
 
-    joinModal.classList.remove(
-        "active"
+document
+  .getElementById("joinForm")
+  .addEventListener(
+    "submit",
+    async event => {
+
+      event.preventDefault();
+
+      const message =
+        document.getElementById(
+          "formMessage"
+        );
+
+      message.className =
+        "form-message";
+
+      message.textContent = "";
+
+
+      const nom =
+        document
+          .getElementById("nom")
+          .value
+          .trim();
+
+      const email =
+        document
+          .getElementById("email")
+          .value
+          .trim();
+
+      const region =
+        document
+          .getElementById("region")
+          .value;
+
+      const image_url =
+        document
+          .getElementById("image_url")
+          .value
+          .trim();
+
+      const description =
+        document
+          .getElementById("description")
+          .value
+          .trim();
+
+
+      /*
+       * IMPORTANT :
+       * le choix est unique grâce aux boutons radio.
+       */
+
+      const typeInscription =
+        document.querySelector(
+          'input[name="type_inscription"]:checked'
+        )?.value;
+
+
+      const anonyme =
+        typeInscription === "anonyme";
+
+
+      const competences =
+        Array.from(
+          document.querySelectorAll(
+            'input[name="competences"]:checked'
+          )
+        )
+        .map(input => input.value);
+
+
+      if(!nom || !email || !region){
+
+        message.className =
+          "form-message error";
+
+        message.textContent =
+          "Merci de remplir tous les champs obligatoires.";
+
+        return;
+      }
+
+
+      const profil = {
+
+        id: crypto.randomUUID(),
+
+        nom: nom,
+
+        grade: "user",
+
+        email: email,
+
+        image_url:
+          image_url || null,
+
+        description:
+          description || null,
+
+        region: region,
+
+        competences:
+          competences,
+
+        anonyme:
+          anonyme
+
+      };
+
+
+      const {
+        error
+      } = await supabaseClient
+        .from("profiles")
+        .insert(profil);
+
+
+      if(error){
+
+        console.error(
+          "Erreur création profil :",
+          error
+        );
+
+        message.className =
+          "form-message error";
+
+        message.textContent =
+          "Impossible de créer le profil pour le moment. " +
+          "Vérifiez les règles d’accès de la table profiles.";
+
+        return;
+      }
+
+
+      message.className =
+        "form-message success";
+
+
+      if(anonyme){
+
+        message.textContent =
+          "Votre profil a bien été créé. " +
+          "Il restera caché de la liste publique des membres.";
+
+      }else{
+
+        message.textContent =
+          "Votre profil a bien été créé. " +
+          "Il apparaît désormais dans la liste des membres.";
+
+      }
+
+
+      document
+        .getElementById("joinForm")
+        .reset();
+
+
+      /*
+       * Après reset(), on remet Sympathisant
+       * comme choix par défaut.
+       */
+
+      document
+        .getElementById("typeSympathisant")
+        .checked = true;
+
+
+      setTimeout(
+        () => {
+
+          fermerModal(joinModal);
+
+          chargerMembres();
+
+        },
+        1800
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   RENDEZ-VOUS
+========================================================= */
+
+async function chargerRendezVous(){
+
+  const track =
+    document.getElementById(
+      "eventsTrack"
     );
 
-    document.body.style.overflow =
-        "";
+  const windowEl =
+    document.getElementById(
+      "eventsWindow"
+    );
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("rendezvous")
+    .select("*")
+    .eq("actif", true)
+    .order("ordre", {
+      ascending:true
+    })
+    .order("date_evenement", {
+      ascending:true
+    });
+
+
+  if(error){
+
+    console.error(
+      "Erreur rendez-vous :",
+      error
+    );
+
+    return;
+
+  }
+
+
+  if(!data || data.length === 0){
+
+    track.innerHTML = `
+      <div class="event-item">
+        Aucun rendez-vous à venir
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  track.innerHTML = "";
+
+
+  data.forEach(event => {
+
+    const item =
+      document.createElement("div");
+
+    item.className =
+      "event-item";
+
+
+    const strong =
+      document.createElement("strong");
+
+    strong.textContent =
+      event.titre ||
+      event.nom ||
+      "Rendez-vous";
+
+
+    const separator =
+      document.createElement("span");
+
+    separator.className =
+      "event-separator";
+
+    separator.textContent =
+      "•";
+
+
+    const date =
+      document.createElement("span");
+
+    if(event.date_evenement){
+
+      const d =
+        new Date(
+          event.date_evenement
+        );
+
+      date.textContent =
+        d.toLocaleDateString(
+          "fr-FR",
+          {
+            day:"2-digit",
+            month:"2-digit"
+          }
+        );
+
+    }
+
+
+    item.appendChild(strong);
+    item.appendChild(separator);
+    item.appendChild(date);
+
+
+    item.addEventListener(
+      "click",
+      () => {
+
+        document
+          .getElementById(
+            "eventModalTitle"
+          )
+          .textContent =
+            event.titre ||
+            event.nom ||
+            "Rendez-vous";
+
+
+        const d =
+          event.date_evenement
+            ? new Date(
+                event.date_evenement
+              )
+            : null;
+
+
+        document
+          .getElementById(
+            "eventModalDate"
+          )
+          .textContent =
+            d
+              ? d.toLocaleString(
+                  "fr-FR",
+                  {
+                    dateStyle:"full",
+                    timeStyle:"short"
+                  }
+                )
+              : "";
+
+
+        document
+          .getElementById(
+            "eventModalDescription"
+          )
+          .textContent =
+            event.description ||
+            "";
+
+
+        ouvrirModal(eventModal);
+
+      }
+    );
+
+
+    track.appendChild(item);
+
+  });
+
+
+  /*
+   * Animation continue de droite vers gauche.
+   */
+
+  let position = 0;
+
+  const vitesse = 110;
+
+  let dernierTemps =
+    performance.now();
+
+
+  function animation(
+    temps
+  ){
+
+    const delta =
+      (temps - dernierTemps) / 1000;
+
+    dernierTemps = temps;
+
+    position +=
+      vitesse * delta;
+
+
+    const largeur =
+      track.scrollWidth;
+
+
+    if(position >= largeur + 35){
+
+      position =
+        -windowEl.clientWidth;
+
+    }
+
+
+    track.style.transform =
+      `translateX(${-position}px)`;
+
+
+    requestAnimationFrame(
+      animation
+    );
+
+  }
+
+
+  requestAnimationFrame(
+    animation
+  );
 
 }
 
 
-/* =====================================================
-   CREATION DU PROFIL
-===================================================== */
-
-document
-    .getElementById("joinForm")
-    .addEventListener(
-        "submit",
-        async function(event) {
-
-            event.preventDefault();
-
-
-            const submit =
-                document.getElementById(
-                    "formSubmit"
-                );
-
-
-            const message =
-                document.getElementById(
-                    "formMessage"
-                );
-
-
-            submit.disabled =
-                true;
-
-
-            message.textContent =
-                "Création de votre profil...";
-
-
-            message.style.color =
-                "#d6ad55";
-
-
-            /* DONNEES */
-
-            const nom =
-                document
-                    .getElementById("nom")
-                    .value
-                    .trim();
-
-
-            const email =
-                document
-                    .getElementById("email")
-                    .value
-                    .trim();
-
-
-            const region =
-                document
-                    .getElementById("region")
-                    .value;
-
-
-            const image_url =
-                document
-                    .getElementById("image_url")
-                    .value
-                    .trim();
-
-
-            const description =
-                document
-                    .getElementById("description")
-                    .value
-                    .trim();
-
-
-            const competences =
-                Array.from(
-                    document.querySelectorAll(
-                        'input[name="competences"]:checked'
-                    )
-                ).map(
-                    checkbox =>
-                        checkbox.value
-                );
-
-
-            /* =================================================
-               INSERTION DANS profiles
-            ================================================= */
-
-            const id =
-                crypto.randomUUID();
-
-
-            const {
-                data,
-                error
-            } = await supabaseClient
-
-                .from("profiles")
-
-                .insert([
-                    {
-
-                        id: id,
-
-                        nom: nom,
-
-                        grade: "membre",
-
-                        email:
-                            email ||
-                            null,
-
-                        image_url:
-                            image_url ||
-                            null,
-
-                        description:
-                            description ||
-                            null,
-
-                        region:
-                            region ||
-                            null,
-
-                        competences:
-                            competences.length
-                                ? competences
-                                : null
-
-                    }
-                ])
-
-                .select()
-                .single();
-
-
-            if (error) {
-
-                console.error(
-                    "Erreur création profil :",
-                    error
-                );
-
-
-                message.textContent =
-                    "Impossible de créer le profil : " +
-                    error.message;
-
-
-                message.style.color =
-                    "#EF4135";
-
-
-                submit.disabled =
-                    false;
-
-                return;
-
-            }
-
-
-            /* =================================================
-               SUCCES
-            ================================================= */
-
-            message.textContent =
-                "Votre profil a bien été créé.";
-
-
-            message.style.color =
-                "#8fd694";
-
-
-            document
-                .getElementById("joinForm")
-                .reset();
-
-
-            /*
-               Actualisation immédiate
-               de la liste des membres.
-            */
-
-            await chargerMembres();
-
-
-            setTimeout(
-                function() {
-
-                    fermerModal();
-
-                    message.textContent =
-                        "";
-
-                    submit.disabled =
-                        false;
-
-                },
-                1800
-            );
-
-        }
-    );
-
-
-/* =====================================================
-   DEMARRAGE
-===================================================== */
+/* =========================================================
+   INITIALISATION
+========================================================= */
 
 chargerMembres();
 
+chargerRendezVous();
+
 </script>
 
-
 </body>
-
 </html>
-```
