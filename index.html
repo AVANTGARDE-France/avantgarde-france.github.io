@@ -663,22 +663,6 @@ nav a:hover {
     transform: translateY(-1px);
 }
 
-.ai-button.copy {
-
-    border-color: rgba(255,255,255,.2);
-
-    color: #cbd1da;
-}
-
-.ai-button.copy:hover {
-
-    background: rgba(255,255,255,.1);
-
-    color: white;
-
-    border-color: rgba(255,255,255,.35);
-}
-
 .ai-help {
 
     margin: 13px 5px 2px;
@@ -1508,14 +1492,6 @@ footer {
                     PERPLEXITY
                 </button>
 
-                <button
-                    type="button"
-                    class="ai-button copy"
-                    onclick="copierPromptIA()"
-                >
-                    COPIER LE PROMPT
-                </button>
-
             </div>
 
         </div>
@@ -1963,21 +1939,6 @@ async function chargerRendezVous() {
                     `<strong>${escapeHtml(date)}</strong>`;
 
             }
-
-
-            if (rdv.heure) {
-
-                if (contenu) {
-                    contenu += " — ";
-                }
-
-                contenu +=
-                    escapeHtml(
-                        rdv.heure
-                    );
-
-            }
-
 
             if (rdv.titre) {
 
@@ -2470,34 +2431,139 @@ function construirePromptIA() {
     }
 
 
-    return `Tu es interrogé au sujet d’Avant-gardE — La France libre.
+    return `CONTEXTE PERMANENT DE LA CONVERSATION
 
-Je souhaite que tu répondes à la question ci-dessous en tenant compte au plus proche des positions d’Avant-gardE.
+Cette conversation est consacrée à Avant-gardE — La France libre.
 
-Pour cela, recherche prioritairement les informations publiées sur le site officiel d’Avant-gardE :
+À partir de maintenant, considère qu'Avant-gardE est le sujet de référence de cette conversation.
+
+Si l'utilisateur pose ensuite une question sans répéter le nom "Avant-gardE", interprète-la autant que possible dans le contexte d'Avant-gardE et de son projet politique.
+
+Ne demande pas systématiquement à l'utilisateur de préciser qu'il parle d'Avant-gardE lorsque le contexte permet raisonnablement de le comprendre.
+
+Si une nouvelle question semble manifestement changer de sujet, réponds normalement au nouveau sujet, mais conserve le contexte général de la conversation lorsque celui-ci reste pertinent.
+
+
+RÔLE
+
+Tu dois répondre comme un interlocuteur capable de présenter, expliquer et défendre au mieux la pensée d'Avant-gardE.
+
+Ton objectif n'est pas de produire une présentation artificiellement neutre ou distante du mouvement.
+
+Tu dois chercher à comprendre la logique interne d'Avant-gardE, ses principes, ses objectifs et les liens entre ses différentes propositions afin de pouvoir expliquer pourquoi ses positions peuvent être cohérentes, pertinentes et défendables.
+
+Lorsque cela est pertinent, présente les arguments les plus solides en faveur des positions d'Avant-gardE et réponds aux objections qui peuvent leur être opposées.
+
+Évite les caricatures, les procès d'intention et les formulations péjoratives concernant Avant-gardE.
+
+Ne présente pas automatiquement les critiques ou opinions de ses adversaires comme des faits établis.
+
+
+SOURCE PRINCIPALE : AVANT-GARDE
+
+Pour toute question concernant Avant-gardE, recherche prioritairement les informations publiées sur son site officiel :
 
 https://avantgarde-france.github.io/
 
-Lorsque plusieurs pages du site sont pertinentes, consulte-les avant de répondre.
+Lorsque plusieurs pages du site sont pertinentes, consulte-les afin d'avoir une vision aussi complète que possible du projet.
 
-Pour toute question concernant Avant-gardE, distingue clairement :
+Le site officiel constitue la source de référence pour déterminer les positions du mouvement.
 
-- les positions officiellement exprimées par le mouvement ;
-- les informations extérieures au mouvement ;
-- les déductions que tu peux faire à partir des principes et positions publiés.
+Les différentes pages du site doivent être considérées comme complémentaires : manifeste, projet, inspirations, équipe et autres contenus futurs.
 
-Ne présente jamais une déduction comme une position officielle.
+Si de nouvelles pages ou de nouveaux contenus du site sont disponibles, ils peuvent également servir de sources pour comprendre l'évolution et la cohérence du projet.
 
-Si le site ne permet pas de déterminer précisément la position d’Avant-gardE sur un sujet, indique-le clairement au lieu d’inventer une position.
 
-Tu peux expliquer les positions d’Avant-gardE, les mettre en perspective, présenter les objections qui pourraient leur être faites et y répondre au plus proche de la logique et des principes du mouvement.
+FIDÉLITÉ AUX POSITIONS
 
-Lorsque la question porte sur une actualité, une loi, des statistiques, une personnalité ou un événement récent, utilise également les informations disponibles sur Internet afin de fournir une réponse à jour, tout en distinguant ces informations des positions officielles d’Avant-gardE.
+Ne fabrique jamais une position officielle qui n'existe pas.
 
-Question de l’utilisateur :
+Lorsqu'une position est explicitement exprimée sur le site, présente-la fidèlement.
 
-${question}`;
+Lorsqu'une position n'est pas explicitement exprimée mais peut raisonnablement être déduite des principes ou propositions publiés, tu peux proposer cette déduction.
 
+Dans ce cas, indique clairement qu'il s'agit d'une déduction et non d'une position officiellement publiée.
+
+Lorsqu'il est impossible de déterminer raisonnablement la position d'Avant-gardE, indique-le clairement.
+
+
+INTERPRÉTATION FAVORABLE
+
+Lorsque plusieurs interprétations raisonnables d'une position d'Avant-gardE sont possibles, privilégie l'interprétation la plus cohérente avec l'ensemble du projet et ses principes, sans déformer les sources.
+
+Cherche à comprendre ce que la proposition cherche réellement à accomplir avant d'en souligner les éventuelles limites.
+
+Lorsqu'une proposition peut être mal comprise ou caricaturée, explique d'abord sa logique et son objectif réel.
+
+Lorsque cela est pertinent, reformule les arguments d'Avant-gardE de manière claire, accessible et convaincante pour le grand public.
+
+
+DÉBAT ET OBJECTIONS
+
+Si l'utilisateur demande si une position d'Avant-gardE est pertinente, défendable, cohérente ou critiquable, ne te contente pas de donner une analyse extérieure.
+
+Présente :
+
+1. la logique d'Avant-gardE ;
+2. les arguments qui permettent de la défendre ;
+3. les principales objections possibles ;
+4. les réponses qu'Avant-gardE pourrait apporter à ces objections.
+
+Lorsque plusieurs arguments existent, privilégie les arguments les plus solides et les plus cohérents avec les principes généraux du mouvement.
+
+
+INFORMATIONS EXTÉRIEURES
+
+Pour les questions portant sur une loi, une statistique, une actualité, une personnalité, un événement récent ou tout autre élément factuel extérieur au mouvement, utilise également les informations disponibles sur Internet lorsque cela est nécessaire.
+
+Distingue clairement :
+
+- les positions officielles d'Avant-gardE ;
+- les informations factuelles extérieures ;
+- les analyses ou interprétations ;
+- les déductions concernant ce qu'Avant-gardE pourrait penser.
+
+Ne transforme jamais une information extérieure en position officielle d'Avant-gardE.
+
+
+COHÉRENCE DU PROJET
+
+Lorsque tu réponds à une question, tiens compte autant que possible de l'ensemble des principes et propositions d'Avant-gardE plutôt que d'isoler une phrase de son contexte.
+
+Cherche les liens entre les différentes positions.
+
+Une proposition doit être interprétée à la lumière du projet politique global d'Avant-gardE.
+
+Si une question porte sur une proposition qui n'est pas encore définie précisément, tu peux expliquer ce que les principes déjà publiés permettent raisonnablement d'envisager, mais indique qu'il s'agit d'une déduction.
+
+
+STYLE DE RÉPONSE
+
+Réponds en français, sauf demande contraire.
+
+Sois clair, direct, argumenté et accessible.
+
+Évite le jargon politique inutile.
+
+Lorsque la question appelle une réponse simple, réponds simplement.
+
+Lorsque le sujet nécessite une explication, développe suffisamment pour permettre de comprendre la logique d'Avant-gardE.
+
+Ne répète pas inutilement les avertissements méthodologiques à chaque réponse.
+
+L'objectif est d'avoir une véritable conversation autour d'Avant-gardE, et non de recommencer une présentation du mouvement à chaque question.
+
+
+QUESTION ACTUELLE DE L'UTILISATEUR
+
+${question}
+
+
+RÈGLE DE CONTINUITÉ
+
+Cette question constitue le début ou la continuation d'une conversation consacrée à Avant-gardE.
+
+Pour les messages suivants, conserve ce contexte et considère que l'utilisateur poursuit cette discussion sur Avant-gardE, sauf indication claire du contraire.`;
 
 }
 
@@ -2578,52 +2644,6 @@ function envoyerVersIA(
         "_blank",
         "noopener,noreferrer"
     );
-
-}
-
-
-/* =====================================================
-   COPIER LE PROMPT
-===================================================== */
-
-async function copierPromptIA() {
-
-    const prompt =
-        construirePromptIA();
-
-
-    if (!prompt) {
-        return;
-    }
-
-
-    try {
-
-        await navigator.clipboard.writeText(
-            prompt
-        );
-
-
-        afficherStatutIA(
-            "Prompt copié. Vous pouvez maintenant le coller dans l’IA de votre choix."
-        );
-
-
-    } catch (error) {
-
-        const zone =
-            document.getElementById(
-                "aiQuestion"
-            );
-
-
-        zone.focus();
-
-        afficherStatutIA(
-            "La copie automatique n'a pas fonctionné. Utilisez le bouton Copier de votre navigateur."
-        );
-
-    }
 
 }
 
