@@ -24,31 +24,17 @@
   --border:rgba(214,173,85,.28);
 }
 
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
-html{
-  scroll-behavior:smooth;
-}
+html{scroll-behavior:smooth}
 
 body{
   margin:0;
-
   background:
-    radial-gradient(
-      circle at 50% 0%,
-      rgba(214,173,85,.07),
-      transparent 35%
-    ),
+    radial-gradient(circle at 50% 0%,rgba(214,173,85,.07),transparent 35%),
     var(--navy);
-
   color:var(--white);
-
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
+  font-family:Georgia,"Times New Roman",serif;
 }
 
 
@@ -57,129 +43,75 @@ body{
 ========================================================= */
 
 header{
-
   min-height:82px;
-
   padding:0 5%;
-
   display:flex;
-
   align-items:center;
-
   justify-content:space-between;
-
-  border-bottom:
-    1px solid rgba(214,173,85,.25);
-
-  background:
-    rgba(7,21,45,.97);
-
+  border-bottom:1px solid rgba(214,173,85,.25);
+  background:rgba(7,21,45,.97);
   position:relative;
-
 }
-
-
-/* LOGO */
 
 .logo{
-
   color:var(--white);
-
   text-decoration:none;
-
   display:flex;
-
   align-items:center;
-
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
-
+  font-family:Georgia,"Times New Roman",serif;
   font-size:28px;
-
   font-weight:bold;
-
   letter-spacing:-1.2px;
-
   line-height:1;
-
   white-space:nowrap;
-
 }
 
-.logo-a,
-.logo-e{
-
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
-
+.logo-a,.logo-e{
+  font-family:Georgia,"Times New Roman",serif;
   font-size:inherit;
-
   font-weight:bold;
-
 }
 
-.logo-a{
-  color:var(--blue-france);
-}
-
-.logo-e{
-  color:var(--red);
-}
-
-
-/* HEADER ACTIONS */
+.logo-a{color:var(--blue-france)}
+.logo-e{color:var(--red)}
 
 .header-actions{
-
   display:flex;
-
   align-items:center;
-
-  gap:10px;
-
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
 }
 
 .header-button{
-
-  border:
-    1px solid rgba(214,173,85,.45);
-
-  background:
-    rgba(255,255,255,.025);
-
+  border:1px solid rgba(214,173,85,.45);
+  background:rgba(255,255,255,.025);
   color:#e7e7e7;
-
-  padding:9px 13px;
-
+  padding:8px 12px;
   font-family:Arial,sans-serif;
-
-  font-size:10px;
-
+  font-size:9px;
   font-weight:bold;
-
   letter-spacing:1px;
-
   cursor:pointer;
-
   text-decoration:none;
-
   transition:.2s;
-
 }
 
 .header-button:hover{
-
   border-color:var(--gold);
-
   color:var(--gold-light);
+  background:rgba(214,173,85,.07);
+}
 
-  background:
-    rgba(214,173,85,.07);
+.logout-button{
+  border-color:rgba(239,65,53,.45);
+  color:#ffaaa2;
+}
 
+.logout-button:hover{
+  border-color:var(--red);
+  color:#ffb5ae;
+  background:rgba(180,30,20,.08);
 }
 
 
@@ -188,65 +120,38 @@ header{
 ========================================================= */
 
 .page{
-
   width:min(1100px,94%);
-
   margin:0 auto;
-
-  padding:60px 0 90px;
-
+  padding:45px 0 70px;
 }
 
 .page-kicker{
-
   color:var(--gold);
-
   font-family:Arial,sans-serif;
-
-  font-size:11px;
-
+  font-size:10px;
   font-weight:bold;
-
   letter-spacing:3px;
-
-  margin-bottom:12px;
-
+  margin-bottom:9px;
   text-align:center;
-
 }
 
 .page-title{
-
   text-align:center;
-
-  font-size:
-    clamp(36px,6vw,58px);
-
+  font-size:clamp(34px,5vw,52px);
   margin:0;
-
 }
 
-.page-title span{
-  color:var(--gold);
-}
+.page-title span{color:var(--gold)}
 
-.page-intro{
-
-  max-width:650px;
-
-  margin:18px auto 40px;
-
+.admin-user{
   text-align:center;
-
   color:var(--muted);
-
   font-family:Arial,sans-serif;
-
-  font-size:13px;
-
-  line-height:1.6;
-
+  font-size:11px;
+  margin-top:10px;
 }
+
+.admin-user strong{color:var(--gold-light)}
 
 
 /* =========================================================
@@ -254,62 +159,34 @@ header{
 ========================================================= */
 
 .login-container{
-
-  width:min(440px,100%);
-
-  margin:80px auto;
-
+  width:min(440px,94%);
+  margin:70px auto;
 }
 
 .login-box{
-
-  background:
-    linear-gradient(
-      145deg,
-      #0d2344,
-      #07152d
-    );
-
-  border:
-    1px solid var(--border);
-
-  padding:40px;
-
-  box-shadow:
-    0 25px 80px rgba(0,0,0,.45);
-
+  background:linear-gradient(145deg,#0d2344,#07152d);
+  border:1px solid var(--border);
+  padding:38px;
+  box-shadow:0 25px 80px rgba(0,0,0,.45);
 }
 
 .login-logo{
-
   text-align:center;
-
-  margin-bottom:35px;
-
+  margin-bottom:30px;
 }
 
 .login-logo .logo{
-
   justify-content:center;
-
   font-size:34px;
-
 }
 
 .login-subtitle{
-
   color:var(--muted);
-
   text-align:center;
-
   font-family:Arial,sans-serif;
-
-  font-size:11px;
-
+  font-size:10px;
   letter-spacing:1px;
-
-  margin-top:10px;
-
+  margin-top:9px;
 }
 
 
@@ -318,91 +195,58 @@ header{
 ========================================================= */
 
 .form-group{
-
-  margin-bottom:21px;
-
+  margin-bottom:15px;
 }
 
 .form-group label{
-
   display:block;
-
   font-family:Arial,sans-serif;
-
-  font-size:11px;
-
+  font-size:10px;
   font-weight:bold;
-
   letter-spacing:.5px;
-
-  margin-bottom:8px;
-
+  margin-bottom:6px;
 }
 
 input[type="text"],
 input[type="email"],
 input[type="password"],
 input[type="url"],
+input[type="date"],
 textarea,
 select{
-
   width:100%;
-
-  border:
-    1px solid rgba(255,255,255,.15);
-
+  border:1px solid rgba(255,255,255,.15);
   background:#061329;
-
   color:var(--white);
-
-  padding:12px 13px;
-
+  padding:9px 11px;
   font-family:Arial,sans-serif;
-
-  font-size:13px;
-
+  font-size:12px;
   outline:none;
-
   border-radius:0;
-
 }
 
 input:focus,
 textarea:focus,
 select:focus{
-
   border-color:var(--gold);
-
 }
 
 input:disabled{
-
   opacity:.55;
-
   cursor:not-allowed;
-
 }
 
 textarea{
-
-  min-height:120px;
-
+  min-height:85px;
   resize:vertical;
-
 }
 
 .help{
-
   color:#8994a6;
-
   font-family:Arial,sans-serif;
-
-  font-size:10px;
-
-  line-height:1.45;
-
-  margin-top:6px;
-
+  font-size:9px;
+  line-height:1.4;
+  margin-top:5px;
 }
 
 
@@ -411,73 +255,40 @@ textarea{
 ========================================================= */
 
 .primary-button{
-
   width:100%;
-
   border:0;
-
   background:var(--gold);
-
   color:var(--navy);
-
-  padding:15px;
-
+  padding:12px;
   font-family:Arial,sans-serif;
-
-  font-size:11px;
-
+  font-size:10px;
   font-weight:bold;
-
   letter-spacing:1.2px;
-
   cursor:pointer;
-
   transition:.2s;
-
 }
 
-.primary-button:hover{
-
-  background:var(--gold-light);
-
-}
+.primary-button:hover{background:var(--gold-light)}
 
 .primary-button:disabled{
-
   opacity:.6;
-
   cursor:wait;
-
 }
 
 .secondary-button{
-
-  border:
-    1px solid rgba(214,173,85,.5);
-
+  border:1px solid rgba(214,173,85,.5);
   background:transparent;
-
   color:var(--gold-light);
-
-  padding:12px 18px;
-
+  padding:9px 14px;
   font-family:Arial,sans-serif;
-
-  font-size:10px;
-
+  font-size:9px;
   font-weight:bold;
-
   letter-spacing:1px;
-
   cursor:pointer;
-
 }
 
 .secondary-button:hover{
-
-  background:
-    rgba(214,173,85,.08);
-
+  background:rgba(214,173,85,.08);
 }
 
 
@@ -486,82 +297,26 @@ textarea{
 ========================================================= */
 
 .message{
-
   display:none;
-
-  padding:13px;
-
-  margin-top:15px;
-
+  padding:10px;
+  margin-top:12px;
   font-family:Arial,sans-serif;
-
-  font-size:12px;
-
-  line-height:1.5;
-
+  font-size:11px;
+  line-height:1.45;
 }
 
 .message.success{
-
   display:block;
-
-  border:
-    1px solid rgba(100,200,130,.4);
-
+  border:1px solid rgba(100,200,130,.4);
   color:#b9e5c4;
-
-  background:
-    rgba(50,130,70,.1);
-
+  background:rgba(50,130,70,.1);
 }
 
 .message.error{
-
   display:block;
-
-  border:
-    1px solid rgba(239,65,53,.4);
-
+  border:1px solid rgba(239,65,53,.4);
   color:#ffb5ae;
-
-  background:
-    rgba(180,30,20,.1);
-
-}
-
-
-/* =========================================================
-   ADMIN
-========================================================= */
-
-#adminScreen{
-
-  display:none;
-
-}
-
-.admin-header{
-
-  margin-bottom:30px;
-
-}
-
-.admin-user{
-
-  text-align:center;
-
-  color:var(--muted);
-
-  font-family:Arial,sans-serif;
-
-  font-size:12px;
-
-}
-
-.admin-user strong{
-
-  color:var(--gold-light);
-
+  background:rgba(180,30,20,.1);
 }
 
 
@@ -570,113 +325,64 @@ textarea{
 ========================================================= */
 
 .tabs{
-
   display:flex;
-
-  border-bottom:
-    1px solid rgba(214,173,85,.25);
-
-  margin-bottom:30px;
-
+  border-bottom:1px solid rgba(214,173,85,.25);
+  margin-bottom:20px;
 }
 
 .tab{
-
   flex:1;
-
   border:0;
-
-  border-bottom:
-    2px solid transparent;
-
+  border-bottom:2px solid transparent;
   background:transparent;
-
   color:#8f9aaa;
-
-  padding:14px;
-
+  padding:11px;
   font-family:Arial,sans-serif;
-
-  font-size:11px;
-
+  font-size:10px;
   font-weight:bold;
-
   letter-spacing:1.3px;
-
   cursor:pointer;
-
 }
 
-.tab:hover{
-
-  color:var(--gold-light);
-
-}
+.tab:hover{color:var(--gold-light)}
 
 .tab.active{
-
   color:var(--gold-light);
-
-  border-bottom-color:
-    var(--gold);
-
+  border-bottom-color:var(--gold);
 }
 
-.tab-content{
+.tab-content{display:none}
 
-  display:none;
-
-}
-
-.tab-content.active{
-
-  display:block;
-
-}
+.tab-content.active{display:block}
 
 
 /* =========================================================
-   CARTES
+   PANELS
 ========================================================= */
 
 .panel{
-
   background:
     linear-gradient(
       145deg,
       rgba(255,255,255,.035),
       rgba(255,255,255,.015)
     );
-
-  border:
-    1px solid var(--border);
-
-  padding:30px;
-
-  margin-bottom:25px;
-
+  border:1px solid var(--border);
+  padding:22px;
+  margin-bottom:18px;
 }
 
 .panel-title{
-
-  font-size:25px;
-
-  margin:0 0 7px;
-
+  font-size:22px;
+  margin:0 0 5px;
 }
 
 .panel-intro{
-
   color:var(--muted);
-
   font-family:Arial,sans-serif;
-
-  font-size:12px;
-
-  line-height:1.5;
-
-  margin:0 0 25px;
-
+  font-size:10px;
+  line-height:1.45;
+  margin:0 0 18px;
 }
 
 
@@ -685,115 +391,66 @@ textarea{
 ========================================================= */
 
 .profile-grid{
-
   display:grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap:20px;
-
+  grid-template-columns:1fr 1fr;
+  gap:12px 16px;
 }
 
-.full-width{
-
-  grid-column:1/-1;
-
-}
+.full-width{grid-column:1/-1}
 
 
 /* =========================================================
-   AFFICHAGE / ANONYME
+   VISIBILITÉ
 ========================================================= */
 
 .registration-choice{
-
   display:grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap:10px;
-
+  grid-template-columns:1fr 1fr;
+  gap:8px;
 }
 
 .choice-option{
-
   position:relative;
-
 }
 
 .choice-option input{
-
   position:absolute;
-
   opacity:0;
-
   pointer-events:none;
-
 }
 
 .choice-label{
-
   display:block;
-
-  height:100%;
-
-  border:
-    1px solid rgba(255,255,255,.14);
-
-  background:
-    rgba(0,0,0,.12);
-
-  padding:15px 17px;
-
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(0,0,0,.12);
+  padding:10px 12px;
   cursor:pointer;
-
   transition:.2s;
-
 }
 
 .choice-label strong{
-
   display:block;
-
   color:var(--white);
-
   font-family:Arial,sans-serif;
-
-  font-size:13px;
-
-  margin-bottom:5px;
-
+  font-size:11px;
+  margin-bottom:3px;
 }
 
 .choice-label span{
-
   display:block;
-
   color:var(--muted);
-
   font-family:Arial,sans-serif;
-
-  font-size:11px;
-
-  line-height:1.5;
-
+  font-size:9px;
+  line-height:1.35;
 }
 
 .choice-option input:checked + .choice-label{
-
   border-color:var(--gold);
-
-  background:
-    rgba(214,173,85,.08);
-
+  background:rgba(214,173,85,.08);
 }
 
 .choice-option input:checked + .choice-label strong{
-
   color:var(--gold-light);
-
 }
 
 
@@ -802,164 +459,111 @@ textarea{
 ========================================================= */
 
 .section-title{
-
   color:var(--gold);
-
-  font-size:19px;
-
-  margin:35px 0 20px;
-
-  padding-bottom:9px;
-
-  border-bottom:
-    1px solid rgba(214,173,85,.2);
-
+  font-size:17px;
+  margin:22px 0 12px;
+  padding-bottom:7px;
+  border-bottom:1px solid rgba(214,173,85,.2);
 }
 
 .competence-group{
-
-  margin-bottom:25px;
-
+  margin-bottom:15px;
 }
 
 .competence-group-title{
-
   font-family:Arial,sans-serif;
-
   color:#eee;
-
-  font-size:13px;
-
+  font-size:10px;
   font-weight:bold;
-
-  margin-bottom:13px;
-
+  margin-bottom:7px;
 }
 
 .competence{
-
   position:relative;
-
-  border:
-    1px solid rgba(255,255,255,.1);
-
-  margin-bottom:8px;
-
-  padding:12px;
-
-  background:
-    rgba(0,0,0,.12);
-
+  border:1px solid rgba(255,255,255,.1);
+  margin-bottom:5px;
+  padding:7px 9px;
+  background:rgba(0,0,0,.12);
   transition:.2s;
-
 }
 
 .competence:hover{
-
-  border-color:
-    rgba(214,173,85,.45);
-
+  border-color:rgba(214,173,85,.45);
 }
 
 .competence label{
-
   display:flex;
-
-  align-items:flex-start;
-
-  gap:10px;
-
+  align-items:center;
+  gap:8px;
   cursor:pointer;
-
 }
 
 .competence input{
-
-  margin-top:3px;
-
+  margin:0;
   accent-color:var(--gold);
-
 }
 
 .competence-name{
-
   color:var(--white);
-
   font-family:Arial,sans-serif;
-
-  font-size:12px;
-
+  font-size:10px;
   font-weight:bold;
-
 }
 
 
-/* INFO BUBBLE */
+/* =========================================================
+   BULLE DES COMPETENCES
+========================================================= */
 
 .competence-info{
-
   display:none;
-
   position:absolute;
-
   z-index:20;
-
-  left:30px;
-
-  right:15px;
-
-  top:calc(100% + 7px);
-
-  padding:13px 15px;
-
+  left:25px;
+  right:10px;
+  top:calc(100% + 5px);
+  padding:10px 12px;
   background:#061329;
-
-  border:
-    1px solid var(--gold);
-
-  box-shadow:
-    0 12px 35px rgba(0,0,0,.55);
-
+  border:1px solid var(--gold);
+  box-shadow:0 12px 35px rgba(0,0,0,.55);
   color:#cfd5df;
-
   font-family:Arial,sans-serif;
-
-  font-size:10px;
-
-  line-height:1.5;
-
+  font-size:9px;
+  line-height:1.45;
 }
 
 .competence-info::before{
-
   content:"";
-
   position:absolute;
-
   top:-6px;
-
-  left:20px;
-
-  width:10px;
-
-  height:10px;
-
+  left:15px;
+  width:9px;
+  height:9px;
   background:#061329;
-
-  border-left:
-    1px solid var(--gold);
-
-  border-top:
-    1px solid var(--gold);
-
+  border-left:1px solid var(--gold);
+  border-top:1px solid var(--gold);
   transform:rotate(45deg);
-
 }
 
 .competence:hover .competence-info{
-
   display:block;
+}
 
+
+/* =========================================================
+   COMPTEUR DESCRIPTION
+========================================================= */
+
+.description-counter{
+  text-align:right;
+  color:#778396;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+  margin-top:4px;
+}
+
+.description-counter.limit{
+  color:#ffaaa2;
 }
 
 
@@ -968,289 +572,163 @@ textarea{
 ========================================================= */
 
 .delete-panel{
-
-  border:
-    1px solid rgba(239,65,53,.28);
-
-  background:
-    rgba(100,20,20,.08);
-
+  border:1px solid rgba(239,65,53,.28);
+  background:rgba(100,20,20,.08);
 }
 
 .delete-panel h3{
-
   color:#ffb5ae;
-
-  margin-top:0;
-
-  font-size:18px;
-
+  margin:0 0 6px;
+  font-size:16px;
 }
 
 .delete-panel p{
-
   color:#aeb7c5;
-
   font-family:Arial,sans-serif;
-
-  font-size:11px;
-
-  line-height:1.6;
-
+  font-size:10px;
+  line-height:1.5;
+  margin:5px 0 12px;
 }
 
 .delete-button{
-
-  border:
-    1px solid rgba(239,65,53,.6);
-
-  background:
-    rgba(180,30,20,.08);
-
+  border:1px solid rgba(239,65,53,.6);
+  background:rgba(180,30,20,.08);
   color:#ffaaa2;
-
-  padding:12px 18px;
-
+  padding:9px 14px;
   font-family:Arial,sans-serif;
-
-  font-size:10px;
-
+  font-size:9px;
   font-weight:bold;
-
   letter-spacing:1px;
-
   cursor:pointer;
-
 }
 
 .delete-button:hover{
-
-  background:
-    rgba(180,30,20,.18);
-
+  background:rgba(180,30,20,.18);
 }
 
 
 /* =========================================================
-   RDV
+   EVENEMENTS
 ========================================================= */
 
 .event-list{
-
   display:grid;
-
-  gap:12px;
-
-  margin-top:25px;
-
+  gap:7px;
+  margin-top:18px;
 }
 
 .event-card{
-
-  border:
-    1px solid rgba(255,255,255,.1);
-
-  background:
-    rgba(0,0,0,.12);
-
-  padding:18px;
-
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(0,0,0,.12);
+  padding:11px 13px;
 }
 
 .event-card-header{
-
   display:flex;
-
   justify-content:space-between;
-
-  gap:15px;
-
+  gap:12px;
   align-items:flex-start;
-
 }
 
 .event-card h3{
-
-  margin:0 0 7px;
-
-  font-size:18px;
-
+  margin:0 0 4px;
+  font-size:15px;
 }
 
 .event-card-date{
-
   color:var(--gold);
-
   font-family:Arial,sans-serif;
-
-  font-size:10px;
-
+  font-size:9px;
   font-weight:bold;
-
 }
 
 .event-card-text{
-
   color:#c8ced8;
-
   font-family:Arial,sans-serif;
-
-  font-size:12px;
-
-  line-height:1.5;
-
-  margin:10px 0;
-
+  font-size:10px;
+  line-height:1.4;
+  margin:7px 0;
 }
 
 .event-actions{
-
   display:flex;
-
-  gap:8px;
-
-  margin-top:14px;
-
+  gap:6px;
+  margin-top:8px;
 }
 
 .event-actions button{
-
-  padding:8px 12px;
-
+  padding:6px 9px;
   font-family:Arial,sans-serif;
-
-  font-size:9px;
-
+  font-size:8px;
   font-weight:bold;
-
   letter-spacing:.7px;
-
   cursor:pointer;
-
 }
 
 .edit-button{
-
-  border:
-    1px solid rgba(214,173,85,.5);
-
+  border:1px solid rgba(214,173,85,.5);
   background:transparent;
-
   color:var(--gold-light);
-
 }
 
 .delete-event-button{
-
-  border:
-    1px solid rgba(239,65,53,.45);
-
+  border:1px solid rgba(239,65,53,.45);
   background:transparent;
-
   color:#ffaaa2;
-
 }
 
 
 /* =========================================================
-   MODAL CONFIRMATION
+   MODAL
 ========================================================= */
 
 .modal{
-
   position:fixed;
-
   inset:0;
-
-  background:
-    rgba(0,0,0,.78);
-
+  background:rgba(0,0,0,.78);
   backdrop-filter:blur(6px);
-
   display:none;
-
   align-items:center;
-
   justify-content:center;
-
   padding:20px;
-
   z-index:1000;
-
 }
 
-.modal.active{
-
-  display:flex;
-
-}
+.modal.active{display:flex}
 
 .modal-box{
-
   width:min(500px,100%);
-
-  background:
-    linear-gradient(
-      145deg,
-      #0d2344,
-      #07152d
-    );
-
-  border:
-    1px solid var(--border);
-
-  box-shadow:
-    0 25px 80px rgba(0,0,0,.55);
-
+  background:linear-gradient(145deg,#0d2344,#07152d);
+  border:1px solid var(--border);
+  box-shadow:0 25px 80px rgba(0,0,0,.55);
   position:relative;
-
-  padding:35px;
-
+  padding:28px;
 }
 
 .modal-box h2{
-
   margin-top:0;
-
+  font-size:22px;
 }
 
 .modal-box p{
-
   color:var(--muted);
-
   font-family:Arial,sans-serif;
-
-  font-size:12px;
-
-  line-height:1.6;
-
+  font-size:11px;
+  line-height:1.5;
 }
 
 .modal-close{
-
   position:absolute;
-
-  right:18px;
-
-  top:14px;
-
+  right:15px;
+  top:10px;
   border:0;
-
   background:none;
-
   color:rgba(255,255,255,.65);
-
-  font-size:28px;
-
+  font-size:26px;
   cursor:pointer;
-
 }
 
-.modal-close:hover{
-
-  color:var(--gold);
-
-}
+.modal-close:hover{color:var(--gold)}
 
 
 /* =========================================================
@@ -1258,20 +736,12 @@ textarea{
 ========================================================= */
 
 footer{
-
-  border-top:
-    1px solid rgba(214,173,85,.15);
-
+  border-top:1px solid rgba(214,173,85,.15);
   text-align:center;
-
-  padding:30px 20px;
-
+  padding:25px 20px;
   color:#7f8998;
-
   font-family:Arial,sans-serif;
-
-  font-size:10px;
-
+  font-size:9px;
 }
 
 
@@ -1282,61 +752,40 @@ footer{
 @media(max-width:800px){
 
   header{
-
-    padding:20px;
-
+    padding:16px 20px;
     flex-direction:column;
-
-    gap:18px;
-
-  }
-
-  .profile-grid{
-
-    grid-template-columns:1fr;
-
-  }
-
-  .full-width{
-
-    grid-column:auto;
-
-  }
-
-  .panel{
-
-    padding:22px 17px;
-
-  }
-
-  .registration-choice{
-
-    grid-template-columns:1fr 1fr;
-
+    gap:14px;
   }
 
   .header-actions{
-
-    flex-wrap:wrap;
-
     justify-content:center;
+  }
 
+  .profile-grid{
+    grid-template-columns:1fr;
+  }
+
+  .full-width{
+    grid-column:auto;
+  }
+
+  .panel{
+    padding:18px 14px;
   }
 
 }
 
 @media(max-width:420px){
 
-  .logo{
-
-    font-size:24px;
-
-  }
+  .logo{font-size:24px}
 
   .registration-choice{
-
     grid-template-columns:1fr;
+  }
 
+  .header-button{
+    padding:7px 9px;
+    font-size:8px;
   }
 
 }
@@ -1353,19 +802,13 @@ footer{
      CONNEXION
 ======================================================= -->
 
-<section
-  id="loginScreen"
-  class="login-container"
->
+<section id="loginScreen" class="login-container">
 
   <div class="login-box">
 
     <div class="login-logo">
 
-      <a
-        href="index.html"
-        class="logo"
-      >
+      <a href="index.html" class="logo">
         <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
       </a>
 
@@ -1375,14 +818,11 @@ footer{
 
     </div>
 
-
     <form id="loginForm">
 
       <div class="form-group">
 
-        <label for="loginEmail">
-          EMAIL
-        </label>
+        <label for="loginEmail">EMAIL</label>
 
         <input
           type="email"
@@ -1393,12 +833,9 @@ footer{
 
       </div>
 
-
       <div class="form-group">
 
-        <label for="loginPassword">
-          MOT DE PASSE
-        </label>
+        <label for="loginPassword">MOT DE PASSE</label>
 
         <input
           type="password"
@@ -1409,7 +846,6 @@ footer{
 
       </div>
 
-
       <button
         type="submit"
         class="primary-button"
@@ -1418,10 +854,7 @@ footer{
         SE CONNECTER
       </button>
 
-      <div
-        id="loginMessage"
-        class="message"
-      ></div>
+      <div id="loginMessage" class="message"></div>
 
     </form>
 
@@ -1431,13 +864,10 @@ footer{
 
 
 <!-- =======================================================
-     ADMIN
+     ESPACE MEMBRE
 ======================================================= -->
 
-<section
-  id="adminScreen"
-  class="page"
->
+<section id="adminScreen" class="page">
 
   <div class="admin-header">
 
@@ -1449,10 +879,7 @@ footer{
       MON <span>ESPACE.</span>
     </h1>
 
-    <div
-      class="admin-user"
-      id="adminUser"
-    ></div>
+    <div class="admin-user" id="adminUser"></div>
 
   </div>
 
@@ -1472,6 +899,7 @@ footer{
       class="tab"
       id="rdvTabButton"
       data-tab="rdvTab"
+      style="display:none"
     >
       RDV
     </button>
@@ -1483,10 +911,7 @@ footer{
        PROFIL
   ====================================================== -->
 
-  <div
-    id="profileTab"
-    class="tab-content active"
-  >
+  <div id="profileTab" class="tab-content active">
 
     <div class="panel">
 
@@ -1496,15 +921,14 @@ footer{
 
       <p class="panel-intro">
         Modifiez les informations qui apparaissent sur votre profil.
-        Les modifications sont enregistrées directement dans votre profil
-        Supabase.
+        Les modifications sont enregistrées directement dans Supabase.
       </p>
 
 
       <form id="profileForm">
 
 
-        <!-- AFFICHAGE -->
+        <!-- VISIBILITE -->
 
         <div class="form-group">
 
@@ -1513,7 +937,6 @@ footer{
           </label>
 
           <div class="registration-choice">
-
 
             <div class="choice-option">
 
@@ -1529,13 +952,10 @@ footer{
                 class="choice-label"
               >
 
-                <strong>
-                  Affiché
-                </strong>
+                <strong>Affiché</strong>
 
                 <span>
-                  Votre profil apparaît dans la liste publique
-                  des membres.
+                  Votre profil apparaît dans la liste publique des membres.
                 </span>
 
               </label>
@@ -1557,19 +977,15 @@ footer{
                 class="choice-label"
               >
 
-                <strong>
-                  Anonyme
-                </strong>
+                <strong>Anonyme</strong>
 
                 <span>
-                  Votre profil est enregistré mais caché
-                  de la liste publique.
+                  Votre profil est enregistré mais caché de la liste publique.
                 </span>
 
               </label>
 
             </div>
-
 
           </div>
 
@@ -1647,15 +1063,11 @@ footer{
               RÉGION
             </label>
 
-            <select
-              id="profileRegion"
-              required
-            >
+            <select id="profileRegion" required>
 
               <option value="">
                 Sélectionnez votre région
               </option>
-
 
               <optgroup label="France métropolitaine">
 
@@ -1675,7 +1087,6 @@ footer{
 
               </optgroup>
 
-
               <optgroup label="Outre-mer">
 
                 <option>Guadeloupe</option>
@@ -1685,7 +1096,6 @@ footer{
                 <option>Mayotte</option>
 
               </optgroup>
-
 
               <optgroup label="Étranger">
 
@@ -1740,8 +1150,11 @@ footer{
               placeholder="Présentez-vous en quelques mots..."
             ></textarea>
 
-            <div class="help">
-              300 caractères maximum.
+            <div
+              id="descriptionCounter"
+              class="description-counter"
+            >
+              0 / 300
             </div>
 
           </div>
@@ -1755,14 +1168,9 @@ footer{
           Talents et compétences métier
         </div>
 
-        <div class="form-group">
-
-          <div class="help">
-            Sélectionnez les compétences que vous souhaitez
-            mettre en avant. Passez la souris sur une compétence
-            pour afficher son détail.
-          </div>
-
+        <div class="help" style="margin-bottom:10px;">
+          Sélectionnez les compétences que vous souhaitez mettre en avant.
+          Passez la souris sur une compétence pour afficher son détail.
         </div>
 
 
@@ -1773,48 +1181,26 @@ footer{
           </div>
 
 
-          <!-- DOCTRINE -->
-
           <div class="competence">
 
             <label>
-
-              <input
-                type="checkbox"
-                name="competences"
-                value="Maîtrise de doctrine"
-              >
-
-              <span class="competence-name">
-                Maîtrise de doctrine
-              </span>
-
+              <input type="checkbox" name="competences" value="Maîtrise de doctrine">
+              <span class="competence-name">Maîtrise de doctrine</span>
             </label>
 
             <div class="competence-info">
-              capacité à préserver la fidélité à l’idéologie
-              d'Avant-Garde et sa cohérence dans l’action du mouvement.
+              capacité à préserver la fidélité à l’idéologie d'Avant-Garde
+              et sa cohérence dans l’action du mouvement.
             </div>
 
           </div>
 
 
-          <!-- TACTIQUE -->
-
           <div class="competence">
 
             <label>
-
-              <input
-                type="checkbox"
-                name="competences"
-                value="Tactique"
-              >
-
-              <span class="competence-name">
-                Tactique
-              </span>
-
+              <input type="checkbox" name="competences" value="Tactique">
+              <span class="competence-name">Tactique</span>
             </label>
 
             <div class="competence-info">
@@ -1826,22 +1212,11 @@ footer{
           </div>
 
 
-          <!-- PRESTANCE -->
-
           <div class="competence">
 
             <label>
-
-              <input
-                type="checkbox"
-                name="competences"
-                value="Prestance"
-              >
-
-              <span class="competence-name">
-                Prestance
-              </span>
-
+              <input type="checkbox" name="competences" value="Prestance">
+              <span class="competence-name">Prestance</span>
             </label>
 
             <div class="competence-info">
@@ -1852,22 +1227,11 @@ footer{
           </div>
 
 
-          <!-- ANALYSES PRAGMATIQUES -->
-
           <div class="competence">
 
             <label>
-
-              <input
-                type="checkbox"
-                name="competences"
-                value="Analyses pragmatiques"
-              >
-
-              <span class="competence-name">
-                Analyses pragmatiques
-              </span>
-
+              <input type="checkbox" name="competences" value="Analyses pragmatiques">
+              <span class="competence-name">Analyses pragmatiques</span>
             </label>
 
             <div class="competence-info">
@@ -1879,22 +1243,11 @@ footer{
           </div>
 
 
-          <!-- ANALYSES POPULISTES -->
-
           <div class="competence">
 
             <label>
-
-              <input
-                type="checkbox"
-                name="competences"
-                value="Analyses populistes"
-              >
-
-              <span class="competence-name">
-                Analyses populistes
-              </span>
-
+              <input type="checkbox" name="competences" value="Analyses populistes">
+              <span class="competence-name">Analyses populistes</span>
             </label>
 
             <div class="competence-info">
@@ -1906,22 +1259,11 @@ footer{
           </div>
 
 
-          <!-- ADMINISTRATION -->
-
           <div class="competence">
 
             <label>
-
-              <input
-                type="checkbox"
-                name="competences"
-                value="Administration"
-              >
-
-              <span class="competence-name">
-                Administration
-              </span>
-
+              <input type="checkbox" name="competences" value="Administration">
+              <span class="competence-name">Administration</span>
             </label>
 
             <div class="competence-info">
@@ -1932,22 +1274,11 @@ footer{
           </div>
 
 
-          <!-- JURIDIQUE -->
-
           <div class="competence">
 
             <label>
-
-              <input
-                type="checkbox"
-                name="competences"
-                value="Expertise et ingénierie juridique"
-              >
-
-              <span class="competence-name">
-                Expertise et ingénierie juridique
-              </span>
-
+              <input type="checkbox" name="competences" value="Expertise et ingénierie juridique">
+              <span class="competence-name">Expertise et ingénierie juridique</span>
             </label>
 
             <div class="competence-info">
@@ -1960,22 +1291,11 @@ footer{
           </div>
 
 
-          <!-- POLITIQUE -->
-
           <div class="competence">
 
             <label>
-
-              <input
-                type="checkbox"
-                name="competences"
-                value="Expertise et ingénierie politique"
-              >
-
-              <span class="competence-name">
-                Expertise et ingénierie politique
-              </span>
-
+              <input type="checkbox" name="competences" value="Expertise et ingénierie politique">
+              <span class="competence-name">Expertise et ingénierie politique</span>
             </label>
 
             <div class="competence-info">
@@ -1995,12 +1315,9 @@ footer{
           </div>
 
 
-          <!-- INFLUENCEURS -->
-
           <div class="competence">
 
             <label>
-
               <input
                 type="checkbox"
                 name="competences"
@@ -2024,8 +1341,6 @@ footer{
 
           </div>
 
-
-          <!-- BIENFAITEURS -->
 
           <div class="competence">
 
@@ -2064,12 +1379,7 @@ footer{
           ENREGISTRER LES MODIFICATIONS
         </button>
 
-
-        <div
-          id="profileMessage"
-          class="message"
-        ></div>
-
+        <div id="profileMessage" class="message"></div>
 
       </form>
 
@@ -2103,32 +1413,29 @@ footer{
 
 
   <!-- =====================================================
-       RDV
+       EVENEMENTS
   ====================================================== -->
 
-  <div
-    id="rdvTab"
-    class="tab-content"
-  >
+  <div id="rdvTab" class="tab-content">
 
     <div class="panel">
 
       <h2 class="panel-title">
-        Rendez-vous
+        Les Evènements Avant-gardE
       </h2>
 
-      <p class="panel-intro">
-        Ajouter, modifier ou supprimer les rendez-vous affichés
-        sur le site.
+      <p
+        class="panel-intro"
+        style="margin-bottom:15px;"
+      >
+        Vous êtes connectés en tant qu’administrateur.
+        Ajoutez, modifiez ou supprimez les évènements affichés sur le site.
       </p>
 
 
       <form id="eventForm">
 
-        <input
-          type="hidden"
-          id="eventId"
-        >
+        <input type="hidden" id="eventId">
 
 
         <div class="profile-grid">
@@ -2199,9 +1506,7 @@ footer{
               DESCRIPTION
             </label>
 
-            <textarea
-              id="eventText"
-            ></textarea>
+            <textarea id="eventText"></textarea>
 
           </div>
 
@@ -2246,9 +1551,9 @@ footer{
               style="
                 display:flex;
                 align-items:center;
-                gap:10px;
+                gap:8px;
                 font-weight:normal;
-                margin-top:13px;
+                margin-top:10px;
               "
             >
 
@@ -2258,8 +1563,8 @@ footer{
                 checked
               >
 
-              <span>
-                Rendez-vous actif
+              <span style="font-family:Arial,sans-serif;font-size:10px;">
+                Evènement actif
               </span>
 
             </label>
@@ -2275,7 +1580,7 @@ footer{
           class="primary-button"
           id="eventSubmitButton"
         >
-          AJOUTER LE RENDEZ-VOUS
+          AJOUTER L'ÉVÈNEMENT
         </button>
 
 
@@ -2283,16 +1588,13 @@ footer{
           type="button"
           class="secondary-button"
           id="eventCancelButton"
-          style="display:none;margin-top:10px;width:100%;"
+          style="display:none;margin-top:8px;width:100%;"
         >
           ANNULER LA MODIFICATION
         </button>
 
 
-        <div
-          id="eventMessage"
-          class="message"
-        ></div>
+        <div id="eventMessage" class="message"></div>
 
       </form>
 
@@ -2306,7 +1608,6 @@ footer{
 
   </div>
 
-
 </section>
 
 
@@ -2314,10 +1615,7 @@ footer{
      MODAL SUPPRESSION
 ======================================================= -->
 
-<div
-  class="modal"
-  id="deleteModal"
->
+<div class="modal" id="deleteModal">
 
   <div class="modal-box">
 
@@ -2353,7 +1651,6 @@ footer{
       SUPPRIMER
     </p>
 
-
     <input
       type="text"
       id="deleteConfirmation"
@@ -2361,16 +1658,14 @@ footer{
       autocomplete="off"
     >
 
-
     <button
       type="button"
       class="delete-button"
       id="confirmDelete"
-      style="width:100%;margin-top:15px;"
+      style="width:100%;margin-top:12px;"
     >
       CONFIRMER LA SUPPRESSION
     </button>
-
 
     <div
       id="deleteMessage"
@@ -2411,7 +1706,6 @@ const supabaseClient =
 ========================================================= */
 
 let currentUser = null;
-
 let currentProfile = null;
 
 
@@ -2446,16 +1740,18 @@ const saveProfileButton =
 const deleteModal =
   document.getElementById("deleteModal");
 
+const descriptionField =
+  document.getElementById("profileDescription");
+
+const descriptionCounter =
+  document.getElementById("descriptionCounter");
+
 
 /* =========================================================
-   OUTILS
+   MESSAGES
 ========================================================= */
 
-function afficherMessage(
-  element,
-  type,
-  texte
-){
+function afficherMessage(element,type,texte){
 
   element.className =
     "message " + type;
@@ -2464,7 +1760,6 @@ function afficherMessage(
     texte;
 
 }
-
 
 function viderMessage(element){
 
@@ -2476,6 +1771,10 @@ function viderMessage(element){
 
 }
 
+
+/* =========================================================
+   COMPETENCES
+========================================================= */
 
 function normaliserCompetences(value){
 
@@ -2499,6 +1798,36 @@ function normaliserCompetences(value){
   return [];
 
 }
+
+
+/* =========================================================
+   COMPTEUR DESCRIPTION
+========================================================= */
+
+function mettreAJourCompteur(){
+
+  const longueur =
+    descriptionField.value.length;
+
+  descriptionCounter.textContent =
+    longueur + " / 300";
+
+  if(longueur >= 300){
+
+    descriptionCounter.classList.add("limit");
+
+  }else{
+
+    descriptionCounter.classList.remove("limit");
+
+  }
+
+}
+
+descriptionField.addEventListener(
+  "input",
+  mettreAJourCompteur
+);
 
 
 /* =========================================================
@@ -2533,9 +1862,7 @@ loginForm.addEventListener(
         .value;
 
 
-    const {
-      error
-    } =
+    const {error} =
       await supabaseClient.auth.signInWithPassword({
         email,
         password
@@ -2578,9 +1905,7 @@ loginForm.addEventListener(
 async function verifierUtilisateur(){
 
   const {
-    data:{
-      user
-    }
+    data:{user}
   } =
     await supabaseClient.auth.getUser();
 
@@ -2615,7 +1940,7 @@ async function verifierUtilisateur(){
         competences,
         anonyme
       `)
-      .eq("id", user.id)
+      .eq("id",user.id)
       .single();
 
 
@@ -2647,27 +1972,24 @@ async function verifierUtilisateur(){
 
   afficherAdmin();
 
+  remplirProfil(profile);
 
-  remplirProfil(
-    profile
-  );
+
+  const rdvButton =
+    document.getElementById("rdvTabButton");
 
 
   if(profile.grade === "admin"){
 
-    document
-      .getElementById("rdvTabButton")
-      .style.display =
-        "block";
+    rdvButton.style.display =
+      "block";
 
     chargerRendezVous();
 
   }else{
 
-    document
-      .getElementById("rdvTabButton")
-      .style.display =
-        "none";
+    rdvButton.style.display =
+      "none";
 
   }
 
@@ -2704,6 +2026,143 @@ function afficherAdmin(){
       "Connecté en tant que <strong>" +
       (currentProfile.nom || currentUser.email) +
       "</strong>";
+
+
+  /* Boutons de l'espace membre */
+
+  ajouterActionsHeader();
+
+}
+
+
+/* =========================================================
+   HEADER ESPACE MEMBRE
+========================================================= */
+
+function ajouterActionsHeader(){
+
+  let actions =
+    document.getElementById("memberHeaderActions");
+
+
+  if(actions){
+    return;
+  }
+
+
+  const header =
+    document.createElement("div");
+
+  header.id =
+    "memberHeaderActions";
+
+  header.className =
+    "header-actions";
+
+  header.innerHTML = `
+
+    <a
+      href="index.html"
+      class="header-button"
+    >
+      HOME
+    </a>
+
+    <button
+      type="button"
+      class="header-button logout-button"
+      id="logoutButton"
+    >
+      SE DÉCONNECTER
+    </button>
+
+  `;
+
+
+  /*
+    On place les boutons au-dessus de l'espace membre,
+    directement dans la page.
+  */
+
+  const adminHeader =
+    document.querySelector(".admin-header");
+
+  adminHeader.insertBefore(
+    header,
+    adminHeader.firstChild
+  );
+
+
+  document
+    .getElementById("logoutButton")
+    .addEventListener(
+      "click",
+      deconnecter
+    );
+
+}
+
+
+/* =========================================================
+   DECONNEXION
+========================================================= */
+
+async function deconnecter(){
+
+  const button =
+    document.getElementById("logoutButton");
+
+  if(button){
+
+    button.disabled =
+      true;
+
+    button.textContent =
+      "DÉCONNEXION…";
+
+  }
+
+
+  const {error} =
+    await supabaseClient.auth.signOut();
+
+
+  if(error){
+
+    console.error(
+      "Erreur déconnexion :",
+      error
+    );
+
+    if(button){
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        "SE DÉCONNECTER";
+
+    }
+
+    return;
+
+  }
+
+
+  currentUser = null;
+  currentProfile = null;
+
+
+  adminScreen.style.display =
+    "none";
+
+  loginScreen.style.display =
+    "block";
+
+
+  loginForm.reset();
+
+  viderMessage(loginMessage);
 
 }
 
@@ -2786,6 +2245,9 @@ function remplirProfil(profile){
 
     });
 
+
+  mettreAJourCompteur();
+
 }
 
 
@@ -2846,9 +2308,7 @@ profileForm.addEventListener(
           'input[name="competences"]:checked'
         )
       )
-      .map(
-        input => input.value
-      );
+      .map(input => input.value);
 
 
     if(!nom || !region){
@@ -2857,6 +2317,24 @@ profileForm.addEventListener(
         profileMessage,
         "error",
         "Le nom et la région sont obligatoires."
+      );
+
+      saveProfileButton.disabled = false;
+
+      saveProfileButton.textContent =
+        "ENREGISTRER LES MODIFICATIONS";
+
+      return;
+
+    }
+
+
+    if(description.length > 300){
+
+      afficherMessage(
+        profileMessage,
+        "error",
+        "La description ne peut pas dépasser 300 caractères."
       );
 
       saveProfileButton.disabled = false;
@@ -2995,9 +2473,7 @@ document
 
 
         document
-          .getElementById(
-            tab.dataset.tab
-          )
+          .getElementById(tab.dataset.tab)
           .classList.add("active");
 
       }
@@ -3007,7 +2483,7 @@ document
 
 
 /* =========================================================
-   RENDEZ-VOUS
+   EVENEMENTS
 ========================================================= */
 
 async function chargerRendezVous(){
@@ -3032,12 +2508,8 @@ async function chargerRendezVous(){
     await supabaseClient
       .from("rendezvous")
       .select("*")
-      .order("ordre",{
-        ascending:true
-      })
-      .order("date_evenement",{
-        ascending:true
-      });
+      .order("ordre",{ascending:true})
+      .order("date_evenement",{ascending:true});
 
 
   if(error){
@@ -3048,7 +2520,7 @@ async function chargerRendezVous(){
     );
 
     eventList.innerHTML =
-      "<div class='message error' style='display:block'>Impossible de charger les rendez-vous.</div>";
+      "<div class='message error' style='display:block'>Impossible de charger les évènements.</div>";
 
     return;
 
@@ -3061,7 +2533,7 @@ async function chargerRendezVous(){
   if(!data || data.length === 0){
 
     eventList.innerHTML =
-      "<div style='color:#8994a6;font-family:Arial,sans-serif;font-size:12px;'>Aucun rendez-vous.</div>";
+      "<div style='color:#8994a6;font-family:Arial,sans-serif;font-size:10px;'>Aucun évènement.</div>";
 
     return;
 
@@ -3099,13 +2571,21 @@ async function chargerRendezVous(){
         <div>
 
           <h3>
-            ${escapeHtml(event.titre || "Rendez-vous")}
+            ${escapeHtml(event.titre || "Evènement")}
           </h3>
 
           <div class="event-card-date">
+
             ${escapeHtml(date)}
-            ${event.heure ? " · " + escapeHtml(event.heure) : ""}
-            ${event.lieu ? " · " + escapeHtml(event.lieu) : ""}
+
+            ${event.heure
+              ? " · " + escapeHtml(event.heure)
+              : ""}
+
+            ${event.lieu
+              ? " · " + escapeHtml(event.lieu)
+              : ""}
+
           </div>
 
         </div>
@@ -3114,7 +2594,7 @@ async function chargerRendezVous(){
           style="
             color:${event.actif ? '#b9e5c4' : '#ffb5ae'};
             font-family:Arial,sans-serif;
-            font-size:9px;
+            font-size:8px;
             font-weight:bold;
           "
         >
@@ -3172,7 +2652,7 @@ async function chargerRendezVous(){
 
 
 /* =========================================================
-   ECHAPPEMENT HTML
+   ECHAPPEMENT
 ========================================================= */
 
 function escapeHtml(value){
@@ -3188,7 +2668,7 @@ function escapeHtml(value){
 
 
 /* =========================================================
-   MODIFIER RDV
+   MODIFIER EVENEMENT
 ========================================================= */
 
 function modifierEvenement(event){
@@ -3209,9 +2689,7 @@ function modifierEvenement(event){
     .getElementById("eventDate")
     .value =
       event.date_evenement
-        ? String(
-            event.date_evenement
-          ).substring(0,10)
+        ? String(event.date_evenement).substring(0,10)
         : "";
 
 
@@ -3275,7 +2753,7 @@ function modifierEvenement(event){
 
 
 /* =========================================================
-   ANNULER MODIFICATION
+   RESET EVENEMENT
 ========================================================= */
 
 document
@@ -3311,7 +2789,7 @@ function resetEventForm(){
   document
     .getElementById("eventSubmitButton")
     .textContent =
-      "AJOUTER LE RENDEZ-VOUS";
+      "AJOUTER L'ÉVÈNEMENT";
 
 
   document
@@ -3328,7 +2806,7 @@ function resetEventForm(){
 
 
 /* =========================================================
-   AJOUT / MODIFICATION RDV
+   AJOUT / MODIFICATION EVENEMENT
 ========================================================= */
 
 document
@@ -3346,9 +2824,7 @@ document
 
 
       const message =
-        document.getElementById(
-          "eventMessage"
-        );
+        document.getElementById("eventMessage");
 
 
       viderMessage(message);
@@ -3436,14 +2912,14 @@ document
       if(result.error){
 
         console.error(
-          "Erreur RDV :",
+          "Erreur évènement :",
           result.error
         );
 
         afficherMessage(
           message,
           "error",
-          "Impossible d'enregistrer le rendez-vous."
+          "Impossible d'enregistrer l'évènement."
         );
 
         return;
@@ -3455,8 +2931,8 @@ document
         message,
         "success",
         id
-          ? "Le rendez-vous a été modifié."
-          : "Le rendez-vous a été ajouté."
+          ? "L’évènement a été modifié."
+          : "L’évènement a été ajouté."
       );
 
 
@@ -3469,14 +2945,14 @@ document
 
 
 /* =========================================================
-   SUPPRIMER RDV
+   SUPPRIMER EVENEMENT
 ========================================================= */
 
 async function supprimerEvenement(id){
 
   if(
     !confirm(
-      "Supprimer définitivement ce rendez-vous ?"
+      "Supprimer définitivement cet évènement ?"
     )
   ){
 
@@ -3485,9 +2961,7 @@ async function supprimerEvenement(id){
   }
 
 
-  const {
-    error
-  } =
+  const {error} =
     await supabaseClient
       .from("rendezvous")
       .delete()
@@ -3497,12 +2971,12 @@ async function supprimerEvenement(id){
   if(error){
 
     console.error(
-      "Erreur suppression RDV :",
+      "Erreur suppression évènement :",
       error
     );
 
     alert(
-      "Impossible de supprimer le rendez-vous."
+      "Impossible de supprimer l’évènement."
     );
 
     return;
@@ -3516,7 +2990,7 @@ async function supprimerEvenement(id){
 
 
 /* =========================================================
-   SUPPRESSION PROFIL
+   MODAL SUPPRESSION PROFIL
 ========================================================= */
 
 document
@@ -3529,15 +3003,18 @@ document
         .getElementById("deleteConfirmation")
         .value = "";
 
+
       viderMessage(
         document.getElementById(
           "deleteMessage"
         )
       );
 
+
       deleteModal.classList.add(
         "active"
       );
+
 
       document.body.style.overflow =
         "hidden";
@@ -3578,9 +3055,7 @@ document
 
       const confirmation =
         document
-          .getElementById(
-            "deleteConfirmation"
-          )
+          .getElementById("deleteConfirmation")
           .value
           .trim();
 
@@ -3616,9 +3091,7 @@ document
         "SUPPRESSION…";
 
 
-      const {
-        error
-      } =
+      const {error} =
         await supabaseClient
           .from("profiles")
           .delete()
@@ -3650,11 +3123,6 @@ document
 
       }
 
-
-      /*
-        Le profil public est maintenant supprimé.
-        On déconnecte également la session.
-      */
 
       await supabaseClient.auth.signOut();
 
@@ -3688,9 +3156,7 @@ deleteModal.addEventListener(
   "click",
   event => {
 
-    if(
-      event.target === deleteModal
-    ){
+    if(event.target === deleteModal){
 
       fermerDeleteModal();
 
