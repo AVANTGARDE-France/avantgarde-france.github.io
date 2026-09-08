@@ -662,6 +662,24 @@ nav a.active{
   padding:7px 10px;
   font-family:Arial,sans-serif;
   font-size:11px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+.vip-medal{
+  width:16px;
+  height:16px;
+  border:1px solid var(--gold);
+  border-radius:50%;
+  color:var(--gold);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:9px;
+  line-height:1;
+  flex-shrink:0;
 }
 
 
@@ -1231,6 +1249,12 @@ footer{
       <div
         id="profileModalSocials"
         class="profile-socials"
+        style="display:none;"
+      ></div>
+
+      <div
+        id="profileModalAudienceMax"
+        class="profile-audience-max"
         style="display:none;"
       ></div>
 
@@ -2068,31 +2092,36 @@ const reseauxSociaux = [
   {
     champ:"facebook_url",
     nom:"Facebook",
-    logo:"https://cdn.simpleicons.org/facebook/1877F2"
+    logo:"https://cdn.simpleicons.org/facebook/1877F2",
+    audienceChamp:"facebook_audience"
   },
 
   {
     champ:"x_url",
     nom:"X",
-    logo:"https://cdn.simpleicons.org/x/FFFFFF"
+    logo:"https://cdn.simpleicons.org/x/FFFFFF",
+    audienceChamp:"x_audience"
   },
 
   {
     champ:"instagram_url",
     nom:"Instagram",
-    logo:"https://cdn.simpleicons.org/instagram/E4405F"
+    logo:"https://cdn.simpleicons.org/instagram/E4405F",
+    audienceChamp:"instagram_audience"
   },
 
   {
     champ:"youtube_url",
     nom:"YouTube",
-    logo:"https://cdn.simpleicons.org/youtube/FF0000"
+    logo:"https://cdn.simpleicons.org/youtube/FF0000",
+    audienceChamp:"youtube_audience"
   },
 
   {
     champ:"tiktok_url",
     nom:"TikTok",
-    logo:"https://cdn.simpleicons.org/tiktok/FFFFFF"
+    logo:"https://cdn.simpleicons.org/tiktok/FFFFFF",
+    audienceChamp:"tiktok_audience"
   }
 
 ];
@@ -2121,6 +2150,21 @@ function urlValide(url){
 }
 
 
+function formaterAudience(valeur){
+
+  const nombre = Number(valeur);
+
+  if(!Number.isFinite(nombre) || nombre < 0){
+    return null;
+  }
+
+  return new Intl.NumberFormat("fr-FR",{
+    maximumFractionDigits:0
+  }).format(nombre);
+
+}
+
+
 function afficherReseauxSociaux(membre){
 
   const container =
@@ -2130,24 +2174,69 @@ function afficherReseauxSociaux(membre){
 
   container.innerHTML = "";
 
-  let nombreReseaux = 0;
-
+  const reseauxAvecAudience = [];
 
   reseauxSociaux.forEach(reseau => {
 
     const url =
       membre[reseau.champ];
 
-
     if(!urlValide(url)){
-
       return;
-
     }
 
+    const audience =
+      Number(membre[reseau.audienceChamp]);
+
+    reseauxAvecAudience.push({
+      ...reseau,
+      url,
+      audience:
+        Number.isFinite(audience) && audience >= 0
+          ? audience
+          : null
+    });
+
+  });
+
+  const reseauxAvecChiffre =
+    reseauxAvecAudience.filter(
+      reseau => reseau.audience !== null
+    );
+
+  const maxAudience =
+    Number(membre.audience_max);
+
+  const maxValide =
+    Number.isFinite(maxAudience) && maxAudience >= 0;
+
+  const reseauMax =
+    membre.audience_reseau ||
+    reseauxAvecAudience
+      .filter(reseau => reseau.audience !== null)
+      .sort((a,b) => b.audience - a.audience)[0]?.nom ||
+    null;
+
+  let nombreReseaux = 0;
+
+  reseauxAvecAudience.forEach(reseau => {
 
     nombreReseaux++;
 
+    const item =
+      document.createElement("div");
+
+    item.className =
+      "profile-social-item";
+
+    const estMax =
+      reseauMax &&
+      reseau.nom.toLowerCase() ===
+      String(reseauMax).toLowerCase();
+
+    if(estMax){
+      item.classList.add("is-max");
+    }
 
     const lien =
       document.createElement("a");
@@ -2156,7 +2245,7 @@ function afficherReseauxSociaux(membre){
       "profile-social-link";
 
     lien.href =
-      url;
+      reseau.url;
 
     lien.target =
       "_blank";
@@ -2172,7 +2261,6 @@ function afficherReseauxSociaux(membre){
       reseau.nom
     );
 
-
     const logo =
       document.createElement("img");
 
@@ -2182,22 +2270,109 @@ function afficherReseauxSociaux(membre){
     logo.alt =
       reseau.nom;
 
-
     logo.onerror =
       function(){
-
-        lien.style.display =
+        item.style.display =
           "none";
-
       };
 
-
     lien.appendChild(logo);
+    item.appendChild(lien);
 
-    container.appendChild(lien);
+    if(estMax){
+
+      const star =
+        document.createElement("span");
+
+      star.className =
+        "profile-social-max-star";
+
+      star.textContent =
+        "★";
+
+      star.title =
+        "Audience maximale";
+
+      item.appendChild(star);
+
+    }
+
+    const audience =
+      document.createElement("div");
+
+    audience.className =
+      "profile-social-audience";
+
+    audience.textContent =
+      reseau.audience !== null
+        ? formaterAudience(reseau.audience) + " abonnés"
+        : "";
+
+    item.appendChild(audience);
+    container.appendChild(item);
 
   });
 
+  let audienceMaxEl =
+    document.getElementById(
+      "profileModalAudienceMax"
+    );
+
+  if(!audienceMaxEl){
+
+    audienceMaxEl =
+      document.createElement("div");
+
+    audienceMaxEl.id =
+      "profileModalAudienceMax";
+
+    audienceMaxEl.className =
+      "profile-audience-max";
+
+    container.insertAdjacentElement(
+      "afterend",
+      audienceMaxEl
+    );
+
+  }
+
+  if(maxValide){
+
+    const date =
+      membre.audience_updated_at
+        ? new Date(membre.audience_updated_at)
+        : null;
+
+    let dateText = "";
+
+    if(date && !Number.isNaN(date.getTime())){
+      dateText =
+        " · mis à jour le " +
+        date.toLocaleDateString("fr-FR") +
+        " à " +
+        date.toLocaleTimeString("fr-FR",{
+          hour:"2-digit",
+          minute:"2-digit"
+        });
+    }
+
+    audienceMaxEl.innerHTML =
+      "Audience max : <strong>" +
+      formaterAudience(maxAudience) +
+      " abonnés</strong>" +
+      (dateText
+        ? " <small>" + dateText + "</small>"
+        : "");
+
+    audienceMaxEl.style.display =
+      "block";
+
+  }else{
+
+    audienceMaxEl.textContent = "";
+    audienceMaxEl.style.display = "none";
+
+  }
 
   container.style.display =
     nombreReseaux > 0
@@ -2282,7 +2457,14 @@ async function chargerMembres(){
       instagram_url,
       youtube_url,
       tiktok_url,
-      audience_max
+      facebook_audience,
+      instagram_audience,
+      x_audience,
+      youtube_audience,
+      tiktok_audience,
+      audience_max,
+      audience_reseau,
+      audience_updated_at
     `)
     .eq("anonyme", false)
     .order("created_at", {
@@ -2564,16 +2746,17 @@ function ouvrirProfil(membre){
   const liste =
     normaliserCompetences(
       membre.competences
-    )
-    .filter(comp => comp !== "VIP");
+    );
 
-
-  /* VIP est une compétence dérivée de l'audience maximale */
   const audienceMax =
-    Number(membre.audience_max) || 0;
+    Number(membre.audience_max);
 
-  if(audienceMax >= 3000){
-    liste.push("VIP");
+  const estVIP =
+    Number.isFinite(audienceMax) &&
+    audienceMax >= 3000;
+
+  if(estVIP && !liste.includes("VIP")){
+    liste.unshift("VIP");
   }
 
 
@@ -2600,33 +2783,44 @@ function ouvrirProfil(membre){
 
     liste.forEach(comp => {
 
-      if(comp === "VIP"){
-
-        const tag =
-          document.createElement("span");
-
-        tag.className =
-          "vip-competence-tag";
-
-        tag.innerHTML = `
-          <span class="vip-medal" aria-hidden="true">★</span>
-          <span>VIP</span>
-        `;
-
-        competences.appendChild(tag);
-
-        return;
-
-      }
-
       const tag =
         document.createElement("span");
 
       tag.className =
         "competence-tag";
 
-      tag.textContent =
-        comp;
+      if(comp === "VIP"){
+
+        const medal =
+          document.createElement("span");
+
+        medal.className =
+          "vip-medal";
+
+        medal.textContent =
+          "★";
+
+        medal.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+        tag.appendChild(medal);
+
+        const vipText =
+          document.createElement("span");
+
+        vipText.textContent =
+          "VIP";
+
+        tag.appendChild(vipText);
+
+      }else{
+
+        tag.textContent =
+          comp;
+
+      }
 
       competences.appendChild(tag);
 
