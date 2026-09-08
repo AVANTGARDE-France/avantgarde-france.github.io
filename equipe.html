@@ -1,17 +1,30 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Avant-gardE — Notre équipe</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
+
+:root{
+  --navy:#07152d;
+  --navy2:#0d2344;
+  --gold:#d6ad55;
+  --gold-light:#f0d58a;
+  --white:#f5f3ed;
+  --muted:#b8c0cd;
+  --blue-france:#0055A4;
+  --red:#EF4135;
+  --border:rgba(214,173,85,.28);
+}
 
 *{
   box-sizing:border-box;
-  margin:0;
-  padding:0;
 }
 
 html{
@@ -19,1126 +32,1307 @@ html{
 }
 
 body{
-  font-family:Arial,Helvetica,sans-serif;
-  background:#050505;
-  color:#f5f5f5;
-  min-height:100vh;
+  margin:0;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(214,173,85,.07),transparent 35%),
+    var(--navy);
+  color:var(--white);
+  font-family:Georgia,"Times New Roman",serif;
 }
 
 
-/* =========================================================
-   HEADER
-========================================================= */
-
-header{
-  position:sticky;
-  top:0;
-  z-index:1000;
-
-  height:76px;
-
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-
-  padding:0 34px;
-
-  background:rgba(5,5,5,.94);
-  border-bottom:1px solid rgba(255,255,255,.08);
-
-  backdrop-filter:blur(12px);
-}
-
-.logo{
-  color:#fff;
-  text-decoration:none;
-
-  font-size:26px;
-  font-weight:900;
-  letter-spacing:-1px;
-}
-
-.logo span{
-  color:#d4af37;
-}
-
-nav{
-  display:flex;
-  align-items:center;
-  gap:28px;
-}
-
-nav a{
-  color:#aaa;
-  text-decoration:none;
-
-  font-size:13px;
-  font-weight:700;
-
-  letter-spacing:1px;
-  text-transform:uppercase;
-
-  transition:.2s;
-}
-
-nav a:hover,
-nav a.active{
-  color:#fff;
-}
-
-.admin-link{
-  width:34px;
-  height:34px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#777;
-  text-decoration:none;
-
-  font-size:18px;
-
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:50%;
-
-  transition:.2s;
-}
-
-.admin-link:hover{
-  color:#d4af37;
-  border-color:#d4af37;
-}
-
-
-/* =========================================================
-   EVENTS BAR
-========================================================= */
+/* =========================
+   RENDEZ-VOUS
+========================= */
 
 .events-bar{
-  position:relative;
-
-  width:100%;
-  height:34px;
-
+  height:36px;
+  background:#050f20;
+  border-bottom:1px solid rgba(214,173,85,.35);
+  display:flex;
+  align-items:center;
   overflow:hidden;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+}
 
-  background:#111;
-  border-bottom:1px solid rgba(212,175,55,.2);
+.events-label{
+  flex-shrink:0;
+  height:100%;
+  display:flex;
+  align-items:center;
+  padding:0 17px;
+  color:var(--gold-light);
+  font-weight:bold;
+  letter-spacing:1px;
+  border-right:1px solid rgba(214,173,85,.3);
+  position:relative;
+  z-index:5;
+  background:#050f20;
+}
 
-  white-space:nowrap;
+.events-window{
+  flex:1;
+  height:100%;
+  overflow:hidden;
+  position:relative;
 }
 
 .events-track{
   position:absolute;
   left:0;
   top:0;
-
-  height:34px;
-
-  display:flex;
+  height:100%;
+  display:inline-flex;
   align-items:center;
-
-  gap:45px;
-
+  white-space:nowrap;
   will-change:transform;
 }
 
 .event-item{
-  color:#aaa;
-
-  font-size:11px;
-  font-weight:700;
-
-  letter-spacing:.5px;
-
+  display:inline-flex;
+  align-items:center;
+  height:100%;
+  padding:0 35px;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  color:#e3e5e8;
   cursor:pointer;
+  transition:
+    background .2s,
+    color .2s;
 }
 
 .event-item:hover{
-  color:#d4af37;
+  background:rgba(214,173,85,.08);
+  color:white;
 }
 
-.event-date{
-  color:#d4af37;
-  margin-right:7px;
+.event-item strong{
+  color:var(--gold-light);
+  margin-right:0;
+}
+
+.event-separator{
+  color:rgba(214,173,85,.5);
+  margin:0 7px;
 }
 
 
-/* =========================================================
+/* =========================
+   HEADER
+========================= */
+
+header{
+  height:82px;
+  padding:0 5%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid rgba(214,173,85,.25);
+  background:rgba(7,21,45,.97);
+  position:relative;
+}
+
+
+/* =========================
+   ROUE ADMIN
+========================= */
+
+.admin-gear{
+  position:absolute;
+  right:14px;
+  top:7px;
+  width:23px;
+  height:23px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:rgba(255,255,255,.42);
+  text-decoration:none;
+  font-family:Arial,sans-serif;
+  font-size:14px;
+  border-radius:50%;
+  transition:
+    color .2s,
+    background .2s,
+    transform .2s;
+}
+
+.admin-gear:hover{
+  color:var(--gold-light);
+  background:rgba(255,255,255,.06);
+  transform:rotate(20deg);
+}
+
+
+/* =========================
+   LOGO
+========================= */
+
+.logo{
+  color:var(--white);
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:28px;
+  font-weight:bold;
+  letter-spacing:-1.2px;
+  line-height:1;
+  font-kerning:normal;
+  text-rendering:optimizeLegibility;
+  white-space:nowrap;
+}
+
+.logo-a,
+.logo-e{
+  display:inline;
+  width:auto;
+  height:auto;
+  background:transparent;
+  border-radius:0;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:inherit;
+  font-weight:bold;
+  line-height:inherit;
+}
+
+.logo-a{
+  color:var(--blue-france);
+}
+
+.logo-e{
+  color:var(--red);
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
+
+nav{
+  display:flex;
+  gap:28px;
+  align-items:center;
+}
+
+nav a{
+  color:#e7e7e7;
+  text-decoration:none;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  font-weight:bold;
+  letter-spacing:1px;
+  transition:color .2s;
+}
+
+nav a:hover{
+  color:var(--gold);
+}
+
+nav a.active{
+  color:var(--gold-light);
+}
+
+
+/* =========================
    HERO
-========================================================= */
+========================= */
 
 .hero{
-  max-width:1200px;
+  max-width:1100px;
   margin:0 auto;
-
-  padding:95px 30px 70px;
+  padding:75px 25px 45px;
+  text-align:center;
 }
 
-.hero-small{
-  color:#d4af37;
-
-  font-size:12px;
-  font-weight:800;
-
-  letter-spacing:4px;
-
-  margin-bottom:18px;
+.kicker{
+  font-family:Arial,sans-serif;
+  color:var(--gold);
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:3px;
+  margin-bottom:16px;
 }
 
 .hero h1{
-  font-size:clamp(48px,8vw,92px);
-
-  line-height:.9;
-
-  letter-spacing:-5px;
-
-  font-weight:900;
+  margin:0;
+  font-size:clamp(42px,7vw,76px);
+  line-height:.95;
+  letter-spacing:-2px;
 }
 
 .hero h1 span{
-  color:#d4af37;
+  color:var(--gold);
 }
 
-.hero-text{
-  max-width:650px;
-
-  margin-top:32px;
-
-  color:#999;
-
-  font-size:16px;
-  line-height:1.7;
+.hero p{
+  max-width:720px;
+  margin:25px auto 30px;
+  color:var(--muted);
+  font-size:17px;
+  line-height:1.65;
 }
 
-.hero-button{
-  display:inline-flex;
 
-  margin-top:32px;
-  padding:14px 24px;
+/* =========================
+   BOUTON REJOINDRE
+========================= */
 
-  color:#050505;
-  background:#d4af37;
-
-  text-decoration:none;
-
-  font-size:12px;
-  font-weight:900;
-
-  letter-spacing:1.5px;
-  text-transform:uppercase;
-
-  border:none;
+.join-button{
+  border:1px solid var(--gold);
+  background:var(--gold);
+  color:var(--navy);
+  padding:14px 26px;
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1.2px;
   cursor:pointer;
-
-  transition:.2s;
+  transition:.25s;
 }
 
-.hero-button:hover{
-  background:#fff;
+.join-button:hover{
+  background:var(--gold-light);
+  transform:translateY(-2px);
+  box-shadow:0 8px 25px rgba(0,0,0,.25);
 }
 
 
-/* =========================================================
-   TEAM
-========================================================= */
+/* =========================
+   MEMBRES
+========================= */
 
 .team-section{
   max-width:1200px;
   margin:0 auto;
+  padding:20px 25px 90px;
+}
 
-  padding:0 30px 100px;
+.section-title{
+  text-align:center;
+  margin-bottom:35px;
+}
+
+.section-title h2{
+  margin:0 0 10px;
+  font-size:30px;
+}
+
+.section-title p{
+  margin:0;
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:13px;
 }
 
 .team-grid{
   display:grid;
-
-  grid-template-columns:
-    repeat(auto-fill,minmax(250px,1fr));
-
+  grid-template-columns:repeat(auto-fit,minmax(245px,1fr));
   gap:20px;
 }
 
-.profile-card{
-  position:relative;
-
-  overflow:hidden;
-
-  background:#0d0d0d;
-
-  border:1px solid rgba(255,255,255,.08);
-
+.member-card{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.015));
+  border:1px solid var(--border);
+  padding:22px;
   cursor:pointer;
-
-  transition:
-    transform .25s,
-    border-color .25s;
+  transition:.25s;
+  min-height:280px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
 }
 
-.profile-card:hover{
+.member-card:hover{
+  border-color:rgba(214,173,85,.75);
   transform:translateY(-4px);
-  border-color:rgba(212,175,55,.5);
+  box-shadow:0 12px 35px rgba(0,0,0,.25);
 }
 
-.profile-image{
-  width:100%;
-  aspect-ratio:1/1;
-
+.member-photo{
+  width:105px;
+  height:105px;
+  border-radius:50%;
   object-fit:cover;
-
-  display:block;
-
-  background:#181818;
+  border:2px solid var(--gold);
+  margin-bottom:16px;
+  background:var(--navy2);
 }
 
-.profile-placeholder{
-  width:100%;
-  aspect-ratio:1/1;
-
+.member-photo-placeholder{
+  width:105px;
+  height:105px;
+  border-radius:50%;
+  border:2px solid var(--gold);
+  margin-bottom:16px;
+  background:var(--navy2);
   display:flex;
   align-items:center;
   justify-content:center;
-
-  background:
-    linear-gradient(135deg,#171717,#090909);
-
-  color:#444;
-
-  font-size:55px;
-  font-weight:900;
+  color:var(--gold);
+  font-size:35px;
 }
 
-.profile-info{
-  padding:20px;
+.member-name{
+  font-size:22px;
+  margin-bottom:6px;
 }
 
-.profile-name{
-  font-size:21px;
-  font-weight:900;
-
-  letter-spacing:-.5px;
-}
-
-.profile-grade{
-  margin-top:5px;
-
-  color:#d4af37;
-
-  font-size:11px;
-  font-weight:800;
-
+.member-grade{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  font-weight:bold;
   letter-spacing:1.5px;
   text-transform:uppercase;
+  margin-bottom:8px;
 }
 
-.profile-region{
-  margin-top:9px;
+.member-region{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  margin-bottom:12px;
+}
 
-  color:#777;
-
+.member-description{
+  color:#c8ced8;
+  font-family:Arial,sans-serif;
   font-size:12px;
-}
-
-.profile-description{
-  margin-top:13px;
-
-  color:#999;
-
-  font-size:13px;
   line-height:1.5;
-
   display:-webkit-box;
   -webkit-line-clamp:3;
   -webkit-box-orient:vertical;
   overflow:hidden;
 }
 
-
-/* =========================================================
-   MODAL
-========================================================= */
-
-.modal-overlay{
-  position:fixed;
-  inset:0;
-
-  z-index:2000;
-
-  display:none;
-
-  align-items:center;
-  justify-content:center;
-
-  padding:20px;
-
-  background:rgba(0,0,0,.82);
-
-  backdrop-filter:blur(8px);
+.loading,
+.no-members{
+  grid-column:1/-1;
+  text-align:center;
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  padding:50px;
 }
 
-.modal-overlay.active{
+
+/* =========================
+   MODALES
+========================= */
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(6px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:1000;
+}
+
+.modal.active{
   display:flex;
 }
 
-.modal{
-  position:relative;
-
-  width:min(850px,100%);
-
-  max-height:90vh;
-
+.modal-box{
+  width:min(720px,100%);
+  max-height:92vh;
   overflow-y:auto;
-
-  background:#0d0d0d;
-
-  border:1px solid rgba(255,255,255,.1);
-
-  box-shadow:0 30px 100px rgba(0,0,0,.7);
+  background:
+    linear-gradient(145deg,#0d2344,#07152d);
+  border:1px solid var(--border);
+  box-shadow:0 25px 80px rgba(0,0,0,.55);
+  position:relative;
+  padding:38px;
 }
 
 .modal-close{
   position:absolute;
-
-  top:15px;
   right:18px;
-
-  z-index:5;
-
-  width:34px;
-  height:34px;
-
-  border:1px solid rgba(255,255,255,.15);
-  border-radius:50%;
-
-  background:rgba(0,0,0,.7);
-
-  color:#aaa;
-
-  font-size:20px;
-
+  top:14px;
+  border:0;
+  background:none;
+  color:rgba(255,255,255,.65);
+  font-size:28px;
   cursor:pointer;
+  line-height:1;
 }
 
 .modal-close:hover{
-  color:#fff;
-  border-color:#d4af37;
+  color:var(--gold);
 }
 
-.profile-modal-content{
-  display:grid;
 
-  grid-template-columns:280px 1fr;
+/* =========================
+   POPUP RENDEZ-VOUS
+========================= */
+
+.rdv-modal-box{
+  width:min(620px,100%);
+  padding:42px 40px 38px;
+}
+
+.rdv-modal-kicker{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  font-weight:bold;
+  letter-spacing:2.5px;
+  margin-bottom:12px;
+}
+
+.rdv-modal-title{
+  margin:0 0 18px;
+  font-size:32px;
+  line-height:1.15;
+}
+
+.rdv-modal-date,
+.rdv-modal-time,
+.rdv-modal-location{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  margin-bottom:7px;
+}
+
+.rdv-modal-date{
+  color:var(--gold-light);
+}
+
+.rdv-modal-description{
+  border-top:1px solid rgba(214,173,85,.2);
+  margin-top:20px;
+  padding-top:20px;
+  color:#d8dce3;
+  font-family:Arial,sans-serif;
+  font-size:14px;
+  line-height:1.65;
+  white-space:pre-line;
+}
+
+.rdv-modal-link{
+  display:inline-block;
+  margin-top:22px;
+  color:var(--gold-light);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1px;
+  text-decoration:none;
+  border-bottom:1px solid rgba(214,173,85,.45);
+  padding-bottom:3px;
+}
+
+.rdv-modal-link:hover{
+  color:var(--white);
+  border-color:var(--gold);
+}
+
+
+/* =========================
+   PROFIL
+========================= */
+
+.profile-modal-content{
+  text-align:center;
 }
 
 .profile-modal-image{
-  width:100%;
-  height:100%;
-
-  min-height:400px;
-
+  width:135px;
+  height:135px;
+  border-radius:50%;
   object-fit:cover;
-
-  background:#171717;
+  border:2px solid var(--gold);
+  margin:5px auto 18px;
+  display:none;
 }
 
-.profile-modal-placeholder{
-  width:100%;
-  min-height:400px;
-
+.profile-placeholder{
+  width:135px;
+  height:135px;
+  border-radius:50%;
+  border:2px solid var(--gold);
+  background:var(--navy2);
   display:flex;
   align-items:center;
   justify-content:center;
-
-  background:#171717;
-
-  color:#444;
-
-  font-size:70px;
-  font-weight:900;
+  margin:5px auto 18px;
+  color:var(--gold);
+  font-size:45px;
 }
 
-.profile-modal-info{
-  padding:40px;
+.profile-modal-content h2{
+  margin:0 0 8px;
+  font-size:32px;
 }
 
-.profile-modal-name{
-  padding-right:35px;
-
-  font-size:36px;
-  font-weight:900;
-
-  letter-spacing:-1.5px;
+.profile-grade{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
 }
 
-.profile-modal-grade{
-  margin-top:8px;
-
-  color:#d4af37;
-
+.profile-region{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
   font-size:12px;
-  font-weight:900;
-
-  letter-spacing:2px;
-  text-transform:uppercase;
+  margin:10px 0 25px;
 }
 
-.profile-modal-region{
-  margin-top:10px;
-
-  color:#777;
-
-  font-size:13px;
-}
-
-.profile-modal-description{
-  margin-top:25px;
-
-  color:#bbb;
-
+.profile-description{
+  color:#d8dce3;
+  font-family:Arial,sans-serif;
   font-size:14px;
-  line-height:1.7;
-}
-
-.profile-competences{
-  display:flex;
-  flex-wrap:wrap;
-
-  gap:7px;
-
-  margin-top:22px;
-}
-
-.competence-tag{
-  padding:6px 9px;
-
-  color:#aaa;
-
-  background:#151515;
-
-  border:1px solid rgba(255,255,255,.08);
-
-  font-size:10px;
-  font-weight:700;
-
-  text-transform:uppercase;
-  letter-spacing:.5px;
+  line-height:1.65;
+  margin-bottom:25px;
 }
 
 
-/* =========================================================
+/* =========================
    RESEAUX SOCIAUX
-========================================================= */
+========================= */
 
 .profile-socials{
   display:flex;
+  justify-content:center;
+  align-items:center;
   flex-wrap:wrap;
-
   gap:10px;
-
-  margin-top:28px;
+  margin:0 0 28px;
 }
 
-.profile-social-item{
-  position:relative;
-
-  min-width:75px;
-
-  padding:9px 9px 8px;
-
+.profile-social-link{
+  width:38px;
+  height:38px;
   display:flex;
-  flex-direction:column;
   align-items:center;
   justify-content:center;
-
-  gap:5px;
-
-  background:#151515;
-
-  border:1px solid rgba(255,255,255,.08);
-
-  border-radius:8px;
-
-  text-decoration:none;
-
-  transition:.2s;
+  border:1px solid rgba(214,173,85,.28);
+  background:rgba(0,0,0,.12);
+  transition:
+    transform .2s,
+    border-color .2s,
+    background .2s;
 }
 
-.profile-social-item:hover{
-  border-color:rgba(255,255,255,.3);
+.profile-social-link:hover{
   transform:translateY(-2px);
+  border-color:var(--gold);
+  background:rgba(214,173,85,.08);
 }
 
-.profile-social-item.is-max{
-  border:1px solid #d4af37;
-
-  box-shadow:
-    0 0 0 1px rgba(212,175,55,.12),
-    0 0 15px rgba(212,175,55,.08);
-}
-
-.profile-social-logo{
-  width:23px;
-  height:23px;
-
+.profile-social-link img{
+  width:21px;
+  height:21px;
+  display:block;
   object-fit:contain;
 }
 
-.profile-social-audience{
-  color:#aaa;
 
-  font-size:11px;
-  font-weight:800;
+/* =========================
+   AUDIENCE RESEAUX SOCIAUX
+========================= */
 
-  line-height:1;
+.profile-social-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+  position:relative;
+}
+
+.profile-social-item.is-max .profile-social-link{
+  border-color:var(--gold);
+  background:rgba(214,173,85,.12);
+  box-shadow:0 0 12px rgba(214,173,85,.18);
+  position:relative;
 }
 
 .profile-social-max-star{
   position:absolute;
-
-  top:-7px;
-  right:-6px;
-
-  width:17px;
-  height:17px;
-
+  right:-7px;
+  top:-8px;
+  width:16px;
+  height:16px;
   display:flex;
   align-items:center;
   justify-content:center;
-
-  color:#050505;
-  background:#d4af37;
-
+  border:1px solid var(--gold);
   border-radius:50%;
+  background:var(--navy);
+  color:var(--gold-light);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:9px;
+  line-height:1;
+  z-index:2;
+}
 
-  font-size:10px;
-  font-weight:900;
+.profile-social-audience{
+  color:#aeb6c3;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+  line-height:1;
+  white-space:nowrap;
 }
 
 .profile-audience-max{
-  margin-top:25px;
-  padding-top:18px;
-
-  border-top:1px solid rgba(255,255,255,.08);
-
-  color:#888;
-
-  font-size:12px;
-}
-
-.profile-audience-max strong{
-  color:#fff;
-
-  font-size:17px;
+  margin:-10px 0 25px;
+  color:var(--gold-light);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  line-height:1.5;
+  font-weight:bold;
 }
 
 .profile-audience-max small{
   display:block;
-
-  margin-top:5px;
-
-  color:#555;
-
-  font-size:9px;
+  margin-top:3px;
+  color:#7f8998;
+  font-size:8px;
+  font-weight:normal;
   font-style:italic;
 }
 
-
-/* =========================================================
-   JOIN MODAL
-========================================================= */
-
-.join-modal-content{
-  padding:40px;
+.profile-competences{
+  border-top:1px solid rgba(214,173,85,.2);
+  padding-top:22px;
 }
 
-.join-modal-content h2{
-  font-size:30px;
-  font-weight:900;
-}
-
-.join-modal-content > p{
-  margin-top:10px;
-
-  color:#888;
-
-  font-size:14px;
-  line-height:1.6;
-}
-
-.form-group{
-  margin-top:20px;
-}
-
-.form-group label{
-  display:block;
-
-  margin-bottom:7px;
-
-  color:#aaa;
-
-  font-size:11px;
-  font-weight:800;
-
-  letter-spacing:1px;
-  text-transform:uppercase;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select{
-  width:100%;
-
-  padding:13px 14px;
-
-  color:#fff;
-  background:#151515;
-
-  border:1px solid rgba(255,255,255,.12);
-
-  outline:none;
-
-  font-family:inherit;
-  font-size:13px;
-}
-
-.form-group textarea{
-  min-height:100px;
-
-  resize:vertical;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus{
-  border-color:#d4af37;
-}
-
-.join-type{
-  display:grid;
-
-  grid-template-columns:1fr 1fr;
-
-  gap:10px;
-
-  margin-top:10px;
-}
-
-.join-type label{
-  margin:0;
-
-  padding:14px;
-
-  border:1px solid rgba(255,255,255,.1);
-
-  cursor:pointer;
-
-  text-align:center;
-}
-
-.join-type input{
-  display:none;
-}
-
-.join-type input:checked + span{
-  color:#d4af37;
+.profile-competences h3{
+  color:var(--gold);
+  font-size:17px;
+  margin:0 0 15px;
 }
 
 .competence-list{
   display:flex;
   flex-wrap:wrap;
-
+  justify-content:center;
   gap:8px;
 }
 
-.competence-checkbox{
-  display:flex;
+.competence-tag{
+  border:1px solid rgba(214,173,85,.4);
+  color:#e6d49e;
+  padding:7px 10px;
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  display:inline-flex;
   align-items:center;
-
+  justify-content:center;
   gap:6px;
+}
 
-  padding:7px 9px;
+.vip-medal{
+  width:16px;
+  height:16px;
+  border:1px solid var(--gold);
+  border-radius:50%;
+  color:var(--gold);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:9px;
+  line-height:1;
+  flex-shrink:0;
+}
 
-  background:#151515;
 
-  border:1px solid rgba(255,255,255,.08);
+/* =========================
+   FORMULAIRE
+========================= */
 
-  color:#aaa;
+.form-title{
+  margin:0 0 8px;
+  font-size:32px;
+}
 
+.form-intro{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:13px;
+  line-height:1.5;
+  margin-bottom:28px;
+}
+
+.form-group{
+  margin-bottom:21px;
+}
+
+.form-group label.main-label{
+  display:block;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  font-weight:bold;
+  letter-spacing:.4px;
+  margin-bottom:8px;
+}
+
+.required{
+  color:var(--gold);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="url"],
+textarea,
+select{
+  width:100%;
+  border:1px solid rgba(255,255,255,.15);
+  background:#061329;
+  color:var(--white);
+  padding:12px 13px;
+  font-family:Arial,sans-serif;
+  font-size:13px;
+  outline:none;
+  border-radius:0;
+}
+
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:var(--gold);
+}
+
+textarea{
+  min-height:110px;
+  resize:vertical;
+}
+
+.help{
+  color:#8994a6;
+  font-family:Arial,sans-serif;
   font-size:10px;
+  margin-top:6px;
+}
 
+
+/* =========================
+   COMPTEUR DESCRIPTION
+========================= */
+
+.description-counter{
+  text-align:right;
+  color:#8994a6;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  margin-top:6px;
+}
+
+.description-counter.warning{
+  color:var(--gold-light);
+}
+
+.description-counter.limit{
+  color:var(--red);
+}
+
+
+/* =========================
+   CHOIX SYMPATHISANT / ANONYME
+========================= */
+
+.registration-choice{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.choice-option{
+  position:relative;
+}
+
+.choice-option input{
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+
+.choice-label{
+  display:block;
+  height:100%;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(0,0,0,.12);
+  padding:15px 17px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.choice-label strong{
+  display:block;
+  color:var(--white);
+  font-family:Arial,sans-serif;
+  font-size:13px;
+  margin-bottom:5px;
+}
+
+.choice-label span{
+  display:block;
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  line-height:1.5;
+}
+
+.choice-option input:checked + .choice-label{
+  border-color:var(--gold);
+  background:rgba(214,173,85,.08);
+}
+
+.choice-option input:checked + .choice-label strong{
+  color:var(--gold-light);
+}
+
+.form-section-title{
+  color:var(--gold);
+  font-size:19px;
+  margin:35px 0 20px;
+  padding-bottom:9px;
+  border-bottom:1px solid rgba(214,173,85,.2);
+}
+
+.competence-group{
+  margin-bottom:25px;
+}
+
+.competence-group-title{
+  font-family:Arial,sans-serif;
+  color:#eee;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:13px;
+}
+
+.competence{
+  border:1px solid rgba(255,255,255,.1);
+  margin-bottom:8px;
+  padding:12px;
+  background:rgba(0,0,0,.12);
+}
+
+.competence label{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
   cursor:pointer;
 }
 
-.competence-checkbox input{
-  width:auto;
+.competence input{
+  margin-top:3px;
+  accent-color:var(--gold);
+}
+
+.competence-name{
+  color:var(--white);
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.competence-description{
+  display:block;
+  color:#929dad;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  line-height:1.45;
+  margin-top:5px;
 }
 
 .submit-button{
   width:100%;
-
-  margin-top:25px;
+  border:0;
+  background:var(--gold);
+  color:var(--navy);
   padding:15px;
-
-  color:#050505;
-  background:#d4af37;
-
-  border:none;
-
-  font-size:12px;
-  font-weight:900;
-
-  letter-spacing:1px;
-  text-transform:uppercase;
-
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1.2px;
   cursor:pointer;
+  margin-top:15px;
 }
 
 .submit-button:hover{
-  background:#fff;
+  background:var(--gold-light);
+}
+
+.submit-button:disabled{
+  opacity:.6;
+  cursor:wait;
 }
 
 .form-message{
+  display:none;
+  padding:13px;
   margin-top:15px;
-
+  font-family:Arial,sans-serif;
   font-size:12px;
   line-height:1.5;
 }
 
-
-/* =========================================================
-   EVENT MODAL
-========================================================= */
-
-.event-modal-content{
-  padding:40px;
+.form-message.success{
+  display:block;
+  border:1px solid rgba(100,200,130,.4);
+  color:#b9e5c4;
+  background:rgba(50,130,70,.1);
 }
 
-.event-modal-content h2{
-  font-size:30px;
-  font-weight:900;
-}
-
-.event-modal-date{
-  margin-top:10px;
-
-  color:#d4af37;
-
-  font-size:12px;
-  font-weight:800;
-}
-
-.event-modal-description{
-  margin-top:20px;
-
-  color:#aaa;
-
-  font-size:14px;
-  line-height:1.7;
+.form-message.error{
+  display:block;
+  border:1px solid rgba(239,65,53,.4);
+  color:#ffb5ae;
+  background:rgba(180,30,20,.1);
 }
 
 
-/* =========================================================
-   RESPONSIVE
-========================================================= */
+/* =========================
+   FOOTER
+========================= */
 
-@media(max-width:750px){
+footer{
+  border-top:1px solid rgba(214,173,85,.15);
+  text-align:center;
+  padding:30px 20px;
+  color:#7f8998;
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  letter-spacing:.5px;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:800px){
 
   header{
     height:auto;
-    min-height:68px;
-
-    padding:14px 18px;
-
-    flex-wrap:wrap;
-    gap:12px;
+    padding:20px;
+    flex-direction:column;
+    gap:18px;
   }
 
   nav{
-    width:100%;
-
-    justify-content:center;
-
     gap:15px;
-
-    overflow-x:auto;
+    flex-wrap:wrap;
+    justify-content:center;
   }
 
   nav a{
     font-size:10px;
   }
 
-  .admin-link{
-    display:none;
+  .logo{
+    font-size:27px;
   }
 
   .hero{
-    padding:65px 20px 50px;
+    padding:55px 20px 35px;
   }
 
-  .hero h1{
-    letter-spacing:-3px;
+  .hero p{
+    font-size:15px;
   }
 
   .team-section{
-    padding:0 20px 70px;
+    padding-left:15px;
+    padding-right:15px;
   }
 
-  .team-grid{
-    grid-template-columns:
-      repeat(2,minmax(0,1fr));
-
-    gap:10px;
+  .modal{
+    padding:8px;
   }
 
-  .profile-info{
-    padding:13px;
+  .modal-box{
+    padding:28px 20px;
+    max-height:95vh;
   }
 
-  .profile-name{
-    font-size:16px;
+  .rdv-modal-box{
+    padding:34px 22px 28px;
   }
 
-  .profile-description{
-    font-size:11px;
+  .rdv-modal-title{
+    font-size:27px;
   }
 
-  .profile-modal-content{
-    grid-template-columns:1fr;
+  .events-label{
+    padding:0 10px;
+    font-size:9px;
   }
 
-  .profile-modal-image,
-  .profile-modal-placeholder{
-    min-height:280px;
-    height:280px;
+  .event-item{
+    font-size:10px;
+    padding:0 16px;
   }
 
-  .profile-modal-info{
-    padding:25px;
-  }
-
-  .profile-modal-name{
-    font-size:28px;
-  }
-
-  .join-modal-content,
-  .event-modal-content{
-    padding:25px;
-  }
-
-}
-
-@media(max-width:430px){
-
-  .team-grid{
+  .registration-choice{
     grid-template-columns:1fr 1fr;
+    gap:8px;
   }
 
-  .profile-socials{
-    gap:7px;
+  .choice-label{
+    padding:13px 11px;
   }
 
-  .profile-social-item{
-    min-width:65px;
+  .choice-label strong{
+    font-size:12px;
+  }
+
+  .choice-label span{
+    font-size:10px;
   }
 
 }
 
+@media(max-width:420px){
 
-/* =========================================================
-   VIP
-========================================================= */
+  .logo{
+    font-size:24px;
+    letter-spacing:-1px;
+  }
 
-.vip-badge{
-  display:inline-flex;
-  align-items:center;
-
-  margin-left:7px;
-  padding:3px 6px;
-
-  color:#050505;
-  background:#d4af37;
-
-  border-radius:3px;
-
-  font-size:8px;
-  font-weight:900;
-
-  letter-spacing:1px;
-
-  vertical-align:middle;
 }
 
 </style>
-</head>
 
+</head>
 
 <body>
 
 
-<!-- ========================================================
-     HEADER
-========================================================= -->
-
-<header>
-
-  <a href="index.html" class="logo">
-    Avant-gard<span>E</span>
-  </a>
-
-  <nav>
-
-    <a href="index.html">
-      Accueil
-    </a>
-
-    <a href="manifeste.html">
-      Manifeste
-    </a>
-
-    <a href="projet.html">
-      Projet
-    </a>
-
-    <a href="inspirations.html">
-      Inspirations
-    </a>
-
-    <a href="equipe.html" class="active">
-      Équipe
-    </a>
-
-  </nav>
-
-  <a
-    href="admin.html"
-    class="admin-link"
-    title="Administration"
-  >
-    ⚙
-  </a>
-
-</header>
-
-
-<!-- ========================================================
-     EVENTS
-========================================================= -->
+<!-- =========================
+     RENDEZ-VOUS
+========================= -->
 
 <div class="events-bar">
 
-  <div
-    id="eventsTrack"
-    class="events-track"
-  ></div>
+  <div class="events-label">
+    EVENEMENT
+  </div>
+
+  <div class="events-window" id="eventsWindow">
+
+    <div
+      class="events-track"
+      id="eventsTrack">
+    </div>
+
+  </div>
 
 </div>
 
 
-<!-- ========================================================
+<!-- =========================
+     HEADER
+========================= -->
+
+<header>
+
+<a
+  href="admin.html"
+  class="admin-gear"
+  title="Administration"
+  aria-label="Administration"
+>
+  ⚙
+</a>
+
+
+<a
+  href="index.html"
+  class="logo"
+>
+
+  <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
+
+</a>
+
+
+<nav>
+
+  <a href="index.html">
+    ACCUEIL
+  </a>
+
+  <a href="manifeste.html">
+    MANIFESTE
+  </a>
+
+  <a href="projet.html">
+    NOTRE PROJET
+  </a>
+
+  <a href="inspirations.html">
+    NOS INSPIRATIONS
+  </a>
+
+  <a
+    href="equipe.html"
+    class="active"
+  >
+    NOTRE ÉQUIPE
+  </a>
+
+</nav>
+
+</header>
+
+
+<!-- =========================
      HERO
-========================================================= -->
+========================= -->
 
 <section class="hero">
 
-  <div class="hero-small">
+  <div class="kicker">
     L’AVANT-GARDE
   </div>
 
   <h1>
-    NOTRE<br>
-    <span>ÉQUIPE.</span>
+    NOTRE <span>ÉQUIPE.</span>
   </h1>
 
-  <p class="hero-text">
-    Découvrez celles et ceux qui construisent
-    l’Avant-gardE et portent notre projet
-    pour une France libre, souveraine et responsable.
+  <p>
+    L’Avant-gardE rassemble des femmes et des hommes qui souhaitent
+    contribuer, chacun selon ses compétences, son influence et ses moyens,
+    à la construction d’une France libre, souveraine et responsable.
   </p>
 
-  <a
-    href="#"
-    class="hero-button"
-    id="joinButton"
+  <button
+    class="join-button"
+    id="openJoin"
   >
-    Rejoindre l’Avant-gardE
-  </a>
+    REJOINDRE L’AVANT-GARDE
+  </button>
 
 </section>
 
 
-<!-- ========================================================
-     TEAM
-========================================================= -->
+<!-- =========================
+     EQUIPE
+========================= -->
 
 <section class="team-section">
 
+  <div class="section-title">
+
+    <h2>
+      Les membres
+    </h2>
+
+    <p>
+      Découvrez celles et ceux qui ont choisi de rendre leur engagement public.
+    </p>
+
+  </div>
+
   <div
-    id="teamGrid"
     class="team-grid"
-  ></div>
+    id="teamGrid"
+  >
+
+    <div
+      class="loading"
+      id="loadingMembers"
+    >
+      Chargement des membres…
+    </div>
+
+  </div>
 
 </section>
 
 
-<!-- ========================================================
-     PROFILE MODAL
-========================================================= -->
+<!-- =========================
+     MODAL MEMBRE
+========================= -->
 
 <div
-  id="profileModal"
-  class="modal-overlay"
+  class="modal"
+  id="memberModal"
 >
 
-  <div class="modal">
+  <div class="modal-box">
 
     <button
       class="modal-close"
-      id="closeProfileModal"
-      type="button"
+      id="closeMember"
+      aria-label="Fermer"
     >
       ×
     </button>
 
     <div class="profile-modal-content">
 
-      <div id="profileModalImageContainer"></div>
+      <img
+        id="profileModalImage"
+        class="profile-modal-image"
+        alt=""
+      >
 
-      <div class="profile-modal-info">
+      <div
+        id="profilePlaceholder"
+        class="profile-placeholder"
+      >
+        ★
+      </div>
+
+      <h2 id="profileModalName"></h2>
+
+      <div
+        id="profileModalGrade"
+        class="profile-grade"
+      ></div>
+
+      <div
+        id="profileModalRegion"
+        class="profile-region"
+      ></div>
+
+      <div
+        id="profileModalDescription"
+        class="profile-description"
+      ></div>
+
+
+      <!-- =========================
+           RESEAUX SOCIAUX
+      ========================= -->
+
+      <div
+        id="profileModalSocials"
+        class="profile-socials"
+        style="display:none;"
+      ></div>
+
+      <div
+        id="profileModalAudienceMax"
+        class="profile-audience-max"
+        style="display:none;"
+      ></div>
+
+
+      <div class="profile-competences">
+
+        <h3>
+          Compétences
+        </h3>
 
         <div
-          id="profileModalName"
-          class="profile-modal-name"
-        ></div>
-
-        <div
-          id="profileModalGrade"
-          class="profile-modal-grade"
-        ></div>
-
-        <div
-          id="profileModalRegion"
-          class="profile-modal-region"
-        ></div>
-
-        <div
-          id="profileModalDescription"
-          class="profile-modal-description"
-        ></div>
-
-        <div
-          id="profileModalSocials"
-          class="profile-socials"
-        ></div>
-
-        <div
-          id="profileAudienceMax"
-          class="profile-audience-max"
-        ></div>
-
-        <div
-          id="profileCompetences"
-          class="profile-competences"
+          class="competence-list"
+          id="profileModalCompetences"
         ></div>
 
       </div>
@@ -1150,70 +1344,98 @@ nav a.active{
 </div>
 
 
-<!-- ========================================================
-     JOIN MODAL
-========================================================= -->
+<!-- =========================
+     MODAL INSCRIPTION
+========================= -->
 
 <div
+  class="modal"
   id="joinModal"
-  class="modal-overlay"
 >
 
-  <div class="modal">
+  <div class="modal-box">
 
     <button
       class="modal-close"
-      id="closeJoinModal"
-      type="button"
+      id="closeJoin"
+      aria-label="Fermer"
     >
       ×
     </button>
 
-    <div class="join-modal-content">
+    <h2 class="form-title">
+      Rejoindre l’Avant-gardE
+    </h2>
 
-      <h2>
-        Rejoindre l’Avant-gardE
-      </h2>
+    <p class="form-intro">
+      Créez votre profil et choisissez la manière dont vous souhaitez
+      apparaître au sein du mouvement.
+    </p>
 
-      <p>
-        Rejoignez le mouvement et participez
-        à la construction de notre projet.
-      </p>
+    <form id="joinForm">
 
 
-      <form id="joinForm">
+      <!-- =========================
+           TYPE D'INSCRIPTION
+      ========================= -->
 
-        <div class="form-group">
+      <div class="form-group">
 
-          <label>
-            Statut
-          </label>
+        <label class="main-label">
+          S’inscrire en tant que
+          <span class="required">*</span>
+        </label>
 
-          <div class="join-type">
+        <div class="registration-choice">
 
-            <label>
-              <input
-                type="radio"
-                name="joinType"
-                value="sympathisant"
-                checked
-              >
+          <div class="choice-option">
 
-              <span>
+            <input
+              type="radio"
+              id="typeSympathisant"
+              name="type_inscription"
+              value="sympathisant"
+              checked
+            >
+
+            <label
+              for="typeSympathisant"
+              class="choice-label"
+            >
+
+              <strong>
                 Sympathisant
-              </span>
-
-            </label>
-
-            <label>
-              <input
-                type="radio"
-                name="joinType"
-                value="anonyme"
-              >
+              </strong>
 
               <span>
+                Votre profil sera affiché dans la liste des membres.
+              </span>
+
+            </label>
+
+          </div>
+
+
+          <div class="choice-option">
+
+            <input
+              type="radio"
+              id="typeAnonyme"
+              name="type_inscription"
+              value="anonyme"
+            >
+
+            <label
+              for="typeAnonyme"
+              class="choice-label"
+            >
+
+              <strong>
                 Anonyme
+              </strong>
+
+              <span>
+                Votre profil sera enregistré mais caché de la liste des membres.
               </span>
 
             </label>
@@ -1222,217 +1444,597 @@ nav a.active{
 
         </div>
 
-
-        <div class="form-group">
-
-          <label for="joinNom">
-            Nom
-          </label>
-
-          <input
-            id="joinNom"
-            type="text"
-            required
-          >
-
-        </div>
+      </div>
 
 
-        <div class="form-group">
+      <!-- =========================
+           NOM
+      ========================= -->
 
-          <label for="joinEmail">
-            Email
-          </label>
+      <div class="form-group">
 
-          <input
-            id="joinEmail"
-            type="email"
-            required
-          >
-
-        </div>
-
-
-        <div class="form-group">
-
-          <label for="joinRegion">
-            Région
-          </label>
-
-          <input
-            id="joinRegion"
-            type="text"
-            required
-          >
-
-        </div>
-
-
-        <div class="form-group">
-
-          <label for="joinImage">
-            URL de votre photo
-          </label>
-
-          <input
-            id="joinImage"
-            type="url"
-            placeholder="https://..."
-          >
-
-        </div>
-
-
-        <div class="form-group">
-
-          <label for="joinDescription">
-            Présentation
-          </label>
-
-          <textarea
-            id="joinDescription"
-            maxlength="300"
-            placeholder="Présentez-vous en quelques mots..."
-          ></textarea>
-
-        </div>
-
-
-        <div class="form-group">
-
-          <label>
-            Compétences
-          </label>
-
-          <div
-            id="competenceList"
-            class="competence-list"
-          >
-
-            <label class="competence-checkbox">
-              <input
-                type="checkbox"
-                value="Communication"
-              >
-              Communication
-            </label>
-
-            <label class="competence-checkbox">
-              <input
-                type="checkbox"
-                value="Économie"
-              >
-              Économie
-            </label>
-
-            <label class="competence-checkbox">
-              <input
-                type="checkbox"
-                value="Droit"
-              >
-              Droit
-            </label>
-
-            <label class="competence-checkbox">
-              <input
-                type="checkbox"
-                value="Politique"
-              >
-              Politique
-            </label>
-
-            <label class="competence-checkbox">
-              <input
-                type="checkbox"
-                value="Numérique"
-              >
-              Numérique
-            </label>
-
-            <label class="competence-checkbox">
-              <input
-                type="checkbox"
-                value="Organisation"
-              >
-              Organisation
-            </label>
-
-          </div>
-
-        </div>
-
-
-        <button
-          type="submit"
-          class="submit-button"
+        <label
+          class="main-label"
+          for="nom"
         >
-          Rejoindre
-        </button>
+          Pseudo ou nom prénom
+          <span class="required">*</span>
+        </label>
+
+        <input
+          type="text"
+          id="nom"
+          maxlength="100"
+          required
+        >
+
+      </div>
+
+
+      <!-- =========================
+           EMAIL
+      ========================= -->
+
+      <div class="form-group">
+
+        <label
+          class="main-label"
+          for="email"
+        >
+          Email
+          <span class="required">*</span>
+        </label>
+
+        <input
+          type="email"
+          id="email"
+          required
+        >
+
+        <div class="help">
+          Une seule inscription est autorisée par adresse e-mail.
+        </div>
+
+      </div>
+
+
+      <!-- =========================
+           REGION
+      ========================= -->
+
+      <div class="form-group">
+
+        <label
+          class="main-label"
+          for="region"
+        >
+          Région
+          <span class="required">*</span>
+        </label>
+
+        <select
+          id="region"
+          required
+        >
+
+          <option value="">
+            Sélectionnez votre région
+          </option>
+
+          <optgroup label="France métropolitaine">
+
+            <option>Auvergne-Rhône-Alpes</option>
+            <option>Bourgogne-Franche-Comté</option>
+            <option>Bretagne</option>
+            <option>Centre-Val de Loire</option>
+            <option>Corse</option>
+            <option>Grand Est</option>
+            <option>Hauts-de-France</option>
+            <option>Île-de-France</option>
+            <option>Normandie</option>
+            <option>Nouvelle-Aquitaine</option>
+            <option>Occitanie</option>
+            <option>Pays de la Loire</option>
+            <option>Provence-Alpes-Côte d’Azur</option>
+
+          </optgroup>
+
+          <optgroup label="Outre-mer">
+
+            <option>Guadeloupe</option>
+            <option>Martinique</option>
+            <option>Guyane</option>
+            <option>La Réunion</option>
+            <option>Mayotte</option>
+
+          </optgroup>
+
+          <optgroup label="Étranger">
+
+            <option>Europe</option>
+            <option>Amérique du Nord</option>
+            <option>Amérique centrale et Caraïbes</option>
+            <option>Amérique du Sud</option>
+            <option>Afrique</option>
+            <option>Asie</option>
+            <option>Océanie</option>
+            <option>Autre</option>
+
+          </optgroup>
+
+        </select>
+
+      </div>
+
+
+      <!-- =========================
+           IMAGE
+      ========================= -->
+
+      <div class="form-group">
+
+        <label
+          class="main-label"
+          for="image_url"
+        >
+          Image
+        </label>
+
+        <input
+          type="url"
+          id="image_url"
+          placeholder="https://..."
+        >
+
+        <div class="help">
+          Indiquez l’URL d’une image déjà hébergée en ligne.
+        </div>
+
+      </div>
+
+
+      <!-- =========================
+           DESCRIPTION
+      ========================= -->
+
+      <div class="form-group">
+
+        <label
+          class="main-label"
+          for="description"
+        >
+          Description
+        </label>
+
+        <textarea
+          id="description"
+          maxlength="300"
+          placeholder="Présentez-vous en quelques mots..."
+        ></textarea>
 
         <div
-          id="formMessage"
-          class="form-message"
-        ></div>
+          class="description-counter"
+          id="descriptionCounter"
+        >
+          <span id="descriptionCount">0</span> / 300
+        </div>
 
-      </form>
+      </div>
 
-    </div>
+
+      <!-- =========================
+           COMPETENCES
+      ========================= -->
+
+      <div class="form-section-title">
+        Talents et compétences métier
+      </div>
+
+      <div class="form-group">
+
+        <label class="main-label">
+          Compétences
+          <span style="font-weight:normal;color:#8994a6;">
+            (auto-évaluation de vos compétences)
+          </span>
+        </label>
+
+      </div>
+
+
+      <!-- =========================
+           COMPETENCES METIER
+      ========================= -->
+
+      <div class="competence-group">
+
+        <div class="competence-group-title">
+          Compétences métier
+        </div>
+
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Maîtrise de doctrine"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Maîtrise de doctrine
+              </span>
+
+              <span class="competence-description">
+                capacité à préserver la fidélité à l’idéologie d'Avant-Garde et sa cohérence dans l’action du mouvement.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Tactique"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Tactique
+              </span>
+
+              <span class="competence-description">
+                capacité à concevoir et mettre en œuvre des tactiques efficaces de développement d’audience, médiatique et électorale, sans renier l’idéologie.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Prestance"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Prestance
+              </span>
+
+              <span class="competence-description">
+                capacité à séduire et convaincre par la parole, le charisme, le charme ou la culture.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Analyses pragmatiques"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Analyses pragmatiques
+              </span>
+
+              <span class="competence-description">
+                capacité à analyser les données, les rendements, les conséquences et les rapports de force. anticipent les évolutions et privilégient les faits.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Analyses populistes"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Analyses populistes
+              </span>
+
+              <span class="competence-description">
+                capacité à analyser les ressentis, aspirations et frustrations populaires. anticipent les réactions naturelles et privilégient le vécu et l’opinion du peuple.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Administration"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Administration
+              </span>
+
+              <span class="competence-description">
+                maîtrise de la gestion des structures, des ressources techniques et opérationnelles et des équipes internes.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Expertise et ingénierie juridique"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Expertise et ingénierie juridique
+              </span>
+
+              <span class="competence-description">
+                maîtrise du droit français et européen ainsi que des mécanismes juridiques, avec capacité à en analyser les règles, les contraintes, les failles et les possibilités d’évolution.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Expertise et ingénierie politique"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Expertise et ingénierie politique
+              </span>
+
+              <span class="competence-description">
+                maîtrise d’un domaine politique ou institutionnel particulier et capacité à en apporter l’expertise.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <!-- =========================
+           INFLUENCE / BIENFAITEUR
+      ========================= -->
+
+      <div class="competence-group">
+
+        <div class="competence-group-title">
+          Je peux vous aider en tant que
+        </div>
+
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Influenceurs / debunkers / créateurs de contenu"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Influenceur / debunker / créateur de contenu
+              </span>
+
+              <span class="competence-description">
+                dans le milieu médiatique et sur les réseaux sociaux, développent spontanément une audience, influencent les comportements, déconstruisent les arguments ou manipulations et produisent des contenus permettant de diffuser et de défendre les idées du mouvement. peuvent conserver une forte indépendance éditoriale.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Bienfaiteurs"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Bienfaiteur
+              </span>
+
+              <span class="competence-description">
+                dans les autres milieux, mettent spontanément leur influence, leur réseau, leur carnet d’adresses, leurs moyens, leur expertise ou leur notoriété au service du développement et du rayonnement du mouvement. peuvent conserver une forte indépendance.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+      </div>
+
+
+      <button
+        type="submit"
+        class="submit-button"
+        id="submitButton"
+      >
+        CRÉER MON PROFIL
+      </button>
+
+
+      <div
+        id="formMessage"
+        class="form-message"
+      ></div>
+
+    </form>
 
   </div>
 
 </div>
 
 
-<!-- ========================================================
-     EVENT MODAL
-========================================================= -->
+<!-- =========================
+     MODAL RENDEZ-VOUS
+========================= -->
 
 <div
+  class="modal"
   id="eventModal"
-  class="modal-overlay"
 >
 
-  <div class="modal">
+  <div class="modal-box rdv-modal-box">
 
     <button
       class="modal-close"
-      id="closeEventModal"
-      type="button"
+      id="closeEvent"
+      aria-label="Fermer"
     >
       ×
     </button>
 
-    <div class="event-modal-content">
-
-      <h2 id="eventModalTitle"></h2>
-
-      <div
-        id="eventModalDate"
-        class="event-modal-date"
-      ></div>
-
-      <div
-        id="eventModalDescription"
-        class="event-modal-description"
-      ></div>
-
+    <div class="rdv-modal-kicker">
+      NOS RENDEZ-VOUS
     </div>
+
+    <h2
+      id="eventModalTitle"
+      class="rdv-modal-title"
+    ></h2>
+
+    <div
+      id="eventModalDate"
+      class="rdv-modal-date"
+    ></div>
+
+    <div
+      id="eventModalTime"
+      class="rdv-modal-time"
+    ></div>
+
+    <div
+      id="eventModalLocation"
+      class="rdv-modal-location"
+    ></div>
+
+    <div
+      id="eventModalDescription"
+      class="rdv-modal-description"
+    ></div>
+
+    <a
+      id="eventModalLink"
+      class="rdv-modal-link"
+      href="#"
+      target="_blank"
+      rel="noopener noreferrer"
+      style="display:none;"
+    >
+      EN SAVOIR PLUS →
+    </a>
 
   </div>
 
 </div>
 
 
-<script type="module">
+<footer>
+
+  © 2026 Avant-gardE — Liberté · Souveraineté · Patrie · Justice
+
+</footer>
+
+
+<script>
 
 /* =========================================================
    SUPABASE
 ========================================================= */
-
-import {
-  createClient
-} from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
 
 const SUPABASE_URL =
   "https://wlhtegrciehmtxqecopv.supabase.co";
@@ -1440,8 +2042,8 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
 
-const supabase =
-  createClient(
+const supabaseClient =
+  supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
   );
@@ -1454,8 +2056,8 @@ const supabase =
 const teamGrid =
   document.getElementById("teamGrid");
 
-const profileModal =
-  document.getElementById("profileModal");
+const memberModal =
+  document.getElementById("memberModal");
 
 const joinModal =
   document.getElementById("joinModal");
@@ -1463,49 +2065,154 @@ const joinModal =
 const eventModal =
   document.getElementById("eventModal");
 
+const submitButton =
+  document.getElementById("submitButton");
+
+const descriptionField =
+  document.getElementById("description");
+
+const descriptionCount =
+  document.getElementById("descriptionCount");
+
+const descriptionCounter =
+  document.getElementById("descriptionCounter");
+
 
 /* =========================================================
-   RESEAUX
+   OUTILS
+========================================================= */
+
+function fermerModal(modal){
+
+  modal.classList.remove("active");
+
+  document.body.style.overflow = "";
+
+}
+
+
+function ouvrirModal(modal){
+
+  modal.classList.add("active");
+
+  document.body.style.overflow = "hidden";
+
+}
+
+
+function imageValide(url){
+
+  if(!url) return false;
+
+  try{
+
+    const u = new URL(url);
+
+    return (
+      u.protocol === "http:" ||
+      u.protocol === "https:"
+    );
+
+  }catch{
+
+    return false;
+
+  }
+
+}
+
+
+function normaliserCompetences(value){
+
+  if(Array.isArray(value)){
+
+    return value;
+
+  }
+
+  if(typeof value === "string"){
+
+    return value
+      .replace(/^\{|\}$/g,"")
+      .split(",")
+      .map(x =>
+        x.trim()
+         .replace(/^"|"$/g,"")
+      )
+      .filter(Boolean);
+
+  }
+
+  return [];
+
+}
+
+
+/* =========================================================
+   RESEAUX SOCIAUX
 ========================================================= */
 
 const reseauxSociaux = [
 
   {
+    champ:"facebook_url",
     nom:"Facebook",
-    champURL:"facebook_url",
-    champAudience:"facebook_audience",
-    logo:"https://cdn.simpleicons.org/facebook/1877F2"
+    logo:"https://cdn.simpleicons.org/facebook/1877F2",
+    audienceChamp:"facebook_audience"
   },
 
   {
+    champ:"x_url",
     nom:"X",
-    champURL:"x_url",
-    champAudience:"x_audience",
-    logo:"https://cdn.simpleicons.org/x/FFFFFF"
+    logo:"https://cdn.simpleicons.org/x/FFFFFF",
+    audienceChamp:"x_audience"
   },
 
   {
+    champ:"instagram_url",
     nom:"Instagram",
-    champURL:"instagram_url",
-    champAudience:"instagram_audience",
-    logo:"https://cdn.simpleicons.org/instagram/E4405F"
+    logo:"https://cdn.simpleicons.org/instagram/E4405F",
+    audienceChamp:"instagram_audience"
   },
 
   {
+    champ:"youtube_url",
     nom:"YouTube",
-    champURL:"youtube_url",
-    champAudience:"youtube_audience",
-    logo:"https://cdn.simpleicons.org/youtube/FF0000"
+    logo:"https://cdn.simpleicons.org/youtube/FF0000",
+    audienceChamp:"youtube_audience"
   },
 
   {
+    champ:"tiktok_url",
     nom:"TikTok",
-    champURL:"tiktok_url",
-    champAudience:"tiktok_audience",
-    logo:"https://cdn.simpleicons.org/tiktok/FFFFFF"
+    logo:"https://cdn.simpleicons.org/tiktok/FFFFFF",
+    audienceChamp:"tiktok_audience"
   }
 
 ];
+
+
+function urlValide(url){
+
+  if(!url) return false;
+
+  try{
+
+    const u =
+      new URL(url);
+
+    return (
+      u.protocol === "http:" ||
+      u.protocol === "https:"
+    );
+
+  }catch{
+
+    return false;
+
+  }
+
+}
 
 
 /* =========================================================
@@ -1516,39 +2223,23 @@ function formaterAudience(valeur){
 
   const nombre = Number(valeur);
 
-  if(
-    !Number.isFinite(nombre) ||
-    nombre < 0
-  ){
+  if(!Number.isFinite(nombre) || nombre < 0){
     return null;
   }
 
 
-  /*
-   * Moins de 1 000
-   *
-   * 850 → 850
-   */
+  /* Moins de 1 000 */
 
   if(nombre < 1000){
 
-    return new Intl.NumberFormat(
-      "fr-FR",
-      {
-        maximumFractionDigits:0
-      }
-    ).format(nombre);
+    return new Intl.NumberFormat("fr-FR",{
+      maximumFractionDigits:0
+    }).format(nombre);
 
   }
 
 
-  /*
-   * De 1 000 à 999 999
-   *
-   * 1 250 → 1,3 K
-   * 12 500 → 12,5 K
-   * 391 000 → 391 K
-   */
+  /* De 1 000 à 999 999 */
 
   if(nombre < 1000000){
 
@@ -1556,87 +2247,328 @@ function formaterAudience(valeur){
       nombre / 1000;
 
     return (
-      new Intl.NumberFormat(
-        "fr-FR",
-        {
-          maximumFractionDigits:
-            valeurK < 10 ? 1 : 0
-        }
-      ).format(valeurK)
+      new Intl.NumberFormat("fr-FR",{
+        maximumFractionDigits:
+          valeurK < 10 ? 1 : 0
+      }).format(valeurK)
       + " K"
     );
 
   }
 
 
-  /*
-   * 1 million et plus
-   *
-   * 1 000 000 → 1 M
-   * 1 250 000 → 1,3 M
-   * 15 400 000 → 15,4 M
-   */
+  /* 1 million et plus */
 
   const valeurM =
     nombre / 1000000;
 
   return (
-    new Intl.NumberFormat(
-      "fr-FR",
-      {
-        maximumFractionDigits:
-          valeurM < 10 ? 1 : 0
-      }
-    ).format(valeurM)
+    new Intl.NumberFormat("fr-FR",{
+      maximumFractionDigits:
+        valeurM < 10 ? 1 : 0
+    }).format(valeurM)
     + " M"
   );
 
 }
 
 
-/* =========================================================
-   GRADE
-========================================================= */
+function afficherReseauxSociaux(membre){
 
-function formaterGrade(grade){
+  const container =
+    document.getElementById(
+      "profileModalSocials"
+    );
 
-  const grades = {
+  container.innerHTML = "";
 
-    admin:"Administrateur",
+  const reseauxAvecAudience = [];
 
-    responsable:"Responsable",
+  reseauxSociaux.forEach(reseau => {
 
-    cadre:"Cadre",
+    const url =
+      membre[reseau.champ];
 
-    militant:"Militant",
+    if(!urlValide(url)){
+      return;
+    }
 
-    user:"Membre",
+    const audience =
+      Number(membre[reseau.audienceChamp]);
 
-    sympathisant:"Sympathisant",
+    reseauxAvecAudience.push({
+      ...reseau,
+      url,
+      audience:
+        Number.isFinite(audience) && audience >= 0
+          ? audience
+          : null
+    });
 
-    anonyme:"Membre"
+  });
 
-  };
+  const reseauxAvecChiffre =
+    reseauxAvecAudience.filter(
+      reseau => reseau.audience !== null
+    );
 
-  return grades[grade] || "Membre";
+  const maxAudience =
+    Number(membre.audience_max);
+
+  const maxValide =
+    Number.isFinite(maxAudience) && maxAudience >= 0;
+
+  const reseauMax =
+    membre.audience_reseau ||
+    reseauxAvecAudience
+      .filter(reseau => reseau.audience !== null)
+      .sort((a,b) => b.audience - a.audience)[0]?.nom ||
+    null;
+
+  function reseauEstMax(reseau){
+    if(!reseauMax) return false;
+
+    const cible =
+      String(reseauMax)
+        .toLowerCase()
+        .replace(/[_\s-]/g,"");
+
+    const valeurs = [
+      reseau.nom,
+      reseau.audienceChamp,
+      reseau.audienceChamp.replace("_audience", "")
+    ]
+    .map(v =>
+      String(v)
+        .toLowerCase()
+        .replace(/[_\s-]/g,"")
+    );
+
+    return valeurs.includes(cible);
+  }
+
+  let nombreReseaux = 0;
+
+  reseauxAvecAudience.forEach(reseau => {
+
+    nombreReseaux++;
+
+    const item =
+      document.createElement("div");
+
+    item.className =
+      "profile-social-item";
+
+    const estMax =
+      reseauEstMax(reseau);
+
+    if(estMax){
+      item.classList.add("is-max");
+    }
+
+    const lien =
+      document.createElement("a");
+
+    lien.className =
+      "profile-social-link";
+
+    lien.href =
+      reseau.url;
+
+    lien.target =
+      "_blank";
+
+    lien.rel =
+      "noopener noreferrer";
+
+    lien.title =
+      reseau.nom;
+
+    lien.setAttribute(
+      "aria-label",
+      reseau.nom
+    );
+
+    const logo =
+      document.createElement("img");
+
+    logo.src =
+      reseau.logo;
+
+    logo.alt =
+      reseau.nom;
+
+    logo.onerror =
+      function(){
+        item.style.display =
+          "none";
+      };
+
+    lien.appendChild(logo);
+    item.appendChild(lien);
+
+    if(estMax){
+
+      const star =
+        document.createElement("span");
+
+      star.className =
+        "profile-social-max-star";
+
+      star.textContent =
+        "★";
+
+      star.title =
+        "Audience maximale";
+
+      item.appendChild(star);
+
+    }
+
+    const audience =
+      document.createElement("div");
+
+    audience.className =
+      "profile-social-audience";
+
+    audience.textContent =
+      reseau.audience !== null
+        ? formaterAudience(reseau.audience)
+        : "";
+
+    item.appendChild(audience);
+    container.appendChild(item);
+
+  });
+
+  let audienceMaxEl =
+    document.getElementById(
+      "profileModalAudienceMax"
+    );
+
+  if(!audienceMaxEl){
+
+    audienceMaxEl =
+      document.createElement("div");
+
+    audienceMaxEl.id =
+      "profileModalAudienceMax";
+
+    audienceMaxEl.className =
+      "profile-audience-max";
+
+    container.insertAdjacentElement(
+      "afterend",
+      audienceMaxEl
+    );
+
+  }
+
+  if(maxValide){
+
+    const date =
+      membre.audience_updated_at
+        ? new Date(membre.audience_updated_at)
+        : null;
+
+    let dateText = "";
+
+    if(date && !Number.isNaN(date.getTime())){
+      dateText =
+        " · mis à jour le " +
+        date.toLocaleDateString("fr-FR") +
+        " à " +
+        date.toLocaleTimeString("fr-FR",{
+          hour:"2-digit",
+          minute:"2-digit"
+        });
+    }
+
+    audienceMaxEl.innerHTML =
+      "Audience max : <strong>" +
+      formaterAudience(maxAudience) +
+      "</strong>" +
+      (dateText
+        ? " <small>" + dateText + "</small>"
+        : "");
+
+    audienceMaxEl.style.display =
+      "block";
+
+  }else{
+
+    audienceMaxEl.textContent = "";
+    audienceMaxEl.style.display = "none";
+
+  }
+
+  container.style.display =
+    nombreReseaux > 0
+      ? "flex"
+      : "none";
 
 }
 
 
 /* =========================================================
-   CHARGEMENT DES MEMBRES
+   COMPTEUR DESCRIPTION
+========================================================= */
+
+function mettreAJourCompteurDescription(){
+
+  const longueur =
+    descriptionField.value.length;
+
+  descriptionCount.textContent =
+    longueur;
+
+  descriptionCounter.classList.remove(
+    "warning",
+    "limit"
+  );
+
+  if(longueur >= 300){
+
+    descriptionCounter.classList.add(
+      "limit"
+    );
+
+  }else if(longueur >= 270){
+
+    descriptionCounter.classList.add(
+      "warning"
+    );
+
+  }
+
+}
+
+
+descriptionField.addEventListener(
+  "input",
+  mettreAJourCompteurDescription
+);
+
+
+mettreAJourCompteurDescription();
+
+
+/* =========================================================
+   CHARGEMENT MEMBRES
 ========================================================= */
 
 async function chargerMembres(){
 
-  teamGrid.innerHTML =
-    "<div style='color:#777'>Chargement...</div>";
-
+  teamGrid.innerHTML = `
+    <div class="loading">
+      Chargement des membres…
+    </div>
+  `;
 
   const {
     data,
     error
-  } = await supabase
+  } = await supabaseClient
     .from("profiles")
     .select(`
       id,
@@ -1662,211 +2594,249 @@ async function chargerMembres(){
       audience_reseau,
       audience_updated_at
     `)
-    .eq("anonyme",false)
-    .order(
-      "created_at",
-      {
-        ascending:true
-      }
-    );
-
+    .eq("anonyme", false)
+    .order("created_at", {
+      ascending:true
+    });
 
   if(error){
 
-    console.error(error);
+    console.error(
+      "Erreur chargement profils :",
+      error
+    );
 
-    teamGrid.innerHTML =
-      "<div style='color:#d66'>Impossible de charger l’équipe.</div>";
+    teamGrid.innerHTML = `
+      <div class="no-members">
+        Impossible de charger les membres.
+      </div>
+    `;
 
     return;
 
   }
-
 
   teamGrid.innerHTML = "";
 
+  if(!data || data.length === 0){
 
-  if(!data || !data.length){
-
-    teamGrid.innerHTML =
-      "<div style='color:#777'>Aucun membre pour le moment.</div>";
+    teamGrid.innerHTML = `
+      <div class="no-members">
+        Aucun membre public pour le moment.
+      </div>
+    `;
 
     return;
 
   }
 
+  data.forEach(membre => {
 
-  data.forEach(
-    membre => {
+    const card =
+      document.createElement("article");
 
-      const card =
-        document.createElement("article");
+    card.className =
+      "member-card";
 
-      card.className =
-        "profile-card";
-
-      card.tabIndex = 0;
+    card.tabIndex = 0;
 
 
-      /* IMAGE */
+    if(imageValide(membre.image_url)){
 
-      if(membre.image_url){
+      const img =
+        document.createElement("img");
 
-        const image =
-          document.createElement("img");
+      img.className =
+        "member-photo";
 
-        image.className =
-          "profile-image";
+      img.src =
+        membre.image_url;
 
-        image.src =
-          membre.image_url;
-
-        image.alt =
-          membre.nom || "Membre";
-
-        image.loading =
-          "lazy";
-
-        card.appendChild(image);
-
-      }else{
-
-        const placeholder =
-          document.createElement("div");
-
-        placeholder.className =
-          "profile-placeholder";
-
-        placeholder.textContent =
-          (membre.nom || "?")
-            .charAt(0)
-            .toUpperCase();
-
-        card.appendChild(
-          placeholder
-        );
-
-      }
-
-
-      /* INFOS */
-
-      const info =
-        document.createElement("div");
-
-      info.className =
-        "profile-info";
-
-
-      const nom =
-        document.createElement("div");
-
-      nom.className =
-        "profile-name";
-
-      nom.textContent =
+      img.alt =
         membre.nom || "Membre";
 
+      img.onerror = function(){
 
-      const grade =
-        document.createElement("div");
-
-      grade.className =
-        "profile-grade";
-
-      grade.textContent =
-        formaterGrade(
-          membre.grade
+        this.replaceWith(
+          creerPlaceholder()
         );
 
+      };
+
+      card.appendChild(img);
+
+    }else{
+
+      card.appendChild(
+        creerPlaceholder()
+      );
+
+    }
+
+
+    const name =
+      document.createElement("div");
+
+    name.className =
+      "member-name";
+
+    name.textContent =
+      membre.nom || "Membre";
+
+    card.appendChild(name);
+
+
+    const grade =
+      document.createElement("div");
+
+    grade.className =
+      "member-grade";
+
+    grade.textContent =
+      membre.grade || "user";
+
+    card.appendChild(grade);
+
+
+    if(membre.region){
 
       const region =
         document.createElement("div");
 
       region.className =
-        "profile-region";
+        "member-region";
 
       region.textContent =
-        membre.region
-          ? membre.region
-          : "";
+        membre.region;
 
+      card.appendChild(region);
+
+    }
+
+
+    if(membre.description){
 
       const description =
         document.createElement("div");
 
       description.className =
-        "profile-description";
+        "member-description";
 
       description.textContent =
-        membre.description || "";
+        membre.description;
 
-
-      info.appendChild(nom);
-      info.appendChild(grade);
-      info.appendChild(region);
-      info.appendChild(description);
-
-      card.appendChild(info);
-
-
-      /* CLICK */
-
-      card.addEventListener(
-        "click",
-        () => ouvrirProfil(membre)
-      );
-
-
-      card.addEventListener(
-        "keydown",
-        event => {
-
-          if(
-            event.key === "Enter" ||
-            event.key === " "
-          ){
-
-            event.preventDefault();
-
-            ouvrirProfil(membre);
-
-          }
-
-        }
-      );
-
-
-      teamGrid.appendChild(card);
+      card.appendChild(description);
 
     }
-  );
+
+
+    card.addEventListener(
+      "click",
+      () => ouvrirProfil(membre)
+    );
+
+
+    card.addEventListener(
+      "keydown",
+      event => {
+
+        if(
+          event.key === "Enter" ||
+          event.key === " "
+        ){
+
+          event.preventDefault();
+
+          ouvrirProfil(membre);
+
+        }
+
+      }
+    );
+
+
+    teamGrid.appendChild(card);
+
+  });
+
+}
+
+
+function creerPlaceholder(){
+
+  const placeholder =
+    document.createElement("div");
+
+  placeholder.className =
+    "member-photo-placeholder";
+
+  placeholder.textContent =
+    "★";
+
+  return placeholder;
 
 }
 
 
 /* =========================================================
-   OUVRIR PROFIL
+   POPUP PROFIL
 ========================================================= */
 
 function ouvrirProfil(membre){
 
-  const imageContainer =
+  const image =
     document.getElementById(
-      "profileModalImageContainer"
+      "profileModalImage"
+    );
+
+  const placeholder =
+    document.getElementById(
+      "profilePlaceholder"
+    );
+
+  const name =
+    document.getElementById(
+      "profileModalName"
+    );
+
+  const grade =
+    document.getElementById(
+      "profileModalGrade"
+    );
+
+  const region =
+    document.getElementById(
+      "profileModalRegion"
+    );
+
+  const description =
+    document.getElementById(
+      "profileModalDescription"
+    );
+
+  const competences =
+    document.getElementById(
+      "profileModalCompetences"
     );
 
 
-  imageContainer.innerHTML = "";
+  name.textContent =
+    membre.nom || "Membre";
 
 
-  if(membre.image_url){
+  grade.textContent =
+    membre.grade || "user";
 
-    const image =
-      document.createElement("img");
 
-    image.className =
-      "profile-modal-image";
+  region.textContent =
+    membre.region || "";
+
+
+  description.textContent =
+    membre.description || "";
+
+
+  if(imageValide(membre.image_url)){
 
     image.src =
       membre.image_url;
@@ -1874,762 +2844,530 @@ function ouvrirProfil(membre){
     image.alt =
       membre.nom || "Membre";
 
-    imageContainer.appendChild(
-      image
-    );
+    image.style.display =
+      "block";
+
+    placeholder.style.display =
+      "none";
 
   }else{
 
-    const placeholder =
-      document.createElement("div");
+    image.style.display =
+      "none";
 
-    placeholder.className =
-      "profile-modal-placeholder";
-
-    placeholder.textContent =
-      (membre.nom || "?")
-        .charAt(0)
-        .toUpperCase();
-
-    imageContainer.appendChild(
-      placeholder
-    );
+    placeholder.style.display =
+      "flex";
 
   }
 
 
-  const nameEl =
-    document.getElementById(
-      "profileModalName"
-    );
+  /* =========================
+     RESEAUX SOCIAUX
+  ========================= */
 
-  const gradeEl =
-    document.getElementById(
-      "profileModalGrade"
-    );
-
-  const regionEl =
-    document.getElementById(
-      "profileModalRegion"
-    );
-
-  const descriptionEl =
-    document.getElementById(
-      "profileModalDescription"
-    );
-
-  const socialsEl =
-    document.getElementById(
-      "profileModalSocials"
-    );
-
-  const audienceMaxEl =
-    document.getElementById(
-      "profileAudienceMax"
-    );
-
-  const competencesEl =
-    document.getElementById(
-      "profileCompetences"
-    );
+  afficherReseauxSociaux(membre);
 
 
-  /* =======================================================
-     INFOS
-  ======================================================= */
-
-  nameEl.textContent =
-    membre.nom || "Membre";
+  competences.innerHTML = "";
 
 
-  gradeEl.textContent =
-    formaterGrade(
-      membre.grade
-    );
-
-
-  regionEl.textContent =
-    membre.region || "";
-
-
-  descriptionEl.textContent =
-    membre.description || "";
-
-
-  /* =======================================================
-     VIP
-  ======================================================= */
+  const liste =
+    normaliserCompetences(
+      membre.competences
+    )
+    .filter(comp => comp !== "VIP");
 
   const audienceMax =
-    Number(
-      membre.audience_max
-    ) || 0;
+    Number(membre.audience_max) || 0;
 
   const estVIP =
     audienceMax >= 3000;
 
-
   if(estVIP){
+    liste.unshift("VIP");
+  }
 
-    const vip =
+
+  if(liste.length === 0){
+
+    const empty =
       document.createElement("span");
 
-    vip.className =
-      "vip-badge";
+    empty.style.color =
+      "#8994a6";
 
-    vip.textContent =
-      "VIP";
+    empty.style.fontFamily =
+      "Arial,sans-serif";
 
-    nameEl.appendChild(vip);
+    empty.style.fontSize =
+      "11px";
 
-  }
+    empty.textContent =
+      "Aucune compétence renseignée.";
 
+    competences.appendChild(empty);
 
-  /* =======================================================
-     RESEAUX SOCIAUX
-  ======================================================= */
+  }else{
 
-  socialsEl.innerHTML = "";
+    liste.forEach(comp => {
 
-
-  const reseauxDisponibles =
-    reseauxSociaux
-      .map(
-        reseau => {
-
-          const audience =
-            membre[
-              reseau.champAudience
-            ];
-
-          const url =
-            membre[
-              reseau.champURL
-            ];
-
-
-          return {
-
-            ...reseau,
-
-            audience:
-              audience !== null &&
-              audience !== undefined &&
-              audience !== ""
-                ? Number(audience)
-                : null,
-
-            url:
-              url || null
-
-          };
-
-        }
-      )
-      .filter(
-        reseau =>
-          reseau.url
-      );
-
-
-  /*
-   * Réseau avec la plus grosse audience
-   */
-
-  let maxReseau = null;
-
-  const reseauxAvecAudience =
-    reseauxDisponibles.filter(
-      reseau =>
-        Number.isFinite(
-          reseau.audience
-        )
-      &&
-        reseau.audience >= 0
-    );
-
-
-  if(
-    membre.audience_reseau
-  ){
-
-    maxReseau =
-      membre.audience_reseau;
-
-  }else if(
-    reseauxAvecAudience.length
-  ){
-
-    maxReseau =
-      [...reseauxAvecAudience]
-        .sort(
-          (a,b) =>
-            b.audience -
-            a.audience
-        )[0]
-        .nom;
-
-  }
-
-
-  reseauxDisponibles.forEach(
-    reseau => {
-
-      const item =
-        document.createElement("a");
-
-      item.className =
-        "profile-social-item";
-
-
-      item.href =
-        reseau.url;
-
-      item.target =
-        "_blank";
-
-      item.rel =
-        "noopener noreferrer";
-
-
-      /*
-       * Réseau maximum
-       */
-
-      if(
-        maxReseau &&
-        reseau.nom.toLowerCase() ===
-        String(maxReseau).toLowerCase()
-      ){
-
-        item.classList.add(
-          "is-max"
-        );
-
-
-        const star =
-          document.createElement("span");
-
-        star.className =
-          "profile-social-max-star";
-
-        star.textContent =
-          "★";
-
-        item.appendChild(
-          star
-        );
-
-      }
-
-
-      /* LOGO */
-
-      const logo =
-        document.createElement("img");
-
-      logo.className =
-        "profile-social-logo";
-
-      logo.src =
-        reseau.logo;
-
-      logo.alt =
-        reseau.nom;
-
-
-      /* AUDIENCE */
-
-      const audience =
+      const tag =
         document.createElement("span");
 
-      audience.className =
-        "profile-social-audience";
+      tag.className =
+        "competence-tag";
 
+      if(comp === "VIP"){
 
-      if(
-        reseau.audience !== null
-      ){
-
-        const valeur =
-          formaterAudience(
-            reseau.audience
-          );
-
-        audience.textContent =
-          valeur || "";
-
-      }
-
-
-      item.appendChild(
-        logo
-      );
-
-      item.appendChild(
-        audience
-      );
-
-
-      socialsEl.appendChild(
-        item
-      );
-
-    }
-  );
-
-
-  /* =======================================================
-     AUDIENCE MAX
-  ======================================================= */
-
-  const dateUpdated =
-    membre.audience_updated_at;
-
-
-  let dateText = "";
-
-
-  if(dateUpdated){
-
-    const date =
-      new Date(
-        dateUpdated
-      );
-
-
-    if(
-      !Number.isNaN(
-        date.getTime()
-      )
-    ){
-
-      const datePart =
-        date.toLocaleDateString(
-          "fr-FR"
-        );
-
-      const timePart =
-        date.toLocaleTimeString(
-          "fr-FR",
-          {
-            hour:"2-digit",
-            minute:"2-digit"
-          }
-        );
-
-
-      dateText =
-        "mis à jour le " +
-        datePart +
-        " à " +
-        timePart;
-
-    }
-
-  }
-
-
-  const valeurMax =
-    formaterAudience(
-      maxAudience
-    );
-
-
-  audienceMaxEl.innerHTML =
-    "Audience max : <strong>" +
-    (valeurMax || "—") +
-    "</strong>" +
-    (
-      dateText
-        ? " <small>" +
-          dateText +
-          "</small>"
-        : ""
-    );
-
-
-  /* =======================================================
-     COMPETENCES
-  ======================================================= */
-
-  competencesEl.innerHTML = "";
-
-
-  let competences =
-    membre.competences;
-
-
-  if(
-    typeof competences === "string"
-  ){
-
-    try{
-
-      competences =
-        JSON.parse(
-          competences
-        );
-
-    }catch{
-
-      competences =
-        competences
-          .split(",")
-          .map(
-            value =>
-              value.trim()
-          )
-          .filter(Boolean);
-
-    }
-
-  }
-
-
-  if(
-    Array.isArray(
-      competences
-    )
-  ){
-
-    competences.forEach(
-      competence => {
-
-        const tag =
+        const medal =
           document.createElement("span");
 
-        tag.className =
-          "competence-tag";
+        medal.className =
+          "vip-medal";
 
-        tag.textContent =
-          competence;
+        medal.textContent =
+          "★";
 
-        competencesEl.appendChild(
-          tag
+        medal.setAttribute(
+          "aria-hidden",
+          "true"
         );
 
+        tag.appendChild(medal);
+
+        const vipText =
+          document.createElement("span");
+
+        vipText.textContent =
+          "VIP";
+
+        tag.appendChild(vipText);
+
+      }else{
+
+        tag.textContent =
+          comp;
+
       }
-    );
+
+      competences.appendChild(tag);
+
+    });
 
   }
 
 
-  profileModal.classList.add(
-    "active"
-  );
-
-  document.body.style.overflow =
-    "hidden";
+  ouvrirModal(memberModal);
 
 }
 
 
 /* =========================================================
-   FERMETURE PROFIL
+   OUVERTURE FORMULAIRE
 ========================================================= */
 
 document
-  .getElementById(
-    "closeProfileModal"
-  )
+  .getElementById("openJoin")
   .addEventListener(
     "click",
-    fermerProfil
-  );
-
-
-function fermerProfil(){
-
-  profileModal.classList.remove(
-    "active"
-  );
-
-  document.body.style.overflow =
-    "";
-
-}
-
-
-profileModal.addEventListener(
-  "click",
-  event => {
-
-    if(
-      event.target ===
-      profileModal
-    ){
-
-      fermerProfil();
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   JOIN MODAL
-========================================================= */
-
-document
-  .getElementById(
-    "joinButton"
-  )
-  .addEventListener(
-    "click",
-    event => {
-
-      event.preventDefault();
-
-      joinModal.classList.add(
-        "active"
-      );
-
-      document.body.style.overflow =
-        "hidden";
-
-    }
-  );
-
-
-document
-  .getElementById(
-    "closeJoinModal"
-  )
-  .addEventListener(
-    "click",
-    fermerJoin
-  );
-
-
-function fermerJoin(){
-
-  joinModal.classList.remove(
-    "active"
-  );
-
-  document.body.style.overflow =
-    "";
-
-}
-
-
-joinModal.addEventListener(
-  "click",
-  event => {
-
-    if(
-      event.target ===
-      joinModal
-    ){
-
-      fermerJoin();
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   FORMULAIRE JOIN
-========================================================= */
-
-document
-  .getElementById(
-    "joinForm"
-  )
-  .addEventListener(
-    "submit",
-    async event => {
-
-      event.preventDefault();
-
+    () => {
 
       const message =
         document.getElementById(
           "formMessage"
         );
 
+      message.className =
+        "form-message";
 
       message.textContent =
-        "Enregistrement en cours...";
+        "";
 
-      message.style.color =
-        "#aaa";
+      mettreAJourCompteurDescription();
 
-
-      const type =
-        document.querySelector(
-          'input[name="joinType"]:checked'
-        ).value;
-
-
-      const nom =
-        document.getElementById(
-          "joinNom"
-        ).value.trim();
-
-
-      const email =
-        document.getElementById(
-          "joinEmail"
-        ).value.trim();
-
-
-      const region =
-        document.getElementById(
-          "joinRegion"
-        ).value.trim();
-
-
-      const image_url =
-        document.getElementById(
-          "joinImage"
-        ).value.trim();
-
-
-      const description =
-        document.getElementById(
-          "joinDescription"
-        ).value.trim();
-
-
-      const competences =
-        [...document.querySelectorAll(
-          ".competence-checkbox input:checked"
-        )].map(
-          checkbox =>
-            checkbox.value
-        );
-
-
-      /* ===================================================
-         VERIFICATION EMAIL
-      =================================================== */
-
-      const {
-        data: existing,
-        error: existingError
-      } = await supabase
-        .from("profiles")
-        .select("id")
-        .ilike(
-          "email",
-          email
-        )
-        .limit(1);
-
-
-      if(existingError){
-
-        console.error(
-          existingError
-        );
-
-        message.textContent =
-          "Une erreur est survenue.";
-
-        message.style.color =
-          "#d66";
-
-        return;
-
-      }
-
-
-      if(
-        existing &&
-        existing.length
-      ){
-
-        message.textContent =
-          "Cette adresse email est déjà utilisée.";
-
-        message.style.color =
-          "#d66";
-
-        return;
-
-      }
-
-
-      /* ===================================================
-         INSERTION
-      =================================================== */
-
-      const {
-        error
-      } = await supabase
-        .from("profiles")
-        .insert({
-
-          id:
-            crypto.randomUUID(),
-
-          nom,
-
-          email,
-
-          region,
-
-          image_url:
-            image_url || null,
-
-          description:
-            description || null,
-
-          competences,
-
-          anonyme:
-            type === "anonyme",
-
-          grade:
-            "user"
-
-        });
-
-
-      if(error){
-
-        console.error(
-          error
-        );
-
-        message.textContent =
-          "Impossible d'enregistrer votre inscription.";
-
-        message.style.color =
-          "#d66";
-
-        return;
-
-      }
-
-
-      message.textContent =
-        "Votre inscription a bien été enregistrée.";
-
-      message.style.color =
-        "#d4af37";
-
-
-      document
-        .getElementById(
-          "joinForm"
-        )
-        .reset();
-
-
-      await chargerMembres();
+      ouvrirModal(joinModal);
 
     }
   );
 
 
 /* =========================================================
-   EVENEMENTS
+   FERMETURE MODALES
+========================================================= */
+
+document
+  .getElementById("closeMember")
+  .addEventListener(
+    "click",
+    () => fermerModal(memberModal)
+  );
+
+
+document
+  .getElementById("closeJoin")
+  .addEventListener(
+    "click",
+    () => fermerModal(joinModal)
+  );
+
+
+document
+  .getElementById("closeEvent")
+  .addEventListener(
+    "click",
+    () => fermerModal(eventModal)
+  );
+
+
+memberModal.addEventListener(
+  "click",
+  event => {
+
+    if(event.target === memberModal){
+
+      fermerModal(memberModal);
+
+    }
+
+  }
+);
+
+
+joinModal.addEventListener(
+  "click",
+  event => {
+
+    if(event.target === joinModal){
+
+      fermerModal(joinModal);
+
+    }
+
+  }
+);
+
+
+eventModal.addEventListener(
+  "click",
+  event => {
+
+    if(event.target === eventModal){
+
+      fermerModal(eventModal);
+
+    }
+
+  }
+);
+
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if(event.key === "Escape"){
+
+      fermerModal(memberModal);
+
+      fermerModal(joinModal);
+
+      fermerModal(eventModal);
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   FORMULAIRE
+========================================================= */
+
+document
+  .getElementById("joinForm")
+  .addEventListener(
+    "submit",
+    async event => {
+
+      event.preventDefault();
+
+      const message =
+        document.getElementById(
+          "formMessage"
+        );
+
+      message.className =
+        "form-message";
+
+      message.textContent =
+        "";
+
+      submitButton.disabled =
+        true;
+
+      submitButton.textContent =
+        "VÉRIFICATION EN COURS…";
+
+
+      const nom =
+        document
+          .getElementById("nom")
+          .value
+          .trim();
+
+
+      const email =
+        document
+          .getElementById("email")
+          .value
+          .trim()
+          .toLowerCase();
+
+
+      const region =
+        document
+          .getElementById("region")
+          .value;
+
+
+      const image_url =
+        document
+          .getElementById("image_url")
+          .value
+          .trim();
+
+
+      const description =
+        document
+          .getElementById("description")
+          .value
+          .trim();
+
+
+      const typeInscription =
+        document.querySelector(
+          'input[name="type_inscription"]:checked'
+        )?.value;
+
+
+      const anonyme =
+        typeInscription === "anonyme";
+
+
+      const competences =
+        Array.from(
+          document.querySelectorAll(
+            'input[name="competences"]:checked'
+          )
+        )
+        .map(
+          input => input.value
+        );
+
+
+      if(!nom || !email || !region){
+
+        message.className =
+          "form-message error";
+
+        message.textContent =
+          "Merci de remplir tous les champs obligatoires.";
+
+        submitButton.disabled =
+          false;
+
+        submitButton.textContent =
+          "CRÉER MON PROFIL";
+
+        return;
+
+      }
+
+
+      const {
+        data: emailExistant,
+        error: emailCheckError
+      } = await supabaseClient
+        .from("profiles")
+        .select("id")
+        .ilike("email", email)
+        .limit(1);
+
+
+      if(emailCheckError){
+
+        console.error(
+          "Erreur vérification email :",
+          emailCheckError
+        );
+
+      }
+
+
+      if(
+        !emailCheckError &&
+        emailExistant &&
+        emailExistant.length > 0
+      ){
+
+        message.className =
+          "form-message error";
+
+        message.textContent =
+          "Cette adresse e-mail est déjà utilisée. " +
+          "Un seul profil peut être créé avec cette adresse.";
+
+        submitButton.disabled =
+          false;
+
+        submitButton.textContent =
+          "CRÉER MON PROFIL";
+
+        return;
+
+      }
+
+
+      const profil = {
+
+        id:
+          crypto.randomUUID(),
+
+        nom:
+          nom,
+
+        grade:
+          "user",
+
+        email:
+          email,
+
+        image_url:
+          image_url || null,
+
+        description:
+          description || null,
+
+        region:
+          region,
+
+        competences:
+          competences,
+
+        anonyme:
+          anonyme
+
+      };
+
+
+      submitButton.textContent =
+        "CRÉATION DU PROFIL…";
+
+
+      const {
+        error
+      } = await supabaseClient
+        .from("profiles")
+        .insert(profil);
+
+
+      if(error){
+
+        console.error(
+          "Erreur création profil :",
+          error
+        );
+
+
+        if(error.code === "23505"){
+
+          message.className =
+            "form-message error";
+
+          message.textContent =
+            "Cette adresse e-mail est déjà utilisée. " +
+            "Un seul profil peut être créé avec cette adresse.";
+
+        }else{
+
+          message.className =
+            "form-message error";
+
+          message.textContent =
+            "Impossible de créer le profil pour le moment. " +
+            "Veuillez réessayer.";
+
+        }
+
+
+        submitButton.disabled =
+          false;
+
+        submitButton.textContent =
+          "CRÉER MON PROFIL";
+
+        return;
+
+      }
+
+
+      message.className =
+        "form-message success";
+
+
+      if(anonyme){
+
+        message.textContent =
+          "Votre profil a bien été créé. " +
+          "Il restera caché de la liste publique des membres.";
+
+      }else{
+
+        message.textContent =
+          "Votre profil a bien été créé. " +
+          "Il apparaît désormais dans la liste des membres.";
+
+      }
+
+
+      document
+        .getElementById("joinForm")
+        .reset();
+
+
+      document
+        .getElementById("typeSympathisant")
+        .checked =
+          true;
+
+
+      mettreAJourCompteurDescription();
+
+
+      submitButton.disabled =
+        false;
+
+      submitButton.textContent =
+        "CRÉER MON PROFIL";
+
+
+      setTimeout(
+        () => {
+
+          fermerModal(joinModal);
+
+          chargerMembres();
+
+        },
+        1800
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   RENDEZ-VOUS
 ========================================================= */
 
 async function chargerRendezVous(){
@@ -2639,41 +3377,43 @@ async function chargerRendezVous(){
       "eventsTrack"
     );
 
+  const windowEl =
+    document.getElementById(
+      "eventsWindow"
+    );
+
 
   const {
     data,
     error
-  } = await supabase
+  } = await supabaseClient
     .from("rendezvous")
     .select("*")
-    .eq(
-      "actif",
-      true
-    )
-    .order(
-      "date_evenement",
-      {
-        ascending:true
-      }
-    );
+    .eq("actif", true)
+    .order("date_evenement", {
+      ascending:true
+    });
 
 
   if(error){
 
-    console.error(error);
+    console.error(
+      "Erreur rendez-vous :",
+      error
+    );
 
     return;
 
   }
 
 
-  if(
-    !data ||
-    !data.length
-  ){
+  if(!data || data.length === 0){
 
-    track.innerHTML =
-      "<span class='event-item'>Aucun rendez-vous à venir</span>";
+    track.innerHTML = `
+      <div class="event-item">
+        Aucun rendez-vous à venir
+      </div>
+    `;
 
     return;
 
@@ -2683,96 +3423,258 @@ async function chargerRendezVous(){
   track.innerHTML = "";
 
 
-  data.forEach(
-    evenement => {
+  data.forEach(event => {
 
-      const item =
-        document.createElement("span");
+    const item =
+      document.createElement("div");
 
-      item.className =
-        "event-item";
+    item.className =
+      "event-item";
 
 
-      const date =
+    /* =========================
+       DATE
+    ========================= */
+
+    const date =
+      document.createElement("strong");
+
+
+    if(event.date_evenement){
+
+      const d =
         new Date(
-          evenement.date_evenement
+          event.date_evenement +
+          "T00:00:00"
         );
 
-
-      let dateText =
-        "";
-
-
-      if(
-        !Number.isNaN(
-          date.getTime()
-        )
-      ){
-
-        dateText =
-          date.toLocaleDateString(
-            "fr-FR",
-            {
-              day:"2-digit",
-              month:"2-digit"
-            }
-          );
-
-      }
-
-
-      item.innerHTML =
-        "<span class='event-date'>" +
-        dateText +
-        "</span>" +
-        (
-          evenement.titre ||
-          "Rendez-vous"
+      date.textContent =
+        d.toLocaleDateString(
+          "fr-FR",
+          {
+            day:"2-digit",
+            month:"2-digit",
+            year:"numeric"
+          }
         );
-
-
-      item.addEventListener(
-        "click",
-        () =>
-          ouvrirEvenement(
-            evenement
-          )
-      );
-
-
-      track.appendChild(
-        item
-      );
 
     }
-  );
 
 
-  /* =======================================================
+    /* =========================
+       TITRE
+    ========================= */
+
+    const titre =
+      document.createElement("strong");
+
+    titre.textContent =
+      event.titre ||
+      event.nom ||
+      "Rendez-vous";
+
+
+    /* =========================
+       LIEU
+    ========================= */
+
+    const lieu =
+      document.createElement("span");
+
+    lieu.textContent =
+      event.lieu ||
+      "";
+
+
+    /* =========================
+       SEPARATEURS
+    ========================= */
+
+    const separateur1 =
+      document.createElement("span");
+
+    separateur1.className =
+      "event-separator";
+
+    separateur1.textContent =
+      "—";
+
+
+    const separateur2 =
+      document.createElement("span");
+
+    separateur2.className =
+      "event-separator";
+
+    separateur2.textContent =
+      "—";
+
+
+    /* =========================
+       CONSTRUCTION
+    ========================= */
+
+    item.appendChild(date);
+
+    item.appendChild(separateur1);
+
+    item.appendChild(titre);
+
+    if(event.lieu){
+
+      item.appendChild(separateur2);
+
+      item.appendChild(lieu);
+
+    }
+
+
+    /* =========================
+       CLIC
+    ========================= */
+
+    item.addEventListener(
+      "click",
+      () => {
+
+        document
+          .getElementById(
+            "eventModalTitle"
+          )
+          .textContent =
+            event.titre ||
+            event.nom ||
+            "Rendez-vous";
+
+
+        const d =
+          event.date_evenement
+            ? new Date(
+                event.date_evenement +
+                "T00:00:00"
+              )
+            : null;
+
+
+        document
+          .getElementById(
+            "eventModalDate"
+          )
+          .textContent =
+            d
+              ? d.toLocaleDateString(
+                  "fr-FR",
+                  {
+                    weekday:"long",
+                    day:"numeric",
+                    month:"long",
+                    year:"numeric"
+                  }
+                )
+              : "";
+
+
+        document
+          .getElementById(
+            "eventModalTime"
+          )
+          .textContent =
+            event.heure
+              ? "À " + event.heure
+              : "";
+
+
+        document
+          .getElementById(
+            "eventModalLocation"
+          )
+          .textContent =
+            event.lieu
+              ? "📍 " + event.lieu
+              : "";
+
+
+        document
+          .getElementById(
+            "eventModalDescription"
+          )
+          .textContent =
+            event.description ||
+            event.texte ||
+            "Aucune description disponible.";
+
+
+        const link =
+          document.getElementById(
+            "eventModalLink"
+          );
+
+
+        if(event.lien){
+
+          link.href =
+            event.lien;
+
+          link.style.display =
+            "inline-block";
+
+        }else{
+
+          link.href =
+            "#";
+
+          link.style.display =
+            "none";
+
+        }
+
+
+        ouvrirModal(eventModal);
+
+      }
+    );
+
+
+    track.appendChild(item);
+
+  });
+
+
+  /* =========================
      ANIMATION
-  ======================================================= */
+  ========================= */
 
-  let position = 0;
+  let position =
+    windowEl.clientWidth;
 
   const vitesse =
-    0.18;
+    180;
+
+  let dernierTemps =
+    performance.now();
 
 
-  function animation(){
+  function animation(temps){
 
-    position -= vitesse;
+    const delta =
+      (temps - dernierTemps) / 1000;
+
+    dernierTemps =
+      temps;
+
+
+    position -=
+      vitesse * delta;
 
 
     const largeur =
       track.scrollWidth;
 
 
-    if(
-      Math.abs(position) >=
-      largeur
-    ){
+    if(position <= -largeur){
 
-      position = 0;
+      position =
+        windowEl.clientWidth;
 
     }
 
@@ -2788,150 +3690,11 @@ async function chargerRendezVous(){
   }
 
 
-  animation();
-
-}
-
-
-/* =========================================================
-   EVENEMENT MODAL
-========================================================= */
-
-function ouvrirEvenement(evenement){
-
-  document
-    .getElementById(
-      "eventModalTitle"
-    )
-    .textContent =
-      evenement.titre ||
-      "Rendez-vous";
-
-
-  const date =
-    new Date(
-      evenement.date_evenement
-    );
-
-
-  let dateText = "";
-
-
-  if(
-    !Number.isNaN(
-      date.getTime()
-    )
-  ){
-
-    dateText =
-      date.toLocaleString(
-        "fr-FR",
-        {
-          dateStyle:"full",
-          timeStyle:"short"
-        }
-      );
-
-  }
-
-
-  document
-    .getElementById(
-      "eventModalDate"
-    )
-    .textContent =
-      dateText;
-
-
-  document
-    .getElementById(
-      "eventModalDescription"
-    )
-    .textContent =
-      evenement.description ||
-      "";
-
-
-  eventModal.classList.add(
-    "active"
+  requestAnimationFrame(
+    animation
   );
 
-  document.body.style.overflow =
-    "hidden";
-
 }
-
-
-document
-  .getElementById(
-    "closeEventModal"
-  )
-  .addEventListener(
-    "click",
-    fermerEvenement
-  );
-
-
-function fermerEvenement(){
-
-  eventModal.classList.remove(
-    "active"
-  );
-
-  document.body.style.overflow =
-    "";
-
-}
-
-
-eventModal.addEventListener(
-  "click",
-  event => {
-
-    if(
-      event.target ===
-      eventModal
-    ){
-
-      fermerEvenement();
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   ESC
-========================================================= */
-
-document.addEventListener(
-  "keydown",
-  event => {
-
-    if(
-      event.key === "Escape"
-    ){
-
-      profileModal.classList.remove(
-        "active"
-      );
-
-      joinModal.classList.remove(
-        "active"
-      );
-
-      eventModal.classList.remove(
-        "active"
-      );
-
-      document.body.style.overflow =
-        "";
-
-    }
-
-  }
-);
 
 
 /* =========================================================
