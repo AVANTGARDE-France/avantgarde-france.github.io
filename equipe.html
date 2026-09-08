@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
 
 <meta charset="UTF-8">
@@ -24,9 +23,13 @@
   --border:rgba(214,173,85,.28);
 }
 
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
-html{scroll-behavior:smooth}
+html{
+  scroll-behavior:smooth;
+}
 
 body{
   margin:0;
@@ -38,90 +41,9 @@ body{
 }
 
 
-/* =====================================================
-   EVENEMENTS
-===================================================== */
-
-.events-bar{
-  height:36px;
-  background:#050f20;
-  border-bottom:1px solid rgba(214,173,85,.35);
-  display:flex;
-  align-items:center;
-  overflow:hidden;
-  font-family:Arial,sans-serif;
-  font-size:12px;
-}
-
-.events-label{
-  flex-shrink:0;
-  height:100%;
-  display:flex;
-  align-items:center;
-  padding:0 17px;
-  color:var(--gold-light);
-  font-weight:bold;
-  letter-spacing:1px;
-  border-right:1px solid rgba(214,173,85,.3);
-  position:relative;
-  z-index:5;
-  background:#050f20;
-}
-
-.events-window{
-  flex:1;
-  height:100%;
-  overflow:hidden;
-  position:relative;
-}
-
-.events-track{
-  position:absolute;
-  left:0;
-  top:0;
-  height:100%;
-  display:inline-flex;
-  align-items:center;
-  white-space:nowrap;
-  will-change:transform;
-}
-
-.event-item{
-  display:inline-flex;
-  align-items:center;
-  height:100%;
-  padding:0 35px;
-  color:#e3e5e8;
-  cursor:pointer;
-  transition:background .2s,color .2s;
-}
-
-.event-item:hover{
-  background:rgba(214,173,85,.08);
-  color:white;
-}
-
-.event-item strong{
-  color:var(--gold-light);
-}
-
-.event-separator{
-  color:rgba(214,173,85,.5);
-  margin:0 7px;
-}
-
-.events-empty{
-  height:100%;
-  display:flex;
-  align-items:center;
-  padding-left:18px;
-  color:#8e98a6;
-}
-
-
-/* =====================================================
+/* =========================
    HEADER
-===================================================== */
+========================= */
 
 header{
   height:82px;
@@ -133,6 +55,11 @@ header{
   background:rgba(7,21,45,.97);
   position:relative;
 }
+
+
+/* =========================
+   ROUE ADMIN
+========================= */
 
 .admin-gear{
   position:absolute;
@@ -148,7 +75,10 @@ header{
   font-family:Arial,sans-serif;
   font-size:14px;
   border-radius:50%;
-  transition:color .2s,background .2s,transform .2s;
+  transition:
+    color .2s,
+    background .2s,
+    transform .2s;
 }
 
 .admin-gear:hover{
@@ -156,6 +86,11 @@ header{
   background:rgba(255,255,255,.06);
   transform:rotate(20deg);
 }
+
+
+/* =========================
+   LOGO
+========================= */
 
 .logo{
   color:var(--white);
@@ -167,18 +102,36 @@ header{
   font-weight:bold;
   letter-spacing:-1.2px;
   line-height:1;
+  font-kerning:normal;
+  text-rendering:optimizeLegibility;
   white-space:nowrap;
 }
 
 .logo-a,
 .logo-e{
-  font-family:inherit;
+  display:inline;
+  width:auto;
+  height:auto;
+  background:transparent;
+  border-radius:0;
+  font-family:Georgia,"Times New Roman",serif;
   font-size:inherit;
   font-weight:bold;
+  line-height:inherit;
 }
 
-.logo-a{color:var(--blue-france)}
-.logo-e{color:var(--red)}
+.logo-a{
+  color:var(--blue-france);
+}
+
+.logo-e{
+  color:var(--red);
+}
+
+
+/* =========================
+   NAVIGATION
+========================= */
 
 nav{
   display:flex;
@@ -196,15 +149,18 @@ nav a{
   transition:color .2s;
 }
 
-nav a:hover,
+nav a:hover{
+  color:var(--gold);
+}
+
 nav a.active{
   color:var(--gold-light);
 }
 
 
-/* =====================================================
+/* =========================
    HERO
-===================================================== */
+========================= */
 
 .hero{
   max-width:1100px;
@@ -229,7 +185,9 @@ nav a.active{
   letter-spacing:-2px;
 }
 
-.hero h1 span{color:var(--gold)}
+.hero h1 span{
+  color:var(--gold);
+}
 
 .hero p{
   max-width:720px;
@@ -238,6 +196,11 @@ nav a.active{
   font-size:17px;
   line-height:1.65;
 }
+
+
+/* =========================
+   BOUTON REJOINDRE
+========================= */
 
 .join-button{
   border:1px solid var(--gold);
@@ -259,9 +222,9 @@ nav a.active{
 }
 
 
-/* =====================================================
+/* =========================
    MEMBRES
-===================================================== */
+========================= */
 
 .team-section{
   max-width:1200px;
@@ -312,7 +275,16 @@ nav a.active{
   box-shadow:0 12px 35px rgba(0,0,0,.25);
 }
 
-.member-photo,
+.member-photo{
+  width:105px;
+  height:105px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--gold);
+  margin-bottom:16px;
+  background:var(--navy2);
+}
+
 .member-photo-placeholder{
   width:105px;
   height:105px;
@@ -320,13 +292,6 @@ nav a.active{
   border:2px solid var(--gold);
   margin-bottom:16px;
   background:var(--navy2);
-}
-
-.member-photo{
-  object-fit:cover;
-}
-
-.member-photo-placeholder{
   display:flex;
   align-items:center;
   justify-content:center;
@@ -377,9 +342,9 @@ nav a.active{
 }
 
 
-/* =====================================================
+/* =========================
    MODALES
-===================================================== */
+========================= */
 
 .modal{
   position:fixed;
@@ -393,13 +358,16 @@ nav a.active{
   z-index:1000;
 }
 
-.modal.active{display:flex}
+.modal.active{
+  display:flex;
+}
 
 .modal-box{
   width:min(720px,100%);
   max-height:92vh;
   overflow-y:auto;
-  background:linear-gradient(145deg,#0d2344,#07152d);
+  background:
+    linear-gradient(145deg,#0d2344,#07152d);
   border:1px solid var(--border);
   box-shadow:0 25px 80px rgba(0,0,0,.55);
   position:relative;
@@ -418,99 +386,39 @@ nav a.active{
   line-height:1;
 }
 
-.modal-close:hover{color:var(--gold)}
-
-
-/* =====================================================
-   MODALE RENDEZ-VOUS
-===================================================== */
-
-.rdv-modal-box{
-  width:min(620px,100%);
-  padding:42px 40px 38px;
-}
-
-.rdv-modal-kicker{
+.modal-close:hover{
   color:var(--gold);
-  font-family:Arial,sans-serif;
-  font-size:10px;
-  font-weight:bold;
-  letter-spacing:2.5px;
-  margin-bottom:12px;
-}
-
-.rdv-modal-title{
-  margin:0 0 18px;
-  font-size:32px;
-  line-height:1.15;
-}
-
-.rdv-modal-date,
-.rdv-modal-time,
-.rdv-modal-location{
-  color:var(--muted);
-  font-family:Arial,sans-serif;
-  font-size:12px;
-  margin-bottom:7px;
-}
-
-.rdv-modal-date{color:var(--gold-light)}
-
-.rdv-modal-description{
-  border-top:1px solid rgba(214,173,85,.2);
-  margin-top:20px;
-  padding-top:20px;
-  color:#d8dce3;
-  font-family:Arial,sans-serif;
-  font-size:14px;
-  line-height:1.65;
-  white-space:pre-line;
-}
-
-.rdv-modal-link{
-  display:inline-block;
-  margin-top:22px;
-  color:var(--gold-light);
-  font-family:Arial,sans-serif;
-  font-size:11px;
-  font-weight:bold;
-  letter-spacing:1px;
-  text-decoration:none;
-  border-bottom:1px solid rgba(214,173,85,.45);
-  padding-bottom:3px;
-}
-
-.rdv-modal-link:hover{
-  color:var(--white);
-  border-color:var(--gold);
 }
 
 
-/* =====================================================
+/* =========================
    PROFIL
-===================================================== */
+========================= */
 
-.profile-modal-content{text-align:center}
+.profile-modal-content{
+  text-align:center;
+}
 
-.profile-modal-image,
+.profile-modal-image{
+  width:135px;
+  height:135px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid var(--gold);
+  margin:5px auto 18px;
+  display:none;
+}
+
 .profile-placeholder{
   width:135px;
   height:135px;
   border-radius:50%;
   border:2px solid var(--gold);
-  margin:5px auto 18px;
-}
-
-.profile-modal-image{
-  object-fit:cover;
-  display:none;
-}
-
-.profile-placeholder{
   background:var(--navy2);
   display:flex;
   align-items:center;
   justify-content:center;
+  margin:5px auto 18px;
   color:var(--gold);
   font-size:45px;
 }
@@ -545,9 +453,9 @@ nav a.active{
 }
 
 
-/* =====================================================
-   RESEAUX / AUDIENCE
-===================================================== */
+/* =========================
+   RESEAUX SOCIAUX
+========================= */
 
 .profile-socials{
   display:flex;
@@ -558,14 +466,6 @@ nav a.active{
   margin:0 0 28px;
 }
 
-.profile-social-item{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:5px;
-  position:relative;
-}
-
 .profile-social-link{
   width:38px;
   height:38px;
@@ -574,7 +474,10 @@ nav a.active{
   justify-content:center;
   border:1px solid rgba(214,173,85,.28);
   background:rgba(0,0,0,.12);
-  transition:.2s;
+  transition:
+    transform .2s,
+    border-color .2s,
+    background .2s;
 }
 
 .profile-social-link:hover{
@@ -586,13 +489,28 @@ nav a.active{
 .profile-social-link img{
   width:21px;
   height:21px;
+  display:block;
   object-fit:contain;
+}
+
+
+/* =========================
+   AUDIENCE RESEAUX SOCIAUX
+========================= */
+
+.profile-social-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+  position:relative;
 }
 
 .profile-social-item.is-max .profile-social-link{
   border-color:var(--gold);
   background:rgba(214,173,85,.12);
   box-shadow:0 0 12px rgba(214,173,85,.18);
+  position:relative;
 }
 
 .profile-social-max-star{
@@ -608,7 +526,9 @@ nav a.active{
   border-radius:50%;
   background:var(--navy);
   color:var(--gold-light);
+  font-family:Georgia,"Times New Roman",serif;
   font-size:9px;
+  line-height:1;
   z-index:2;
 }
 
@@ -678,12 +598,14 @@ nav a.active{
   align-items:center;
   justify-content:center;
   font-size:9px;
+  line-height:1;
+  flex-shrink:0;
 }
 
 
-/* =====================================================
+/* =========================
    FORMULAIRE
-===================================================== */
+========================= */
 
 .form-title{
   margin:0 0 8px;
@@ -698,7 +620,9 @@ nav a.active{
   margin-bottom:28px;
 }
 
-.form-group{margin-bottom:21px}
+.form-group{
+  margin-bottom:21px;
+}
 
 .form-group label.main-label{
   display:block;
@@ -709,7 +633,9 @@ nav a.active{
   margin-bottom:8px;
 }
 
-.required{color:var(--gold)}
+.required{
+  color:var(--gold);
+}
 
 input[type="text"],
 input[type="email"],
@@ -745,6 +671,11 @@ textarea{
   margin-top:6px;
 }
 
+
+/* =========================
+   COMPTEUR DESCRIPTION
+========================= */
+
 .description-counter{
   text-align:right;
   color:#8994a6;
@@ -753,8 +684,18 @@ textarea{
   margin-top:6px;
 }
 
-.description-counter.warning{color:var(--gold-light)}
-.description-counter.limit{color:var(--red)}
+.description-counter.warning{
+  color:var(--gold-light);
+}
+
+.description-counter.limit{
+  color:var(--red);
+}
+
+
+/* =========================
+   CHOIX SYMPATHISANT / ANONYME
+========================= */
 
 .registration-choice{
   display:grid;
@@ -762,7 +703,9 @@ textarea{
   gap:10px;
 }
 
-.choice-option{position:relative}
+.choice-option{
+  position:relative;
+}
 
 .choice-option input{
   position:absolute;
@@ -813,7 +756,9 @@ textarea{
   border-bottom:1px solid rgba(214,173,85,.2);
 }
 
-.competence-group{margin-bottom:25px}
+.competence-group{
+  margin-bottom:25px;
+}
 
 .competence-group-title{
   font-family:Arial,sans-serif;
@@ -872,7 +817,9 @@ textarea{
   margin-top:15px;
 }
 
-.submit-button:hover{background:var(--gold-light)}
+.submit-button:hover{
+  background:var(--gold-light);
+}
 
 .submit-button:disabled{
   opacity:.6;
@@ -903,9 +850,9 @@ textarea{
 }
 
 
-/* =====================================================
+/* =========================
    FOOTER
-===================================================== */
+========================= */
 
 footer{
   border-top:1px solid rgba(214,173,85,.15);
@@ -918,9 +865,9 @@ footer{
 }
 
 
-/* =====================================================
+/* =========================
    MOBILE
-===================================================== */
+========================= */
 
 @media(max-width:800px){
 
@@ -937,13 +884,21 @@ footer{
     justify-content:center;
   }
 
-  nav a{font-size:10px}
+  nav a{
+    font-size:10px;
+  }
 
-  .logo{font-size:27px}
+  .logo{
+    font-size:27px;
+  }
 
-  .hero{padding:55px 20px 35px}
+  .hero{
+    padding:55px 20px 35px;
+  }
 
-  .hero p{font-size:15px}
+  .hero p{
+    font-size:15px;
+  }
 
   .team-section{
     padding-left:15px;
@@ -959,32 +914,22 @@ footer{
     max-height:95vh;
   }
 
-  .rdv-modal-box{
-    padding:34px 22px 28px;
-  }
-
-  .rdv-modal-title{font-size:27px}
-
-  .events-label{
-    padding:0 10px;
-    font-size:9px;
-  }
-
-  .event-item{
-    font-size:10px;
-    padding:0 16px;
-  }
-
   .registration-choice{
     grid-template-columns:1fr 1fr;
     gap:8px;
   }
 
-  .choice-label{padding:13px 11px}
+  .choice-label{
+    padding:13px 11px;
+  }
 
-  .choice-label strong{font-size:12px}
+  .choice-label strong{
+    font-size:12px;
+  }
 
-  .choice-label span{font-size:10px}
+  .choice-label span{
+    font-size:10px;
+  }
 
 }
 
@@ -1004,37 +949,9 @@ footer{
 <body>
 
 
-<!-- =====================================================
-     EVENEMENTS
-===================================================== -->
-
-<div class="events-bar">
-
-  <div class="events-label">
-    EVENEMENT
-  </div>
-
-  <div class="events-window">
-
-    <div
-      id="eventsTrack"
-      class="events-track"
-    >
-
-      <div class="events-empty">
-        Chargement...
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- =====================================================
+<!-- =========================
      HEADER
-===================================================== -->
+========================= -->
 
 <header>
 
@@ -1047,12 +964,16 @@ footer{
   ⚙
 </a>
 
+
 <a
   href="index.html"
   class="logo"
 >
+
   <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
+
 </a>
+
 
 <nav>
 
@@ -1084,9 +1005,9 @@ footer{
 </header>
 
 
-<!-- =====================================================
+<!-- =========================
      HERO
-===================================================== -->
+========================= -->
 
 <section class="hero">
 
@@ -1114,9 +1035,9 @@ footer{
 </section>
 
 
-<!-- =====================================================
+<!-- =========================
      EQUIPE
-===================================================== -->
+========================= -->
 
 <section class="team-section">
 
@@ -1149,9 +1070,9 @@ footer{
 </section>
 
 
-<!-- =====================================================
+<!-- =========================
      MODAL MEMBRE
-===================================================== -->
+========================= -->
 
 <div
   class="modal"
@@ -1200,6 +1121,11 @@ footer{
         class="profile-description"
       ></div>
 
+
+      <!-- =========================
+           RESEAUX SOCIAUX
+      ========================= -->
+
       <div
         id="profileModalSocials"
         class="profile-socials"
@@ -1211,6 +1137,7 @@ footer{
         class="profile-audience-max"
         style="display:none;"
       ></div>
+
 
       <div class="profile-competences">
 
@@ -1232,9 +1159,9 @@ footer{
 </div>
 
 
-<!-- =====================================================
+<!-- =========================
      MODAL INSCRIPTION
-===================================================== -->
+========================= -->
 
 <div
   class="modal"
@@ -1262,6 +1189,10 @@ footer{
 
     <form id="joinForm">
 
+
+      <!-- =========================
+           TYPE D'INSCRIPTION
+      ========================= -->
 
       <div class="form-group">
 
@@ -1299,6 +1230,7 @@ footer{
 
           </div>
 
+
           <div class="choice-option">
 
             <input
@@ -1330,6 +1262,10 @@ footer{
       </div>
 
 
+      <!-- =========================
+           NOM
+      ========================= -->
+
       <div class="form-group">
 
         <label
@@ -1349,6 +1285,10 @@ footer{
 
       </div>
 
+
+      <!-- =========================
+           EMAIL
+      ========================= -->
 
       <div class="form-group">
 
@@ -1372,6 +1312,10 @@ footer{
 
       </div>
 
+
+      <!-- =========================
+           REGION
+      ========================= -->
 
       <div class="form-group">
 
@@ -1438,6 +1382,10 @@ footer{
       </div>
 
 
+      <!-- =========================
+           IMAGE
+      ========================= -->
+
       <div class="form-group">
 
         <label
@@ -1459,6 +1407,10 @@ footer{
 
       </div>
 
+
+      <!-- =========================
+           DESCRIPTION
+      ========================= -->
 
       <div class="form-group">
 
@@ -1485,6 +1437,10 @@ footer{
       </div>
 
 
+      <!-- =========================
+           COMPETENCES
+      ========================= -->
+
       <div class="form-section-title">
         Talents et compétences métier
       </div>
@@ -1500,6 +1456,10 @@ footer{
 
       </div>
 
+
+      <!-- =========================
+           COMPETENCES METIER
+      ========================= -->
 
       <div class="competence-group">
 
@@ -1726,6 +1686,10 @@ footer{
       </div>
 
 
+      <!-- =========================
+           INFLUENCE / BIENFAITEUR
+      ========================= -->
+
       <div class="competence-group">
 
         <div class="competence-group-title">
@@ -1810,70 +1774,6 @@ footer{
 </div>
 
 
-<!-- =====================================================
-     MODAL RENDEZ-VOUS
-===================================================== -->
-
-<div
-  class="modal"
-  id="eventModal"
->
-
-  <div class="modal-box rdv-modal-box">
-
-    <button
-      class="modal-close"
-      id="closeEvent"
-      aria-label="Fermer"
-    >
-      ×
-    </button>
-
-    <div class="rdv-modal-kicker">
-      NOS RENDEZ-VOUS
-    </div>
-
-    <h2
-      id="eventModalTitle"
-      class="rdv-modal-title"
-    ></h2>
-
-    <div
-      id="eventModalDate"
-      class="rdv-modal-date"
-    ></div>
-
-    <div
-      id="eventModalTime"
-      class="rdv-modal-time"
-    ></div>
-
-    <div
-      id="eventModalLocation"
-      class="rdv-modal-location"
-    ></div>
-
-    <div
-      id="eventModalDescription"
-      class="rdv-modal-description"
-    ></div>
-
-    <a
-      id="eventModalLink"
-      class="rdv-modal-link"
-      href="#"
-      target="_blank"
-      rel="noopener noreferrer"
-      style="display:none;"
-    >
-      EN SAVOIR PLUS →
-    </a>
-
-  </div>
-
-</div>
-
-
 <footer>
 
   © 2026 Avant-gardE — Liberté · Souveraineté · Patrie · Justice
@@ -1883,9 +1783,9 @@ footer{
 
 <script>
 
-/* =====================================================
+/* =========================================================
    SUPABASE
-===================================================== */
+========================================================= */
 
 const SUPABASE_URL =
   "https://wlhtegrciehmtxqecopv.supabase.co";
@@ -1900,9 +1800,9 @@ const supabaseClient =
   );
 
 
-/* =====================================================
+/* =========================================================
    ELEMENTS
-===================================================== */
+========================================================= */
 
 const teamGrid =
   document.getElementById("teamGrid");
@@ -1912,9 +1812,6 @@ const memberModal =
 
 const joinModal =
   document.getElementById("joinModal");
-
-const eventModal =
-  document.getElementById("eventModal");
 
 const submitButton =
   document.getElementById("submitButton");
@@ -1928,12 +1825,10 @@ const descriptionCount =
 const descriptionCounter =
   document.getElementById("descriptionCounter");
 
-let tickerAnimation = null;
 
-
-/* =====================================================
+/* =========================================================
    OUTILS
-===================================================== */
+========================================================= */
 
 function fermerModal(modal){
 
@@ -1975,13 +1870,6 @@ function imageValide(url){
 }
 
 
-function urlValide(url){
-
-  return imageValide(url);
-
-}
-
-
 function normaliserCompetences(value){
 
   if(Array.isArray(value)){
@@ -1996,7 +1884,8 @@ function normaliserCompetences(value){
       .replace(/^\{|\}$/g,"")
       .split(",")
       .map(x =>
-        x.trim().replace(/^"|"$/g,"")
+        x.trim()
+         .replace(/^"|"$/g,"")
       )
       .filter(Boolean);
 
@@ -2007,27 +1896,9 @@ function normaliserCompetences(value){
 }
 
 
-function escapeHtml(value){
-
-  if(value === null || value === undefined){
-
-    return "";
-
-  }
-
-  return String(value)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
-}
-
-
-/* =====================================================
+/* =========================================================
    RESEAUX SOCIAUX
-===================================================== */
+========================================================= */
 
 const reseauxSociaux = [
 
@@ -2069,26 +1940,54 @@ const reseauxSociaux = [
 ];
 
 
+function urlValide(url){
+
+  if(!url) return false;
+
+  try{
+
+    const u =
+      new URL(url);
+
+    return (
+      u.protocol === "http:" ||
+      u.protocol === "https:"
+    );
+
+  }catch{
+
+    return false;
+
+  }
+
+}
+
+
+/* =========================================================
+   FORMATAGE AUDIENCE
+========================================================= */
+
 function formaterAudience(valeur){
 
   const nombre = Number(valeur);
 
   if(!Number.isFinite(nombre) || nombre < 0){
-
     return null;
-
   }
+
+
+  /* Moins de 1 000 */
 
   if(nombre < 1000){
 
-    return new Intl.NumberFormat(
-      "fr-FR",
-      {
-        maximumFractionDigits:0
-      }
-    ).format(nombre);
+    return new Intl.NumberFormat("fr-FR",{
+      maximumFractionDigits:0
+    }).format(nombre);
 
   }
+
+
+  /* De 1 000 à 999 999 */
 
   if(nombre < 1000000){
 
@@ -2096,29 +1995,26 @@ function formaterAudience(valeur){
       nombre / 1000;
 
     return (
-      new Intl.NumberFormat(
-        "fr-FR",
-        {
-          maximumFractionDigits:
-            valeurK < 10 ? 1 : 0
-        }
-      ).format(valeurK)
+      new Intl.NumberFormat("fr-FR",{
+        maximumFractionDigits:
+          valeurK < 10 ? 1 : 0
+      }).format(valeurK)
       + " K"
     );
 
   }
 
+
+  /* 1 million et plus */
+
   const valeurM =
     nombre / 1000000;
 
   return (
-    new Intl.NumberFormat(
-      "fr-FR",
-      {
-        maximumFractionDigits:
-          valeurM < 10 ? 1 : 0
-      }
-    ).format(valeurM)
+    new Intl.NumberFormat("fr-FR",{
+      maximumFractionDigits:
+        valeurM < 10 ? 1 : 0
+    }).format(valeurM)
     + " M"
   );
 
@@ -2141,50 +2037,43 @@ function afficherReseauxSociaux(membre){
     const url =
       membre[reseau.champ];
 
-    if(!urlValide(url)) return;
+    if(!urlValide(url)){
+      return;
+    }
 
     const audience =
-      Number(
-        membre[reseau.audienceChamp]
-      );
+      Number(membre[reseau.audienceChamp]);
 
     reseauxAvecAudience.push({
       ...reseau,
       url,
       audience:
-        Number.isFinite(audience) &&
-        audience >= 0
+        Number.isFinite(audience) && audience >= 0
           ? audience
           : null
     });
 
   });
 
+  const reseauxAvecChiffre =
+    reseauxAvecAudience.filter(
+      reseau => reseau.audience !== null
+    );
 
   const maxAudience =
     Number(membre.audience_max);
 
   const maxValide =
-    Number.isFinite(maxAudience) &&
-    maxAudience >= 0;
-
+    Number.isFinite(maxAudience) && maxAudience >= 0;
 
   const reseauMax =
     membre.audience_reseau ||
     reseauxAvecAudience
-      .filter(
-        reseau =>
-          reseau.audience !== null
-      )
-      .sort(
-        (a,b) =>
-          b.audience - a.audience
-      )[0]?.nom ||
+      .filter(reseau => reseau.audience !== null)
+      .sort((a,b) => b.audience - a.audience)[0]?.nom ||
     null;
 
-
   function reseauEstMax(reseau){
-
     if(!reseauMax) return false;
 
     const cible =
@@ -2195,22 +2084,18 @@ function afficherReseauxSociaux(membre){
     const valeurs = [
       reseau.nom,
       reseau.audienceChamp,
-      reseau.audienceChamp
-        .replace("_audience","")
-    ].map(
-      v =>
-        String(v)
-          .toLowerCase()
-          .replace(/[_\s-]/g,"")
+      reseau.audienceChamp.replace("_audience","")
+    ]
+    .map(v =>
+      String(v)
+        .toLowerCase()
+        .replace(/[_\s-]/g,"")
     );
 
     return valeurs.includes(cible);
-
   }
 
-
   let nombreReseaux = 0;
-
 
   reseauxAvecAudience.forEach(reseau => {
 
@@ -2222,17 +2107,12 @@ function afficherReseauxSociaux(membre){
     item.className =
       "profile-social-item";
 
-
     const estMax =
       reseauEstMax(reseau);
 
-
     if(estMax){
-
       item.classList.add("is-max");
-
     }
-
 
     const lien =
       document.createElement("a");
@@ -2257,7 +2137,6 @@ function afficherReseauxSociaux(membre){
       reseau.nom
     );
 
-
     const logo =
       document.createElement("img");
 
@@ -2268,15 +2147,13 @@ function afficherReseauxSociaux(membre){
       reseau.nom;
 
     logo.onerror =
-      () => {
+      function(){
         item.style.display =
           "none";
       };
 
-
     lien.appendChild(logo);
     item.appendChild(lien);
-
 
     if(estMax){
 
@@ -2296,7 +2173,6 @@ function afficherReseauxSociaux(membre){
 
     }
 
-
     const audience =
       document.createElement("div");
 
@@ -2305,71 +2181,64 @@ function afficherReseauxSociaux(membre){
 
     audience.textContent =
       reseau.audience !== null
-        ? formaterAudience(
-            reseau.audience
-          )
+        ? formaterAudience(reseau.audience)
         : "";
-
 
     item.appendChild(audience);
     container.appendChild(item);
 
   });
 
-
   let audienceMaxEl =
     document.getElementById(
       "profileModalAudienceMax"
     );
 
+  if(!audienceMaxEl){
+
+    audienceMaxEl =
+      document.createElement("div");
+
+    audienceMaxEl.id =
+      "profileModalAudienceMax";
+
+    audienceMaxEl.className =
+      "profile-audience-max";
+
+    container.insertAdjacentElement(
+      "afterend",
+      audienceMaxEl
+    );
+
+  }
 
   if(maxValide){
 
     const date =
       membre.audience_updated_at
-        ? new Date(
-            membre.audience_updated_at
-          )
+        ? new Date(membre.audience_updated_at)
         : null;
 
     let dateText = "";
 
-
-    if(
-      date &&
-      !Number.isNaN(
-        date.getTime()
-      )
-    ){
-
+    if(date && !Number.isNaN(date.getTime())){
       dateText =
         " · mis à jour le " +
-        date.toLocaleDateString(
-          "fr-FR"
-        ) +
+        date.toLocaleDateString("fr-FR") +
         " à " +
-        date.toLocaleTimeString(
-          "fr-FR",
-          {
-            hour:"2-digit",
-            minute:"2-digit"
-          }
-        );
-
+        date.toLocaleTimeString("fr-FR",{
+          hour:"2-digit",
+          minute:"2-digit"
+        });
     }
-
 
     audienceMaxEl.innerHTML =
       "Audience max : <strong>" +
       formaterAudience(maxAudience) +
       "</strong>" +
-      (
-        dateText
-          ? " <small>" +
-            dateText +
-            "</small>"
-          : ""
-      );
+      (dateText
+        ? " <small>" + dateText + "</small>"
+        : "");
 
     audienceMaxEl.style.display =
       "block";
@@ -2377,12 +2246,9 @@ function afficherReseauxSociaux(membre){
   }else{
 
     audienceMaxEl.textContent = "";
-
-    audienceMaxEl.style.display =
-      "none";
+    audienceMaxEl.style.display = "none";
 
   }
-
 
   container.style.display =
     nombreReseaux > 0
@@ -2392,9 +2258,9 @@ function afficherReseauxSociaux(membre){
 }
 
 
-/* =====================================================
+/* =========================================================
    COMPTEUR DESCRIPTION
-===================================================== */
+========================================================= */
 
 function mettreAJourCompteurDescription(){
 
@@ -2431,12 +2297,13 @@ descriptionField.addEventListener(
   mettreAJourCompteurDescription
 );
 
+
 mettreAJourCompteurDescription();
 
 
-/* =====================================================
-   MEMBRES
-===================================================== */
+/* =========================================================
+   CHARGEMENT MEMBRES
+========================================================= */
 
 async function chargerMembres(){
 
@@ -2446,14 +2313,11 @@ async function chargerMembres(){
     </div>
   `;
 
-
   const {
     data,
     error
   } = await supabaseClient
-
     .from("profiles")
-
     .select(`
       id,
       created_at,
@@ -2478,19 +2342,10 @@ async function chargerMembres(){
       audience_reseau,
       audience_updated_at
     `)
-
-    .eq(
-      "anonyme",
-      false
-    )
-
-    .order(
-      "created_at",
-      {
-        ascending:true
-      }
-    );
-
+    .eq("anonyme", false)
+    .order("created_at", {
+      ascending:true
+    });
 
   if(error){
 
@@ -2509,9 +2364,7 @@ async function chargerMembres(){
 
   }
 
-
   teamGrid.innerHTML = "";
-
 
   if(!data || data.length === 0){
 
@@ -2524,7 +2377,6 @@ async function chargerMembres(){
     return;
 
   }
-
 
   data.forEach(membre => {
 
@@ -2674,9 +2526,9 @@ function creerPlaceholder(){
 }
 
 
-/* =====================================================
-   PROFIL
-===================================================== */
+/* =========================================================
+   POPUP PROFIL
+========================================================= */
 
 function ouvrirProfil(membre){
 
@@ -2719,11 +2571,14 @@ function ouvrirProfil(membre){
   name.textContent =
     membre.nom || "Membre";
 
+
   grade.textContent =
     membre.grade || "user";
 
+
   region.textContent =
     membre.region || "";
+
 
   description.textContent =
     membre.description || "";
@@ -2754,6 +2609,10 @@ function ouvrirProfil(membre){
   }
 
 
+  /* =========================
+     RESEAUX SOCIAUX
+  ========================= */
+
   afficherReseauxSociaux(membre);
 
 
@@ -2764,10 +2623,7 @@ function ouvrirProfil(membre){
     normaliserCompetences(
       membre.competences
     )
-    .filter(
-      comp => comp !== "VIP"
-    );
-
+    .filter(comp => comp !== "VIP");
 
   const audienceMax =
     Number(membre.audience_max) || 0;
@@ -2775,11 +2631,8 @@ function ouvrirProfil(membre){
   const estVIP =
     audienceMax >= 3000;
 
-
   if(estVIP){
-
     liste.unshift("VIP");
-
   }
 
 
@@ -2812,7 +2665,6 @@ function ouvrirProfil(membre){
       tag.className =
         "competence-tag";
 
-
       if(comp === "VIP"){
 
         const medal =
@@ -2831,7 +2683,6 @@ function ouvrirProfil(membre){
 
         tag.appendChild(medal);
 
-
         const vipText =
           document.createElement("span");
 
@@ -2847,7 +2698,6 @@ function ouvrirProfil(membre){
 
       }
 
-
       competences.appendChild(tag);
 
     });
@@ -2860,9 +2710,9 @@ function ouvrirProfil(membre){
 }
 
 
-/* =====================================================
-   FORMULAIRE — OUVERTURE
-===================================================== */
+/* =========================================================
+   OUVERTURE FORMULAIRE
+========================================================= */
 
 document
   .getElementById("openJoin")
@@ -2889,9 +2739,9 @@ document
   );
 
 
-/* =====================================================
+/* =========================================================
    FERMETURE MODALES
-===================================================== */
+========================================================= */
 
 document
   .getElementById("closeMember")
@@ -2900,6 +2750,7 @@ document
     () => fermerModal(memberModal)
   );
 
+
 document
   .getElementById("closeJoin")
   .addEventListener(
@@ -2907,31 +2758,33 @@ document
     () => fermerModal(joinModal)
   );
 
-document
-  .getElementById("closeEvent")
-  .addEventListener(
-    "click",
-    () => fermerModal(eventModal)
-  );
+
+memberModal.addEventListener(
+  "click",
+  event => {
+
+    if(event.target === memberModal){
+
+      fermerModal(memberModal);
+
+    }
+
+  }
+);
 
 
-[memberModal,joinModal,eventModal]
-  .forEach(modal => {
+joinModal.addEventListener(
+  "click",
+  event => {
 
-    modal.addEventListener(
-      "click",
-      event => {
+    if(event.target === joinModal){
 
-        if(event.target === modal){
+      fermerModal(joinModal);
 
-          fermerModal(modal);
+    }
 
-        }
-
-      }
-    );
-
-  });
+  }
+);
 
 
 document.addEventListener(
@@ -2941,8 +2794,8 @@ document.addEventListener(
     if(event.key === "Escape"){
 
       fermerModal(memberModal);
+
       fermerModal(joinModal);
-      fermerModal(eventModal);
 
     }
 
@@ -2950,9 +2803,9 @@ document.addEventListener(
 );
 
 
-/* =====================================================
+/* =========================================================
    FORMULAIRE
-===================================================== */
+========================================================= */
 
 document
   .getElementById("joinForm")
@@ -2961,7 +2814,6 @@ document
     async event => {
 
       event.preventDefault();
-
 
       const message =
         document.getElementById(
@@ -2973,7 +2825,6 @@ document
 
       message.textContent =
         "";
-
 
       submitButton.disabled =
         true;
@@ -3061,16 +2912,9 @@ document
         data: emailExistant,
         error: emailCheckError
       } = await supabaseClient
-
         .from("profiles")
-
         .select("id")
-
-        .ilike(
-          "email",
-          email
-        )
-
+        .ilike("email", email)
         .limit(1);
 
 
@@ -3147,9 +2991,7 @@ document
       const {
         error
       } = await supabaseClient
-
         .from("profiles")
-
         .insert(profil);
 
 
@@ -3197,12 +3039,19 @@ document
         "form-message success";
 
 
-      message.textContent =
-        anonyme
-          ? "Votre profil a bien été créé. " +
-            "Il restera caché de la liste publique des membres."
-          : "Votre profil a bien été créé. " +
-            "Il apparaît désormais dans la liste des membres.";
+      if(anonyme){
+
+        message.textContent =
+          "Votre profil a bien été créé. " +
+          "Il restera caché de la liste publique des membres.";
+
+      }else{
+
+        message.textContent =
+          "Votre profil a bien été créé. " +
+          "Il apparaît désormais dans la liste des membres.";
+
+      }
 
 
       document
@@ -3241,409 +3090,11 @@ document
   );
 
 
-/* =====================================================
-   RENDEZ-VOUS
-   IDENTIQUE AU SYSTEME DE L'INDEX
-===================================================== */
-
-async function chargerRendezVous(){
-
-  const track =
-    document.getElementById(
-      "eventsTrack"
-    );
-
-
-  const {
-    data,
-    error
-  } = await supabaseClient
-
-    .from("rendezvous")
-
-    .select("*")
-
-    .eq(
-      "actif",
-      true
-    )
-
-    .order(
-      "date_evenement",
-      {
-        ascending:true
-      }
-    );
-
-
-  if(error){
-
-    console.error(
-      "Erreur Supabase :",
-      error
-    );
-
-    track.innerHTML = `
-      <div class="events-empty">
-        Aucun rendez-vous actuellement.
-      </div>
-    `;
-
-    return;
-
-  }
-
-
-  if(!data || data.length === 0){
-
-    track.innerHTML = `
-      <div class="events-empty">
-        Aucun rendez-vous actuellement.
-      </div>
-    `;
-
-    return;
-
-  }
-
-
-  track.innerHTML = "";
-
-
-  data.forEach(rdv => {
-
-    const element =
-      document.createElement("div");
-
-    element.className =
-      "event-item";
-
-
-    const date =
-      formaterDateCourte(
-        rdv.date_evenement
-      );
-
-
-    let contenu = "";
-
-
-    if(date){
-
-      contenu +=
-        `<strong>${escapeHtml(date)}</strong>`;
-
-    }
-
-
-    if(rdv.titre){
-
-      if(contenu){
-
-        contenu +=
-          `<span class="event-separator">—</span>`;
-
-      }
-
-      contenu +=
-        `<strong>${escapeHtml(rdv.titre)}</strong>`;
-
-    }
-
-
-    if(rdv.lieu){
-
-      contenu +=
-        `<span class="event-separator">—</span>`;
-
-      contenu +=
-        escapeHtml(rdv.lieu);
-
-    }
-
-
-    element.innerHTML =
-      contenu;
-
-
-    element.addEventListener(
-      "click",
-      () => ouvrirRendezVous(rdv)
-    );
-
-
-    track.appendChild(element);
-
-  });
-
-
-  demarrerDefilement();
-
-}
-
-
-function demarrerDefilement(){
-
-  const track =
-    document.getElementById(
-      "eventsTrack"
-    );
-
-  const windowElement =
-    document.querySelector(
-      ".events-window"
-    );
-
-
-  if(!track || !windowElement){
-
-    return;
-
-  }
-
-
-  if(tickerAnimation){
-
-    cancelAnimationFrame(
-      tickerAnimation
-    );
-
-    tickerAnimation = null;
-
-  }
-
-
-  const largeurContenu =
-    track.scrollWidth;
-
-  const largeurFenetre =
-    windowElement.clientWidth;
-
-
-  if(!largeurContenu){
-
-    return;
-
-  }
-
-
-  const vitesse =
-    180;
-
-
-  let position =
-    largeurFenetre;
-
-  let dernierTemps =
-    performance.now();
-
-
-  track.style.transform =
-    `translateX(${position}px)`;
-
-
-  function animation(temps){
-
-    const delta =
-      (temps - dernierTemps) /
-      1000;
-
-
-    dernierTemps =
-      temps;
-
-
-    position -=
-      vitesse * delta;
-
-
-    if(
-      position <=
-      -largeurContenu
-    ){
-
-      position =
-        largeurFenetre;
-
-    }
-
-
-    track.style.transform =
-      `translateX(${position}px)`;
-
-
-    tickerAnimation =
-      requestAnimationFrame(
-        animation
-      );
-
-  }
-
-
-  tickerAnimation =
-    requestAnimationFrame(
-      animation
-    );
-
-}
-
-
-function formaterDateCourte(dateString){
-
-  if(!dateString){
-
-    return "";
-
-  }
-
-
-  const date =
-    new Date(
-      dateString +
-      "T00:00:00"
-    );
-
-
-  if(
-    isNaN(
-      date.getTime()
-    )
-  ){
-
-    return "";
-
-  }
-
-
-  return date.toLocaleDateString(
-    "fr-FR",
-    {
-      day:"2-digit",
-      month:"2-digit",
-      year:"numeric"
-    }
-  );
-
-}
-
-
-function ouvrirRendezVous(rdv){
-
-  document
-    .getElementById(
-      "eventModalTitle"
-    )
-    .textContent =
-      rdv.titre ||
-      "Rendez-vous";
-
-
-  const date =
-    document.getElementById(
-      "eventModalDate"
-    );
-
-
-  if(rdv.date_evenement){
-
-    date.textContent =
-      new Date(
-        rdv.date_evenement +
-        "T00:00:00"
-      ).toLocaleDateString(
-        "fr-FR",
-        {
-          weekday:"long",
-          day:"numeric",
-          month:"long",
-          year:"numeric"
-        }
-      );
-
-  }else{
-
-    date.textContent = "";
-
-  }
-
-
-  document
-    .getElementById(
-      "eventModalTime"
-    )
-    .textContent =
-      rdv.heure
-        ? "À " + rdv.heure
-        : "";
-
-
-  document
-    .getElementById(
-      "eventModalLocation"
-    )
-    .textContent =
-      rdv.lieu
-        ? "📍 " + rdv.lieu
-        : "";
-
-
-  document
-    .getElementById(
-      "eventModalDescription"
-    )
-    .textContent =
-      rdv.description ||
-      rdv.texte ||
-      "Aucune description disponible.";
-
-
-  const link =
-    document.getElementById(
-      "eventModalLink"
-    );
-
-
-  if(rdv.lien){
-
-    link.href =
-      rdv.lien;
-
-    link.style.display =
-      "inline-block";
-
-  }else{
-
-    link.href =
-      "#";
-
-    link.style.display =
-      "none";
-
-  }
-
-
-  ouvrirModal(eventModal);
-
-}
-
-
-/* =====================================================
-   DEMARRAGE
-===================================================== */
+/* =========================================================
+   INITIALISATION
+========================================================= */
 
 chargerMembres();
-
-chargerRendezVous();
-
-
-/* =====================================================
-   REDIMENSIONNEMENT
-===================================================== */
-
-window.addEventListener(
-  "resize",
-  demarrerDefilement
-);
 
 </script>
 
