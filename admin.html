@@ -2468,7 +2468,8 @@ loginForm.addEventListener(
 
     viderMessage(loginMessage);
 
-    loginButton.disabled = true;
+    loginButton.disabled = false;
+    loginButton.textContent = "CONNEXION";
 
     loginButton.textContent =
       "CONNEXION…";
@@ -2637,13 +2638,14 @@ async function verifierUtilisateur(){
 ========================================================= */
 
 function afficherConnexion(){
+  loginScreen.style.display = "block";
+  adminScreen.style.display = "none";
 
-  loginScreen.style.display =
-    "block";
+  loginButton.disabled = false;
+  loginButton.textContent = "CONNEXION";
 
-  adminScreen.style.display =
-    "none";
-
+  loginForm.reset();
+  viderMessage(loginMessage);
 }
 
 
@@ -2737,19 +2739,13 @@ function ajouterActionsHeader(){
 ========================================================= */
 
 async function deconnecter(){
+  await supabaseClient.auth.signOut();
 
-  const button =
-    document.getElementById("logoutButton");
+  currentUser = null;
+  currentProfile = null;
 
-  if(button){
-
-    button.disabled =
-      true;
-
-    button.textContent =
-      "DÉCONNEXION…";
-
-  }
+  afficherConnexion();
+}
 
 
   const {error} =
