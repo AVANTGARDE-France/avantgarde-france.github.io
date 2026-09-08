@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
 
 <meta charset="UTF-8">
@@ -38,6 +39,84 @@ body{
     var(--navy);
   color:var(--white);
   font-family:Georgia,"Times New Roman",serif;
+}
+
+
+/* =========================
+   RENDEZ-VOUS
+========================= */
+
+.events-bar{
+  height:36px;
+  background:#050f20;
+  border-bottom:1px solid rgba(214,173,85,.35);
+  display:flex;
+  align-items:center;
+  overflow:hidden;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+}
+
+.events-label{
+  flex-shrink:0;
+  height:100%;
+  display:flex;
+  align-items:center;
+  padding:0 17px;
+  color:var(--gold-light);
+  font-weight:bold;
+  letter-spacing:1px;
+  border-right:1px solid rgba(214,173,85,.3);
+  position:relative;
+  z-index:5;
+  background:#050f20;
+}
+
+.events-window{
+  flex:1;
+  height:100%;
+  overflow:hidden;
+  position:relative;
+}
+
+.events-track{
+  position:absolute;
+  left:0;
+  top:0;
+  height:100%;
+  display:inline-flex;
+  align-items:center;
+  white-space:nowrap;
+  will-change:transform;
+}
+
+.event-item{
+  display:inline-flex;
+  align-items:center;
+  height:100%;
+  padding:0 35px;
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  color:#e3e5e8;
+  cursor:pointer;
+  transition:
+    background .2s,
+    color .2s;
+}
+
+.event-item:hover{
+  background:rgba(214,173,85,.08);
+  color:white;
+}
+
+.event-item strong{
+  color:var(--gold-light);
+  margin-right:0;
+}
+
+.event-separator{
+  color:rgba(214,173,85,.5);
+  margin:0 7px;
 }
 
 
@@ -388,6 +467,73 @@ nav a.active{
 
 .modal-close:hover{
   color:var(--gold);
+}
+
+
+/* =========================
+   POPUP RENDEZ-VOUS
+========================= */
+
+.rdv-modal-box{
+  width:min(620px,100%);
+  padding:42px 40px 38px;
+}
+
+.rdv-modal-kicker{
+  color:var(--gold);
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  font-weight:bold;
+  letter-spacing:2.5px;
+  margin-bottom:12px;
+}
+
+.rdv-modal-title{
+  margin:0 0 18px;
+  font-size:32px;
+  line-height:1.15;
+}
+
+.rdv-modal-date,
+.rdv-modal-time,
+.rdv-modal-location{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  margin-bottom:7px;
+}
+
+.rdv-modal-date{
+  color:var(--gold-light);
+}
+
+.rdv-modal-description{
+  border-top:1px solid rgba(214,173,85,.2);
+  margin-top:20px;
+  padding-top:20px;
+  color:#d8dce3;
+  font-family:Arial,sans-serif;
+  font-size:14px;
+  line-height:1.65;
+  white-space:pre-line;
+}
+
+.rdv-modal-link{
+  display:inline-block;
+  margin-top:22px;
+  color:var(--gold-light);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  font-weight:bold;
+  letter-spacing:1px;
+  text-decoration:none;
+  border-bottom:1px solid rgba(214,173,85,.45);
+  padding-bottom:3px;
+}
+
+.rdv-modal-link:hover{
+  color:var(--white);
+  border-color:var(--gold);
 }
 
 
@@ -914,6 +1060,24 @@ footer{
     max-height:95vh;
   }
 
+  .rdv-modal-box{
+    padding:34px 22px 28px;
+  }
+
+  .rdv-modal-title{
+    font-size:27px;
+  }
+
+  .events-label{
+    padding:0 10px;
+    font-size:9px;
+  }
+
+  .event-item{
+    font-size:10px;
+    padding:0 16px;
+  }
+
   .registration-choice{
     grid-template-columns:1fr 1fr;
     gap:8px;
@@ -950,57 +1114,75 @@ footer{
 
 
 <!-- =========================
+     RENDEZ-VOUS
+========================= -->
+
+<div class="events-bar">
+
+  <div class="events-label">
+    EVENEMENT
+  </div>
+
+  <div class="events-window" id="eventsWindow">
+
+    <div
+      class="events-track"
+      id="eventsTrack">
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
      HEADER
 ========================= -->
 
 <header>
 
-<a
-  href="admin.html"
-  class="admin-gear"
-  title="Administration"
-  aria-label="Administration"
->
-  ⚙
-</a>
-
-
-<a
-  href="index.html"
-  class="logo"
->
-
-  <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
-
-</a>
-
-
-<nav>
-
-  <a href="index.html">
-    ACCUEIL
-  </a>
-
-  <a href="manifeste.html">
-    MANIFESTE
-  </a>
-
-  <a href="projet.html">
-    NOTRE PROJET
-  </a>
-
-  <a href="inspirations.html">
-    NOS INSPIRATIONS
+  <a
+    href="admin.html"
+    class="admin-gear"
+    title="Administration"
+    aria-label="Administration"
+  >
+    ⚙
   </a>
 
   <a
-    href="equipe.html"
-    class="active"
+    href="index.html"
+    class="logo"
   >
-    NOTRE ÉQUIPE
+    <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
   </a>
 
-</nav>
+  <nav>
+
+    <a href="index.html">
+      ACCUEIL
+    </a>
+
+    <a href="manifeste.html">
+      MANIFESTE
+    </a>
+
+    <a href="projet.html">
+      NOTRE PROJET
+    </a>
+
+    <a href="inspirations.html">
+      NOS INSPIRATIONS
+    </a>
+
+    <a
+      href="equipe.html"
+      class="active"
+    >
+      NOTRE ÉQUIPE
+    </a>
+
+  </nav>
 
 </header>
 
@@ -1774,14 +1956,77 @@ footer{
 </div>
 
 
+<!-- =========================
+     MODAL RENDEZ-VOUS
+========================= -->
+
+<div
+  class="modal"
+  id="eventModal"
+>
+
+  <div class="modal-box rdv-modal-box">
+
+    <button
+      class="modal-close"
+      id="closeEvent"
+      aria-label="Fermer"
+    >
+      ×
+    </button>
+
+    <div class="rdv-modal-kicker">
+      NOS RENDEZ-VOUS
+    </div>
+
+    <h2
+      id="eventModalTitle"
+      class="rdv-modal-title"
+    ></h2>
+
+    <div
+      id="eventModalDate"
+      class="rdv-modal-date"
+    ></div>
+
+    <div
+      id="eventModalTime"
+      class="rdv-modal-time"
+    ></div>
+
+    <div
+      id="eventModalLocation"
+      class="rdv-modal-location"
+    ></div>
+
+    <div
+      id="eventModalDescription"
+      class="rdv-modal-description"
+    ></div>
+
+    <a
+      id="eventModalLink"
+      class="rdv-modal-link"
+      href="#"
+      target="_blank"
+      rel="noopener noreferrer"
+      style="display:none;"
+    >
+      EN SAVOIR PLUS →
+    </a>
+
+  </div>
+
+</div>
+
+
 <footer>
-
   © 2026 Avant-gardE — Liberté · Souveraineté · Patrie · Justice
-
 </footer>
 
 
 <script>
+
 
 /* =========================================================
    SUPABASE
@@ -1812,6 +2057,9 @@ const memberModal =
 
 const joinModal =
   document.getElementById("joinModal");
+
+const eventModal =
+  document.getElementById("eventModal");
 
 const submitButton =
   document.getElementById("submitButton");
@@ -1854,7 +2102,8 @@ function imageValide(url){
 
   try{
 
-    const u = new URL(url);
+    const u =
+      new URL(url);
 
     return (
       u.protocol === "http:" ||
@@ -1969,10 +2218,13 @@ function urlValide(url){
 
 function formaterAudience(valeur){
 
-  const nombre = Number(valeur);
+  const nombre =
+    Number(valeur);
 
   if(!Number.isFinite(nombre) || nombre < 0){
+
     return null;
+
   }
 
 
@@ -2032,39 +2284,50 @@ function afficherReseauxSociaux(membre){
 
   const reseauxAvecAudience = [];
 
+
   reseauxSociaux.forEach(reseau => {
 
     const url =
       membre[reseau.champ];
 
     if(!urlValide(url)){
+
       return;
+
     }
 
     const audience =
       Number(membre[reseau.audienceChamp]);
 
     reseauxAvecAudience.push({
+
       ...reseau,
+
       url,
+
       audience:
         Number.isFinite(audience) && audience >= 0
           ? audience
           : null
+
     });
 
   });
+
 
   const reseauxAvecChiffre =
     reseauxAvecAudience.filter(
       reseau => reseau.audience !== null
     );
 
+
   const maxAudience =
     Number(membre.audience_max);
 
   const maxValide =
-    Number.isFinite(maxAudience) && maxAudience >= 0;
+    Number.isFinite(maxAudience) &&
+    maxAudience >= 0;
+
 
   const reseauMax =
     membre.audience_reseau ||
@@ -2073,7 +2336,9 @@ function afficherReseauxSociaux(membre){
       .sort((a,b) => b.audience - a.audience)[0]?.nom ||
     null;
 
+
   function reseauEstMax(reseau){
+
     if(!reseauMax) return false;
 
     const cible =
@@ -2082,9 +2347,13 @@ function afficherReseauxSociaux(membre){
         .replace(/[_\s-]/g,"");
 
     const valeurs = [
+
       reseau.nom,
+
       reseau.audienceChamp,
+
       reseau.audienceChamp.replace("_audience","")
+
     ]
     .map(v =>
       String(v)
@@ -2093,9 +2362,12 @@ function afficherReseauxSociaux(membre){
     );
 
     return valeurs.includes(cible);
+
   }
 
+
   let nombreReseaux = 0;
+
 
   reseauxAvecAudience.forEach(reseau => {
 
@@ -2107,12 +2379,16 @@ function afficherReseauxSociaux(membre){
     item.className =
       "profile-social-item";
 
+
     const estMax =
       reseauEstMax(reseau);
 
     if(estMax){
+
       item.classList.add("is-max");
+
     }
+
 
     const lien =
       document.createElement("a");
@@ -2137,6 +2413,7 @@ function afficherReseauxSociaux(membre){
       reseau.nom
     );
 
+
     const logo =
       document.createElement("img");
 
@@ -2148,12 +2425,17 @@ function afficherReseauxSociaux(membre){
 
     logo.onerror =
       function(){
+
         item.style.display =
           "none";
+
       };
 
+
     lien.appendChild(logo);
+
     item.appendChild(lien);
+
 
     if(estMax){
 
@@ -2173,6 +2455,7 @@ function afficherReseauxSociaux(membre){
 
     }
 
+
     const audience =
       document.createElement("div");
 
@@ -2185,14 +2468,17 @@ function afficherReseauxSociaux(membre){
         : "";
 
     item.appendChild(audience);
+
     container.appendChild(item);
 
   });
+
 
   let audienceMaxEl =
     document.getElementById(
       "profileModalAudienceMax"
     );
+
 
   if(!audienceMaxEl){
 
@@ -2212,6 +2498,7 @@ function afficherReseauxSociaux(membre){
 
   }
 
+
   if(maxValide){
 
     const date =
@@ -2221,7 +2508,9 @@ function afficherReseauxSociaux(membre){
 
     let dateText = "";
 
+
     if(date && !Number.isNaN(date.getTime())){
+
       dateText =
         " · mis à jour le " +
         date.toLocaleDateString("fr-FR") +
@@ -2230,15 +2519,19 @@ function afficherReseauxSociaux(membre){
           hour:"2-digit",
           minute:"2-digit"
         });
+
     }
+
 
     audienceMaxEl.innerHTML =
       "Audience max : <strong>" +
       formaterAudience(maxAudience) +
       "</strong>" +
-      (dateText
-        ? " <small>" + dateText + "</small>"
-        : "");
+      (
+        dateText
+          ? " <small>" + dateText + "</small>"
+          : ""
+      );
 
     audienceMaxEl.style.display =
       "block";
@@ -2246,9 +2539,12 @@ function afficherReseauxSociaux(membre){
   }else{
 
     audienceMaxEl.textContent = "";
-    audienceMaxEl.style.display = "none";
+
+    audienceMaxEl.style.display =
+      "none";
 
   }
+
 
   container.style.display =
     nombreReseaux > 0
@@ -2275,6 +2571,7 @@ function mettreAJourCompteurDescription(){
     "limit"
   );
 
+
   if(longueur >= 300){
 
     descriptionCounter.classList.add(
@@ -2297,7 +2594,6 @@ descriptionField.addEventListener(
   mettreAJourCompteurDescription
 );
 
-
 mettreAJourCompteurDescription();
 
 
@@ -2313,11 +2609,14 @@ async function chargerMembres(){
     </div>
   `;
 
+
   const {
     data,
     error
   } = await supabaseClient
+
     .from("profiles")
+
     .select(`
       id,
       created_at,
@@ -2342,10 +2641,13 @@ async function chargerMembres(){
       audience_reseau,
       audience_updated_at
     `)
+
     .eq("anonyme", false)
-    .order("created_at", {
+
+    .order("created_at",{
       ascending:true
     });
+
 
   if(error){
 
@@ -2364,7 +2666,9 @@ async function chargerMembres(){
 
   }
 
+
   teamGrid.innerHTML = "";
+
 
   if(!data || data.length === 0){
 
@@ -2378,6 +2682,7 @@ async function chargerMembres(){
 
   }
 
+
   data.forEach(membre => {
 
     const card =
@@ -2386,7 +2691,8 @@ async function chargerMembres(){
     card.className =
       "member-card";
 
-    card.tabIndex = 0;
+    card.tabIndex =
+      0;
 
 
     if(imageValide(membre.image_url)){
@@ -2403,13 +2709,14 @@ async function chargerMembres(){
       img.alt =
         membre.nom || "Membre";
 
-      img.onerror = function(){
+      img.onerror =
+        function(){
 
-        this.replaceWith(
-          creerPlaceholder()
-        );
+          this.replaceWith(
+            creerPlaceholder()
+          );
 
-      };
+        };
 
       card.appendChild(img);
 
@@ -2571,14 +2878,11 @@ function ouvrirProfil(membre){
   name.textContent =
     membre.nom || "Membre";
 
-
   grade.textContent =
     membre.grade || "user";
 
-
   region.textContent =
     membre.region || "";
-
 
   description.textContent =
     membre.description || "";
@@ -2616,7 +2920,8 @@ function ouvrirProfil(membre){
   afficherReseauxSociaux(membre);
 
 
-  competences.innerHTML = "";
+  competences.innerHTML =
+    "";
 
 
   const liste =
@@ -2625,14 +2930,18 @@ function ouvrirProfil(membre){
     )
     .filter(comp => comp !== "VIP");
 
+
   const audienceMax =
     Number(membre.audience_max) || 0;
 
   const estVIP =
     audienceMax >= 3000;
 
+
   if(estVIP){
+
     liste.unshift("VIP");
+
   }
 
 
@@ -2665,6 +2974,7 @@ function ouvrirProfil(membre){
       tag.className =
         "competence-tag";
 
+
       if(comp === "VIP"){
 
         const medal =
@@ -2683,6 +2993,7 @@ function ouvrirProfil(membre){
 
         tag.appendChild(medal);
 
+
         const vipText =
           document.createElement("span");
 
@@ -2697,6 +3008,7 @@ function ouvrirProfil(membre){
           comp;
 
       }
+
 
       competences.appendChild(tag);
 
@@ -2759,6 +3071,14 @@ document
   );
 
 
+document
+  .getElementById("closeEvent")
+  .addEventListener(
+    "click",
+    () => fermerModal(eventModal)
+  );
+
+
 memberModal.addEventListener(
   "click",
   event => {
@@ -2787,6 +3107,20 @@ joinModal.addEventListener(
 );
 
 
+eventModal.addEventListener(
+  "click",
+  event => {
+
+    if(event.target === eventModal){
+
+      fermerModal(eventModal);
+
+    }
+
+  }
+);
+
+
 document.addEventListener(
   "keydown",
   event => {
@@ -2796,6 +3130,8 @@ document.addEventListener(
       fermerModal(memberModal);
 
       fermerModal(joinModal);
+
+      fermerModal(eventModal);
 
     }
 
@@ -2815,6 +3151,7 @@ document
 
       event.preventDefault();
 
+
       const message =
         document.getElementById(
           "formMessage"
@@ -2825,6 +3162,7 @@ document
 
       message.textContent =
         "";
+
 
       submitButton.disabled =
         true;
@@ -2912,9 +3250,13 @@ document
         data: emailExistant,
         error: emailCheckError
       } = await supabaseClient
+
         .from("profiles")
+
         .select("id")
+
         .ilike("email", email)
+
         .limit(1);
 
 
@@ -2991,7 +3333,9 @@ document
       const {
         error
       } = await supabaseClient
+
         .from("profiles")
+
         .insert(profil);
 
 
@@ -3091,12 +3435,351 @@ document
 
 
 /* =========================================================
+   RENDEZ-VOUS
+========================================================= */
+
+async function chargerRendezVous(){
+
+  const track =
+    document.getElementById(
+      "eventsTrack"
+    );
+
+  const windowEl =
+    document.getElementById(
+      "eventsWindow"
+    );
+
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+
+    .from("rendezvous")
+
+    .select("*")
+
+    .eq("actif", true)
+
+    .order("date_evenement",{
+      ascending:true
+    });
+
+
+  if(error){
+
+    console.error(
+      "Erreur rendez-vous :",
+      error
+    );
+
+    return;
+
+  }
+
+
+  if(!data || data.length === 0){
+
+    track.innerHTML = `
+      <div class="event-item">
+        Aucun rendez-vous à venir
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  track.innerHTML = "";
+
+
+  data.forEach(event => {
+
+    const item =
+      document.createElement("div");
+
+    item.className =
+      "event-item";
+
+
+    /* =========================
+       DATE
+    ========================= */
+
+    const date =
+      document.createElement("strong");
+
+
+    if(event.date_evenement){
+
+      const d =
+        new Date(
+          event.date_evenement +
+          "T00:00:00"
+        );
+
+      date.textContent =
+        d.toLocaleDateString(
+          "fr-FR",
+          {
+            day:"2-digit",
+            month:"2-digit",
+            year:"numeric"
+          }
+        );
+
+    }
+
+
+    /* =========================
+       TITRE
+    ========================= */
+
+    const titre =
+      document.createElement("strong");
+
+    titre.textContent =
+      event.titre ||
+      event.nom ||
+      "Rendez-vous";
+
+
+    /* =========================
+       LIEU
+    ========================= */
+
+    const lieu =
+      document.createElement("span");
+
+    lieu.textContent =
+      event.lieu ||
+      "";
+
+
+    /* =========================
+       SEPARATEURS
+    ========================= */
+
+    const separateur1 =
+      document.createElement("span");
+
+    separateur1.className =
+      "event-separator";
+
+    separateur1.textContent =
+      "—";
+
+
+    const separateur2 =
+      document.createElement("span");
+
+    separateur2.className =
+      "event-separator";
+
+    separateur2.textContent =
+      "—";
+
+
+    /* =========================
+       CONSTRUCTION
+    ========================= */
+
+    item.appendChild(date);
+
+    item.appendChild(separateur1);
+
+    item.appendChild(titre);
+
+
+    if(event.lieu){
+
+      item.appendChild(separateur2);
+
+      item.appendChild(lieu);
+
+    }
+
+
+    /* =========================
+       CLIC
+    ========================= */
+
+    item.addEventListener(
+      "click",
+      () => {
+
+        document
+          .getElementById(
+            "eventModalTitle"
+          )
+          .textContent =
+            event.titre ||
+            event.nom ||
+            "Rendez-vous";
+
+
+        const d =
+          event.date_evenement
+            ? new Date(
+                event.date_evenement +
+                "T00:00:00"
+              )
+            : null;
+
+
+        document
+          .getElementById(
+            "eventModalDate"
+          )
+          .textContent =
+            d
+              ? d.toLocaleDateString(
+                  "fr-FR",
+                  {
+                    weekday:"long",
+                    day:"numeric",
+                    month:"long",
+                    year:"numeric"
+                  }
+                )
+              : "";
+
+
+        document
+          .getElementById(
+            "eventModalTime"
+          )
+          .textContent =
+            event.heure
+              ? "À " + event.heure
+              : "";
+
+
+        document
+          .getElementById(
+            "eventModalLocation"
+          )
+          .textContent =
+            event.lieu
+              ? "📍 " + event.lieu
+              : "";
+
+
+        document
+          .getElementById(
+            "eventModalDescription"
+          )
+          .textContent =
+            event.description ||
+            event.texte ||
+            "Aucune description disponible.";
+
+
+        const link =
+          document.getElementById(
+            "eventModalLink"
+          );
+
+
+        if(event.lien){
+
+          link.href =
+            event.lien;
+
+          link.style.display =
+            "inline-block";
+
+        }else{
+
+          link.href =
+            "#";
+
+          link.style.display =
+            "none";
+
+        }
+
+
+        ouvrirModal(eventModal);
+
+      }
+    );
+
+
+    track.appendChild(item);
+
+  });
+
+
+  /* =========================
+     ANIMATION
+  ========================= */
+
+  let position =
+    windowEl.clientWidth;
+
+  const vitesse =
+    180;
+
+  let dernierTemps =
+    performance.now();
+
+
+  function animation(temps){
+
+    const delta =
+      (temps - dernierTemps) / 1000;
+
+    dernierTemps =
+      temps;
+
+
+    position -=
+      vitesse * delta;
+
+
+    const largeur =
+      track.scrollWidth;
+
+
+    if(position <= -largeur){
+
+      position =
+        windowEl.clientWidth;
+
+    }
+
+
+    track.style.transform =
+      `translateX(${position}px)`;
+
+
+    requestAnimationFrame(
+      animation
+    );
+
+  }
+
+
+  requestAnimationFrame(
+    animation
+  );
+
+}
+
+
+/* =========================================================
    INITIALISATION
 ========================================================= */
 
 chargerMembres();
 
+chargerRendezVous();
+
 </script>
 
 </body>
+
 </html>
