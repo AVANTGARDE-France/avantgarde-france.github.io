@@ -817,6 +817,210 @@ textarea{
 
 
 /* =========================================================
+   GESTION DES EQUIPES
+========================================================= */
+
+.team-role{
+  margin-bottom:22px;
+}
+
+.team-role-title{
+  color:var(--gold);
+  font-size:18px;
+  margin:0 0 8px;
+  padding-bottom:7px;
+  border-bottom:1px solid rgba(214,173,85,.2);
+}
+
+.team-role-text{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  line-height:1.55;
+  margin:0 0 12px;
+}
+
+.team-search{
+  width:100%;
+  margin-bottom:6px;
+}
+
+.team-search-results{
+  max-height:220px;
+  overflow-y:auto;
+  border:1px solid rgba(255,255,255,.10);
+  background:#061329;
+}
+
+.team-search-results:empty{
+  display:none;
+}
+
+.team-member-option{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border:0;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  background:transparent;
+  color:var(--white);
+  padding:9px 10px;
+  text-align:left;
+  cursor:pointer;
+  font-family:Arial,sans-serif;
+}
+
+.team-member-option:last-child{
+  border-bottom:0;
+}
+
+.team-member-option:hover{
+  background:rgba(214,173,85,.08);
+}
+
+.team-member-option img{
+  width:30px;
+  height:30px;
+  object-fit:cover;
+  border-radius:50%;
+  border:1px solid rgba(214,173,85,.3);
+  flex-shrink:0;
+}
+
+.team-member-option-name{
+  font-size:10px;
+  font-weight:bold;
+}
+
+.team-member-option-region{
+  display:block;
+  color:#7f8998;
+  font-size:8px;
+  margin-top:2px;
+}
+
+.team-selected{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:8px;
+}
+
+.team-selected-member{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  border:1px solid rgba(214,173,85,.35);
+  background:rgba(214,173,85,.06);
+  padding:5px 7px;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+}
+
+.team-selected-member button{
+  border:0;
+  background:none;
+  color:#ffaaa2;
+  cursor:pointer;
+  font-size:13px;
+  line-height:1;
+  padding:0 2px;
+}
+
+.team-disabled{
+  opacity:.55;
+  pointer-events:none;
+}
+
+.team-permission{
+  color:#7f8998;
+  font-family:Arial,sans-serif;
+  font-size:8px;
+  font-style:italic;
+  margin-top:6px;
+}
+
+.team-regions{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin:18px 0 22px;
+}
+
+.team-region-button{
+  border:1px solid rgba(214,173,85,.25);
+  background:rgba(255,255,255,.025);
+  color:#c8ced8;
+  padding:9px 5px 8px;
+  cursor:pointer;
+  transition:.2s;
+  font-family:Arial,sans-serif;
+  font-size:8px;
+  font-weight:bold;
+  line-height:1.25;
+}
+
+.team-region-button:hover{
+  border-color:var(--gold);
+  color:var(--gold-light);
+}
+
+.team-region-button.active{
+  border-color:var(--gold);
+  background:rgba(214,173,85,.08);
+  color:var(--gold-light);
+}
+
+.team-region-icon{
+  width:28px;
+  height:28px;
+  margin:0 auto 5px;
+  border:1px solid rgba(214,173,85,.35);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--gold);
+  font-size:12px;
+}
+
+.team-region-panel{
+  display:none;
+}
+
+.team-region-panel.active{
+  display:block;
+}
+
+.team-region-title{
+  color:var(--gold-light);
+  font-size:21px;
+  margin:0 0 18px;
+}
+
+.team-block{
+  border:1px solid rgba(214,173,85,.20);
+  background:rgba(0,0,0,.10);
+  padding:16px;
+  margin-bottom:14px;
+}
+
+.team-block-title{
+  font-size:15px;
+  margin:0 0 5px;
+}
+
+.team-block-intro{
+  color:#8f9aaa;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+  line-height:1.4;
+  margin:0 0 12px;
+}
+
+
+/* =========================================================
    MODAL
 ========================================================= */
 
@@ -915,6 +1119,10 @@ footer{
     padding:18px 14px;
   }
 
+  .team-regions{
+    grid-template-columns:repeat(2,1fr);
+  }
+
 }
 
 @media(max-width:420px){
@@ -928,6 +1136,10 @@ footer{
   .header-button{
     padding:7px 9px;
     font-size:8px;
+  }
+
+  .team-regions{
+    grid-template-columns:1fr 1fr;
   }
 
 }
@@ -1051,6 +1263,14 @@ footer{
       style="display:none"
     >
       RDV
+    </button>
+
+    <button
+      class="tab"
+      id="teamTabButton"
+      data-tab="teamTab"
+    >
+      GESTION DES EQUIPES
     </button>
 
   </div>
@@ -1311,9 +1531,7 @@ footer{
         </div>
 
 
-        <!-- =================================================
-             RESEAUX SOCIAUX
-        ================================================== -->
+        <!-- RESEAUX SOCIAUX -->
 
         <div class="social-title">
           Réseaux sociaux
@@ -1417,9 +1635,7 @@ footer{
         </div>
 
 
-        <!-- =================================================
-             MEDAILLE VIP
-        ================================================== -->
+        <!-- MEDAILLE VIP -->
 
         <div class="vip-title">
           Médaille VIP
@@ -1458,7 +1674,7 @@ footer{
               id="vipAudience"
               class="vip-audience"
             >
-              Audience actuelle : — 
+              Audience actuelle : —
             </div>
 
           </div>
@@ -1835,6 +2051,149 @@ footer{
 
   </div>
 
+
+  <!-- =====================================================
+       GESTION DES EQUIPES
+  ====================================================== -->
+
+  <div id="teamTab" class="tab-content">
+
+    <!-- =================================================
+         COMMISSAIRE FONDATEUR
+    ================================================== -->
+
+    <div class="panel">
+
+      <div class="team-role">
+
+        <h2 class="team-role-title">
+          Commissaire Fondateur
+        </h2>
+
+        <p class="team-role-text">
+          Garant de l’idéologie, de la doctrine, de la stratégie et de
+          l’identité du mouvement.<br>
+          Il veille à la continuité de ses principes fondateurs, à la
+          cohérence de sa ligne idéologique et au respect de ses orientations
+          fondamentales. Il constitue l’autorité de référence en matière doctrinale.
+        </p>
+
+        <div id="founderPermissionMessage" class="team-permission"></div>
+
+        <input
+          type="text"
+          id="founderSearch"
+          class="team-search"
+          placeholder="Rechercher un membre..."
+          autocomplete="off"
+        >
+
+        <div
+          id="founderResults"
+          class="team-search-results"
+        ></div>
+
+        <div
+          id="founderSelected"
+          class="team-selected"
+        ></div>
+
+        <div
+          id="founderMessage"
+          class="message"
+        ></div>
+
+      </div>
+
+
+      <!-- =================================================
+           DELEGUE NATIONAL
+      ================================================== -->
+
+      <div class="team-role">
+
+        <h2 class="team-role-title">
+          Délégué National
+        </h2>
+
+        <p class="team-role-text">
+          Secrétaire général et trésorier du mouvement. Il est le
+          porte-parole officiel du mouvement.<br>
+          Il représente et met en œuvre la ligne stratégique du
+          mouvement à l’échelle nationale, assure sa direction administrative et
+          financière, coordonne les structures territoriales et veille à l’application
+          des orientations définies par le mouvement.
+        </p>
+
+        <div id="nationalPermissionMessage" class="team-permission"></div>
+
+        <input
+          type="text"
+          id="nationalSearch"
+          class="team-search"
+          placeholder="Rechercher un membre..."
+          autocomplete="off"
+        >
+
+        <div
+          id="nationalResults"
+          class="team-search-results"
+        ></div>
+
+        <div
+          id="nationalSelected"
+          class="team-selected"
+        ></div>
+
+        <div
+          id="nationalMessage"
+          class="message"
+        ></div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =================================================
+         DELEGUES REGIONAUX ET EQUIPES
+    ================================================== -->
+
+    <div class="panel">
+
+      <h2 class="panel-title">
+        Délégués régionaux et leurs équipes
+      </h2>
+
+      <p class="panel-intro">
+        Ils représentent le mouvement à l’échelle régionale ou départementale.
+        Ils assistent le Délégué national dans ses missions, notamment administratives
+        et financières. Ils coordonnent l’action territoriale, animent les structures
+        locales et assurent le relais entre le niveau national et les membres de leur
+        territoire. Ils peuvent avoir des missions spécifiques dans le cadre de leurs
+        talents ou compétences. Leur nombre et leur répartition territoriale ne sont
+        pas définis de manière rigide.
+      </p>
+
+
+      <!-- NAVIGATION REGIONS -->
+
+      <div
+        id="teamRegions"
+        class="team-regions"
+      ></div>
+
+
+      <!-- TABLEAUX REGIONS -->
+
+      <div
+        id="teamRegionPanels"
+      ></div>
+
+    </div>
+
+  </div>
+
 </section>
 
 
@@ -1934,6 +2293,20 @@ const supabaseClient =
 
 let currentUser = null;
 let currentProfile = null;
+
+
+/* =========================================================
+   GESTION DES EQUIPES
+========================================================= */
+
+let tousLesMembres =
+  [];
+
+let regionsEquipe =
+  [];
+
+let regionEquipeActive =
+  null;
 
 
 /* =========================================================
@@ -2201,6 +2574,7 @@ async function verifierUtilisateur(){
         id,
         nom,
         grade,
+        grade2,
         email,
         image_url,
         description,
@@ -2266,6 +2640,14 @@ async function verifierUtilisateur(){
       "none";
 
   }
+
+
+  /*
+    Gestion des équipes :
+    accessible à tous les membres connectés.
+  */
+
+  chargerGestionEquipes();
 
 }
 
@@ -2767,11 +3149,6 @@ profileForm.addEventListener(
       data;
 
 
-    /*
-      audience_max n'est pas modifié par ce formulaire.
-      On le conserve depuis la valeur précédente / Supabase.
-    */
-
     mettreAJourMedailleVIP(
       data.audience_max
     );
@@ -2848,6 +3225,1771 @@ document
     );
 
   });
+
+
+/* =========================================================
+   GESTION DES EQUIPES
+========================================================= */
+
+const regionsEquipeListe = [
+
+  "Auvergne-Rhône-Alpes",
+  "Bourgogne-Franche-Comté",
+  "Bretagne",
+  "Centre-Val de Loire",
+  "Corse",
+  "Grand Est",
+  "Hauts-de-France",
+  "Île-de-France",
+  "Normandie",
+  "Nouvelle-Aquitaine",
+  "Occitanie",
+  "Pays de la Loire",
+  "Provence-Alpes-Côte d’Azur",
+  "Guadeloupe",
+  "Martinique",
+  "Guyane",
+  "La Réunion",
+  "Mayotte",
+  "Europe",
+  "Amérique du Nord",
+  "Amérique centrale et Caraïbes",
+  "Amérique du Sud",
+  "Afrique",
+  "Asie",
+  "Océanie",
+  "Autre"
+
+];
+
+
+/* =========================================================
+   DROITS
+========================================================= */
+
+function estAdmin(){
+
+  return currentProfile?.grade === "admin";
+
+}
+
+
+function estCommissaireFondateur(){
+
+  return currentProfile?.grade2 ===
+    "Commissaire Fondateur";
+
+}
+
+
+function estDelegueNational(){
+
+  return currentProfile?.grade2 ===
+    "Délégué National";
+
+}
+
+
+function estDelegueRegional(region){
+
+  return (
+    currentProfile?.grade2 ===
+      "Délégué Régional" &&
+    currentProfile?.region ===
+      region
+  );
+
+}
+
+
+/*
+  Le niveau le plus élevé détermine les droits.
+*/
+
+function peutGererDirection(){
+
+  return (
+    estAdmin() ||
+    estCommissaireFondateur()
+  );
+
+}
+
+
+function peutGererEquipes(){
+
+  return (
+    estAdmin() ||
+    estCommissaireFondateur() ||
+    estDelegueNational()
+  );
+
+}
+
+
+function peutGererMilitants(region){
+
+  return (
+    estAdmin() ||
+    estCommissaireFondateur() ||
+    estDelegueNational() ||
+    estDelegueRegional(region)
+  );
+
+}
+
+
+/* =========================================================
+   CHARGER GESTION EQUIPES
+========================================================= */
+
+async function chargerGestionEquipes(){
+
+  await chargerTousLesMembres();
+
+  afficherPermissionsDirection();
+
+  afficherRegionsEquipe();
+
+  afficherSelectionDirection();
+
+  initialiserRechercheDirection();
+
+  afficherRegionEquipe(
+    regionsEquipeListe[0]
+  );
+
+}
+
+
+/* =========================================================
+   CHARGER MEMBRES
+========================================================= */
+
+async function chargerTousLesMembres(){
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select(`
+        id,
+        nom,
+        image_url,
+        region,
+        grade,
+        grade2,
+        anonyme
+      `)
+      .order(
+        "nom",
+        {
+          ascending:true
+        }
+      );
+
+
+  if(error){
+
+    console.error(
+      "Erreur chargement membres :",
+      error
+    );
+
+    tousLesMembres = [];
+
+    return;
+
+  }
+
+
+  tousLesMembres =
+    data || [];
+
+}
+
+
+/* =========================================================
+   PERMISSIONS DIRECTION
+========================================================= */
+
+function afficherPermissionsDirection(){
+
+  const founderMessage =
+    document.getElementById(
+      "founderPermissionMessage"
+    );
+
+  const nationalMessage =
+    document.getElementById(
+      "nationalPermissionMessage"
+    );
+
+
+  founderMessage.textContent =
+    peutGererDirection()
+      ? "Modification autorisée."
+      : "Modification réservée à l’administration du site.";
+
+  founderMessage.style.color =
+    peutGererDirection()
+      ? "#b9e5c4"
+      : "#7f8998";
+
+
+  nationalMessage.textContent =
+    peutGererDirection()
+      ? "Modification autorisée."
+      : "Modification réservée à l’administration du site.";
+
+  nationalMessage.style.color =
+    peutGererDirection()
+      ? "#b9e5c4"
+      : "#7f8998";
+
+
+  if(!peutGererDirection()){
+
+    document
+      .getElementById("founderSearch")
+      .classList.add("team-disabled");
+
+    document
+      .getElementById("nationalSearch")
+      .classList.add("team-disabled");
+
+  }
+
+}
+
+
+/* =========================================================
+   AFFICHAGE SELECTION DIRECTION
+========================================================= */
+
+function afficherSelectionDirection(){
+
+  const fondateur =
+    tousLesMembres.find(
+      membre =>
+        membre.grade2 ===
+        "Commissaire Fondateur"
+    );
+
+
+  const national =
+    tousLesMembres.find(
+      membre =>
+        membre.grade2 ===
+        "Délégué National"
+    );
+
+
+  afficherSelectionUnique(
+    "founderSelected",
+    fondateur,
+    "founder"
+  );
+
+
+  afficherSelectionUnique(
+    "nationalSelected",
+    national,
+    "national"
+  );
+
+}
+
+
+/* =========================================================
+   SELECTION UNIQUE
+========================================================= */
+
+function afficherSelectionUnique(
+  elementId,
+  membre,
+  type
+){
+
+  const container =
+    document.getElementById(
+      elementId
+    );
+
+
+  container.innerHTML = "";
+
+
+  if(!membre){
+
+    container.innerHTML =
+      "<div class='team-permission'>Aucun membre désigné.</div>";
+
+    return;
+
+  }
+
+
+  const item =
+    document.createElement("div");
+
+  item.className =
+    "team-selected-member";
+
+
+  item.innerHTML =
+    `
+      <span>
+        ${escapeHtml(membre.nom || "Membre")}
+      </span>
+
+      ${
+        peutGererDirection()
+          ? `
+            <button
+              type="button"
+              title="Retirer"
+            >
+              ×
+            </button>
+          `
+          : ""
+      }
+    `;
+
+
+  if(peutGererDirection()){
+
+    item
+      .querySelector("button")
+      .addEventListener(
+        "click",
+        () =>
+          retirerRoleUnique(
+            membre,
+            type
+          )
+      );
+
+  }
+
+
+  container.appendChild(item);
+
+}
+
+
+/* =========================================================
+   RECHERCHE DIRECTION
+========================================================= */
+
+function initialiserRechercheDirection(){
+
+  document
+    .getElementById("founderSearch")
+    .addEventListener(
+      "input",
+      event =>
+        afficherResultatsDirection(
+          event.target.value,
+          "founder"
+        )
+    );
+
+
+  document
+    .getElementById("nationalSearch")
+    .addEventListener(
+      "input",
+      event =>
+        afficherResultatsDirection(
+          event.target.value,
+          "national"
+        )
+    );
+
+}
+
+
+/* =========================================================
+   RESULTATS DIRECTION
+========================================================= */
+
+function afficherResultatsDirection(
+  recherche,
+  type
+){
+
+  const container =
+    document.getElementById(
+      type === "founder"
+        ? "founderResults"
+        : "nationalResults"
+    );
+
+
+  container.innerHTML = "";
+
+
+  if(!peutGererDirection()){
+
+    return;
+
+  }
+
+
+  const texte =
+    recherche
+      .trim()
+      .toLowerCase();
+
+
+  if(!texte){
+
+    return;
+
+  }
+
+
+  const membres =
+    tousLesMembres
+      .filter(
+        membre =>
+          String(
+            membre.nom || ""
+          )
+          .toLowerCase()
+          .includes(texte)
+      )
+      .slice(0,20);
+
+
+  membres.forEach(
+    membre => {
+
+      const bouton =
+        creerOptionMembre(
+          membre
+        );
+
+
+      bouton.addEventListener(
+        "click",
+        () =>
+          attribuerRoleUnique(
+            membre,
+            type
+          )
+      );
+
+
+      container.appendChild(
+        bouton
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   ATTRIBUER ROLE UNIQUE
+========================================================= */
+
+async function attribuerRoleUnique(
+  membre,
+  type
+){
+
+  if(!peutGererDirection()){
+
+    return;
+
+  }
+
+
+  const role =
+    type === "founder"
+      ? "Commissaire Fondateur"
+      : "Délégué National";
+
+
+  const autreRole =
+    type === "founder"
+      ? "Délégué National"
+      : "Commissaire Fondateur";
+
+
+  const ancien =
+    tousLesMembres.find(
+      profil =>
+        profil.grade2 === role
+    );
+
+
+  /*
+    Un seul titulaire :
+    l'ancien titulaire est libéré.
+  */
+
+  if(ancien && ancien.id !== membre.id){
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from("profiles")
+        .update({
+          grade2:null
+        })
+        .eq(
+          "id",
+          ancien.id
+        );
+
+
+    if(error){
+
+      console.error(
+        "Erreur retrait ancien titulaire :",
+        error
+      );
+
+      afficherMessage(
+        document.getElementById(
+          type === "founder"
+            ? "founderMessage"
+            : "nationalMessage"
+        ),
+        "error",
+        "Impossible de modifier le titulaire."
+      );
+
+      return;
+
+    }
+
+  }
+
+
+  /*
+    Si le membre était titulaire de l'autre
+    fonction, elle est libérée.
+  */
+
+  const ancienAutre =
+    tousLesMembres.find(
+      profil =>
+        profil.id === membre.id &&
+        profil.grade2 === autreRole
+    );
+
+
+  if(ancienAutre){
+
+    /*
+      Rien de supplémentaire :
+      l'update ci-dessous remplacera le grade2.
+    */
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .update({
+        grade2:role
+      })
+      .eq(
+        "id",
+        membre.id
+      )
+      .select()
+      .single();
+
+
+  if(error){
+
+    console.error(
+      "Erreur attribution grade2 :",
+      error
+    );
+
+    afficherMessage(
+      document.getElementById(
+        type === "founder"
+          ? "founderMessage"
+          : "nationalMessage"
+      ),
+      "error",
+      "Impossible d'enregistrer cette fonction."
+    );
+
+    return;
+
+  }
+
+
+  mettreAJourMembreLocal(
+    data
+  );
+
+
+  document
+    .getElementById(
+      type === "founder"
+        ? "founderSearch"
+        : "nationalSearch"
+    )
+    .value = "";
+
+
+  document
+    .getElementById(
+      type === "founderResults"
+        ? "founderResults"
+        : "nationalResults"
+    );
+
+
+  afficherSelectionDirection();
+
+  afficherRegionsEquipe();
+
+
+  afficherMessage(
+    document.getElementById(
+      type === "founder"
+        ? "founderMessage"
+        : "nationalMessage"
+    ),
+    "success",
+    "La fonction a été attribuée."
+  );
+
+
+  setTimeout(
+    () =>
+      viderMessage(
+        document.getElementById(
+          type === "founder"
+            ? "founderMessage"
+            : "nationalMessage"
+        )
+      ),
+    2500
+  );
+
+}
+
+
+/* =========================================================
+   RETIRER ROLE UNIQUE
+========================================================= */
+
+async function retirerRoleUnique(
+  membre,
+  type
+){
+
+  if(!peutGererDirection()){
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .update({
+        grade2:null
+      })
+      .eq(
+        "id",
+        membre.id
+      )
+      .select()
+      .single();
+
+
+  if(error){
+
+    console.error(
+      "Erreur retrait grade2 :",
+      error
+    );
+
+    afficherMessage(
+      document.getElementById(
+        type === "founder"
+          ? "founderMessage"
+          : "nationalMessage"
+      ),
+      "error",
+      "Impossible de retirer cette fonction."
+    );
+
+    return;
+
+  }
+
+
+  mettreAJourMembreLocal(
+    data
+  );
+
+  afficherSelectionDirection();
+
+  afficherRegionsEquipe();
+
+}
+
+
+/* =========================================================
+   REGIONS
+========================================================= */
+
+function afficherRegionsEquipe(){
+
+  const navigation =
+    document.getElementById(
+      "teamRegions"
+    );
+
+  const panels =
+    document.getElementById(
+      "teamRegionPanels"
+    );
+
+
+  navigation.innerHTML = "";
+
+  panels.innerHTML = "";
+
+
+  regionsEquipeListe.forEach(
+    (region,index) => {
+
+      const bouton =
+        document.createElement("button");
+
+      bouton.type =
+        "button";
+
+      bouton.className =
+        "team-region-button";
+
+      bouton.dataset.region =
+        region;
+
+      bouton.innerHTML =
+        `
+          <div class="team-region-icon">
+            ${index + 1}
+          </div>
+
+          ${escapeHtml(region)}
+        `;
+
+
+      bouton.addEventListener(
+        "click",
+        () =>
+          afficherRegionEquipe(
+            region
+          )
+      );
+
+
+      navigation.appendChild(
+        bouton
+      );
+
+
+      const panel =
+        document.createElement("div");
+
+      panel.id =
+        "team-region-" +
+        index;
+
+      panel.className =
+        "team-region-panel";
+
+      panel.dataset.region =
+        region;
+
+
+      panel.innerHTML =
+        `
+          <h3 class="team-region-title">
+            ${escapeHtml(region)}
+          </h3>
+
+          <div class="team-block">
+
+            <h4 class="team-block-title">
+              Délégués Régionaux
+            </h4>
+
+            <p class="team-block-intro">
+              Sélection multiple des membres de cette région.
+            </p>
+
+            <input
+              type="text"
+              class="team-search regional-search"
+              data-region="${escapeHtml(region)}"
+              data-role="Délégué Régional"
+              placeholder="Rechercher un membre..."
+              autocomplete="off"
+            >
+
+            <div
+              class="team-search-results regional-results"
+              data-region="${escapeHtml(region)}"
+              data-role="Délégué Régional"
+            ></div>
+
+            <div
+              class="team-selected regional-selected"
+              data-region="${escapeHtml(region)}"
+              data-role="Délégué Régional"
+            ></div>
+
+            <div class="team-permission">
+              Modification : administration, Délégué National ou Commissaire Fondateur.
+            </div>
+
+            <div
+              class="message regional-message"
+              data-region="${escapeHtml(region)}"
+            ></div>
+
+          </div>
+
+
+          <div class="team-block">
+
+            <h4 class="team-block-title">
+              L'équipe Militante
+            </h4>
+
+            <p class="team-block-intro">
+              Sélection multiple des membres de cette région.
+            </p>
+
+            <input
+              type="text"
+              class="team-search militant-search"
+              data-region="${escapeHtml(region)}"
+              data-role="Militant"
+              placeholder="Rechercher un membre..."
+              autocomplete="off"
+            >
+
+            <div
+              class="team-search-results militant-results"
+              data-region="${escapeHtml(region)}"
+              data-role="Militant"
+            ></div>
+
+            <div
+              class="team-selected militant-selected"
+              data-region="${escapeHtml(region)}"
+              data-role="Militant"
+            ></div>
+
+            <div class="team-permission">
+              Modification : administration, Délégué National, Commissaire Fondateur ou Délégué Régional de cette région.
+            </div>
+
+            <div
+              class="message militant-message"
+              data-region="${escapeHtml(region)}"
+            ></div>
+
+          </div>
+        `;
+
+
+      panels.appendChild(
+        panel
+      );
+
+    }
+  );
+
+
+  initialiserRecherchesRegions();
+
+  afficherRegionEquipe(
+    regionEquipeActive ||
+    regionsEquipeListe[0]
+  );
+
+}
+
+
+/* =========================================================
+   AFFICHER UNE REGION
+========================================================= */
+
+function afficherRegionEquipe(
+  region
+){
+
+  regionEquipeActive =
+    region;
+
+
+  document
+    .querySelectorAll(
+      ".team-region-button"
+    )
+    .forEach(
+      bouton => {
+
+        bouton.classList.toggle(
+          "active",
+          bouton.dataset.region ===
+            region
+        );
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      ".team-region-panel"
+    )
+    .forEach(
+      panel => {
+
+        panel.classList.toggle(
+          "active",
+          panel.dataset.region ===
+            region
+        );
+
+      }
+    );
+
+
+  afficherEquipesRegion(
+    region
+  );
+
+}
+
+
+/* =========================================================
+   INITIALISER RECHERCHES REGIONS
+========================================================= */
+
+function initialiserRecherchesRegions(){
+
+  document
+    .querySelectorAll(
+      ".regional-search"
+    )
+    .forEach(
+      input => {
+
+        input.addEventListener(
+          "input",
+          () =>
+            afficherResultatsRegion(
+              input,
+              "Délégué Régional"
+            )
+        );
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      ".militant-search"
+    )
+    .forEach(
+      input => {
+
+        input.addEventListener(
+          "input",
+          () =>
+            afficherResultatsRegion(
+              input,
+              "Militant"
+            )
+        );
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   AFFICHER EQUIPES REGION
+========================================================= */
+
+function afficherEquipesRegion(
+  region
+){
+
+  const delegues =
+    tousLesMembres.filter(
+      membre =>
+        membre.region === region &&
+        membre.grade2 ===
+          "Délégué Régional"
+    );
+
+
+  const militants =
+    tousLesMembres.filter(
+      membre =>
+        membre.region === region &&
+        membre.grade2 ===
+          "Militant"
+    );
+
+
+  document
+    .querySelectorAll(
+      ".regional-selected"
+    )
+    .forEach(
+      container => {
+
+        if(
+          container.dataset.region ===
+          region
+        ){
+
+          afficherMembresSelectionnes(
+            container,
+            delegues,
+            region,
+            "Délégué Régional"
+          );
+
+        }
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      ".militant-selected"
+    )
+    .forEach(
+      container => {
+
+        if(
+          container.dataset.region ===
+          region
+        ){
+
+          afficherMembresSelectionnes(
+            container,
+            militants,
+            region,
+            "Militant"
+          );
+
+        }
+
+      }
+    );
+
+
+  appliquerPermissionsRegion(
+    region
+  );
+
+}
+
+
+/* =========================================================
+   PERMISSIONS REGION
+========================================================= */
+
+function appliquerPermissionsRegion(
+  region
+){
+
+  const peutDelegues =
+    peutGererEquipes();
+
+  const peutMilitants =
+    peutGererMilitants(
+      region
+    );
+
+
+  document
+    .querySelectorAll(
+      ".regional-search"
+    )
+    .forEach(
+      input => {
+
+        if(
+          input.dataset.region ===
+          region
+        ){
+
+          input.classList.toggle(
+            "team-disabled",
+            !peutDelegues
+          );
+
+        }
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      ".militant-search"
+    )
+    .forEach(
+      input => {
+
+        if(
+          input.dataset.region ===
+          region
+        ){
+
+          input.classList.toggle(
+            "team-disabled",
+            !peutMilitants
+          );
+
+        }
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   RESULTATS REGION
+========================================================= */
+
+function afficherResultatsRegion(
+  input,
+  role
+){
+
+  const region =
+    input.dataset.region;
+
+
+  const container =
+    document.querySelector(
+      role === "Délégué Régional"
+        ? `.regional-results[data-region="${CSS.escape(region)}"]`
+        : `.militant-results[data-region="${CSS.escape(region)}"]`
+    );
+
+
+  if(!container){
+
+    return;
+
+  }
+
+
+  container.innerHTML = "";
+
+
+  const autorise =
+    role === "Délégué Régional"
+      ? peutGererEquipes()
+      : peutGererMilitants(
+          region
+        );
+
+
+  if(!autorise){
+
+    return;
+
+  }
+
+
+  const texte =
+    input.value
+      .trim()
+      .toLowerCase();
+
+
+  if(!texte){
+
+    return;
+
+  }
+
+
+  /*
+    La recherche est limitée à la région
+    concernée.
+  */
+
+  const membres =
+    tousLesMembres
+      .filter(
+        membre =>
+          membre.region === region &&
+          String(
+            membre.nom || ""
+          )
+          .toLowerCase()
+          .includes(texte)
+      )
+      .slice(0,20);
+
+
+  membres.forEach(
+    membre => {
+
+      const bouton =
+        creerOptionMembre(
+          membre
+        );
+
+
+      bouton.addEventListener(
+        "click",
+        () =>
+          attribuerRoleRegional(
+            membre,
+            region,
+            role
+          )
+      );
+
+
+      container.appendChild(
+        bouton
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   CREER OPTION MEMBRE
+========================================================= */
+
+function creerOptionMembre(
+  membre
+){
+
+  const bouton =
+    document.createElement("button");
+
+  bouton.type =
+    "button";
+
+  bouton.className =
+    "team-member-option";
+
+
+  const image =
+    membre.image_url ||
+    "";
+
+
+  bouton.innerHTML =
+    `
+      ${
+        image
+          ? `
+            <img
+              src="${escapeHtml(image)}"
+              alt=""
+              onerror="this.style.display='none'"
+            >
+          `
+          : `
+            <div
+              style="
+                width:30px;
+                height:30px;
+                border-radius:50%;
+                border:1px solid rgba(214,173,85,.3);
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                color:var(--gold);
+                font-size:10px;
+                flex-shrink:0;
+              "
+            >
+              ★
+            </div>
+          `
+      }
+
+      <span>
+
+        <span class="team-member-option-name">
+          ${escapeHtml(membre.nom || "Membre")}
+        </span>
+
+        <span class="team-member-option-region">
+          ${escapeHtml(membre.region || "")}
+        </span>
+
+      </span>
+    `;
+
+
+  return bouton;
+
+}
+
+
+/* =========================================================
+   ATTRIBUTION REGIONALE
+========================================================= */
+
+async function attribuerRoleRegional(
+  membre,
+  region,
+  role
+){
+
+  const autorise =
+    role === "Délégué Régional"
+      ? peutGererEquipes()
+      : peutGererMilitants(
+          region
+        );
+
+
+  if(!autorise){
+
+    return;
+
+  }
+
+
+  /*
+    Le membre doit impérativement appartenir
+    à la région affichée.
+  */
+
+  if(membre.region !== region){
+
+    return;
+
+  }
+
+
+  /*
+    Avec grade2, chaque membre possède un niveau
+    hiérarchique unique.
+  */
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .update({
+        grade2:role
+      })
+      .eq(
+        "id",
+        membre.id
+      )
+      .select()
+      .single();
+
+
+  if(error){
+
+    console.error(
+      "Erreur attribution rôle régional :",
+      error
+    );
+
+    afficherMessageRegion(
+      region,
+      role,
+      "error",
+      "Impossible d'enregistrer cette affectation."
+    );
+
+    return;
+
+  }
+
+
+  mettreAJourMembreLocal(
+    data
+  );
+
+
+  const searchSelector =
+    role === "Délégué Régional"
+      ? `.regional-search[data-region="${CSS.escape(region)}"]`
+      : `.militant-search[data-region="${CSS.escape(region)}"]`;
+
+
+  const search =
+    document.querySelector(
+      searchSelector
+    );
+
+
+  if(search){
+
+    search.value =
+      "";
+
+  }
+
+
+  const resultSelector =
+    role === "Délégué Régional"
+      ? `.regional-results[data-region="${CSS.escape(region)}"]`
+      : `.militant-results[data-region="${CSS.escape(region)}"]`;
+
+
+  const results =
+    document.querySelector(
+      resultSelector
+    );
+
+
+  if(results){
+
+    results.innerHTML =
+      "";
+
+  }
+
+
+  afficherEquipesRegion(
+    region
+  );
+
+
+  afficherMessageRegion(
+    region,
+    role,
+    "success",
+    "Le membre a été affecté."
+  );
+
+
+  setTimeout(
+    () =>
+      viderMessageRegion(
+        region,
+        role
+      ),
+    2200
+  );
+
+}
+
+
+/* =========================================================
+   AFFICHER MEMBRES SELECTIONNES
+========================================================= */
+
+function afficherMembresSelectionnes(
+  container,
+  membres,
+  region,
+  role
+){
+
+  container.innerHTML = "";
+
+
+  if(
+    !membres ||
+    membres.length === 0
+  ){
+
+    container.innerHTML =
+      "<div class='team-permission'>Aucun membre affecté.</div>";
+
+    return;
+
+  }
+
+
+  const autorise =
+    role === "Délégué Régional"
+      ? peutGererEquipes()
+      : peutGererMilitants(
+          region
+        );
+
+
+  membres.forEach(
+    membre => {
+
+      const item =
+        document.createElement("div");
+
+      item.className =
+        "team-selected-member";
+
+
+      item.innerHTML =
+        `
+          <span>
+            ${escapeHtml(membre.nom || "Membre")}
+          </span>
+
+          ${
+            autorise
+              ? `
+                <button
+                  type="button"
+                  title="Retirer"
+                >
+                  ×
+                </button>
+              `
+              : ""
+          }
+        `;
+
+
+      if(autorise){
+
+        item
+          .querySelector("button")
+          .addEventListener(
+            "click",
+            () =>
+              retirerRoleRegional(
+                membre,
+                region,
+                role
+              )
+          );
+
+      }
+
+
+      container.appendChild(
+        item
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   RETIRER ROLE REGIONAL
+========================================================= */
+
+async function retirerRoleRegional(
+  membre,
+  region,
+  role
+){
+
+  const autorise =
+    role === "Délégué Régional"
+      ? peutGererEquipes()
+      : peutGererMilitants(
+          region
+        );
+
+
+  if(!autorise){
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .update({
+        grade2:null
+      })
+      .eq(
+        "id",
+        membre.id
+      )
+      .select()
+      .single();
+
+
+  if(error){
+
+    console.error(
+      "Erreur retrait rôle régional :",
+      error
+    );
+
+    afficherMessageRegion(
+      region,
+      role,
+      "error",
+      "Impossible de retirer ce membre."
+    );
+
+    return;
+
+  }
+
+
+  mettreAJourMembreLocal(
+    data
+  );
+
+
+  afficherEquipesRegion(
+    region
+  );
+
+}
+
+
+/* =========================================================
+   MESSAGE REGION
+========================================================= */
+
+function afficherMessageRegion(
+  region,
+  role,
+  type,
+  texte
+){
+
+  const selector =
+    role === "Délégué Régional"
+      ? `.regional-message[data-region="${CSS.escape(region)}"]`
+      : `.militant-message[data-region="${CSS.escape(region)}"]`;
+
+
+  const element =
+    document.querySelector(
+      selector
+    );
+
+
+  if(element){
+
+    afficherMessage(
+      element,
+      type,
+      texte
+    );
+
+  }
+
+}
+
+
+function viderMessageRegion(
+  region,
+  role
+){
+
+  const selector =
+    role === "Délégué Régional"
+      ? `.regional-message[data-region="${CSS.escape(region)}"]`
+      : `.militant-message[data-region="${CSS.escape(region)}"]`;
+
+
+  const element =
+    document.querySelector(
+      selector
+    );
+
+
+  if(element){
+
+    viderMessage(
+      element
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   MISE A JOUR MEMBRE LOCAL
+========================================================= */
+
+function mettreAJourMembreLocal(
+  membre
+){
+
+  const index =
+    tousLesMembres.findIndex(
+      profil =>
+        profil.id ===
+        membre.id
+    );
+
+
+  if(index !== -1){
+
+    tousLesMembres[index] =
+      membre;
+
+  }
+
+}
+
+
+/* =========================================================
+   ECHAPPEMENT
+========================================================= */
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
 
 
 /* =========================================================
@@ -3020,22 +5162,6 @@ async function chargerRendezVous(){
     eventList.appendChild(card);
 
   });
-
-}
-
-
-/* =========================================================
-   ECHAPPEMENT
-========================================================= */
-
-function escapeHtml(value){
-
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
 
 }
 
