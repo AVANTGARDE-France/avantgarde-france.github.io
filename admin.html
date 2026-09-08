@@ -439,6 +439,105 @@ textarea{
 
 
 /* =========================================================
+   MEDAILLE VIP
+========================================================= */
+
+.vip-title{
+  color:var(--gold);
+  font-size:17px;
+  margin:22px 0 6px;
+  padding-bottom:7px;
+  border-bottom:1px solid rgba(214,173,85,.2);
+}
+
+.vip-intro{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:9px;
+  line-height:1.45;
+  margin-bottom:12px;
+}
+
+.vip-medal{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  border:1px solid rgba(255,255,255,.10);
+  background:rgba(0,0,0,.12);
+  padding:10px 12px;
+}
+
+.vip-medal-icon{
+  flex-shrink:0;
+  width:34px;
+  height:34px;
+  border:1px solid #687180;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#687180;
+  background:rgba(104,113,128,.08);
+  font-size:16px;
+  box-shadow:none;
+  transition:.25s;
+}
+
+.vip-medal.active{
+  border-color:rgba(214,173,85,.38);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(214,173,85,.07),
+      rgba(0,0,0,.12)
+    );
+}
+
+.vip-medal.active .vip-medal-icon{
+  border-color:var(--gold);
+  color:var(--gold-light);
+  background:rgba(214,173,85,.08);
+  box-shadow:
+    0 0 10px rgba(214,173,85,.15);
+}
+
+.vip-medal-text strong{
+  display:block;
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  color:#7c8593;
+  margin-bottom:3px;
+}
+
+.vip-medal.active .vip-medal-text strong{
+  color:var(--gold-light);
+}
+
+.vip-medal-text span{
+  display:block;
+  color:#8d97a7;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+  line-height:1.4;
+}
+
+.vip-medal.active .vip-medal-text span{
+  color:#b8c0cd;
+}
+
+.vip-audience{
+  margin-top:6px;
+  color:#707988;
+  font-family:Arial,sans-serif;
+  font-size:8px;
+}
+
+.vip-medal.active .vip-audience{
+  color:var(--gold);
+}
+
+
+/* =========================================================
    VISIBILITÉ
 ========================================================= */
 
@@ -1318,6 +1417,54 @@ footer{
         </div>
 
 
+        <!-- =================================================
+             MEDAILLE VIP
+        ================================================== -->
+
+        <div class="vip-title">
+          Médaille VIP
+        </div>
+
+        <div class="vip-intro">
+          VIP : cette médaille s'obtient avec vos réseaux sociaux
+          lorsque votre audience dépasse 3k followers.
+        </div>
+
+        <div
+          id="vipMedal"
+          class="vip-medal"
+        >
+
+          <div
+            class="vip-medal-icon"
+            aria-hidden="true"
+          >
+            ★
+          </div>
+
+          <div class="vip-medal-text">
+
+            <strong>
+              VIP
+            </strong>
+
+            <span>
+              Médaille attribuée automatiquement lorsque
+              votre audience maximale atteint au moins 3 000 followers.
+            </span>
+
+            <div
+              id="vipAudience"
+              class="vip-audience"
+            >
+              Audience actuelle : — 
+            </div>
+
+          </div>
+
+        </div>
+
+
         <!-- COMPETENCES -->
 
         <div class="section-title">
@@ -1457,68 +1604,6 @@ footer{
             <div class="competence-info">
               maîtrise d’un domaine politique ou institutionnel
               particulier et capacité à en apporter l’expertise.
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div class="competence-group">
-
-          <div class="competence-group-title">
-            Je peux vous aider en tant que
-          </div>
-
-
-          <div class="competence">
-
-            <label>
-              <input
-                type="checkbox"
-                name="competences"
-                value="Influenceurs / debunkers / créateurs de contenu"
-              >
-
-              <span class="competence-name">
-                Influenceur / debunker / créateur de contenu
-              </span>
-
-            </label>
-
-            <div class="competence-info">
-              dans le milieu médiatique et sur les réseaux sociaux,
-              développent spontanément une audience, influencent les
-              comportements, déconstruisent les arguments ou manipulations
-              et produisent des contenus permettant de diffuser et de
-              défendre les idées du mouvement. Je conserver mon
-              indépendance éditoriale.
-            </div>
-
-          </div>
-
-
-          <div class="competence">
-
-            <label>
-
-              <input
-                type="checkbox"
-                name="competences"
-                value="Bienfaiteurs"
-              >
-
-              <span class="competence-name">
-                Bienfaiteur
-              </span>
-
-            </label>
-
-            <div class="competence-info">
-              dans les autres milieux, mettent spontanément leur influence,
-              leur réseau, leur carnet d’adresses, leurs moyens, leur
-              expertise ou leur notoriété au service du développement et
-              du rayonnement du mouvement.
             </div>
 
           </div>
@@ -1887,6 +1972,12 @@ const descriptionField =
 const descriptionCounter =
   document.getElementById("descriptionCounter");
 
+const vipMedal =
+  document.getElementById("vipMedal");
+
+const vipAudience =
+  document.getElementById("vipAudience");
+
 
 /* =========================================================
    MESSAGES
@@ -1937,6 +2028,41 @@ function normaliserCompetences(value){
   }
 
   return [];
+
+}
+
+
+/* =========================================================
+   MEDAILLE VIP
+========================================================= */
+
+function mettreAJourMedailleVIP(audienceMax){
+
+  const audience =
+    Number(audienceMax) || 0;
+
+
+  if(audience >= 3000){
+
+    vipMedal.classList.add("active");
+
+    vipAudience.textContent =
+      "Audience actuelle : " +
+      audience.toLocaleString("fr-FR") +
+      " followers";
+
+  }else{
+
+    vipMedal.classList.remove("active");
+
+    vipAudience.textContent =
+      audience > 0
+        ? "Audience actuelle : " +
+          audience.toLocaleString("fr-FR") +
+          " followers"
+        : "Audience actuelle : —";
+
+  }
 
 }
 
@@ -2084,7 +2210,8 @@ async function verifierUtilisateur(){
         x_url,
         instagram_url,
         youtube_url,
-        tiktok_url
+        tiktok_url,
+        audience_max
       `)
       .eq("id",user.id)
       .single();
@@ -2174,10 +2301,7 @@ function afficherAdmin(){
       "</strong>";
 
 
-  /* Boutons de l'espace membre */
-
   ajouterActionsHeader();
-
 
 }
 
@@ -2383,6 +2507,13 @@ function remplirProfil(profile){
     .getElementById("profileTiktok")
     .value =
       profile.tiktok_url || "";
+
+
+  /* MEDAILLE VIP */
+
+  mettreAJourMedailleVIP(
+    profile.audience_max
+  );
 
 
   if(profile.anonyme){
@@ -2633,6 +2764,16 @@ profileForm.addEventListener(
 
     currentProfile =
       data;
+
+
+    /*
+      audience_max n'est pas modifié par ce formulaire.
+      On le conserve depuis la valeur précédente / Supabase.
+    */
+
+    mettreAJourMedailleVIP(
+      data.audience_max
+    );
 
 
     afficherMessage(
