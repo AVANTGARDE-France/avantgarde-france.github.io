@@ -941,24 +941,27 @@ textarea{
   margin-top:6px;
 }
 
+
+/* MODIFICATION : 5 REGIONS PAR LIGNE */
+
 .team-regions{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:8px;
-  margin:18px 0 22px;
+  grid-template-columns:repeat(5,1fr);
+  gap:6px;
+  margin:12px 0 18px;
 }
 
 .team-region-button{
   border:1px solid rgba(214,173,85,.25);
   background:rgba(255,255,255,.025);
   color:#c8ced8;
-  padding:9px 5px 8px;
+  padding:7px 6px;
   cursor:pointer;
   transition:.2s;
   font-family:Arial,sans-serif;
-  font-size:8px;
+  font-size:10px;
   font-weight:bold;
-  line-height:1.25;
+  line-height:1.2;
 }
 
 .team-region-button:hover{
@@ -972,17 +975,11 @@ textarea{
   color:var(--gold-light);
 }
 
+
+/* CONSERVE POUR COMPATIBILITE MAIS PLUS UTILISE */
+
 .team-region-icon{
-  width:28px;
-  height:28px;
-  margin:0 auto 5px;
-  border:1px solid rgba(214,173,85,.35);
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--gold);
-  font-size:12px;
+  display:none;
 }
 
 .team-region-panel{
@@ -1404,22 +1401,22 @@ footer{
           </div>
 
 
-          <!-- GRADE -->
+          <!-- IMAGE : PREND LA PLACE DU GRADE -->
 
           <div class="form-group">
 
-            <label for="profileGrade">
-              GRADE
+            <label for="profileImage">
+              IMAGE
             </label>
 
             <input
-              type="text"
-              id="profileGrade"
-              disabled
+              type="url"
+              id="profileImage"
+              placeholder="https://..."
             >
 
             <div class="help">
-              Le grade est attribué par l'administration.
+              Indiquez l’URL d’une image déjà hébergée en ligne.
             </div>
 
           </div>
@@ -1481,27 +1478,6 @@ footer{
               </optgroup>
 
             </select>
-
-          </div>
-
-
-          <!-- IMAGE -->
-
-          <div class="form-group full-width">
-
-            <label for="profileImage">
-              IMAGE
-            </label>
-
-            <input
-              type="url"
-              id="profileImage"
-              placeholder="https://..."
-            >
-
-            <div class="help">
-              Indiquez l’URL d’une image déjà hébergée en ligne.
-            </div>
 
           </div>
 
@@ -2284,14 +2260,11 @@ let currentProfile = null;
    GESTION DES EQUIPES
 ========================================================= */
 
-let tousLesMembres =
-  [];
+let tousLesMembres = [];
 
-let regionsEquipe =
-  [];
+let regionsEquipe = [];
 
-let regionEquipeActive =
-  null;
+let regionEquipeActive = null;
 
 
 /* =========================================================
@@ -2613,7 +2586,7 @@ async function verifierUtilisateur(){
     document.getElementById("rdvTabButton");
 
 
-  if(profile.grade === "admin"){
+  if(peutGererRendezVous()){
 
     rdvButton.style.display =
       "block";
@@ -2638,6 +2611,7 @@ async function verifierUtilisateur(){
 ========================================================= */
 
 function afficherConnexion(){
+
   loginScreen.style.display = "block";
   adminScreen.style.display = "none";
 
@@ -2646,6 +2620,7 @@ function afficherConnexion(){
 
   loginForm.reset();
   viderMessage(loginMessage);
+
 }
 
 
@@ -2819,12 +2794,6 @@ function remplirProfil(profile){
       profile.email ||
       currentUser.email ||
       "";
-
-
-  document
-    .getElementById("profileGrade")
-    .value =
-      profile.grade || "user";
 
 
   document
@@ -3041,10 +3010,6 @@ profileForm.addEventListener(
     }
 
 
-    /*
-      Vérification simple de l'adresse e-mail.
-    */
-
     const emailValide =
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
         email
@@ -3087,10 +3052,6 @@ profileForm.addEventListener(
     }
 
 
-    /*
-      Détection du changement de région.
-    */
-
     const ancienneRegion =
       currentProfile?.region || "";
 
@@ -3110,11 +3071,6 @@ profileForm.addEventListener(
         ancienneGrade2 === "Militant"
       );
 
-
-    /*
-      Avertissement AVANT confirmation.
-      Les fonctions nationales ne sont pas concernées.
-    */
 
     if(perteDroitsRegionaux){
 
@@ -3142,21 +3098,11 @@ profileForm.addEventListener(
     }
 
 
-    /*
-      Si changement de région avec fonction régionale :
-      grade2 sera automatiquement supprimé.
-    */
-
     const grade2ApresChangement =
       perteDroitsRegionaux
         ? null
         : currentProfile?.grade2 || null;
 
-
-    /*
-      Mise à jour de l'adresse d'authentification
-      uniquement si elle a réellement changé.
-    */
 
     const ancienEmailAuth =
       (currentUser?.email || "")
@@ -3247,13 +3193,6 @@ profileForm.addEventListener(
           tiktok_url:
             tiktok_url || null,
 
-          /*
-            Le grade2 n'est normalement jamais modifié
-            par l'utilisateur.
-            Il n'est mis à null que dans le cas sécurisé
-            d'un changement de région avec droit régional.
-          */
-
           ...(perteDroitsRegionaux
             ? { grade2:null }
             : {})
@@ -3294,12 +3233,6 @@ profileForm.addEventListener(
       data;
 
 
-    /*
-      Si l'email Auth n'est pas encore confirmé,
-      Supabase peut conserver temporairement l'ancien
-      email de connexion.
-    */
-
     if(changementEmail){
 
       afficherMessage(
@@ -3334,12 +3267,6 @@ profileForm.addEventListener(
         "</strong>";
 
 
-    /*
-      Rafraîchissement de la gestion des équipes
-      pour tenir compte immédiatement d'un éventuel
-      changement de région ou de grade2.
-    */
-
     if(perteDroitsRegionaux){
 
       await chargerGestionEquipes();
@@ -3370,7 +3297,7 @@ document
 
         if(
           tab.id === "rdvTabButton" &&
-          currentProfile?.grade !== "admin"
+          !peutGererRendezVous()
         ){
 
           return;
@@ -3480,6 +3407,22 @@ function estDelegueRegional(region){
 }
 
 
+/* =========================================================
+   DROITS RDV
+========================================================= */
+
+function peutGererRendezVous(){
+
+  return (
+    estAdmin() ||
+    estCommissaireFondateur() ||
+    estDelegueNational() ||
+    currentProfile?.grade2 === "Délégué Régional"
+  );
+
+}
+
+
 function peutGererDirection(){
 
   return (
@@ -3529,8 +3472,24 @@ async function chargerGestionEquipes(){
 
   initialiserRechercheDirection();
 
+  /*
+    Région du profil connecté sélectionnée par défaut.
+  */
+
+  const regionParDefaut =
+    currentProfile?.region &&
+    regionsEquipeListe.includes(
+      currentProfile.region
+    )
+      ? currentProfile.region
+      : regionsEquipeListe[0];
+
+
   afficherRegionEquipe(
-    regionsEquipeListe[0]
+    regionEquipeActive &&
+    regionsEquipeListe.includes(regionEquipeActive)
+      ? regionEquipeActive
+      : regionParDefaut
   );
 
 }
@@ -4137,6 +4096,33 @@ function afficherRegionsEquipe(){
   panels.innerHTML = "";
 
 
+  /*
+    Région du profil connecté par défaut.
+    Toutes les régions restent visibles.
+  */
+
+  const regionParDefaut =
+    currentProfile?.region &&
+    regionsEquipeListe.includes(
+      currentProfile.region
+    )
+      ? currentProfile.region
+      : regionsEquipeListe[0];
+
+
+  if(
+    !regionEquipeActive ||
+    !regionsEquipeListe.includes(
+      regionEquipeActive
+    )
+  ){
+
+    regionEquipeActive =
+      regionParDefaut;
+
+  }
+
+
   regionsEquipeListe.forEach(
     (region,index) => {
 
@@ -4152,14 +4138,24 @@ function afficherRegionsEquipe(){
       bouton.dataset.region =
         region;
 
-      bouton.innerHTML =
-        `
-          <div class="team-region-icon">
-            ${index + 1}
-          </div>
+      /*
+        Suppression des numéros décoratifs.
+      */
 
-          ${escapeHtml(region)}
-        `;
+      bouton.innerHTML =
+        escapeHtml(region);
+
+
+      if(
+        region ===
+        regionEquipeActive
+      ){
+
+        bouton.classList.add(
+          "active"
+        );
+
+      }
 
 
       bouton.addEventListener(
@@ -4294,8 +4290,7 @@ function afficherRegionsEquipe(){
   initialiserRecherchesRegions();
 
   afficherRegionEquipe(
-    regionEquipeActive ||
-    regionsEquipeListe[0]
+    regionEquipeActive
   );
 
 }
@@ -5143,7 +5138,7 @@ function escapeHtml(value){
 
 async function chargerRendezVous(){
 
-  if(currentProfile?.grade !== "admin"){
+  if(!peutGererRendezVous()){
     return;
   }
 
@@ -5316,6 +5311,11 @@ async function chargerRendezVous(){
 
 function modifierEvenement(event){
 
+  if(!peutGererRendezVous()){
+    return;
+  }
+
+
   document
     .getElementById("eventId")
     .value =
@@ -5450,7 +5450,7 @@ document
       event.preventDefault();
 
 
-      if(currentProfile?.grade !== "admin"){
+      if(!peutGererRendezVous()){
         return;
       }
 
@@ -5574,6 +5574,11 @@ document
 ========================================================= */
 
 async function supprimerEvenement(id){
+
+  if(!peutGererRendezVous()){
+    return;
+  }
+
 
   if(
     !confirm(
