@@ -2739,13 +2739,19 @@ function ajouterActionsHeader(){
 ========================================================= */
 
 async function deconnecter(){
-  await supabaseClient.auth.signOut();
 
-  currentUser = null;
-  currentProfile = null;
+  const button =
+    document.getElementById("logoutButton");
 
-  afficherConnexion();
-}
+
+  if(button){
+
+    button.disabled = true;
+
+    button.textContent =
+      "DÉCONNEXION…";
+
+  }
 
 
   const {error} =
@@ -2759,15 +2765,16 @@ async function deconnecter(){
       error
     );
 
+
     if(button){
 
-      button.disabled =
-        false;
+      button.disabled = false;
 
       button.textContent =
         "SE DÉCONNECTER";
 
     }
+
 
     return;
 
@@ -2775,19 +2782,21 @@ async function deconnecter(){
 
 
   currentUser = null;
+
   currentProfile = null;
 
 
-  adminScreen.style.display =
-    "none";
+  if(button){
 
-  loginScreen.style.display =
-    "block";
+    button.disabled = false;
+
+    button.textContent =
+      "SE DÉCONNECTER";
+
+  }
 
 
-  loginForm.reset();
-
-  viderMessage(loginMessage);
+  afficherConnexion();
 
 }
 
