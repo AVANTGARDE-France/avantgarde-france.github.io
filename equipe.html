@@ -2389,7 +2389,7 @@ function afficherReseauxSociaux(membre){
 
     audience.textContent =
       reseau.audience !== null
-        ? formaterAudience(reseau.audience) + " abonnés"
+        ? formaterAudience(reseau.audience)
         : "";
 
     item.appendChild(audience);
@@ -2443,7 +2443,7 @@ function afficherReseauxSociaux(membre){
     audienceMaxEl.innerHTML =
       "Audience max : <strong>" +
       formaterAudience(maxAudience) +
-      " abonnés</strong>" +
+      "</strong>" +
       (dateText
         ? " <small>" + dateText + "</small>"
         : "");
