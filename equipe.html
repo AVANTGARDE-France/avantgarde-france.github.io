@@ -638,6 +638,70 @@ nav a.active{
   object-fit:contain;
 }
 
+/* =========================
+   AUDIENCE RESEAUX SOCIAUX
+========================= */
+
+.profile-social-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+  position:relative;
+}
+
+.profile-social-item.is-max .profile-social-link{
+  border-color:var(--gold);
+  background:rgba(214,173,85,.12);
+  box-shadow:0 0 12px rgba(214,173,85,.18);
+  position:relative;
+}
+
+.profile-social-max-star{
+  position:absolute;
+  right:-7px;
+  top:-8px;
+  width:16px;
+  height:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--gold);
+  border-radius:50%;
+  background:var(--navy);
+  color:var(--gold-light);
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:9px;
+  line-height:1;
+  z-index:2;
+}
+
+.profile-social-audience{
+  color:#aeb6c3;
+  font-family:Arial,sans-serif;
+  font-size:9px;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.profile-audience-max{
+  margin:-10px 0 25px;
+  color:var(--gold-light);
+  font-family:Arial,sans-serif;
+  font-size:11px;
+  line-height:1.5;
+  font-weight:bold;
+}
+
+.profile-audience-max small{
+  display:block;
+  margin-top:3px;
+  color:#7f8998;
+  font-size:8px;
+  font-weight:normal;
+  font-style:italic;
+}
+
 .profile-competences{
   border-top:1px solid rgba(214,173,85,.2);
   padding-top:22px;
@@ -2217,6 +2281,28 @@ function afficherReseauxSociaux(membre){
       .sort((a,b) => b.audience - a.audience)[0]?.nom ||
     null;
 
+  function reseauEstMax(reseau){
+    if(!reseauMax) return false;
+
+    const cible =
+      String(reseauMax)
+        .toLowerCase()
+        .replace(/[_\s-]/g,"");
+
+    const valeurs = [
+      reseau.nom,
+      reseau.audienceChamp,
+      reseau.audienceChamp.replace("_audience", "")
+    ]
+    .map(v =>
+      String(v)
+        .toLowerCase()
+        .replace(/[_\s-]/g,"")
+    );
+
+    return valeurs.includes(cible);
+  }
+
   let nombreReseaux = 0;
 
   reseauxAvecAudience.forEach(reseau => {
@@ -2230,9 +2316,7 @@ function afficherReseauxSociaux(membre){
       "profile-social-item";
 
     const estMax =
-      reseauMax &&
-      reseau.nom.toLowerCase() ===
-      String(reseauMax).toLowerCase();
+      reseauEstMax(reseau);
 
     if(estMax){
       item.classList.add("is-max");
@@ -2746,16 +2830,16 @@ function ouvrirProfil(membre){
   const liste =
     normaliserCompetences(
       membre.competences
-    );
+    )
+    .filter(comp => comp !== "VIP");
 
   const audienceMax =
-    Number(membre.audience_max);
+    Number(membre.audience_max) || 0;
 
   const estVIP =
-    Number.isFinite(audienceMax) &&
     audienceMax >= 3000;
 
-  if(estVIP && !liste.includes("VIP")){
+  if(estVIP){
     liste.unshift("VIP");
   }
 
