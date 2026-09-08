@@ -638,15 +638,6 @@ nav a.active{
   object-fit:contain;
 }
 
-/* AUDIENCE RESEAUX SOCIAUX */
-.profile-social-item{display:flex;flex-direction:column;align-items:center;gap:5px}
-.profile-social-item.audience-max .profile-social-link{border-color:var(--gold);background:rgba(214,173,85,.12);box-shadow:0 0 12px rgba(214,173,85,.18);position:relative}
-.profile-social-item.audience-max .profile-social-link::after{content:"★";position:absolute;right:-6px;top:-7px;color:var(--gold-light);font-size:10px}
-.profile-social-audience{color:#aeb6c3;font-family:Arial,sans-serif;font-size:9px;line-height:1}
-.profile-audience{margin:-10px 0 25px;color:#d8dce3;font-family:Arial,sans-serif;font-size:11px;line-height:1.5}
-.profile-audience-max{color:var(--gold-light);font-weight:bold}
-.profile-audience-update{display:block;margin-top:3px;color:#7f8998;font-size:8px;font-style:italic}
-
 .profile-competences{
   border-top:1px solid rgba(214,173,85,.2);
   padding-top:22px;
@@ -873,13 +864,6 @@ textarea{
   line-height:1.45;
   margin-top:5px;
 }
-
-.medal-info{cursor:default;border-color:rgba(214,173,85,.28);background:linear-gradient(145deg,rgba(214,173,85,.07),rgba(0,0,0,.12))}
-.medal-info:hover{border-color:rgba(214,173,85,.45);background:linear-gradient(145deg,rgba(214,173,85,.10),rgba(0,0,0,.14))}
-.medal-content{display:flex;align-items:flex-start;gap:13px}
-.medal-icon{flex-shrink:0;width:30px;height:30px;border:1px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold-light);background:rgba(214,173,85,.08);font-size:14px;margin-top:1px;box-shadow:0 0 10px rgba(214,173,85,.15)}
-.medal-info .competence-name{display:block;color:var(--gold-light);font-size:12px;line-height:1.4}
-.medal-info .competence-description{display:block;margin-top:6px;color:#aeb6c3;font-size:10px;line-height:1.5}
 
 .submit-button{
   width:100%;
@@ -1797,32 +1781,72 @@ footer{
 
       </div>
 
-       <!-- =========================
-            MEDAILLES
-       ========================= -->
 
-       <div class="competence-group">
-         <div class="competence-group-title">Obtenez des médailles</div>
-         <div class="competence medal-info">
-           <div class="medal-content">
-             <div class="medal-icon" aria-hidden="true">★</div>
-             <div>
-               <span class="competence-name">VIP : Célébrité / Influenceur / debunker / créateur de contenu à "forte audience"</span>
-               <span class="competence-description">dont l’influence ou la notoriété contribuent au rayonnement du mouvement.</span>
-             </div>
-           </div>
-         </div>
-         <div class="competence medal-info">
-           <div class="medal-content">
-             <div class="medal-icon" aria-hidden="true">★</div>
-             <div>
-               <span class="competence-name">Mécène du mois : "Top 10 donateurs"</span>
-               <span class="competence-description">contribuant au développement, aux évènements et à la médiatisation du mouvement.</span>
-             </div>
-           </div>
-         </div>
-       </div>
+      <!-- =========================
+           INFLUENCE / BIENFAITEUR
+      ========================= -->
 
+      <div class="competence-group">
+
+        <div class="competence-group-title">
+          Je peux vous aider en tant que
+        </div>
+
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Influenceurs / debunkers / créateurs de contenu"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Influenceur / debunker / créateur de contenu
+              </span>
+
+              <span class="competence-description">
+                dans le milieu médiatique et sur les réseaux sociaux, développent spontanément une audience, influencent les comportements, déconstruisent les arguments ou manipulations et produisent des contenus permettant de diffuser et de défendre les idées du mouvement. peuvent conserver une forte indépendance éditoriale.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+
+        <div class="competence">
+
+          <label>
+
+            <input
+              type="checkbox"
+              name="competences"
+              value="Bienfaiteurs"
+            >
+
+            <span>
+
+              <span class="competence-name">
+                Bienfaiteur
+              </span>
+
+              <span class="competence-description">
+                dans les autres milieux, mettent spontanément leur influence, leur réseau, leur carnet d’adresses, leurs moyens, leur expertise ou leur notoriété au service du développement et du rayonnement du mouvement. peuvent conserver une forte indépendance.
+              </span>
+
+            </span>
+
+          </label>
+
+        </div>
+
+      </div>
 
 
       <button
@@ -2097,37 +2121,89 @@ function urlValide(url){
 }
 
 
-function formaterAudience(valeur){
-  const n=Number(valeur);
-  if(!Number.isFinite(n)||n<=0) return "";
-  if(n>=1000000) return (n/1000000).toLocaleString("fr-FR",{maximumFractionDigits:1})+" M";
-  if(n>=1000) return (n/1000).toLocaleString("fr-FR",{maximumFractionDigits:1})+" k";
-  return n.toLocaleString("fr-FR");
-}
-
 function afficherReseauxSociaux(membre){
-  const container=document.getElementById("profileModalSocials");
-  container.innerHTML="";
-  let nombreReseaux=0;
-  const audiences={facebook_audience:Number(membre.facebook_audience)||0,instagram_audience:Number(membre.instagram_audience)||0,x_audience:Number(membre.x_audience)||0,youtube_audience:Number(membre.youtube_audience)||0,tiktok_audience:Number(membre.tiktok_audience)||0};
-  const maxAudience=Math.max(0,...Object.values(audiences));
-  const maxReseau=membre.audience_reseau||Object.keys(audiences).find(k=>audiences[k]===maxAudience)||"";
-  reseauxSociaux.forEach(reseau=>{
-    const url=membre[reseau.champ];
-    if(!urlValide(url)) return;
+
+  const container =
+    document.getElementById(
+      "profileModalSocials"
+    );
+
+  container.innerHTML = "";
+
+  let nombreReseaux = 0;
+
+
+  reseauxSociaux.forEach(reseau => {
+
+    const url =
+      membre[reseau.champ];
+
+
+    if(!urlValide(url)){
+
+      return;
+
+    }
+
+
     nombreReseaux++;
-    const item=document.createElement("div"); item.className="profile-social-item";
-    const lien=document.createElement("a"); lien.className="profile-social-link"; lien.href=url; lien.target="_blank"; lien.rel="noopener noreferrer"; lien.title=reseau.nom; lien.setAttribute("aria-label",reseau.nom);
-    const audienceField=reseau.champ.replace("_url","_audience"); const audience=audiences[audienceField]||0;
-    if(maxAudience>0&&audience===maxAudience&&audienceField===maxReseau)item.classList.add("audience-max");
-    const logo=document.createElement("img"); logo.src=reseau.logo; logo.alt=reseau.nom; logo.onerror=function(){item.style.display="none"}; lien.appendChild(logo); item.appendChild(lien);
-    if(audience>0){const a=document.createElement("span");a.className="profile-social-audience";a.textContent=formaterAudience(audience);item.appendChild(a)}
-    container.appendChild(item);
+
+
+    const lien =
+      document.createElement("a");
+
+    lien.className =
+      "profile-social-link";
+
+    lien.href =
+      url;
+
+    lien.target =
+      "_blank";
+
+    lien.rel =
+      "noopener noreferrer";
+
+    lien.title =
+      reseau.nom;
+
+    lien.setAttribute(
+      "aria-label",
+      reseau.nom
+    );
+
+
+    const logo =
+      document.createElement("img");
+
+    logo.src =
+      reseau.logo;
+
+    logo.alt =
+      reseau.nom;
+
+
+    logo.onerror =
+      function(){
+
+        lien.style.display =
+          "none";
+
+      };
+
+
+    lien.appendChild(logo);
+
+    container.appendChild(lien);
+
   });
-  container.style.display=nombreReseaux>0?"flex":"none";
-  let info=document.getElementById("profileAudienceInfo");
-  if(!info){info=document.createElement("div");info.id="profileAudienceInfo";info.className="profile-audience";container.insertAdjacentElement("afterend",info)}
-  if(maxAudience>0){const d=membre.audience_updated_at?new Date(membre.audience_updated_at):null;info.innerHTML='<span class="profile-audience-max">Audience max : '+formaterAudience(maxAudience)+'</span>'+(d?'<span class="profile-audience-update">mise à jour le '+d.toLocaleDateString("fr-FR")+' à '+d.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"})+'</span>':"");info.style.display="block"}else{info.innerHTML="";info.style.display="none"}
+
+
+  container.style.display =
+    nombreReseaux > 0
+      ? "flex"
+      : "none";
+
 }
 
 
@@ -2205,15 +2281,7 @@ async function chargerMembres(){
       x_url,
       instagram_url,
       youtube_url,
-      tiktok_url,
-      facebook_audience,
-      instagram_audience,
-      x_audience,
-      youtube_audience,
-      tiktok_audience,
-      audience_max,
-      audience_reseau,
-      audience_updated_at
+      tiktok_url
     `)
     .eq("anonyme", false)
     .order("created_at", {
@@ -2495,7 +2563,17 @@ function ouvrirProfil(membre){
   const liste =
     normaliserCompetences(
       membre.competences
-    );
+    )
+    .filter(comp => comp !== "VIP");
+
+
+  /* VIP est une compétence dérivée de l'audience maximale */
+  const audienceMax =
+    Number(membre.audience_max) || 0;
+
+  if(audienceMax >= 3000){
+    liste.push("VIP");
+  }
 
 
   if(liste.length === 0){
@@ -2520,6 +2598,25 @@ function ouvrirProfil(membre){
   }else{
 
     liste.forEach(comp => {
+
+      if(comp === "VIP"){
+
+        const tag =
+          document.createElement("span");
+
+        tag.className =
+          "vip-competence-tag";
+
+        tag.innerHTML = `
+          <span class="vip-medal" aria-hidden="true">★</span>
+          <span>VIP</span>
+        `;
+
+        competences.appendChild(tag);
+
+        return;
+
+      }
 
       const tag =
         document.createElement("span");
