@@ -195,6 +195,10 @@ function normaliserCompetences(value) {
 }
 
 
+/* =========================================================
+   FORMATAGE DES AUDIENCES
+========================================================= */
+
 function formaterAudience(valeur) {
 
     const nombre = Number(valeur);
@@ -205,6 +209,85 @@ function formaterAudience(valeur) {
     ) {
         return "0";
     }
+
+
+    /* =====================================================
+       MILLIONS
+    ===================================================== */
+
+    if (nombre >= 1000000) {
+
+        const millions =
+            nombre / 1000000;
+
+
+        let texte;
+
+
+        if (millions >= 100) {
+
+            texte =
+                millions.toFixed(0);
+
+        } else {
+
+            texte =
+                millions.toFixed(1);
+
+        }
+
+
+        texte =
+            texte
+                .replace(".", ",")
+                .replace(/,0$/, "");
+
+
+        return `${texte} M`;
+
+    }
+
+
+    /* =====================================================
+       MILLIERS
+    ===================================================== */
+
+    if (nombre >= 1000) {
+
+        const milliers =
+            nombre / 1000;
+
+
+        let texte;
+
+
+        if (milliers >= 100) {
+
+            texte =
+                milliers.toFixed(0);
+
+        } else {
+
+            texte =
+                milliers.toFixed(1);
+
+        }
+
+
+        texte =
+            texte
+                .replace(".", ",")
+                .replace(/,0$/, "");
+
+
+        return `${texte} k`;
+
+    }
+
+
+    /* =====================================================
+       MOINS DE 1000
+    ===================================================== */
 
     return new Intl.NumberFormat(
         "fr-FR",
@@ -469,6 +552,10 @@ function afficherReseauxSociaux(membre) {
         }
 
 
+        /* =================================================
+           LIEN
+        ================================================= */
+
         const lien =
             document.createElement("a");
 
@@ -492,6 +579,10 @@ function afficherReseauxSociaux(membre) {
             reseau.nom
         );
 
+
+        /* =================================================
+           LOGO
+        ================================================= */
 
         const image =
             document.createElement("img");
@@ -521,13 +612,11 @@ function afficherReseauxSociaux(membre) {
 
 
         /* =================================================
-           ÉTOILE
+           ÉTOILE — RÉSEAU À PLUS FORTE AUDIENCE
 
-           IMPORTANT :
-           L'étoile est maintenant enfant du lien.
-           Elle est donc positionnée absolument par rapport
-           au bouton et ne participe jamais au calcul de
-           largeur de la ligne flex.
+           L'étoile est volontairement placée À L'INTÉRIEUR
+           du lien afin qu'elle soit totalement indépendante
+           du calcul de largeur de la ligne flex.
         ================================================= */
 
         if (isMax) {
@@ -567,6 +656,10 @@ function afficherReseauxSociaux(membre) {
         );
 
 
+        /* =================================================
+           AUDIENCE
+        ================================================= */
+
         const audienceElement =
             document.createElement("span");
 
@@ -577,6 +670,12 @@ function afficherReseauxSociaux(membre) {
             formaterAudience(
                 audience
             );
+
+
+        audienceElement.title =
+            `${new Intl.NumberFormat(
+                "fr-FR"
+            ).format(audience)} abonnés`;
 
 
         itemHtml.appendChild(
@@ -593,7 +692,7 @@ function afficherReseauxSociaux(membre) {
 
     /* =====================================================
        AUDIENCE MAX
-    ====================================================== */
+    ===================================================== */
 
     let audienceMax = 0;
 
@@ -1370,14 +1469,13 @@ function ouvrirProfil(
         }
 
 
-        /*
-         * Mécène peut rester enregistré dans les données
-         * existantes, mais n'est jamais sélectionnable
-         * dans le formulaire.
-         *
-         * Si le profil possède déjà cette information dans
-         * la base, elle sera affichée comme médaille.
-         */
+        /* =================================================
+           MECENE
+
+           Les anciennes données peuvent contenir Mécène
+           dans la colonne competences. On le conserve alors
+           comme médaille informative.
+        ================================================= */
 
         const estMecene =
             competencesBrutes.some(
@@ -1534,8 +1632,7 @@ function ouvrirProfil(
 
 
                         medal.className =
-                            "vip-medal"
-                        ;
+                            "vip-medal";
 
 
                         medal.textContent =
@@ -2051,6 +2148,11 @@ function initialiserFormulaireInscription() {
                 .map(
                     input =>
                         input.value
+                )
+                .filter(
+                    value =>
+                        value !== "VIP" &&
+                        value !== "Mécène"
                 )
                 .filter(Boolean);
 
