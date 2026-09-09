@@ -1,840 +1,237 @@
 /* =========================================================
    AVANT-GARDE — NOTRE ÉQUIPE
-   css/equipe.css
+   js/equipe.js
 
-   Mise en forme spécifique à la page équipe.
-   Le style général du site reste dans css/style.css.
+   Logique spécifique à la page équipe.
 ========================================================= */
 
 
 /* =========================================================
-   HERO ÉQUIPE
+   DONNÉES
 ========================================================= */
 
-.team-hero {
-
-    position: relative;
-
-    min-height: 430px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    text-align: center;
-
-    overflow: hidden;
-
-    background:
-        linear-gradient(
-            rgba(5,17,37,.70),
-            rgba(5,17,37,.88)
-        ),
-        radial-gradient(
-            circle at center,
-            #17345b 0%,
-            #08172f 58%,
-            #050e1d 100%
-        );
-
-    border-bottom:
-        1px solid rgba(214,173,85,.25);
-}
+let membres = [];
 
 
-.team-hero::before,
-.team-hero::after {
+const reseauxSociaux = [
 
-    content: "";
+  {
+    champ: "facebook_url",
+    nom: "Facebook",
+    logo: "https://cdn.simpleicons.org/facebook/1877F2",
+    audienceChamp: "facebook_audience"
+  },
 
-    position: absolute;
+  {
+    champ: "x_url",
+    nom: "X",
+    logo: "https://cdn.simpleicons.org/x/FFFFFF",
+    audienceChamp: "x_audience"
+  },
 
-    width: 270px;
-    height: 270px;
+  {
+    champ: "instagram_url",
+    nom: "Instagram",
+    logo: "https://cdn.simpleicons.org/instagram/E4405F",
+    audienceChamp: "instagram_audience"
+  },
 
-    border:
-        1px solid rgba(214,173,85,.13);
+  {
+    champ: "youtube_url",
+    nom: "YouTube",
+    logo: "https://cdn.simpleicons.org/youtube/FF0000",
+    audienceChamp: "youtube_audience"
+  },
 
-    transform: rotate(45deg);
+  {
+    champ: "tiktok_url",
+    nom: "TikTok",
+    logo: "https://cdn.simpleicons.org/tiktok/FFFFFF",
+    audienceChamp: "tiktok_audience"
+  }
 
-    pointer-events: none;
-}
-
-
-.team-hero::before {
-
-    left: -160px;
-    top: 65px;
-}
-
-
-.team-hero::after {
-
-    right: -160px;
-    bottom: 50px;
-}
-
-
-.team-hero .hero-content {
-
-    position: relative;
-
-    z-index: 2;
-
-    width: 100%;
-    max-width: 900px;
-
-    padding: 70px 25px;
-}
-
-
-.team-hero .section-kicker {
-
-    margin-bottom: 16px;
-
-    color: var(--gold-light);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-    letter-spacing: 4px;
-}
-
-
-.team-hero h1 {
-
-    margin: 0;
-
-    font-size:
-        clamp(42px, 7vw, 78px);
-
-    line-height: .98;
-
-    letter-spacing: 3px;
-
-    font-weight: normal;
-}
-
-
-.team-hero h1 span {
-
-    color: var(--gold);
-}
-
-
-.team-hero p {
-
-    max-width: 650px;
-
-    margin: 25px auto 0;
-
-    color: #cbd1da;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 15px;
-
-    line-height: 1.7;
-}
+];
 
 
 /* =========================================================
-   BOUTON REJOINDRE
+   OUTILS
 ========================================================= */
 
-.join-button {
+function escapeHtml(value) {
 
-    display: inline-block;
+  if (value === null || value === undefined) {
+    return "";
+  }
 
-    margin-top: 28px;
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
-    padding: 13px 25px;
-
-    border:
-        1px solid var(--gold);
-
-    background: transparent;
-
-    color: var(--gold-light);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 11px;
-
-    font-weight: bold;
-
-    letter-spacing: 1.5px;
-
-    cursor: pointer;
-
-    transition:
-        background .2s,
-        color .2s,
-        transform .2s,
-        box-shadow .2s;
 }
 
 
-.join-button:hover {
+function ouvrirModalEquipe(modal) {
 
-    background: var(--gold);
+  if (!modal) {
+    return;
+  }
 
-    color: var(--navy);
+  modal.classList.add("active");
+  document.body.style.overflow = "hidden";
 
-    transform: translateY(-1px);
-
-    box-shadow:
-        0 8px 25px rgba(0,0,0,.25);
 }
 
 
-/* =========================================================
-   SECTION ÉQUIPE
-========================================================= */
+function fermerModalEquipe(modal) {
 
-.team-section {
+  if (!modal) {
+    return;
+  }
 
-    max-width: 1180px;
+  modal.classList.remove("active");
 
-    margin: auto;
+  if (
+    !document.querySelector(
+      ".profile-modal.active, .join-modal.active, .rdv-modal.active"
+    )
+  ) {
+    document.body.style.overflow = "";
+  }
 
-    padding:
-        65px 25px 75px;
 }
 
 
-.section-title {
+function imageValide(url) {
 
-    text-align: center;
+  if (!url || typeof url !== "string") {
+    return false;
+  }
 
-    margin-bottom: 42px;
+  try {
+
+    const parsed = new URL(url);
+
+    return (
+      parsed.protocol === "http:" ||
+      parsed.protocol === "https:"
+    );
+
+  } catch (error) {
+
+    return false;
+
+  }
+
 }
 
 
-.section-title .section-kicker {
+function urlValide(url) {
 
-    margin-bottom: 11px;
+  if (!url || typeof url !== "string") {
+    return false;
+  }
+
+  try {
+
+    const parsed = new URL(url);
+
+    return (
+      parsed.protocol === "http:" ||
+      parsed.protocol === "https:"
+    );
+
+  } catch (error) {
+
+    return false;
+
+  }
+
 }
 
 
-.section-title h2 {
+function normaliserCompetences(value) {
 
-    margin: 0;
+  if (!value) {
+    return [];
+  }
 
-    font-size:
-        clamp(28px, 4vw, 40px);
 
-    font-weight: normal;
+  if (Array.isArray(value)) {
 
-    letter-spacing: 1px;
+    return value
+      .map(item => String(item).trim())
+      .filter(Boolean);
+
+  }
+
+
+  if (typeof value === "string") {
+
+    const texte = value.trim();
+
+    if (!texte) {
+      return [];
+    }
+
+
+    try {
+
+      const parsed = JSON.parse(texte);
+
+      if (Array.isArray(parsed)) {
+
+        return parsed
+          .map(item => String(item).trim())
+          .filter(Boolean);
+
+      }
+
+    } catch (error) {
+      // Ce n'est pas du JSON.
+    }
+
+
+    return texte
+      .split(",")
+      .map(item => item.trim())
+      .filter(Boolean);
+
+  }
+
+
+  return [];
+
 }
 
 
-/* =========================================================
-   GRILLE MEMBRES
-========================================================= */
+function formaterAudience(valeur) {
 
-.team-grid {
+  const nombre = Number(valeur);
 
-    display: grid;
+  if (!Number.isFinite(nombre) || nombre <= 0) {
+    return "0";
+  }
 
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
+  return nombre.toLocaleString("fr-FR");
 
-    gap: 20px;
-
-    align-items: stretch;
 }
 
 
-/* =========================================================
-   CARTE MEMBRE
-========================================================= */
+function obtenirAudience(membre, reseau) {
 
-.member-card {
+  const valeur = Number(
+    membre[reseau.audienceChamp]
+  );
 
-    position: relative;
+  if (!Number.isFinite(valeur) || valeur < 0) {
+    return 0;
+  }
 
-    min-width: 0;
+  return valeur;
 
-    overflow: hidden;
-
-    padding: 0;
-
-    border:
-        1px solid rgba(214,173,85,.25);
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(20,43,76,.78),
-            rgba(5,15,32,.96)
-        );
-
-    cursor: pointer;
-
-    transition:
-        transform .25s ease,
-        border-color .25s ease,
-        box-shadow .25s ease;
-}
-
-
-.member-card:hover {
-
-    transform: translateY(-4px);
-
-    border-color:
-        rgba(214,173,85,.60);
-
-    box-shadow:
-        0 15px 40px rgba(0,0,0,.30);
-}
-
-
-/* =========================================================
-   PHOTO CARTE
-========================================================= */
-
-.member-card-image {
-
-    position: relative;
-
-    display: block;
-
-    width: 100%;
-
-    aspect-ratio: 1 / 1;
-
-    overflow: hidden;
-
-    background:
-        radial-gradient(
-            circle at center,
-            #18365d 0%,
-            #08172f 70%,
-            #050e1d 100%
-        );
-}
-
-
-.member-card-image img {
-
-    width: 100%;
-    height: 100%;
-
-    object-fit: cover;
-
-    transition:
-        transform .35s ease;
-}
-
-
-.member-card:hover
-.member-card-image img {
-
-    transform: scale(1.035);
-}
-
-
-.member-card-placeholder {
-
-    width: 100%;
-    aspect-ratio: 1 / 1;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    color: var(--gold-light);
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-    font-size: 72px;
-
-    font-weight: bold;
-
-    background:
-        linear-gradient(
-            145deg,
-            #17345b,
-            #07152d
-        );
-}
-
-
-/* =========================================================
-   CONTENU CARTE
-========================================================= */
-
-.member-card-content {
-
-    padding:
-        20px 20px 22px;
-}
-
-
-.member-card-name {
-
-    margin: 0 0 7px;
-
-    color: var(--white);
-
-    font-size: 22px;
-
-    line-height: 1.15;
-
-    font-weight: normal;
-}
-
-
-.member-card-grade {
-
-    color: var(--gold-light);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 10px;
-
-    font-weight: bold;
-
-    letter-spacing: 1.5px;
-
-    text-transform: uppercase;
-}
-
-
-.member-card-region {
-
-    margin-top: 8px;
-
-    color: var(--muted);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 12px;
-}
-
-
-.member-card-description {
-
-    margin-top: 14px;
-
-    color: #c2c9d4;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 13px;
-
-    line-height: 1.55;
-}
-
-
-.member-card-socials {
-
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 7px;
-
-    margin-top: 17px;
-}
-
-
-.member-card-social {
-
-    width: 28px;
-    height: 28px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    border:
-        1px solid rgba(255,255,255,.12);
-
-    background:
-        rgba(0,0,0,.18);
-
-    border-radius: 50%;
-}
-
-
-.member-card-social img {
-
-    width: 15px;
-    height: 15px;
-
-    object-fit: contain;
-}
-
-
-/* =========================================================
-   MODALE PROFIL
-========================================================= */
-
-.profile-modal {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 1000;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    padding: 25px;
-
-    background:
-        rgba(2,8,18,.82);
-
-    backdrop-filter:
-        blur(8px);
-
-    -webkit-backdrop-filter:
-        blur(8px);
-
-    opacity: 0;
-
-    visibility: hidden;
-
-    pointer-events: none;
-
-    transition:
-        opacity .25s ease,
-        visibility .25s ease;
-}
-
-
-.profile-modal.active {
-
-    opacity: 1;
-
-    visibility: visible;
-
-    pointer-events: auto;
-}
-
-
-.profile-modal-box {
-
-    position: relative;
-
-    width: min(100%, 980px);
-
-    max-height:
-        calc(100vh - 50px);
-
-    overflow-y: auto;
-
-    background:
-        linear-gradient(
-            145deg,
-            #102746,
-            #050f20
-        );
-
-    border:
-        1px solid rgba(214,173,85,.42);
-
-    box-shadow:
-        0 30px 90px rgba(0,0,0,.55);
-
-    transform:
-        translateY(18px)
-        scale(.985);
-
-    transition:
-        transform .25s ease;
-}
-
-
-.profile-modal.active
-.profile-modal-box {
-
-    transform:
-        translateY(0)
-        scale(1);
-}
-
-
-.profile-modal-box::before {
-
-    content: "";
-
-    position: absolute;
-
-    top: 0;
-    left: 0;
-    right: 0;
-
-    height: 3px;
-
-    background: var(--gold);
-}
-
-
-/* =========================================================
-   BOUTON FERMETURE
-========================================================= */
-
-.modal-close {
-
-    position: absolute;
-
-    top: 16px;
-    right: 16px;
-
-    z-index: 10;
-
-    width: 36px;
-    height: 36px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    border:
-        1px solid rgba(214,173,85,.35);
-
-    border-radius: 50%;
-
-    background:
-        rgba(5,15,32,.85);
-
-    color: var(--white);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 23px;
-
-    line-height: 1;
-
-    cursor: pointer;
-
-    transition:
-        background .2s,
-        color .2s,
-        transform .2s;
-}
-
-
-.modal-close:hover {
-
-    background: var(--gold);
-
-    color: var(--navy);
-
-    transform: rotate(90deg);
-}
-
-
-/* =========================================================
-   CONTENU PROFIL
-========================================================= */
-
-.profile-content {
-
-    display: grid;
-
-    grid-template-columns:
-        300px minmax(0, 1fr);
-
-    gap: 45px;
-
-    padding: 55px 45px 45px;
-}
-
-
-.profile-left {
-
-    text-align: center;
-}
-
-
-.profile-photo {
-
-    width: 100%;
-
-    aspect-ratio: 1 / 1;
-
-    object-fit: cover;
-
-    border:
-        1px solid rgba(214,173,85,.35);
-}
-
-
-.profile-photo-placeholder {
-
-    width: 100%;
-
-    aspect-ratio: 1 / 1;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    background:
-        radial-gradient(
-            circle at center,
-            #18365d 0%,
-            #07152d 72%
-        );
-
-    border:
-        1px solid rgba(214,173,85,.35);
-
-    color: var(--gold-light);
-
-    font-size: 90px;
-
-    font-weight: bold;
-}
-
-
-.profile-name {
-
-    margin:
-        22px 0 8px;
-
-    font-size: 28px;
-
-    line-height: 1.15;
-
-    font-weight: normal;
-}
-
-
-.profile-modal-vip {
-
-    display: inline-block;
-
-    margin-bottom: 9px;
-
-    padding: 5px 10px;
-
-    border:
-        1px solid rgba(214,173,85,.55);
-
-    color: var(--gold-light);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 9px;
-
-    font-weight: bold;
-
-    letter-spacing: 1.2px;
-}
-
-
-.profile-grade {
-
-    color: var(--gold);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 10px;
-
-    font-weight: bold;
-
-    letter-spacing: 1.5px;
-
-    text-transform: uppercase;
-}
-
-
-.profile-region {
-
-    margin-top: 9px;
-
-    color: var(--muted);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 12px;
-}
-
-
-/* =========================================================
-   DESCRIPTION
-========================================================= */
-
-.profile-description {
-
-    color: #d2d7df;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 14px;
-
-    line-height: 1.75;
-
-    white-space: pre-line;
-
-    margin-bottom: 30px;
-}
-
-
-.profile-subtitle {
-
-    margin:
-        0 0 15px;
-
-    padding-bottom: 10px;
-
-    border-bottom:
-        1px solid rgba(214,173,85,.25);
-
-    color: var(--gold-light);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 10px;
-
-    font-weight: bold;
-
-    letter-spacing: 2px;
 }
 
 
@@ -842,1047 +239,1686 @@
    RÉSEAUX SOCIAUX
 ========================================================= */
 
-.profile-socials {
+function afficherReseauxSociaux(membre) {
 
-    display: grid;
+  const container =
+    document.getElementById("profileModalSocials");
 
-    grid-template-columns:
-        repeat(5, minmax(0, 1fr));
+  const audienceMaxContainer =
+    document.getElementById("profileModalAudienceMax");
 
-    gap: 9px;
 
-    margin-bottom: 13px;
-}
+  if (!container) {
+    return;
+  }
 
 
-.profile-social-link {
+  container.innerHTML = "";
 
-    position: relative;
 
-    min-height: 72px;
+  if (audienceMaxContainer) {
 
-    display: flex;
+    audienceMaxContainer.innerHTML = "";
+    audienceMaxContainer.style.display = "none";
 
-    flex-direction: column;
+  }
 
-    align-items: center;
-    justify-content: center;
 
-    gap: 6px;
+  const reseauxDisponibles =
+    reseauxSociaux.filter(reseau => {
 
-    padding: 8px;
+      return urlValide(
+        membre[reseau.champ]
+      );
 
-    border:
-        1px solid rgba(255,255,255,.11);
+    });
 
-    background:
-        rgba(255,255,255,.025);
 
-    color: var(--white);
+  if (!reseauxDisponibles.length) {
 
-    text-decoration: none;
+    const section =
+      document.getElementById("profileSocialSection");
 
-    transition:
-        border-color .2s,
-        background .2s,
-        transform .2s;
-}
+    if (section) {
+      section.style.display = "none";
+    }
 
+    return;
 
-.profile-social-link:hover {
+  }
 
-    border-color:
-        rgba(214,173,85,.55);
 
-    background:
-        rgba(214,173,85,.07);
+  const section =
+    document.getElementById("profileSocialSection");
 
-    transform: translateY(-2px);
-}
+  if (section) {
+    section.style.display = "";
+  }
 
 
-.profile-social-link.is-max {
+  /*
+   * Calcul de l'audience maximale.
+   */
 
-    border:
-        1px solid rgba(214,173,85,.85);
+  const audiences = reseauxDisponibles.map(reseau => {
 
-    box-shadow:
-        0 0 0 1px rgba(214,173,85,.08),
-        0 7px 20px rgba(0,0,0,.18);
-}
+    return {
+      reseau,
+      audience: obtenirAudience(membre, reseau)
+    };
 
+  });
 
-.profile-social-link.is-max::after {
 
-    content: "★";
+  let reseauMax = null;
 
-    position: absolute;
 
-    top: 5px;
-    right: 7px;
+  /*
+   * On privilégie le réseau enregistré par le système
+   * d'update-audience lorsqu'il correspond réellement
+   * à une audience disponible.
+   */
 
-    color: var(--gold-light);
+  if (membre.audience_reseau) {
 
-    font-size: 11px;
-}
+    const reseauIndique =
+      audiences.find(item => {
 
-
-.profile-social-logo {
-
-    width: 20px;
-    height: 20px;
-
-    object-fit: contain;
-}
-
-
-.profile-social-name {
-
-    color: #dfe3e9;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 9px;
-
-    font-weight: bold;
-
-    letter-spacing: .5px;
-}
-
-
-.profile-social-audience {
-
-    color: var(--muted);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 9px;
-}
-
-
-.profile-audience-max {
-
-    margin:
-        12px 0 30px;
-
-    padding:
-        10px 13px;
-
-    border-left:
-        2px solid var(--gold);
-
-    background:
-        rgba(214,173,85,.045);
-
-    color: #dce1e8;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 11px;
-
-    line-height: 1.5;
-}
-
-
-.profile-audience-max strong {
-
-    color: var(--gold-light);
-
-    font-size: 13px;
-}
-
-
-.profile-audience-max small {
-
-    color: #7f8997;
-
-    font-size: 9px;
-
-    font-style: italic;
-}
-
-
-/* =========================================================
-   COMPÉTENCES
-========================================================= */
-
-.profile-competences {
-
-    display: flex;
-
-    flex-wrap: wrap;
-
-    gap: 8px;
-}
-
-
-.profile-competence {
-
-    padding:
-        7px 11px;
-
-    border:
-        1px solid rgba(214,173,85,.28);
-
-    background:
-        rgba(214,173,85,.045);
-
-    color: #d9dde4;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 10px;
-
-    font-weight: bold;
-
-    letter-spacing: .4px;
-}
-
-
-/* =========================================================
-   MODALE INSCRIPTION
-========================================================= */
-
-.join-modal {
-
-    position: fixed;
-
-    inset: 0;
-
-    z-index: 1000;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    padding: 25px;
-
-    background:
-        rgba(2,8,18,.84);
-
-    backdrop-filter:
-        blur(8px);
-
-    -webkit-backdrop-filter:
-        blur(8px);
-
-    opacity: 0;
-
-    visibility: hidden;
-
-    pointer-events: none;
-
-    transition:
-        opacity .25s ease,
-        visibility .25s ease;
-}
-
-
-.join-modal.active {
-
-    opacity: 1;
-
-    visibility: visible;
-
-    pointer-events: auto;
-}
-
-
-.join-modal-box {
-
-    position: relative;
-
-    width: min(100%, 720px);
-
-    max-height:
-        calc(100vh - 40px);
-
-    overflow-y: auto;
-
-    padding:
-        48px 42px 42px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #102746,
-            #050f20
+        return (
+          String(item.reseau.nom).toLowerCase() ===
+          String(membre.audience_reseau).toLowerCase()
         );
 
-    border:
-        1px solid rgba(214,173,85,.42);
+      });
 
-    box-shadow:
-        0 30px 90px rgba(0,0,0,.55);
 
-    transform:
-        translateY(18px)
-        scale(.985);
+    if (
+      reseauIndique &&
+      reseauIndique.audience > 0
+    ) {
 
-    transition:
-        transform .25s ease;
-}
+      reseauMax = reseauIndique;
 
+    }
 
-.join-modal.active
-.join-modal-box {
+  }
 
-    transform:
-        translateY(0)
-        scale(1);
-}
 
+  /*
+   * Sinon, calcul automatique.
+   */
 
-.join-modal-box::before {
+  if (!reseauMax) {
 
-    content: "";
+    audiences.forEach(item => {
 
-    position: absolute;
+      if (
+        item.audience > 0 &&
+        (
+          !reseauMax ||
+          item.audience > reseauMax.audience
+        )
+      ) {
 
-    top: 0;
-    left: 0;
-    right: 0;
+        reseauMax = item;
 
-    height: 3px;
+      }
 
-    background: var(--gold);
-}
+    });
 
+  }
 
-.join-modal-kicker {
 
-    color: var(--gold);
+  /*
+   * Création des boutons réseaux.
+   */
 
-    font-family:
-        Arial,
-        sans-serif;
+  audiences.forEach(item => {
 
-    font-size: 10px;
+    const reseau = item.reseau;
+    const audience = item.audience;
 
-    font-weight: bold;
+    const lien = document.createElement("a");
 
-    letter-spacing: 3px;
+    lien.className = "profile-social-link";
 
-    margin-bottom: 10px;
-}
+    lien.href = reseau.champ
+      ? membre[reseau.champ]
+      : "#";
 
+    lien.target = "_blank";
+    lien.rel = "noopener noreferrer";
 
-.form-title {
+    lien.title =
+      `${reseau.nom} — ${formaterAudience(audience)} abonnés`;
 
-    margin: 0;
 
-    font-size:
-        clamp(30px, 5vw, 42px);
+    const isMax =
+      Boolean(
+        reseauMax &&
+        reseauMax.reseau.nom === reseau.nom &&
+        reseauMax.audience > 0
+      );
 
-    font-weight: normal;
 
-    letter-spacing: 1px;
-}
-
-
-.form-intro {
-
-    margin:
-        12px 0 30px;
-
-    color: var(--muted);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 13px;
-
-    line-height: 1.6;
-}
-
-
-/* =========================================================
-   FORMULAIRE
-========================================================= */
-
-.form-group {
-
-    margin-bottom: 22px;
-}
-
-
-.form-group > label:first-child,
-.form-group > .main-label {
-
-    display: block;
-
-    margin-bottom: 8px;
-
-    color: #e5e7eb;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 10px;
-
-    font-weight: bold;
-
-    letter-spacing: 1px;
-
-    text-transform: uppercase;
-}
-
-
-.required {
-
-    color: var(--red);
-}
-
-
-.form-group input[type="text"],
-.form-group input[type="email"],
-.form-group input[type="url"],
-.form-group textarea {
-
-    display: block;
-
-    width: 100%;
-
-    padding:
-        12px 13px;
-
-    border:
-        1px solid rgba(255,255,255,.13);
-
-    outline: none;
-
-    background:
-        #050f20;
-
-    color: var(--white);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 13px;
-
-    transition:
-        border-color .2s,
-        box-shadow .2s;
-}
-
-
-.form-group textarea {
-
-    min-height: 130px;
-
-    resize: vertical;
-
-    line-height: 1.6;
-}
-
-
-.form-group input:focus,
-.form-group textarea:focus {
-
-    border-color:
-        rgba(214,173,85,.65);
-
-    box-shadow:
-        0 0 0 2px rgba(214,173,85,.08);
-}
-
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-
-    color: #697586;
-}
-
-
-.help {
-
-    margin-top: 6px;
-
-    color: #778294;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 10px;
-}
-
-
-.description-counter {
-
-    margin-top: 6px;
-
-    text-align: right;
-
-    color: #778294;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 10px;
-}
-
-
-.description-counter.warning {
-
-    color: var(--gold-light);
-}
-
-
-.description-counter.limit {
-
-    color: var(--red);
-}
-
-
-/* =========================================================
-   CHOIX VISIBILITÉ
-========================================================= */
-
-.registration-choice {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-    gap: 10px;
-}
-
-
-.choice-option {
-
-    border:
-        1px solid rgba(255,255,255,.11);
-
-    background:
-        rgba(255,255,255,.025);
-
-    transition:
-        border-color .2s,
-        background .2s;
-}
-
-
-.choice-option:hover {
-
-    border-color:
-        rgba(214,173,85,.40);
-
-    background:
-        rgba(214,173,85,.04);
-}
-
-
-.choice-label {
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 5px;
-
-    padding: 14px;
-
-    cursor: pointer;
-}
-
-
-.choice-label input {
-
-    position: absolute;
-
-    opacity: 0;
-
-    pointer-events: none;
-}
-
-
-.choice-label strong {
-
-    color: var(--white);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 12px;
-}
-
-
-.choice-label span {
-
-    color: var(--muted);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 10px;
-
-    line-height: 1.4;
-}
-
-
-.choice-label:has(input:checked) {
-
-    outline:
-        1px solid var(--gold);
-
-    background:
-        rgba(214,173,85,.07);
-}
-
-
-/* =========================================================
-   COMPÉTENCES FORMULAIRE
-========================================================= */
-
-.form-section-title {
-
-    margin:
-        30px 0 15px;
-
-    padding-bottom: 10px;
-
-    border-bottom:
-        1px solid rgba(214,173,85,.25);
-
-    color: var(--gold-light);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 10px;
-
-    font-weight: bold;
-
-    letter-spacing: 2px;
-}
-
-
-.competence-group {
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-    gap: 9px;
-}
-
-
-.competence {
-
-    border:
-        1px solid rgba(255,255,255,.10);
-
-    background:
-        rgba(255,255,255,.02);
-
-    transition:
-        border-color .2s,
-        background .2s;
-}
-
-
-.competence:hover {
-
-    border-color:
-        rgba(214,173,85,.38);
-
-    background:
-        rgba(214,173,85,.035);
-}
-
-
-.competence label {
-
-    display: flex;
-
-    align-items: flex-start;
-
-    gap: 10px;
-
-    padding: 12px;
-
-    cursor: pointer;
-}
-
-
-.competence input {
-
-    margin-top: 2px;
-
-    accent-color: var(--gold);
-
-    flex-shrink: 0;
-}
-
-
-.competence-name {
-
-    display: block;
-
-    color: #e1e4e9;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 11px;
-
-    font-weight: bold;
-}
-
-
-.competence-description {
-
-    display: block;
-
-    margin-top: 3px;
-
-    color: #7f8997;
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 9px;
-
-    line-height: 1.4;
-}
-
-
-/* =========================================================
-   MESSAGE FORMULAIRE
-========================================================= */
-
-.form-message {
-
-    min-height: 18px;
-
-    margin:
-        18px 0 10px;
-
-    color: var(--gold-light);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 11px;
-
-    line-height: 1.5;
-}
-
-
-/* =========================================================
-   BOUTON FORMULAIRE
-========================================================= */
-
-.submit-button {
-
-    display: block;
-
-    width: 100%;
-
-    padding:
-        13px 20px;
-
-    border:
-        1px solid var(--gold);
-
-    background: transparent;
-
-    color: var(--gold-light);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 10px;
-
-    font-weight: bold;
-
-    letter-spacing: 1.5px;
-
-    cursor: pointer;
-
-    transition:
-        background .2s,
-        color .2s,
-        transform .2s;
-}
-
-
-.submit-button:hover {
-
-    background: var(--gold);
-
-    color: var(--navy);
-
-    transform: translateY(-1px);
-}
-
-
-.submit-button:disabled {
-
-    opacity: .5;
-
-    cursor: wait;
-
-    transform: none;
-}
-
-
-/* =========================================================
-   ÉTAT CHARGEMENT
-========================================================= */
-
-.team-grid .events-empty {
-
-    grid-column:
-        1 / -1;
-
-    min-height: 120px;
-
-    justify-content: center;
-
-    padding: 30px;
-
-    border:
-        1px solid rgba(214,173,85,.18);
-
-    background:
-        rgba(255,255,255,.02);
-
-    font-family:
-        Arial,
-        sans-serif;
-
-    font-size: 12px;
-}
-
-
-/* =========================================================
-   RESPONSIVE TABLETTE
-========================================================= */
-
-@media (max-width: 900px) {
-
-    .team-grid {
-
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+    if (isMax) {
+      lien.classList.add("is-max");
     }
 
 
-    .profile-content {
+    const itemHtml = document.createElement("div");
 
-        grid-template-columns:
-            240px minmax(0, 1fr);
+    itemHtml.className = "profile-social-item";
 
-        gap: 30px;
 
-        padding:
-            50px 30px 35px;
+    if (isMax) {
+
+      itemHtml.innerHTML = `
+        <div class="profile-social-max-star"
+             aria-label="Audience maximale">
+          ★
+        </div>
+      `;
+
     }
 
 
-    .profile-socials {
+    const image = document.createElement("img");
 
-        grid-template-columns:
-            repeat(3, minmax(0, 1fr));
+    image.src = reseau.logo;
+    image.alt = reseau.nom;
+    image.loading = "lazy";
+
+
+    const nom = document.createElement("strong");
+
+    nom.textContent = reseau.nom;
+
+
+    const audienceElement =
+      document.createElement("span");
+
+    audienceElement.className =
+      "profile-social-audience";
+
+    audienceElement.textContent =
+      formaterAudience(audience);
+
+
+    lien.appendChild(image);
+    lien.appendChild(nom);
+    lien.appendChild(audienceElement);
+
+    itemHtml.appendChild(lien);
+
+    container.appendChild(itemHtml);
+
+  });
+
+
+  /*
+   * Audience maximale.
+   */
+
+  let audienceMax = 0;
+
+
+  const audienceBase =
+    Number(membre.audience_max);
+
+
+  if (
+    Number.isFinite(audienceBase) &&
+    audienceBase > 0
+  ) {
+
+    audienceMax = audienceBase;
+
+  }
+
+
+  if (
+    reseauMax &&
+    reseauMax.audience > audienceMax
+  ) {
+
+    audienceMax = reseauMax.audience;
+
+  }
+
+
+  if (
+    audienceMaxContainer &&
+    audienceMax > 0
+  ) {
+
+    let dateTexte = "";
+
+
+    if (membre.audience_updated_at) {
+
+      const date =
+        new Date(membre.audience_updated_at);
+
+
+      if (!Number.isNaN(date.getTime())) {
+
+        const datePart =
+          date.toLocaleDateString(
+            "fr-FR",
+            {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric"
+            }
+          );
+
+
+        const heurePart =
+          date.toLocaleTimeString(
+            "fr-FR",
+            {
+              hour: "2-digit",
+              minute: "2-digit"
+            }
+          );
+
+
+        dateTexte =
+          ` <small>· mis à jour le ${datePart} à ${heurePart}</small>`;
+
+      }
+
     }
+
+
+    audienceMaxContainer.innerHTML = `
+      Audience max :
+      <strong>${escapeHtml(formaterAudience(audienceMax))}</strong>
+      ${dateTexte}
+    `;
+
+    audienceMaxContainer.style.display = "";
+
+  }
 
 }
 
 
 /* =========================================================
-   RESPONSIVE MOBILE
+   CHARGEMENT DES MEMBRES
 ========================================================= */
 
-@media (max-width: 680px) {
+async function chargerMembres() {
 
-    .team-hero {
+  const grid =
+    document.getElementById("teamGrid");
 
-        min-height: 390px;
+
+  if (!grid) {
+    return;
+  }
+
+
+  grid.innerHTML = `
+    <div class="events-empty">
+      Chargement des membres…
+    </div>
+  `;
+
+
+  if (
+    typeof supabaseClient === "undefined" ||
+    !supabaseClient
+  ) {
+
+    grid.innerHTML = `
+      <div class="events-empty">
+        Impossible de contacter la base de données.
+      </div>
+    `;
+
+    console.error(
+      "supabaseClient est introuvable."
+    );
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+
+    .from("profiles")
+
+    .select(`
+      id,
+      created_at,
+      nom,
+      grade,
+      image_url,
+      description,
+      region,
+      competences,
+      anonyme,
+      facebook_url,
+      x_url,
+      instagram_url,
+      youtube_url,
+      tiktok_url,
+      facebook_audience,
+      instagram_audience,
+      x_audience,
+      youtube_audience,
+      tiktok_audience,
+      audience_max,
+      audience_reseau,
+      audience_updated_at
+    `)
+
+    .eq("anonyme", false)
+
+    .order(
+      "created_at",
+      {
+        ascending: true
+      }
+    );
+
+
+  if (error) {
+
+    console.error(
+      "Erreur chargement membres :",
+      error
+    );
+
+
+    grid.innerHTML = `
+      <div class="events-empty">
+        Impossible de charger l’équipe.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  membres = Array.isArray(data)
+    ? data
+    : [];
+
+
+  if (!membres.length) {
+
+    grid.innerHTML = `
+      <div class="events-empty">
+        Aucun membre public pour le moment.
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  grid.innerHTML = "";
+
+
+  membres.forEach(membre => {
+
+    const card =
+      document.createElement("article");
+
+
+    card.className = "member-card";
+
+    card.tabIndex = 0;
+
+    card.setAttribute(
+      "role",
+      "button"
+    );
+
+    card.setAttribute(
+      "aria-label",
+      `Voir le profil de ${membre.nom || "ce membre"}`
+    );
+
+
+    const imageUrl =
+      imageValide(membre.image_url)
+        ? membre.image_url
+        : "";
+
+
+    const nom =
+      escapeHtml(
+        membre.nom || "Membre"
+      );
+
+
+    const grade =
+      escapeHtml(
+        membre.grade || "Membre"
+      );
+
+
+    const region =
+      escapeHtml(
+        membre.region || ""
+      );
+
+
+    let description =
+      String(
+        membre.description || ""
+      );
+
+
+    if (description.length > 180) {
+
+      description =
+        `${description.slice(0, 180).trim()}…`;
+
     }
 
 
-    .team-hero .hero-content {
+    description =
+      escapeHtml(description);
 
-        padding:
-            55px 20px;
+
+    if (imageUrl) {
+
+      card.innerHTML = `
+
+        <img
+          class="member-photo"
+          src="${escapeHtml(imageUrl)}"
+          alt="${nom}"
+          loading="lazy"
+        >
+
+        <div class="member-info">
+
+          <h3 class="member-name">
+            ${nom}
+          </h3>
+
+          <div class="member-grade">
+            ${grade}
+          </div>
+
+          ${
+            region
+              ? `
+                <div class="member-region">
+                  ${region}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            description
+              ? `
+                <div class="member-description">
+                  ${description}
+                </div>
+              `
+              : ""
+          }
+
+        </div>
+
+      `;
+
+    } else {
+
+      card.innerHTML = `
+
+        <div class="member-photo-placeholder">
+          A
+        </div>
+
+        <div class="member-info">
+
+          <h3 class="member-name">
+            ${nom}
+          </h3>
+
+          <div class="member-grade">
+            ${grade}
+          </div>
+
+          ${
+            region
+              ? `
+                <div class="member-region">
+                  ${region}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            description
+              ? `
+                <div class="member-description">
+                  ${description}
+                </div>
+              `
+              : ""
+          }
+
+        </div>
+
+      `;
+
     }
 
 
-    .team-hero h1 {
-
-        font-size:
-            clamp(36px, 12vw, 58px);
-
-        letter-spacing: 2px;
-    }
+    card.addEventListener(
+      "click",
+      () => ouvrirProfil(membre)
+    );
 
 
-    .team-section {
+    card.addEventListener(
+      "keydown",
+      event => {
 
-        padding:
-            45px 16px 55px;
-    }
+        if (
+          event.key === "Enter" ||
+          event.key === " "
+        ) {
 
+          event.preventDefault();
 
-    .team-grid {
+          ouvrirProfil(membre);
 
-        grid-template-columns:
-            1fr;
+        }
 
-        gap: 15px;
-    }
-
-
-    .member-card {
-
-        max-width: 520px;
-
-        width: 100%;
-
-        margin: auto;
-    }
+      }
+    );
 
 
-    .profile-modal,
-    .join-modal {
+    grid.appendChild(card);
 
-        padding: 12px;
-    }
-
-
-    .profile-modal-box {
-
-        max-height:
-            calc(100vh - 24px);
-    }
-
-
-    .profile-content {
-
-        grid-template-columns: 1fr;
-
-        gap: 28px;
-
-        padding:
-            48px 20px 25px;
-    }
-
-
-    .profile-left {
-
-        max-width: 270px;
-
-        width: 100%;
-
-        margin: auto;
-    }
-
-
-    .profile-name {
-
-        font-size: 25px;
-    }
-
-
-    .profile-socials {
-
-        grid-template-columns:
-            repeat(3, minmax(0, 1fr));
-    }
-
-
-    .join-modal-box {
-
-        max-height:
-            calc(100vh - 24px);
-
-        padding:
-            42px 20px 25px;
-    }
-
-
-    .registration-choice,
-    .competence-group {
-
-        grid-template-columns:
-            1fr;
-    }
-
-
-    .modal-close {
-
-        top: 10px;
-        right: 10px;
-    }
+  });
 
 }
 
 
 /* =========================================================
-   TRÈS PETITS ÉCRANS
+   OUVERTURE PROFIL
 ========================================================= */
 
-@media (max-width: 420px) {
+function ouvrirProfil(membre) {
 
-    .profile-socials {
+  if (!membre) {
+    return;
+  }
 
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+
+  const modal =
+    document.getElementById("memberModal");
+
+
+  if (!modal) {
+    return;
+  }
+
+
+  const image =
+    document.getElementById("profileModalImage");
+
+
+  const placeholder =
+    document.getElementById("profilePlaceholder");
+
+
+  const name =
+    document.getElementById("profileModalName");
+
+
+  const grade =
+    document.getElementById("profileModalGrade");
+
+
+  const region =
+    document.getElementById("profileModalRegion");
+
+
+  const description =
+    document.getElementById(
+      "profileModalDescription"
+    );
+
+
+  if (name) {
+
+    name.textContent =
+      membre.nom || "Membre";
+
+  }
+
+
+  if (grade) {
+
+    grade.textContent =
+      membre.grade || "Membre";
+
+  }
+
+
+  if (region) {
+
+    region.textContent =
+      membre.region || "";
+
+  }
+
+
+  if (description) {
+
+    description.textContent =
+      membre.description || "";
+
+  }
+
+
+  /*
+   * Image.
+   */
+
+  if (
+    image &&
+    imageValide(membre.image_url)
+  ) {
+
+    image.src =
+      membre.image_url;
+
+    image.alt =
+      membre.nom || "Membre";
+
+    image.style.display =
+      "block";
+
+
+    if (placeholder) {
+
+      placeholder.style.display =
+        "none";
+
+    }
+
+  } else {
+
+    if (image) {
+
+      image.removeAttribute("src");
+
+      image.style.display =
+        "none";
+
     }
 
 
-    .profile-content {
+    if (placeholder) {
 
-        padding:
-            45px 15px 20px;
+      placeholder.style.display =
+        "flex";
+
+      placeholder.textContent =
+        membre.nom
+          ? String(membre.nom)
+              .trim()
+              .charAt(0)
+              .toUpperCase()
+          : "A";
+
+    }
+
+  }
+
+
+  /*
+   * Réseaux sociaux.
+   */
+
+  afficherReseauxSociaux(membre);
+
+
+  /*
+   * Compétences.
+   */
+
+  const competenceContainer =
+    document.getElementById(
+      "profileModalCompetences"
+    );
+
+
+  if (competenceContainer) {
+
+    competenceContainer.innerHTML = "";
+
+
+    const competences =
+      normaliserCompetences(
+        membre.competences
+      )
+      .filter(
+        competence =>
+          String(competence)
+            .trim()
+            .toUpperCase() !== "VIP"
+      );
+
+
+    if (competences.length) {
+
+      const section =
+        document.getElementById(
+          "profileCompetenceSection"
+        );
+
+
+      if (section) {
+        section.style.display = "";
+      }
+
+
+      competences.forEach(competence => {
+
+        const tag =
+          document.createElement("span");
+
+        tag.className =
+          "competence-tag";
+
+        tag.textContent =
+          competence;
+
+        competenceContainer.appendChild(tag);
+
+      });
+
+    } else {
+
+      const section =
+        document.getElementById(
+          "profileCompetenceSection"
+        );
+
+
+      if (section) {
+        section.style.display = "none";
+      }
+
+    }
+
+  }
+
+
+  /*
+   * VIP.
+   *
+   * Priorité à audience_max enregistrée.
+   * Si elle n'existe pas, on recalcule.
+   */
+
+  const vipContainer =
+    document.getElementById(
+      "profileModalVip"
+    );
+
+
+  if (vipContainer) {
+
+    let audienceMax =
+      Number(membre.audience_max);
+
+
+    if (
+      !Number.isFinite(audienceMax) ||
+      audienceMax < 0
+    ) {
+
+      audienceMax = 0;
+
     }
 
 
-    .join-modal-box {
+    reseauxSociaux.forEach(reseau => {
 
-        padding-left: 15px;
-        padding-right: 15px;
+      const audience =
+        obtenirAudience(
+          membre,
+          reseau
+        );
+
+
+      if (audience > audienceMax) {
+
+        audienceMax = audience;
+
+      }
+
+    });
+
+
+    if (audienceMax >= 3000) {
+
+      vipContainer.innerHTML = `
+        <span class="vip-medal">
+          ★ VIP
+        </span>
+      `;
+
+      vipContainer.style.display =
+        "";
+
+    } else {
+
+      vipContainer.innerHTML =
+        "";
+
+      vipContainer.style.display =
+        "none";
+
     }
+
+  }
+
+
+  ouvrirModalEquipe(modal);
 
 }
+
 
 /* =========================================================
-   COMPATIBILITÉ JS / CLASSES RENDUES DYNAMIQUEMENT
+   COMPTEUR DESCRIPTION
 ========================================================= */
 
-.profile-social-item { position: relative; min-width: 0; }
-.profile-social-item .profile-social-link { width: 100%; }
-.profile-social-max-star { position:absolute; top:5px; right:7px; z-index:2; color:var(--gold-light); font-size:11px; pointer-events:none; }
+function mettreAJourCompteurDescription() {
 
-.form-message.success { color:#9fd7b0; }
-.form-message.error { color:#ff9d95; }
+  const textarea =
+    document.getElementById(
+      "descriptionField"
+    );
 
-@media (max-width:680px) {
-    .profile-socials { grid-template-columns:repeat(2,minmax(0,1fr)); }
+
+  const compteur =
+    document.getElementById(
+      "descriptionCount"
+    );
+
+
+  if (!textarea || !compteur) {
+    return;
+  }
+
+
+  const longueur =
+    textarea.value.length;
+
+
+  compteur.textContent =
+    `${longueur} / 300`;
+
+
+  compteur.classList.toggle(
+    "warning",
+    longueur >= 270 &&
+    longueur < 300
+  );
+
+
+  compteur.classList.toggle(
+    "limit",
+    longueur >= 300
+  );
+
 }
 
+
+/* =========================================================
+   OUVERTURE INSCRIPTION
+========================================================= */
+
+function initialiserOuvertureInscription() {
+
+  const bouton =
+    document.getElementById(
+      "openJoin"
+    );
+
+
+  const modal =
+    document.getElementById(
+      "joinModal"
+    );
+
+
+  const message =
+    document.getElementById(
+      "formMessage"
+    );
+
+
+  if (!bouton || !modal) {
+    return;
+  }
+
+
+  bouton.addEventListener(
+    "click",
+    () => {
+
+      if (message) {
+
+        message.textContent =
+          "";
+
+        message.className =
+          "form-message";
+
+      }
+
+
+      ouvrirModalEquipe(modal);
+
+      mettreAJourCompteurDescription();
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   FERMETURE MODALES
+========================================================= */
+
+function initialiserFermetureModales() {
+
+  const memberModal =
+    document.getElementById(
+      "memberModal"
+    );
+
+
+  const joinModal =
+    document.getElementById(
+      "joinModal"
+    );
+
+
+  const closeMember =
+    document.getElementById(
+      "closeMember"
+    );
+
+
+  const closeJoin =
+    document.getElementById(
+      "closeJoin"
+    );
+
+
+  if (closeMember && memberModal) {
+
+    closeMember.addEventListener(
+      "click",
+      () => {
+
+        fermerModalEquipe(memberModal);
+
+      }
+    );
+
+  }
+
+
+  if (closeJoin && joinModal) {
+
+    closeJoin.addEventListener(
+      "click",
+      () => {
+
+        fermerModalEquipe(joinModal);
+
+      }
+    );
+
+  }
+
+
+  if (memberModal) {
+
+    memberModal.addEventListener(
+      "click",
+      event => {
+
+        if (
+          event.target === memberModal
+        ) {
+
+          fermerModalEquipe(
+            memberModal
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+
+  if (joinModal) {
+
+    joinModal.addEventListener(
+      "click",
+      event => {
+
+        if (
+          event.target === joinModal
+        ) {
+
+          fermerModalEquipe(
+            joinModal
+          );
+
+        }
+
+      }
+    );
+
+  }
+
+
+  document.addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key !== "Escape") {
+        return;
+      }
+
+
+      if (
+        memberModal &&
+        memberModal.classList.contains("active")
+      ) {
+
+        fermerModalEquipe(
+          memberModal
+        );
+
+        return;
+
+      }
+
+
+      if (
+        joinModal &&
+        joinModal.classList.contains("active")
+      ) {
+
+        fermerModalEquipe(
+          joinModal
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   FORMULAIRE INSCRIPTION
+========================================================= */
+
+function initialiserFormulaireInscription() {
+
+  const form =
+    document.getElementById(
+      "joinForm"
+    );
+
+
+  if (!form) {
+    return;
+  }
+
+
+  form.addEventListener(
+    "submit",
+    async event => {
+
+      event.preventDefault();
+
+
+      const nomField =
+        document.getElementById("nom");
+
+
+      const emailField =
+        document.getElementById("email");
+
+
+      const regionField =
+        document.getElementById("region");
+
+
+      const imageField =
+        document.getElementById("image_url");
+
+
+      const descriptionField =
+        document.getElementById(
+          "descriptionField"
+        );
+
+
+      const submitButton =
+        document.getElementById(
+          "submitJoin"
+        );
+
+
+      const message =
+        document.getElementById(
+          "formMessage"
+        );
+
+
+      const typeInscription =
+        document.querySelector(
+          'input[name="type_inscription"]:checked'
+        );
+
+
+      if (
+        !nomField ||
+        !emailField ||
+        !regionField ||
+        !descriptionField
+      ) {
+
+        return;
+
+      }
+
+
+      const nom =
+        nomField.value.trim();
+
+
+      const email =
+        emailField.value.trim()
+          .toLowerCase();
+
+
+      const region =
+        regionField.value.trim();
+
+
+      const image_url =
+        imageField
+          ? imageField.value.trim()
+          : "";
+
+
+      const description =
+        descriptionField.value.trim();
+
+
+      const anonyme =
+        typeInscription
+          ? typeInscription.value === "anonyme"
+          : false;
+
+
+      const competences =
+        Array.from(
+          document.querySelectorAll(
+            'input[name="competences"]:checked'
+          )
+        )
+        .map(input => input.value)
+        .filter(Boolean);
+
+
+      /*
+       * Réinitialisation message.
+       */
+
+      if (message) {
+
+        message.textContent =
+          "";
+
+        message.className =
+          "form-message";
+
+      }
+
+
+      /*
+       * Validation.
+       */
+
+      if (!nom) {
+
+        afficherErreurFormulaire(
+          message,
+          "Merci d’indiquer votre nom."
+        );
+
+        nomField.focus();
+
+        return;
+
+      }
+
+
+      if (!email) {
+
+        afficherErreurFormulaire(
+          message,
+          "Merci d’indiquer votre adresse email."
+        );
+
+        emailField.focus();
+
+        return;
+
+      }
+
+
+      const emailValide =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+          .test(email);
+
+
+      if (!emailValide) {
+
+        afficherErreurFormulaire(
+          message,
+          "L’adresse email semble invalide."
+        );
+
+        emailField.focus();
+
+        return;
+
+      }
+
+
+      if (!region) {
+
+        afficherErreurFormulaire(
+          message,
+          "Merci d’indiquer votre région."
+        );
+
+        regionField.focus();
+
+        return;
+
+      }
+
+
+      if (!description) {
+
+        afficherErreurFormulaire(
+          message,
+          "Merci de renseigner une présentation."
+        );
+
+        descriptionField.focus();
+
+        return;
+
+      }
+
+
+      if (description.length > 300) {
+
+        afficherErreurFormulaire(
+          message,
+          "La présentation ne doit pas dépasser 300 caractères."
+        );
+
+        descriptionField.focus();
+
+        return;
+
+      }
+
+
+      if (
+        image_url &&
+        !imageValide(image_url)
+      ) {
+
+        afficherErreurFormulaire(
+          message,
+          "L’URL de la photo semble invalide."
+        );
+
+        imageField.focus();
+
+        return;
+
+      }
+
+
+      if (
+        typeof supabaseClient === "undefined" ||
+        !supabaseClient
+      ) {
+
+        afficherErreurFormulaire(
+          message,
+          "La connexion à la base de données est indisponible."
+        );
+
+        return;
+
+      }
+
+
+      /*
+       * Désactivation bouton.
+       */
+
+      if (submitButton) {
+
+        submitButton.disabled =
+          true;
+
+        submitButton.textContent =
+          "INSCRIPTION EN COURS…";
+
+      }
+
+
+      try {
+
+        /*
+         * Vérification email déjà présent.
+         */
+
+        const {
+          data: doublon,
+          error: erreurDoublon
+        } = await supabaseClient
+
+          .from("profiles")
+
+          .select("id")
+
+          .ilike(
+            "email",
+            email
+          )
+
+          .limit(1);
+
+
+        if (erreurDoublon) {
+          throw erreurDoublon;
+        }
+
+
+        if (
+          Array.isArray(doublon) &&
+          doublon.length > 0
+        ) {
+
+          afficherErreurFormulaire(
+            message,
+            "Cette adresse email est déjà enregistrée."
+          );
+
+          return;
+
+        }
+
+
+        /*
+         * UUID.
+         */
+
+        const id =
+          crypto.randomUUID();
+
+
+        /*
+         * Insertion.
+         */
+
+        const {
+          error: erreurInsertion
+        } = await supabaseClient
+
+          .from("profiles")
+
+          .insert({
+
+            id,
+
+            nom,
+
+            grade: "user",
+
+            email,
+
+            image_url:
+              image_url || null,
+
+            description:
+              description || null,
+
+            region,
+
+            competences,
+
+            anonyme
+
+          });
+
+
+        if (erreurInsertion) {
+          throw erreurInsertion;
+        }
+
+
+        /*
+         * Succès.
+         */
+
+        if (message) {
+
+          message.textContent =
+            "Votre inscription a bien été enregistrée. Merci de rejoindre l’Avant-gardE.";
+
+          message.className =
+            "form-message success";
+
+        }
+
+
+        form.reset();
+
+
+        /*
+         * Le choix par défaut redevient sympathisant.
+         */
+
+        const radioSympathisant =
+          document.querySelector(
+            'input[name="type_inscription"][value="sympathisant"]'
+          );
+
+
+        if (radioSympathisant) {
+
+          radioSympathisant.checked =
+            true;
+
+        }
+
+
+        mettreAJourCompteurDescription();
+
+
+        /*
+         * Recharge l'équipe après un court délai.
+         */
+
+        setTimeout(
+          () => {
+
+            chargerMembres();
+
+          },
+          1800
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Erreur inscription :",
+          error
+        );
+
+
+        afficherErreurFormulaire(
+          message,
+          "Une erreur est survenue lors de l’inscription. Veuillez réessayer."
+        );
+
+
+      } finally {
+
+        if (submitButton) {
+
+          submitButton.disabled =
+            false;
+
+          submitButton.textContent =
+            "REJOINDRE L’AVANT-GARDE";
+
+        }
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   MESSAGE ERREUR
+========================================================= */
+
+function afficherErreurFormulaire(
+  element,
+  texte
+) {
+
+  if (!element) {
+    return;
+  }
+
+
+  element.textContent =
+    texte;
+
+
+  element.className =
+    "form-message error";
+
+}
+
+
+/* =========================================================
+   COMPTEUR
+========================================================= */
+
+function initialiserCompteurDescription() {
+
+  const textarea =
+    document.getElementById(
+      "descriptionField"
+    );
+
+
+  if (!textarea) {
+    return;
+  }
+
+
+  textarea.addEventListener(
+    "input",
+    mettreAJourCompteurDescription
+  );
+
+
+  mettreAJourCompteurDescription();
+
+}
+
+
+/* =========================================================
+   INITIALISATION
+========================================================= */
+
+async function initialiserEquipe() {
+
+  await chargerMembres();
+
+  initialiserOuvertureInscription();
+
+  initialiserFermetureModales();
+
+  initialiserFormulaireInscription();
+
+  initialiserCompteurDescription();
+
+}
+
+
+/* =========================================================
+   DOM READY
+========================================================= */
+
+if (
+  document.readyState === "loading"
+) {
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    initialiserEquipe
+  );
+
+} else {
+
+  initialiserEquipe();
+
+}
