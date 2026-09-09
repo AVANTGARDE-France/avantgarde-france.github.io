@@ -1,2466 +1,1888 @@
 /* =========================================================
    AVANT-GARDE — NOTRE ÉQUIPE
-   js/equipe.js
+   css/equipe.css
 
-   Logique spécifique à la page équipe.
+   Mise en forme spécifique à la page équipe.
+   Le style général du site reste dans css/style.css.
 ========================================================= */
 
 
 /* =========================================================
-   DONNÉES
+   HERO ÉQUIPE
 ========================================================= */
 
-let membres = [];
+.team-hero {
 
+    position: relative;
 
-const reseauxSociaux = [
+    min-height: 430px;
 
-    {
-        champ: "facebook_url",
-        nom: "Facebook",
-        logo: "https://cdn.simpleicons.org/facebook/1877F2",
-        audienceChamp: "facebook_audience"
-    },
+    display: flex;
 
-    {
-        champ: "x_url",
-        nom: "X",
-        logo: "https://cdn.simpleicons.org/x/FFFFFF",
-        audienceChamp: "x_audience"
-    },
+    align-items: center;
+    justify-content: center;
 
-    {
-        champ: "instagram_url",
-        nom: "Instagram",
-        logo: "https://cdn.simpleicons.org/instagram/E4405F",
-        audienceChamp: "instagram_audience"
-    },
+    text-align: center;
 
-    {
-        champ: "youtube_url",
-        nom: "YouTube",
-        logo: "https://cdn.simpleicons.org/youtube/FF0000",
-        audienceChamp: "youtube_audience"
-    },
+    overflow: hidden;
 
-    {
-        champ: "tiktok_url",
-        nom: "TikTok",
-        logo: "https://cdn.simpleicons.org/tiktok/FFFFFF",
-        audienceChamp: "tiktok_audience"
-    }
-
-];
-
-
-/* =========================================================
-   OUTILS
-========================================================= */
-
-function escapeHtml(value) {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-        return "";
-    }
-
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-
-}
-
-
-function ouvrirModalEquipe(modal) {
-
-    if (!modal) {
-        return;
-    }
-
-    modal.classList.add("active");
-
-    document.body.style.overflow = "hidden";
-
-}
-
-
-function fermerModalEquipe(modal) {
-
-    if (!modal) {
-        return;
-    }
-
-    modal.classList.remove("active");
-
-    if (
-        !document.querySelector(
-            ".profile-modal.active, .join-modal.active, .rdv-modal.active"
-        )
-    ) {
-        document.body.style.overflow = "";
-    }
-
-}
-
-
-function imageValide(url) {
-
-    if (
-        !url ||
-        typeof url !== "string"
-    ) {
-        return false;
-    }
-
-    try {
-
-        const parsed = new URL(url);
-
-        return (
-            parsed.protocol === "http:" ||
-            parsed.protocol === "https:"
+    background:
+        linear-gradient(
+            rgba(5,17,37,.70),
+            rgba(5,17,37,.88)
+        ),
+        radial-gradient(
+            circle at center,
+            #17345b 0%,
+            #08172f 58%,
+            #050e1d 100%
         );
 
-    } catch (error) {
-
-        return false;
-
-    }
-
+    border-bottom:
+        1px solid rgba(214,173,85,.25);
 }
 
 
-function urlValide(url) {
+.team-hero::before,
+.team-hero::after {
 
-    if (
-        !url ||
-        typeof url !== "string"
-    ) {
-        return false;
-    }
+    content: "";
 
-    try {
+    position: absolute;
 
-        const parsed = new URL(url);
+    width: 270px;
+    height: 270px;
 
-        return (
-            parsed.protocol === "http:" ||
-            parsed.protocol === "https:"
-        );
+    border:
+        1px solid rgba(214,173,85,.13);
 
-    } catch (error) {
+    transform: rotate(45deg);
 
-        return false;
-
-    }
-
+    pointer-events: none;
 }
 
 
-function normaliserCompetences(value) {
+.team-hero::before {
 
-    if (!value) {
-        return [];
-    }
-
-
-    if (Array.isArray(value)) {
-
-        return value
-            .map(item => String(item).trim())
-            .filter(Boolean);
-
-    }
-
-
-    if (typeof value === "string") {
-
-        const texte = value.trim();
-
-        if (!texte) {
-            return [];
-        }
-
-
-        try {
-
-            const parsed = JSON.parse(texte);
-
-            if (Array.isArray(parsed)) {
-
-                return parsed
-                    .map(item => String(item).trim())
-                    .filter(Boolean);
-
-            }
-
-        } catch (error) {
-
-            /* Ce n'est pas du JSON. */
-
-        }
-
-
-        return texte
-            .split(",")
-            .map(item => item.trim())
-            .filter(Boolean);
-
-    }
-
-
-    return [];
-
+    left: -160px;
+    top: 65px;
 }
 
 
-function formaterAudience(valeur) {
+.team-hero::after {
 
-    const nombre = Number(valeur);
-
-    if (
-        !Number.isFinite(nombre) ||
-        nombre <= 0
-    ) {
-        return "0";
-    }
-
-    return nombre.toLocaleString("fr-FR");
-
+    right: -160px;
+    bottom: 50px;
 }
 
 
-function obtenirAudience(membre, reseau) {
+.team-hero .hero-content {
 
-    const valeur = Number(
-        membre[reseau.audienceChamp]
-    );
+    position: relative;
 
-    if (
-        !Number.isFinite(valeur) ||
-        valeur < 0
-    ) {
-        return 0;
-    }
+    z-index: 2;
 
-    return valeur;
+    width: 100%;
+    max-width: 900px;
 
+    padding: 70px 25px;
+}
+
+
+.team-hero .section-kicker {
+
+    margin-bottom: 16px;
+
+    color: var(--gold-light);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 11px;
+
+    font-weight: bold;
+
+    letter-spacing: 4px;
+}
+
+
+.team-hero h1 {
+
+    margin: 0;
+
+    font-size:
+        clamp(42px, 7vw, 78px);
+
+    line-height: .98;
+
+    letter-spacing: 3px;
+
+    font-weight: normal;
+}
+
+
+.team-hero h1 span {
+
+    color: var(--gold);
+}
+
+
+.team-hero p {
+
+    max-width: 650px;
+
+    margin: 25px auto 0;
+
+    color: #cbd1da;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 15px;
+
+    line-height: 1.7;
 }
 
 
 /* =========================================================
-   RÉSEAUX SOCIAUX — CARTE
+   BOUTON REJOINDRE
 ========================================================= */
 
-function afficherReseauxCarte(membre, container) {
+.join-button {
 
-    if (!container) {
-        return;
-    }
+    display: inline-block;
 
-    container.innerHTML = "";
+    margin-top: 28px;
 
+    padding: 13px 25px;
 
-    reseauxSociaux.forEach(reseau => {
+    border:
+        1px solid var(--gold);
 
-        const url = membre[reseau.champ];
+    background: transparent;
 
-        if (!urlValide(url)) {
-            return;
-        }
+    color: var(--gold-light);
 
+    font-family:
+        Arial,
+        sans-serif;
 
-        const lien = document.createElement("a");
+    font-size: 11px;
 
-        lien.className = "member-card-social";
+    font-weight: bold;
 
-        lien.href = url;
+    letter-spacing: 1.5px;
 
-        lien.target = "_blank";
+    cursor: pointer;
 
-        lien.rel = "noopener noreferrer";
-
-        lien.setAttribute(
-            "aria-label",
-            `${reseau.nom} de ${membre.nom || "ce membre"}`
-        );
-
-
-        const image = document.createElement("img");
-
-        image.src = reseau.logo;
-
-        image.alt = reseau.nom;
-
-        image.loading = "lazy";
+    transition:
+        background .2s,
+        color .2s,
+        transform .2s,
+        box-shadow .2s;
+}
 
 
-        lien.appendChild(image);
+.join-button:hover {
 
-        container.appendChild(lien);
+    background: var(--gold);
 
-    });
+    color: var(--navy);
 
+    transform: translateY(-1px);
 
-    if (!container.children.length) {
-        container.style.display = "none";
-    } else {
-        container.style.display = "";
-    }
-
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.25);
 }
 
 
 /* =========================================================
-   RÉSEAUX SOCIAUX — MODALE
+   SECTION ÉQUIPE
 ========================================================= */
 
-function afficherReseauxSociaux(membre) {
+.team-section {
 
-    const container =
-        document.getElementById(
-            "profileModalSocials"
-        );
+    max-width: 1180px;
 
-    const audienceMaxContainer =
-        document.getElementById(
-            "profileModalAudienceMax"
-        );
+    margin: auto;
 
-    const section =
-        document.getElementById(
-            "profileSocialSection"
-        );
+    padding:
+        65px 25px 75px;
+}
 
 
-    if (!container) {
-        return;
-    }
+.section-title {
 
+    text-align: center;
 
-    container.innerHTML = "";
+    margin-bottom: 42px;
+}
 
 
-    if (audienceMaxContainer) {
+.section-title .section-kicker {
 
-        audienceMaxContainer.innerHTML = "";
+    margin-bottom: 11px;
+}
 
-        audienceMaxContainer.style.display = "none";
 
-    }
+.section-title h2 {
 
+    margin: 0;
 
-    const reseauxDisponibles =
-        reseauxSociaux.filter(
-            reseau =>
-                urlValide(
-                    membre[reseau.champ]
-                )
-        );
+    font-size:
+        clamp(28px, 4vw, 40px);
 
+    font-weight: normal;
 
-    if (!reseauxDisponibles.length) {
-
-        if (section) {
-            section.style.display = "none";
-        }
-
-        return;
-
-    }
-
-
-    if (section) {
-        section.style.display = "";
-    }
-
-
-    const audiences =
-        reseauxDisponibles.map(
-            reseau => ({
-                reseau,
-                audience:
-                    obtenirAudience(
-                        membre,
-                        reseau
-                    )
-            })
-        );
-
-
-    let reseauMax = null;
-
-
-    /*
-     * Si audience_reseau est renseigné,
-     * on privilégie ce réseau.
-     */
-
-    if (membre.audience_reseau) {
-
-        const reseauIndique =
-            audiences.find(item => {
-
-                return (
-                    String(
-                        item.reseau.nom
-                    ).toLowerCase() ===
-                    String(
-                        membre.audience_reseau
-                    ).toLowerCase()
-                );
-
-            });
-
-
-        if (
-            reseauIndique &&
-            reseauIndique.audience > 0
-        ) {
-            reseauMax = reseauIndique;
-        }
-
-    }
-
-
-    /*
-     * Sinon on recherche automatiquement
-     * l'audience la plus élevée.
-     */
-
-    if (!reseauMax) {
-
-        audiences.forEach(item => {
-
-            if (
-                item.audience > 0 &&
-                (
-                    !reseauMax ||
-                    item.audience >
-                    reseauMax.audience
-                )
-            ) {
-
-                reseauMax = item;
-
-            }
-
-        });
-
-    }
-
-
-    /*
-     * Création des cartes réseaux.
-     */
-
-    audiences.forEach(item => {
-
-        const reseau = item.reseau;
-
-        const audience = item.audience;
-
-
-        const lien =
-            document.createElement("a");
-
-        lien.className =
-            "profile-social-link";
-
-
-        lien.href =
-            membre[reseau.champ];
-
-
-        lien.target = "_blank";
-
-        lien.rel =
-            "noopener noreferrer";
-
-
-        lien.title =
-            `${reseau.nom} — ${formaterAudience(audience)} abonnés`;
-
-
-        const isMax =
-            Boolean(
-                reseauMax &&
-                reseauMax.reseau.nom ===
-                    reseau.nom &&
-                reseauMax.audience > 0
-            );
-
-
-        if (isMax) {
-
-            lien.classList.add(
-                "is-max"
-            );
-
-        }
-
-
-        const image =
-            document.createElement("img");
-
-        image.className =
-            "profile-social-logo";
-
-        image.src =
-            reseau.logo;
-
-        image.alt =
-            reseau.nom;
-
-        image.loading =
-            "lazy";
-
-
-        const nom =
-            document.createElement("strong");
-
-        nom.className =
-            "profile-social-name";
-
-        nom.textContent =
-            reseau.nom;
-
-
-        const audienceElement =
-            document.createElement("span");
-
-        audienceElement.className =
-            "profile-social-audience";
-
-        audienceElement.textContent =
-            formaterAudience(audience);
-
-
-        lien.appendChild(image);
-
-        lien.appendChild(nom);
-
-        lien.appendChild(
-            audienceElement
-        );
-
-
-        container.appendChild(lien);
-
-    });
-
-
-    /*
-     * Audience maximale affichée.
-     */
-
-    let audienceMax = 0;
-
-
-    const audienceBase =
-        Number(
-            membre.audience_max
-        );
-
-
-    if (
-        Number.isFinite(audienceBase) &&
-        audienceBase > 0
-    ) {
-        audienceMax = audienceBase;
-    }
-
-
-    if (
-        reseauMax &&
-        reseauMax.audience >
-            audienceMax
-    ) {
-
-        audienceMax =
-            reseauMax.audience;
-
-    }
-
-
-    if (
-        audienceMaxContainer &&
-        audienceMax > 0
-    ) {
-
-        let dateTexte = "";
-
-
-        if (membre.audience_updated_at) {
-
-            const date =
-                new Date(
-                    membre.audience_updated_at
-                );
-
-
-            if (
-                !Number.isNaN(
-                    date.getTime()
-                )
-            ) {
-
-                const datePart =
-                    date.toLocaleDateString(
-                        "fr-FR",
-                        {
-                            day: "2-digit",
-                            month: "2-digit",
-                            year: "numeric"
-                        }
-                    );
-
-
-                const heurePart =
-                    date.toLocaleTimeString(
-                        "fr-FR",
-                        {
-                            hour: "2-digit",
-                            minute: "2-digit"
-                        }
-                    );
-
-
-                dateTexte =
-                    ` <small>· mis à jour le ${datePart} à ${heurePart}</small>`;
-
-            }
-
-        }
-
-
-        audienceMaxContainer.innerHTML = `
-            Audience max :
-            <strong>
-                ${escapeHtml(
-                    formaterAudience(
-                        audienceMax
-                    )
-                )}
-            </strong>
-            ${dateTexte}
-        `;
-
-
-        audienceMaxContainer.style.display =
-            "";
-
-    }
-
+    letter-spacing: 1px;
 }
 
 
 /* =========================================================
-   CHARGEMENT DES MEMBRES
+   GRILLE MEMBRES
 ========================================================= */
 
-async function chargerMembres() {
+.team-grid {
 
-    const grid =
-        document.getElementById(
-            "teamGrid"
-        );
+    display: grid;
 
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
 
-    if (!grid) {
-        return;
-    }
+    gap: 20px;
 
-
-    grid.innerHTML = `
-        <div class="events-empty">
-            Chargement des membres…
-        </div>
-    `;
-
-
-    /*
-     * supabase.js crée cet alias :
-     *
-     * window.supabaseClient = supabase
-     *
-     * On le conserve ici pour la compatibilité.
-     */
-
-    if (
-        typeof supabaseClient ===
-            "undefined" ||
-        !supabaseClient
-    ) {
-
-        grid.innerHTML = `
-            <div class="events-empty">
-                Impossible de contacter la base de données.
-            </div>
-        `;
-
-
-        console.error(
-            "supabaseClient est introuvable."
-        );
-
-
-        return;
-
-    }
-
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-
-        .from("profiles")
-
-        .select(`
-            id,
-            created_at,
-            nom,
-            grade,
-            image_url,
-            description,
-            region,
-            competences,
-            anonyme,
-            facebook_url,
-            x_url,
-            instagram_url,
-            youtube_url,
-            tiktok_url,
-            facebook_audience,
-            instagram_audience,
-            x_audience,
-            youtube_audience,
-            tiktok_audience,
-            audience_max,
-            audience_reseau,
-            audience_updated_at
-        `)
-
-        .eq(
-            "anonyme",
-            false
-        )
-
-        .order(
-            "created_at",
-            {
-                ascending: true
-            }
-        );
-
-
-    if (error) {
-
-        console.error(
-            "Erreur chargement membres :",
-            error
-        );
-
-
-        grid.innerHTML = `
-            <div class="events-empty">
-                Impossible de charger l’équipe.
-            </div>
-        `;
-
-
-        return;
-
-    }
-
-
-    membres =
-        Array.isArray(data)
-            ? data
-            : [];
-
-
-    if (!membres.length) {
-
-        grid.innerHTML = `
-            <div class="events-empty">
-                Aucun membre public pour le moment.
-            </div>
-        `;
-
-
-        return;
-
-    }
-
-
-    grid.innerHTML = "";
-
-
-    membres.forEach(membre => {
-
-        const card =
-            document.createElement(
-                "article"
-            );
-
-
-        card.className =
-            "member-card";
-
-
-        card.tabIndex = 0;
-
-
-        card.setAttribute(
-            "role",
-            "button"
-        );
-
-
-        card.setAttribute(
-            "aria-label",
-            `Voir le profil de ${membre.nom || "ce membre"}`
-        );
-
-
-        /*
-         * =====================================================
-         * CONTENEUR PHOTO
-         * =====================================================
-         */
-
-        const imageContainer =
-            document.createElement(
-                "div"
-            );
-
-
-        imageContainer.className =
-            "member-card-image";
-
-
-        const imageUrl =
-            imageValide(
-                membre.image_url
-            )
-                ? membre.image_url
-                : "";
-
-
-        if (imageUrl) {
-
-            const image =
-                document.createElement(
-                    "img"
-                );
-
-
-            image.src =
-                imageUrl;
-
-
-            image.alt =
-                membre.nom ||
-                "Membre";
-
-
-            image.loading =
-                "lazy";
-
-
-            /*
-             * Si l'image distante ne fonctionne
-             * pas, on repasse sur le placeholder.
-             */
-
-            image.addEventListener(
-                "error",
-                () => {
-
-                    image.style.display =
-                        "none";
-
-
-                    if (
-                        !imageContainer.querySelector(
-                            ".member-card-placeholder"
-                        )
-                    ) {
-
-                        const placeholder =
-                            document.createElement(
-                                "div"
-                            );
-
-
-                        placeholder.className =
-                            "member-card-placeholder";
-
-
-                        placeholder.textContent =
-                            membre.nom
-                                ? String(
-                                    membre.nom
-                                )
-                                    .trim()
-                                    .charAt(0)
-                                    .toUpperCase()
-                                : "A";
-
-
-                        imageContainer.appendChild(
-                            placeholder
-                        );
-
-                    }
-
-                },
-                {
-                    once: true
-                }
-            );
-
-
-            imageContainer.appendChild(
-                image
-            );
-
-        } else {
-
-            const placeholder =
-                document.createElement(
-                    "div"
-                );
-
-
-            placeholder.className =
-                "member-card-placeholder";
-
-
-            placeholder.textContent =
-                membre.nom
-                    ? String(
-                        membre.nom
-                    )
-                        .trim()
-                        .charAt(0)
-                        .toUpperCase()
-                    : "A";
-
-
-            imageContainer.appendChild(
-                placeholder
-            );
-
-        }
-
-
-        card.appendChild(
-            imageContainer
-        );
-
-
-        /*
-         * =====================================================
-         * CONTENU CARTE
-         * =====================================================
-         */
-
-        const content =
-            document.createElement(
-                "div"
-            );
-
-
-        content.className =
-            "member-card-content";
-
-
-        const name =
-            document.createElement(
-                "h3"
-            );
-
-
-        name.className =
-            "member-card-name";
-
-
-        name.textContent =
-            membre.nom ||
-            "Membre";
-
-
-        content.appendChild(
-            name
-        );
-
-
-        const grade =
-            document.createElement(
-                "div"
-            );
-
-
-        grade.className =
-            "member-card-grade";
-
-
-        grade.textContent =
-            membre.grade ||
-            "Membre";
-
-
-        content.appendChild(
-            grade
-        );
-
-
-        if (membre.region) {
-
-            const region =
-                document.createElement(
-                    "div"
-                );
-
-
-            region.className =
-                "member-card-region";
-
-
-            region.textContent =
-                membre.region;
-
-
-            content.appendChild(
-                region
-            );
-
-        }
-
-
-        if (membre.description) {
-
-            let description =
-                String(
-                    membre.description
-                );
-
-
-            if (
-                description.length >
-                180
-            ) {
-
-                description =
-                    `${description
-                        .slice(
-                            0,
-                            180
-                        )
-                        .trim()}…`;
-
-            }
-
-
-            const descriptionElement =
-                document.createElement(
-                    "div"
-                );
-
-
-            descriptionElement.className =
-                "member-card-description";
-
-
-            descriptionElement.textContent =
-                description;
-
-
-            content.appendChild(
-                descriptionElement
-            );
-
-        }
-
-
-        /*
-         * Réseaux sociaux de la carte.
-         */
-
-        const socials =
-            document.createElement(
-                "div"
-            );
-
-
-        socials.className =
-            "member-card-socials";
-
-
-        afficherReseauxCarte(
-            membre,
-            socials
-        );
-
-
-        if (socials.children.length) {
-
-            content.appendChild(
-                socials
-            );
-
-        }
-
-
-        card.appendChild(
-            content
-        );
-
-
-        /*
-         * =====================================================
-         * OUVERTURE PROFIL
-         * =====================================================
-         */
-
-        card.addEventListener(
-            "click",
-            event => {
-
-                /*
-                 * Un clic sur un réseau social
-                 * ne doit pas ouvrir la modale.
-                 */
-
-                if (
-                    event.target.closest(
-                        ".member-card-social"
-                    )
-                ) {
-                    return;
-                }
-
-
-                ouvrirProfil(
-                    membre
-                );
-
-            }
-        );
-
-
-        card.addEventListener(
-            "keydown",
-            event => {
-
-                if (
-                    event.key ===
-                        "Enter" ||
-                    event.key ===
-                        " "
-                ) {
-
-                    event.preventDefault();
-
-                    ouvrirProfil(
-                        membre
-                    );
-
-                }
-
-            }
-        );
-
-
-        grid.appendChild(
-            card
-        );
-
-    });
-
+    align-items: stretch;
 }
 
 
 /* =========================================================
-   OUVERTURE PROFIL
+   CARTE MEMBRE
 ========================================================= */
 
-function ouvrirProfil(membre) {
+.member-card {
 
-    if (!membre) {
-        return;
-    }
+    position: relative;
 
+    min-width: 0;
 
-    const modal =
-        document.getElementById(
-            "memberModal"
+    overflow: hidden;
+
+    padding: 0;
+
+    border:
+        1px solid rgba(214,173,85,.25);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20,43,76,.78),
+            rgba(5,15,32,.96)
         );
 
+    cursor: pointer;
 
-    if (!modal) {
-        return;
-    }
+    transition:
+        transform .25s ease,
+        border-color .25s ease,
+        box-shadow .25s ease;
+}
 
 
-    const image =
-        document.getElementById(
-            "profileModalImage"
-        );
+.member-card:hover {
 
+    transform: translateY(-4px);
 
-    const placeholder =
-        document.getElementById(
-            "profilePlaceholder"
-        );
+    border-color:
+        rgba(214,173,85,.60);
 
-
-    const name =
-        document.getElementById(
-            "profileModalName"
-        );
-
-
-    const grade =
-        document.getElementById(
-            "profileModalGrade"
-        );
-
-
-    const region =
-        document.getElementById(
-            "profileModalRegion"
-        );
-
-
-    const description =
-        document.getElementById(
-            "profileModalDescription"
-        );
-
-
-    /*
-     * =====================================================
-     * INFORMATIONS PRINCIPALES
-     * =====================================================
-     */
-
-    if (name) {
-
-        name.textContent =
-            membre.nom ||
-            "Membre";
-
-    }
-
-
-    if (grade) {
-
-        grade.textContent =
-            membre.grade ||
-            "Membre";
-
-    }
-
-
-    if (region) {
-
-        region.textContent =
-            membre.region ||
-            "";
-
-    }
-
-
-    if (description) {
-
-        description.textContent =
-            membre.description ||
-            "";
-
-    }
-
-
-    /*
-     * =====================================================
-     * IMAGE
-     * =====================================================
-     */
-
-    if (
-        image &&
-        imageValide(
-            membre.image_url
-        )
-    ) {
-
-        image.src =
-            membre.image_url;
-
-
-        image.alt =
-            membre.nom ||
-            "Membre";
-
-
-        image.style.display =
-            "block";
-
-
-        if (placeholder) {
-
-            placeholder.style.display =
-                "none";
-
-        }
-
-
-        image.onerror = () => {
-
-            image.style.display =
-                "none";
-
-
-            if (placeholder) {
-
-                placeholder.style.display =
-                    "flex";
-
-
-                placeholder.textContent =
-                    membre.nom
-                        ? String(
-                            membre.nom
-                        )
-                            .trim()
-                            .charAt(0)
-                            .toUpperCase()
-                        : "A";
-
-            }
-
-        };
-
-    } else {
-
-        if (image) {
-
-            image.removeAttribute(
-                "src"
-            );
-
-
-            image.style.display =
-                "none";
-
-        }
-
-
-        if (placeholder) {
-
-            placeholder.style.display =
-                "flex";
-
-
-            placeholder.textContent =
-                membre.nom
-                    ? String(
-                        membre.nom
-                    )
-                        .trim()
-                        .charAt(0)
-                        .toUpperCase()
-                    : "A";
-
-        }
-
-    }
-
-
-    /*
-     * =====================================================
-     * RÉSEAUX SOCIAUX
-     * =====================================================
-     */
-
-    afficherReseauxSociaux(
-        membre
-    );
-
-
-    /*
-     * =====================================================
-     * COMPÉTENCES
-     * =====================================================
-     */
-
-    const competenceContainer =
-        document.getElementById(
-            "profileModalCompetences"
-        );
-
-
-    const competenceSection =
-        document.getElementById(
-            "profileCompetenceSection"
-        );
-
-
-    if (competenceContainer) {
-
-        competenceContainer.innerHTML =
-            "";
-
-
-        const competences =
-            normaliserCompetences(
-                membre.competences
-            )
-            .filter(
-                competence =>
-                    String(
-                        competence
-                    )
-                        .trim()
-                        .toUpperCase() !==
-                    "VIP"
-            );
-
-
-        if (competences.length) {
-
-            if (competenceSection) {
-
-                competenceSection.style.display =
-                    "";
-
-            }
-
-
-            competences.forEach(
-                competence => {
-
-                    const tag =
-                        document.createElement(
-                            "span"
-                        );
-
-
-                    /*
-                     * IMPORTANT :
-                     * le CSS attend
-                     * .profile-competence
-                     */
-
-                    tag.className =
-                        "profile-competence";
-
-
-                    tag.textContent =
-                        competence;
-
-
-                    competenceContainer.appendChild(
-                        tag
-                    );
-
-                }
-            );
-
-        } else {
-
-            if (competenceSection) {
-
-                competenceSection.style.display =
-                    "none";
-
-            }
-
-        }
-
-    }
-
-
-    /*
-     * =====================================================
-     * VIP
-     * =====================================================
-     */
-
-    const vipContainer =
-        document.getElementById(
-            "profileModalVip"
-        );
-
-
-    if (vipContainer) {
-
-        let audienceMax =
-            Number(
-                membre.audience_max
-            );
-
-
-        if (
-            !Number.isFinite(
-                audienceMax
-            ) ||
-            audienceMax < 0
-        ) {
-
-            audienceMax = 0;
-
-        }
-
-
-        reseauxSociaux.forEach(
-            reseau => {
-
-                const audience =
-                    obtenirAudience(
-                        membre,
-                        reseau
-                    );
-
-
-                if (
-                    audience >
-                    audienceMax
-                ) {
-
-                    audienceMax =
-                        audience;
-
-                }
-
-            }
-        );
-
-
-        if (
-            audienceMax >= 3000
-        ) {
-
-            vipContainer.innerHTML =
-                "★ VIP";
-
-
-            vipContainer.style.display =
-                "";
-
-        } else {
-
-            vipContainer.innerHTML =
-                "";
-
-
-            vipContainer.style.display =
-                "none";
-
-        }
-
-    }
-
-
-    /*
-     * =====================================================
-     * OUVERTURE
-     * =====================================================
-     */
-
-    ouvrirModalEquipe(
-        modal
-    );
-
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.30);
 }
 
 
 /* =========================================================
-   COMPTEUR DESCRIPTION
+   PHOTO CARTE
 ========================================================= */
 
-function mettreAJourCompteurDescription() {
+.member-card-image {
 
-    const textarea =
-        document.getElementById(
-            "descriptionField"
+    position: relative;
+
+    display: block;
+
+    width: 100%;
+
+    aspect-ratio: 1 / 1;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #18365d 0%,
+            #08172f 70%,
+            #050e1d 100%
         );
+}
 
 
-    const compteur =
-        document.getElementById(
-            "descriptionCount"
+.member-card-image img {
+
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transition:
+        transform .35s ease;
+}
+
+
+.member-card:hover
+.member-card-image img {
+
+    transform: scale(1.035);
+}
+
+
+.member-card-placeholder {
+
+    width: 100%;
+    aspect-ratio: 1 / 1;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    color: var(--gold-light);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 72px;
+
+    font-weight: bold;
+
+    background:
+        linear-gradient(
+            145deg,
+            #17345b,
+            #07152d
         );
-
-
-    if (
-        !textarea ||
-        !compteur
-    ) {
-        return;
-    }
-
-
-    const longueur =
-        textarea.value.length;
-
-
-    compteur.textContent =
-        `${longueur} / 300`;
-
-
-    compteur.classList.toggle(
-        "warning",
-        longueur >= 270 &&
-        longueur < 300
-    );
-
-
-    compteur.classList.toggle(
-        "limit",
-        longueur >= 300
-    );
-
 }
 
 
 /* =========================================================
-   OUVERTURE INSCRIPTION
+   CONTENU CARTE
 ========================================================= */
 
-function initialiserOuvertureInscription() {
+.member-card-content {
 
-    const bouton =
-        document.getElementById(
-            "openJoin"
-        );
-
-
-    const modal =
-        document.getElementById(
-            "joinModal"
-        );
+    padding:
+        20px 20px 22px;
+}
 
 
-    const message =
-        document.getElementById(
-            "formMessage"
-        );
+.member-card-name {
+
+    margin: 0 0 7px;
+
+    color: var(--white);
+
+    font-size: 22px;
+
+    line-height: 1.15;
+
+    font-weight: normal;
+}
 
 
-    if (
-        !bouton ||
-        !modal
-    ) {
-        return;
-    }
+.member-card-grade {
+
+    color: var(--gold-light);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+}
 
 
-    bouton.addEventListener(
-        "click",
-        () => {
+.member-card-region {
 
-            if (message) {
+    margin-top: 8px;
 
-                message.textContent =
-                    "";
+    color: var(--muted);
 
-                message.className =
-                    "form-message";
+    font-family:
+        Arial,
+        sans-serif;
 
-            }
-
-
-            ouvrirModalEquipe(
-                modal
-            );
+    font-size: 12px;
+}
 
 
-            mettreAJourCompteurDescription();
+.member-card-description {
 
-        }
-    );
+    margin-top: 14px;
 
+    color: #c2c9d4;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 13px;
+
+    line-height: 1.55;
+}
+
+
+.member-card-socials {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 7px;
+
+    margin-top: 17px;
+}
+
+
+.member-card-social {
+
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    background:
+        rgba(0,0,0,.18);
+
+    border-radius: 50%;
+}
+
+
+.member-card-social img {
+
+    width: 15px;
+    height: 15px;
+
+    object-fit: contain;
 }
 
 
 /* =========================================================
-   FERMETURE MODALES
+   MODALE PROFIL
 ========================================================= */
 
-function initialiserFermetureModales() {
+.profile-modal {
 
-    const memberModal =
-        document.getElementById(
-            "memberModal"
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1000;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 25px;
+
+    background:
+        rgba(2,8,18,.82);
+
+    backdrop-filter:
+        blur(8px);
+
+    -webkit-backdrop-filter:
+        blur(8px);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition:
+        opacity .25s ease,
+        visibility .25s ease;
+}
+
+
+.profile-modal.active {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    pointer-events: auto;
+}
+
+
+.profile-modal-box {
+
+    position: relative;
+
+    width: min(100%, 980px);
+
+    max-height:
+        calc(100vh - 50px);
+
+    overflow-y: auto;
+
+    background:
+        linear-gradient(
+            145deg,
+            #102746,
+            #050f20
         );
 
+    border:
+        1px solid rgba(214,173,85,.42);
 
-    const joinModal =
-        document.getElementById(
-            "joinModal"
+    box-shadow:
+        0 30px 90px rgba(0,0,0,.55);
+
+    transform:
+        translateY(18px)
+        scale(.985);
+
+    transition:
+        transform .25s ease;
+}
+
+
+.profile-modal.active
+.profile-modal-box {
+
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+
+.profile-modal-box::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 3px;
+
+    background: var(--gold);
+}
+
+
+/* =========================================================
+   BOUTON FERMETURE
+========================================================= */
+
+.modal-close {
+
+    position: absolute;
+
+    top: 16px;
+    right: 16px;
+
+    z-index: 10;
+
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border:
+        1px solid rgba(214,173,85,.35);
+
+    border-radius: 50%;
+
+    background:
+        rgba(5,15,32,.85);
+
+    color: var(--white);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 23px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition:
+        background .2s,
+        color .2s,
+        transform .2s;
+}
+
+
+.modal-close:hover {
+
+    background: var(--gold);
+
+    color: var(--navy);
+
+    transform: rotate(90deg);
+}
+
+
+/* =========================================================
+   CONTENU PROFIL
+========================================================= */
+
+.profile-content {
+
+    display: grid;
+
+    grid-template-columns:
+        300px minmax(0, 1fr);
+
+    gap: 45px;
+
+    padding: 55px 45px 45px;
+}
+
+
+.profile-left {
+
+    text-align: center;
+}
+
+
+.profile-photo {
+
+    width: 100%;
+
+    aspect-ratio: 1 / 1;
+
+    object-fit: cover;
+
+    border:
+        1px solid rgba(214,173,85,.35);
+}
+
+
+.profile-photo-placeholder {
+
+    width: 100%;
+
+    aspect-ratio: 1 / 1;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            #18365d 0%,
+            #07152d 72%
         );
 
+    border:
+        1px solid rgba(214,173,85,.35);
 
-    const closeMember =
-        document.getElementById(
-            "closeMember"
+    color: var(--gold-light);
+
+    font-size: 90px;
+
+    font-weight: bold;
+}
+
+
+.profile-name {
+
+    margin:
+        22px 0 8px;
+
+    font-size: 28px;
+
+    line-height: 1.15;
+
+    font-weight: normal;
+}
+
+
+.profile-modal-vip {
+
+    display: inline-block;
+
+    margin-bottom: 9px;
+
+    padding: 5px 10px;
+
+    border:
+        1px solid rgba(214,173,85,.55);
+
+    color: var(--gold-light);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 9px;
+
+    font-weight: bold;
+
+    letter-spacing: 1.2px;
+}
+
+
+.profile-grade {
+
+    color: var(--gold);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+}
+
+
+.profile-region {
+
+    margin-top: 9px;
+
+    color: var(--muted);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.profile-description {
+
+    color: #d2d7df;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 14px;
+
+    line-height: 1.75;
+
+    white-space: pre-line;
+
+    margin-bottom: 30px;
+}
+
+
+.profile-subtitle {
+
+    margin:
+        0 0 15px;
+
+    padding-bottom: 10px;
+
+    border-bottom:
+        1px solid rgba(214,173,85,.25);
+
+    color: var(--gold-light);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: 2px;
+}
+
+
+/* =========================================================
+   RÉSEAUX SOCIAUX
+========================================================= */
+
+.profile-socials {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(5, minmax(0, 1fr));
+
+    gap: 9px;
+
+    margin-bottom: 13px;
+}
+
+
+.profile-social-link {
+
+    position: relative;
+
+    min-height: 72px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    padding: 8px;
+
+    border:
+        1px solid rgba(255,255,255,.11);
+
+    background:
+        rgba(255,255,255,.025);
+
+    color: var(--white);
+
+    text-decoration: none;
+
+    transition:
+        border-color .2s,
+        background .2s,
+        transform .2s;
+}
+
+
+.profile-social-link:hover {
+
+    border-color:
+        rgba(214,173,85,.55);
+
+    background:
+        rgba(214,173,85,.07);
+
+    transform: translateY(-2px);
+}
+
+
+.profile-social-link.is-max {
+
+    border:
+        1px solid rgba(214,173,85,.85);
+
+    box-shadow:
+        0 0 0 1px rgba(214,173,85,.08),
+        0 7px 20px rgba(0,0,0,.18);
+}
+
+
+.profile-social-link.is-max::after {
+
+    content: "★";
+
+    position: absolute;
+
+    top: 5px;
+    right: 7px;
+
+    color: var(--gold-light);
+
+    font-size: 11px;
+}
+
+
+.profile-social-logo {
+
+    width: 20px;
+    height: 20px;
+
+    object-fit: contain;
+}
+
+
+.profile-social-name {
+
+    color: #dfe3e9;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 9px;
+
+    font-weight: bold;
+
+    letter-spacing: .5px;
+}
+
+
+.profile-social-audience {
+
+    color: var(--muted);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 9px;
+}
+
+
+.profile-audience-max {
+
+    margin:
+        12px 0 30px;
+
+    padding:
+        10px 13px;
+
+    border-left:
+        2px solid var(--gold);
+
+    background:
+        rgba(214,173,85,.045);
+
+    color: #dce1e8;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+.profile-audience-max strong {
+
+    color: var(--gold-light);
+
+    font-size: 13px;
+}
+
+
+.profile-audience-max small {
+
+    color: #7f8997;
+
+    font-size: 9px;
+
+    font-style: italic;
+}
+
+
+/* =========================================================
+   COMPÉTENCES
+========================================================= */
+
+.profile-competences {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+
+.profile-competence {
+
+    padding:
+        7px 11px;
+
+    border:
+        1px solid rgba(214,173,85,.28);
+
+    background:
+        rgba(214,173,85,.045);
+
+    color: #d9dde4;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: .4px;
+}
+
+
+/* =========================================================
+   MODALE INSCRIPTION
+========================================================= */
+
+.join-modal {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1000;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 25px;
+
+    background:
+        rgba(2,8,18,.84);
+
+    backdrop-filter:
+        blur(8px);
+
+    -webkit-backdrop-filter:
+        blur(8px);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    pointer-events: none;
+
+    transition:
+        opacity .25s ease,
+        visibility .25s ease;
+}
+
+
+.join-modal.active {
+
+    opacity: 1;
+
+    visibility: visible;
+
+    pointer-events: auto;
+}
+
+
+.join-modal-box {
+
+    position: relative;
+
+    width: min(100%, 720px);
+
+    max-height:
+        calc(100vh - 40px);
+
+    overflow-y: auto;
+
+    padding:
+        48px 42px 42px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #102746,
+            #050f20
         );
 
+    border:
+        1px solid rgba(214,173,85,.42);
 
-    const closeJoin =
-        document.getElementById(
-            "closeJoin"
-        );
+    box-shadow:
+        0 30px 90px rgba(0,0,0,.55);
+
+    transform:
+        translateY(18px)
+        scale(.985);
+
+    transition:
+        transform .25s ease;
+}
 
 
-    /*
-     * Bouton fermeture profil.
-     */
+.join-modal.active
+.join-modal-box {
 
-    if (
-        closeMember &&
-        memberModal
-    ) {
+    transform:
+        translateY(0)
+        scale(1);
+}
 
-        closeMember.addEventListener(
-            "click",
-            () => {
 
-                fermerModalEquipe(
-                    memberModal
-                );
+.join-modal-box::before {
 
-            }
-        );
+    content: "";
 
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 3px;
+
+    background: var(--gold);
+}
+
+
+.join-modal-kicker {
+
+    color: var(--gold);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: 3px;
+
+    margin-bottom: 10px;
+}
+
+
+.form-title {
+
+    margin: 0;
+
+    font-size:
+        clamp(30px, 5vw, 42px);
+
+    font-weight: normal;
+
+    letter-spacing: 1px;
+}
+
+
+.form-intro {
+
+    margin:
+        12px 0 30px;
+
+    color: var(--muted);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   FORMULAIRE
+========================================================= */
+
+.form-group {
+
+    margin-bottom: 22px;
+}
+
+
+.form-group > label:first-child,
+.form-group > .main-label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #e5e7eb;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    text-transform: uppercase;
+}
+
+
+.required {
+
+    color: var(--red);
+}
+
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="url"],
+.form-group textarea {
+
+    display: block;
+
+    width: 100%;
+
+    padding:
+        12px 13px;
+
+    border:
+        1px solid rgba(255,255,255,.13);
+
+    outline: none;
+
+    background:
+        #050f20;
+
+    color: var(--white);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 13px;
+
+    transition:
+        border-color .2s,
+        box-shadow .2s;
+}
+
+
+.form-group textarea {
+
+    min-height: 130px;
+
+    resize: vertical;
+
+    line-height: 1.6;
+}
+
+
+.form-group input:focus,
+.form-group textarea:focus {
+
+    border-color:
+        rgba(214,173,85,.65);
+
+    box-shadow:
+        0 0 0 2px rgba(214,173,85,.08);
+}
+
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+
+    color: #697586;
+}
+
+
+.help {
+
+    margin-top: 6px;
+
+    color: #778294;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 10px;
+}
+
+
+.description-counter {
+
+    margin-top: 6px;
+
+    text-align: right;
+
+    color: #778294;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 10px;
+}
+
+
+.description-counter.warning {
+
+    color: var(--gold-light);
+}
+
+
+.description-counter.limit {
+
+    color: var(--red);
+}
+
+
+/* =========================================================
+   CHOIX VISIBILITÉ
+========================================================= */
+
+.registration-choice {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px;
+}
+
+
+.choice-option {
+
+    border:
+        1px solid rgba(255,255,255,.11);
+
+    background:
+        rgba(255,255,255,.025);
+
+    transition:
+        border-color .2s,
+        background .2s;
+}
+
+
+.choice-option:hover {
+
+    border-color:
+        rgba(214,173,85,.40);
+
+    background:
+        rgba(214,173,85,.04);
+}
+
+
+.choice-label {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+    padding: 14px;
+
+    cursor: pointer;
+}
+
+
+.choice-label input {
+
+    position: absolute;
+
+    opacity: 0;
+
+    pointer-events: none;
+}
+
+
+.choice-label strong {
+
+    color: var(--white);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 12px;
+}
+
+
+.choice-label span {
+
+    color: var(--muted);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 10px;
+
+    line-height: 1.4;
+}
+
+
+.choice-label:has(input:checked) {
+
+    outline:
+        1px solid var(--gold);
+
+    background:
+        rgba(214,173,85,.07);
+}
+
+
+/* =========================================================
+   COMPÉTENCES FORMULAIRE
+========================================================= */
+
+.form-section-title {
+
+    margin:
+        30px 0 15px;
+
+    padding-bottom: 10px;
+
+    border-bottom:
+        1px solid rgba(214,173,85,.25);
+
+    color: var(--gold-light);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: 2px;
+}
+
+
+.competence-group {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 9px;
+}
+
+
+.competence {
+
+    border:
+        1px solid rgba(255,255,255,.10);
+
+    background:
+        rgba(255,255,255,.02);
+
+    transition:
+        border-color .2s,
+        background .2s;
+}
+
+
+.competence:hover {
+
+    border-color:
+        rgba(214,173,85,.38);
+
+    background:
+        rgba(214,173,85,.035);
+}
+
+
+.competence label {
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 10px;
+
+    padding: 12px;
+
+    cursor: pointer;
+}
+
+
+.competence input {
+
+    margin-top: 2px;
+
+    accent-color: var(--gold);
+
+    flex-shrink: 0;
+}
+
+
+.competence-name {
+
+    display: block;
+
+    color: #e1e4e9;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 11px;
+
+    font-weight: bold;
+}
+
+
+.competence-description {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color: #7f8997;
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 9px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   MESSAGE FORMULAIRE
+========================================================= */
+
+.form-message {
+
+    min-height: 18px;
+
+    margin:
+        18px 0 10px;
+
+    color: var(--gold-light);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   BOUTON FORMULAIRE
+========================================================= */
+
+.submit-button {
+
+    display: block;
+
+    width: 100%;
+
+    padding:
+        13px 20px;
+
+    border:
+        1px solid var(--gold);
+
+    background: transparent;
+
+    color: var(--gold-light);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: 1.5px;
+
+    cursor: pointer;
+
+    transition:
+        background .2s,
+        color .2s,
+        transform .2s;
+}
+
+
+.submit-button:hover {
+
+    background: var(--gold);
+
+    color: var(--navy);
+
+    transform: translateY(-1px);
+}
+
+
+.submit-button:disabled {
+
+    opacity: .5;
+
+    cursor: wait;
+
+    transform: none;
+}
+
+
+/* =========================================================
+   ÉTAT CHARGEMENT
+========================================================= */
+
+.team-grid .events-empty {
+
+    grid-column:
+        1 / -1;
+
+    min-height: 120px;
+
+    justify-content: center;
+
+    padding: 30px;
+
+    border:
+        1px solid rgba(214,173,85,.18);
+
+    background:
+        rgba(255,255,255,.02);
+
+    font-family:
+        Arial,
+        sans-serif;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   RESPONSIVE TABLETTE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .team-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
     }
 
 
-    /*
-     * Bouton fermeture inscription.
-     */
+    .profile-content {
 
-    if (
-        closeJoin &&
-        joinModal
-    ) {
+        grid-template-columns:
+            240px minmax(0, 1fr);
 
-        closeJoin.addEventListener(
-            "click",
-            () => {
+        gap: 30px;
 
-                fermerModalEquipe(
-                    joinModal
-                );
-
-            }
-        );
-
+        padding:
+            50px 30px 35px;
     }
 
 
-    /*
-     * Clic sur le fond de la modale profil.
-     */
+    .profile-socials {
 
-    if (memberModal) {
-
-        memberModal.addEventListener(
-            "click",
-            event => {
-
-                if (
-                    event.target ===
-                    memberModal
-                ) {
-
-                    fermerModalEquipe(
-                        memberModal
-                    );
-
-                }
-
-            }
-        );
-
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
     }
-
-
-    /*
-     * Clic sur le fond de la modale inscription.
-     */
-
-    if (joinModal) {
-
-        joinModal.addEventListener(
-            "click",
-            event => {
-
-                if (
-                    event.target ===
-                    joinModal
-                ) {
-
-                    fermerModalEquipe(
-                        joinModal
-                    );
-
-                }
-
-            }
-        );
-
-    }
-
-
-    /*
-     * Touche Escape.
-     */
-
-    document.addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key !==
-                "Escape"
-            ) {
-                return;
-            }
-
-
-            if (
-                memberModal &&
-                memberModal.classList.contains(
-                    "active"
-                )
-            ) {
-
-                fermerModalEquipe(
-                    memberModal
-                );
-
-                return;
-
-            }
-
-
-            if (
-                joinModal &&
-                joinModal.classList.contains(
-                    "active"
-                )
-            ) {
-
-                fermerModalEquipe(
-                    joinModal
-                );
-
-            }
-
-        }
-    );
 
 }
 
 
 /* =========================================================
-   FORMULAIRE INSCRIPTION
+   RESPONSIVE MOBILE
 ========================================================= */
 
-function initialiserFormulaireInscription() {
+@media (max-width: 680px) {
 
-    const form =
-        document.getElementById(
-            "joinForm"
-        );
+    .team-hero {
 
-
-    if (!form) {
-        return;
+        min-height: 390px;
     }
 
 
-    form.addEventListener(
-        "submit",
-        async event => {
+    .team-hero .hero-content {
 
-            event.preventDefault();
-
-
-            const nomField =
-                document.getElementById(
-                    "nom"
-                );
-
-
-            const emailField =
-                document.getElementById(
-                    "email"
-                );
-
-
-            const regionField =
-                document.getElementById(
-                    "region"
-                );
-
-
-            const imageField =
-                document.getElementById(
-                    "image_url"
-                );
-
-
-            const descriptionField =
-                document.getElementById(
-                    "descriptionField"
-                );
-
-
-            const submitButton =
-                document.getElementById(
-                    "submitJoin"
-                );
-
-
-            const message =
-                document.getElementById(
-                    "formMessage"
-                );
-
-
-            const typeInscription =
-                document.querySelector(
-                    'input[name="type_inscription"]:checked'
-                );
-
-
-            if (
-                !nomField ||
-                !emailField ||
-                !regionField ||
-                !descriptionField
-            ) {
-                return;
-            }
-
-
-            const nom =
-                nomField.value.trim();
-
-
-            const email =
-                emailField.value
-                    .trim()
-                    .toLowerCase();
-
-
-            const region =
-                regionField.value.trim();
-
-
-            const image_url =
-                imageField
-                    ? imageField.value.trim()
-                    : "";
-
-
-            const description =
-                descriptionField.value.trim();
-
-
-            const anonyme =
-                typeInscription
-                    ? typeInscription.value ===
-                      "anonyme"
-                    : false;
-
-
-            const competences =
-                Array.from(
-                    document.querySelectorAll(
-                        'input[name="competences"]:checked'
-                    )
-                )
-                .map(
-                    input =>
-                        input.value
-                )
-                .filter(Boolean);
-
-
-            /*
-             * Réinitialisation message.
-             */
-
-            if (message) {
-
-                message.textContent =
-                    "";
-
-                message.className =
-                    "form-message";
-
-            }
-
-
-            /*
-             * Validation nom.
-             */
-
-            if (!nom) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "Merci d’indiquer votre nom."
-                );
-
-
-                nomField.focus();
-
-                return;
-
-            }
-
-
-            /*
-             * Validation email.
-             */
-
-            if (!email) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "Merci d’indiquer votre adresse email."
-                );
-
-
-                emailField.focus();
-
-                return;
-
-            }
-
-
-            const emailValide =
-                /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                    .test(email);
-
-
-            if (!emailValide) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "L’adresse email semble invalide."
-                );
-
-
-                emailField.focus();
-
-                return;
-
-            }
-
-
-            /*
-             * Validation région.
-             */
-
-            if (!region) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "Merci d’indiquer votre région."
-                );
-
-
-                regionField.focus();
-
-                return;
-
-            }
-
-
-            /*
-             * Validation présentation.
-             */
-
-            if (!description) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "Merci de renseigner une présentation."
-                );
-
-
-                descriptionField.focus();
-
-                return;
-
-            }
-
-
-            if (
-                description.length >
-                300
-            ) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "La présentation ne doit pas dépasser 300 caractères."
-                );
-
-
-                descriptionField.focus();
-
-                return;
-
-            }
-
-
-            /*
-             * Validation image.
-             */
-
-            if (
-                image_url &&
-                !imageValide(
-                    image_url
-                )
-            ) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "L’URL de la photo semble invalide."
-                );
-
-
-                imageField.focus();
-
-                return;
-
-            }
-
-
-            /*
-             * Vérification Supabase.
-             */
-
-            if (
-                typeof supabaseClient ===
-                    "undefined" ||
-                !supabaseClient
-            ) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "La connexion à la base de données est indisponible."
-                );
-
-                return;
-
-            }
-
-
-            /*
-             * Désactivation bouton.
-             */
-
-            if (submitButton) {
-
-                submitButton.disabled =
-                    true;
-
-
-                submitButton.textContent =
-                    "INSCRIPTION EN COURS…";
-
-            }
-
-
-            try {
-
-                /*
-                 * Vérification email déjà présent.
-                 */
-
-                const {
-                    data: doublon,
-                    error: erreurDoublon
-                } = await supabaseClient
-
-                    .from("profiles")
-
-                    .select("id")
-
-                    .ilike(
-                        "email",
-                        email
-                    )
-
-                    .limit(1);
-
-
-                if (erreurDoublon) {
-                    throw erreurDoublon;
-                }
-
-
-                if (
-                    Array.isArray(
-                        doublon
-                    ) &&
-                    doublon.length > 0
-                ) {
-
-                    afficherErreurFormulaire(
-                        message,
-                        "Cette adresse email est déjà enregistrée."
-                    );
-
-
-                    return;
-
-                }
-
-
-                /*
-                 * UUID.
-                 */
-
-                const id =
-                    crypto.randomUUID();
-
-
-                /*
-                 * Insertion.
-                 */
-
-                const {
-                    error: erreurInsertion
-                } = await supabaseClient
-
-                    .from("profiles")
-
-                    .insert({
-
-                        id,
-
-                        nom,
-
-                        grade: "user",
-
-                        email,
-
-                        image_url:
-                            image_url ||
-                            null,
-
-                        description:
-                            description ||
-                            null,
-
-                        region,
-
-                        competences,
-
-                        anonyme
-
-                    });
-
-
-                if (erreurInsertion) {
-                    throw erreurInsertion;
-                }
-
-
-                /*
-                 * Succès.
-                 */
-
-                if (message) {
-
-                    message.textContent =
-                        "Votre inscription a bien été enregistrée. Merci de rejoindre l’Avant-gardE.";
-
-
-                    message.className =
-                        "form-message success";
-
-                }
-
-
-                form.reset();
-
-
-                /*
-                 * Le choix par défaut
-                 * redevient sympathisant.
-                 */
-
-                const radioSympathisant =
-                    document.querySelector(
-                        'input[name="type_inscription"][value="sympathisant"]'
-                    );
-
-
-                if (
-                    radioSympathisant
-                ) {
-
-                    radioSympathisant.checked =
-                        true;
-
-                }
-
-
-                mettreAJourCompteurDescription();
-
-
-                /*
-                 * Recharge l'équipe.
-                 */
-
-                setTimeout(
-                    () => {
-
-                        chargerMembres();
-
-                    },
-                    1800
-                );
-
-            } catch (error) {
-
-                console.error(
-                    "Erreur inscription :",
-                    error
-                );
-
-
-                afficherErreurFormulaire(
-                    message,
-                    "Une erreur est survenue lors de l’inscription. Veuillez réessayer."
-                );
-
-            } finally {
-
-                if (submitButton) {
-
-                    submitButton.disabled =
-                        false;
-
-
-                    submitButton.textContent =
-                        "REJOINDRE L’AVANT-GARDE";
-
-                }
-
-            }
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   MESSAGE ERREUR
-========================================================= */
-
-function afficherErreurFormulaire(
-    element,
-    texte
-) {
-
-    if (!element) {
-        return;
+        padding:
+            55px 20px;
     }
 
 
-    element.textContent =
-        texte;
+    .team-hero h1 {
 
+        font-size:
+            clamp(36px, 12vw, 58px);
 
-    element.className =
-        "form-message error";
-
-}
-
-
-/* =========================================================
-   COMPTEUR
-========================================================= */
-
-function initialiserCompteurDescription() {
-
-    const textarea =
-        document.getElementById(
-            "descriptionField"
-        );
-
-
-    if (!textarea) {
-        return;
+        letter-spacing: 2px;
     }
 
 
-    textarea.addEventListener(
-        "input",
-        mettreAJourCompteurDescription
-    );
+    .team-section {
+
+        padding:
+            45px 16px 55px;
+    }
 
 
-    mettreAJourCompteurDescription();
+    .team-grid {
+
+        grid-template-columns:
+            1fr;
+
+        gap: 15px;
+    }
+
+
+    .member-card {
+
+        max-width: 520px;
+
+        width: 100%;
+
+        margin: auto;
+    }
+
+
+    .profile-modal,
+    .join-modal {
+
+        padding: 12px;
+    }
+
+
+    .profile-modal-box {
+
+        max-height:
+            calc(100vh - 24px);
+    }
+
+
+    .profile-content {
+
+        grid-template-columns: 1fr;
+
+        gap: 28px;
+
+        padding:
+            48px 20px 25px;
+    }
+
+
+    .profile-left {
+
+        max-width: 270px;
+
+        width: 100%;
+
+        margin: auto;
+    }
+
+
+    .profile-name {
+
+        font-size: 25px;
+    }
+
+
+    .profile-socials {
+
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+
+    .join-modal-box {
+
+        max-height:
+            calc(100vh - 24px);
+
+        padding:
+            42px 20px 25px;
+    }
+
+
+    .registration-choice,
+    .competence-group {
+
+        grid-template-columns:
+            1fr;
+    }
+
+
+    .modal-close {
+
+        top: 10px;
+        right: 10px;
+    }
 
 }
 
 
 /* =========================================================
-   INITIALISATION
+   TRÈS PETITS ÉCRANS
 ========================================================= */
 
-async function initialiserEquipe() {
+@media (max-width: 420px) {
 
-    await chargerMembres();
+    .profile-socials {
 
-    initialiserOuvertureInscription();
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
 
-    initialiserFermetureModales();
 
-    initialiserFormulaireInscription();
+    .profile-content {
 
-    initialiserCompteurDescription();
+        padding:
+            45px 15px 20px;
+    }
+
+
+    .join-modal-box {
+
+        padding-left: 15px;
+        padding-right: 15px;
+    }
 
 }
-
 
 /* =========================================================
-   DOM READY
+   COMPATIBILITÉ JS / CLASSES RENDUES DYNAMIQUEMENT
 ========================================================= */
 
-if (
-    document.readyState ===
-    "loading"
-) {
+.profile-social-item { position: relative; min-width: 0; }
+.profile-social-item .profile-social-link { width: 100%; }
+.profile-social-max-star { position:absolute; top:5px; right:7px; z-index:2; color:var(--gold-light); font-size:11px; pointer-events:none; }
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        initialiserEquipe
-    );
+.form-message.success { color:#9fd7b0; }
+.form-message.error { color:#ff9d95; }
 
-} else {
-
-    initialiserEquipe();
-
+@media (max-width:680px) {
+    .profile-socials { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
+
