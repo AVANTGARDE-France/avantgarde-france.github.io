@@ -1,67 +1,52 @@
 /* =========================================================
-   AVANT-GARDE — COMPOSANTS COMMUNS
-   js/components.js
+AVANT-GARDE — COMPONENTS
+js/components.js
 
-   Gestion :
-   - header
-   - navigation
-   - barre événements
-   - ticker
-   - footer
-   - modale événement
-========================================================= */
+Composants communs à toutes les pages :
 
+* Barre événementielle
+* Header / navigation
+* Roue admin
+* Footer
+* Modale rendez-vous
+* Chargement des événements Supabase
+  ========================================================= */
 
-/* =========================================================
-   VARIABLES
-========================================================= */
-
-let rendezVous = [];
-
-let tickerAnimation = null;
-
+import { supabase } from "./supabase.js";
 
 /* =========================================================
-   HEADER
+HEADER
 ========================================================= */
 
 function injecterHeader() {
 
-  const container =
-    document.getElementById(
-      "site-header"
-    );
+```
+const container = document.getElementById("site-header");
 
+if (!container) return;
 
-  if (!container) {
-    return;
-  }
+container.innerHTML = `
 
-
-  container.innerHTML = `
-
-    <!-- BARRE ÉVÉNEMENTS -->
+    <!-- BARRE EVENEMENT -->
 
     <div class="events-bar">
 
-      <div class="events-label">
-        EVENEMENT
-      </div>
-
-      <div class="events-window">
-
-        <div
-          id="eventsTrack"
-          class="events-track"
-        >
-
-          <div class="events-empty">
-            Chargement…
-          </div>
-
+        <div class="events-label">
+            EVENEMENT
         </div>
 
-      </div>
+        <div class="events-window">
+
+            <div
+                id="eventsTrack"
+                class="events-track"
+            >
+                <div class="events-empty">
+                    Chargement…
+                </div>
+            </div>
+
+        </div>
 
     </div>
 
@@ -70,1071 +55,877 @@ function injecterHeader() {
 
     <header class="site-header">
 
-      <div class="header-inner">
+        <div class="header-inner">
+
+            <a
+                href="index.html"
+                class="logo"
+                aria-label="Avant-gardE — La France libre"
+            >
+                <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
+            </a>
 
 
-        <!-- LOGO -->
+            <nav class="main-nav">
 
-        <a
-          href="index.html"
-          class="logo"
-          aria-label="Avant-gardE — Accueil"
-        >
+                <a href="manifeste.html">
+                    MANIFESTE
+                </a>
 
-          <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
+                <a href="projet.html">
+                    PROJET
+                </a>
 
-        </a>
+                <a href="inspirations.html">
+                    INSPIRATIONS
+                </a>
 
+                <a href="equipe.html">
+                    L'ÉQUIPE
+                </a>
 
-        <!-- NAVIGATION -->
-
-        <nav
-          class="main-nav"
-          aria-label="Navigation principale"
-        >
-
-          <a href="index.html">
-            ACCUEIL
-          </a>
-
-          <a href="manifeste.html">
-            MANIFESTE
-          </a>
-
-          <a href="projet.html">
-            NOTRE PROJET
-          </a>
-
-          <a href="inspirations.html">
-            NOS INSPIRATIONS
-          </a>
-
-          <a href="equipe.html">
-            NOTRE ÉQUIPE
-          </a>
-
-        </nav>
+            </nav>
 
 
-        <!-- ADMINISTRATION -->
+            <a
+                href="admin.html"
+                class="admin-link"
+                aria-label="Administration"
+                title="Administration"
+            >
+                ⚙
+            </a>
 
-        <a
-          href="admin.html"
-          class="admin-link"
-          title="Administration"
-          aria-label="Administration"
-        >
-          ⚙
-        </a>
-
-
-      </div>
+        </div>
 
     </header>
-
-  `;
+`;
+```
 
 }
 
-
 /* =========================================================
-   FOOTER
+FOOTER
 ========================================================= */
 
 function injecterFooter() {
 
-  const container =
-    document.getElementById(
-      "site-footer"
-    );
+```
+const container = document.getElementById("site-footer");
 
+if (!container) return;
 
-  if (!container) {
-    return;
-  }
+container.innerHTML = `
 
+    <footer>
 
-  container.innerHTML = `
+        <div>
+            Avant-gardE — La France libre
+        </div>
 
-    <footer class="site-footer">
-
-      <div>
-        © ${new Date().getFullYear()}
-        Avant-gardE — La France libre
-      </div>
-
-      <div>
-        Nation · Liberté · Responsabilité
-      </div>
+        <div>
+            Souveraineté · Liberté · Responsabilité
+        </div>
 
     </footer>
-
-  `;
+`;
+```
 
 }
 
-
 /* =========================================================
-   MODALE ÉVÉNEMENT
+MODALE RENDEZ-VOUS
 ========================================================= */
 
 function injecterModaleRendezVous() {
 
-  const container =
-    document.getElementById(
-      "site-rdv-modal"
-    );
+```
+const container = document.getElementById("site-rdv-modal");
 
+if (!container) return;
 
-  if (!container) {
-    return;
-  }
-
-
-  container.innerHTML = `
+container.innerHTML = `
 
     <div
-      class="rdv-modal"
-      id="rdvModal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="rdvModalTitle"
+        id="rdvModal"
+        class="rdv-modal"
+        aria-hidden="true"
     >
 
-      <div class="rdv-modal-box">
+        <div class="rdv-modal-box">
+
+            <button
+                id="rdvModalClose"
+                class="rdv-modal-close"
+                type="button"
+                aria-label="Fermer"
+            >
+                ×
+            </button>
 
 
-        <button
-          type="button"
-          class="rdv-modal-close"
-          id="rdvModalClose"
-          aria-label="Fermer"
-        >
-          ×
-        </button>
+            <div class="rdv-modal-kicker">
+                RENDEZ-VOUS
+            </div>
 
 
-        <div class="rdv-modal-kicker">
-          EVENEMENT
+            <h2
+                id="rdvModalTitle"
+                class="rdv-modal-title"
+            >
+            </h2>
+
+
+            <div class="rdv-modal-info">
+
+                <div>
+                    <span>DATE :</span>
+                    <strong id="rdvModalDate"></strong>
+                </div>
+
+                <div>
+                    <span>HEURE :</span>
+                    <strong id="rdvModalTime"></strong>
+                </div>
+
+                <div id="rdvModalLocationWrap">
+                    <span>LIEU :</span>
+                    <strong id="rdvModalLocation"></strong>
+                </div>
+
+            </div>
+
+
+            <div
+                id="rdvModalDescription"
+                class="rdv-modal-description"
+            >
+            </div>
+
+
+            <a
+                id="rdvModalLink"
+                class="rdv-modal-link"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                style="display:none;"
+            >
+                EN SAVOIR PLUS
+            </a>
+
         </div>
-
-
-        <h2
-          class="rdv-modal-title"
-          id="rdvModalTitle"
-        >
-        </h2>
-
-
-        <div class="rdv-modal-info">
-
-          <div>
-            <span>DATE :</span>
-            <strong id="rdvModalDate"></strong>
-          </div>
-
-          <div>
-            <span>HEURE :</span>
-            <strong id="rdvModalTime"></strong>
-          </div>
-
-          <div>
-            <span>LIEU :</span>
-            <strong id="rdvModalLocation"></strong>
-          </div>
-
-        </div>
-
-
-        <div
-          class="rdv-modal-description"
-          id="rdvModalDescription"
-        >
-        </div>
-
-
-        <a
-          href="#"
-          id="rdvModalLink"
-          class="rdv-modal-link"
-          target="_blank"
-          rel="noopener noreferrer"
-          style="display:none;"
-        >
-          EN SAVOIR PLUS
-        </a>
-
-
-      </div>
 
     </div>
-
-  `;
+`;
+```
 
 }
 
-
 /* =========================================================
-   CHARGEMENT ÉVÉNEMENTS
+CHARGEMENT DES EVENEMENTS
 ========================================================= */
 
 async function chargerRendezVous() {
 
-  const track =
-    document.getElementById(
-      "eventsTrack"
-    );
+```
+const track = document.getElementById("eventsTrack");
 
+if (!track) return;
 
-  if (!track) {
-    return;
-  }
+try {
 
+    const maintenant = new Date().toISOString();
 
-  if (
-    typeof supabaseClient === "undefined" ||
-    !supabaseClient
-  ) {
+    const { data, error } = await supabase
+        .from("rendezvous")
+        .select("*")
+        .eq("actif", true)
+        .gte("date_evenement", maintenant)
+        .order("date_evenement", {
+            ascending: true
+        });
 
-    track.innerHTML = `
-      <div class="events-empty">
-        Aucun événement.
-      </div>
-    `;
 
-    return;
-
-  }
-
-
-  const {
-    data,
-    error
-  } = await supabaseClient
-
-    .from("rendezvous")
-
-    .select("*")
-
-    .eq(
-      "actif",
-      true
-    )
-
-    .order(
-      "date_evenement",
-      {
-        ascending: true
-      }
-    );
-
-
-  if (error) {
-
-    console.error(
-      "Erreur chargement événements :",
-      error
-    );
-
-
-    track.innerHTML = `
-      <div class="events-empty">
-        Aucun événement.
-      </div>
-    `;
-
-    return;
-
-  }
-
-
-  rendezVous =
-    Array.isArray(data)
-      ? data
-      : [];
-
-
-  if (!rendezVous.length) {
-
-    track.innerHTML = `
-      <div class="events-empty">
-        Aucun événement à venir.
-      </div>
-    `;
-
-    demarrerDefilement();
-
-    return;
-
-  }
-
-
-  track.innerHTML = "";
-
-
-  rendezVous.forEach(
-    (rdv, index) => {
-
-      const event =
-        document.createElement("div");
-
-
-      event.className =
-        "event";
-
-
-      event.tabIndex =
-        0;
-
-
-      event.setAttribute(
-        "role",
-        "button"
-      );
-
-
-      event.setAttribute(
-        "aria-label",
-        `Ouvrir l'événement ${rdv.titre || "événement"}`
-      );
-
-
-      const date =
-        formaterDateCourte(
-          rdv.date_evenement
-        );
-
-
-      const heure =
-        rdv.heure
-          ? String(rdv.heure).slice(0, 5)
-          : "";
-
-
-      event.innerHTML = `
-
-        <strong>
-          ${escapeHtmlComponents(date)}
-        </strong>
-
-        ${
-          heure
-            ? `
-              <span>
-                ${escapeHtmlComponents(heure)}
-              </span>
-            `
-            : ""
-        }
-
-        <span>
-          ${escapeHtmlComponents(
-            rdv.titre || "Événement"
-          )}
-        </span>
-
-        ${
-          rdv.lieu
-            ? `
-              <span>
-                — ${escapeHtmlComponents(rdv.lieu)}
-              </span>
-            `
-            : ""
-        }
-
-      `;
-
-
-      event.addEventListener(
-        "click",
-        () => {
-
-          ouvrirRendezVous(
-            rendezVous[index]
-          );
-
-        }
-      );
-
-
-      event.addEventListener(
-        "keydown",
-        eventKeyboard => {
-
-          if (
-            eventKeyboard.key === "Enter" ||
-            eventKeyboard.key === " "
-          ) {
-
-            eventKeyboard.preventDefault();
-
-            ouvrirRendezVous(
-              rendezVous[index]
-            );
-
-          }
-
-        }
-      );
-
-
-      track.appendChild(event);
-
-
-      /*
-       * Séparateur sauf dernier.
-       */
-
-      if (
-        index <
-        rendezVous.length - 1
-      ) {
-
-        const separator =
-          document.createElement("span");
-
-
-        separator.className =
-          "event-separator";
-
-
-        separator.textContent =
-          "◆";
-
-
-        track.appendChild(
-          separator
-        );
-
-      }
-
+    if (error) {
+        throw error;
     }
-  );
 
 
-  /*
-   * On attend que le navigateur ait calculé
-   * les dimensions avant de lancer l'animation.
-   */
+    if (!data || data.length === 0) {
 
-  requestAnimationFrame(
-    () => {
+        track.innerHTML = `
+            <div class="events-empty">
+                Aucun événement à venir
+            </div>
+        `;
 
-      requestAnimationFrame(
-        () => {
+        arreterDefilement();
 
-          demarrerDefilement();
-
-        }
-      );
-
+        return;
     }
-  );
-
-}
 
 
-/* =========================================================
-   TICKER — DÉFILEMENT
-========================================================= */
+    track.innerHTML = data
+        .map((rdv, index) => {
 
-function demarrerDefilement() {
+            const date = new Date(rdv.date_evenement);
 
-  const windowElement =
-    document.querySelector(
-      ".events-window"
-    );
+            const dateFormatee =
+                formaterDateCourte(date);
 
-
-  const track =
-    document.getElementById(
-      "eventsTrack"
-    );
+            const heure =
+                formaterHeure(date);
 
 
-  if (
-    !windowElement ||
-    !track
-  ) {
+            return `
 
-    return;
+                ${index > 0
+                    ? `<span class="event-separator">◆</span>`
+                    : ""
+                }
 
-  }
+                <div
+                    class="event"
+                    data-rdv-id="${escapeHtmlComponents(String(rdv.id))}"
+                >
 
+                    <strong>
+                        ${escapeHtmlComponents(
+                            rdv.titre || "Événement"
+                        )}
+                    </strong>
 
-  /*
-   * Annule l'ancienne animation.
-   */
+                    <span>
+                        &nbsp;·&nbsp;
+                        ${dateFormatee}
+                        &nbsp;·&nbsp;
+                        ${heure}
+                    </span>
 
-  if (tickerAnimation !== null) {
-
-    cancelAnimationFrame(
-      tickerAnimation
-    );
-
-    tickerAnimation = null;
-
-  }
-
-
-  /*
-   * Reset.
-   */
-
-  track.style.transform =
-    "translate3d(0, 0, 0)";
-
-
-  /*
-   * Mesure réelle.
-   */
-
-  const largeurFenetre =
-    windowElement.getBoundingClientRect()
-      .width;
-
-
-  const largeurTrack =
-    track.scrollWidth;
-
-
-  if (
-    !largeurFenetre ||
-    !largeurTrack
-  ) {
-
-    return;
-
-  }
-
-
-  /*
-   * Si tout tient dans la fenêtre,
-   * aucun défilement n'est nécessaire.
-   */
-
-  if (
-    largeurTrack <=
-    largeurFenetre
-  ) {
-
-    track.style.transform =
-      "translate3d(0, 0, 0)";
-
-    return;
-
-  }
-
-
-  /*
-   * Départ à droite.
-   */
-
-  let position =
-    largeurFenetre;
-
-
-  const vitesse =
-    80;
-
-
-  let dernierTemps =
-    performance.now();
-
-
-  function animation(
-    temps
-  ) {
-
-    const delta =
-      Math.min(
-        temps - dernierTemps,
-        100
-      );
-
-
-    dernierTemps =
-      temps;
-
-
-    position -=
-      vitesse *
-      delta /
-      1000;
+                </div>
+            `;
+        })
+        .join("");
 
 
     /*
-     * Lorsque tout le contenu est sorti
-     * à gauche, on recommence à droite.
+     * IMPORTANT :
+     * On attend deux frames afin que le navigateur ait
+     * réellement calculé la largeur du contenu avant
+     * de lancer l'animation.
+     */
+    requestAnimationFrame(() => {
+
+        requestAnimationFrame(() => {
+
+            demarrerDefilement();
+
+        });
+
+    });
+
+
+} catch (error) {
+
+    console.error(
+        "Erreur chargement rendez-vous :",
+        error
+    );
+
+    track.innerHTML = `
+        <div class="events-empty">
+            Impossible de charger les événements
+        </div>
+    `;
+
+    arreterDefilement();
+}
+```
+
+}
+
+/* =========================================================
+DEFILEMENT EVENEMENTIEL
+========================================================= */
+
+let tickerAnimation = null;
+
+/*
+
+* Arrête proprement l'animation existante.
+  */
+
+function arreterDefilement() {
+
+```
+if (tickerAnimation !== null) {
+
+    cancelAnimationFrame(
+        tickerAnimation
+    );
+
+    tickerAnimation = null;
+}
+```
+
+}
+
+/*
+
+* Démarre le défilement.
+*
+* IMPORTANT :
+* On NE vérifie PAS si le contenu est plus petit
+* que la fenêtre.
+*
+* Même avec un seul événement court, celui-ci doit
+* entrer par la droite, traverser toute la barre,
+* sortir à gauche, puis recommencer.
+  */
+
+function demarrerDefilement() {
+
+```
+const track =
+    document.getElementById("eventsTrack");
+
+const windowElement =
+    document.querySelector(".events-window");
+
+
+if (!track || !windowElement) return;
+
+
+arreterDefilement();
+
+
+const largeurFenetre =
+    windowElement.clientWidth;
+
+const largeurContenu =
+    track.scrollWidth;
+
+
+if (
+    largeurFenetre <= 0 ||
+    largeurContenu <= 0
+) {
+    return;
+}
+
+
+/*
+ * Vitesse identique à l'ancien code original.
+ */
+
+const vitesse = 180;
+
+
+/*
+ * Le contenu commence complètement à droite
+ * de la fenêtre.
+ */
+
+let position = largeurFenetre;
+
+
+let dernierTemps =
+    performance.now();
+
+
+track.style.transform =
+    `translateX(${position}px)`;
+
+
+function animation(temps) {
+
+    const delta =
+        (temps - dernierTemps) / 1000;
+
+
+    dernierTemps = temps;
+
+
+    position -=
+        vitesse * delta;
+
+
+    /*
+     * Lorsque tout le contenu est sorti à gauche,
+     * on le replace à droite.
      */
 
     if (
-      position <
-      -largeurTrack
+        position <= -largeurContenu
     ) {
 
-      position =
-        largeurFenetre;
-
+        position =
+            largeurFenetre;
     }
 
 
     track.style.transform =
-      `translate3d(${position}px, 0, 0)`;
+        `translateX(${position}px)`;
 
 
     tickerAnimation =
-      requestAnimationFrame(
-        animation
-      );
-
-  }
-
-
-  tickerAnimation =
-    requestAnimationFrame(
-      animation
-    );
-
+        requestAnimationFrame(
+            animation
+        );
 }
 
 
+tickerAnimation =
+    requestAnimationFrame(
+        animation
+    );
+```
+
+}
+
 /* =========================================================
-   OUVERTURE ÉVÉNEMENT
+OUVERTURE DE LA MODALE
 ========================================================= */
 
-function ouvrirRendezVous(rdv) {
+async function ouvrirRendezVous(id) {
 
-  if (!rdv) {
-    return;
-  }
+```
+const modal =
+    document.getElementById("rdvModal");
 
-
-  const modal =
-    document.getElementById(
-      "rdvModal"
-    );
+if (!modal) return;
 
 
-  if (!modal) {
-    return;
-  }
+try {
+
+    const { data, error } = await supabase
+        .from("rendezvous")
+        .select("*")
+        .eq("id", id)
+        .single();
 
 
-  const title =
-    document.getElementById(
-      "rdvModalTitle"
-    );
-
-
-  const date =
-    document.getElementById(
-      "rdvModalDate"
-    );
-
-
-  const time =
-    document.getElementById(
-      "rdvModalTime"
-    );
-
-
-  const location =
-    document.getElementById(
-      "rdvModalLocation"
-    );
-
-
-  const description =
-    document.getElementById(
-      "rdvModalDescription"
-    );
-
-
-  const link =
-    document.getElementById(
-      "rdvModalLink"
-    );
-
-
-  if (title) {
-
-    title.textContent =
-      rdv.titre || "Événement";
-
-  }
-
-
-  if (date) {
-
-    date.textContent =
-      formaterDateCourte(
-        rdv.date_evenement
-      );
-
-  }
-
-
-  if (time) {
-
-    time.textContent =
-      rdv.heure
-        ? String(rdv.heure).slice(0, 5)
-        : "—";
-
-  }
-
-
-  if (location) {
-
-    location.textContent =
-      rdv.lieu || "—";
-
-  }
-
-
-  if (description) {
-
-    description.textContent =
-      rdv.description || "";
-
-  }
-
-
-  if (link) {
-
-    if (
-      rdv.lien &&
-      urlValideComponents(rdv.lien)
-    ) {
-
-      link.href =
-        rdv.lien;
-
-      link.style.display =
-        "inline-flex";
-
-    } else {
-
-      link.removeAttribute(
-        "href"
-      );
-
-      link.style.display =
-        "none";
-
+    if (error) {
+        throw error;
     }
 
-  }
+
+    if (!data) return;
 
 
-  modal.classList.add(
-    "active"
-  );
+    const titre =
+        document.getElementById("rdvModalTitle");
+
+    const date =
+        document.getElementById("rdvModalDate");
+
+    const time =
+        document.getElementById("rdvModalTime");
+
+    const location =
+        document.getElementById("rdvModalLocation");
+
+    const locationWrap =
+        document.getElementById(
+            "rdvModalLocationWrap"
+        );
+
+    const description =
+        document.getElementById(
+            "rdvModalDescription"
+        );
+
+    const link =
+        document.getElementById(
+            "rdvModalLink"
+        );
 
 
-  document.body.style.overflow =
-    "hidden";
+    const dateObjet =
+        new Date(data.date_evenement);
+
+
+    if (titre) {
+
+        titre.textContent =
+            data.titre || "Événement";
+    }
+
+
+    if (date) {
+
+        date.textContent =
+            formaterDateLongue(
+                dateObjet
+            );
+    }
+
+
+    if (time) {
+
+        time.textContent =
+            formaterHeure(
+                dateObjet
+            );
+    }
+
+
+    if (
+        location &&
+        locationWrap
+    ) {
+
+        if (data.lieu) {
+
+            location.textContent =
+                data.lieu;
+
+            locationWrap.style.display =
+                "";
+        } else {
+
+            location.textContent =
+                "";
+
+            locationWrap.style.display =
+                "none";
+        }
+    }
+
+
+    if (description) {
+
+        description.innerHTML =
+            escapeHtmlComponents(
+                data.description || ""
+            ).replace(/\n/g, "<br>");
+    }
+
+
+    if (link) {
+
+        if (
+            data.lien &&
+            urlValideComponents(
+                data.lien
+            )
+        ) {
+
+            link.href =
+                data.lien;
+
+            link.style.display =
+                "inline-block";
+
+        } else {
+
+            link.style.display =
+                "none";
+        }
+    }
+
+
+    modal.classList.add("active");
+
+    modal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+} catch (error) {
+
+    console.error(
+        "Erreur ouverture rendez-vous :",
+        error
+    );
+}
+```
 
 }
 
-
 /* =========================================================
-   FERMETURE ÉVÉNEMENT
+FERMETURE DE LA MODALE
 ========================================================= */
 
 function fermerRendezVous() {
 
-  const modal =
-    document.getElementById(
-      "rdvModal"
-    );
+```
+const modal =
+    document.getElementById("rdvModal");
+
+if (!modal) return;
 
 
-  if (!modal) {
-    return;
-  }
+modal.classList.remove("active");
 
-
-  modal.classList.remove(
-    "active"
-  );
-
-
-  if (
-    !document.querySelector(
-      ".profile-modal.active, .join-modal.active, .rdv-modal.active"
-    )
-  ) {
-
-    document.body.style.overflow =
-      "";
-
-  }
+modal.setAttribute(
+    "aria-hidden",
+    "true"
+);
+```
 
 }
 
-
 /* =========================================================
-   ÉCOUTEURS MODALE ÉVÉNEMENT
+ECOUTEURS RENDEZ-VOUS
 ========================================================= */
 
 function initialiserEcouteursRendezVous() {
 
-  const modal =
+```
+const track =
+    document.getElementById("eventsTrack");
+
+
+if (track) {
+
+    track.addEventListener(
+        "click",
+        event => {
+
+            const eventElement =
+                event.target.closest(".event");
+
+
+            if (!eventElement) return;
+
+
+            const id =
+                eventElement.dataset.rdvId;
+
+
+            if (!id) return;
+
+
+            ouvrirRendezVous(id);
+        }
+    );
+}
+
+
+const close =
     document.getElementById(
-      "rdvModal"
+        "rdvModalClose"
     );
 
 
-  const close =
-    document.getElementById(
-      "rdvModalClose"
-    );
-
-
-  if (close) {
+if (close) {
 
     close.addEventListener(
-      "click",
-      fermerRendezVous
+        "click",
+        fermerRendezVous
+    );
+}
+
+
+const modal =
+    document.getElementById(
+        "rdvModal"
     );
 
-  }
 
-
-  if (modal) {
+if (modal) {
 
     modal.addEventListener(
-      "click",
-      event => {
+        "click",
+        event => {
 
-        if (
-          event.target === modal
-        ) {
+            if (
+                event.target === modal
+            ) {
 
-          fermerRendezVous();
-
+                fermerRendezVous();
+            }
         }
-
-      }
     );
+}
 
-  }
 
-
-  document.addEventListener(
+document.addEventListener(
     "keydown",
     event => {
 
-      if (
-        event.key === "Escape"
-      ) {
+        if (
+            event.key === "Escape"
+        ) {
 
-        fermerRendezVous();
-
-      }
-
+            fermerRendezVous();
+        }
     }
-  );
+);
 
 
-  /*
-   * Recalcule le ticker au changement
-   * de taille de fenêtre.
-   */
+/*
+ * Si la fenêtre change de largeur,
+ * on recalcule complètement le ticker.
+ */
 
-  let resizeTimer =
-    null;
-
-
-  window.addEventListener(
+window.addEventListener(
     "resize",
     () => {
 
-      clearTimeout(
-        resizeTimer
-      );
+        requestAnimationFrame(
+            () => {
 
+                demarrerDefilement();
 
-      resizeTimer =
-        setTimeout(
-          () => {
-
-            requestAnimationFrame(
-              demarrerDefilement
-            );
-
-          },
-          120
+            }
         );
-
     }
-  );
+);
+```
 
 }
 
-
 /* =========================================================
-   DATE
+FORMATAGE DATES
 ========================================================= */
 
-function formaterDateCourte(
-  dateString
-) {
+function formaterDateCourte(date) {
 
-  if (!dateString) {
+```
+if (!(date instanceof Date)) {
     return "";
-  }
+}
 
 
-  const date =
-    new Date(
-      `${dateString}T00:00:00`
-    );
-
-
-  if (
-    Number.isNaN(
-      date.getTime()
-    )
-  ) {
-
-    return String(
-      dateString
-    );
-
-  }
-
-
-  return date.toLocaleDateString(
+return date.toLocaleDateString(
     "fr-FR",
     {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric"
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
     }
-  );
+);
+```
 
 }
 
+function formaterDateLongue(date) {
+
+```
+if (!(date instanceof Date)) {
+    return "";
+}
+
+
+return date.toLocaleDateString(
+    "fr-FR",
+    {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    }
+);
+```
+
+}
+
+function formaterHeure(date) {
+
+```
+if (!(date instanceof Date)) {
+    return "";
+}
+
+
+return date.toLocaleTimeString(
+    "fr-FR",
+    {
+        hour: "2-digit",
+        minute: "2-digit"
+    }
+);
+```
+
+}
 
 /* =========================================================
-   VALIDATION URL
+VALIDATION URL
 ========================================================= */
 
-function urlValideComponents(
-  url
-) {
+function urlValideComponents(url) {
 
-  if (
-    !url ||
-    typeof url !== "string"
-  ) {
-
-    return false;
-
-  }
-
-
-  try {
+```
+try {
 
     const parsed =
-      new URL(url);
-
+        new URL(url);
 
     return (
-      parsed.protocol === "http:" ||
-      parsed.protocol === "https:"
+        parsed.protocol === "http:" ||
+        parsed.protocol === "https:"
     );
 
-  } catch (error) {
+} catch {
 
     return false;
-
-  }
+}
+```
 
 }
 
-
 /* =========================================================
-   ESCAPE HTML
+ECHAPPEMENT HTML
 ========================================================= */
 
-function escapeHtmlComponents(
-  value
-) {
+function escapeHtmlComponents(value) {
 
-  if (
-    value === null ||
-    value === undefined
-  ) {
-
-    return "";
-
-  }
-
-
-  return String(value)
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+```
+return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+```
 
 }
 
-
 /* =========================================================
-   INITIALISATION COMPOSANTS
+INITIALISATION GENERALE
 ========================================================= */
 
 async function initialiserComposants() {
 
-  injecterHeader();
+```
+injecterHeader();
 
-  injecterFooter();
+injecterFooter();
 
-  injecterModaleRendezVous();
+injecterModaleRendezVous();
 
-  await chargerRendezVous();
 
-  initialiserEcouteursRendezVous();
+await chargerRendezVous();
+
+
+initialiserEcouteursRendezVous();
+```
 
 }
 
-
 /* =========================================================
-   DOM READY
+DOM READY
 ========================================================= */
 
 if (
-  document.readyState === "loading"
+document.readyState === "loading"
 ) {
 
-  document.addEventListener(
+```
+document.addEventListener(
     "DOMContentLoaded",
     initialiserComposants
-  );
+);
+```
 
 } else {
 
-  initialiserComposants();
+```
+initialiserComposants();
+```
 
 }
