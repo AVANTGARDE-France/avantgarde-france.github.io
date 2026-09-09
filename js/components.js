@@ -820,12 +820,6 @@ async function chargerRendezVous() {
                             );
 
 
-                        const heure =
-                            formaterHeure(
-                                rdv.heure
-                            );
-
-
                         return `
 
                             ${
@@ -859,11 +853,11 @@ async function chargerRendezVous() {
                                     &nbsp;·&nbsp;
                                     ${formaterDateCourte(date)}
                                     ${
-                                        heure
+                                        rdv.lieu
                                             ? `
                                                 &nbsp;·&nbsp;
                                                 ${escapeHtml(
-                                                    heure
+                                                    rdv.lieu
                                                 )}
                                             `
                                             : ""
