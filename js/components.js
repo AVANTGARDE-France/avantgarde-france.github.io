@@ -1,3 +1,4 @@
+```javascript
 /* =========================================================
    AVANT-GARDE — COMPONENTS
    js/components.js
@@ -17,156 +18,105 @@ import { supabase } from "./supabase.js";
 
 
 /* =========================================================
-   VARIABLES GLOBALES
-========================================================= */
-
-let tickerAnimation = null;
-
-
-/* =========================================================
-   ECHAPPEMENT HTML
-========================================================= */
-
-function escapeHtml(value) {
-
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-
-/* =========================================================
-   VALIDATION URL
-========================================================= */
-
-function urlValide(url) {
-
-    try {
-
-        const parsed = new URL(url);
-
-        return (
-            parsed.protocol === "http:" ||
-            parsed.protocol === "https:"
-        );
-
-    } catch {
-
-        return false;
-    }
-}
-
-
-/* =========================================================
    HEADER
 ========================================================= */
 
 function injecterHeader() {
 
-    const container =
-        document.getElementById("site-header");
+  const conteneur = document.getElementById("site-header");
 
-    if (!container) return;
+  if (!conteneur) return;
 
+  conteneur.innerHTML = `
 
-    container.innerHTML = `
+    <!-- ===================================================
+         BARRE ÉVÉNEMENTIELLE
+    ==================================================== -->
 
-        <!-- =================================================
-             BARRE EVENEMENT
-        ================================================== -->
+    <div class="events-bar">
 
-        <div class="events-bar">
+      <div class="events-label">
+        RENDEZ-VOUS
+      </div>
 
-            <div class="events-label">
-                EVENEMENT
-            </div>
+      <div class="events-window">
 
-            <div class="events-window">
-
-                <div
-                    id="eventsTrack"
-                    class="events-track"
-                >
-
-                    <div class="events-empty">
-                        Chargement…
-                    </div>
-
-                </div>
-
-            </div>
-
+        <div
+          id="eventsTrack"
+          class="events-track"
+        >
+          <div class="events-empty">
+            Chargement des événements…
+          </div>
         </div>
 
+      </div>
 
-        <!-- =================================================
-             HEADER
-        ================================================== -->
-
-        <header class="site-header">
-
-            <div class="header-inner">
+    </div>
 
 
-                <!-- LOGO -->
+    <!-- ===================================================
+         HEADER
+    ==================================================== -->
 
-                <a
-                    href="index.html"
-                    class="logo"
-                    aria-label="Avant-gardE — La France libre"
-                >
+    <header class="site-header">
 
-                    <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
-
-                </a>
+      <div class="header-inner">
 
 
-                <!-- NAVIGATION -->
+        <!-- LOGO -->
 
-                <nav
-                    class="main-nav"
-                    aria-label="Navigation principale"
-                >
-
-                    <a href="manifeste.html">
-                        MANIFESTE
-                    </a>
-
-                    <a href="projet.html">
-                        PROJET
-                    </a>
-
-                    <a href="inspirations.html">
-                        INSPIRATIONS
-                    </a>
-
-                    <a href="equipe.html">
-                        L'ÉQUIPE
-                    </a>
-
-                </nav>
+        <a
+          href="index.html"
+          class="logo"
+          aria-label="Avant-gardE — La France libre"
+        >
+          <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
+        </a>
 
 
-                <!-- ADMIN -->
+        <!-- NAVIGATION -->
 
-                <a
-                    href="admin.html"
-                    class="admin-link"
-                    aria-label="Administration"
-                    title="Administration"
-                >
-                    ⚙
-                </a>
+        <nav
+          class="main-nav"
+          aria-label="Navigation principale"
+        >
+
+          <a href="manifeste.html">
+            Manifeste
+          </a>
+
+          <a href="projet.html">
+            Projet
+          </a>
+
+          <a href="inspirations.html">
+            Inspirations
+          </a>
+
+          <a href="equipe.html">
+            Équipe
+          </a>
+
+        </nav>
 
 
-            </div>
+        <!-- ADMIN -->
 
-        </header>
+        <a
+          href="admin.html"
+          class="admin-link"
+          aria-label="Administration"
+          title="Administration"
+        >
+          ⚙
+        </a>
 
-    `;
+      </div>
+
+    </header>
+
+  `;
 }
 
 
@@ -176,31 +126,34 @@ function injecterHeader() {
 
 function injecterFooter() {
 
-    const container =
-        document.getElementById("site-footer");
+  const conteneur = document.getElementById("site-footer");
 
-    if (!container) return;
+  if (!conteneur) return;
 
+  /*
+     On vide systématiquement le conteneur afin d'éviter
+     qu'un ancien contenu éventuel interfère avec le footer.
+  */
 
-    container.innerHTML = `
+  conteneur.innerHTML = "";
 
-        <footer>
+  const footer = document.createElement("footer");
 
-            <div>
-                © 2026 Avant-gardE
-            </div>
+  footer.innerHTML = `
+    <div>
+      © 2026 Avant-gardE
+    </div>
 
-            <div>
-                Avant-gardE — La France libre
-            </div>
+    <div>
+      Avant-gardE — La France libre
+    </div>
 
-            <div>
-                Souveraineté · Liberté · Responsabilité
-            </div>
+    <div>
+      Souveraineté · Liberté · Responsabilité
+    </div>
+  `;
 
-        </footer>
-
-    `;
+  conteneur.appendChild(footer);
 }
 
 
@@ -210,931 +163,619 @@ function injecterFooter() {
 
 function injecterModaleRendezVous() {
 
-    const container =
-        document.getElementById("site-rdv-modal");
+  const conteneur = document.getElementById("site-rdv-modal");
 
-    if (!container) return;
+  if (!conteneur) return;
 
+  conteneur.innerHTML = `
 
-    container.innerHTML = `
+    <div
+      id="rdvModal"
+      class="rdv-modal"
+      aria-hidden="true"
+    >
 
-        <div
-            id="rdvModal"
-            class="rdv-modal"
-            aria-hidden="true"
+      <div class="rdv-modal-overlay"></div>
+
+      <div
+        class="rdv-modal-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="rdvModalTitle"
+      >
+
+        <button
+          type="button"
+          class="rdv-modal-close"
+          id="rdvModalClose"
+          aria-label="Fermer"
         >
+          ×
+        </button>
 
-            <div
-                class="rdv-modal-box"
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="rdvModalTitle"
-            >
-
-
-                <!-- FERMETURE -->
-
-                <button
-                    id="rdvModalClose"
-                    class="rdv-modal-close"
-                    type="button"
-                    aria-label="Fermer"
-                >
-                    ×
-                </button>
-
-
-                <!-- KICKER -->
-
-                <div class="rdv-modal-kicker">
-                    RENDEZ-VOUS
-                </div>
-
-
-                <!-- TITRE -->
-
-                <h2
-                    id="rdvModalTitle"
-                    class="rdv-modal-title"
-                >
-                </h2>
-
-
-                <!-- INFORMATIONS -->
-
-                <div class="rdv-modal-info">
-
-
-                    <div>
-
-                        <span>
-                            DATE
-                        </span>
-
-                        <strong
-                            id="rdvModalDate"
-                        >
-                        </strong>
-
-                    </div>
-
-
-                    <div>
-
-                        <span>
-                            HEURE
-                        </span>
-
-                        <strong
-                            id="rdvModalTime"
-                        >
-                        </strong>
-
-                    </div>
-
-
-                    <div
-                        id="rdvModalLocationWrap"
-                    >
-
-                        <span>
-                            LIEU
-                        </span>
-
-                        <strong
-                            id="rdvModalLocation"
-                        >
-                        </strong>
-
-                    </div>
-
-
-                </div>
-
-
-                <!-- DESCRIPTION -->
-
-                <div
-                    id="rdvModalDescription"
-                    class="rdv-modal-description"
-                >
-                </div>
-
-
-                <!-- LIEN -->
-
-                <a
-                    id="rdvModalLink"
-                    class="rdv-modal-link"
-                    href="#"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style="display:none;"
-                >
-                    EN SAVOIR PLUS
-                </a>
-
-
-            </div>
-
+        <div class="section-kicker">
+          RENDEZ-VOUS
         </div>
 
-    `;
+        <h2 id="rdvModalTitle">
+          Événement
+        </h2>
+
+        <div
+          id="rdvModalDetails"
+          class="rdv-modal-details"
+        ></div>
+
+      </div>
+
+    </div>
+
+  `;
 }
 
 
 /* =========================================================
-   FORMATAGE DATE COURTE
-========================================================= */
-
-function formaterDateCourte(date) {
-
-    if (!(date instanceof Date)) {
-        return "";
-    }
-
-
-    return date.toLocaleDateString(
-        "fr-FR",
-        {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-        }
-    );
-}
-
-
-/* =========================================================
-   FORMATAGE DATE LONGUE
-========================================================= */
-
-function formaterDateLongue(date) {
-
-    if (!(date instanceof Date)) {
-        return "";
-    }
-
-
-    return date.toLocaleDateString(
-        "fr-FR",
-        {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric"
-        }
-    );
-}
-
-
-/* =========================================================
-   FORMATAGE HEURE
-========================================================= */
-
-function formaterHeure(date) {
-
-    if (!(date instanceof Date)) {
-        return "";
-    }
-
-
-    return date.toLocaleTimeString(
-        "fr-FR",
-        {
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    );
-}
-
-
-/* =========================================================
-   CHARGEMENT DES EVENEMENTS
+   CHARGEMENT DES RENDEZ-VOUS
 ========================================================= */
 
 async function chargerRendezVous() {
 
-    const track =
-        document.getElementById(
-            "eventsTrack"
-        );
+  const track = document.getElementById("eventsTrack");
 
-    if (!track) return;
+  if (!track) return;
 
+  try {
 
-    try {
+    const maintenant = new Date().toISOString();
 
-        const maintenant =
-            new Date().toISOString();
+    const { data, error } = await supabase
+      .from("rendezvous")
+      .select("*")
+      .eq("actif", true)
+      .gte("date_evenement", maintenant)
+      .order("date_evenement", {
+        ascending: true
+      });
 
-
-        const {
-            data,
-            error
-        } = await supabase
-
-            .from("rendezvous")
-
-            .select("*")
-
-            .eq("actif", true)
-
-            .gte(
-                "date_evenement",
-                maintenant
-            )
-
-            .order(
-                "date_evenement",
-                {
-                    ascending: true
-                }
-            );
-
-
-        if (error) {
-            throw error;
-        }
-
-
-        /* -------------------------------------------------
-           AUCUN EVENEMENT
-        ------------------------------------------------- */
-
-        if (
-            !data ||
-            data.length === 0
-        ) {
-
-            track.innerHTML = `
-
-                <div class="events-empty">
-                    Aucun événement à venir
-                </div>
-
-            `;
-
-            arreterDefilement();
-
-            return;
-        }
-
-
-        /* -------------------------------------------------
-           CREATION DES EVENEMENTS
-        ------------------------------------------------- */
-
-        track.innerHTML = data
-            .map(
-                (rdv, index) => {
-
-                    const date =
-                        new Date(
-                            rdv.date_evenement
-                        );
-
-
-                    return `
-
-                        ${
-                            index > 0
-                                ? `
-                                    <span
-                                        class="event-separator"
-                                    >
-                                        ◆
-                                    </span>
-                                `
-                                : ""
-                        }
-
-
-                        <div
-                            class="event"
-                            data-rdv-id="${escapeHtml(
-                                rdv.id
-                            )}"
-                        >
-
-                            <strong>
-                                ${escapeHtml(
-                                    rdv.titre ||
-                                    "Événement"
-                                )}
-                            </strong>
-
-                            <span>
-                                &nbsp;·&nbsp;
-                                ${formaterDateCourte(date)}
-                                &nbsp;·&nbsp;
-                                ${formaterHeure(date)}
-                            </span>
-
-                        </div>
-
-                    `;
-                }
-            )
-            .join("");
-
-
-        /*
-         * Deux frames permettent d'attendre que le navigateur
-         * ait calculé correctement la largeur réelle du ticker.
-         */
-
-        requestAnimationFrame(
-            () => {
-
-                requestAnimationFrame(
-                    () => {
-
-                        demarrerDefilement();
-
-                    }
-                );
-
-            }
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Erreur chargement rendez-vous :",
-            error
-        );
-
-
-        track.innerHTML = `
-
-            <div class="events-empty">
-                Impossible de charger les événements
-            </div>
-
-        `;
-
-
-        arreterDefilement();
-    }
-}
-
-
-/* =========================================================
-   ARRET DU TICKER
-========================================================= */
-
-function arreterDefilement() {
-
-    if (
-        tickerAnimation !== null
-    ) {
-
-        cancelAnimationFrame(
-            tickerAnimation
-        );
-
-        tickerAnimation = null;
-    }
-}
-
-
-/* =========================================================
-   DEMARRAGE DU TICKER
-========================================================= */
-
-function demarrerDefilement() {
-
-    const track =
-        document.getElementById(
-            "eventsTrack"
-        );
-
-
-    const windowElement =
-        document.querySelector(
-            ".events-window"
-        );
-
-
-    if (
-        !track ||
-        !windowElement
-    ) {
-        return;
+    if (error) {
+      throw error;
     }
 
 
-    arreterDefilement();
+    /* =====================================================
+       AUCUN ÉVÉNEMENT
+    ====================================================== */
 
+    if (!data || data.length === 0) {
 
-    const largeurFenetre =
-        windowElement.clientWidth;
+      track.innerHTML = `
+        <div class="events-empty">
+          Aucun rendez-vous à venir.
+        </div>
+      `;
 
-
-    const largeurContenu =
-        track.scrollWidth;
-
-
-    if (
-        largeurFenetre <= 0 ||
-        largeurContenu <= 0
-    ) {
-        return;
+      return;
     }
 
 
-    /*
-     * Vitesse du défilement :
-     * 180 pixels par seconde.
-     */
+    /* =====================================================
+       CONSTRUCTION DES ÉVÉNEMENTS
+    ====================================================== */
 
-    const vitesse = 180;
+    track.innerHTML = data
+      .map((evenement, index) => {
 
-
-    /*
-     * Le ticker commence à droite.
-     */
-
-    let position =
-        largeurFenetre;
-
-
-    let dernierTemps =
-        performance.now();
-
-
-    track.style.transform =
-        `translateX(${position}px)`;
-
-
-    function animation(temps) {
-
-        const delta =
-            (temps - dernierTemps) /
-            1000;
-
-
-        dernierTemps =
-            temps;
-
-
-        position -=
-            vitesse * delta;
-
-
-        /*
-         * Lorsque tout le contenu est sorti
-         * par la gauche, on recommence à droite.
-         */
-
-        if (
-            position <=
-            -largeurContenu
-        ) {
-
-            position =
-                largeurFenetre;
-        }
-
-
-        track.style.transform =
-            `translateX(${position}px)`;
-
-
-        tickerAnimation =
-            requestAnimationFrame(
-                animation
-            );
-    }
-
-
-    tickerAnimation =
-        requestAnimationFrame(
-            animation
-        );
-}
-
-
-/* =========================================================
-   OUVERTURE MODALE EVENEMENT
-========================================================= */
-
-async function ouvrirRendezVous(id) {
-
-    const modal =
-        document.getElementById(
-            "rdvModal"
+        const date = new Date(
+          evenement.date_evenement
         );
 
+        const dateFormatee = date.toLocaleDateString(
+          "fr-FR",
+          {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+          }
+        );
 
-    if (!modal) return;
-
-
-    try {
-
-        const {
-            data,
-            error
-        } = await supabase
-
-            .from("rendezvous")
-
-            .select("*")
-
-            .eq("id", id)
-
-            .single();
-
-
-        if (error) {
-            throw error;
-        }
-
-
-        if (!data) {
-            return;
-        }
+        const heureFormatee = date.toLocaleTimeString(
+          "fr-FR",
+          {
+            hour: "2-digit",
+            minute: "2-digit"
+          }
+        );
 
 
         const titre =
-            document.getElementById(
-                "rdvModalTitle"
-            );
+          evenement.titre ||
+          evenement.nom ||
+          "Rendez-vous";
 
 
-        const date =
-            document.getElementById(
-                "rdvModalDate"
-            );
+        const lieu =
+          evenement.lieu ||
+          "";
 
 
-        const time =
-            document.getElementById(
-                "rdvModalTime"
-            );
+        return `
 
+          <button
+            type="button"
+            class="event"
+            data-event-index="${index}"
+          >
 
-        const location =
-            document.getElementById(
-                "rdvModalLocation"
-            );
+            <span class="event-date">
+              ${dateFormatee}
+            </span>
 
+            <span class="event-time">
+              ${heureFormatee}
+            </span>
 
-        const locationWrap =
-            document.getElementById(
-                "rdvModalLocationWrap"
-            );
+            <span class="event-title">
+              ${titre}
+            </span>
 
-
-        const description =
-            document.getElementById(
-                "rdvModalDescription"
-            );
-
-
-        const link =
-            document.getElementById(
-                "rdvModalLink"
-            );
-
-
-        const dateObjet =
-            new Date(
-                data.date_evenement
-            );
-
-
-        /* -------------------------------------------------
-           TITRE
-        ------------------------------------------------- */
-
-        if (titre) {
-
-            titre.textContent =
-                data.titre ||
-                "Événement";
-        }
-
-
-        /* -------------------------------------------------
-           DATE
-        ------------------------------------------------- */
-
-        if (date) {
-
-            date.textContent =
-                formaterDateLongue(
-                    dateObjet
-                );
-        }
-
-
-        /* -------------------------------------------------
-           HEURE
-        ------------------------------------------------- */
-
-        if (time) {
-
-            time.textContent =
-                formaterHeure(
-                    dateObjet
-                );
-        }
-
-
-        /* -------------------------------------------------
-           LIEU
-        ------------------------------------------------- */
-
-        if (
-            location &&
-            locationWrap
-        ) {
-
-            if (data.lieu) {
-
-                location.textContent =
-                    data.lieu;
-
-                locationWrap.style.display =
-                    "";
-
-
-            } else {
-
-                location.textContent =
-                    "";
-
-                locationWrap.style.display =
-                    "none";
+            ${
+              lieu
+                ? `
+                  <span class="event-location">
+                    — ${lieu}
+                  </span>
+                `
+                : ""
             }
-        }
+
+          </button>
+
+          ${
+            index < data.length - 1
+              ? `
+                <span class="event-separator">
+                  •
+                </span>
+              `
+              : ""
+          }
+
+        `;
+
+      })
+      .join("");
 
 
-        /* -------------------------------------------------
-           DESCRIPTION
-        ------------------------------------------------- */
+    /*
+       On conserve les événements pour la modale.
+    */
 
-        if (description) {
-
-            description.innerHTML =
-                escapeHtml(
-                    data.description || ""
-                ).replace(
-                    /\n/g,
-                    "<br>"
-                );
-        }
+    window.avantGardeEvenements = data;
 
 
-        /* -------------------------------------------------
-           LIEN
-        ------------------------------------------------- */
+    /*
+       Double requestAnimationFrame :
+       permet au navigateur de calculer correctement
+       la largeur réelle du contenu avant de lancer
+       l'animation.
+    */
 
-        if (link) {
+    requestAnimationFrame(() => {
 
-            if (
-                data.lien &&
-                urlValide(
-                    data.lien
-                )
-            ) {
+      requestAnimationFrame(() => {
 
-                link.href =
-                    data.lien;
+        demarrerDefilement();
 
-                link.style.display =
-                    "inline-block";
+      });
 
+    });
 
-            } else {
+  } catch (error) {
 
-                link.href =
-                    "#";
+    console.error(
+      "Erreur chargement rendez-vous :",
+      error
+    );
 
-                link.style.display =
-                    "none";
-            }
-        }
-
-
-        /* -------------------------------------------------
-           AFFICHAGE
-        ------------------------------------------------- */
-
-        modal.classList.add(
-            "active"
-        );
-
-
-        modal.setAttribute(
-            "aria-hidden",
-            "false"
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Erreur ouverture rendez-vous :",
-            error
-        );
-    }
+    track.innerHTML = `
+      <div class="events-empty">
+        Impossible de charger les rendez-vous.
+      </div>
+    `;
+  }
 }
 
 
 /* =========================================================
-   FERMETURE MODALE EVENEMENT
+   DÉFILEMENT AUTOMATIQUE
 ========================================================= */
 
-function fermerRendezVous() {
-
-    const modal =
-        document.getElementById(
-            "rdvModal"
-        );
+let animationEvenements = null;
 
 
-    if (!modal) return;
+function demarrerDefilement() {
+
+  const track = document.getElementById("eventsTrack");
+  const fenetre = document.querySelector(".events-window");
+
+  if (!track || !fenetre) return;
 
 
-    modal.classList.remove(
-        "active"
+  /*
+     Arrêt d'une éventuelle animation précédente.
+  */
+
+  if (animationEvenements) {
+
+    cancelAnimationFrame(
+      animationEvenements
     );
 
+    animationEvenements = null;
+  }
 
-    modal.setAttribute(
-        "aria-hidden",
-        "true"
-    );
+
+  const largeurFenetre =
+    fenetre.offsetWidth;
+
+  const largeurContenu =
+    track.scrollWidth;
+
+
+  /*
+     Si le contenu ne dépasse pas la fenêtre,
+     aucun défilement nécessaire.
+  */
+
+  if (
+    largeurContenu <= largeurFenetre
+  ) {
+
+    track.style.transform =
+      "translateX(0)";
+
+    return;
+  }
+
+
+  /*
+     Position de départ :
+     contenu placé juste à droite de la fenêtre.
+  */
+
+  let position =
+    largeurFenetre;
+
+
+  const vitesse =
+    180;
+
+  let dernierTemps =
+    performance.now();
+
+
+  function animation(temps) {
+
+    const delta =
+      (temps - dernierTemps) / 1000;
+
+    dernierTemps = temps;
+
+
+    position -=
+      vitesse * delta;
+
+
+    /*
+       Lorsque tout le contenu est sorti
+       par la gauche, on recommence.
+    */
+
+    if (
+      position <= -largeurContenu
+    ) {
+
+      position =
+        largeurFenetre;
+    }
+
+
+    track.style.transform =
+      `translateX(${position}px)`;
+
+
+    animationEvenements =
+      requestAnimationFrame(animation);
+  }
+
+
+  animationEvenements =
+    requestAnimationFrame(animation);
 }
 
 
 /* =========================================================
-   ECOUTEURS EVENEMENTS
+   MODALE — OUVERTURE
+========================================================= */
+
+function ouvrirModaleRendezVous(index) {
+
+  const modal =
+    document.getElementById("rdvModal");
+
+  const details =
+    document.getElementById("rdvModalDetails");
+
+  const titre =
+    document.getElementById("rdvModalTitle");
+
+
+  if (
+    !modal ||
+    !details ||
+    !titre
+  ) {
+    return;
+  }
+
+
+  const evenement =
+    window.avantGardeEvenements?.[index];
+
+
+  if (!evenement) return;
+
+
+  const date =
+    new Date(
+      evenement.date_evenement
+    );
+
+
+  const dateFormatee =
+    date.toLocaleDateString(
+      "fr-FR",
+      {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }
+    );
+
+
+  const heureFormatee =
+    date.toLocaleTimeString(
+      "fr-FR",
+      {
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    );
+
+
+  titre.textContent =
+    evenement.titre ||
+    evenement.nom ||
+    "Rendez-vous";
+
+
+  details.innerHTML = `
+
+    <div class="rdv-detail">
+
+      <strong>
+        Date
+      </strong>
+
+      <span>
+        ${dateFormatee}
+      </span>
+
+    </div>
+
+
+    <div class="rdv-detail">
+
+      <strong>
+        Heure
+      </strong>
+
+      <span>
+        ${heureFormatee}
+      </span>
+
+    </div>
+
+
+    ${
+      evenement.lieu
+        ? `
+          <div class="rdv-detail">
+
+            <strong>
+              Lieu
+            </strong>
+
+            <span>
+              ${evenement.lieu}
+            </span>
+
+          </div>
+        `
+        : ""
+    }
+
+
+    ${
+      evenement.description
+        ? `
+          <div class="rdv-detail rdv-description">
+
+            ${evenement.description}
+
+          </div>
+        `
+        : ""
+    }
+
+  `;
+
+
+  modal.classList.add("is-open");
+
+  modal.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+
+  document.body.classList.add(
+    "modal-open"
+  );
+}
+
+
+/* =========================================================
+   MODALE — FERMETURE
+========================================================= */
+
+function fermerModaleRendezVous() {
+
+  const modal =
+    document.getElementById("rdvModal");
+
+  if (!modal) return;
+
+
+  modal.classList.remove(
+    "is-open"
+  );
+
+  modal.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+
+  document.body.classList.remove(
+    "modal-open"
+  );
+}
+
+
+/* =========================================================
+   ÉCOUTEURS RENDEZ-VOUS
 ========================================================= */
 
 function initialiserEcouteursRendezVous() {
 
-    const track =
-        document.getElementById(
-            "eventsTrack"
+  document.addEventListener(
+    "click",
+    evenement => {
+
+      const bouton =
+        evenement.target.closest(
+          ".event"
         );
 
 
-    /* -----------------------------------------------------
-       CLIC SUR UN EVENEMENT
-    ----------------------------------------------------- */
+      if (bouton) {
 
-    if (track) {
+        const index =
+          Number(
+            bouton.dataset.eventIndex
+          );
 
-        track.addEventListener(
-            "click",
-            event => {
-
-                const eventElement =
-                    event.target.closest(
-                        ".event"
-                    );
-
-
-                if (!eventElement) {
-                    return;
-                }
-
-
-                const id =
-                    eventElement.dataset.rdvId;
-
-
-                if (!id) {
-                    return;
-                }
-
-
-                ouvrirRendezVous(id);
-            }
+        ouvrirModaleRendezVous(
+          index
         );
+
+        return;
+      }
+
+
+      if (
+        evenement.target.closest(
+          "#rdvModalClose"
+        )
+      ) {
+
+        fermerModaleRendezVous();
+
+        return;
+      }
+
+
+      if (
+        evenement.target.classList.contains(
+          "rdv-modal-overlay"
+        )
+      ) {
+
+        fermerModaleRendezVous();
+
+      }
+
     }
+  );
 
 
-    /* -----------------------------------------------------
-       BOUTON FERMER
-    ----------------------------------------------------- */
+  document.addEventListener(
+    "keydown",
+    evenement => {
 
-    const close =
-        document.getElementById(
-            "rdvModalClose"
-        );
+      if (
+        evenement.key === "Escape"
+      ) {
 
+        fermerModaleRendezVous();
 
-    if (close) {
+      }
 
-        close.addEventListener(
-            "click",
-            fermerRendezVous
-        );
     }
-
-
-    /* -----------------------------------------------------
-       CLIC SUR LE FOND
-    ----------------------------------------------------- */
-
-    const modal =
-        document.getElementById(
-            "rdvModal"
-        );
-
-
-    if (modal) {
-
-        modal.addEventListener(
-            "click",
-            event => {
-
-                if (
-                    event.target ===
-                    modal
-                ) {
-
-                    fermerRendezVous();
-                }
-            }
-        );
-    }
-
-
-    /* -----------------------------------------------------
-       TOUCHE ESCAPE
-    ----------------------------------------------------- */
-
-    document.addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key ===
-                "Escape"
-            ) {
-
-                fermerRendezVous();
-            }
-        }
-    );
-
-
-    /* -----------------------------------------------------
-       REDIMENSIONNEMENT
-    ----------------------------------------------------- */
-
-    window.addEventListener(
-        "resize",
-        () => {
-
-            requestAnimationFrame(
-                () => {
-
-                    demarrerDefilement();
-
-                }
-            );
-        }
-    );
+  );
 }
 
 
 /* =========================================================
-   INITIALISATION GENERALE
+   REDIMENSIONNEMENT
+========================================================= */
+
+window.addEventListener(
+  "resize",
+  () => {
+
+    /*
+       On relance le calcul de largeur
+       lorsque la fenêtre change de taille.
+    */
+
+    requestAnimationFrame(() => {
+
+      demarrerDefilement();
+
+    });
+
+  }
+);
+
+
+/* =========================================================
+   INITIALISATION GÉNÉRALE
 ========================================================= */
 
 async function initialiserComposants() {
 
-    /*
-     * Injection des composants communs.
-     */
+  injecterHeader();
 
-    injecterHeader();
+  injecterFooter();
 
-    injecterFooter();
+  injecterModaleRendezVous();
 
-    injecterModaleRendezVous();
+  await chargerRendezVous();
 
-
-    /*
-     * Chargement Supabase des événements.
-     */
-
-    await chargerRendezVous();
-
-
-    /*
-     * Activation des interactions.
-     */
-
-    initialiserEcouteursRendezVous();
+  initialiserEcouteursRendezVous();
 }
 
 
@@ -1143,16 +784,17 @@ async function initialiserComposants() {
 ========================================================= */
 
 if (
-    document.readyState ===
-    "loading"
+  document.readyState === "loading"
 ) {
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        initialiserComposants
-    );
+  document.addEventListener(
+    "DOMContentLoaded",
+    initialiserComposants
+  );
 
 } else {
 
-    initialiserComposants();
+  initialiserComposants();
+
 }
+```
