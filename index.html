@@ -1,20 +1,18 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 
 <head>
 
   <meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+
+>
 
   <title>Avant-gardE — La France libre</title>
-
-  <!-- =====================================================
-       CSS GLOBAL
-  ====================================================== -->
 
   <link
     rel="stylesheet"
@@ -23,479 +21,419 @@
 
 </head>
 
-
 <body>
 
   <!-- =====================================================
        COMPOSANTS COMMUNS
-
-       components.js remplira automatiquement :
-       - événements
-       - header
-       - menu
-       - logo
-       - footer
-       - modale événement
   ====================================================== -->
 
   <div id="site-header"></div>
 
-
   <!-- =====================================================
-       HERO
+       CONTENU PRINCIPAL
   ====================================================== -->
 
   <main>
 
-    <section class="hero">
+```
+<!-- ===================================================
+     HERO
+==================================================== -->
 
-      <div class="hero-content">
+<section class="hero">
 
-        <div class="eyebrow">
-          SOUVERAINETÉ · LIBERTÉ · RESPONSABILITÉ
-        </div>
+  <div class="hero-content">
 
+    <div class="eyebrow">
+      SOUVERAINETÉ · LIBERTÉ · RESPONSABILITÉ
+    </div>
 
-        <h1>
-          LA FRANCE <span>LIBRE.</span>
-        </h1>
+    <h1>
+      LA FRANCE <span>LIBRE.</span>
+    </h1>
 
+    <div class="hero-line"></div>
 
-        <div class="hero-line"></div>
+    <h2>
+      Redonner aux Français leur liberté<br>
+      en redonnant à la France sa souveraineté.
+    </h2>
 
+    <p>
+      Avant-gardE veut dépasser les vieux clivages
+      politiques pour proposer une nouvelle voie :
+      une France souveraine, un État recentré sur
+      l'essentiel, et des citoyens libres et responsables.
+    </p>
 
-        <h2>
-          Redonner aux Français leur liberté<br>
-          en redonnant à la France sa souveraineté.
-        </h2>
+  </div>
 
+</section>
 
-        <p>
-          Avant-gardE veut dépasser les vieux clivages
-          politiques pour proposer une nouvelle voie :
-          une France souveraine, un État recentré sur
-          l'essentiel, et des citoyens libres et responsables.
-        </p>
 
-      </div>
+<!-- ===================================================
+     IA D'AVANT-GARDE
+==================================================== -->
 
-    </section>
+<section class="ai-section">
 
+  <div class="ai-inner">
 
-    <!-- ===================================================
-         IA D'AVANT-GARDE
-    ==================================================== -->
+    <div class="section-kicker">
+      L'IA D'AVANT-GARDE
+    </div>
 
-    <section class="ai-section">
+    <h2>
+      Une question sur Avant-gardE ?
+    </h2>
 
-      <div class="ai-inner">
+    <p class="ai-intro">
+      Posez votre question ci-dessous.
+      Elle sera automatiquement préparée afin que
+      les principales intelligences artificielles puissent
+      s'appuyer sur les informations officielles
+      d'Avant-gardE pour vous répondre.
+    </p>
 
-        <div class="section-kicker">
-          L'IA D'AVANT-GARDE
-        </div>
+    <textarea
+      id="aiQuestion"
+      class="ai-question"
+      placeholder="Posez votre question sur Avant-gardE..."
+    ></textarea>
 
+    <div class="ai-buttons">
 
-        <h2>
-          Une question sur Avant-gardE ?
-        </h2>
-
-
-        <p class="ai-intro">
-
-          Posez votre question ci-dessous.
-          Elle sera automatiquement préparée afin que
-          les principales intelligences artificielles puissent
-          s'appuyer sur les informations officielles
-          d'Avant-gardE pour vous répondre.
-
-        </p>
-
-
-        <textarea
-          id="aiQuestion"
-          class="ai-question"
-          placeholder="Posez votre question sur Avant-gardE..."
-        ></textarea>
-
-
-        <div class="ai-buttons">
-
-          <button
-            type="button"
-            class="ai-button"
-            onclick="envoyerVersIA('chatgpt')"
-          >
-            ChatGPT
-          </button>
-
-
-          <button
-            type="button"
-            class="ai-button"
-            onclick="envoyerVersIA('gemini')"
-          >
-            Gemini
-          </button>
-
-
-          <button
-            type="button"
-            class="ai-button"
-            onclick="envoyerVersIA('claude')"
-          >
-            Claude
-          </button>
-
-
-          <button
-            type="button"
-            class="ai-button"
-            onclick="envoyerVersIA('perplexity')"
-          >
-            Perplexity
-          </button>
-
-        </div>
-
-
-        <div
-          id="aiStatus"
-          class="ai-status"
-          aria-live="polite"
-        ></div>
-
-
-        <div class="ai-help">
-
-          Les réponses générées par ces services
-          appartiennent à leurs propres systèmes d'intelligence
-          artificielle. Avant-gardE ne contrôle pas leurs réponses.
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- ===================================================
-         RAISON D'ÊTRE
-    ==================================================== -->
-
-    <section class="intro">
-
-      <div class="section-kicker">
-        NOTRE RAISON D'ÊTRE
-      </div>
-
-
-      <h2>
-        Changer de paradigme.
-      </h2>
-
-
-      <p>
-
-        La France a besoin d'un nouveau projet politique.
-        Un projet qui replace la souveraineté nationale,
-        la liberté individuelle, la responsabilité et la
-        justice au cœur de l'action publique.
-
-        <br><br>
-
-        Avant-gardE refuse de choisir entre une France
-        figée dans le passé et un système qui renonce
-        progressivement à ses libertés.
-
-        <br><br>
-
-        Notre ambition est de construire une France
-        souveraine, libre et responsable.
-
-      </p>
-
-    </section>
-
-
-    <!-- ===================================================
-         PRINCIPES
-    ==================================================== -->
-
-    <section class="principles">
-
-      <article class="principle">
-
-        <div class="symbol">
-          ⚖
-        </div>
-
-        <h3>
-          Souveraineté
-        </h3>
-
-        <p>
-
-          La France doit pouvoir décider librement
-          de son destin, de ses lois et de son avenir.
-
-        </p>
-
-      </article>
-
-
-      <article class="principle">
-
-        <div class="symbol">
-          ✦
-        </div>
-
-        <h3>
-          Liberté
-        </h3>
-
-        <p>
-
-          L'État doit protéger les libertés fondamentales
-          et laisser aux citoyens la responsabilité de leurs choix.
-
-        </p>
-
-      </article>
-
-
-      <article class="principle">
-
-        <div class="symbol">
-          ⚔
-        </div>
-
-        <h3>
-          Responsabilité
-        </h3>
-
-        <p>
-
-          Une société libre ne peut fonctionner sans
-          responsabilité individuelle, collective et nationale.
-
-        </p>
-
-      </article>
-
-    </section>
-
-
-    <!-- ===================================================
-         MANIFESTE
-    ==================================================== -->
-
-    <section class="manifesto">
-
-      <div class="section-kicker">
-        L'AVANT-GARDE
-      </div>
-
-
-      <h2>
-        Ni retour en arrière.<br>
-        Ni statu quo.
-      </h2>
-
-
-      <p>
-
-        Avant-gardE veut ouvrir une nouvelle voie politique :
-        souveraine, libre, pragmatique et tournée vers l'avenir.
-
-      </p>
-
-
-      <a
-        href="manifeste.html"
-        class="button"
+      <button
+        type="button"
+        class="ai-button"
+        onclick="envoyerVersIA('chatgpt')"
       >
-        DÉCOUVRIR LE MANIFESTE →
-      </a>
+        ChatGPT
+      </button>
 
-    </section>
+      <button
+        type="button"
+        class="ai-button"
+        onclick="envoyerVersIA('gemini')"
+      >
+        Gemini
+      </button>
 
+      <button
+        type="button"
+        class="ai-button"
+        onclick="envoyerVersIA('claude')"
+      >
+        Claude
+      </button>
 
-    <!-- ===================================================
-         ACTUALITÉS
-    ==================================================== -->
+      <button
+        type="button"
+        class="ai-button"
+        onclick="envoyerVersIA('perplexity')"
+      >
+        Perplexity
+      </button>
 
-    <section class="news">
+    </div>
 
-      <div class="news-title">
+    <div
+      id="aiStatus"
+      class="ai-status"
+      aria-live="polite"
+    ></div>
 
-        <h2>
-          Actualités & publications
-        </h2>
+    <div class="ai-help">
+      Les réponses générées par ces services
+      appartiennent à leurs propres systèmes d'intelligence
+      artificielle. Avant-gardE ne contrôle pas leurs réponses.
+    </div>
 
+  </div>
 
-        <span>
-          Avant-gardE
-        </span>
-
-      </div>
-
-
-      <div class="news-grid">
-
-        <article class="news-card">
-
-          <span>
-            BIENTÔT
-          </span>
-
-
-          <h3>
-            Les premières publications
-          </h3>
-
-
-          <p>
-
-            Retrouvez prochainement les publications
-            et prises de position d'Avant-gardE.
-
-          </p>
-
-        </article>
+</section>
 
 
-        <article class="news-card">
+<!-- ===================================================
+     RAISON D'ÊTRE
+==================================================== -->
 
-          <span>
-            ÉVÉNEMENT
-          </span>
+<section class="intro">
 
+  <div class="section-kicker">
+    NOTRE RAISON D'ÊTRE
+  </div>
 
-          <h3>
-            Rencontres & événements
-          </h3>
+  <h2>
+    Changer de paradigme.
+  </h2>
 
+  <p>
+    La France a besoin d'un nouveau projet politique.
+    Un projet qui replace la souveraineté nationale,
+    la liberté individuelle, la responsabilité et la
+    justice au cœur de l'action publique.
 
-          <p>
+    <br><br>
 
-            Les prochains rendez-vous d'Avant-gardE
-            apparaîtront également dans la barre d'événements.
+    Avant-gardE refuse de choisir entre une France
+    figée dans le passé et un système qui renonce
+    progressivement à ses libertés.
 
-          </p>
+    <br><br>
 
-        </article>
+    Notre ambition est de construire une France
+    souveraine, libre et responsable.
+  </p>
 
-
-        <article class="news-card">
-
-          <span>
-            À VENIR
-          </span>
-
-
-          <h3>
-            Notre projet
-          </h3>
-
-
-          <p>
-
-            Découvrez progressivement les propositions
-            et orientations politiques d'Avant-gardE.
-
-          </p>
-
-        </article>
-
-      </div>
-
-    </section>
+</section>
 
 
-    <!-- ===================================================
-         REJOINDRE
-    ==================================================== -->
+<!-- ===================================================
+     PRINCIPES
+==================================================== -->
 
-    <section class="join">
+<section class="principles">
 
-      <h2>
-        Rejoignez l'Avant-gardE.
-      </h2>
+  <article class="principle">
 
+    <div class="symbol">
+      ⚖
+    </div>
+
+    <h3>
+      Souveraineté
+    </h3>
+
+    <p>
+      La France doit pouvoir décider librement
+      de son destin, de ses lois et de son avenir.
+    </p>
+
+  </article>
+
+
+  <article class="principle">
+
+    <div class="symbol">
+      ✦
+    </div>
+
+    <h3>
+      Liberté
+    </h3>
+
+    <p>
+      L'État doit protéger les libertés fondamentales
+      et laisser aux citoyens la responsabilité de leurs choix.
+    </p>
+
+  </article>
+
+
+  <article class="principle">
+
+    <div class="symbol">
+      ⚔
+    </div>
+
+    <h3>
+      Responsabilité
+    </h3>
+
+    <p>
+      Une société libre ne peut fonctionner sans
+      responsabilité individuelle, collective et nationale.
+    </p>
+
+  </article>
+
+</section>
+
+
+<!-- ===================================================
+     MANIFESTE
+==================================================== -->
+
+<section class="manifesto">
+
+  <div class="section-kicker">
+    L'AVANT-GARDE
+  </div>
+
+  <h2>
+    Ni retour en arrière.<br>
+    Ni statu quo.
+  </h2>
+
+  <p>
+    Avant-gardE veut ouvrir une nouvelle voie politique :
+    souveraine, libre, pragmatique et tournée vers l'avenir.
+  </p>
+
+  <a
+    href="manifeste.html"
+    class="button"
+  >
+    DÉCOUVRIR LE MANIFESTE →
+  </a>
+
+</section>
+
+
+<!-- ===================================================
+     ACTUALITÉS
+==================================================== -->
+
+<section class="news">
+
+  <div class="news-title">
+
+    <h2>
+      Actualités & publications
+    </h2>
+
+    <span>
+      Avant-gardE
+    </span>
+
+  </div>
+
+
+  <div class="news-grid">
+
+    <article class="news-card">
+
+      <span>
+        BIENTÔT
+      </span>
+
+      <h3>
+        Les premières publications
+      </h3>
 
       <p>
-
-        Une nouvelle génération politique ne se décrète pas.
-        Elle se construit avec celles et ceux qui veulent
-        participer au changement.
-
+        Retrouvez prochainement les publications
+        et prises de position d'Avant-gardE.
       </p>
 
+    </article>
 
-      <a
-        href="equipe.html"
-        class="button"
-      >
-        NOUS REJOINDRE →
-      </a>
 
-    </section>
+    <article class="news-card">
+
+      <span>
+        ÉVÉNEMENT
+      </span>
+
+      <h3>
+        Rencontres & événements
+      </h3>
+
+      <p>
+        Les prochains rendez-vous d'Avant-gardE
+        apparaîtront également dans la barre d'événements.
+      </p>
+
+    </article>
+
+
+    <article class="news-card">
+
+      <span>
+        À VENIR
+      </span>
+
+      <h3>
+        Notre projet
+      </h3>
+
+      <p>
+        Découvrez progressivement les propositions
+        et orientations politiques d'Avant-gardE.
+      </p>
+
+    </article>
+
+  </div>
+
+</section>
+
+
+<!-- ===================================================
+     REJOINDRE
+==================================================== -->
+
+<section class="join">
+
+  <h2>
+    Rejoignez l'Avant-gardE.
+  </h2>
+
+  <p>
+    Une nouvelle génération politique ne se décrète pas.
+    Elle se construit avec celles et ceux qui veulent
+    participer au changement.
+  </p>
+
+  <a
+    href="equipe.html"
+    class="button"
+  >
+    NOUS REJOINDRE →
+  </a>
+
+</section>
+```
 
   </main>
 
-
   <!-- =====================================================
-       FOOTER COMMUN
+       FOOTER
   ====================================================== -->
 
   <div id="site-footer"></div>
 
-
   <!-- =====================================================
-       MODALE ÉVÉNEMENT COMMUNE
+       MODALE RENDEZ-VOUS
   ====================================================== -->
 
   <div id="site-rdv-modal"></div>
 
-
   <!-- =====================================================
-       SCRIPTS
+       SUPABASE CDN
   ====================================================== -->
-
-  <!--
-       Supabase
-       Le fichier supabase.js est utilisé comme module
-       par components.js et les autres scripts.
-  -->
 
   <script
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
   ></script>
 
-
-  <!-- Connexion Supabase commune -->
+  <!-- =====================================================
+       SUPABASE
+  ====================================================== -->
 
   <script
     type="module"
     src="js/supabase.js"
   ></script>
 
-
-  <!-- Composants communs -->
+  <!-- =====================================================
+       COMPOSANTS COMMUNS
+  ====================================================== -->
 
   <script
     type="module"
     src="js/components.js"
   ></script>
 
-
-  <!-- JavaScript spécifique à l'accueil -->
+  <!-- =====================================================
+       JAVASCRIPT ACCUEIL
+  ====================================================== -->
 
   <script
     type="module"
     src="js/index.js"
   ></script>
-
 
 </body>
 
