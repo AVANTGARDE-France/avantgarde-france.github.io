@@ -1,4 +1,3 @@
-javascript
 /* =========================================================
    AVANT-GARDE — COMPONENTS
    js/components.js
