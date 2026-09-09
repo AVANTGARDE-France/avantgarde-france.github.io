@@ -1,2038 +1,926 @@
-/* =========================================================
-   AVANT-GARDE — NOTRE ÉQUIPE
-   js/equipe.js
+<!DOCTYPE html>
+<html lang="fr">
 
-   Logique spécifique à la page équipe.
+<head>
 
-   Les éléments communs au site sont gérés par :
-   - js/supabase.js
-   - js/components.js
-========================================================= */
+  <meta charset="UTF-8">
 
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-/* =========================================================
-   VARIABLES
-========================================================= */
+  <title>Avant-gardE — Notre équipe</title>
 
-let membres = [];
+  <!-- =====================================================
+       CSS GLOBAL
+  ====================================================== -->
 
+  <link
+    rel="stylesheet"
+    href="css/style.css"
+  >
 
-/* =========================================================
-   RÉSEAUX SOCIAUX
-========================================================= */
+</head>
 
-const reseauxSociaux = [
 
-  {
-    champ: "facebook_url",
-    nom: "Facebook",
-    logo: "https://cdn.simpleicons.org/facebook/1877F2",
-    audienceChamp: "facebook_audience"
-  },
+<body>
 
-  {
-    champ: "x_url",
-    nom: "X",
-    logo: "https://cdn.simpleicons.org/x/FFFFFF",
-    audienceChamp: "x_audience"
-  },
+  <!-- =====================================================
+       COMPOSANTS COMMUNS
+       
+       components.js injecte automatiquement :
+       - barre des événements
+       - header
+       - logo
+       - navigation
+       - accès administration
+       - footer
+       - modale événement
+  ====================================================== -->
 
-  {
-    champ: "instagram_url",
-    nom: "Instagram",
-    logo: "https://cdn.simpleicons.org/instagram/E4405F",
-    audienceChamp: "instagram_audience"
-  },
+  <div id="site-header"></div>
 
-  {
-    champ: "youtube_url",
-    nom: "YouTube",
-    logo: "https://cdn.simpleicons.org/youtube/FF0000",
-    audienceChamp: "youtube_audience"
-  },
 
-  {
-    champ: "tiktok_url",
-    nom: "TikTok",
-    logo: "https://cdn.simpleicons.org/tiktok/FFFFFF",
-    audienceChamp: "tiktok_audience"
-  }
+  <!-- =====================================================
+       HERO
+  ====================================================== -->
 
-];
+  <section class="hero">
 
-
-/* =========================================================
-   OUTILS — MODALES
-========================================================= */
-
-function ouvrirModalEquipe(modal) {
-
-  if (!modal) return;
-
-  modal.classList.add("active");
-
-  modal.setAttribute(
-    "aria-hidden",
-    "false"
-  );
-
-  document.body.style.overflow =
-    "hidden";
-
-}
-
-
-function fermerModalEquipe(modal) {
-
-  if (!modal) return;
-
-  modal.classList.remove("active");
-
-  modal.setAttribute(
-    "aria-hidden",
-    "true"
-  );
-
-  document.body.style.overflow =
-    "";
-
-}
-
-
-/* =========================================================
-   VALIDATION IMAGE
-========================================================= */
-
-function imageValide(url) {
-
-  if (!url) return false;
-
-  try {
-
-    const parsed =
-      new URL(url);
-
-    return (
-      parsed.protocol === "http:" ||
-      parsed.protocol === "https:"
-    );
-
-  } catch {
-
-    return false;
-
-  }
-
-}
-
-
-/* =========================================================
-   NORMALISATION DES COMPÉTENCES
-========================================================= */
-
-function normaliserCompetences(value) {
-
-  if (!value) return [];
-
-
-  if (Array.isArray(value)) {
-
-    return value
-      .map(item =>
-        String(item).trim()
-      )
-      .filter(Boolean);
-
-  }
-
-
-  if (typeof value === "string") {
-
-    try {
-
-      const parsed =
-        JSON.parse(value);
-
-
-      if (Array.isArray(parsed)) {
-
-        return parsed
-          .map(item =>
-            String(item).trim()
-          )
-          .filter(Boolean);
-
-      }
-
-    } catch {
-
-      // La valeur peut être une chaîne simple.
-
-    }
-
-
-    return value
-      .split(",")
-      .map(item =>
-        item.trim()
-      )
-      .filter(Boolean);
-
-  }
-
-
-  return [];
-
-}
-
-
-/* =========================================================
-   VALIDATION URL
-========================================================= */
-
-function urlValide(url) {
-
-  if (!url) return false;
-
-  try {
-
-    const parsed =
-      new URL(url);
-
-    return (
-      parsed.protocol === "http:" ||
-      parsed.protocol === "https:"
-    );
-
-  } catch {
-
-    return false;
-
-  }
-
-}
-
-
-/* =========================================================
-   FORMATAGE AUDIENCE
-========================================================= */
-
-function formaterAudience(valeur) {
-
-  if (
-    valeur === null ||
-    valeur === undefined ||
-    valeur === ""
-  ) {
-
-    return "";
-
-  }
-
-
-  const nombre =
-    Number(valeur);
-
-
-  if (!Number.isFinite(nombre)) {
-
-    return "";
-
-  }
-
-
-  return nombre.toLocaleString(
-    "fr-FR"
-  );
-
-}
-
-
-/* =========================================================
-   AFFICHAGE DES RÉSEAUX SOCIAUX
-========================================================= */
-
-function afficherReseauxSociaux(membre) {
-
-  const container =
-    document.getElementById(
-      "profileModalSocials"
-    );
-
-
-  const audienceMaxContainer =
-    document.getElementById(
-      "profileModalAudienceMax"
-    );
-
-
-  if (!container) return;
-
-
-  /*
-     Réseaux réellement renseignés
-     et contenant une URL valide.
-  */
-
-  const reseauxDisponibles =
-    reseauxSociaux.filter(
-      reseau =>
-        urlValide(
-          membre[reseau.champ]
-        )
-    );
-
-
-  /*
-     Aucun réseau.
-  */
-
-  if (!reseauxDisponibles.length) {
-
-    container.innerHTML = "";
-
-    container.style.display =
-      "none";
-
-
-    if (audienceMaxContainer) {
-
-      audienceMaxContainer.innerHTML =
-        "";
-
-      audienceMaxContainer.style.display =
-        "none";
-
-    }
-
-    return;
-
-  }
-
-
-  container.style.display =
-    "flex";
-
-
-  /*
-     Récupération des audiences.
-  */
-
-  const audiences =
-    reseauxDisponibles.map(
-      reseau => {
-
-        const valeur =
-          Number(
-            membre[
-              reseau.audienceChamp
-            ]
-          );
-
-
-        return {
-
-          reseau,
-
-          valeur:
-            Number.isFinite(valeur)
-              ? valeur
-              : 0
-
-        };
-
-      }
-    );
-
-
-  /*
-     Détermination du réseau
-     ayant la plus grosse audience.
-  */
-
-  let reseauMax = null;
-
-
-  if (audiences.length) {
-
-    reseauMax =
-      audiences.reduce(
-        (max, actuel) => {
-
-          return actuel.valeur >
-            max.valeur
-            ? actuel
-            : max;
-
-        }
-      );
-
-  }
-
-
-  /*
-     Si audience_reseau est renseigné
-     dans Supabase, on l'utilise
-     pour identifier le réseau maximum.
-  */
-
-  if (membre.audience_reseau) {
-
-    const reseauBase =
-      reseauxDisponibles.find(
-        reseau =>
-          reseau.nom.toLowerCase() ===
-          String(
-            membre.audience_reseau
-          ).toLowerCase()
-      );
-
-
-    if (reseauBase) {
-
-      const audienceBase =
-        audiences.find(
-          item =>
-            item.reseau ===
-            reseauBase
-        );
-
-
-      if (audienceBase) {
-
-        reseauMax =
-          audienceBase;
-
-      }
-
-    }
-
-  }
-
-
-  /*
-     Construction des boutons
-     de réseaux sociaux.
-  */
-
-  container.innerHTML =
-    reseauxDisponibles
-      .map(
-        reseau => {
-
-          const audience =
-            audiences.find(
-              item =>
-                item.reseau ===
-                reseau
-            );
-
-
-          const estMax =
-            Boolean(
-              reseauMax &&
-              audience &&
-              audience.reseau ===
-                reseauMax.reseau
-            );
-
-
-          return `
-
-            <a
-              href="${membre[reseau.champ]}"
-              class="profile-social-link"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="${reseau.nom}"
-              aria-label="${reseau.nom}"
-            >
-
-              <div
-                class="
-                  profile-social-item
-                  ${estMax ? "is-max" : ""}
-                "
-              >
-
-                ${
-                  estMax
-                    ? `
-                      <span
-                        class="profile-social-max-star"
-                        aria-hidden="true"
-                      >
-                        ★
-                      </span>
-                    `
-                    : ""
-                }
-
-
-                <img
-                  src="${reseau.logo}"
-                  alt=""
-                  loading="lazy"
-                >
-
-
-                ${
-                  audience &&
-                  audience.valeur > 0
-                    ? `
-                      <span
-                        class="profile-social-audience"
-                      >
-                        ${formaterAudience(
-                          audience.valeur
-                        )}
-                      </span>
-                    `
-                    : ""
-                }
-
-              </div>
-
-            </a>
-
-          `;
-
-        }
-      )
-      .join("");
-
-
-  /*
-     Affichage de l'audience maximale.
-  */
-
-  if (
-    audienceMaxContainer &&
-    reseauMax &&
-    reseauMax.valeur > 0
-  ) {
-
-    let dateTexte = "";
-
-
-    if (
-      membre.audience_updated_at
-    ) {
-
-      const date =
-        new Date(
-          membre.audience_updated_at
-        );
-
-
-      if (
-        !Number.isNaN(
-          date.getTime()
-        )
-      ) {
-
-        dateTexte =
-          `mis à jour le ${
-            date.toLocaleDateString(
-              "fr-FR"
-            )
-          } à ${
-            date.toLocaleTimeString(
-              "fr-FR",
-              {
-                hour: "2-digit",
-                minute: "2-digit"
-              }
-            )
-          }`;
-
-      }
-
-    }
-
-
-    audienceMaxContainer.innerHTML = `
-
-      Audience max :
-      <strong>
-        ${formaterAudience(
-          reseauMax.valeur
-        )}
-      </strong>
-
-      ${
-        dateTexte
-          ? `
-            <small>
-              · ${dateTexte}
-            </small>
-          `
-          : ""
-      }
-
-    `;
-
-
-    audienceMaxContainer.style.display =
-      "block";
-
-  } else {
-
-    if (audienceMaxContainer) {
-
-      audienceMaxContainer.innerHTML =
-        "";
-
-      audienceMaxContainer.style.display =
-        "none";
-
-    }
-
-  }
-
-}
-
-
-/* =========================================================
-   CHARGEMENT DES MEMBRES
-========================================================= */
-
-async function chargerMembres() {
-
-  const teamGrid =
-    document.getElementById(
-      "teamGrid"
-    );
-
-
-  if (!teamGrid) return;
-
-
-  teamGrid.innerHTML = `
-
-    <div class="loading">
-      Chargement des membres…
+    <div class="kicker">
+      L’AVANT-GARDE
     </div>
 
-  `;
 
+    <h1>
+      NOTRE <span>ÉQUIPE.</span>
+    </h1>
 
-  try {
 
-    const {
-      data,
-      error
-    } =
-      await window.supabaseClient
+    <p>
+      L’Avant-gardE rassemble des femmes et des hommes qui souhaitent
+      contribuer, chacun selon ses compétences, son influence et ses moyens,
+      à la construction d’une France libre, souveraine et responsable.
+    </p>
 
-        .from("profiles")
 
-        .select(`
-          id,
-          created_at,
-          nom,
-          grade,
-          image_url,
-          description,
-          region,
-          competences,
-          anonyme,
-          facebook_url,
-          x_url,
-          instagram_url,
-          youtube_url,
-          tiktok_url,
-          facebook_audience,
-          instagram_audience,
-          x_audience,
-          youtube_audience,
-          tiktok_audience,
-          audience_max,
-          audience_reseau,
-          audience_updated_at
-        `)
+    <button
+      class="join-button"
+      id="openJoin"
+      type="button"
+    >
+      REJOINDRE L’AVANT-GARDE
+    </button>
 
-        .eq(
-          "anonyme",
-          false
-        )
+  </section>
 
-        .order(
-          "created_at",
-          {
-            ascending: true
-          }
-        );
-
-
-    if (error) {
-
-      console.error(
-        "Erreur chargement membres :",
-        error
-      );
 
+  <!-- =====================================================
+       EQUIPE
+  ====================================================== -->
 
-      teamGrid.innerHTML = `
+  <section class="team-section">
 
-        <div class="no-members">
-          Impossible de charger les membres.
-        </div>
+    <div class="section-title">
 
-      `;
+      <h2>
+        Les membres
+      </h2>
 
-      return;
+      <p>
+        Découvrez celles et ceux qui ont choisi de rendre leur engagement public.
+      </p>
 
-    }
+    </div>
 
 
-    membres =
-      data || [];
+    <div
+      class="team-grid"
+      id="teamGrid"
+    >
 
-
-    if (!membres.length) {
-
-      teamGrid.innerHTML = `
-
-        <div class="no-members">
-          Aucun membre à afficher pour le moment.
-        </div>
-
-      `;
-
-      return;
-
-    }
-
-
-    teamGrid.innerHTML =
-      membres
-        .map(
-          (membre, index) => {
-
-            const description =
-              membre.description ||
-              "";
-
-
-            const descriptionCourte =
-              description.length > 180
-                ? description.slice(
-                    0,
-                    177
-                  ) + "…"
-                : description;
-
-
-            const image =
-              imageValide(
-                membre.image_url
-              );
-
-
-            return `
-
-              <article
-                class="member-card"
-                data-member-index="${index}"
-                tabindex="0"
-                role="button"
-                aria-label="Voir le profil de ${
-                  membre.nom ||
-                  "ce membre"
-                }"
-              >
-
-                <div class="member-photo">
-
-                  ${
-                    image
-                      ? `
-                        <img
-                          src="${membre.image_url}"
-                          alt="${
-                            membre.nom ||
-                            "Membre"
-                          }"
-                          loading="lazy"
-                        >
-                      `
-                      : `
-                        <div
-                          class="member-photo-placeholder"
-                          aria-hidden="true"
-                        >
-                          ★
-                        </div>
-                      `
-                  }
-
-                </div>
-
-
-                <div class="member-name">
-
-                  ${
-                    membre.nom ||
-                    "Membre"
-                  }
-
-                </div>
-
-
-                ${
-                  membre.grade
-                    ? `
-                      <div class="member-grade">
-                        ${membre.grade}
-                      </div>
-                    `
-                    : ""
-                }
-
-
-                ${
-                  membre.region
-                    ? `
-                      <div class="member-region">
-                        ${membre.region}
-                      </div>
-                    `
-                    : ""
-                }
-
-
-                ${
-                  descriptionCourte
-                    ? `
-                      <div class="member-description">
-                        ${descriptionCourte}
-                      </div>
-                    `
-                    : ""
-                }
-
-              </article>
-
-            `;
-
-          }
-        )
-        .join("");
-
-
-    /*
-       Activation des cartes.
-    */
-
-    document
-      .querySelectorAll(
-        ".member-card"
-      )
-      .forEach(card => {
-
-
-        card.addEventListener(
-          "click",
-          () => {
-
-            const index =
-              Number(
-                card.dataset.memberIndex
-              );
-
-
-            const membre =
-              membres[index];
-
-
-            if (membre) {
-
-              ouvrirProfil(
-                membre
-              );
-
-            }
-
-          }
-        );
-
-
-        card.addEventListener(
-          "keydown",
-          event => {
-
-            if (
-              event.key === "Enter" ||
-              event.key === " "
-            ) {
-
-              event.preventDefault();
-
-
-              const index =
-                Number(
-                  card.dataset.memberIndex
-                );
-
-
-              const membre =
-                membres[index];
-
-
-              if (membre) {
-
-                ouvrirProfil(
-                  membre
-                );
-
-              }
-
-            }
-
-          }
-        );
-
-      });
-
-
-  } catch (error) {
-
-    console.error(
-      "Erreur inattendue chargement membres :",
-      error
-    );
-
-
-    teamGrid.innerHTML = `
-
-      <div class="no-members">
-        Impossible de charger les membres.
+      <div
+        class="loading"
+        id="loadingMembers"
+      >
+        Chargement des membres…
       </div>
 
-    `;
+    </div>
 
-  }
+  </section>
 
-}
 
+  <!-- =====================================================
+       MODAL MEMBRE
+  ====================================================== -->
 
-/* =========================================================
-   OUVERTURE PROFIL
-========================================================= */
+  <div
+    class="modal"
+    id="memberModal"
+    aria-hidden="true"
+  >
 
-function ouvrirProfil(membre) {
+    <div
+      class="modal-box"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="profileModalName"
+    >
 
-  const modal =
-    document.getElementById(
-      "memberModal"
-    );
+      <button
+        class="modal-close"
+        id="closeMember"
+        type="button"
+        aria-label="Fermer"
+      >
+        ×
+      </button>
 
 
-  if (!modal) return;
+      <div class="profile-modal-content">
 
+        <img
+          id="profileModalImage"
+          class="profile-modal-image"
+          alt=""
+        >
 
-  const image =
-    document.getElementById(
-      "profileModalImage"
-    );
 
-  const name =
-    document.getElementById(
-      "profileModalName"
-    );
+        <div
+          id="profilePlaceholder"
+          class="profile-placeholder"
+        >
+          ★
+        </div>
 
-  const grade =
-    document.getElementById(
-      "profileModalGrade"
-    );
 
-  const region =
-    document.getElementById(
-      "profileModalRegion"
-    );
+        <h2 id="profileModalName"></h2>
 
-  const description =
-    document.getElementById(
-      "profileModalDescription"
-    );
 
-  const competencesContainer =
-    document.getElementById(
-      "profileModalCompetences"
-    );
+        <div
+          id="profileModalGrade"
+          class="profile-grade"
+        ></div>
 
-  const vipContainer =
-    document.getElementById(
-      "profileModalVip"
-    );
 
+        <div
+          id="profileModalRegion"
+          class="profile-region"
+        ></div>
 
-  /*
-     NOM
-  */
 
-  if (name) {
+        <div
+          id="profileModalDescription"
+          class="profile-description"
+        ></div>
 
-    name.textContent =
-      membre.nom ||
-      "Membre";
 
-  }
+        <!-- =================================================
+             RESEAUX SOCIAUX
+        ================================================== -->
 
+        <div
+          id="profileModalSocials"
+          class="profile-socials"
+          style="display:none;"
+        ></div>
 
-  /*
-     GRADE
-  */
 
-  if (grade) {
+        <div
+          id="profileModalAudienceMax"
+          class="profile-audience-max"
+          style="display:none;"
+        ></div>
 
-    grade.textContent =
-      membre.grade ||
-      "";
 
-    grade.style.display =
-      membre.grade
-        ? ""
-        : "none";
-
-  }
-
-
-  /*
-     RÉGION
-  */
-
-  if (region) {
-
-    region.textContent =
-      membre.region ||
-      "";
-
-    region.style.display =
-      membre.region
-        ? ""
-        : "none";
-
-  }
-
-
-  /*
-     DESCRIPTION
-  */
-
-  if (description) {
-
-    description.textContent =
-      membre.description ||
-      "";
-
-    description.style.display =
-      membre.description
-        ? ""
-        : "none";
-
-  }
-
-
-  /*
-     IMAGE
-  */
-
-  if (image) {
-
-    if (
-      imageValide(
-        membre.image_url
-      )
-    ) {
-
-      image.src =
-        membre.image_url;
-
-      image.alt =
-        membre.nom ||
-        "Membre";
-
-      image.style.display =
-        "block";
-
-    } else {
-
-      image.removeAttribute(
-        "src"
-      );
-
-      image.alt =
-        "";
-
-      image.style.display =
-        "none";
-
-    }
-
-  }
-
-
-  /*
-     RÉSEAUX SOCIAUX
-  */
-
-  afficherReseauxSociaux(
-    membre
-  );
-
-
-  /*
-     COMPÉTENCES
-  */
-
-  if (competencesContainer) {
-
-    let competences =
-      normaliserCompetences(
-        membre.competences
-      );
-
-
-    /*
-       VIP est calculé automatiquement
-       et ne doit pas être affiché comme
-       une compétence classique.
-    */
-
-    competences =
-      competences.filter(
-        competence =>
-          competence.toUpperCase() !==
-          "VIP"
-      );
-
-
-    if (!competences.length) {
-
-      competencesContainer.innerHTML = `
+        <!-- =================================================
+             COMPETENCES
+        ================================================== -->
 
         <div class="profile-competences">
 
-          <div class="competence-list">
+          <h3>
+            Compétences
+          </h3>
 
-            <span class="competence-tag">
-              Aucune compétence renseignée.
+
+          <div
+            class="competence-list"
+            id="profileModalCompetences"
+          ></div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       MODAL INSCRIPTION
+  ====================================================== -->
+
+  <div
+    class="modal"
+    id="joinModal"
+    aria-hidden="true"
+  >
+
+    <div
+      class="modal-box"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="joinModalTitle"
+    >
+
+      <button
+        class="modal-close"
+        id="closeJoin"
+        type="button"
+        aria-label="Fermer"
+      >
+        ×
+      </button>
+
+
+      <h2
+        class="form-title"
+        id="joinModalTitle"
+      >
+        Rejoindre l’Avant-gardE
+      </h2>
+
+
+      <p class="form-intro">
+        Créez votre profil et choisissez la manière dont vous souhaitez
+        apparaître au sein du mouvement.
+      </p>
+
+
+      <form id="joinForm">
+
+        <!-- =================================================
+             TYPE D'INSCRIPTION
+        ================================================== -->
+
+        <div class="form-group">
+
+          <label class="main-label">
+
+            S’inscrire en tant que
+
+            <span class="required">
+              *
             </span>
 
+          </label>
+
+
+          <div class="registration-choice">
+
+            <div class="choice-option">
+
+              <input
+                type="radio"
+                id="typeSympathisant"
+                name="type_inscription"
+                value="sympathisant"
+                checked
+              >
+
+
+              <label
+                for="typeSympathisant"
+                class="choice-label"
+              >
+
+                <strong>
+                  Sympathisant
+                </strong>
+
+
+                <span>
+                  Votre profil sera affiché dans la liste des membres.
+                </span>
+
+              </label>
+
+            </div>
+
+
+            <div class="choice-option">
+
+              <input
+                type="radio"
+                id="typeAnonyme"
+                name="type_inscription"
+                value="anonyme"
+              >
+
+
+              <label
+                for="typeAnonyme"
+                class="choice-label"
+              >
+
+                <strong>
+                  Anonyme
+                </strong>
+
+
+                <span>
+                  Votre profil sera enregistré mais caché de la liste des membres.
+                </span>
+
+              </label>
+
+            </div>
+
           </div>
 
         </div>
 
-      `;
 
-    } else {
+        <!-- =================================================
+             NOM
+        ================================================== -->
 
-      competencesContainer.innerHTML = `
+        <div class="form-group">
 
-        <div class="profile-competences">
+          <label
+            class="main-label"
+            for="nom"
+          >
 
-          <div class="competence-list">
+            Pseudo ou nom prénom
 
-            ${
-              competences
-                .map(
-                  competence => `
+            <span class="required">
+              *
+            </span>
 
-                    <span class="competence-tag">
-                      ${competence}
-                    </span>
+          </label>
 
-                  `
-                )
-                .join("")
-            }
+
+          <input
+            type="text"
+            id="nom"
+            maxlength="100"
+            required
+          >
+
+        </div>
+
+
+        <!-- =================================================
+             EMAIL
+        ================================================== -->
+
+        <div class="form-group">
+
+          <label
+            class="main-label"
+            for="email"
+          >
+
+            Email
+
+            <span class="required">
+              *
+            </span>
+
+          </label>
+
+
+          <input
+            type="email"
+            id="email"
+            required
+          >
+
+
+          <div class="help">
+            Une seule inscription est autorisée par adresse e-mail.
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             REGION
+        ================================================== -->
+
+        <div class="form-group">
+
+          <label
+            class="main-label"
+            for="region"
+          >
+
+            Région
+
+            <span class="required">
+              *
+            </span>
+
+          </label>
+
+
+          <select
+            id="region"
+            required
+          >
+
+            <option value="">
+              Sélectionnez votre région
+            </option>
+
+
+            <optgroup label="France métropolitaine">
+
+              <option>Auvergne-Rhône-Alpes</option>
+              <option>Bourgogne-Franche-Comté</option>
+              <option>Bretagne</option>
+              <option>Centre-Val de Loire</option>
+              <option>Corse</option>
+              <option>Grand Est</option>
+              <option>Hauts-de-France</option>
+              <option>Île-de-France</option>
+              <option>Normandie</option>
+              <option>Nouvelle-Aquitaine</option>
+              <option>Occitanie</option>
+              <option>Pays de la Loire</option>
+              <option>Provence-Alpes-Côte d’Azur</option>
+
+            </optgroup>
+
+
+            <optgroup label="Outre-mer">
+
+              <option>Guadeloupe</option>
+              <option>Martinique</option>
+              <option>Guyane</option>
+              <option>La Réunion</option>
+              <option>Mayotte</option>
+
+            </optgroup>
+
+
+            <optgroup label="Étranger">
+
+              <option>Europe</option>
+              <option>Amérique du Nord</option>
+              <option>Amérique centrale et Caraïbes</option>
+              <option>Amérique du Sud</option>
+              <option>Afrique</option>
+              <option>Asie</option>
+              <option>Océanie</option>
+              <option>Autre</option>
+
+            </optgroup>
+
+          </select>
+
+        </div>
+
+
+        <!-- =================================================
+             IMAGE
+        ================================================== -->
+
+        <div class="form-group">
+
+          <label
+            class="main-label"
+            for="image_url"
+          >
+            Image
+          </label>
+
+
+          <input
+            type="url"
+            id="image_url"
+            placeholder="https://..."
+          >
+
+
+          <div class="help">
+            Indiquez l’URL d’une image déjà hébergée en ligne.
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             DESCRIPTION
+        ================================================== -->
+
+        <div class="form-group">
+
+          <label
+            class="main-label"
+            for="description"
+          >
+            Description
+          </label>
+
+
+          <textarea
+            id="description"
+            maxlength="300"
+            placeholder="Présentez-vous en quelques mots..."
+          ></textarea>
+
+
+          <div
+            class="description-counter"
+            id="descriptionCounter"
+          >
+
+            <span id="descriptionCount">
+              0
+            </span>
+
+            / 300
 
           </div>
 
         </div>
 
-      `;
 
-    }
+        <!-- =================================================
+             COMPETENCES
+        ================================================== -->
 
-  }
-
-
-  /*
-     VIP
-  */
-
-  if (vipContainer) {
-
-    const audienceMax =
-      Number(
-        membre.audience_max
-      );
+        <div class="form-section-title">
+          Talents et compétences métier
+        </div>
 
 
-    const estVIP =
-      Number.isFinite(
-        audienceMax
-      ) &&
-      audienceMax >= 3000;
+        <div class="form-group">
 
+          <label class="main-label">
 
-    if (estVIP) {
+            Compétences
 
-      vipContainer.innerHTML = `
+            <span
+              style="font-weight:normal;color:#8994a6;"
+            >
+              (auto-évaluation de vos compétences)
+            </span>
 
-        <div class="vip-medal">
-
-          <span>
-            ★
-          </span>
-
-          VIP
+          </label>
 
         </div>
 
-      `;
 
+        <!-- =================================================
+             COMPETENCES METIER
+        ================================================== -->
 
-      vipContainer.style.display =
-        "block";
+        <div class="competence-group">
 
-    } else {
+          <div class="competence-group-title">
+            Compétences métier
+          </div>
 
-      vipContainer.innerHTML =
-        "";
 
-      vipContainer.style.display =
-        "none";
+          <div class="competence">
 
-    }
+            <label>
 
-  }
+              <input
+                type="checkbox"
+                name="competences"
+                value="Maîtrise de doctrine"
+              >
 
+              <span>
 
-  ouvrirModalEquipe(
-    modal
-  );
+                <span class="competence-name">
+                  Maîtrise de doctrine
+                </span>
 
-}
+                <span class="competence-description">
+                  capacité à préserver la fidélité à l’idéologie d'Avant-Garde et sa cohérence dans l’action du mouvement.
+                </span>
 
+              </span>
 
-/* =========================================================
-   COMPTEUR DESCRIPTION
-========================================================= */
+            </label>
 
-function mettreAJourCompteurDescription() {
+          </div>
 
-  const descriptionField =
-    document.getElementById(
-      "descriptionField"
-    );
 
-  const descriptionCount =
-    document.getElementById(
-      "descriptionCount"
-    );
+          <div class="competence">
 
+            <label>
 
-  if (
-    !descriptionField ||
-    !descriptionCount
-  ) {
+              <input
+                type="checkbox"
+                name="competences"
+                value="Tactique"
+              >
 
-    return;
+              <span>
 
-  }
+                <span class="competence-name">
+                  Tactique
+                </span>
 
+                <span class="competence-description">
+                  capacité à concevoir et mettre en œuvre des tactiques efficaces de développement d’audience, médiatique et électorale, sans renier l’idéologie.
+                </span>
 
-  const longueur =
-    descriptionField.value.length;
+              </span>
 
+            </label>
 
-  descriptionCount.textContent =
-    longueur;
+          </div>
 
 
-  descriptionCount.classList.remove(
-    "warning"
-  );
+          <div class="competence">
 
-  descriptionCount.classList.remove(
-    "limit"
-  );
+            <label>
 
+              <input
+                type="checkbox"
+                name="competences"
+                value="Prestance"
+              >
 
-  if (longueur >= 300) {
+              <span>
 
-    descriptionCount.classList.add(
-      "limit"
-    );
+                <span class="competence-name">
+                  Prestance
+                </span>
 
-  } else if (longueur >= 270) {
+                <span class="competence-description">
+                  capacité à séduire et convaincre par la parole, le charisme, le charme ou la culture.
+                </span>
 
-    descriptionCount.classList.add(
-      "warning"
-    );
+              </span>
 
-  }
+            </label>
 
-}
+          </div>
 
 
-/* =========================================================
-   OUVERTURE INSCRIPTION
-========================================================= */
+          <div class="competence">
 
-function initialiserOuvertureInscription() {
+            <label>
 
-  const openJoin =
-    document.getElementById(
-      "openJoin"
-    );
+              <input
+                type="checkbox"
+                name="competences"
+                value="Analyses pragmatiques"
+              >
 
-  const joinModal =
-    document.getElementById(
-      "joinModal"
-    );
+              <span>
 
+                <span class="competence-name">
+                  Analyses pragmatiques
+                </span>
 
-  if (
-    !openJoin ||
-    !joinModal
-  ) {
+                <span class="competence-description">
+                  capacité à analyser les données, les rendements, les conséquences et les rapports de force. anticipent les évolutions et privilégient les faits.
+                </span>
 
-    return;
+              </span>
 
-  }
+            </label>
 
+          </div>
 
-  openJoin.addEventListener(
-    "click",
-    () => {
 
-      const formMessage =
-        document.getElementById(
-          "formMessage"
-        );
+          <div class="competence">
 
+            <label>
 
-      if (formMessage) {
+              <input
+                type="checkbox"
+                name="competences"
+                value="Analyses populistes"
+              >
 
-        formMessage.textContent =
-          "";
+              <span>
 
-        formMessage.className =
-          "form-message";
+                <span class="competence-name">
+                  Analyses populistes
+                </span>
 
-      }
+                <span class="competence-description">
+                  capacité à analyser les ressentis, aspirations et frustrations populaires. anticipent les réactions naturelles et privilégient le vécu et l’opinion du peuple.
+                </span>
 
+              </span>
 
-      mettreAJourCompteurDescription();
+            </label>
 
+          </div>
 
-      ouvrirModalEquipe(
-        joinModal
-      );
 
-    }
-  );
+          <div class="competence">
 
-}
+            <label>
 
+              <input
+                type="checkbox"
+                name="competences"
+                value="Administration"
+              >
 
-/* =========================================================
-   FERMETURE DES MODALES ÉQUIPE
-========================================================= */
+              <span>
 
-function initialiserFermetureModales() {
+                <span class="competence-name">
+                  Administration
+                </span>
 
-  const memberModal =
-    document.getElementById(
-      "memberModal"
-    );
+                <span class="competence-description">
+                  maîtrise de la gestion des structures, des ressources techniques et opérationnelles et des équipes internes.
+                </span>
 
-  const joinModal =
-    document.getElementById(
-      "joinModal"
-    );
+              </span>
 
-  const closeMember =
-    document.getElementById(
-      "closeMember"
-    );
+            </label>
 
-  const closeJoin =
-    document.getElementById(
-      "closeJoin"
-    );
+          </div>
 
 
-  /*
-     Bouton fermer profil.
-  */
+          <div class="competence">
 
-  if (
-    closeMember &&
-    memberModal
-  ) {
+            <label>
 
-    closeMember.addEventListener(
-      "click",
-      () => {
+              <input
+                type="checkbox"
+                name="competences"
+                value="Expertise et ingénierie juridique"
+              >
 
-        fermerModalEquipe(
-          memberModal
-        );
+              <span>
 
-      }
-    );
+                <span class="competence-name">
+                  Expertise et ingénierie juridique
+                </span>
 
-  }
+                <span class="competence-description">
+                  maîtrise du droit français et européen ainsi que des mécanismes juridiques, avec capacité à en analyser les règles, les contraintes, les failles et les possibilités d’évolution.
+                </span>
 
+              </span>
 
-  /*
-     Bouton fermer inscription.
-  */
+            </label>
 
-  if (
-    closeJoin &&
-    joinModal
-  ) {
+          </div>
 
-    closeJoin.addEventListener(
-      "click",
-      () => {
 
-        fermerModalEquipe(
-          joinModal
-        );
+          <div class="competence">
 
-      }
-    );
+            <label>
 
-  }
+              <input
+                type="checkbox"
+                name="competences"
+                value="Expertise et ingénierie politique"
+              >
 
+              <span>
 
-  /*
-     Clic sur le fond.
-  */
+                <span class="competence-name">
+                  Expertise et ingénierie politique
+                </span>
 
-  [
-    memberModal,
-    joinModal
-  ]
-    .forEach(modal => {
+                <span class="competence-description">
+                  maîtrise d’un domaine politique ou institutionnel particulier et capacité à en apporter l’expertise.
+                </span>
 
-      if (!modal) return;
+              </span>
 
+            </label>
 
-      modal.addEventListener(
-        "click",
-        event => {
+          </div>
 
-          if (
-            event.target === modal
-          ) {
+        </div>
 
-            fermerModalEquipe(
-              modal
-            );
 
-          }
+        <!-- =================================================
+             INFLUENCE / BIENFAITEUR
+        ================================================== -->
 
-        }
-      );
+        <div class="competence-group">
 
-    });
+          <div class="competence-group-title">
+            Je peux vous aider en tant que
+          </div>
 
 
-  /*
-     Touche Échap.
-  */
+          <div class="competence">
 
-  document.addEventListener(
-    "keydown",
-    event => {
+            <label>
 
-      if (
-        event.key !== "Escape"
-      ) {
+              <input
+                type="checkbox"
+                name="competences"
+                value="Influenceurs / debunkers / créateurs de contenu"
+              >
 
-        return;
+              <span>
 
-      }
+                <span class="competence-name">
+                  Influenceur / debunker / créateur de contenu
+                </span>
 
+                <span class="competence-description">
+                  dans le milieu médiatique et sur les réseaux sociaux, développent spontanément une audience, influencent les comportements, déconstruisent les arguments ou manipulations et produisent des contenus permettant de diffuser et de défendre les idées du mouvement. peuvent conserver une forte indépendance éditoriale.
+                </span>
 
-      if (
-        memberModal &&
-        memberModal.classList.contains(
-          "active"
-        )
-      ) {
+              </span>
 
-        fermerModalEquipe(
-          memberModal
-        );
+            </label>
 
-        return;
+          </div>
 
-      }
 
+          <div class="competence">
 
-      if (
-        joinModal &&
-        joinModal.classList.contains(
-          "active"
-        )
-      ) {
+            <label>
 
-        fermerModalEquipe(
-          joinModal
-        );
+              <input
+                type="checkbox"
+                name="competences"
+                value="Bienfaiteurs"
+              >
 
-      }
+              <span>
 
-    }
-  );
+                <span class="competence-name">
+                  Bienfaiteur
+                </span>
 
-}
+                <span class="competence-description">
+                  dans les autres milieux, mettent spontanément leur influence, leur réseau, leur carnet d’adresses, leurs moyens, leur expertise ou leur notoriété au service du développement et du rayonnement du mouvement. peuvent conserver une forte indépendance.
+                </span>
 
+              </span>
 
-/* =========================================================
-   FORMULAIRE D'INSCRIPTION
-========================================================= */
+            </label>
 
-function initialiserFormulaireInscription() {
+          </div>
 
-  const form =
-    document.getElementById(
-      "joinForm"
-    );
+        </div>
 
 
-  if (!form) return;
+        <!-- =================================================
+             VALIDATION
+        ================================================== -->
 
+        <button
+          type="submit"
+          class="submit-button"
+          id="submitButton"
+        >
+          CRÉER MON PROFIL
+        </button>
 
-  const submitButton =
-    document.getElementById(
-      "submitButton"
-    );
 
-  const formMessage =
-    document.getElementById(
-      "formMessage"
-    );
+        <div
+          id="formMessage"
+          class="form-message"
+        ></div>
 
+      </form>
 
-  form.addEventListener(
-    "submit",
-    async event => {
+    </div>
 
-      event.preventDefault();
+  </div>
 
 
-      if (formMessage) {
+  <!-- =====================================================
+       SCRIPTS
+  ====================================================== -->
 
-        formMessage.textContent =
-          "";
+  <!-- Supabase CDN -->
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
 
-        formMessage.className =
-          "form-message";
 
-      }
+  <!-- Connexion Supabase commune -->
+  <script src="js/supabase.js"></script>
 
 
-      if (submitButton) {
+  <!-- Composants communs -->
+  <script src="js/components.js"></script>
 
-        submitButton.disabled =
-          true;
 
-        submitButton.textContent =
-          "VÉRIFICATION EN COURS…";
+  <!-- JavaScript spécifique à l'équipe -->
+  <script src="js/equipe.js"></script>
 
-      }
 
+</body>
 
-      try {
-
-        /*
-           Récupération des champs.
-        */
-
-        const nom =
-          document
-            .getElementById("nom")
-            ?.value
-            .trim() || "";
-
-
-        const email =
-          document
-            .getElementById("email")
-            ?.value
-            .trim()
-            .toLowerCase() || "";
-
-
-        const region =
-          document
-            .getElementById("region")
-            ?.value
-            .trim() || "";
-
-
-        const image_url =
-          document
-            .getElementById("image_url")
-            ?.value
-            .trim() || "";
-
-
-        const description =
-          document
-            .getElementById(
-              "descriptionField"
-            )
-            ?.value
-            .trim() || "";
-
-
-        const typeInscription =
-          document.querySelector(
-            'input[name="type_inscription"]:checked'
-          )?.value ||
-          "sympathisant";
-
-
-        const competences =
-          Array.from(
-            document.querySelectorAll(
-              'input[name="competences"]:checked'
-            )
-          ).map(
-            checkbox =>
-              checkbox.value
-          );
-
-
-        const anonyme =
-          typeInscription ===
-          "anonyme";
-
-
-        /*
-           Validation des champs obligatoires.
-        */
-
-        if (
-          !nom ||
-          !email ||
-          !region
-        ) {
-
-          throw new Error(
-            "Veuillez remplir tous les champs obligatoires."
-          );
-
-        }
-
-
-        /*
-           Validation e-mail.
-        */
-
-        if (
-          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
-            email
-          )
-        ) {
-
-          throw new Error(
-            "Veuillez saisir une adresse e-mail valide."
-          );
-
-        }
-
-
-        /*
-           Limite description.
-        */
-
-        if (
-          description.length > 300
-        ) {
-
-          throw new Error(
-            "La présentation ne peut pas dépasser 300 caractères."
-          );
-
-        }
-
-
-        /*
-           Validation URL photo.
-        */
-
-        if (
-          image_url &&
-          !urlValide(image_url)
-        ) {
-
-          throw new Error(
-            "L'URL de la photo n'est pas valide."
-          );
-
-        }
-
-
-        /*
-           Vérification e-mail déjà utilisé.
-        */
-
-        const {
-          data: emailExistant,
-          error: emailError
-        } =
-          await window.supabaseClient
-
-            .from("profiles")
-
-            .select("id")
-
-            .ilike(
-              "email",
-              email
-            )
-
-            .limit(1);
-
-
-        if (emailError) {
-
-          console.error(
-            "Erreur vérification e-mail :",
-            emailError
-          );
-
-
-          throw new Error(
-            "Impossible de vérifier l'adresse e-mail."
-          );
-
-        }
-
-
-        if (
-          emailExistant &&
-          emailExistant.length > 0
-        ) {
-
-          throw new Error(
-            "Cette adresse e-mail est déjà utilisée."
-          );
-
-        }
-
-
-        /*
-           Génération de l'ID.
-        */
-
-        let id;
-
-
-        if (
-          window.crypto &&
-          typeof window.crypto.randomUUID ===
-            "function"
-        ) {
-
-          id =
-            window.crypto.randomUUID();
-
-        } else {
-
-          id =
-            "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
-              .replace(
-                /[xy]/g,
-                character => {
-
-                  const random =
-                    Math.random() *
-                      16 |
-                    0;
-
-
-                  const value =
-                    character === "x"
-                      ? random
-                      : (
-                          random &
-                          0x3
-                        ) |
-                        0x8;
-
-
-                  return value.toString(
-                    16
-                  );
-
-                }
-              );
-
-        }
-
-
-        /*
-           Création du profil.
-        */
-
-        const profil = {
-
-          id,
-
-          nom,
-
-          grade: "user",
-
-          email,
-
-          image_url:
-            image_url || null,
-
-          description:
-            description || null,
-
-          region,
-
-          competences,
-
-          anonyme
-
-        };
-
-
-        if (submitButton) {
-
-          submitButton.textContent =
-            "INSCRIPTION EN COURS…";
-
-        }
-
-
-        /*
-           Insertion Supabase.
-        */
-
-        const {
-          error
-        } =
-          await window.supabaseClient
-
-            .from("profiles")
-
-            .insert(
-              [profil]
-            );
-
-
-        if (error) {
-
-          console.error(
-            "Erreur insertion profil :",
-            error
-          );
-
-
-          if (
-            error.code ===
-            "23505"
-          ) {
-
-            throw new Error(
-              "Cette adresse e-mail est déjà utilisée."
-            );
-
-          }
-
-
-          throw new Error(
-            "Impossible d'enregistrer votre inscription."
-          );
-
-        }
-
-
-        /*
-           Message de réussite.
-        */
-
-        if (formMessage) {
-
-          if (anonyme) {
-
-            formMessage.textContent =
-              "Votre inscription a bien été enregistrée. Votre profil reste masqué de la liste publique.";
-
-          } else {
-
-            formMessage.textContent =
-              "Votre inscription a bien été enregistrée. Bienvenue chez Avant-gardE !";
-
-          }
-
-
-          formMessage.className =
-            "form-message success";
-
-        }
-
-
-        /*
-           Réinitialisation du formulaire.
-        */
-
-        form.reset();
-
-
-        const sympathisantRadio =
-          document.querySelector(
-            'input[name="type_inscription"][value="sympathisant"]'
-          );
-
-
-        if (sympathisantRadio) {
-
-          sympathisantRadio.checked =
-            true;
-
-        }
-
-
-        mettreAJourCompteurDescription();
-
-
-        /*
-           Fermeture et rechargement.
-        */
-
-        window.setTimeout(
-          async () => {
-
-            const joinModal =
-              document.getElementById(
-                "joinModal"
-              );
-
-
-            fermerModalEquipe(
-              joinModal
-            );
-
-
-            await chargerMembres();
-
-          },
-          1800
-        );
-
-
-      } catch (error) {
-
-        console.error(
-          "Erreur inscription :",
-          error
-        );
-
-
-        if (formMessage) {
-
-          formMessage.textContent =
-            error.message ||
-            "Une erreur est survenue.";
-
-
-          formMessage.className =
-            "form-message error";
-
-        }
-
-      } finally {
-
-        if (submitButton) {
-
-          submitButton.disabled =
-            false;
-
-          submitButton.textContent =
-            "REJOINDRE AVANT-GARDE";
-
-        }
-
-      }
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   INITIALISATION COMPTEUR
-========================================================= */
-
-function initialiserCompteurDescription() {
-
-  const descriptionField =
-    document.getElementById(
-      "descriptionField"
-    );
-
-
-  if (!descriptionField) return;
-
-
-  descriptionField.addEventListener(
-    "input",
-    mettreAJourCompteurDescription
-  );
-
-
-  mettreAJourCompteurDescription();
-
-}
-
-
-/* =========================================================
-   INITIALISATION PAGE ÉQUIPE
-========================================================= */
-
-function initialiserEquipe() {
-
-  chargerMembres();
-
-  initialiserOuvertureInscription();
-
-  initialiserFermetureModales();
-
-  initialiserFormulaireInscription();
-
-  initialiserCompteurDescription();
-
-}
-
-
-/* =========================================================
-   DOM READY
-========================================================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
-
-    initialiserEquipe();
-
-  }
-);
+</html>
