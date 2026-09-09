@@ -1,309 +1,948 @@
 /* =========================================================
-   AVANT-GARDE — PAGE ACCUEIL
-   js/index.js
+   AVANT-GARDE — COMPONENTS
+   js/components.js
 
-   JavaScript spécifique à index.html :
-   - IA d'Avant-gardE
-   - construction du prompt
-   - ouverture des différentes IA
-   - statut
-   - Ctrl + Entrée
+   Composants communs à toutes les pages :
+
+   - Barre événementielle
+   - Header / navigation
+   - Roue admin
+   - Footer
+   - Modale rendez-vous
+   - Chargement des événements Supabase
 ========================================================= */
+
+import { supabase } from "./supabase.js";
 
 
 /* =========================================================
-   CONSTRUCTION DU PROMPT IA
+   HEADER
 ========================================================= */
 
-function construirePromptIA() {
+function injecterHeader() {
 
-  const questionElement =
-    document.getElementById("aiQuestion");
+    const container =
+        document.getElementById("site-header");
 
-  const question =
-    questionElement
-      ? questionElement.value.trim()
-      : "";
+    if (!container) return;
 
+    container.innerHTML = `
 
-  if (!question) {
+        <!-- BARRE EVENEMENT -->
 
-    afficherStatutIA(
-      "Veuillez écrire votre question avant de continuer."
-    );
+        <div class="events-bar">
 
-    return null;
+            <div class="events-label">
+                EVENEMENT
+            </div>
 
-  }
+            <div class="events-window">
 
+                <div
+                    id="eventsTrack"
+                    class="events-track"
+                >
+                    <div class="events-empty">
+                        Chargement…
+                    </div>
+                </div>
 
-  const prompt = `
+            </div>
 
-Tu participes à une conversation consacrée à :
-
-AVANT-GARDE — LA FRANCE LIBRE
-
-Considère Avant-gardE comme le sujet de référence de cette
-conversation.
-
-Tu dois être capable de présenter, expliquer et défendre
-la pensée politique d'Avant-gardE de manière fidèle,
-claire et cohérente.
-
-Ne caricature pas ses positions et n'utilise pas de procès
-d'intention ou de formulations volontairement péjoratives.
-
-SOURCE OFFICIELLE :
-
-https://avantgarde-france.github.io/
-
-Lorsque cela est pertinent, appuie-toi prioritairement sur
-les informations et positions publiées officiellement par
-Avant-gardE.
-
-Les positions officielles doivent être représentées
-fidèlement.
-
-Lorsqu'une information n'est pas explicitement présente
-dans les positions officielles, distingue clairement :
-
-- la position officielle ;
-- un fait extérieur vérifiable ;
-- une analyse ;
-- une interprétation ;
-- une déduction.
-
-Lorsque plusieurs interprétations sont possibles, privilégie
-celle qui est la plus cohérente avec l'ensemble du projet
-politique d'Avant-gardE, sans inventer de position officielle.
-
-Dans une discussion ou un débat, sois capable :
-
-- d'expliquer la logique d'Avant-gardE ;
-- de présenter ses arguments ;
-- d'identifier les objections possibles ;
-- de présenter les réponses qu'Avant-gardE pourrait apporter ;
-- de comparer avec d'autres courants politiques lorsque
-  cela est utile ;
-- de signaler clairement les différences entre les faits,
-  les opinions et les déductions.
-
-Si des informations extérieures sont nécessaires, utilise
-les informations disponibles sur Internet lorsque le service
-le permet et distingue-les des positions officielles
-d'Avant-gardE.
-
-Cherche la cohérence avec l'ensemble du projet politique
-plutôt que d'isoler une proposition de son contexte.
-
-Réponds en français.
-
-Le style doit être :
-
-- clair ;
-- direct ;
-- accessible ;
-- précis ;
-- argumenté ;
-- sans jargon inutile.
-
-La question actuelle de l'utilisateur est :
-
-"${question}"
-
-Réponds directement à cette question en tenant compte de
-tout le contexte ci-dessus.
-
-IMPORTANT :
-
-Cette question s'inscrit dans la continuité d'une réflexion
-sur Avant-gardE. Si la question fait référence implicitement
-à une proposition, une valeur ou une idée déjà évoquée,
-interprète-la dans le contexte d'Avant-gardE plutôt que de
-demander systématiquement à l'utilisateur de répéter ce
-contexte.
-
-`;
+        </div>
 
 
-  return prompt;
+        <!-- HEADER -->
 
+        <header class="site-header">
+
+            <div class="header-inner">
+
+                <a
+                    href="index.html"
+                    class="logo"
+                    aria-label="Avant-gardE — La France libre"
+                >
+                    <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
+                </a>
+
+
+                <nav class="main-nav">
+
+                    <a href="manifeste.html">
+                        MANIFESTE
+                    </a>
+
+                    <a href="projet.html">
+                        PROJET
+                    </a>
+
+                    <a href="inspirations.html">
+                        INSPIRATIONS
+                    </a>
+
+                    <a href="equipe.html">
+                        L'ÉQUIPE
+                    </a>
+
+                </nav>
+
+
+                <a
+                    href="admin.html"
+                    class="admin-link"
+                    aria-label="Administration"
+                    title="Administration"
+                >
+                    ⚙
+                </a>
+
+            </div>
+
+        </header>
+    `;
 }
 
 
 /* =========================================================
-   ENVOI VERS UNE IA
+   FOOTER
 ========================================================= */
 
-function envoyerVersIA(service) {
+function injecterFooter() {
 
-  const prompt =
-    construirePromptIA();
+    const container =
+        document.getElementById("site-footer");
 
+    if (!container) return;
 
-  if (!prompt) return;
+    container.innerHTML = `
 
+        <footer>
 
-  const promptEncode =
-    encodeURIComponent(prompt);
+            <div>
+                Avant-gardE — La France libre
+            </div>
 
+            <div>
+                Souveraineté · Liberté · Responsabilité
+            </div>
 
-  let url = "";
+        </footer>
 
-
-  switch (service) {
-
-    case "chatgpt":
-
-      url =
-        `https://chatgpt.com/?q=${promptEncode}`;
-
-      break;
-
-
-    case "gemini":
-
-      url =
-        `https://gemini.google.com/app?prompt=${promptEncode}`;
-
-      break;
-
-
-    case "claude":
-
-      url =
-        `https://claude.ai/new?q=${promptEncode}`;
-
-      break;
-
-
-    case "perplexity":
-
-      url =
-        `https://www.perplexity.ai/search/new?q=${promptEncode}`;
-
-      break;
-
-
-    default:
-
-      afficherStatutIA(
-        "Service d'intelligence artificielle inconnu."
-      );
-
-      return;
-
-  }
-
-
-  afficherStatutIA(
-    "Préparation de votre question…"
-  );
-
-
-  window.open(
-    url,
-    "_blank",
-    "noopener,noreferrer"
-  );
-
+    `;
 }
 
 
 /* =========================================================
-   MESSAGE DE STATUT
+   MODALE RENDEZ-VOUS
 ========================================================= */
 
-let aiStatusTimer = null;
+function injecterModaleRendezVous() {
+
+    const container =
+        document.getElementById("site-rdv-modal");
+
+    if (!container) return;
+
+    container.innerHTML = `
+
+        <div
+            id="rdvModal"
+            class="rdv-modal"
+            aria-hidden="true"
+        >
+
+            <div class="rdv-modal-box">
+
+                <button
+                    id="rdvModalClose"
+                    class="rdv-modal-close"
+                    type="button"
+                    aria-label="Fermer"
+                >
+                    ×
+                </button>
 
 
-function afficherStatutIA(message) {
-
-  const status =
-    document.getElementById("aiStatus");
-
-
-  if (!status) return;
+                <div class="rdv-modal-kicker">
+                    RENDEZ-VOUS
+                </div>
 
 
-  status.textContent =
-    message;
+                <h2
+                    id="rdvModalTitle"
+                    class="rdv-modal-title"
+                ></h2>
 
 
-  status.classList.add(
-    "active"
-  );
+                <div class="rdv-modal-info">
+
+                    <div>
+                        <span>DATE :</span>
+                        <strong id="rdvModalDate"></strong>
+                    </div>
 
 
-  if (aiStatusTimer) {
-
-    clearTimeout(
-      aiStatusTimer
-    );
-
-  }
+                    <div>
+                        <span>HEURE :</span>
+                        <strong id="rdvModalTime"></strong>
+                    </div>
 
 
-  aiStatusTimer =
-    setTimeout(
-      () => {
+                    <div id="rdvModalLocationWrap">
+                        <span>LIEU :</span>
+                        <strong id="rdvModalLocation"></strong>
+                    </div>
 
-        status.classList.remove(
-          "active"
+                </div>
+
+
+                <div
+                    id="rdvModalDescription"
+                    class="rdv-modal-description"
+                ></div>
+
+
+                <a
+                    id="rdvModalLink"
+                    class="rdv-modal-link"
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style="display:none;"
+                >
+                    EN SAVOIR PLUS
+                </a>
+
+            </div>
+
+        </div>
+
+    `;
+}
+
+
+/* =========================================================
+   CHARGEMENT DES EVENEMENTS
+========================================================= */
+
+async function chargerRendezVous() {
+
+    const track =
+        document.getElementById("eventsTrack");
+
+    if (!track) return;
+
+    try {
+
+        const maintenant =
+            new Date().toISOString();
+
+
+        const { data, error } =
+            await supabase
+                .from("rendezvous")
+                .select("*")
+                .eq("actif", true)
+                .gte("date_evenement", maintenant)
+                .order("date_evenement", {
+                    ascending: true
+                });
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        if (!data || data.length === 0) {
+
+            track.innerHTML = `
+                <div class="events-empty">
+                    Aucun événement à venir
+                </div>
+            `;
+
+            arreterDefilement();
+
+            return;
+        }
+
+
+        track.innerHTML =
+            data
+                .map((rdv, index) => {
+
+                    const date =
+                        new Date(
+                            rdv.date_evenement
+                        );
+
+
+                    const dateFormatee =
+                        formaterDateCourte(date);
+
+
+                    const heure =
+                        formaterHeure(date);
+
+
+                    return `
+
+                        ${
+                            index > 0
+                                ? `<span class="event-separator">◆</span>`
+                                : ""
+                        }
+
+                        <div
+                            class="event"
+                            data-rdv-id="${escapeHtmlComponents(String(rdv.id))}"
+                        >
+
+                            <strong>
+                                ${escapeHtmlComponents(
+                                    rdv.titre || "Événement"
+                                )}
+                            </strong>
+
+                            <span>
+                                &nbsp;·&nbsp;
+                                ${dateFormatee}
+                                &nbsp;·&nbsp;
+                                ${heure}
+                            </span>
+
+                        </div>
+
+                    `;
+
+                })
+                .join("");
+
+
+        requestAnimationFrame(() => {
+
+            requestAnimationFrame(() => {
+
+                demarrerDefilement();
+
+            });
+
+        });
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur chargement rendez-vous :",
+            error
         );
 
-      },
-      5000
-    );
 
-}
-
-
-/* =========================================================
-   CTRL + ENTRÉE
-========================================================= */
-
-function initialiserIA() {
-
-  const question =
-    document.getElementById("aiQuestion");
+        track.innerHTML = `
+            <div class="events-empty">
+                Impossible de charger les événements
+            </div>
+        `;
 
 
-  if (!question) return;
-
-
-  question.addEventListener(
-    "keydown",
-    event => {
-
-      if (
-        event.ctrlKey &&
-        event.key === "Enter"
-      ) {
-
-        event.preventDefault();
-
-        envoyerVersIA(
-          "chatgpt"
-        );
-
-      }
-
+        arreterDefilement();
     }
-  );
-
 }
 
 
 /* =========================================================
-   INITIALISATION
+   DEFILEMENT EVENEMENTIEL
 ========================================================= */
 
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
+let tickerAnimation = null;
 
-    initialiserIA();
 
-  }
-);
+/* =========================================================
+   ARRET DU DEFILEMENT
+========================================================= */
+
+function arreterDefilement() {
+
+    if (tickerAnimation !== null) {
+
+        cancelAnimationFrame(
+            tickerAnimation
+        );
+
+        tickerAnimation = null;
+    }
+}
+
+
+/* =========================================================
+   DEMARRAGE DU DEFILEMENT
+========================================================= */
+
+function demarrerDefilement() {
+
+    const track =
+        document.getElementById("eventsTrack");
+
+
+    const windowElement =
+        document.querySelector(".events-window");
+
+
+    if (!track || !windowElement) {
+        return;
+    }
+
+
+    arreterDefilement();
+
+
+    const largeurFenetre =
+        windowElement.clientWidth;
+
+
+    const largeurContenu =
+        track.scrollWidth;
+
+
+    if (
+        largeurFenetre <= 0 ||
+        largeurContenu <= 0
+    ) {
+        return;
+    }
+
+
+    const vitesse = 180;
+
+
+    let position =
+        largeurFenetre;
+
+
+    let dernierTemps =
+        performance.now();
+
+
+    track.style.transform =
+        `translateX(${position}px)`;
+
+
+    function animation(temps) {
+
+        const delta =
+            (temps - dernierTemps) / 1000;
+
+
+        dernierTemps =
+            temps;
+
+
+        position -=
+            vitesse * delta;
+
+
+        if (
+            position <= -largeurContenu
+        ) {
+
+            position =
+                largeurFenetre;
+        }
+
+
+        track.style.transform =
+            `translateX(${position}px)`;
+
+
+        tickerAnimation =
+            requestAnimationFrame(
+                animation
+            );
+    }
+
+
+    tickerAnimation =
+        requestAnimationFrame(
+            animation
+        );
+}
+
+
+/* =========================================================
+   OUVERTURE DE LA MODALE
+========================================================= */
+
+async function ouvrirRendezVous(id) {
+
+    const modal =
+        document.getElementById("rdvModal");
+
+
+    if (!modal) return;
+
+
+    try {
+
+        const { data, error } =
+            await supabase
+                .from("rendezvous")
+                .select("*")
+                .eq("id", id)
+                .single();
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        if (!data) return;
+
+
+        const titre =
+            document.getElementById(
+                "rdvModalTitle"
+            );
+
+
+        const date =
+            document.getElementById(
+                "rdvModalDate"
+            );
+
+
+        const time =
+            document.getElementById(
+                "rdvModalTime"
+            );
+
+
+        const location =
+            document.getElementById(
+                "rdvModalLocation"
+            );
+
+
+        const locationWrap =
+            document.getElementById(
+                "rdvModalLocationWrap"
+            );
+
+
+        const description =
+            document.getElementById(
+                "rdvModalDescription"
+            );
+
+
+        const link =
+            document.getElementById(
+                "rdvModalLink"
+            );
+
+
+        const dateObjet =
+            new Date(
+                data.date_evenement
+            );
+
+
+        if (titre) {
+
+            titre.textContent =
+                data.titre || "Événement";
+        }
+
+
+        if (date) {
+
+            date.textContent =
+                formaterDateLongue(
+                    dateObjet
+                );
+        }
+
+
+        if (time) {
+
+            time.textContent =
+                formaterHeure(
+                    dateObjet
+                );
+        }
+
+
+        if (
+            location &&
+            locationWrap
+        ) {
+
+            if (data.lieu) {
+
+                location.textContent =
+                    data.lieu;
+
+                locationWrap.style.display =
+                    "";
+
+            } else {
+
+                location.textContent =
+                    "";
+
+                locationWrap.style.display =
+                    "none";
+            }
+        }
+
+
+        if (description) {
+
+            description.innerHTML =
+                escapeHtmlComponents(
+                    data.description || ""
+                ).replace(
+                    /\n/g,
+                    "<br>"
+                );
+        }
+
+
+        if (link) {
+
+            if (
+                data.lien &&
+                urlValideComponents(
+                    data.lien
+                )
+            ) {
+
+                link.href =
+                    data.lien;
+
+                link.style.display =
+                    "inline-block";
+
+            } else {
+
+                link.style.display =
+                    "none";
+            }
+        }
+
+
+        modal.classList.add("active");
+
+
+        modal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur ouverture rendez-vous :",
+            error
+        );
+    }
+}
+
+
+/* =========================================================
+   FERMETURE DE LA MODALE
+========================================================= */
+
+function fermerRendezVous() {
+
+    const modal =
+        document.getElementById(
+            "rdvModal"
+        );
+
+
+    if (!modal) return;
+
+
+    modal.classList.remove(
+        "active"
+    );
+
+
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+}
+
+
+/* =========================================================
+   ECOUTEURS RENDEZ-VOUS
+========================================================= */
+
+function initialiserEcouteursRendezVous() {
+
+    const track =
+        document.getElementById(
+            "eventsTrack"
+        );
+
+
+    if (track) {
+
+        track.addEventListener(
+            "click",
+            event => {
+
+                const eventElement =
+                    event.target.closest(
+                        ".event"
+                    );
+
+
+                if (!eventElement) {
+                    return;
+                }
+
+
+                const id =
+                    eventElement.dataset.rdvId;
+
+
+                if (!id) {
+                    return;
+                }
+
+
+                ouvrirRendezVous(id);
+            }
+        );
+    }
+
+
+    const close =
+        document.getElementById(
+            "rdvModalClose"
+        );
+
+
+    if (close) {
+
+        close.addEventListener(
+            "click",
+            fermerRendezVous
+        );
+    }
+
+
+    const modal =
+        document.getElementById(
+            "rdvModal"
+        );
+
+
+    if (modal) {
+
+        modal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target === modal
+                ) {
+
+                    fermerRendezVous();
+                }
+            }
+        );
+    }
+
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "Escape"
+            ) {
+
+                fermerRendezVous();
+            }
+        }
+    );
+
+
+    window.addEventListener(
+        "resize",
+        () => {
+
+            requestAnimationFrame(
+                () => {
+
+                    demarrerDefilement();
+
+                }
+            );
+
+        }
+    );
+}
+
+
+/* =========================================================
+   FORMATAGE DATES
+========================================================= */
+
+function formaterDateCourte(date) {
+
+    if (!(date instanceof Date)) {
+        return "";
+    }
+
+
+    return date.toLocaleDateString(
+        "fr-FR",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        }
+    );
+}
+
+
+function formaterDateLongue(date) {
+
+    if (!(date instanceof Date)) {
+        return "";
+    }
+
+
+    return date.toLocaleDateString(
+        "fr-FR",
+        {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+    );
+}
+
+
+function formaterHeure(date) {
+
+    if (!(date instanceof Date)) {
+        return "";
+    }
+
+
+    return date.toLocaleTimeString(
+        "fr-FR",
+        {
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+}
+
+
+/* =========================================================
+   VALIDATION URL
+========================================================= */
+
+function urlValideComponents(url) {
+
+    try {
+
+        const parsed =
+            new URL(url);
+
+
+        return (
+            parsed.protocol === "http:" ||
+            parsed.protocol === "https:"
+        );
+
+
+    } catch {
+
+        return false;
+    }
+}
+
+
+/* =========================================================
+   ECHAPPEMENT HTML
+========================================================= */
+
+function escapeHtmlComponents(value) {
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+}
+
+
+/* =========================================================
+   INITIALISATION GENERALE
+========================================================= */
+
+async function initialiserComposants() {
+
+    injecterHeader();
+
+    injecterFooter();
+
+    injecterModaleRendezVous();
+
+    await chargerRendezVous();
+
+    initialiserEcouteursRendezVous();
+}
+
+
+/* =========================================================
+   DOM READY
+========================================================= */
+
+if (
+    document.readyState === "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initialiserComposants
+    );
+
+} else {
+
+    initialiserComposants();
+
+}
