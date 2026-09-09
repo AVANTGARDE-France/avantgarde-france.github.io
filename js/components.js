@@ -10,9 +10,54 @@
    - Footer
    - Modale rendez-vous
    - Chargement des événements Supabase
+   - Défilement automatique des événements
 ========================================================= */
 
 import { supabase } from "./supabase.js";
+
+
+/* =========================================================
+   VARIABLES GLOBALES
+========================================================= */
+
+let tickerAnimation = null;
+
+
+/* =========================================================
+   ECHAPPEMENT HTML
+========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+/* =========================================================
+   VALIDATION URL
+========================================================= */
+
+function urlValide(url) {
+
+    try {
+
+        const parsed = new URL(url);
+
+        return (
+            parsed.protocol === "http:" ||
+            parsed.protocol === "https:"
+        );
+
+    } catch {
+
+        return false;
+    }
+}
 
 
 /* =========================================================
@@ -26,9 +71,12 @@ function injecterHeader() {
 
     if (!container) return;
 
+
     container.innerHTML = `
 
-        <!-- BARRE EVENEMENT -->
+        <!-- =================================================
+             BARRE EVENEMENT
+        ================================================== -->
 
         <div class="events-bar">
 
@@ -36,15 +84,18 @@ function injecterHeader() {
                 EVENEMENT
             </div>
 
+
             <div class="events-window">
 
                 <div
                     id="eventsTrack"
                     class="events-track"
                 >
+
                     <div class="events-empty">
                         Chargement…
                     </div>
+
                 </div>
 
             </div>
@@ -52,22 +103,34 @@ function injecterHeader() {
         </div>
 
 
-        <!-- HEADER -->
+        <!-- =================================================
+             HEADER
+        ================================================== -->
 
         <header class="site-header">
 
             <div class="header-inner">
+
+
+                <!-- LOGO -->
 
                 <a
                     href="index.html"
                     class="logo"
                     aria-label="Avant-gardE — La France libre"
                 >
+
                     <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
+
                 </a>
 
 
-                <nav class="main-nav">
+                <!-- NAVIGATION -->
+
+                <nav
+                    class="main-nav"
+                    aria-label="Navigation principale"
+                >
 
                     <a href="manifeste.html">
                         MANIFESTE
@@ -88,6 +151,8 @@ function injecterHeader() {
                 </nav>
 
 
+                <!-- ADMIN -->
+
                 <a
                     href="admin.html"
                     class="admin-link"
@@ -97,9 +162,11 @@ function injecterHeader() {
                     ⚙
                 </a>
 
+
             </div>
 
         </header>
+
     `;
 }
 
@@ -115,9 +182,14 @@ function injecterFooter() {
 
     if (!container) return;
 
+
     container.innerHTML = `
 
         <footer>
+
+            <div>
+                © 2026 Avant-gardE
+            </div>
 
             <div>
                 Avant-gardE — La France libre
@@ -128,6 +200,7 @@ function injecterFooter() {
             </div>
 
         </footer>
+
     `;
 }
 
@@ -143,6 +216,7 @@ function injecterModaleRendezVous() {
 
     if (!container) return;
 
+
     container.innerHTML = `
 
         <div
@@ -151,7 +225,15 @@ function injecterModaleRendezVous() {
             aria-hidden="true"
         >
 
-            <div class="rdv-modal-box">
+            <div
+                class="rdv-modal-box"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="rdvModalTitle"
+            >
+
+
+                <!-- FERMETURE -->
 
                 <button
                     id="rdvModalClose"
@@ -163,10 +245,14 @@ function injecterModaleRendezVous() {
                 </button>
 
 
+                <!-- KICKER -->
+
                 <div class="rdv-modal-kicker">
                     RENDEZ-VOUS
                 </div>
 
+
+                <!-- TITRE -->
 
                 <h2
                     id="rdvModalTitle"
@@ -175,25 +261,59 @@ function injecterModaleRendezVous() {
                 </h2>
 
 
+                <!-- INFORMATIONS -->
+
                 <div class="rdv-modal-info">
 
-                    <div>
-                        <span>DATE :</span>
-                        <strong id="rdvModalDate"></strong>
-                    </div>
 
                     <div>
-                        <span>HEURE :</span>
-                        <strong id="rdvModalTime"></strong>
+
+                        <span>
+                            DATE
+                        </span>
+
+                        <strong
+                            id="rdvModalDate"
+                        >
+                        </strong>
+
                     </div>
 
-                    <div id="rdvModalLocationWrap">
-                        <span>LIEU :</span>
-                        <strong id="rdvModalLocation"></strong>
+
+                    <div>
+
+                        <span>
+                            HEURE
+                        </span>
+
+                        <strong
+                            id="rdvModalTime"
+                        >
+                        </strong>
+
                     </div>
+
+
+                    <div
+                        id="rdvModalLocationWrap"
+                    >
+
+                        <span>
+                            LIEU
+                        </span>
+
+                        <strong
+                            id="rdvModalLocation"
+                        >
+                        </strong>
+
+                    </div>
+
 
                 </div>
 
+
+                <!-- DESCRIPTION -->
 
                 <div
                     id="rdvModalDescription"
@@ -201,6 +321,8 @@ function injecterModaleRendezVous() {
                 >
                 </div>
 
+
+                <!-- LIEN -->
 
                 <a
                     id="rdvModalLink"
@@ -213,10 +335,78 @@ function injecterModaleRendezVous() {
                     EN SAVOIR PLUS
                 </a>
 
+
             </div>
 
         </div>
+
     `;
+}
+
+
+/* =========================================================
+   FORMATAGE DATE COURTE
+========================================================= */
+
+function formaterDateCourte(date) {
+
+    if (!(date instanceof Date)) {
+        return "";
+    }
+
+
+    return date.toLocaleDateString(
+        "fr-FR",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        }
+    );
+}
+
+
+/* =========================================================
+   FORMATAGE DATE LONGUE
+========================================================= */
+
+function formaterDateLongue(date) {
+
+    if (!(date instanceof Date)) {
+        return "";
+    }
+
+
+    return date.toLocaleDateString(
+        "fr-FR",
+        {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+    );
+}
+
+
+/* =========================================================
+   FORMATAGE HEURE
+========================================================= */
+
+function formaterHeure(date) {
+
+    if (!(date instanceof Date)) {
+        return "";
+    }
+
+
+    return date.toLocaleTimeString(
+        "fr-FR",
+        {
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
 }
 
 
@@ -231,20 +421,35 @@ async function chargerRendezVous() {
 
     if (!track) return;
 
+
     try {
 
         const maintenant =
             new Date().toISOString();
 
-        const { data, error } =
-            await supabase
-                .from("rendezvous")
-                .select("*")
-                .eq("actif", true)
-                .gte("date_evenement", maintenant)
-                .order("date_evenement", {
+
+        const {
+            data,
+            error
+        } = await supabase
+
+            .from("rendezvous")
+
+            .select("*")
+
+            .eq("actif", true)
+
+            .gte(
+                "date_evenement",
+                maintenant
+            )
+
+            .order(
+                "date_evenement",
+                {
                     ascending: true
-                });
+                }
+            );
 
 
         if (error) {
@@ -252,12 +457,21 @@ async function chargerRendezVous() {
         }
 
 
-        if (!data || data.length === 0) {
+        /* -------------------------------------------------
+           AUCUN EVENEMENT
+        ------------------------------------------------- */
+
+        if (
+            !data ||
+            data.length === 0
+        ) {
 
             track.innerHTML = `
+
                 <div class="events-empty">
                     Aucun événement à venir
                 </div>
+
             `;
 
             arreterDefilement();
@@ -266,63 +480,82 @@ async function chargerRendezVous() {
         }
 
 
-        track.innerHTML =
-            data
-                .map((rdv, index) => {
+        /* -------------------------------------------------
+           CREATION DES EVENEMENTS
+        ------------------------------------------------- */
+
+        track.innerHTML = data
+            .map(
+                (rdv, index) => {
 
                     const date =
                         new Date(
                             rdv.date_evenement
                         );
 
-                    const dateFormatee =
-                        formaterDateCourte(date);
-
-                    const heure =
-                        formaterHeure(date);
-
 
                     return `
 
                         ${
                             index > 0
-                                ? `<span class="event-separator">◆</span>`
+                                ? `
+                                    <span
+                                        class="event-separator"
+                                    >
+                                        ◆
+                                    </span>
+                                `
                                 : ""
                         }
 
+
                         <div
                             class="event"
-                            data-rdv-id="${escapeHtmlComponents(String(rdv.id))}"
+                            data-rdv-id="${escapeHtml(
+                                rdv.id
+                            )}"
                         >
 
                             <strong>
-                                ${escapeHtmlComponents(
-                                    rdv.titre || "Événement"
+                                ${escapeHtml(
+                                    rdv.titre ||
+                                    "Événement"
                                 )}
                             </strong>
 
                             <span>
                                 &nbsp;·&nbsp;
-                                ${dateFormatee}
+                                ${formaterDateCourte(date)}
                                 &nbsp;·&nbsp;
-                                ${heure}
+                                ${formaterHeure(date)}
                             </span>
 
                         </div>
+
                     `;
-                })
-                .join("");
+                }
+            )
+            .join("");
 
 
-        requestAnimationFrame(() => {
+        /*
+         * Deux frames permettent d'attendre que le navigateur
+         * ait calculé correctement la largeur réelle du ticker.
+         */
 
-            requestAnimationFrame(() => {
+        requestAnimationFrame(
+            () => {
 
-                demarrerDefilement();
+                requestAnimationFrame(
+                    () => {
 
-            });
+                        demarrerDefilement();
 
-        });
+                    }
+                );
+
+            }
+        );
 
 
     } catch (error) {
@@ -332,11 +565,15 @@ async function chargerRendezVous() {
             error
         );
 
+
         track.innerHTML = `
+
             <div class="events-empty">
                 Impossible de charger les événements
             </div>
+
         `;
+
 
         arreterDefilement();
     }
@@ -344,19 +581,14 @@ async function chargerRendezVous() {
 
 
 /* =========================================================
-   DEFILEMENT EVENEMENTIEL
-========================================================= */
-
-let tickerAnimation = null;
-
-
-/* =========================================================
-   ARRET DU DEFILEMENT
+   ARRET DU TICKER
 ========================================================= */
 
 function arreterDefilement() {
 
-    if (tickerAnimation !== null) {
+    if (
+        tickerAnimation !== null
+    ) {
 
         cancelAnimationFrame(
             tickerAnimation
@@ -368,19 +600,29 @@ function arreterDefilement() {
 
 
 /* =========================================================
-   DEMARRAGE DU DEFILEMENT
+   DEMARRAGE DU TICKER
 ========================================================= */
 
 function demarrerDefilement() {
 
     const track =
-        document.getElementById("eventsTrack");
+        document.getElementById(
+            "eventsTrack"
+        );
+
 
     const windowElement =
-        document.querySelector(".events-window");
+        document.querySelector(
+            ".events-window"
+        );
 
 
-    if (!track || !windowElement) return;
+    if (
+        !track ||
+        !windowElement
+    ) {
+        return;
+    }
 
 
     arreterDefilement();
@@ -388,6 +630,7 @@ function demarrerDefilement() {
 
     const largeurFenetre =
         windowElement.clientWidth;
+
 
     const largeurContenu =
         track.scrollWidth;
@@ -401,8 +644,16 @@ function demarrerDefilement() {
     }
 
 
+    /*
+     * Vitesse du défilement en pixels/seconde.
+     */
+
     const vitesse = 180;
 
+
+    /*
+     * Le ticker commence à droite de la zone visible.
+     */
 
     let position =
         largeurFenetre;
@@ -419,7 +670,8 @@ function demarrerDefilement() {
     function animation(temps) {
 
         const delta =
-            (temps - dernierTemps) / 1000;
+            (temps - dernierTemps) /
+            1000;
 
 
         dernierTemps =
@@ -430,8 +682,14 @@ function demarrerDefilement() {
             vitesse * delta;
 
 
+        /*
+         * Lorsque tout le contenu est sorti
+         * par la gauche, on recommence à droite.
+         */
+
         if (
-            position <= -largeurContenu
+            position <=
+            -largeurContenu
         ) {
 
             position =
@@ -458,25 +716,34 @@ function demarrerDefilement() {
 
 
 /* =========================================================
-   OUVERTURE DE LA MODALE
+   OUVERTURE MODALE EVENEMENT
 ========================================================= */
 
 async function ouvrirRendezVous(id) {
 
     const modal =
-        document.getElementById("rdvModal");
+        document.getElementById(
+            "rdvModal"
+        );
+
 
     if (!modal) return;
 
 
     try {
 
-        const { data, error } =
-            await supabase
-                .from("rendezvous")
-                .select("*")
-                .eq("id", id)
-                .single();
+        const {
+            data,
+            error
+        } = await supabase
+
+            .from("rendezvous")
+
+            .select("*")
+
+            .eq("id", id)
+
+            .single();
 
 
         if (error) {
@@ -484,7 +751,9 @@ async function ouvrirRendezVous(id) {
         }
 
 
-        if (!data) return;
+        if (!data) {
+            return;
+        }
 
 
         const titre =
@@ -492,30 +761,36 @@ async function ouvrirRendezVous(id) {
                 "rdvModalTitle"
             );
 
+
         const date =
             document.getElementById(
                 "rdvModalDate"
             );
+
 
         const time =
             document.getElementById(
                 "rdvModalTime"
             );
 
+
         const location =
             document.getElementById(
                 "rdvModalLocation"
             );
+
 
         const locationWrap =
             document.getElementById(
                 "rdvModalLocationWrap"
             );
 
+
         const description =
             document.getElementById(
                 "rdvModalDescription"
             );
+
 
         const link =
             document.getElementById(
@@ -529,12 +804,21 @@ async function ouvrirRendezVous(id) {
             );
 
 
+        /* -------------------------------------------------
+           TITRE
+        ------------------------------------------------- */
+
         if (titre) {
 
             titre.textContent =
-                data.titre || "Événement";
+                data.titre ||
+                "Événement";
         }
 
+
+        /* -------------------------------------------------
+           DATE
+        ------------------------------------------------- */
 
         if (date) {
 
@@ -545,6 +829,10 @@ async function ouvrirRendezVous(id) {
         }
 
 
+        /* -------------------------------------------------
+           HEURE
+        ------------------------------------------------- */
+
         if (time) {
 
             time.textContent =
@@ -553,6 +841,10 @@ async function ouvrirRendezVous(id) {
                 );
         }
 
+
+        /* -------------------------------------------------
+           LIEU
+        ------------------------------------------------- */
 
         if (
             location &&
@@ -567,6 +859,7 @@ async function ouvrirRendezVous(id) {
                 locationWrap.style.display =
                     "";
 
+
             } else {
 
                 location.textContent =
@@ -578,10 +871,14 @@ async function ouvrirRendezVous(id) {
         }
 
 
+        /* -------------------------------------------------
+           DESCRIPTION
+        ------------------------------------------------- */
+
         if (description) {
 
             description.innerHTML =
-                escapeHtmlComponents(
+                escapeHtml(
                     data.description || ""
                 ).replace(
                     /\n/g,
@@ -590,11 +887,15 @@ async function ouvrirRendezVous(id) {
         }
 
 
+        /* -------------------------------------------------
+           LIEN
+        ------------------------------------------------- */
+
         if (link) {
 
             if (
                 data.lien &&
-                urlValideComponents(
+                urlValide(
                     data.lien
                 )
             ) {
@@ -605,7 +906,11 @@ async function ouvrirRendezVous(id) {
                 link.style.display =
                     "inline-block";
 
+
             } else {
+
+                link.href =
+                    "#";
 
                 link.style.display =
                     "none";
@@ -613,7 +918,14 @@ async function ouvrirRendezVous(id) {
         }
 
 
-        modal.classList.add("active");
+        /* -------------------------------------------------
+           AFFICHAGE
+        ------------------------------------------------- */
+
+        modal.classList.add(
+            "active"
+        );
+
 
         modal.setAttribute(
             "aria-hidden",
@@ -632,18 +944,24 @@ async function ouvrirRendezVous(id) {
 
 
 /* =========================================================
-   FERMETURE DE LA MODALE
+   FERMETURE MODALE EVENEMENT
 ========================================================= */
 
 function fermerRendezVous() {
 
     const modal =
-        document.getElementById("rdvModal");
+        document.getElementById(
+            "rdvModal"
+        );
+
 
     if (!modal) return;
 
 
-    modal.classList.remove("active");
+    modal.classList.remove(
+        "active"
+    );
+
 
     modal.setAttribute(
         "aria-hidden",
@@ -653,7 +971,7 @@ function fermerRendezVous() {
 
 
 /* =========================================================
-   ECOUTEURS RENDEZ-VOUS
+   ECOUTEURS EVENEMENTS
 ========================================================= */
 
 function initialiserEcouteursRendezVous() {
@@ -663,6 +981,10 @@ function initialiserEcouteursRendezVous() {
             "eventsTrack"
         );
 
+
+    /* -----------------------------------------------------
+       CLIC SUR UN EVENEMENT
+    ----------------------------------------------------- */
 
     if (track) {
 
@@ -676,14 +998,18 @@ function initialiserEcouteursRendezVous() {
                     );
 
 
-                if (!eventElement) return;
+                if (!eventElement) {
+                    return;
+                }
 
 
                 const id =
                     eventElement.dataset.rdvId;
 
 
-                if (!id) return;
+                if (!id) {
+                    return;
+                }
 
 
                 ouvrirRendezVous(id);
@@ -691,6 +1017,10 @@ function initialiserEcouteursRendezVous() {
         );
     }
 
+
+    /* -----------------------------------------------------
+       BOUTON FERMER
+    ----------------------------------------------------- */
 
     const close =
         document.getElementById(
@@ -707,6 +1037,10 @@ function initialiserEcouteursRendezVous() {
     }
 
 
+    /* -----------------------------------------------------
+       CLIC SUR LE FOND
+    ----------------------------------------------------- */
+
     const modal =
         document.getElementById(
             "rdvModal"
@@ -720,7 +1054,8 @@ function initialiserEcouteursRendezVous() {
             event => {
 
                 if (
-                    event.target === modal
+                    event.target ===
+                    modal
                 ) {
 
                     fermerRendezVous();
@@ -730,12 +1065,17 @@ function initialiserEcouteursRendezVous() {
     }
 
 
+    /* -----------------------------------------------------
+       TOUCHE ESCAPE
+    ----------------------------------------------------- */
+
     document.addEventListener(
         "keydown",
         event => {
 
             if (
-                event.key === "Escape"
+                event.key ===
+                "Escape"
             ) {
 
                 fermerRendezVous();
@@ -743,6 +1083,10 @@ function initialiserEcouteursRendezVous() {
         }
     );
 
+
+    /* -----------------------------------------------------
+       REDIMENSIONNEMENT
+    ----------------------------------------------------- */
 
     window.addEventListener(
         "resize",
@@ -761,121 +1105,15 @@ function initialiserEcouteursRendezVous() {
 
 
 /* =========================================================
-   FORMATAGE DATES
-========================================================= */
-
-function formaterDateCourte(date) {
-
-    if (!(date instanceof Date)) {
-        return "";
-    }
-
-
-    return date.toLocaleDateString(
-        "fr-FR",
-        {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric"
-        }
-    );
-}
-
-
-function formaterDateLongue(date) {
-
-    if (!(date instanceof Date)) {
-        return "";
-    }
-
-
-    return date.toLocaleDateString(
-        "fr-FR",
-        {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric"
-        }
-    );
-}
-
-
-function formaterHeure(date) {
-
-    if (!(date instanceof Date)) {
-        return "";
-    }
-
-
-    return date.toLocaleTimeString(
-        "fr-FR",
-        {
-            hour: "2-digit",
-            minute: "2-digit"
-        }
-    );
-}
-
-
-/* =========================================================
-   VALIDATION URL
-========================================================= */
-
-function urlValideComponents(url) {
-
-    try {
-
-        const parsed =
-            new URL(url);
-
-        return (
-            parsed.protocol === "http:" ||
-            parsed.protocol === "https:"
-        );
-
-    } catch {
-
-        return false;
-    }
-}
-
-
-/* =========================================================
-   ECHAPPEMENT HTML
-========================================================= */
-
-function escapeHtmlComponents(value) {
-
-    return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-}
-
-
-/* =========================================================
    INITIALISATION GENERALE
 ========================================================= */
 
 async function initialiserComposants() {
+
+    /*
+     * Les composants sont injectés avant de charger
+     * les données afin que le DOM soit prêt.
+     */
 
     injecterHeader();
 
@@ -884,8 +1122,16 @@ async function initialiserComposants() {
     injecterModaleRendezVous();
 
 
+    /*
+     * Chargement Supabase des événements.
+     */
+
     await chargerRendezVous();
 
+
+    /*
+     * Activation des interactions.
+     */
 
     initialiserEcouteursRendezVous();
 }
@@ -896,7 +1142,8 @@ async function initialiserComposants() {
 ========================================================= */
 
 if (
-    document.readyState === "loading"
+    document.readyState ===
+    "loading"
 ) {
 
     document.addEventListener(
@@ -908,21 +1155,3 @@ if (
 
     initialiserComposants();
 }
-:::
-
-### Très important
-
-Dans GitHub, ton fichier doit commencer directement par :
-
-`/* =========================================================`
-
-puis arriver à :
-
-`import { supabase } from "./supabase.js";`
-
-et **il ne doit absolument plus y avoir de lignes contenant trois accents graves ` ``` `**.
-
-Ton `index.html` peut rester avec la modification que je t'ai donnée précédemment :
-
-```html
-<script type="module" src="js/components.js"></script>
