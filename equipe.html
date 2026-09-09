@@ -12,10 +12,6 @@
 
   <title>Avant-gardE — Notre équipe</title>
 
-  <!-- =====================================================
-       CSS GLOBAL
-  ====================================================== -->
-
   <link
     rel="stylesheet"
     href="css/style.css"
@@ -28,88 +24,87 @@
 
   <!-- =====================================================
        COMPOSANTS COMMUNS
-       
-       components.js injecte automatiquement :
-       - barre des événements
-       - header
-       - logo
-       - navigation
-       - accès administration
-       - footer
-       - modale événement
   ====================================================== -->
 
   <div id="site-header"></div>
 
 
   <!-- =====================================================
-       HERO
+       CONTENU PRINCIPAL
   ====================================================== -->
 
-  <section class="hero">
+  <main>
 
-    <div class="kicker">
-      L’AVANT-GARDE
-    </div>
+    <!-- ===================================================
+         HERO
+    ==================================================== -->
 
+    <section class="hero">
 
-    <h1>
-      NOTRE <span>ÉQUIPE.</span>
-    </h1>
-
-
-    <p>
-      L’Avant-gardE rassemble des femmes et des hommes qui souhaitent
-      contribuer, chacun selon ses compétences, son influence et ses moyens,
-      à la construction d’une France libre, souveraine et responsable.
-    </p>
-
-
-    <button
-      class="join-button"
-      id="openJoin"
-      type="button"
-    >
-      REJOINDRE L’AVANT-GARDE
-    </button>
-
-  </section>
-
-
-  <!-- =====================================================
-       EQUIPE
-  ====================================================== -->
-
-  <section class="team-section">
-
-    <div class="section-title">
-
-      <h2>
-        Les membres
-      </h2>
-
-      <p>
-        Découvrez celles et ceux qui ont choisi de rendre leur engagement public.
-      </p>
-
-    </div>
-
-
-    <div
-      class="team-grid"
-      id="teamGrid"
-    >
-
-      <div
-        class="loading"
-        id="loadingMembers"
-      >
-        Chargement des membres…
+      <div class="kicker">
+        L’AVANT-GARDE
       </div>
 
-    </div>
 
-  </section>
+      <h1>
+        NOTRE <span>ÉQUIPE.</span>
+      </h1>
+
+
+      <p>
+        L’Avant-gardE rassemble des femmes et des hommes qui souhaitent
+        contribuer, chacun selon ses compétences, son influence et ses moyens,
+        à la construction d’une France libre, souveraine et responsable.
+      </p>
+
+
+      <button
+        class="join-button"
+        id="openJoin"
+        type="button"
+      >
+        REJOINDRE L’AVANT-GARDE
+      </button>
+
+    </section>
+
+
+    <!-- ===================================================
+         EQUIPE
+    ==================================================== -->
+
+    <section class="team-section">
+
+      <div class="section-title">
+
+        <h2>
+          Les membres
+        </h2>
+
+        <p>
+          Découvrez celles et ceux qui ont choisi de rendre leur engagement public.
+        </p>
+
+      </div>
+
+
+      <div
+        class="team-grid"
+        id="teamGrid"
+      >
+
+        <div
+          class="loading"
+          id="loadingMembers"
+        >
+          Chargement des membres…
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
 
 
   <!-- =====================================================
@@ -141,22 +136,35 @@
 
       <div class="profile-modal-content">
 
-        <img
-          id="profileModalImage"
-          class="profile-modal-image"
-          alt=""
-        >
+        <div class="profile-modal-photo">
+
+          <img
+            id="profileModalImage"
+            class="profile-modal-image"
+            alt=""
+          >
 
 
-        <div
-          id="profilePlaceholder"
-          class="profile-placeholder"
-        >
-          ★
+          <div
+            id="profilePlaceholder"
+            class="profile-placeholder"
+            aria-hidden="true"
+          >
+            ★
+          </div>
+
         </div>
 
 
         <h2 id="profileModalName"></h2>
+
+
+        <!-- VIP -->
+        <div
+          id="profileModalVip"
+          class="profile-modal-vip"
+          style="display:none;"
+        ></div>
 
 
         <div
@@ -273,9 +281,7 @@
 
             S’inscrire en tant que
 
-            <span class="required">
-              *
-            </span>
+            <span class="required">*</span>
 
           </label>
 
@@ -358,9 +364,7 @@
 
             Pseudo ou nom prénom
 
-            <span class="required">
-              *
-            </span>
+            <span class="required">*</span>
 
           </label>
 
@@ -388,9 +392,7 @@
 
             Email
 
-            <span class="required">
-              *
-            </span>
+            <span class="required">*</span>
 
           </label>
 
@@ -422,9 +424,7 @@
 
             Région
 
-            <span class="required">
-              *
-            </span>
+            <span class="required">*</span>
 
           </label>
 
@@ -523,14 +523,14 @@
 
           <label
             class="main-label"
-            for="description"
+            for="descriptionField"
           >
             Description
           </label>
 
 
           <textarea
-            id="description"
+            id="descriptionField"
             maxlength="300"
             placeholder="Présentez-vous en quelques mots..."
           ></textarea>
@@ -567,9 +567,7 @@
 
             Compétences
 
-            <span
-              style="font-weight:normal;color:#8994a6;"
-            >
+            <span style="font-weight:normal;color:#8994a6;">
               (auto-évaluation de vos compétences)
             </span>
 
@@ -687,7 +685,7 @@
                 </span>
 
                 <span class="competence-description">
-                  capacité à analyser les données, les rendements, les conséquences et les rapports de force. anticipent les évolutions et privilégient les faits.
+                  capacité à analyser les données, les rendements, les conséquences et les rapports de force. Anticipent les évolutions et privilégient les faits.
                 </span>
 
               </span>
@@ -714,7 +712,7 @@
                 </span>
 
                 <span class="competence-description">
-                  capacité à analyser les ressentis, aspirations et frustrations populaires. anticipent les réactions naturelles et privilégient le vécu et l’opinion du peuple.
+                  capacité à analyser les ressentis, aspirations et frustrations populaires. Anticipent les réactions naturelles et privilégient le vécu et l’opinion du peuple.
                 </span>
 
               </span>
@@ -883,13 +881,14 @@
           class="submit-button"
           id="submitButton"
         >
-          CRÉER MON PROFIL
+          REJOINDRE AVANT-GARDE
         </button>
 
 
         <div
           id="formMessage"
           class="form-message"
+          aria-live="polite"
         ></div>
 
       </form>
@@ -900,24 +899,24 @@
 
 
   <!-- =====================================================
+       CONTENEUR FOOTER / MODALE EVENEMENT
+  ====================================================== -->
+
+  <div id="site-footer"></div>
+
+  <div id="site-rdv-modal"></div>
+
+
+  <!-- =====================================================
        SCRIPTS
   ====================================================== -->
 
-  <!-- Supabase CDN -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-  ></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-
-  <!-- Connexion Supabase commune -->
   <script src="js/supabase.js"></script>
 
-
-  <!-- Composants communs -->
   <script src="js/components.js"></script>
 
-
-  <!-- JavaScript spécifique à l'équipe -->
   <script src="js/equipe.js"></script>
 
 
