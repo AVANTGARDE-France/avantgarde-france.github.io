@@ -3,23 +3,15 @@
    js/equipe.js
 
    Logique spécifique à la page équipe.
-
-   Les éléments communs au site sont gérés par :
-   - js/supabase.js
-   - js/components.js
 ========================================================= */
 
 
 /* =========================================================
-   VARIABLES
+   DONNÉES
 ========================================================= */
 
 let membres = [];
 
-
-/* =========================================================
-   RÉSEAUX SOCIAUX
-========================================================= */
 
 const reseauxSociaux = [
 
@@ -62,36 +54,32 @@ const reseauxSociaux = [
 
 
 /* =========================================================
-   ÉCHAPPEMENT HTML
+   OUTILS
 ========================================================= */
 
 function escapeHtml(value) {
 
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
 }
 
 
-/* =========================================================
-   OUTILS — MODALES
-========================================================= */
-
 function ouvrirModalEquipe(modal) {
 
-  if (!modal) return;
+  if (!modal) {
+    return;
+  }
 
   modal.classList.add("active");
-
-  modal.setAttribute(
-    "aria-hidden",
-    "false"
-  );
-
   document.body.style.overflow = "hidden";
 
 }
@@ -99,37 +87,46 @@ function ouvrirModalEquipe(modal) {
 
 function fermerModalEquipe(modal) {
 
-  if (!modal) return;
+  if (!modal) {
+    return;
+  }
 
   modal.classList.remove("active");
 
-  modal.setAttribute(
-    "aria-hidden",
-    "true"
-  );
-
-  /*
-     Ne réactive le scroll que si aucune
-     autre modale n'est ouverte.
-  */
-
-  const autreModaleOuverte =
-    document.querySelector(
-      ".modal.active, .rdv-modal.active"
-    );
-
-  if (!autreModaleOuverte) {
-
+  if (
+    !document.querySelector(
+      ".profile-modal.active, .join-modal.active, .rdv-modal.active"
+    )
+  ) {
     document.body.style.overflow = "";
-
   }
 
 }
 
 
-/* =========================================================
-   VALIDATION IMAGE / URL
-========================================================= */
+function imageValide(url) {
+
+  if (!url || typeof url !== "string") {
+    return false;
+  }
+
+  try {
+
+    const parsed = new URL(url);
+
+    return (
+      parsed.protocol === "http:" ||
+      parsed.protocol === "https:"
+    );
+
+  } catch (error) {
+
+    return false;
+
+  }
+
+}
+
 
 function urlValide(url) {
 
@@ -146,7 +143,7 @@ function urlValide(url) {
       parsed.protocol === "https:"
     );
 
-  } catch {
+  } catch (error) {
 
     return false;
 
@@ -155,20 +152,11 @@ function urlValide(url) {
 }
 
 
-function imageValide(url) {
-
-  return urlValide(url);
-
-}
-
-
-/* =========================================================
-   NORMALISATION DES COMPÉTENCES
-========================================================= */
-
 function normaliserCompetences(value) {
 
-  if (!value) return [];
+  if (!value) {
+    return [];
+  }
 
 
   if (Array.isArray(value)) {
@@ -182,9 +170,16 @@ function normaliserCompetences(value) {
 
   if (typeof value === "string") {
 
+    const texte = value.trim();
+
+    if (!texte) {
+      return [];
+    }
+
+
     try {
 
-      const parsed = JSON.parse(value);
+      const parsed = JSON.parse(texte);
 
       if (Array.isArray(parsed)) {
 
@@ -194,16 +189,12 @@ function normaliserCompetences(value) {
 
       }
 
-    } catch {
-
-      /*
-         La valeur peut être une chaîne classique.
-      */
-
+    } catch (error) {
+      // Ce n'est pas du JSON.
     }
 
 
-    return value
+    return texte
       .split(",")
       .map(item => item.trim())
       .filter(Boolean);
@@ -216,85 +207,78 @@ function normaliserCompetences(value) {
 }
 
 
-/* =========================================================
-   FORMATAGE AUDIENCE
-========================================================= */
-
 function formaterAudience(valeur) {
-
-  if (
-    valeur === null ||
-    valeur === undefined ||
-    valeur === ""
-  ) {
-
-    return "";
-
-  }
-
 
   const nombre = Number(valeur);
 
-
-  if (!Number.isFinite(nombre)) {
-
-    return "";
-
+  if (!Number.isFinite(nombre) || nombre <= 0) {
+    return "0";
   }
-
 
   return nombre.toLocaleString("fr-FR");
 
 }
 
 
+function obtenirAudience(membre, reseau) {
+
+  const valeur = Number(
+    membre[reseau.audienceChamp]
+  );
+
+  if (!Number.isFinite(valeur) || valeur < 0) {
+    return 0;
+  }
+
+  return valeur;
+
+}
+
+
 /* =========================================================
-   AFFICHAGE DES RÉSEAUX SOCIAUX
+   RÉSEAUX SOCIAUX
 ========================================================= */
 
 function afficherReseauxSociaux(membre) {
 
   const container =
-    document.getElementById(
-      "profileModalSocials"
-    );
-
+    document.getElementById("profileModalSocials");
 
   const audienceMaxContainer =
-    document.getElementById(
-      "profileModalAudienceMax"
-    );
+    document.getElementById("profileModalAudienceMax");
 
 
-  if (!container) return;
+  if (!container) {
+    return;
+  }
+
+
+  container.innerHTML = "";
+
+
+  if (audienceMaxContainer) {
+    audienceMaxContainer.innerHTML = "";
+    audienceMaxContainer.style.display = "none";
+  }
 
 
   const reseauxDisponibles =
-    reseauxSociaux.filter(
-      reseau =>
-        urlValide(
-          membre[reseau.champ]
-        )
-    );
+    reseauxSociaux.filter(reseau => {
 
+      return urlValide(
+        membre[reseau.champ]
+      );
 
-  /*
-     Aucun réseau renseigné.
-  */
+    });
+
 
   if (!reseauxDisponibles.length) {
 
-    container.innerHTML = "";
+    const section =
+      document.getElementById("profileSocialSection");
 
-    container.style.display = "none";
-
-
-    if (audienceMaxContainer) {
-
-      audienceMaxContainer.innerHTML = "";
-
-      audienceMaxContainer.style.display = "none";
-
+    if (section) {
+      section.style.display = "none";
     }
 
     return;
@@ -302,100 +286,56 @@ function afficherReseauxSociaux(membre) {
   }
 
 
-  /*
-     Calcul des audiences.
-  */
+  const section =
+    document.getElementById("profileSocialSection");
 
-  const audiences =
-    reseauxDisponibles.map(reseau => {
-
-      const valeur =
-        Number(
-          membre[reseau.audienceChamp]
-        );
-
-
-      return {
-
-        reseau,
-
-        valeur:
-          Number.isFinite(valeur)
-            ? valeur
-            : 0
-
-      };
-
-    });
-
-
-  /*
-     Recherche du réseau ayant
-     la plus grande audience.
-  */
-
-  let reseauMax = null;
-
-
-  if (audiences.length) {
-
-    reseauMax =
-      audiences.reduce(
-        (max, actuel) => {
-
-          if (!max) {
-            return actuel;
-          }
-
-          return actuel.valeur > max.valeur
-            ? actuel
-            : max;
-
-        },
-        null
-      );
-
+  if (section) {
+    section.style.display = "";
   }
 
 
   /*
-     Si audience_reseau est renseigné
-     dans Supabase, il devient prioritaire.
-  */
+   * Calcul de l'audience maximale.
+   */
+
+  const audiences = reseauxDisponibles.map(reseau => {
+
+    return {
+      reseau,
+      audience: obtenirAudience(membre, reseau)
+    };
+
+  });
+
+
+  let reseauMax = null;
+
+
+  /*
+   * On privilégie le réseau enregistré par le système
+   * d'update-audience lorsqu'il correspond réellement
+   * à une audience disponible.
+   */
 
   if (membre.audience_reseau) {
 
-    const nomAudience =
-      String(
-        membre.audience_reseau
-      ).trim()
-      .toLowerCase();
+    const reseauIndique =
+      audiences.find(item => {
 
-
-    const reseauBase =
-      reseauxDisponibles.find(
-        reseau =>
-          reseau.nom.toLowerCase() ===
-          nomAudience
-      );
-
-
-    if (reseauBase) {
-
-      const audienceBase =
-        audiences.find(
-          item =>
-            item.reseau ===
-            reseauBase
+        return (
+          String(item.reseau.nom).toLowerCase() ===
+          String(membre.audience_reseau).toLowerCase()
         );
 
+      });
 
-      if (audienceBase) {
 
-        reseauMax =
-          audienceBase;
+    if (
+      reseauIndique &&
+      reseauIndique.audience > 0
+    ) {
 
-      }
+      reseauMax = reseauIndique;
 
     }
 
@@ -403,100 +343,153 @@ function afficherReseauxSociaux(membre) {
 
 
   /*
-     Construction des icônes.
-  */
+   * Sinon, calcul automatique.
+   */
 
-  container.innerHTML =
-    reseauxDisponibles
-      .map(reseau => {
+  if (!reseauMax) {
 
-        const audience =
-          audiences.find(
-            item =>
-              item.reseau ===
-              reseau
-          );
+    audiences.forEach(item => {
 
+      if (
+        item.audience > 0 &&
+        (
+          !reseauMax ||
+          item.audience > reseauMax.audience
+        )
+      ) {
 
-        const estMax =
-          Boolean(
-            reseauMax &&
-            audience &&
-            audience.reseau ===
-              reseauMax.reseau &&
-            audience.valeur > 0
-          );
+        reseauMax = item;
 
+      }
 
-        return `
+    });
 
-          <a
-            href="${escapeHtml(membre[reseau.champ])}"
-            class="profile-social-link ${estMax ? "is-max" : ""}"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="${escapeHtml(reseau.nom)}"
-            aria-label="${escapeHtml(reseau.nom)}"
-          >
-
-            <div class="profile-social-item">
-
-              ${
-                estMax
-                  ? `
-                    <span
-                      class="profile-social-max-star"
-                      aria-label="Audience maximale"
-                      title="Audience maximale"
-                    >
-                      ★
-                    </span>
-                  `
-                  : ""
-              }
-
-
-              <img
-                src="${escapeHtml(reseau.logo)}"
-                alt="${escapeHtml(reseau.nom)}"
-                loading="lazy"
-              >
-
-
-              ${
-                audience &&
-                audience.valeur > 0
-                  ? `
-                    <span class="profile-social-audience">
-                      ${formaterAudience(
-                        audience.valeur
-                      )}
-                    </span>
-                  `
-                  : ""
-              }
-
-            </div>
-
-          </a>
-
-        `;
-
-      })
-      .join("");
-
-
-  container.style.display = "flex";
+  }
 
 
   /*
-     Audience maximale affichée sous les réseaux.
-  */
+   * Création des boutons réseaux.
+   */
+
+  audiences.forEach(item => {
+
+    const reseau = item.reseau;
+    const audience = item.audience;
+
+    const lien = document.createElement("a");
+
+    lien.className = "profile-social-link";
+
+    lien.href = reseau.champ
+      ? membre[reseau.champ]
+      : "#";
+
+    lien.target = "_blank";
+    lien.rel = "noopener noreferrer";
+
+    lien.title =
+      `${reseau.nom} — ${formaterAudience(audience)} abonnés`;
+
+
+    const isMax =
+      Boolean(
+        reseauMax &&
+        reseauMax.reseau.nom === reseau.nom &&
+        reseauMax.audience > 0
+      );
+
+
+    if (isMax) {
+
+      lien.classList.add("is-max");
+
+    }
+
+
+    const itemHtml = document.createElement("div");
+
+    itemHtml.className = "profile-social-item";
+
+
+    if (isMax) {
+
+      itemHtml.innerHTML = `
+        <div class="profile-social-max-star"
+             aria-label="Audience maximale">
+          ★
+        </div>
+      `;
+
+    }
+
+
+    const image = document.createElement("img");
+
+    image.src = reseau.logo;
+    image.alt = reseau.nom;
+    image.loading = "lazy";
+
+
+    const nom = document.createElement("strong");
+
+    nom.textContent = reseau.nom;
+
+
+    const audienceElement =
+      document.createElement("span");
+
+    audienceElement.className =
+      "profile-social-audience";
+
+    audienceElement.textContent =
+      formaterAudience(audience);
+
+
+    lien.appendChild(image);
+    lien.appendChild(nom);
+    lien.appendChild(audienceElement);
+
+    itemHtml.appendChild(lien);
+
+    container.appendChild(itemHtml);
+
+  });
+
+
+  /*
+   * Audience maximale.
+   */
+
+  let audienceMax = 0;
+
+
+  const audienceBase =
+    Number(membre.audience_max);
+
+
+  if (
+    Number.isFinite(audienceBase) &&
+    audienceBase > 0
+  ) {
+
+    audienceMax = audienceBase;
+
+  }
+
+
+  if (
+    reseauMax &&
+    reseauMax.audience > audienceMax
+  ) {
+
+    audienceMax = reseauMax.audience;
+
+  }
+
 
   if (
     audienceMaxContainer &&
-    reseauMax &&
-    reseauMax.valeur > 0
+    audienceMax > 0
   ) {
 
     let dateTexte = "";
@@ -505,27 +498,34 @@ function afficherReseauxSociaux(membre) {
     if (membre.audience_updated_at) {
 
       const date =
-        new Date(
-          membre.audience_updated_at
-        );
+        new Date(membre.audience_updated_at);
 
 
       if (!Number.isNaN(date.getTime())) {
 
+        const datePart =
+          date.toLocaleDateString(
+            "fr-FR",
+            {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric"
+            }
+          );
+
+
+        const heurePart =
+          date.toLocaleTimeString(
+            "fr-FR",
+            {
+              hour: "2-digit",
+              minute: "2-digit"
+            }
+          );
+
+
         dateTexte =
-          `mis à jour le ${
-            date.toLocaleDateString(
-              "fr-FR"
-            )
-          } à ${
-            date.toLocaleTimeString(
-              "fr-FR",
-              {
-                hour: "2-digit",
-                minute: "2-digit"
-              }
-            )
-          }`;
+          ` <small>· mis à jour le ${datePart} à ${heurePart}</small>`;
 
       }
 
@@ -533,38 +533,12 @@ function afficherReseauxSociaux(membre) {
 
 
     audienceMaxContainer.innerHTML = `
-
       Audience max :
-      <strong>
-        ${formaterAudience(
-          reseauMax.valeur
-        )}
-      </strong>
-
-      ${
-        dateTexte
-          ? `
-            <small>
-              <em>· ${escapeHtml(dateTexte)}</em>
-            </small>
-          `
-          : ""
-      }
-
+      <strong>${escapeHtml(formaterAudience(audienceMax))}</strong>
+      ${dateTexte}
     `;
 
-
-    audienceMaxContainer.style.display = "block";
-
-  } else {
-
-    if (audienceMaxContainer) {
-
-      audienceMaxContainer.innerHTML = "";
-
-      audienceMaxContainer.style.display = "none";
-
-    }
+    audienceMaxContainer.style.display = "";
 
   }
 
@@ -577,39 +551,96 @@ function afficherReseauxSociaux(membre) {
 
 async function chargerMembres() {
 
-  const teamGrid =
-    document.getElementById(
-      "teamGrid"
-    );
+  const grid =
+    document.getElementById("teamGrid");
 
 
-  if (!teamGrid) return;
+  if (!grid) {
+    return;
+  }
 
 
-  teamGrid.innerHTML = `
-
-    <div class="loading">
+  grid.innerHTML = `
+    <div class="events-empty">
       Chargement des membres…
     </div>
-
   `;
 
 
   if (
-    !window.supabaseClient
+    typeof supabaseClient === "undefined" ||
+    !supabaseClient
   ) {
 
+    grid.innerHTML = `
+      <div class="events-empty">
+        Impossible de contacter la base de données.
+      </div>
+    `;
+
     console.error(
-      "supabaseClient introuvable."
+      "supabaseClient est introuvable."
+    );
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+
+    .from("profiles")
+
+    .select(`
+      id,
+      created_at,
+      nom,
+      grade,
+      image_url,
+      description,
+      region,
+      competences,
+      anonyme,
+      facebook_url,
+      x_url,
+      instagram_url,
+      youtube_url,
+      tiktok_url,
+      facebook_audience,
+      instagram_audience,
+      x_audience,
+      youtube_audience,
+      tiktok_audience,
+      audience_max,
+      audience_reseau,
+      audience_updated_at
+    `)
+
+    .eq("anonyme", false)
+
+    .order(
+      "created_at",
+      {
+        ascending: true
+      }
     );
 
 
-    teamGrid.innerHTML = `
+  if (error) {
 
-      <div class="no-members">
-        Connexion à la base de données impossible.
+    console.error(
+      "Erreur chargement membres :",
+      error
+    );
+
+
+    grid.innerHTML = `
+      <div class="events-empty">
+        Impossible de charger l’équipe.
       </div>
-
     `;
 
     return;
@@ -617,292 +648,208 @@ async function chargerMembres() {
   }
 
 
-  try {
+  membres = Array.isArray(data)
+    ? data
+    : [];
 
-    const {
-      data,
-      error
-    } =
-      await window.supabaseClient
 
-        .from("profiles")
+  if (!membres.length) {
 
-        .select(`
-          id,
-          created_at,
-          nom,
-          grade,
-          image_url,
-          description,
-          region,
-          competences,
-          anonyme,
-          facebook_url,
-          x_url,
-          instagram_url,
-          youtube_url,
-          tiktok_url,
-          facebook_audience,
-          instagram_audience,
-          x_audience,
-          youtube_audience,
-          tiktok_audience,
-          audience_max,
-          audience_reseau,
-          audience_updated_at
-        `)
+    grid.innerHTML = `
+      <div class="events-empty">
+        Aucun membre public pour le moment.
+      </div>
+    `;
 
-        .eq(
-          "anonyme",
-          false
-        )
+    return;
 
-        .order(
-          "created_at",
-          {
-            ascending: true
-          }
-        );
+  }
 
 
-    if (error) {
+  grid.innerHTML = "";
 
-      console.error(
-        "Erreur chargement membres :",
-        error
-      );
 
+  membres.forEach(membre => {
 
-      teamGrid.innerHTML = `
+    const card =
+      document.createElement("article");
 
-        <div class="no-members">
-          Impossible de charger les membres.
-        </div>
 
-      `;
+    card.className = "member-card";
 
-      return;
+    card.tabIndex = 0;
 
-    }
+    card.setAttribute(
+      "role",
+      "button"
+    );
 
-
-    membres = data || [];
-
-
-    if (!membres.length) {
-
-      teamGrid.innerHTML = `
-
-        <div class="no-members">
-          Aucun membre à afficher pour le moment.
-        </div>
-
-      `;
-
-      return;
-
-    }
-
-
-    teamGrid.innerHTML =
-      membres
-        .map(
-          (membre, index) => {
-
-            const description =
-              String(
-                membre.description || ""
-              );
-
-
-            const descriptionCourte =
-              description.length > 180
-                ? description.slice(0, 177) + "…"
-                : description;
-
-
-            const image =
-              imageValide(
-                membre.image_url
-              );
-
-
-            const nom =
-              membre.nom ||
-              "Membre";
-
-
-            return `
-
-              <article
-                class="member-card"
-                data-member-index="${index}"
-                tabindex="0"
-                role="button"
-                aria-label="Voir le profil de ${escapeHtml(nom)}"
-              >
-
-                <div class="member-photo">
-
-                  ${
-                    image
-                      ? `
-                        <img
-                          src="${escapeHtml(membre.image_url)}"
-                          alt="${escapeHtml(nom)}"
-                          loading="lazy"
-                        >
-                      `
-                      : `
-                        <div
-                          class="member-photo-placeholder"
-                          aria-hidden="true"
-                        >
-                          ★
-                        </div>
-                      `
-                  }
-
-                </div>
-
-
-                <div class="member-name">
-                  ${escapeHtml(nom)}
-                </div>
-
-
-                ${
-                  membre.grade
-                    ? `
-                      <div class="member-grade">
-                        ${escapeHtml(membre.grade)}
-                      </div>
-                    `
-                    : ""
-                }
-
-
-                ${
-                  membre.region
-                    ? `
-                      <div class="member-region">
-                        ${escapeHtml(membre.region)}
-                      </div>
-                    `
-                    : ""
-                }
-
-
-                ${
-                  descriptionCourte
-                    ? `
-                      <div class="member-description">
-                        ${escapeHtml(descriptionCourte)}
-                      </div>
-                    `
-                    : ""
-                }
-
-              </article>
-
-            `;
-
-          }
-        )
-        .join("");
-
-
-    /*
-       Activation des cartes.
-    */
-
-    document
-      .querySelectorAll(
-        ".member-card"
-      )
-      .forEach(card => {
-
-        card.addEventListener(
-          "click",
-          () => {
-
-            const index =
-              Number(
-                card.dataset.memberIndex
-              );
-
-
-            const membre =
-              membres[index];
-
-
-            if (membre) {
-
-              ouvrirProfil(
-                membre
-              );
-
-            }
-
-          }
-        );
-
-
-        card.addEventListener(
-          "keydown",
-          event => {
-
-            if (
-              event.key === "Enter" ||
-              event.key === " "
-            ) {
-
-              event.preventDefault();
-
-
-              const index =
-                Number(
-                  card.dataset.memberIndex
-                );
-
-
-              const membre =
-                membres[index];
-
-
-              if (membre) {
-
-                ouvrirProfil(
-                  membre
-                );
-
-              }
-
-            }
-
-          }
-        );
-
-      });
-
-
-  } catch (error) {
-
-    console.error(
-      "Erreur inattendue chargement membres :",
-      error
+    card.setAttribute(
+      "aria-label",
+      `Voir le profil de ${membre.nom || "ce membre"}`
     );
 
 
-    teamGrid.innerHTML = `
+    const imageUrl =
+      imageValide(membre.image_url)
+        ? membre.image_url
+        : "";
 
-      <div class="no-members">
-        Impossible de charger les membres.
-      </div>
 
-    `;
+    const nom =
+      escapeHtml(
+        membre.nom || "Membre"
+      );
 
-  }
+
+    const grade =
+      escapeHtml(
+        membre.grade || "Membre"
+      );
+
+
+    const region =
+      escapeHtml(
+        membre.region || ""
+      );
+
+
+    let description =
+      String(
+        membre.description || ""
+      );
+
+
+    if (description.length > 180) {
+
+      description =
+        `${description.slice(0, 180).trim()}…`;
+
+    }
+
+
+    description =
+      escapeHtml(description);
+
+
+    if (imageUrl) {
+
+      card.innerHTML = `
+
+        <img
+          class="member-photo"
+          src="${escapeHtml(imageUrl)}"
+          alt="${nom}"
+          loading="lazy"
+        >
+
+        <div class="member-info">
+
+          <h3 class="member-name">
+            ${nom}
+          </h3>
+
+          <div class="member-grade">
+            ${grade}
+          </div>
+
+          ${
+            region
+              ? `
+                <div class="member-region">
+                  ${region}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            description
+              ? `
+                <div class="member-description">
+                  ${description}
+                </div>
+              `
+              : ""
+          }
+
+        </div>
+
+      `;
+
+    } else {
+
+      card.innerHTML = `
+
+        <div class="member-photo-placeholder">
+          A
+        </div>
+
+        <div class="member-info">
+
+          <h3 class="member-name">
+            ${nom}
+          </h3>
+
+          <div class="member-grade">
+            ${grade}
+          </div>
+
+          ${
+            region
+              ? `
+                <div class="member-region">
+                  ${region}
+                </div>
+              `
+              : ""
+          }
+
+          ${
+            description
+              ? `
+                <div class="member-description">
+                  ${description}
+                </div>
+              `
+              : ""
+          }
+
+        </div>
+
+      `;
+
+    }
+
+
+    card.addEventListener(
+      "click",
+      () => ouvrirProfil(membre)
+    );
+
+
+    card.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key === "Enter" ||
+          event.key === " "
+        ) {
+
+          event.preventDefault();
+
+          ouvrirProfil(membre);
+
+        }
+
+      }
+    );
+
+
+    grid.appendChild(card);
+
+  });
 
 }
 
@@ -913,49 +860,214 @@ async function chargerMembres() {
 
 function ouvrirProfil(membre) {
 
+  if (!membre) {
+    return;
+  }
+
+
   const modal =
-    document.getElementById(
-      "memberModal"
-    );
+    document.getElementById("memberModal");
 
 
-  if (!modal) return;
+  if (!modal) {
+    return;
+  }
 
 
   const image =
-    document.getElementById(
-      "profileModalImage"
-    );
+    document.getElementById("profileModalImage");
+
 
   const placeholder =
-    document.getElementById(
-      "profilePlaceholder"
-    );
+    document.getElementById("profilePlaceholder");
+
 
   const name =
-    document.getElementById(
-      "profileModalName"
-    );
+    document.getElementById("profileModalName");
+
 
   const grade =
-    document.getElementById(
-      "profileModalGrade"
-    );
+    document.getElementById("profileModalGrade");
+
 
   const region =
-    document.getElementById(
-      "profileModalRegion"
-    );
+    document.getElementById("profileModalRegion");
+
 
   const description =
     document.getElementById(
       "profileModalDescription"
     );
 
-  const competencesContainer =
+
+  if (name) {
+
+    name.textContent =
+      membre.nom || "Membre";
+
+  }
+
+
+  if (grade) {
+
+    grade.textContent =
+      membre.grade || "Membre";
+
+  }
+
+
+  if (region) {
+
+    region.textContent =
+      membre.region || "";
+
+  }
+
+
+  if (description) {
+
+    description.textContent =
+      membre.description || "";
+
+  }
+
+
+  /*
+   * Image.
+   */
+
+  if (
+    image &&
+    imageValide(membre.image_url)
+  ) {
+
+    image.src =
+      membre.image_url;
+
+    image.alt =
+      membre.nom || "Membre";
+
+    image.style.display =
+      "block";
+
+
+    if (placeholder) {
+      placeholder.style.display =
+        "none";
+    }
+
+  } else {
+
+    if (image) {
+      image.removeAttribute("src");
+      image.style.display =
+        "none";
+    }
+
+
+    if (placeholder) {
+
+      placeholder.style.display =
+        "flex";
+
+      placeholder.textContent =
+        membre.nom
+          ? String(membre.nom)
+              .trim()
+              .charAt(0)
+              .toUpperCase()
+          : "A";
+
+    }
+
+  }
+
+
+  /*
+   * Réseaux sociaux.
+   */
+
+  afficherReseauxSociaux(membre);
+
+
+  /*
+   * Compétences.
+   */
+
+  const competenceContainer =
     document.getElementById(
       "profileModalCompetences"
     );
+
+
+  if (competenceContainer) {
+
+    competenceContainer.innerHTML = "";
+
+
+    const competences =
+      normaliserCompetences(
+        membre.competences
+      )
+      .filter(
+        competence =>
+          String(competence)
+            .trim()
+            .toUpperCase() !== "VIP"
+      );
+
+
+    if (competences.length) {
+
+      const section =
+        document.getElementById(
+          "profileCompetenceSection"
+        );
+
+
+      if (section) {
+        section.style.display = "";
+      }
+
+
+      competences.forEach(competence => {
+
+        const tag =
+          document.createElement("span");
+
+        tag.className =
+          "competence-tag";
+
+        tag.textContent =
+          competence;
+
+        competenceContainer.appendChild(tag);
+
+      });
+
+    } else {
+
+      const section =
+        document.getElementById(
+          "profileCompetenceSection"
+        );
+
+
+      if (section) {
+        section.style.display = "none";
+      }
+
+    }
+
+  }
+
+
+  /*
+   * VIP.
+   *
+   * Priorité à audience_max enregistrée.
+   * Si elle n'existe pas, on recalcule.
+   */
 
   const vipContainer =
     document.getElementById(
@@ -963,271 +1075,53 @@ function ouvrirProfil(membre) {
     );
 
 
-  /*
-     NOM
-  */
-
-  if (name) {
-
-    name.textContent =
-      membre.nom ||
-      "Membre";
-
-  }
-
-
-  /*
-     GRADE
-  */
-
-  if (grade) {
-
-    grade.textContent =
-      membre.grade ||
-      "";
-
-    grade.style.display =
-      membre.grade
-        ? ""
-        : "none";
-
-  }
-
-
-  /*
-     RÉGION
-  */
-
-  if (region) {
-
-    region.textContent =
-      membre.region ||
-      "";
-
-    region.style.display =
-      membre.region
-        ? ""
-        : "none";
-
-  }
-
-
-  /*
-     DESCRIPTION
-  */
-
-  if (description) {
-
-    description.textContent =
-      membre.description ||
-      "";
-
-    description.style.display =
-      membre.description
-        ? ""
-        : "none";
-
-  }
-
-
-  /*
-     IMAGE
-  */
-
-  if (image) {
-
-    if (
-      imageValide(
-        membre.image_url
-      )
-    ) {
-
-      image.src =
-        membre.image_url;
-
-      image.alt =
-        membre.nom ||
-        "Membre";
-
-      image.style.display =
-        "block";
-
-
-      if (placeholder) {
-
-        placeholder.style.display =
-          "none";
-
-      }
-
-    } else {
-
-      image.removeAttribute("src");
-
-      image.alt = "";
-
-      image.style.display =
-        "none";
-
-
-      if (placeholder) {
-
-        placeholder.style.display =
-          "flex";
-
-      }
-
-    }
-
-  }
-
-
-  /*
-     RÉSEAUX SOCIAUX
-  */
-
-  afficherReseauxSociaux(
-    membre
-  );
-
-
-  /*
-     COMPÉTENCES
-  */
-
-  if (competencesContainer) {
-
-    let competences =
-      normaliserCompetences(
-        membre.competences
-      );
-
-
-    /*
-       VIP ne doit pas être affiché
-       comme compétence classique.
-    */
-
-    competences =
-      competences.filter(
-        competence =>
-          competence.toUpperCase() !==
-          "VIP"
-      );
-
-
-    if (!competences.length) {
-
-      competencesContainer.innerHTML = `
-
-        <span class="competence-tag">
-          Aucune compétence renseignée.
-        </span>
-
-      `;
-
-    } else {
-
-      competencesContainer.innerHTML =
-
-        competences
-          .map(
-            competence => `
-
-              <span class="competence-tag">
-                ${escapeHtml(competence)}
-              </span>
-
-            `
-          )
-          .join("");
-
-    }
-
-  }
-
-
-  /*
-     VIP
-  */
-
   if (vipContainer) {
 
-    const audienceMax =
-      Number(
-        membre.audience_max
-      );
+    let audienceMax =
+      Number(membre.audience_max);
 
 
-    /*
-       Si audience_max n'est pas renseigné,
-       on recalcule depuis les audiences.
-    */
+    if (
+      !Number.isFinite(audienceMax) ||
+      audienceMax < 0
+    ) {
 
-    let audienceCalculee =
-      Number.isFinite(
-        audienceMax
-      )
-        ? audienceMax
-        : 0;
-
-
-    if (audienceCalculee <= 0) {
-
-      reseauxSociaux.forEach(
-        reseau => {
-
-          const valeur =
-            Number(
-              membre[
-                reseau.audienceChamp
-              ]
-            );
-
-
-          if (
-            Number.isFinite(valeur) &&
-            valeur > audienceCalculee
-          ) {
-
-            audienceCalculee =
-              valeur;
-
-          }
-
-        }
-      );
+      audienceMax = 0;
 
     }
 
 
-    const estVIP =
-      audienceCalculee >= 3000;
+    reseauxSociaux.forEach(reseau => {
+
+      const audience =
+        obtenirAudience(
+          membre,
+          reseau
+        );
 
 
-    if (estVIP) {
+      if (audience > audienceMax) {
+        audienceMax = audience;
+      }
+
+    });
+
+
+    if (audienceMax >= 3000) {
 
       vipContainer.innerHTML = `
-
-        <div class="vip-medal">
-
-          <span aria-hidden="true">
-            ★
-          </span>
-
-          VIP
-
-        </div>
-
+        <span class="vip-medal">
+          ★ VIP
+        </span>
       `;
 
-
       vipContainer.style.display =
-        "block";
+        "";
 
     } else {
 
-      vipContainer.innerHTML = "";
+      vipContainer.innerHTML =
+        "";
 
       vipContainer.style.display =
         "none";
@@ -1237,9 +1131,7 @@ function ouvrirProfil(membre) {
   }
 
 
-  ouvrirModalEquipe(
-    modal
-  );
+  ouvrirModalEquipe(modal);
 
 }
 
@@ -1250,57 +1142,42 @@ function ouvrirProfil(membre) {
 
 function mettreAJourCompteurDescription() {
 
-  const descriptionField =
+  const textarea =
     document.getElementById(
       "descriptionField"
     );
 
-  const descriptionCount =
+
+  const compteur =
     document.getElementById(
       "descriptionCount"
     );
 
 
-  if (
-    !descriptionField ||
-    !descriptionCount
-  ) {
-
+  if (!textarea || !compteur) {
     return;
-
   }
 
 
   const longueur =
-    descriptionField.value.length;
+    textarea.value.length;
 
 
-  descriptionCount.textContent =
-    longueur;
+  compteur.textContent =
+    `${longueur} / 300`;
 
 
-  descriptionCount.classList.remove(
-    "warning"
+  compteur.classList.toggle(
+    "warning",
+    longueur >= 270 &&
+    longueur < 300
   );
 
-  descriptionCount.classList.remove(
-    "limit"
+
+  compteur.classList.toggle(
+    "limit",
+    longueur >= 300
   );
-
-
-  if (longueur >= 300) {
-
-    descriptionCount.classList.add(
-      "limit"
-    );
-
-  } else if (longueur >= 270) {
-
-    descriptionCount.classList.add(
-      "warning"
-    );
-
-  }
 
 }
 
@@ -1311,54 +1188,47 @@ function mettreAJourCompteurDescription() {
 
 function initialiserOuvertureInscription() {
 
-  const openJoin =
+  const bouton =
     document.getElementById(
       "openJoin"
     );
 
-  const joinModal =
+
+  const modal =
     document.getElementById(
       "joinModal"
     );
 
 
-  if (
-    !openJoin ||
-    !joinModal
-  ) {
+  const message =
+    document.getElementById(
+      "formMessage"
+    );
 
+
+  if (!bouton || !modal) {
     return;
-
   }
 
 
-  openJoin.addEventListener(
+  bouton.addEventListener(
     "click",
     () => {
 
-      const formMessage =
-        document.getElementById(
-          "formMessage"
-        );
+      if (message) {
 
-
-      if (formMessage) {
-
-        formMessage.textContent =
+        message.textContent =
           "";
 
-        formMessage.className =
+        message.className =
           "form-message";
 
       }
 
 
+      ouvrirModalEquipe(modal);
+
       mettreAJourCompteurDescription();
-
-
-      ouvrirModalEquipe(
-        joinModal
-      );
 
     }
   );
@@ -1367,7 +1237,7 @@ function initialiserOuvertureInscription() {
 
 
 /* =========================================================
-   FERMETURE DES MODALES
+   FERMETURE MODALES
 ========================================================= */
 
 function initialiserFermetureModales() {
@@ -1377,15 +1247,18 @@ function initialiserFermetureModales() {
       "memberModal"
     );
 
+
   const joinModal =
     document.getElementById(
       "joinModal"
     );
 
+
   const closeMember =
     document.getElementById(
       "closeMember"
     );
+
 
   const closeJoin =
     document.getElementById(
@@ -1393,37 +1266,45 @@ function initialiserFermetureModales() {
     );
 
 
-  if (
-    closeMember &&
-    memberModal
-  ) {
+  if (closeMember && memberModal) {
 
     closeMember.addEventListener(
       "click",
       () => {
-
-        fermerModalEquipe(
-          memberModal
-        );
-
+        fermerModalEquipe(memberModal);
       }
     );
 
   }
 
 
-  if (
-    closeJoin &&
-    joinModal
-  ) {
+  if (closeJoin && joinModal) {
 
     closeJoin.addEventListener(
       "click",
       () => {
+        fermerModalEquipe(joinModal);
+      }
+    );
 
-        fermerModalEquipe(
-          joinModal
-        );
+  }
+
+
+  if (memberModal) {
+
+    memberModal.addEventListener(
+      "click",
+      event => {
+
+        if (
+          event.target === memberModal
+        ) {
+
+          fermerModalEquipe(
+            memberModal
+          );
+
+        }
 
       }
     );
@@ -1431,53 +1312,40 @@ function initialiserFermetureModales() {
   }
 
 
-  [
-    memberModal,
-    joinModal
-  ]
-    .forEach(modal => {
+  if (joinModal) {
 
-      if (!modal) return;
+    joinModal.addEventListener(
+      "click",
+      event => {
 
+        if (
+          event.target === joinModal
+        ) {
 
-      modal.addEventListener(
-        "click",
-        event => {
-
-          if (
-            event.target === modal
-          ) {
-
-            fermerModalEquipe(
-              modal
-            );
-
-          }
+          fermerModalEquipe(
+            joinModal
+          );
 
         }
-      );
 
-    });
+      }
+    );
+
+  }
 
 
   document.addEventListener(
     "keydown",
     event => {
 
-      if (
-        event.key !== "Escape"
-      ) {
-
+      if (event.key !== "Escape") {
         return;
-
       }
 
 
       if (
         memberModal &&
-        memberModal.classList.contains(
-          "active"
-        )
+        memberModal.classList.contains("active")
       ) {
 
         fermerModalEquipe(
@@ -1491,9 +1359,7 @@ function initialiserFermetureModales() {
 
       if (
         joinModal &&
-        joinModal.classList.contains(
-          "active"
-        )
+        joinModal.classList.contains("active")
       ) {
 
         fermerModalEquipe(
@@ -1509,7 +1375,7 @@ function initialiserFermetureModales() {
 
 
 /* =========================================================
-   FORMULAIRE D'INSCRIPTION
+   FORMULAIRE INSCRIPTION
 ========================================================= */
 
 function initialiserFormulaireInscription() {
@@ -1520,18 +1386,9 @@ function initialiserFormulaireInscription() {
     );
 
 
-  if (!form) return;
-
-
-  const submitButton =
-    document.getElementById(
-      "submitButton"
-    );
-
-  const formMessage =
-    document.getElementById(
-      "formMessage"
-    );
+  if (!form) {
+    return;
+  }
 
 
   form.addEventListener(
@@ -1541,16 +1398,240 @@ function initialiserFormulaireInscription() {
       event.preventDefault();
 
 
-      if (formMessage) {
+      const nomField =
+        document.getElementById("nom");
 
-        formMessage.textContent =
+
+      const emailField =
+        document.getElementById("email");
+
+
+      const regionField =
+        document.getElementById("region");
+
+
+      const imageField =
+        document.getElementById("image_url");
+
+
+      const descriptionField =
+        document.getElementById(
+          "descriptionField"
+        );
+
+
+      const submitButton =
+        document.getElementById(
+          "submitJoin"
+        );
+
+
+      const message =
+        document.getElementById(
+          "formMessage"
+        );
+
+
+      const typeInscription =
+        document.querySelector(
+          'input[name="type_inscription"]:checked'
+        );
+
+
+      if (
+        !nomField ||
+        !emailField ||
+        !regionField ||
+        !descriptionField
+      ) {
+
+        return;
+
+      }
+
+
+      const nom =
+        nomField.value.trim();
+
+
+      const email =
+        emailField.value.trim()
+          .toLowerCase();
+
+
+      const region =
+        regionField.value.trim();
+
+
+      const image_url =
+        imageField
+          ? imageField.value.trim()
+          : "";
+
+
+      const description =
+        descriptionField.value.trim();
+
+
+      const anonyme =
+        typeInscription
+          ? typeInscription.value === "anonyme"
+          : false;
+
+
+      const competences =
+        Array.from(
+          document.querySelectorAll(
+            'input[name="competences"]:checked'
+          )
+        )
+        .map(input => input.value)
+        .filter(Boolean);
+
+
+      /*
+       * Réinitialisation message.
+       */
+
+      if (message) {
+
+        message.textContent =
           "";
 
-        formMessage.className =
+        message.className =
           "form-message";
 
       }
 
+
+      /*
+       * Validation.
+       */
+
+      if (!nom) {
+
+        afficherErreurFormulaire(
+          message,
+          "Merci d’indiquer votre nom."
+        );
+
+        nomField.focus();
+
+        return;
+
+      }
+
+
+      if (!email) {
+
+        afficherErreurFormulaire(
+          message,
+          "Merci d’indiquer votre adresse email."
+        );
+
+        emailField.focus();
+
+        return;
+
+      }
+
+
+      const emailValide =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+          .test(email);
+
+
+      if (!emailValide) {
+
+        afficherErreurFormulaire(
+          message,
+          "L’adresse email semble invalide."
+        );
+
+        emailField.focus();
+
+        return;
+
+      }
+
+
+      if (!region) {
+
+        afficherErreurFormulaire(
+          message,
+          "Merci d’indiquer votre région."
+        );
+
+        regionField.focus();
+
+        return;
+
+      }
+
+
+      if (!description) {
+
+        afficherErreurFormulaire(
+          message,
+          "Merci de renseigner une présentation."
+        );
+
+        descriptionField.focus();
+
+        return;
+
+      }
+
+
+      if (description.length > 300) {
+
+        afficherErreurFormulaire(
+          message,
+          "La présentation ne doit pas dépasser 300 caractères."
+        );
+
+        descriptionField.focus();
+
+        return;
+
+      }
+
+
+      if (
+        image_url &&
+        !imageValide(image_url)
+      ) {
+
+        afficherErreurFormulaire(
+          message,
+          "L’URL de la photo semble invalide."
+        );
+
+        imageField.focus();
+
+        return;
+
+      }
+
+
+      if (
+        typeof supabaseClient === "undefined" ||
+        !supabaseClient
+      ) {
+
+        afficherErreurFormulaire(
+          message,
+          "La connexion à la base de données est indisponible."
+        );
+
+        return;
+
+      }
+
+
+      /*
+       * Désactivation bouton.
+       */
 
       if (submitButton) {
 
@@ -1558,343 +1639,137 @@ function initialiserFormulaireInscription() {
           true;
 
         submitButton.textContent =
-          "VÉRIFICATION EN COURS…";
+          "INSCRIPTION EN COURS…";
 
       }
 
 
       try {
 
-        const nom =
-          document
-            .getElementById("nom")
-            ?.value
-            .trim() || "";
-
-
-        const email =
-          document
-            .getElementById("email")
-            ?.value
-            .trim()
-            .toLowerCase() || "";
-
-
-        const region =
-          document
-            .getElementById("region")
-            ?.value
-            .trim() || "";
-
-
-        const image_url =
-          document
-            .getElementById("image_url")
-            ?.value
-            .trim() || "";
-
-
-        const description =
-          document
-            .getElementById(
-              "descriptionField"
-            )
-            ?.value
-            .trim() || "";
-
-
-        const typeInscription =
-          document.querySelector(
-            'input[name="type_inscription"]:checked'
-          )?.value ||
-          "sympathisant";
-
-
-        const competences =
-          Array.from(
-            document.querySelectorAll(
-              'input[name="competences"]:checked'
-            )
-          ).map(
-            checkbox =>
-              checkbox.value
-          );
-
-
-        const anonyme =
-          typeInscription === "anonyme";
-
-
         /*
-           Validation.
-        */
+         * Vérification email déjà présent.
+         */
 
-        if (
-          !nom ||
-          !email ||
-          !region
-        ) {
+        const {
+          data: doublon,
+          error: erreurDoublon
+        } = await supabaseClient
 
-          throw new Error(
-            "Veuillez remplir tous les champs obligatoires."
-          );
+          .from("profiles")
 
-        }
+          .select("id")
 
-
-        if (
-          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+          .ilike(
+            "email",
             email
           )
-        ) {
 
-          throw new Error(
-            "Veuillez saisir une adresse e-mail valide."
-          );
-
-        }
+          .limit(1);
 
 
-        if (
-          description.length > 300
-        ) {
+        if (erreurDoublon) {
 
-          throw new Error(
-            "La présentation ne peut pas dépasser 300 caractères."
-          );
+          throw erreurDoublon;
 
         }
 
 
         if (
-          image_url &&
-          !urlValide(image_url)
+          Array.isArray(doublon) &&
+          doublon.length > 0
         ) {
 
-          throw new Error(
-            "L'URL de la photo n'est pas valide."
+          afficherErreurFormulaire(
+            message,
+            "Cette adresse email est déjà enregistrée."
           );
 
-        }
-
-
-        if (
-          !window.supabaseClient
-        ) {
-
-          throw new Error(
-            "Connexion à la base de données impossible."
-          );
+          return;
 
         }
 
 
         /*
-           Vérification e-mail existant.
-        */
+         * UUID.
+         */
+
+        const id =
+          crypto.randomUUID();
+
+
+        /*
+         * Insertion.
+         */
 
         const {
-          data: emailExistant,
-          error: emailError
-        } =
-          await window.supabaseClient
+          error: erreurInsertion
+        } = await supabaseClient
 
-            .from("profiles")
+          .from("profiles")
 
-            .select("id")
+          .insert({
 
-            .ilike(
-              "email",
-              email
-            )
+            id,
 
-            .limit(1);
+            nom,
 
+            grade: "user",
 
-        if (emailError) {
+            email,
 
-          console.error(
-            "Erreur vérification e-mail :",
-            emailError
-          );
+            image_url:
+              image_url || null,
 
+            description:
+              description || null,
 
-          throw new Error(
-            "Impossible de vérifier l'adresse e-mail."
-          );
+            region,
 
-        }
+            competences,
 
-
-        if (
-          emailExistant &&
-          emailExistant.length > 0
-        ) {
-
-          throw new Error(
-            "Cette adresse e-mail est déjà utilisée."
-          );
-
-        }
-
-
-        /*
-           Génération UUID.
-        */
-
-        let id;
-
-
-        if (
-          window.crypto &&
-          typeof window.crypto.randomUUID ===
-            "function"
-        ) {
-
-          id =
-            window.crypto.randomUUID();
-
-        } else {
-
-          id =
-            "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
-              .replace(
-                /[xy]/g,
-                character => {
-
-                  const random =
-                    Math.random() *
-                      16 |
-                    0;
-
-
-                  const value =
-                    character === "x"
-                      ? random
-                      : (
-                          random &
-                          0x3
-                        ) |
-                        0x8;
-
-
-                  return value.toString(16);
-
-                }
-              );
-
-        }
-
-
-        /*
-           Profil.
-        */
-
-        const profil = {
-
-          id,
-
-          nom,
-
-          grade: "user",
-
-          email,
-
-          image_url:
-            image_url || null,
-
-          description:
-            description || null,
-
-          region,
-
-          competences,
-
-          anonyme
-
-        };
-
-
-        if (submitButton) {
-
-          submitButton.textContent =
-            "INSCRIPTION EN COURS…";
-
-        }
-
-
-        const {
-          error
-        } =
-          await window.supabaseClient
-
-            .from("profiles")
-
-            .insert([profil]);
-
-
-        if (error) {
-
-          console.error(
-            "Erreur insertion profil :",
-            error
-          );
-
-
-          if (
-            error.code === "23505"
-          ) {
-
-            throw new Error(
-              "Cette adresse e-mail est déjà utilisée."
-            );
-
-          }
-
-
-          throw new Error(
-            "Impossible d'enregistrer votre inscription."
-          );
-
-        }
-
-
-        /*
-           Succès.
-        */
-
-        if (formMessage) {
-
-          formMessage.textContent =
             anonyme
 
-              ? "Votre inscription a bien été enregistrée. Votre profil reste masqué de la liste publique."
-
-              : "Votre inscription a bien été enregistrée. Bienvenue chez Avant-gardE !";
+          });
 
 
-          formMessage.className =
+        if (erreurInsertion) {
+
+          throw erreurInsertion;
+
+        }
+
+
+        /*
+         * Succès.
+         */
+
+        if (message) {
+
+          message.textContent =
+            "Votre inscription a bien été enregistrée. Merci de rejoindre l’Avant-gardE.";
+
+          message.className =
             "form-message success";
 
         }
 
 
-        /*
-           Reset.
-        */
-
         form.reset();
 
 
-        const sympathisantRadio =
+        /*
+         * Le choix par défaut redevient sympathisant.
+         */
+
+        const radioSympathisant =
           document.querySelector(
             'input[name="type_inscription"][value="sympathisant"]'
           );
 
 
-        if (sympathisantRadio) {
+        if (radioSympathisant) {
 
-          sympathisantRadio.checked =
+          radioSympathisant.checked =
             true;
 
         }
@@ -1904,29 +1779,17 @@ function initialiserFormulaireInscription() {
 
 
         /*
-           Fermeture + rechargement.
-        */
+         * Recharge l'équipe après un court délai.
+         */
 
-        window.setTimeout(
-          async () => {
+        setTimeout(
+          () => {
 
-            const joinModal =
-              document.getElementById(
-                "joinModal"
-              );
-
-
-            fermerModalEquipe(
-              joinModal
-            );
-
-
-            await chargerMembres();
+            chargerMembres();
 
           },
           1800
         );
-
 
       } catch (error) {
 
@@ -1936,24 +1799,12 @@ function initialiserFormulaireInscription() {
         );
 
 
-        if (formMessage) {
-
-          formMessage.textContent =
-            error.message ||
-            "Une erreur est survenue.";
-
-
-          formMessage.className =
-            "form-message error";
-
-        }
+        afficherErreurFormulaire(
+          message,
+          "Une erreur est survenue lors de l’inscription. Veuillez réessayer."
+        );
 
       } finally {
-
-        /*
-           Si l'inscription a réussi, le bouton
-           est réactivé avant la fermeture.
-        */
 
         if (submitButton) {
 
@@ -1961,7 +1812,7 @@ function initialiserFormulaireInscription() {
             false;
 
           submitButton.textContent =
-            "REJOINDRE AVANT-GARDE";
+            "REJOINDRE L’AVANT-GARDE";
 
         }
 
@@ -1974,21 +1825,46 @@ function initialiserFormulaireInscription() {
 
 
 /* =========================================================
-   INITIALISATION COMPTEUR
+   MESSAGE ERREUR
+========================================================= */
+
+function afficherErreurFormulaire(
+  element,
+  texte
+) {
+
+  if (!element) {
+    return;
+  }
+
+
+  element.textContent =
+    texte;
+
+  element.className =
+    "form-message error";
+
+}
+
+
+/* =========================================================
+   COMPTEUR
 ========================================================= */
 
 function initialiserCompteurDescription() {
 
-  const descriptionField =
+  const textarea =
     document.getElementById(
       "descriptionField"
     );
 
 
-  if (!descriptionField) return;
+  if (!textarea) {
+    return;
+  }
 
 
-  descriptionField.addEventListener(
+  textarea.addEventListener(
     "input",
     mettreAJourCompteurDescription
   );
@@ -2000,10 +1876,12 @@ function initialiserCompteurDescription() {
 
 
 /* =========================================================
-   INITIALISATION PAGE ÉQUIPE
+   INITIALISATION
 ========================================================= */
 
-function initialiserEquipe() {
+async function initialiserEquipe() {
+
+  await chargerMembres();
 
   initialiserOuvertureInscription();
 
@@ -2013,8 +1891,6 @@ function initialiserEquipe() {
 
   initialiserCompteurDescription();
 
-  chargerMembres();
-
 }
 
 
@@ -2022,11 +1898,17 @@ function initialiserEquipe() {
    DOM READY
 ========================================================= */
 
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
+if (
+  document.readyState === "loading"
+) {
 
-    initialiserEquipe();
+  document.addEventListener(
+    "DOMContentLoaded",
+    initialiserEquipe
+  );
 
-  }
-);
+} else {
+
+  initialiserEquipe();
+
+}
