@@ -84,7 +84,6 @@ function injecterHeader() {
                 EVENEMENT
             </div>
 
-
             <div class="events-window">
 
                 <div
@@ -417,7 +416,9 @@ function formaterHeure(date) {
 async function chargerRendezVous() {
 
     const track =
-        document.getElementById("eventsTrack");
+        document.getElementById(
+            "eventsTrack"
+        );
 
     if (!track) return;
 
@@ -645,14 +646,15 @@ function demarrerDefilement() {
 
 
     /*
-     * Vitesse du défilement en pixels/seconde.
+     * Vitesse du défilement :
+     * 180 pixels par seconde.
      */
 
     const vitesse = 180;
 
 
     /*
-     * Le ticker commence à droite de la zone visible.
+     * Le ticker commence à droite.
      */
 
     let position =
@@ -1111,8 +1113,7 @@ function initialiserEcouteursRendezVous() {
 async function initialiserComposants() {
 
     /*
-     * Les composants sont injectés avant de charger
-     * les données afin que le DOM soit prêt.
+     * Injection des composants communs.
      */
 
     injecterHeader();
