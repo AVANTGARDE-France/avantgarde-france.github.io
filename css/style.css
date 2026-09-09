@@ -1,1 +1,1523 @@
-/* AVANT-GARDE — CSS */
+/* =========================================================
+   AVANT-GARDE — STYLE GLOBAL
+   css/style.css
+
+   Ce fichier contient :
+   - éléments communs à toutes les pages
+   - barre des événements
+   - header / navigation
+   - footer
+   - modale événement
+   - styles de la page Accueil
+   - styles de la page Équipe
+========================================================= */
+
+
+/* =========================================================
+   VARIABLES
+========================================================= */
+
+:root {
+  --navy: #07152d;
+  --navy2: #0d2344;
+  --gold: #d6ad55;
+  --gold-light: #f0d58a;
+  --white: #f5f3ed;
+  --muted: #b8c0cd;
+  --blue-france: #0055A4;
+  --red: #EF4135;
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--navy);
+  color: var(--white);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+button,
+textarea,
+input,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+
+/* =========================================================
+   BARRE ÉVÉNEMENTS
+========================================================= */
+
+.events-bar {
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  background: #020b19;
+  border-bottom: 1px solid rgba(214, 173, 85, 0.25);
+  overflow: hidden;
+}
+
+.events-label {
+  flex: 0 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  background: var(--gold);
+  color: var(--navy);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.events-window {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.events-track {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+.event {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 28px;
+  height: 38px;
+  color: var(--white);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.event:hover {
+  color: var(--gold-light);
+}
+
+.event strong {
+  color: var(--gold-light);
+  font-weight: 700;
+}
+
+.event-separator {
+  color: rgba(214, 173, 85, 0.45);
+  font-size: 14px;
+}
+
+.events-empty {
+  padding: 0 25px;
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.site-header {
+  position: relative;
+  z-index: 100;
+  width: 100%;
+  background: rgba(7, 21, 45, 0.98);
+  border-bottom: 1px solid rgba(214, 173, 85, 0.22);
+}
+
+.header-inner {
+  width: min(1180px, calc(100% - 40px));
+  min-height: 82px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: baseline;
+  text-decoration: none;
+  color: var(--white);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  white-space: nowrap;
+}
+
+.logo-a,
+.logo-e {
+  color: var(--gold);
+}
+
+.logo-e {
+  font-style: italic;
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.main-nav a {
+  position: relative;
+  color: var(--white);
+  text-decoration: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  transition: color 0.2s ease;
+}
+
+.main-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  width: 0;
+  height: 1px;
+  background: var(--gold);
+  transition: width 0.2s ease;
+}
+
+.main-nav a:hover {
+  color: var(--gold-light);
+}
+
+.main-nav a:hover::after {
+  width: 100%;
+}
+
+.admin-link {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(214, 173, 85, 0.45);
+  border-radius: 50%;
+  color: var(--gold);
+  text-decoration: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 15px;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.admin-link:hover {
+  background: var(--gold);
+  color: var(--navy);
+  border-color: var(--gold);
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.site-footer {
+  padding: 35px 20px;
+  border-top: 1px solid rgba(214, 173, 85, 0.18);
+  background: #040f21;
+  color: var(--muted);
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.8px;
+}
+
+
+/* =========================================================
+   MODALE ÉVÉNEMENT
+========================================================= */
+
+.rdv-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(5px);
+}
+
+.rdv-modal.active {
+  display: flex;
+}
+
+.rdv-modal-box {
+  position: relative;
+  width: min(620px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 45px;
+  background: var(--navy2);
+  border: 1px solid rgba(214, 173, 85, 0.45);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.55);
+  animation: modalAppear 0.22s ease-out;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rdv-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.rdv-modal-close:hover {
+  color: var(--gold);
+}
+
+.rdv-modal-kicker {
+  margin-bottom: 12px;
+  color: var(--gold);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.rdv-modal-title {
+  margin: 0 0 25px;
+  color: var(--white);
+  font-size: 31px;
+  line-height: 1.15;
+}
+
+.rdv-modal-info {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 25px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+
+.rdv-modal-info span {
+  color: var(--muted);
+}
+
+.rdv-modal-description {
+  margin-bottom: 25px;
+  color: #d8dde5;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+
+.rdv-modal-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  background: var(--gold);
+  color: var(--navy);
+  text-decoration: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   PAGE ACCUEIL — HERO
+========================================================= */
+
+.hero {
+  position: relative;
+  min-height: 590px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 80px 20px;
+  background:
+    radial-gradient(circle at 80% 20%, rgba(214, 173, 85, 0.08), transparent 30%),
+    linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  right: -220px;
+  top: -220px;
+  border: 1px solid rgba(214, 173, 85, 0.13);
+  border-radius: 50%;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  width: 720px;
+  height: 720px;
+  right: -320px;
+  top: -320px;
+  border: 1px solid rgba(214, 173, 85, 0.08);
+  border-radius: 50%;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  width: min(1100px, 100%);
+  margin: 0 auto;
+}
+
+.eyebrow {
+  margin-bottom: 20px;
+  color: var(--gold);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.hero h1 {
+  margin: 0;
+  color: var(--white);
+  font-size: clamp(54px, 9vw, 112px);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -4px;
+}
+
+.hero h1 span {
+  color: var(--gold);
+}
+
+.hero-line {
+  width: 90px;
+  height: 2px;
+  margin: 30px 0;
+  background: var(--gold);
+}
+
+.hero h2 {
+  max-width: 760px;
+  margin: 0 0 20px;
+  color: var(--white);
+  font-size: clamp(23px, 3vw, 36px);
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.hero p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+
+/* =========================================================
+   PAGE ACCUEIL — IA
+========================================================= */
+
+.ai-section {
+  padding: 90px 20px;
+  background: #081a34;
+  border-top: 1px solid rgba(214, 173, 85, 0.12);
+  border-bottom: 1px solid rgba(214, 173, 85, 0.12);
+}
+
+.ai-inner {
+  width: min(900px, 100%);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.ai-section .section-kicker {
+  margin-bottom: 15px;
+}
+
+.ai-section h2 {
+  margin: 0 0 15px;
+  color: var(--white);
+  font-size: clamp(30px, 5vw, 48px);
+}
+
+.ai-intro {
+  max-width: 700px;
+  margin: 0 auto 30px;
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.ai-question {
+  width: 100%;
+  min-height: 145px;
+  padding: 18px;
+  resize: vertical;
+  border: 1px solid rgba(214, 173, 85, 0.3);
+  outline: none;
+  background: #041124;
+  color: var(--white);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ai-question:focus {
+  border-color: var(--gold);
+}
+
+.ai-question::placeholder {
+  color: #738096;
+}
+
+.ai-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.ai-button {
+  padding: 12px 18px;
+  border: 1px solid rgba(214, 173, 85, 0.5);
+  background: transparent;
+  color: var(--gold-light);
+  cursor: pointer;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.ai-button:hover {
+  background: var(--gold);
+  color: var(--navy);
+  border-color: var(--gold);
+}
+
+.ai-status {
+  min-height: 20px;
+  margin-top: 15px;
+  color: var(--gold-light);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+}
+
+.ai-help {
+  max-width: 700px;
+  margin: 18px auto 0;
+  color: #748096;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   PAGE ACCUEIL — INTRO
+========================================================= */
+
+.intro {
+  width: min(900px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 110px 0;
+  text-align: center;
+}
+
+.section-kicker {
+  margin-bottom: 14px;
+  color: var(--gold);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+}
+
+.intro h2 {
+  margin: 0 0 25px;
+  color: var(--white);
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 1;
+}
+
+.intro p {
+  margin: 0 auto;
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+
+/* =========================================================
+   PAGE ACCUEIL — PRINCIPES
+========================================================= */
+
+.principles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid rgba(214, 173, 85, 0.16);
+  border-bottom: 1px solid rgba(214, 173, 85, 0.16);
+}
+
+.principle {
+  min-height: 270px;
+  padding: 55px 35px;
+  text-align: center;
+  border-right: 1px solid rgba(214, 173, 85, 0.16);
+}
+
+.principle:last-child {
+  border-right: 0;
+}
+
+.symbol {
+  margin-bottom: 20px;
+  color: var(--gold);
+  font-size: 38px;
+}
+
+.principle h3 {
+  margin: 0 0 15px;
+  color: var(--white);
+  font-size: 25px;
+}
+
+.principle p {
+  margin: 0;
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   PAGE ACCUEIL — MANIFESTE
+========================================================= */
+
+.manifesto {
+  padding: 110px 20px;
+  background: #091c38;
+  text-align: center;
+}
+
+.manifesto h2 {
+  margin: 0 0 25px;
+  color: var(--white);
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 1;
+}
+
+.manifesto p {
+  max-width: 720px;
+  margin: 0 auto 30px;
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 24px;
+  border: 1px solid var(--gold);
+  background: var(--gold);
+  color: var(--navy);
+  text-decoration: none;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.button:hover {
+  background: transparent;
+  color: var(--gold);
+}
+
+
+/* =========================================================
+   PAGE ACCUEIL — ACTUALITÉS
+========================================================= */
+
+.news {
+  padding: 100px 20px;
+}
+
+.news-title {
+  width: min(1100px, 100%);
+  margin: 0 auto 35px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.news-title h2 {
+  margin: 0;
+  color: var(--white);
+  font-size: clamp(34px, 5vw, 52px);
+}
+
+.news-title span {
+  color: var(--gold);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.news-grid {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.news-card {
+  min-height: 220px;
+  padding: 30px;
+  border: 1px solid rgba(214, 173, 85, 0.17);
+  background: #091b35;
+}
+
+.news-card span {
+  color: var(--gold);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.news-card h3 {
+  margin: 22px 0 12px;
+  color: var(--white);
+  font-size: 23px;
+}
+
+.news-card p {
+  margin: 0;
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   PAGE ACCUEIL — REJOINDRE
+========================================================= */
+
+.join {
+  padding: 110px 20px;
+  background:
+    linear-gradient(rgba(7, 21, 45, 0.92), rgba(7, 21, 45, 0.96)),
+    #07152d;
+  text-align: center;
+  border-top: 1px solid rgba(214, 173, 85, 0.15);
+}
+
+.join h2 {
+  margin: 0 0 18px;
+  color: var(--white);
+  font-size: clamp(40px, 6vw, 70px);
+  line-height: 1;
+}
+
+.join p {
+  max-width: 600px;
+  margin: 0 auto 30px;
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+
+/* =========================================================
+   PAGE ÉQUIPE — HERO
+========================================================= */
+
+.team-hero {
+  padding: 95px 20px 75px;
+  background:
+    radial-gradient(circle at 75% 20%, rgba(214, 173, 85, 0.08), transparent 28%),
+    linear-gradient(135deg, var(--navy), var(--navy2));
+  text-align: center;
+}
+
+.team-hero h1 {
+  margin: 0;
+  color: var(--white);
+  font-size: clamp(48px, 8vw, 90px);
+  line-height: 0.95;
+  letter-spacing: -3px;
+}
+
+.team-hero h1 span {
+  color: var(--gold);
+}
+
+.team-hero p {
+  max-width: 680px;
+  margin: 25px auto 30px;
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+
+/* =========================================================
+   PAGE ÉQUIPE — SECTION
+========================================================= */
+
+.team-section {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 90px 0 110px;
+}
+
+.section-title {
+  margin-bottom: 35px;
+}
+
+.section-title .section-kicker {
+  margin-bottom: 10px;
+}
+
+.section-title h2 {
+  margin: 0;
+  color: var(--white);
+  font-size: clamp(34px, 5vw, 52px);
+}
+
+
+/* =========================================================
+   PAGE ÉQUIPE — MEMBRES
+========================================================= */
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.member-card {
+  overflow: hidden;
+  border: 1px solid rgba(214, 173, 85, 0.18);
+  background: #091b35;
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.member-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(214, 173, 85, 0.55);
+}
+
+.member-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: block;
+  object-fit: cover;
+  background: #061326;
+}
+
+.member-photo-placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #061326;
+  color: var(--gold);
+  font-size: 50px;
+}
+
+.member-info {
+  padding: 23px;
+}
+
+.member-name {
+  margin: 0 0 7px;
+  color: var(--white);
+  font-size: 23px;
+}
+
+.member-grade {
+  margin-bottom: 8px;
+  color: var(--gold);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+}
+
+.member-region {
+  margin-bottom: 13px;
+  color: #8f9bae;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+}
+
+.member-description {
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+
+/* =========================================================
+   PAGE ÉQUIPE — MODALE PROFIL
+========================================================= */
+
+.profile-modal,
+.join-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(5px);
+}
+
+.profile-modal.active,
+.join-modal.active {
+  display: flex;
+}
+
+.profile-modal-box,
+.join-modal-box {
+  position: relative;
+  width: min(900px, 100%);
+  max-height: 92vh;
+  overflow-y: auto;
+  background: var(--navy2);
+  border: 1px solid rgba(214, 173, 85, 0.4);
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.6);
+  animation: modalAppear 0.22s ease-out;
+}
+
+.profile-modal-close,
+.join-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.profile-modal-close:hover,
+.join-modal-close:hover {
+  color: var(--gold);
+}
+
+.profile-content {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+}
+
+.profile-left {
+  padding: 35px;
+  background: #06152c;
+  border-right: 1px solid rgba(214, 173, 85, 0.15);
+}
+
+.profile-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: block;
+  object-fit: cover;
+  margin-bottom: 23px;
+}
+
+.profile-photo-placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 23px;
+  background: #0b1e3b;
+  color: var(--gold);
+  font-size: 60px;
+}
+
+.profile-name {
+  margin: 0 0 8px;
+  color: var(--white);
+  font-size: 29px;
+}
+
+.profile-grade {
+  margin-bottom: 8px;
+  color: var(--gold);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+}
+
+.profile-region {
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+}
+
+.profile-right {
+  padding: 38px;
+}
+
+.profile-description {
+  margin-bottom: 30px;
+  color: #d4dae4;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+.profile-subtitle {
+  margin: 0 0 15px;
+  color: var(--gold);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   PAGE ÉQUIPE — RÉSEAUX SOCIAUX
+========================================================= */
+
+.profile-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.profile-social-link {
+  position: relative;
+  min-width: 95px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid rgba(214, 173, 85, 0.18);
+  background: #06152c;
+  text-decoration: none;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.profile-social-link:hover {
+  transform: translateY(-2px);
+  border-color: var(--gold);
+}
+
+.profile-social-item {
+  position: relative;
+}
+
+.profile-social-item.is-max .profile-social-link {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(214, 173, 85, 0.15);
+}
+
+.profile-social-link img {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+}
+
+.profile-social-link strong {
+  color: var(--white);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+}
+
+.profile-social-audience {
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+}
+
+.profile-social-max-star {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 21px;
+  height: 21px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--navy);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.profile-audience-max {
+  margin-top: 8px;
+  color: var(--gold-light);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+
+.profile-audience-max strong {
+  color: var(--white);
+}
+
+.profile-audience-max small {
+  color: #7f8a9c;
+  font-size: 8px;
+  font-style: italic;
+}
+
+
+/* =========================================================
+   PAGE ÉQUIPE — COMPÉTENCES
+========================================================= */
+
+.profile-competences {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.competence {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid rgba(214, 173, 85, 0.22);
+  background: rgba(214, 173, 85, 0.05);
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  line-height: 1.3;
+}
+
+.competence.vip {
+  border-color: var(--gold);
+  background: rgba(214, 173, 85, 0.1);
+  color: var(--gold-light);
+}
+
+
+/* =========================================================
+   PAGE ÉQUIPE — FORMULAIRE
+========================================================= */
+
+.join-modal-box {
+  width: min(700px, 100%);
+  padding: 45px;
+}
+
+.join-modal-kicker {
+  margin-bottom: 10px;
+  color: var(--gold);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.join-modal-box h2 {
+  margin: 0 0 12px;
+  color: var(--white);
+  font-size: 38px;
+}
+
+.join-modal-intro {
+  margin: 0 0 30px;
+  color: var(--muted);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.join-form {
+  display: grid;
+  gap: 15px;
+}
+
+.form-group {
+  display: grid;
+  gap: 7px;
+}
+
+.form-group label {
+  color: var(--gold-light);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 12px 13px;
+  border: 1px solid rgba(214, 173, 85, 0.25);
+  outline: none;
+  background: #06152c;
+  color: var(--white);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  border-color: var(--gold);
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.form-help {
+  color: #788397;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.form-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.form-radio {
+  flex: 1;
+  min-width: 180px;
+  padding: 12px;
+  border: 1px solid rgba(214, 173, 85, 0.2);
+  background: #06152c;
+  cursor: pointer;
+}
+
+.form-radio label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.form-radio input {
+  width: auto;
+}
+
+.form-submit {
+  margin-top: 8px;
+  padding: 14px 20px;
+  border: 1px solid var(--gold);
+  background: var(--gold);
+  color: var(--navy);
+  cursor: pointer;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.form-submit:hover {
+  background: transparent;
+  color: var(--gold);
+}
+
+.form-status {
+  min-height: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.form-status.success {
+  color: #8ed69a;
+}
+
+.form-status.error {
+  color: #ef8c8c;
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLETTE
+========================================================= */
+
+@media (max-width: 800px) {
+
+  .header-inner {
+    min-height: auto;
+    padding: 18px 0;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .main-nav {
+    justify-content: center;
+    gap: 15px 18px;
+  }
+
+  .logo {
+    font-size: 27px;
+  }
+
+  .hero {
+    min-height: 440px;
+    padding: 65px 20px;
+  }
+
+  .hero h1 {
+    letter-spacing: -2px;
+  }
+
+  .principles {
+    grid-template-columns: 1fr;
+  }
+
+  .principle {
+    min-height: auto;
+    border-right: 0;
+    border-bottom: 1px solid rgba(214, 173, 85, 0.16);
+  }
+
+  .principle:last-child {
+    border-bottom: 0;
+  }
+
+  .news-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .news-title {
+    display: block;
+  }
+
+  .news-title h2 {
+    margin-bottom: 12px;
+  }
+
+  .profile-content {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-left {
+    border-right: 0;
+    border-bottom: 1px solid rgba(214, 173, 85, 0.15);
+  }
+
+  .profile-photo,
+  .profile-photo-placeholder {
+    width: min(300px, 100%);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .rdv-modal-box {
+    padding: 35px 25px;
+  }
+
+  .join-modal-box {
+    padding: 35px 25px;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+  .events-label {
+    padding: 0 10px;
+    font-size: 8px;
+  }
+
+  .event {
+    padding: 0 18px;
+    font-size: 10px;
+  }
+
+  .logo {
+    font-size: 24px;
+  }
+
+  .main-nav {
+    gap: 12px;
+  }
+
+  .main-nav a {
+    font-size: 8px;
+    letter-spacing: 0.8px;
+  }
+
+  .hero {
+    min-height: 400px;
+    padding: 55px 18px;
+  }
+
+  .hero h1 {
+    font-size: 52px;
+  }
+
+  .hero h2 {
+    font-size: 22px;
+  }
+
+  .intro,
+  .news,
+  .team-section {
+    width: min(100% - 30px, 1180px);
+  }
+
+  .ai-section {
+    padding: 70px 15px;
+  }
+
+  .ai-buttons {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .ai-button {
+    width: 100%;
+  }
+
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-right {
+    padding: 25px 20px;
+  }
+
+  .profile-left {
+    padding: 25px 20px;
+  }
+
+  .profile-socials {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .profile-social-link {
+    width: 100%;
+  }
+
+  .join-modal-box {
+    padding: 35px 20px;
+  }
+
+  .form-radio-group {
+    flex-direction: column;
+  }
+
+}
