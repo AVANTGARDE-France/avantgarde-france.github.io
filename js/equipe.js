@@ -62,6 +62,22 @@ const reseauxSociaux = [
 
 
 /* =========================================================
+   ÉCHAPPEMENT HTML
+========================================================= */
+
+function escapeHtml(value) {
+
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
+/* =========================================================
    OUTILS — MODALES
 ========================================================= */
 
@@ -76,8 +92,7 @@ function ouvrirModalEquipe(modal) {
     "false"
   );
 
-  document.body.style.overflow =
-    "hidden";
+  document.body.style.overflow = "hidden";
 
 }
 
@@ -93,24 +108,38 @@ function fermerModalEquipe(modal) {
     "true"
   );
 
-  document.body.style.overflow =
-    "";
+  /*
+     Ne réactive le scroll que si aucune
+     autre modale n'est ouverte.
+  */
+
+  const autreModaleOuverte =
+    document.querySelector(
+      ".modal.active, .rdv-modal.active"
+    );
+
+  if (!autreModaleOuverte) {
+
+    document.body.style.overflow = "";
+
+  }
 
 }
 
 
 /* =========================================================
-   VALIDATION IMAGE
+   VALIDATION IMAGE / URL
 ========================================================= */
 
-function imageValide(url) {
+function urlValide(url) {
 
-  if (!url) return false;
+  if (!url || typeof url !== "string") {
+    return false;
+  }
 
   try {
 
-    const parsed =
-      new URL(url);
+    const parsed = new URL(url);
 
     return (
       parsed.protocol === "http:" ||
@@ -122,6 +151,13 @@ function imageValide(url) {
     return false;
 
   }
+
+}
+
+
+function imageValide(url) {
+
+  return urlValide(url);
 
 }
 
@@ -138,9 +174,7 @@ function normaliserCompetences(value) {
   if (Array.isArray(value)) {
 
     return value
-      .map(item =>
-        String(item).trim()
-      )
+      .map(item => String(item).trim())
       .filter(Boolean);
 
   }
@@ -150,65 +184,34 @@ function normaliserCompetences(value) {
 
     try {
 
-      const parsed =
-        JSON.parse(value);
-
+      const parsed = JSON.parse(value);
 
       if (Array.isArray(parsed)) {
 
         return parsed
-          .map(item =>
-            String(item).trim()
-          )
+          .map(item => String(item).trim())
           .filter(Boolean);
 
       }
 
     } catch {
 
-      // La valeur peut être une chaîne simple.
+      /*
+         La valeur peut être une chaîne classique.
+      */
 
     }
 
 
     return value
       .split(",")
-      .map(item =>
-        item.trim()
-      )
+      .map(item => item.trim())
       .filter(Boolean);
 
   }
 
 
   return [];
-
-}
-
-
-/* =========================================================
-   VALIDATION URL
-========================================================= */
-
-function urlValide(url) {
-
-  if (!url) return false;
-
-  try {
-
-    const parsed =
-      new URL(url);
-
-    return (
-      parsed.protocol === "http:" ||
-      parsed.protocol === "https:"
-    );
-
-  } catch {
-
-    return false;
-
-  }
 
 }
 
@@ -230,8 +233,7 @@ function formaterAudience(valeur) {
   }
 
 
-  const nombre =
-    Number(valeur);
+  const nombre = Number(valeur);
 
 
   if (!Number.isFinite(nombre)) {
@@ -241,9 +243,7 @@ function formaterAudience(valeur) {
   }
 
 
-  return nombre.toLocaleString(
-    "fr-FR"
-  );
+  return nombre.toLocaleString("fr-FR");
 
 }
 
@@ -269,11 +269,6 @@ function afficherReseauxSociaux(membre) {
   if (!container) return;
 
 
-  /*
-     Réseaux réellement renseignés
-     et contenant une URL valide.
-  */
-
   const reseauxDisponibles =
     reseauxSociaux.filter(
       reseau =>
@@ -284,24 +279,21 @@ function afficherReseauxSociaux(membre) {
 
 
   /*
-     Aucun réseau.
+     Aucun réseau renseigné.
   */
 
   if (!reseauxDisponibles.length) {
 
     container.innerHTML = "";
 
-    container.style.display =
-      "none";
+    container.style.display = "none";
 
 
     if (audienceMaxContainer) {
 
-      audienceMaxContainer.innerHTML =
-        "";
+      audienceMaxContainer.innerHTML = "";
 
-      audienceMaxContainer.style.display =
-        "none";
+      audienceMaxContainer.style.display = "none";
 
     }
 
@@ -310,44 +302,36 @@ function afficherReseauxSociaux(membre) {
   }
 
 
-  container.style.display =
-    "flex";
-
-
   /*
-     Récupération des audiences.
+     Calcul des audiences.
   */
 
   const audiences =
-    reseauxDisponibles.map(
-      reseau => {
+    reseauxDisponibles.map(reseau => {
 
-        const valeur =
-          Number(
-            membre[
-              reseau.audienceChamp
-            ]
-          );
+      const valeur =
+        Number(
+          membre[reseau.audienceChamp]
+        );
 
 
-        return {
+      return {
 
-          reseau,
+        reseau,
 
-          valeur:
-            Number.isFinite(valeur)
-              ? valeur
-              : 0
+        valeur:
+          Number.isFinite(valeur)
+            ? valeur
+            : 0
 
-        };
+      };
 
-      }
-    );
+    });
 
 
   /*
-     Détermination du réseau
-     ayant la plus grosse audience.
+     Recherche du réseau ayant
+     la plus grande audience.
   */
 
   let reseauMax = null;
@@ -359,12 +343,16 @@ function afficherReseauxSociaux(membre) {
       audiences.reduce(
         (max, actuel) => {
 
-          return actuel.valeur >
-            max.valeur
+          if (!max) {
+            return actuel;
+          }
+
+          return actuel.valeur > max.valeur
             ? actuel
             : max;
 
-        }
+        },
+        null
       );
 
   }
@@ -372,19 +360,23 @@ function afficherReseauxSociaux(membre) {
 
   /*
      Si audience_reseau est renseigné
-     dans Supabase, on l'utilise
-     pour identifier le réseau maximum.
+     dans Supabase, il devient prioritaire.
   */
 
   if (membre.audience_reseau) {
+
+    const nomAudience =
+      String(
+        membre.audience_reseau
+      ).trim()
+      .toLowerCase();
+
 
     const reseauBase =
       reseauxDisponibles.find(
         reseau =>
           reseau.nom.toLowerCase() ===
-          String(
-            membre.audience_reseau
-          ).toLowerCase()
+          nomAudience
       );
 
 
@@ -411,99 +403,94 @@ function afficherReseauxSociaux(membre) {
 
 
   /*
-     Construction des boutons
-     de réseaux sociaux.
+     Construction des icônes.
   */
 
   container.innerHTML =
     reseauxDisponibles
-      .map(
-        reseau => {
+      .map(reseau => {
 
-          const audience =
-            audiences.find(
-              item =>
-                item.reseau ===
-                reseau
-            );
-
-
-          const estMax =
-            Boolean(
-              reseauMax &&
-              audience &&
-              audience.reseau ===
-                reseauMax.reseau
-            );
+        const audience =
+          audiences.find(
+            item =>
+              item.reseau ===
+              reseau
+          );
 
 
-          return `
+        const estMax =
+          Boolean(
+            reseauMax &&
+            audience &&
+            audience.reseau ===
+              reseauMax.reseau &&
+            audience.valeur > 0
+          );
 
-            <a
-              href="${membre[reseau.champ]}"
-              class="profile-social-link"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="${reseau.nom}"
-              aria-label="${reseau.nom}"
-            >
 
-              <div
-                class="
-                  profile-social-item
-                  ${estMax ? "is-max" : ""}
-                "
+        return `
+
+          <a
+            href="${escapeHtml(membre[reseau.champ])}"
+            class="profile-social-link ${estMax ? "is-max" : ""}"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="${escapeHtml(reseau.nom)}"
+            aria-label="${escapeHtml(reseau.nom)}"
+          >
+
+            <div class="profile-social-item">
+
+              ${
+                estMax
+                  ? `
+                    <span
+                      class="profile-social-max-star"
+                      aria-label="Audience maximale"
+                      title="Audience maximale"
+                    >
+                      ★
+                    </span>
+                  `
+                  : ""
+              }
+
+
+              <img
+                src="${escapeHtml(reseau.logo)}"
+                alt="${escapeHtml(reseau.nom)}"
+                loading="lazy"
               >
 
-                ${
-                  estMax
-                    ? `
-                      <span
-                        class="profile-social-max-star"
-                        aria-hidden="true"
-                      >
-                        ★
-                      </span>
-                    `
-                    : ""
-                }
 
+              ${
+                audience &&
+                audience.valeur > 0
+                  ? `
+                    <span class="profile-social-audience">
+                      ${formaterAudience(
+                        audience.valeur
+                      )}
+                    </span>
+                  `
+                  : ""
+              }
 
-                <img
-                  src="${reseau.logo}"
-                  alt=""
-                  loading="lazy"
-                >
+            </div>
 
+          </a>
 
-                ${
-                  audience &&
-                  audience.valeur > 0
-                    ? `
-                      <span
-                        class="profile-social-audience"
-                      >
-                        ${formaterAudience(
-                          audience.valeur
-                        )}
-                      </span>
-                    `
-                    : ""
-                }
+        `;
 
-              </div>
-
-            </a>
-
-          `;
-
-        }
-      )
+      })
       .join("");
 
 
+  container.style.display = "flex";
+
+
   /*
-     Affichage de l'audience maximale.
+     Audience maximale affichée sous les réseaux.
   */
 
   if (
@@ -515,9 +502,7 @@ function afficherReseauxSociaux(membre) {
     let dateTexte = "";
 
 
-    if (
-      membre.audience_updated_at
-    ) {
+    if (membre.audience_updated_at) {
 
       const date =
         new Date(
@@ -525,11 +510,7 @@ function afficherReseauxSociaux(membre) {
         );
 
 
-      if (
-        !Number.isNaN(
-          date.getTime()
-        )
-      ) {
+      if (!Number.isNaN(date.getTime())) {
 
         dateTexte =
           `mis à jour le ${
@@ -564,7 +545,7 @@ function afficherReseauxSociaux(membre) {
         dateTexte
           ? `
             <small>
-              · ${dateTexte}
+              <em>· ${escapeHtml(dateTexte)}</em>
             </small>
           `
           : ""
@@ -573,18 +554,15 @@ function afficherReseauxSociaux(membre) {
     `;
 
 
-    audienceMaxContainer.style.display =
-      "block";
+    audienceMaxContainer.style.display = "block";
 
   } else {
 
     if (audienceMaxContainer) {
 
-      audienceMaxContainer.innerHTML =
-        "";
+      audienceMaxContainer.innerHTML = "";
 
-      audienceMaxContainer.style.display =
-        "none";
+      audienceMaxContainer.style.display = "none";
 
     }
 
@@ -615,6 +593,28 @@ async function chargerMembres() {
     </div>
 
   `;
+
+
+  if (
+    !window.supabaseClient
+  ) {
+
+    console.error(
+      "supabaseClient introuvable."
+    );
+
+
+    teamGrid.innerHTML = `
+
+      <div class="no-members">
+        Connexion à la base de données impossible.
+      </div>
+
+    `;
+
+    return;
+
+  }
 
 
   try {
@@ -686,8 +686,7 @@ async function chargerMembres() {
     }
 
 
-    membres =
-      data || [];
+    membres = data || [];
 
 
     if (!membres.length) {
@@ -711,16 +710,14 @@ async function chargerMembres() {
           (membre, index) => {
 
             const description =
-              membre.description ||
-              "";
+              String(
+                membre.description || ""
+              );
 
 
             const descriptionCourte =
               description.length > 180
-                ? description.slice(
-                    0,
-                    177
-                  ) + "…"
+                ? description.slice(0, 177) + "…"
                 : description;
 
 
@@ -730,6 +727,11 @@ async function chargerMembres() {
               );
 
 
+            const nom =
+              membre.nom ||
+              "Membre";
+
+
             return `
 
               <article
@@ -737,10 +739,7 @@ async function chargerMembres() {
                 data-member-index="${index}"
                 tabindex="0"
                 role="button"
-                aria-label="Voir le profil de ${
-                  membre.nom ||
-                  "ce membre"
-                }"
+                aria-label="Voir le profil de ${escapeHtml(nom)}"
               >
 
                 <div class="member-photo">
@@ -749,11 +748,8 @@ async function chargerMembres() {
                     image
                       ? `
                         <img
-                          src="${membre.image_url}"
-                          alt="${
-                            membre.nom ||
-                            "Membre"
-                          }"
+                          src="${escapeHtml(membre.image_url)}"
+                          alt="${escapeHtml(nom)}"
                           loading="lazy"
                         >
                       `
@@ -771,12 +767,7 @@ async function chargerMembres() {
 
 
                 <div class="member-name">
-
-                  ${
-                    membre.nom ||
-                    "Membre"
-                  }
-
+                  ${escapeHtml(nom)}
                 </div>
 
 
@@ -784,7 +775,7 @@ async function chargerMembres() {
                   membre.grade
                     ? `
                       <div class="member-grade">
-                        ${membre.grade}
+                        ${escapeHtml(membre.grade)}
                       </div>
                     `
                     : ""
@@ -795,7 +786,7 @@ async function chargerMembres() {
                   membre.region
                     ? `
                       <div class="member-region">
-                        ${membre.region}
+                        ${escapeHtml(membre.region)}
                       </div>
                     `
                     : ""
@@ -806,7 +797,7 @@ async function chargerMembres() {
                   descriptionCourte
                     ? `
                       <div class="member-description">
-                        ${descriptionCourte}
+                        ${escapeHtml(descriptionCourte)}
                       </div>
                     `
                     : ""
@@ -830,7 +821,6 @@ async function chargerMembres() {
         ".member-card"
       )
       .forEach(card => {
-
 
         card.addEventListener(
           "click",
@@ -935,6 +925,11 @@ function ouvrirProfil(membre) {
   const image =
     document.getElementById(
       "profileModalImage"
+    );
+
+  const placeholder =
+    document.getElementById(
+      "profilePlaceholder"
     );
 
   const name =
@@ -1057,17 +1052,30 @@ function ouvrirProfil(membre) {
       image.style.display =
         "block";
 
+
+      if (placeholder) {
+
+        placeholder.style.display =
+          "none";
+
+      }
+
     } else {
 
-      image.removeAttribute(
-        "src"
-      );
+      image.removeAttribute("src");
 
-      image.alt =
-        "";
+      image.alt = "";
 
       image.style.display =
         "none";
+
+
+      if (placeholder) {
+
+        placeholder.style.display =
+          "flex";
+
+      }
 
     }
 
@@ -1096,9 +1104,8 @@ function ouvrirProfil(membre) {
 
 
     /*
-       VIP est calculé automatiquement
-       et ne doit pas être affiché comme
-       une compétence classique.
+       VIP ne doit pas être affiché
+       comme compétence classique.
     */
 
     competences =
@@ -1113,47 +1120,27 @@ function ouvrirProfil(membre) {
 
       competencesContainer.innerHTML = `
 
-        <div class="profile-competences">
-
-          <div class="competence-list">
-
-            <span class="competence-tag">
-              Aucune compétence renseignée.
-            </span>
-
-          </div>
-
-        </div>
+        <span class="competence-tag">
+          Aucune compétence renseignée.
+        </span>
 
       `;
 
     } else {
 
-      competencesContainer.innerHTML = `
+      competencesContainer.innerHTML =
 
-        <div class="profile-competences">
+        competences
+          .map(
+            competence => `
 
-          <div class="competence-list">
+              <span class="competence-tag">
+                ${escapeHtml(competence)}
+              </span>
 
-            ${
-              competences
-                .map(
-                  competence => `
-
-                    <span class="competence-tag">
-                      ${competence}
-                    </span>
-
-                  `
-                )
-                .join("")
-            }
-
-          </div>
-
-        </div>
-
-      `;
+            `
+          )
+          .join("");
 
     }
 
@@ -1172,11 +1159,50 @@ function ouvrirProfil(membre) {
       );
 
 
-    const estVIP =
+    /*
+       Si audience_max n'est pas renseigné,
+       on recalcule depuis les audiences.
+    */
+
+    let audienceCalculee =
       Number.isFinite(
         audienceMax
-      ) &&
-      audienceMax >= 3000;
+      )
+        ? audienceMax
+        : 0;
+
+
+    if (audienceCalculee <= 0) {
+
+      reseauxSociaux.forEach(
+        reseau => {
+
+          const valeur =
+            Number(
+              membre[
+                reseau.audienceChamp
+              ]
+            );
+
+
+          if (
+            Number.isFinite(valeur) &&
+            valeur > audienceCalculee
+          ) {
+
+            audienceCalculee =
+              valeur;
+
+          }
+
+        }
+      );
+
+    }
+
+
+    const estVIP =
+      audienceCalculee >= 3000;
 
 
     if (estVIP) {
@@ -1185,7 +1211,7 @@ function ouvrirProfil(membre) {
 
         <div class="vip-medal">
 
-          <span>
+          <span aria-hidden="true">
             ★
           </span>
 
@@ -1201,8 +1227,7 @@ function ouvrirProfil(membre) {
 
     } else {
 
-      vipContainer.innerHTML =
-        "";
+      vipContainer.innerHTML = "";
 
       vipContainer.style.display =
         "none";
@@ -1342,7 +1367,7 @@ function initialiserOuvertureInscription() {
 
 
 /* =========================================================
-   FERMETURE DES MODALES ÉQUIPE
+   FERMETURE DES MODALES
 ========================================================= */
 
 function initialiserFermetureModales() {
@@ -1368,10 +1393,6 @@ function initialiserFermetureModales() {
     );
 
 
-  /*
-     Bouton fermer profil.
-  */
-
   if (
     closeMember &&
     memberModal
@@ -1391,10 +1412,6 @@ function initialiserFermetureModales() {
   }
 
 
-  /*
-     Bouton fermer inscription.
-  */
-
   if (
     closeJoin &&
     joinModal
@@ -1413,10 +1430,6 @@ function initialiserFermetureModales() {
 
   }
 
-
-  /*
-     Clic sur le fond.
-  */
 
   [
     memberModal,
@@ -1446,10 +1459,6 @@ function initialiserFermetureModales() {
 
     });
 
-
-  /*
-     Touche Échap.
-  */
 
   document.addEventListener(
     "keydown",
@@ -1556,10 +1565,6 @@ function initialiserFormulaireInscription() {
 
       try {
 
-        /*
-           Récupération des champs.
-        */
-
         const nom =
           document
             .getElementById("nom")
@@ -1617,12 +1622,11 @@ function initialiserFormulaireInscription() {
 
 
         const anonyme =
-          typeInscription ===
-          "anonyme";
+          typeInscription === "anonyme";
 
 
         /*
-           Validation des champs obligatoires.
+           Validation.
         */
 
         if (
@@ -1638,10 +1642,6 @@ function initialiserFormulaireInscription() {
         }
 
 
-        /*
-           Validation e-mail.
-        */
-
         if (
           !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
             email
@@ -1655,10 +1655,6 @@ function initialiserFormulaireInscription() {
         }
 
 
-        /*
-           Limite description.
-        */
-
         if (
           description.length > 300
         ) {
@@ -1669,10 +1665,6 @@ function initialiserFormulaireInscription() {
 
         }
 
-
-        /*
-           Validation URL photo.
-        */
 
         if (
           image_url &&
@@ -1686,8 +1678,19 @@ function initialiserFormulaireInscription() {
         }
 
 
+        if (
+          !window.supabaseClient
+        ) {
+
+          throw new Error(
+            "Connexion à la base de données impossible."
+          );
+
+        }
+
+
         /*
-           Vérification e-mail déjà utilisé.
+           Vérification e-mail existant.
         */
 
         const {
@@ -1736,7 +1739,7 @@ function initialiserFormulaireInscription() {
 
 
         /*
-           Génération de l'ID.
+           Génération UUID.
         */
 
         let id;
@@ -1775,9 +1778,7 @@ function initialiserFormulaireInscription() {
                         0x8;
 
 
-                  return value.toString(
-                    16
-                  );
+                  return value.toString(16);
 
                 }
               );
@@ -1786,7 +1787,7 @@ function initialiserFormulaireInscription() {
 
 
         /*
-           Création du profil.
+           Profil.
         */
 
         const profil = {
@@ -1822,10 +1823,6 @@ function initialiserFormulaireInscription() {
         }
 
 
-        /*
-           Insertion Supabase.
-        */
-
         const {
           error
         } =
@@ -1833,9 +1830,7 @@ function initialiserFormulaireInscription() {
 
             .from("profiles")
 
-            .insert(
-              [profil]
-            );
+            .insert([profil]);
 
 
         if (error) {
@@ -1847,8 +1842,7 @@ function initialiserFormulaireInscription() {
 
 
           if (
-            error.code ===
-            "23505"
+            error.code === "23505"
           ) {
 
             throw new Error(
@@ -1866,22 +1860,17 @@ function initialiserFormulaireInscription() {
 
 
         /*
-           Message de réussite.
+           Succès.
         */
 
         if (formMessage) {
 
-          if (anonyme) {
+          formMessage.textContent =
+            anonyme
 
-            formMessage.textContent =
-              "Votre inscription a bien été enregistrée. Votre profil reste masqué de la liste publique.";
+              ? "Votre inscription a bien été enregistrée. Votre profil reste masqué de la liste publique."
 
-          } else {
-
-            formMessage.textContent =
-              "Votre inscription a bien été enregistrée. Bienvenue chez Avant-gardE !";
-
-          }
+              : "Votre inscription a bien été enregistrée. Bienvenue chez Avant-gardE !";
 
 
           formMessage.className =
@@ -1891,7 +1880,7 @@ function initialiserFormulaireInscription() {
 
 
         /*
-           Réinitialisation du formulaire.
+           Reset.
         */
 
         form.reset();
@@ -1915,7 +1904,7 @@ function initialiserFormulaireInscription() {
 
 
         /*
-           Fermeture et rechargement.
+           Fermeture + rechargement.
         */
 
         window.setTimeout(
@@ -1960,6 +1949,11 @@ function initialiserFormulaireInscription() {
         }
 
       } finally {
+
+        /*
+           Si l'inscription a réussi, le bouton
+           est réactivé avant la fermeture.
+        */
 
         if (submitButton) {
 
@@ -2011,8 +2005,6 @@ function initialiserCompteurDescription() {
 
 function initialiserEquipe() {
 
-  chargerMembres();
-
   initialiserOuvertureInscription();
 
   initialiserFermetureModales();
@@ -2020,6 +2012,8 @@ function initialiserEquipe() {
   initialiserFormulaireInscription();
 
   initialiserCompteurDescription();
+
+  chargerMembres();
 
 }
 
