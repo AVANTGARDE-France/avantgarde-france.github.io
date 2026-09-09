@@ -28,7 +28,7 @@
 
   <!-- =====================================================
        COMPOSANTS COMMUNS
-       
+
        components.js remplira automatiquement :
        - événements
        - header
@@ -223,18 +223,15 @@
 
     <section class="principles">
 
-
       <article class="principle">
 
         <div class="symbol">
           ⚖
         </div>
 
-
         <h3>
           Souveraineté
         </h3>
-
 
         <p>
 
@@ -246,18 +243,15 @@
       </article>
 
 
-
       <article class="principle">
 
         <div class="symbol">
           ✦
         </div>
 
-
         <h3>
           Liberté
         </h3>
-
 
         <p>
 
@@ -269,18 +263,15 @@
       </article>
 
 
-
       <article class="principle">
 
         <div class="symbol">
           ⚔
         </div>
 
-
         <h3>
           Responsabilité
         </h3>
-
 
         <p>
 
@@ -290,7 +281,6 @@
         </p>
 
       </article>
-
 
     </section>
 
@@ -352,7 +342,6 @@
 
       <div class="news-grid">
 
-
         <article class="news-card">
 
           <span>
@@ -373,7 +362,6 @@
           </p>
 
         </article>
-
 
 
         <article class="news-card">
@@ -398,7 +386,6 @@
         </article>
 
 
-
         <article class="news-card">
 
           <span>
@@ -419,7 +406,6 @@
           </p>
 
         </article>
-
 
       </div>
 
@@ -476,22 +462,39 @@
        SCRIPTS
   ====================================================== -->
 
-  <!-- Supabase CDN -->
+  <!--
+       Supabase
+       Le fichier supabase.js est utilisé comme module
+       par components.js et les autres scripts.
+  -->
+
   <script
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
   ></script>
 
 
   <!-- Connexion Supabase commune -->
-  <script src="js/supabase.js"></script>
+
+  <script
+    type="module"
+    src="js/supabase.js"
+  ></script>
 
 
   <!-- Composants communs -->
-  <script src="js/components.js"></script>
+
+  <script
+    type="module"
+    src="js/components.js"
+  ></script>
 
 
   <!-- JavaScript spécifique à l'accueil -->
-  <script src="js/index.js"></script>
+
+  <script
+    type="module"
+    src="js/index.js"
+  ></script>
 
 
 </body>
