@@ -86,6 +86,15 @@
     margin-bottom: 35px;
 }
 
+.section-title .section-kicker {
+    color: var(--gold);
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+}
+
 .section-title h2 {
     margin: 0 0 10px;
     font-size: 30px;
@@ -105,7 +114,10 @@
 
 .team-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(245px, 1fr)
+    );
     gap: 20px;
 }
 
@@ -122,13 +134,16 @@
             rgba(255, 255, 255, .015)
         );
 
-    border: 1px solid var(--border);
+    border: 1px solid rgba(214, 173, 85, .28);
 
     padding: 22px;
 
     cursor: pointer;
 
-    transition: .25s;
+    transition:
+        transform .25s,
+        border-color .25s,
+        box-shadow .25s;
 
     min-height: 280px;
 
@@ -139,14 +154,24 @@
     align-items: center;
 
     text-align: center;
+
+    outline: none;
 }
 
-.member-card:hover {
+.member-card:hover,
+.member-card:focus-visible {
     border-color: rgba(214, 173, 85, .75);
 
     transform: translateY(-4px);
 
-    box-shadow: 0 12px 35px rgba(0, 0, 0, .25);
+    box-shadow:
+        0 12px 35px rgba(0, 0, 0, .25);
+}
+
+.member-card:focus-visible {
+    box-shadow:
+        0 0 0 2px rgba(214, 173, 85, .25),
+        0 12px 35px rgba(0, 0, 0, .25);
 }
 
 
@@ -167,6 +192,8 @@
     margin-bottom: 16px;
 
     background: var(--navy2);
+
+    flex-shrink: 0;
 }
 
 .member-photo-placeholder {
@@ -189,7 +216,14 @@
 
     color: var(--gold);
 
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
     font-size: 35px;
+
+    flex-shrink: 0;
 }
 
 
@@ -203,7 +237,7 @@
 
 .member-name {
     font-size: 22px;
-    margin-bottom: 6px;
+    margin: 0 0 6px;
 }
 
 .member-grade {
@@ -252,7 +286,7 @@
 
 
 /* =========================================================
-   CHARGEMENT / ABSENCE DE MEMBRES
+   CHARGEMENT / ABSENCE
 ========================================================= */
 
 .loading,
@@ -311,7 +345,7 @@
             #07152d
         );
 
-    border: 1px solid var(--border);
+    border: 1px solid rgba(214, 173, 85, .28);
 
     box-shadow:
         0 25px 80px rgba(0, 0, 0, .55);
@@ -328,17 +362,26 @@
 
     top: 14px;
 
+    width: 32px;
+    height: 32px;
+
     border: 0;
 
     background: none;
 
     color: rgba(255, 255, 255, .65);
 
+    font-family:
+        Arial,
+        sans-serif;
+
     font-size: 28px;
 
     cursor: pointer;
 
     line-height: 1;
+
+    z-index: 5;
 }
 
 .modal-close:hover {
@@ -354,6 +397,12 @@
     text-align: center;
 }
 
+.profile-photo-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .profile-modal-image {
     width: 135px;
     height: 135px;
@@ -367,6 +416,8 @@
     margin: 5px auto 18px;
 
     display: none;
+
+    background: var(--navy2);
 }
 
 .profile-placeholder {
@@ -388,6 +439,11 @@
     margin: 5px auto 18px;
 
     color: var(--gold);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
     font-size: 45px;
 }
@@ -432,6 +488,30 @@
     line-height: 1.65;
 
     margin-bottom: 25px;
+
+    white-space: pre-line;
+}
+
+
+/* =========================================================
+   SOUS-TITRE PROFIL
+========================================================= */
+
+.profile-subtitle {
+    color: var(--gold);
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+
+    font-size: 15px;
+
+    font-weight: normal;
+
+    letter-spacing: 1px;
+
+    margin: 0 0 15px;
 }
 
 
@@ -676,6 +756,20 @@
     width: min(720px, 100%);
 }
 
+.form-kicker {
+    color: var(--gold);
+
+    font-family: Arial, sans-serif;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: 2.5px;
+
+    margin-bottom: 9px;
+}
+
 .form-title {
     margin: 0 0 8px;
 
@@ -744,6 +838,8 @@ select {
     outline: none;
 
     border-radius: 0;
+
+    box-sizing: border-box;
 }
 
 input:focus,
@@ -776,7 +872,7 @@ textarea {
 
 
 /* =========================================================
-   COMPTEUR DESCRIPTION
+   COMPTEUR
 ========================================================= */
 
 .description-counter {
@@ -829,6 +925,8 @@ textarea {
 
     height: 100%;
 
+    box-sizing: border-box;
+
     border:
         1px solid rgba(255, 255, 255, .14);
 
@@ -838,7 +936,14 @@ textarea {
 
     cursor: pointer;
 
-    transition: .2s;
+    transition:
+        border-color .2s,
+        background .2s;
+}
+
+.choice-label:hover {
+    border-color:
+        rgba(214, 173, 85, .45);
 }
 
 .choice-label strong {
@@ -925,6 +1030,18 @@ textarea {
 
     background:
         rgba(0, 0, 0, .12);
+
+    transition:
+        border-color .2s,
+        background .2s;
+}
+
+.competence:hover {
+    border-color:
+        rgba(214, 173, 85, .35);
+
+    background:
+        rgba(214, 173, 85, .035);
 }
 
 .competence label {
@@ -941,6 +1058,8 @@ textarea {
     margin-top: 3px;
 
     accent-color: var(--gold);
+
+    flex-shrink: 0;
 }
 
 .competence-name {
@@ -994,16 +1113,24 @@ textarea {
     cursor: pointer;
 
     margin-top: 15px;
+
+    transition:
+        background .2s,
+        transform .2s;
 }
 
 .submit-button:hover {
     background: var(--gold-light);
+
+    transform: translateY(-1px);
 }
 
 .submit-button:disabled {
     opacity: .6;
 
     cursor: wait;
+
+    transform: none;
 }
 
 
@@ -1047,6 +1174,27 @@ textarea {
 
     background:
         rgba(180, 30, 20, .1);
+}
+
+
+/* =========================================================
+   SCROLLBAR MODALE
+========================================================= */
+
+.modal-box::-webkit-scrollbar {
+    width: 7px;
+}
+
+.modal-box::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, .15);
+}
+
+.modal-box::-webkit-scrollbar-thumb {
+    background: rgba(214, 173, 85, .35);
+}
+
+.modal-box::-webkit-scrollbar-thumb:hover {
+    background: rgba(214, 173, 85, .6);
 }
 
 
@@ -1110,6 +1258,16 @@ textarea {
 
     .registration-choice {
         grid-template-columns: 1fr;
+    }
+
+    .form-title {
+        font-size: 28px;
+    }
+
+    .profile-modal-image,
+    .profile-placeholder {
+        width: 120px;
+        height: 120px;
     }
 
 }
