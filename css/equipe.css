@@ -1,1031 +1,1115 @@
-<!DOCTYPE html>
-<html lang="fr">
+/* =========================================================
+   AVANT-GARDE — NOTRE ÉQUIPE
+   css/equipe.css
+
+   Style spécifique à la page équipe.
+   Le style général reste dans css/style.css.
+========================================================= */
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.team-hero {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 75px 25px 45px;
+    text-align: center;
+}
+
+.team-hero .kicker {
+    font-family: Arial, sans-serif;
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+}
+
+.team-hero h1 {
+    margin: 0;
+    font-size: clamp(42px, 7vw, 76px);
+    line-height: .95;
+    letter-spacing: -2px;
+}
+
+.team-hero h1 span {
+    color: var(--gold);
+}
+
+.team-hero p {
+    max-width: 720px;
+    margin: 25px auto 30px;
+    color: var(--muted);
+    font-size: 17px;
+    line-height: 1.65;
+}
+
+
+/* =========================================================
+   BOUTON REJOINDRE
+========================================================= */
 
-<head>
+.join-button {
+    border: 1px solid var(--gold);
+    background: var(--gold);
+    color: var(--navy);
+    padding: 14px 26px;
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1.2px;
+    cursor: pointer;
+    transition: .25s;
+}
 
-    <meta charset="UTF-8">
+.join-button:hover {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .25);
+}
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
 
-    <title>Avant-gardE — Notre équipe</title>
+/* =========================================================
+   MEMBRES
+========================================================= */
 
-    <link
-        rel="stylesheet"
-        href="css/style.css"
-    >
+.team-section {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 25px 90px;
+}
 
-    <link
-        rel="stylesheet"
-        href="css/equipe.css"
-    >
+.section-title {
+    text-align: center;
+    margin-bottom: 35px;
+}
 
-</head>
+.section-title h2 {
+    margin: 0 0 10px;
+    font-size: 30px;
+}
 
+.section-title p {
+    margin: 0;
+    color: var(--muted);
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+}
 
-<body>
 
+/* =========================================================
+   GRILLE
+========================================================= */
 
-<!-- =========================================================
-     HEADER COMMUN
-========================================================= -->
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+    gap: 20px;
+}
 
-<div id="site-header"></div>
 
+/* =========================================================
+   CARTE MEMBRE
+========================================================= */
 
+.member-card {
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, .035),
+            rgba(255, 255, 255, .015)
+        );
 
-<!-- =========================================================
-     HERO
-========================================================= -->
+    border: 1px solid var(--border);
 
-<section class="hero team-hero">
+    padding: 22px;
 
-    <div class="kicker">
-        L’AVANT-GARDE
-    </div>
+    cursor: pointer;
 
-    <h1>
-        NOTRE <span>ÉQUIPE.</span>
-    </h1>
+    transition: .25s;
 
-    <p>
-        L’Avant-gardE rassemble des femmes et des hommes qui souhaitent
-        contribuer, chacun selon ses compétences, son influence et ses moyens,
-        à la construction d’une France libre, souveraine et responsable.
-    </p>
+    min-height: 280px;
 
-    <button
-        type="button"
-        class="join-button"
-        id="openJoin"
-    >
-        REJOINDRE L’AVANT-GARDE
-    </button>
+    display: flex;
 
-</section>
+    flex-direction: column;
 
+    align-items: center;
 
+    text-align: center;
+}
 
-<!-- =========================================================
-     MEMBRES
-========================================================= -->
+.member-card:hover {
+    border-color: rgba(214, 173, 85, .75);
 
-<section class="team-section">
+    transform: translateY(-4px);
 
-    <div class="section-title">
+    box-shadow: 0 12px 35px rgba(0, 0, 0, .25);
+}
 
-        <h2>
-            Les membres
-        </h2>
 
-        <p>
-            Découvrez celles et ceux qui ont choisi de rendre leur engagement public.
-        </p>
+/* =========================================================
+   PHOTO MEMBRE
+========================================================= */
 
-    </div>
+.member-photo {
+    width: 105px;
+    height: 105px;
 
+    border-radius: 50%;
 
-    <div
-        class="team-grid"
-        id="teamGrid"
-    >
+    object-fit: cover;
 
-        <div
-            class="loading"
-            id="loadingMembers"
-        >
-            Chargement des membres…
-        </div>
+    border: 2px solid var(--gold);
 
-    </div>
+    margin-bottom: 16px;
 
-</section>
+    background: var(--navy2);
+}
 
+.member-photo-placeholder {
+    width: 105px;
+    height: 105px;
 
+    border-radius: 50%;
 
-<!-- =========================================================
-     MODAL PROFIL MEMBRE
-========================================================= -->
+    border: 2px solid var(--gold);
 
-<div
-    class="modal"
-    id="memberModal"
-    aria-hidden="true"
->
+    margin-bottom: 16px;
 
-    <div class="modal-box">
+    background: var(--navy2);
 
-        <button
-            type="button"
-            class="modal-close"
-            id="closeMember"
-            aria-label="Fermer"
-        >
-            ×
-        </button>
+    display: flex;
 
+    align-items: center;
 
-        <div class="profile-modal-content">
+    justify-content: center;
 
+    color: var(--gold);
 
-            <!-- PHOTO -->
+    font-size: 35px;
+}
 
-            <img
-                id="profileModalImage"
-                class="profile-modal-image"
-                alt=""
-            >
 
+/* =========================================================
+   INFORMATIONS CARTE
+========================================================= */
 
-            <div
-                id="profilePlaceholder"
-                class="profile-placeholder"
-                aria-hidden="true"
-            >
-                ★
-            </div>
+.member-info {
+    width: 100%;
+}
 
+.member-name {
+    font-size: 22px;
+    margin-bottom: 6px;
+}
 
-            <!-- IDENTITE -->
+.member-grade {
+    color: var(--gold);
 
-            <h2 id="profileModalName"></h2>
+    font-family: Arial, sans-serif;
 
-            <div
-                id="profileModalGrade"
-                class="profile-grade"
-            ></div>
+    font-size: 10px;
 
-            <div
-                id="profileModalRegion"
-                class="profile-region"
-            ></div>
+    font-weight: bold;
 
+    letter-spacing: 1.5px;
 
-            <!-- DESCRIPTION -->
+    text-transform: uppercase;
 
-            <div
-                id="profileModalDescription"
-                class="profile-description"
-            ></div>
+    margin-bottom: 8px;
+}
 
+.member-region {
+    color: var(--muted);
 
-            <!-- RESEAUX SOCIAUX -->
+    font-family: Arial, sans-serif;
 
-            <div
-                id="profileSocialSection"
-                class="profile-social-section"
-            >
+    font-size: 11px;
 
-                <div
-                    id="profileModalSocials"
-                    class="profile-socials"
-                    style="display:none;"
-                ></div>
+    margin-bottom: 12px;
+}
 
+.member-description {
+    color: #c8ced8;
 
-                <div
-                    id="profileModalAudienceMax"
-                    class="profile-audience-max"
-                    style="display:none;"
-                ></div>
+    font-family: Arial, sans-serif;
 
-            </div>
+    font-size: 12px;
 
+    line-height: 1.5;
 
-            <!-- COMPETENCES -->
+    display: -webkit-box;
 
-            <div
-                id="profileCompetenceSection"
-                class="profile-competences"
-            >
+    -webkit-line-clamp: 3;
 
-                <h3>
-                    Compétences
-                </h3>
+    -webkit-box-orient: vertical;
 
-                <div
-                    class="competence-list"
-                    id="profileModalCompetences"
-                ></div>
+    overflow: hidden;
+}
 
-            </div>
 
-        </div>
+/* =========================================================
+   CHARGEMENT / ABSENCE DE MEMBRES
+========================================================= */
 
-    </div>
+.loading,
+.no-members {
+    grid-column: 1 / -1;
 
-</div>
+    text-align: center;
 
+    color: var(--muted);
 
+    font-family: Arial, sans-serif;
 
-<!-- =========================================================
-     MODAL INSCRIPTION
-========================================================= -->
+    padding: 50px;
+}
 
-<div
-    class="modal"
-    id="joinModal"
-    aria-hidden="true"
->
 
-    <div class="modal-box join-modal-box">
+/* =========================================================
+   MODALES
+========================================================= */
 
+.modal {
+    position: fixed;
 
-        <button
-            type="button"
-            class="modal-close"
-            id="closeJoin"
-            aria-label="Fermer"
-        >
-            ×
-        </button>
+    inset: 0;
 
+    background: rgba(0, 0, 0, .78);
 
-        <h2 class="form-title">
-            Rejoindre l’Avant-gardE
-        </h2>
+    backdrop-filter: blur(6px);
 
+    display: none;
 
-        <p class="form-intro">
-            Créez votre profil et choisissez la manière dont vous souhaitez
-            apparaître au sein du mouvement.
-        </p>
+    align-items: center;
 
+    justify-content: center;
 
+    padding: 20px;
 
-        <form id="joinForm">
+    z-index: 1000;
+}
 
+.modal.active {
+    display: flex;
+}
 
-            <!-- =====================================================
-                 VISIBILITE
-            ====================================================== -->
+.modal-box {
+    width: min(720px, 100%);
 
-            <div class="form-group">
+    max-height: 92vh;
 
-                <label class="main-label">
+    overflow-y: auto;
 
-                    S’inscrire en tant que
+    background:
+        linear-gradient(
+            145deg,
+            #0d2344,
+            #07152d
+        );
 
-                    <span class="required">
-                        *
-                    </span>
+    border: 1px solid var(--border);
 
-                </label>
+    box-shadow:
+        0 25px 80px rgba(0, 0, 0, .55);
 
+    position: relative;
 
-                <div class="registration-choice">
+    padding: 38px;
+}
 
+.modal-close {
+    position: absolute;
 
-                    <div class="choice-option">
+    right: 18px;
 
-                        <input
-                            type="radio"
-                            id="typeSympathisant"
-                            name="type_inscription"
-                            value="sympathisant"
-                            checked
-                        >
+    top: 14px;
 
-                        <label
-                            for="typeSympathisant"
-                            class="choice-label"
-                        >
+    border: 0;
 
-                            <strong>
-                                Sympathisant
-                            </strong>
+    background: none;
 
-                            <span>
-                                Votre profil sera affiché dans la liste des membres.
-                            </span>
+    color: rgba(255, 255, 255, .65);
 
-                        </label>
+    font-size: 28px;
 
-                    </div>
+    cursor: pointer;
 
+    line-height: 1;
+}
 
+.modal-close:hover {
+    color: var(--gold);
+}
 
-                    <div class="choice-option">
 
-                        <input
-                            type="radio"
-                            id="typeAnonyme"
-                            name="type_inscription"
-                            value="anonyme"
-                        >
+/* =========================================================
+   PROFIL
+========================================================= */
 
-                        <label
-                            for="typeAnonyme"
-                            class="choice-label"
-                        >
+.profile-modal-content {
+    text-align: center;
+}
 
-                            <strong>
-                                Anonyme
-                            </strong>
+.profile-modal-image {
+    width: 135px;
+    height: 135px;
 
-                            <span>
-                                Votre profil sera enregistré mais caché de la liste des membres.
-                            </span>
+    border-radius: 50%;
 
-                        </label>
+    object-fit: cover;
 
-                    </div>
+    border: 2px solid var(--gold);
 
-                </div>
+    margin: 5px auto 18px;
 
-            </div>
+    display: none;
+}
 
+.profile-placeholder {
+    width: 135px;
+    height: 135px;
 
+    border-radius: 50%;
 
-            <!-- =====================================================
-                 NOM
-            ====================================================== -->
+    border: 2px solid var(--gold);
 
-            <div class="form-group">
+    background: var(--navy2);
 
-                <label
-                    class="main-label"
-                    for="nom"
-                >
-                    Pseudo ou nom prénom
+    display: flex;
 
-                    <span class="required">
-                        *
-                    </span>
-                </label>
+    align-items: center;
 
+    justify-content: center;
 
-                <input
-                    type="text"
-                    id="nom"
-                    name="nom"
-                    maxlength="100"
-                    required
-                >
+    margin: 5px auto 18px;
 
-            </div>
+    color: var(--gold);
 
+    font-size: 45px;
+}
 
+.profile-modal-content h2 {
+    margin: 0 0 8px;
 
-            <!-- =====================================================
-                 EMAIL
-            ====================================================== -->
+    font-size: 32px;
+}
 
-            <div class="form-group">
+.profile-grade {
+    color: var(--gold);
 
-                <label
-                    class="main-label"
-                    for="email"
-                >
-                    Email
+    font-family: Arial, sans-serif;
 
-                    <span class="required">
-                        *
-                    </span>
-                </label>
+    font-size: 11px;
 
+    font-weight: bold;
 
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                >
+    letter-spacing: 1.5px;
 
+    text-transform: uppercase;
+}
 
-                <div class="help">
-                    Une seule inscription est autorisée par adresse e-mail.
-                </div>
+.profile-region {
+    color: var(--muted);
 
-            </div>
+    font-family: Arial, sans-serif;
 
+    font-size: 12px;
 
+    margin: 10px 0 25px;
+}
 
-            <!-- =====================================================
-                 REGION
-            ====================================================== -->
+.profile-description {
+    color: #d8dce3;
 
-            <div class="form-group">
+    font-family: Arial, sans-serif;
 
-                <label
-                    class="main-label"
-                    for="region"
-                >
-                    Région
+    font-size: 14px;
 
-                    <span class="required">
-                        *
-                    </span>
-                </label>
+    line-height: 1.65;
 
+    margin-bottom: 25px;
+}
 
-                <select
-                    id="region"
-                    name="region"
-                    required
-                >
 
-                    <option value="">
-                        Sélectionnez votre région
-                    </option>
+/* =========================================================
+   RESEAUX SOCIAUX
+========================================================= */
 
+.profile-social-section {
+    margin-bottom: 5px;
+}
 
-                    <optgroup label="France métropolitaine">
+.profile-socials {
+    display: flex;
 
-                        <option>
-                            Auvergne-Rhône-Alpes
-                        </option>
+    justify-content: center;
 
-                        <option>
-                            Bourgogne-Franche-Comté
-                        </option>
+    align-items: center;
 
-                        <option>
-                            Bretagne
-                        </option>
+    flex-wrap: wrap;
 
-                        <option>
-                            Centre-Val de Loire
-                        </option>
+    gap: 10px;
 
-                        <option>
-                            Corse
-                        </option>
+    margin: 0 0 28px;
+}
 
-                        <option>
-                            Grand Est
-                        </option>
+.profile-social-item {
+    display: flex;
 
-                        <option>
-                            Hauts-de-France
-                        </option>
+    flex-direction: column;
 
-                        <option>
-                            Île-de-France
-                        </option>
+    align-items: center;
 
-                        <option>
-                            Normandie
-                        </option>
+    gap: 5px;
 
-                        <option>
-                            Nouvelle-Aquitaine
-                        </option>
+    position: relative;
+}
 
-                        <option>
-                            Occitanie
-                        </option>
+.profile-social-link {
+    width: 38px;
+    height: 38px;
 
-                        <option>
-                            Pays de la Loire
-                        </option>
+    display: flex;
 
-                        <option>
-                            Provence-Alpes-Côte d’Azur
-                        </option>
+    align-items: center;
 
-                    </optgroup>
+    justify-content: center;
 
+    border: 1px solid rgba(214, 173, 85, .28);
 
-                    <optgroup label="Outre-mer">
+    background: rgba(0, 0, 0, .12);
 
-                        <option>
-                            Guadeloupe
-                        </option>
+    transition:
+        transform .2s,
+        border-color .2s,
+        background .2s;
 
-                        <option>
-                            Martinique
-                        </option>
+    text-decoration: none;
+}
 
-                        <option>
-                            Guyane
-                        </option>
+.profile-social-link:hover {
+    transform: translateY(-2px);
 
-                        <option>
-                            La Réunion
-                        </option>
+    border-color: var(--gold);
 
-                        <option>
-                            Mayotte
-                        </option>
+    background: rgba(214, 173, 85, .08);
+}
 
-                    </optgroup>
+.profile-social-link img {
+    width: 21px;
+    height: 21px;
 
+    display: block;
 
-                    <optgroup label="Étranger">
+    object-fit: contain;
+}
 
-                        <option>
-                            Europe
-                        </option>
+.profile-social-item.is-max .profile-social-link {
+    border-color: var(--gold);
 
-                        <option>
-                            Amérique du Nord
-                        </option>
+    background: rgba(214, 173, 85, .12);
 
-                        <option>
-                            Amérique centrale et Caraïbes
-                        </option>
+    box-shadow:
+        0 0 12px rgba(214, 173, 85, .18);
+}
 
-                        <option>
-                            Amérique du Sud
-                        </option>
+.profile-social-max-star {
+    position: absolute;
 
-                        <option>
-                            Afrique
-                        </option>
+    right: -7px;
 
-                        <option>
-                            Asie
-                        </option>
+    top: -8px;
 
-                        <option>
-                            Océanie
-                        </option>
+    width: 16px;
+    height: 16px;
 
-                        <option>
-                            Autre
-                        </option>
+    display: flex;
 
-                    </optgroup>
+    align-items: center;
 
-                </select>
+    justify-content: center;
 
-            </div>
+    border: 1px solid var(--gold);
 
+    border-radius: 50%;
 
+    background: var(--navy);
 
-            <!-- =====================================================
-                 IMAGE
-            ====================================================== -->
+    color: var(--gold-light);
 
-            <div class="form-group">
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
 
-                <label
-                    class="main-label"
-                    for="image_url"
-                >
-                    Image
-                </label>
+    font-size: 9px;
 
+    line-height: 1;
 
-                <input
-                    type="url"
-                    id="image_url"
-                    name="image_url"
-                    placeholder="https://..."
-                >
+    z-index: 2;
+}
 
+.profile-social-audience {
+    color: #aeb6c3;
 
-                <div class="help">
-                    Indiquez l’URL d’une image déjà hébergée en ligne.
-                </div>
+    font-family: Arial, sans-serif;
 
-            </div>
+    font-size: 9px;
 
+    line-height: 1;
 
+    white-space: nowrap;
+}
 
-            <!-- =====================================================
-                 DESCRIPTION
-            ====================================================== -->
+.profile-audience-max {
+    margin: -10px 0 25px;
 
-            <div class="form-group">
+    color: var(--gold-light);
 
-                <label
-                    class="main-label"
-                    for="description"
-                >
-                    Description
-                </label>
+    font-family: Arial, sans-serif;
 
+    font-size: 11px;
 
-                <textarea
-                    id="description"
-                    name="description"
-                    maxlength="300"
-                    placeholder="Présentez-vous en quelques mots..."
-                ></textarea>
+    line-height: 1.5;
 
+    font-weight: bold;
+}
 
-                <div
-                    class="description-counter"
-                    id="descriptionCounter"
-                >
+.profile-audience-max small {
+    display: block;
 
-                    <span id="descriptionCount">
-                        0
-                    </span>
+    margin-top: 3px;
 
-                    / 300
+    color: #7f8998;
 
-                </div>
+    font-size: 8px;
 
-            </div>
+    font-weight: normal;
 
+    font-style: italic;
+}
 
 
-            <!-- =====================================================
-                 COMPETENCES
-            ====================================================== -->
+/* =========================================================
+   COMPETENCES DU PROFIL
+========================================================= */
 
-            <div class="form-section-title">
-                Talents et compétences métier
-            </div>
+.profile-competences {
+    border-top:
+        1px solid rgba(214, 173, 85, .2);
 
+    padding-top: 22px;
+}
 
-            <div class="form-group">
+.profile-competences h3 {
+    color: var(--gold);
 
-                <label class="main-label">
+    font-size: 17px;
 
-                    Compétences
+    margin: 0 0 15px;
+}
 
-                    <span class="competence-help">
-                        (auto-évaluation de vos compétences)
-                    </span>
+.competence-list {
+    display: flex;
 
-                </label>
+    flex-wrap: wrap;
 
-            </div>
+    justify-content: center;
 
+    gap: 8px;
+}
 
+.competence-tag {
+    border:
+        1px solid rgba(214, 173, 85, .4);
 
-            <!-- =====================================================
-                 COMPETENCES METIER
-            ====================================================== -->
+    color: #e6d49e;
 
-            <div class="competence-group">
+    padding: 7px 10px;
 
-                <div class="competence-group-title">
-                    Compétences métier
-                </div>
+    font-family: Arial, sans-serif;
 
+    font-size: 11px;
 
-                <div class="competence">
+    display: inline-flex;
 
-                    <label>
+    align-items: center;
 
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Maîtrise de doctrine"
-                        >
+    justify-content: center;
 
-                        <span>
+    gap: 6px;
+}
 
-                            <span class="competence-name">
-                                Maîtrise de doctrine
-                            </span>
+.vip-medal {
+    width: 16px;
+    height: 16px;
 
-                            <span class="competence-description">
-                                capacité à préserver la fidélité à l’idéologie d'Avant-Garde et sa cohérence dans l’action du mouvement.
-                            </span>
+    border: 1px solid var(--gold);
 
-                        </span>
+    border-radius: 50%;
 
-                    </label>
+    color: var(--gold);
 
-                </div>
+    display: inline-flex;
 
+    align-items: center;
 
+    justify-content: center;
 
-                <div class="competence">
+    font-size: 9px;
 
-                    <label>
+    line-height: 1;
 
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Tactique"
-                        >
+    flex-shrink: 0;
+}
 
-                        <span>
 
-                            <span class="competence-name">
-                                Tactique
-                            </span>
+/* =========================================================
+   FORMULAIRE
+========================================================= */
 
-                            <span class="competence-description">
-                                capacité à concevoir et mettre en œuvre des tactiques efficaces de développement d’audience, médiatique et électorale, sans renier l’idéologie.
-                            </span>
+.join-modal-box {
+    width: min(720px, 100%);
+}
 
-                        </span>
+.form-title {
+    margin: 0 0 8px;
 
-                    </label>
+    font-size: 32px;
+}
 
-                </div>
+.form-intro {
+    color: var(--muted);
 
+    font-family: Arial, sans-serif;
 
+    font-size: 13px;
 
-                <div class="competence">
+    line-height: 1.5;
 
-                    <label>
+    margin-bottom: 28px;
+}
 
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Prestance"
-                        >
+.form-group {
+    margin-bottom: 21px;
+}
 
-                        <span>
+.form-group label.main-label {
+    display: block;
 
-                            <span class="competence-name">
-                                Prestance
-                            </span>
+    font-family: Arial, sans-serif;
 
-                            <span class="competence-description">
-                                capacité à séduire et convaincre par la parole, le charisme, le charme ou la culture.
-                            </span>
+    font-size: 12px;
 
-                        </span>
+    font-weight: bold;
 
-                    </label>
+    letter-spacing: .4px;
 
-                </div>
+    margin-bottom: 8px;
+}
 
+.required {
+    color: var(--gold);
+}
 
 
-                <div class="competence">
+/* =========================================================
+   CHAMPS
+========================================================= */
 
-                    <label>
+input[type="text"],
+input[type="email"],
+input[type="url"],
+textarea,
+select {
+    width: 100%;
 
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Analyses pragmatiques"
-                        >
+    border:
+        1px solid rgba(255, 255, 255, .15);
 
-                        <span>
+    background: #061329;
 
-                            <span class="competence-name">
-                                Analyses pragmatiques
-                            </span>
+    color: var(--white);
 
-                            <span class="competence-description">
-                                capacité à analyser les données, les rendements, les conséquences et les rapports de force. anticipent les évolutions et privilégient les faits.
-                            </span>
+    padding: 12px 13px;
 
-                        </span>
+    font-family: Arial, sans-serif;
 
-                    </label>
+    font-size: 13px;
 
-                </div>
+    outline: none;
 
+    border-radius: 0;
+}
 
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--gold);
+}
 
-                <div class="competence">
+textarea {
+    min-height: 110px;
 
-                    <label>
+    resize: vertical;
+}
 
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Analyses populistes"
-                        >
+.help {
+    color: #8994a6;
 
-                        <span>
+    font-family: Arial, sans-serif;
 
-                            <span class="competence-name">
-                                Analyses populistes
-                            </span>
+    font-size: 10px;
 
-                            <span class="competence-description">
-                                capacité à analyser les ressentis, aspirations et frustrations populaires. anticipent les réactions naturelles et privilégient le vécu et l’opinion du peuple.
-                            </span>
+    margin-top: 6px;
+}
 
-                        </span>
+.competence-help {
+    font-weight: normal;
 
-                    </label>
+    color: #8994a6;
+}
 
-                </div>
 
+/* =========================================================
+   COMPTEUR DESCRIPTION
+========================================================= */
 
+.description-counter {
+    text-align: right;
 
-                <div class="competence">
+    color: #8994a6;
 
-                    <label>
+    font-family: Arial, sans-serif;
 
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Administration"
-                        >
+    font-size: 10px;
 
-                        <span>
+    margin-top: 6px;
+}
 
-                            <span class="competence-name">
-                                Administration
-                            </span>
+.description-counter.warning {
+    color: var(--gold-light);
+}
 
-                            <span class="competence-description">
-                                maîtrise de la gestion des structures, des ressources techniques et opérationnelles et des équipes internes.
-                            </span>
+.description-counter.limit {
+    color: var(--red);
+}
 
-                        </span>
 
-                    </label>
+/* =========================================================
+   CHOIX SYMPATHISANT / ANONYME
+========================================================= */
 
-                </div>
+.registration-choice {
+    display: grid;
 
+    grid-template-columns: 1fr 1fr;
 
+    gap: 10px;
+}
 
-                <div class="competence">
+.choice-option {
+    position: relative;
+}
 
-                    <label>
+.choice-option input {
+    position: absolute;
 
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Expertise et ingénierie juridique"
-                        >
+    opacity: 0;
 
-                        <span>
+    pointer-events: none;
+}
 
-                            <span class="competence-name">
-                                Expertise et ingénierie juridique
-                            </span>
+.choice-label {
+    display: block;
 
-                            <span class="competence-description">
-                                maîtrise du droit français et européen ainsi que des mécanismes juridiques, avec capacité à en analyser les règles, les contraintes, les failles et les possibilités d’évolution.
-                            </span>
+    height: 100%;
 
-                        </span>
+    border:
+        1px solid rgba(255, 255, 255, .14);
 
-                    </label>
+    background: rgba(0, 0, 0, .12);
 
-                </div>
+    padding: 15px 17px;
 
+    cursor: pointer;
 
+    transition: .2s;
+}
 
-                <div class="competence">
+.choice-label strong {
+    display: block;
 
-                    <label>
+    color: var(--white);
 
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Expertise et ingénierie politique"
-                        >
+    font-family: Arial, sans-serif;
 
-                        <span>
+    font-size: 13px;
 
-                            <span class="competence-name">
-                                Expertise et ingénierie politique
-                            </span>
+    margin-bottom: 5px;
+}
 
-                            <span class="competence-description">
-                                maîtrise d’un domaine politique ou institutionnel particulier et capacité à en apporter l’expertise.
-                            </span>
+.choice-label span {
+    display: block;
 
-                        </span>
+    color: var(--muted);
 
-                    </label>
+    font-family: Arial, sans-serif;
 
-                </div>
+    font-size: 11px;
 
-            </div>
+    line-height: 1.5;
+}
 
+.choice-option input:checked + .choice-label {
+    border-color: var(--gold);
 
+    background:
+        rgba(214, 173, 85, .08);
+}
 
-            <!-- =====================================================
-                 INFLUENCE / BIENFAITEUR
-            ====================================================== -->
+.choice-option input:checked + .choice-label strong {
+    color: var(--gold-light);
+}
 
-            <div class="competence-group">
 
-                <div class="competence-group-title">
-                    Je peux vous aider en tant que
-                </div>
+/* =========================================================
+   TITRES SECTIONS FORMULAIRE
+========================================================= */
 
+.form-section-title {
+    color: var(--gold);
 
-                <div class="competence">
+    font-size: 19px;
 
-                    <label>
+    margin: 35px 0 20px;
 
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Influenceurs / debunkers / créateurs de contenu"
-                        >
+    padding-bottom: 9px;
 
-                        <span>
+    border-bottom:
+        1px solid rgba(214, 173, 85, .2);
+}
 
-                            <span class="competence-name">
-                                Influenceur / debunker / créateur de contenu
-                            </span>
 
-                            <span class="competence-description">
-                                dans le milieu médiatique et sur les réseaux sociaux, développent spontanément une audience, influencent les comportements, déconstruisent les arguments ou manipulations et produisent des contenus permettant de diffuser et de défendre les idées du mouvement. peuvent conserver une forte indépendance éditoriale.
-                            </span>
+/* =========================================================
+   GROUPES COMPETENCES
+========================================================= */
 
-                        </span>
+.competence-group {
+    margin-bottom: 25px;
+}
 
-                    </label>
+.competence-group-title {
+    font-family: Arial, sans-serif;
 
-                </div>
+    color: #eee;
 
+    font-size: 13px;
 
+    font-weight: bold;
 
-                <div class="competence">
+    margin-bottom: 13px;
+}
 
-                    <label>
+.competence {
+    border:
+        1px solid rgba(255, 255, 255, .1);
 
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Bienfaiteurs"
-                        >
+    margin-bottom: 8px;
 
-                        <span>
+    padding: 12px;
 
-                            <span class="competence-name">
-                                Bienfaiteur
-                            </span>
+    background:
+        rgba(0, 0, 0, .12);
+}
 
-                            <span class="competence-description">
-                                dans les autres milieux, mettent spontanément leur influence, leur réseau, leur carnet d’adresses, leurs moyens, leur expertise ou leur notoriété au service du développement et du rayonnement du mouvement. peuvent conserver une forte indépendance.
-                            </span>
+.competence label {
+    display: flex;
 
-                        </span>
+    align-items: flex-start;
 
-                    </label>
+    gap: 10px;
 
-                </div>
+    cursor: pointer;
+}
 
-            </div>
+.competence input {
+    margin-top: 3px;
 
+    accent-color: var(--gold);
+}
 
+.competence-name {
+    color: var(--white);
 
-            <!-- =====================================================
-                 SUBMIT
-            ====================================================== -->
+    font-family: Arial, sans-serif;
 
-            <button
-                type="submit"
-                class="submit-button"
-                id="submitButton"
-            >
-                CRÉER MON PROFIL
-            </button>
+    font-size: 12px;
 
+    font-weight: bold;
+}
 
-            <div
-                id="formMessage"
-                class="form-message"
-            ></div>
+.competence-description {
+    display: block;
 
-        </form>
+    color: #929dad;
 
-    </div>
+    font-family: Arial, sans-serif;
 
-</div>
+    font-size: 10px;
 
+    line-height: 1.45;
 
+    margin-top: 5px;
+}
 
-<!-- =========================================================
-     FOOTER COMMUN
-========================================================= -->
 
-<div id="site-footer"></div>
+/* =========================================================
+   BOUTON FORMULAIRE
+========================================================= */
 
+.submit-button {
+    width: 100%;
 
+    border: 0;
 
-<!-- =========================================================
-     MODAL RENDEZ-VOUS
-     components.js le remplit automatiquement
-========================================================= -->
+    background: var(--gold);
 
-<div id="event-modal-container"></div>
+    color: var(--navy);
 
+    padding: 15px;
 
+    font-family: Arial, sans-serif;
 
-<!-- =========================================================
-     SCRIPTS
-========================================================= -->
+    font-size: 11px;
 
-<script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-></script>
+    font-weight: bold;
 
+    letter-spacing: 1.2px;
 
-<script
-    type="module"
-    src="js/supabase.js"
-></script>
+    cursor: pointer;
 
+    margin-top: 15px;
+}
 
-<script
-    type="module"
-    src="js/components.js"
-></script>
+.submit-button:hover {
+    background: var(--gold-light);
+}
 
+.submit-button:disabled {
+    opacity: .6;
 
-<script
-    type="module"
-    src="js/equipe.js"
-></script>
+    cursor: wait;
+}
 
 
-</body>
+/* =========================================================
+   MESSAGE FORMULAIRE
+========================================================= */
 
-</html>
+.form-message {
+    display: none;
+
+    padding: 13px;
+
+    margin-top: 15px;
+
+    font-family: Arial, sans-serif;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+.form-message.success {
+    display: block;
+
+    border:
+        1px solid rgba(100, 200, 130, .4);
+
+    color: #b9e5c4;
+
+    background:
+        rgba(50, 130, 70, .1);
+}
+
+.form-message.error {
+    display: block;
+
+    border:
+        1px solid rgba(239, 65, 53, .4);
+
+    color: #ffb5ae;
+
+    background:
+        rgba(180, 30, 20, .1);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .team-hero {
+        padding: 55px 20px 35px;
+    }
+
+    .team-hero p {
+        font-size: 15px;
+    }
+
+    .team-section {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .modal {
+        padding: 8px;
+    }
+
+    .modal-box {
+        padding: 28px 20px;
+        max-height: 95vh;
+    }
+
+    .registration-choice {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    .choice-label {
+        padding: 13px 11px;
+    }
+
+    .choice-label strong {
+        font-size: 12px;
+    }
+
+    .choice-label span {
+        font-size: 10px;
+    }
+
+}
+
+
+@media (max-width: 520px) {
+
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-modal-content h2 {
+        font-size: 27px;
+    }
+
+    .registration-choice {
+        grid-template-columns: 1fr;
+    }
+
+}
