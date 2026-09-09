@@ -4,10 +4,8 @@
 
    Logique spécifique à la page équipe.
 
-   IMPORTANT :
-   - Header / footer / rendez-vous = components.js
-   - Supabase = supabase.js
-   - Ce fichier ne gère que la page équipe
+   Header / footer / rendez-vous = components.js
+   Supabase = supabase.js
 ========================================================= */
 
 
@@ -172,7 +170,7 @@ function normaliserCompetences(value) {
 
         } catch (error) {
 
-            // Ce n'est pas du JSON.
+            /* Pas du JSON : on poursuit. */
 
         }
 
@@ -277,6 +275,7 @@ function fermerModalEquipe(modal) {
         document.querySelector(
             ".modal.active"
         );
+
 
     if (!autreModalOuvert) {
 
@@ -406,7 +405,7 @@ function afficherReseauxSociaux(membre) {
 
 
     /* =====================================================
-       SINON CALCUL AUTOMATIQUE
+       CALCUL AUTOMATIQUE SI NECESSAIRE
     ====================================================== */
 
     if (!reseauMax) {
@@ -432,7 +431,7 @@ function afficherReseauxSociaux(membre) {
 
 
     /* =====================================================
-       AFFICHAGE DES RÉSEAUX
+       AFFICHAGE
     ====================================================== */
 
     audiences.forEach(item => {
@@ -476,7 +475,9 @@ function afficherReseauxSociaux(membre) {
             "profile-social-link";
 
         lien.href =
-            membre[reseau.champ];
+            reseauUrlSecurisee(
+                membre[reseau.champ]
+            );
 
         lien.target =
             "_blank";
@@ -515,7 +516,9 @@ function afficherReseauxSociaux(membre) {
             };
 
 
-        lien.appendChild(image);
+        lien.appendChild(
+            image
+        );
 
 
         if (isMax) {
@@ -532,12 +535,21 @@ function afficherReseauxSociaux(membre) {
             star.title =
                 "Audience maximale";
 
-            itemHtml.appendChild(star);
+            star.setAttribute(
+                "aria-label",
+                "Audience maximale"
+            );
+
+            itemHtml.appendChild(
+                star
+            );
 
         }
 
 
-        itemHtml.appendChild(lien);
+        itemHtml.appendChild(
+            lien
+        );
 
 
         const audienceElement =
@@ -565,7 +577,7 @@ function afficherReseauxSociaux(membre) {
 
 
     /* =====================================================
-       AUDIENCE MAX
+       AUDIENCE MAXIMALE
     ====================================================== */
 
     let audienceMax = 0;
@@ -670,6 +682,21 @@ function afficherReseauxSociaux(membre) {
             "block";
 
     }
+
+}
+
+
+/* =========================================================
+   SECURISATION URL
+========================================================= */
+
+function reseauUrlSecurisee(url) {
+
+    if (!urlValide(url)) {
+        return "#";
+    }
+
+    return url;
 
 }
 
@@ -808,8 +835,6 @@ function creerCarteMembre(
         "member-info";
 
 
-    /* NOM */
-
     const name =
         document.createElement("h3");
 
@@ -828,8 +853,6 @@ function creerCarteMembre(
     );
 
 
-    /* GRADE */
-
     const grade =
         document.createElement("div");
 
@@ -847,8 +870,6 @@ function creerCarteMembre(
         grade
     );
 
-
-    /* REGION */
 
     if (membre.region) {
 
@@ -870,8 +891,6 @@ function creerCarteMembre(
 
     }
 
-
-    /* DESCRIPTION */
 
     if (membre.description) {
 
@@ -900,7 +919,7 @@ function creerCarteMembre(
 
 
     /* =====================================================
-       OUVERTURE PROFIL
+       OUVERTURE
     ====================================================== */
 
     card.addEventListener(
@@ -1187,6 +1206,11 @@ function ouvrirProfil(
             membre.region ||
             "";
 
+        region.style.display =
+            membre.region
+                ? ""
+                : "none";
+
     }
 
 
@@ -1195,6 +1219,11 @@ function ouvrirProfil(
         description.textContent =
             membre.description ||
             "";
+
+        description.style.display =
+            membre.description
+                ? ""
+                : "none";
 
     }
 
@@ -1301,8 +1330,6 @@ function ouvrirProfil(
             );
 
 
-        /* VIP */
-
         const audienceMax =
             Number(
                 membre.audience_max
@@ -1348,23 +1375,7 @@ function ouvrirProfil(
                 empty
             );
 
-
-            if (competenceSection) {
-
-                competenceSection.style.display =
-                    "";
-
-            }
-
         } else {
-
-            if (competenceSection) {
-
-                competenceSection.style.display =
-                    "";
-
-            }
-
 
             liste.forEach(
                 competence => {
@@ -1380,7 +1391,9 @@ function ouvrirProfil(
 
 
                     if (
-                        competence ===
+                        String(
+                            competence
+                        ).toUpperCase() ===
                         "VIP"
                     ) {
 
@@ -1437,6 +1450,14 @@ function ouvrirProfil(
 
                 }
             );
+
+        }
+
+
+        if (competenceSection) {
+
+            competenceSection.style.display =
+                "";
 
         }
 
@@ -1917,7 +1938,7 @@ function initialiserFormulaireInscription() {
 
             /* =================================================
                VALIDATION
-            ================================================= */
+            ================================================== */
 
             if (!nom) {
 
@@ -2034,7 +2055,7 @@ function initialiserFormulaireInscription() {
 
             /* =================================================
                BOUTON
-            ================================================= */
+            ================================================== */
 
             if (submitButton) {
 
@@ -2089,7 +2110,6 @@ function initialiserFormulaireInscription() {
                         message,
                         "Cette adresse e-mail est déjà utilisée. Un seul profil peut être créé avec cette adresse."
                     );
-
 
                     return;
 
