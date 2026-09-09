@@ -1,0 +1,1 @@
+// AVANT-GARDE — Composants communs
