@@ -1,11 +1,12 @@
 /* =========================================================
-   AVANT-GARDE — SUPABASE
-   js/supabase.js
+AVANT-GARDE — SUPABASE
+js/supabase.js
 
-   Connexion Supabase unique utilisée par les pages du site.
+Connexion Supabase unique utilisée par les pages du site.
 ========================================================= */
 
-window.supabaseClient = window.supabase.createClient(
-  "https://wlhtegrciehmtxqecopv.supabase.co",
-  "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs"
+export const supabase =
+window.supabase.createClient(
+"https://wlhtegrciehmtxqecopv.supabase.co",
+"sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs"
 );
