@@ -2,8 +2,10 @@ name: Mise à jour audiences réseaux
 
 on:
   schedule:
+    # 20 passages entre 01h00 et 05h47
     - cron: "2,17,32,47 1-5 * * *"
       timezone: "Europe/Paris"
+
   workflow_dispatch:
 
 concurrency:
@@ -11,78 +13,113 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+
   update-audience:
+
     runs-on: ubuntu-latest
+
     timeout-minutes: 15
 
     steps:
+
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: 22
 
       - name: Update audiences
+
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
         run: |
+
           node <<'EOF'
 
           const https = require("https");
 
-          console.log("");
-          console.log("========================================");
-          console.log("AVANT-GARDE — UPDATE AUDIENCE");
-          console.log("========================================");
-          console.log("");
+          // ============================================================
+          // CONFIGURATION
+          // ============================================================
 
-          const SUPABASE_URL = process.env.SUPABASE_URL;
-          const SUPABASE_SERVICE_ROLE_KEY =
+          const SUPABASE_URL =
+            process.env.SUPABASE_URL;
+
+          const SUPABASE_KEY =
             process.env.SUPABASE_SERVICE_ROLE_KEY;
 
           if (!SUPABASE_URL) {
-            throw new Error("SUPABASE_URL manquant.");
+            throw new Error(
+              "SUPABASE_URL manquant"
+            );
           }
 
-          if (!SUPABASE_SERVICE_ROLE_KEY) {
-            throw new Error("SUPABASE_SERVICE_ROLE_KEY manquant.");
+          if (!SUPABASE_KEY) {
+            throw new Error(
+              "SUPABASE_SERVICE_ROLE_KEY manquant"
+            );
           }
 
+          // Pulse que nous avons déjà testé avec succès
           const PULSE_URL =
             "https://pulse.walls.sh/profile?url=";
 
+          // ------------------------------------------------------------
+          // LIMITES
+          // ------------------------------------------------------------
+
+          // On reste sous 120/minute
           const MAX_CALLS_PER_MINUTE = 120;
+
+          // 100 URLs par minute environ
           const PULSE_DELAY_MS = 600;
 
+          // Maximum d'URLs par lancement
           const MAX_URLS_PER_RUN = 1000;
+
+          // Nombre de profils candidats récupérés
           const CANDIDATE_PROFILES = 1500;
 
+          // Nombre maximum de tentatives Pulse
           const MAX_RETRIES = 3;
+
+          // Timeout Pulse
           const PULSE_TIMEOUT_MS = 15000;
 
-          console.log(
-            `Limite Pulse : ${MAX_CALLS_PER_MINUTE}/min`
-          );
 
-          console.log(
-            `Budget URLs : ${MAX_URLS_PER_RUN}`
-          );
-
-          /*
-           * ---------------------------------------------------------
-           * UTILITAIRES
-           * ---------------------------------------------------------
-           */
+          // ============================================================
+          // OUTILS
+          // ============================================================
 
           function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
+            return new Promise(
+              resolve => setTimeout(resolve, ms)
+            );
           }
 
-          function detectNetwork(url) {
-            if (!url) return null;
 
-            const value = String(url).trim().toLowerCase();
+          function normalizeUrl(url) {
+
+            if (!url) {
+              return null;
+            }
+
+            const value =
+              String(url).trim();
+
+            if (!value) {
+              return null;
+            }
+
+            return value;
+          }
+
+
+          function detectNetwork(url) {
+
+            const value =
+              url.toLowerCase();
 
             if (
               value.includes("facebook.com") ||
@@ -120,260 +157,150 @@ jobs:
             return null;
           }
 
-          function normaliserUrl(url) {
-            if (!url) return "";
 
-            return String(url)
-              .trim()
-              .replace(/\/+$/, "");
+          function audienceColumn(network) {
+
+            return `${network}_audience`;
           }
 
-          function parsePulseAudience(data) {
-            if (!data) return null;
 
-            const candidats = [
-              data.followers,
-              data.followerCount,
-              data.followersCount,
-              data.subscribers,
-              data.subscriberCount,
-              data.audience,
-              data.count,
+          // ============================================================
+          // SUPABASE REQUEST
+          // ============================================================
 
-              data.data?.followers,
-              data.data?.followerCount,
-              data.data?.followersCount,
-              data.data?.subscribers,
-              data.data?.subscriberCount,
-              data.data?.audience,
-              data.data?.count,
-
-              data.profile?.followers,
-              data.profile?.followerCount,
-              data.profile?.followersCount,
-              data.profile?.subscribers,
-              data.profile?.subscriberCount,
-              data.profile?.audience,
-              data.profile?.count
-            ];
-
-            for (const valeur of candidats) {
-              if (
-                valeur !== undefined &&
-                valeur !== null
-              ) {
-                const nombre = parseAudienceNumber(valeur);
-
-                if (nombre !== null) {
-                  return nombre;
-                }
-              }
-            }
-
-            return null;
-          }
-
-          function parseAudienceNumber(value) {
-            if (
-              typeof value === "number" &&
-              Number.isFinite(value) &&
-              value >= 0
-            ) {
-              return Math.round(value);
-            }
-
-            if (
-              typeof value !== "string"
-            ) {
-              return null;
-            }
-
-            let texte = value.trim();
-
-            if (!texte) {
-              return null;
-            }
-
-            /*
-             * On accepte par exemple :
-             * 566
-             * 2 000 000
-             * 2,000,000
-             * 2.000.000
-             *
-             * On retire tout sauf les chiffres.
-             */
-
-            texte = texte.replace(/[^\d]/g, "");
-
-            if (!texte) {
-              return null;
-            }
-
-            const nombre = Number(texte);
-
-            if (
-              !Number.isFinite(nombre) ||
-              nombre < 0
-            ) {
-              return null;
-            }
-
-            return Math.round(nombre);
-          }
-
-          /*
-           * ---------------------------------------------------------
-           * REQUÊTES HTTP
-           * ---------------------------------------------------------
-           */
-
-          function httpsRequest(
-            url,
-            options = {},
-            body = null,
-            timeoutMs = 20000
-          ) {
-            return new Promise((resolve, reject) => {
-
-              const parsed = new URL(url);
-
-              const requestOptions = {
-                hostname: parsed.hostname,
-                port: parsed.port || 443,
-                path:
-                  parsed.pathname +
-                  parsed.search,
-                method: options.method || "GET",
-                headers: options.headers || {},
-                timeout: timeoutMs
-              };
-
-              const req = https.request(
-                requestOptions,
-                res => {
-
-                  let data = "";
-
-                  res.on(
-                    "data",
-                    chunk => {
-                      data += chunk;
-                    }
-                  );
-
-                  res.on(
-                    "end",
-                    () => {
-
-                      resolve({
-                        status: res.statusCode,
-                        headers: res.headers,
-                        body: data
-                      });
-
-                    }
-                  );
-
-                }
-              );
-
-              req.on(
-                "timeout",
-                () => {
-                  req.destroy(
-                    new Error(
-                      `HTTP timeout après ${timeoutMs} ms`
-                    )
-                  );
-                }
-              );
-
-              req.on(
-                "error",
-                reject
-              );
-
-              if (body !== null) {
-                req.write(body);
-              }
-
-              req.end();
-            });
-          }
-
-          async function supabaseRequest(
+          function supabaseRequest(
             path,
             options = {}
           ) {
 
-            const url =
-              `${SUPABASE_URL}${path}`;
+            return new Promise(
+              (resolve, reject) => {
 
-            const headers = {
-              "apikey":
-                SUPABASE_SERVICE_ROLE_KEY,
+                const url =
+                  new URL(
+                    path,
+                    SUPABASE_URL
+                  );
 
-              "Authorization":
-                `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+                const request =
+                  https.request(
+                    url,
+                    {
+                      method:
+                        options.method || "GET",
 
-              "Content-Type":
-                "application/json",
+                      headers: {
 
-              ...(options.headers || {})
-            };
+                        "apikey":
+                          SUPABASE_KEY,
 
-            const response =
-              await httpsRequest(
-                url,
-                {
-                  method:
-                    options.method || "GET",
-                  headers
-                },
-                options.body || null,
-                30000
-              );
+                        "Authorization":
+                          `Bearer ${SUPABASE_KEY}`,
 
-            if (
-              response.status < 200 ||
-              response.status >= 300
-            ) {
+                        "Content-Type":
+                          "application/json",
 
-              throw new Error(
-                `Supabase HTTP ${response.status}: ${response.body}`
-              );
+                        ...(options.headers || {})
+                      }
+                    },
 
-            }
+                    response => {
 
-            if (!response.body) {
-              return null;
-            }
+                      let body = "";
 
-            try {
-              return JSON.parse(
-                response.body
-              );
-            } catch {
-              return response.body;
-            }
+                      response.on(
+                        "data",
+                        chunk => {
+                          body += chunk;
+                        }
+                      );
+
+                      response.on(
+                        "end",
+                        () => {
+
+                          let data = null;
+
+                          try {
+
+                            data =
+                              body
+                                ? JSON.parse(body)
+                                : null;
+
+                          } catch {
+
+                            data = body;
+
+                          }
+
+
+                          if (
+                            response.statusCode >= 200 &&
+                            response.statusCode < 300
+                          ) {
+
+                            resolve({
+                              status:
+                                response.statusCode,
+                              data
+                            });
+
+                          } else {
+
+                            reject(
+                              new Error(
+                                `Supabase HTTP ${response.statusCode}: ${body}`
+                              )
+                            );
+
+                          }
+
+                        }
+                      );
+
+                    }
+                  );
+
+
+                request.on(
+                  "error",
+                  reject
+                );
+
+
+                if (options.body) {
+
+                  request.write(
+                    options.body
+                  );
+
+                }
+
+
+                request.end();
+
+              }
+            );
           }
 
-          /*
-           * ---------------------------------------------------------
-           * PULSE
-           * ---------------------------------------------------------
-           */
 
-          async function getPulseAudience(url) {
+          // ============================================================
+          // PULSE
+          // ============================================================
 
-            const encodedUrl =
-              encodeURIComponent(url);
+          async function pulseRequest(
+            socialUrl
+          ) {
 
-            const endpoint =
-              `${PULSE_URL}${encodedUrl}`;
+            const requestUrl =
+              PULSE_URL +
+              encodeURIComponent(
+                socialUrl
+              );
 
             let lastError = null;
+
 
             for (
               let attempt = 1;
@@ -383,770 +310,1010 @@ jobs:
 
               try {
 
-                console.log(
-                  `  Tentative ${attempt}/${MAX_RETRIES} : ${url}`
+                const body =
+                  await new Promise(
+                    (resolve, reject) => {
+
+                      const request =
+                        https.get(
+                          requestUrl,
+                          {
+                            headers: {
+
+                              "User-Agent":
+                                "Avant-Garde-Audience-Updater/1.0",
+
+                              "Accept":
+                                "application/json,text/plain,*/*"
+
+                            }
+                          },
+
+                          response => {
+
+                            let data = "";
+
+                            response.on(
+                              "data",
+                              chunk => {
+                                data += chunk;
+                              }
+                            );
+
+
+                            response.on(
+                              "end",
+                              () => {
+
+                                if (
+                                  response.statusCode < 200 ||
+                                  response.statusCode >= 300
+                                ) {
+
+                                  reject(
+                                    new Error(
+                                      `Pulse HTTP ${response.statusCode}`
+                                    )
+                                  );
+
+                                  return;
+                                }
+
+
+                                resolve(data);
+
+                              }
+                            );
+
+                          }
+                        );
+
+
+                      request.setTimeout(
+                        PULSE_TIMEOUT_MS,
+                        () => {
+
+                          request.destroy(
+                            new Error(
+                              "Pulse timeout"
+                            )
+                          );
+
+                        }
+                      );
+
+
+                      request.on(
+                        "error",
+                        reject
+                      );
+
+                    }
+                  );
+
+
+                return parsePulseAudience(
+                  body
                 );
 
-                const response =
-                  await httpsRequest(
-                    endpoint,
-                    {
-                      method: "GET",
-                      headers: {
-                        "Accept":
-                          "application/json"
-                      }
-                    },
-                    null,
-                    PULSE_TIMEOUT_MS
-                  );
-
-                if (
-                  response.status < 200 ||
-                  response.status >= 300
-                ) {
-
-                  throw new Error(
-                    `Pulse HTTP ${response.status}`
-                  );
-
-                }
-
-                let data;
-
-                try {
-                  data =
-                    JSON.parse(
-                      response.body
-                    );
-                } catch {
-
-                  throw new Error(
-                    "Réponse Pulse invalide."
-                  );
-
-                }
-
-                const audience =
-                  parsePulseAudience(data);
-
-                if (audience === null) {
-
-                  throw new Error(
-                    "Audience introuvable dans la réponse Pulse."
-                  );
-
-                }
-
-                return audience;
 
               } catch (error) {
 
                 lastError = error;
 
+                console.log(
+                  `      Tentative ${attempt}/${MAX_RETRIES} : ${error.message}`
+                );
+
+
                 if (
                   attempt < MAX_RETRIES
                 ) {
+
                   await sleep(
-                    PULSE_DELAY_MS
+                    1500 * attempt
                   );
+
                 }
 
               }
+
             }
 
-            throw lastError ||
-              new Error(
-                "Erreur Pulse inconnue."
-              );
+
+            throw lastError;
           }
 
-          /*
-           * ---------------------------------------------------------
-           * PROFILS SUPABASE
-           * ---------------------------------------------------------
-           */
+
+          // ============================================================
+          // EXTRACTION FOLLOWERS
+          // ============================================================
+
+          function parsePulseAudience(
+            body
+          ) {
+
+            let data = null;
+
+
+            try {
+
+              data =
+                JSON.parse(body);
+
+            } catch {
+
+              data = null;
+
+            }
+
+
+            function numberValue(
+              value
+            ) {
+
+              if (
+                typeof value === "number" &&
+                Number.isFinite(value)
+              ) {
+
+                return Math.round(
+                  value
+                );
+
+              }
+
+
+              if (
+                typeof value === "string"
+              ) {
+
+                const cleaned =
+                  value.replace(
+                    /[^\d]/g,
+                    ""
+                  );
+
+
+                if (cleaned) {
+
+                  return Number(
+                    cleaned
+                  );
+
+                }
+
+              }
+
+
+              return null;
+            }
+
+
+            if (data) {
+
+              const candidates = [
+
+                data.followers,
+                data.followerCount,
+                data.followersCount,
+                data.subscribers,
+                data.subscriberCount,
+                data.audience,
+                data.count,
+
+                data.data?.followers,
+                data.data?.followerCount,
+                data.data?.followersCount,
+                data.data?.subscribers,
+                data.data?.subscriberCount,
+                data.data?.audience,
+                data.data?.count,
+
+                data.profile?.followers,
+                data.profile?.followerCount,
+                data.profile?.followersCount,
+                data.profile?.subscribers,
+                data.profile?.subscriberCount
+
+              ];
+
+
+              for (
+                const candidate
+                of candidates
+              ) {
+
+                const number =
+                  numberValue(
+                    candidate
+                  );
+
+
+                if (
+                  number !== null &&
+                  number >= 0
+                ) {
+
+                  return number;
+
+                }
+
+              }
+
+            }
+
+
+            // ----------------------------------------------------------
+            // Dernier recours
+            // ----------------------------------------------------------
+
+            const text =
+              String(body);
+
+
+            const patterns = [
+
+              /"followers"\s*:\s*([0-9]+)/i,
+
+              /"followerCount"\s*:\s*([0-9]+)/i,
+
+              /"followersCount"\s*:\s*([0-9]+)/i,
+
+              /"subscribers"\s*:\s*([0-9]+)/i,
+
+              /"subscriberCount"\s*:\s*([0-9]+)/i,
+
+              /"audience"\s*:\s*([0-9]+)/i,
+
+              /"count"\s*:\s*([0-9]+)/i
+
+            ];
+
+
+            for (
+              const pattern
+              of patterns
+            ) {
+
+              const match =
+                text.match(
+                  pattern
+                );
+
+
+              if (match) {
+
+                const number =
+                  Number(
+                    match[1]
+                  );
+
+
+                if (
+                  Number.isFinite(number)
+                ) {
+
+                  return number;
+
+                }
+
+              }
+
+            }
+
+
+            throw new Error(
+              "Audience introuvable dans la réponse Pulse"
+            );
+          }
+
+
+          // ============================================================
+          // RÉCUPÉRATION DES PROFILS
+          // ============================================================
 
           async function getProfiles() {
 
-            const columns = [
+            /*
+             * IMPORTANT :
+             *
+             * La colonne est "nom", PAS "name".
+             */
+
+            const fields = [
+
               "id",
               "nom",
+
               "facebook_url",
               "instagram_url",
               "x_url",
               "youtube_url",
               "tiktok_url",
+
               "facebook_audience",
               "instagram_audience",
               "x_audience",
               "youtube_audience",
               "tiktok_audience",
+
               "audience_max",
               "audience_reseau",
               "audience_updated_at"
+
             ].join(",");
 
+
             const path =
-              `/rest/v1/profiles` +
-              `?select=${encodeURIComponent(columns)}` +
-              `&anonyme=eq.false` +
+              `${SUPABASE_URL}/rest/v1/profiles` +
+              `?select=${encodeURIComponent(fields)}` +
               `&order=audience_updated_at.asc.nullsfirst,id.asc` +
               `&limit=${CANDIDATE_PROFILES}`;
 
-            return await supabaseRequest(
-              path
-            );
+
+            const result =
+              await supabaseRequest(
+                path
+              );
+
+
+            return result.data || [];
           }
 
-          /*
-           * ---------------------------------------------------------
-           * MISE À JOUR VIA RPC
-           *
-           * IMPORTANT :
-           * On n'utilise plus PATCH /profiles.
-           *
-           * Le trigger protect_team_profile_update()
-           * autorise la modification lorsque la fonction RPC
-           * active le contexte avantgarde.audience_updater.
-           * ---------------------------------------------------------
-           */
 
-          async function updateProfileAudiences(
+          // ============================================================
+          // CALCUL MAXIMUM
+          // ============================================================
+
+          function calculateAudience(
+            profile
+          ) {
+
+            const networks = [
+
+              {
+                name: "facebook",
+                value:
+                  profile.facebook_audience
+              },
+
+              {
+                name: "instagram",
+                value:
+                  profile.instagram_audience
+              },
+
+              {
+                name: "x",
+                value:
+                  profile.x_audience
+              },
+
+              {
+                name: "youtube",
+                value:
+                  profile.youtube_audience
+              },
+
+              {
+                name: "tiktok",
+                value:
+                  profile.tiktok_audience
+              }
+
+            ];
+
+
+            let max = 0;
+            let network = null;
+
+
+            for (
+              const item
+              of networks
+            ) {
+
+              const value =
+                Number(
+                  item.value
+                );
+
+
+              if (
+                Number.isFinite(value) &&
+                value > max
+              ) {
+
+                max = value;
+                network = item.name;
+
+              }
+
+            }
+
+
+            return {
+              max,
+              network
+            };
+          }
+
+
+          // ============================================================
+          // UPDATE SUPABASE
+          // ============================================================
+
+          async function updateProfile(
             profileId,
             values
           ) {
 
+            /*
+             * IMPORTANT :
+             *
+             * On ne fait PLUS de PATCH direct sur profiles.
+             *
+             * Le trigger de sécurité de profiles bloque ce type
+             * de modification.
+             *
+             * On passe donc par la fonction RPC dédiée :
+             *
+             * public.update_profile_audiences(...)
+             *
+             * créée dans Supabase pour le système automatique.
+             */
+
             const path =
-              "/rest/v1/rpc/update_profile_audiences";
+              `${SUPABASE_URL}/rest/v1/rpc/update_profile_audiences`;
 
-            const body = {
-              p_profile_id:
-                profileId,
-
-              p_facebook_audience:
-                values.facebook_audience,
-
-              p_instagram_audience:
-                values.instagram_audience,
-
-              p_x_audience:
-                values.x_audience,
-
-              p_youtube_audience:
-                values.youtube_audience,
-
-              p_tiktok_audience:
-                values.tiktok_audience,
-
-              p_audience_max:
-                values.audience_max,
-
-              p_audience_reseau:
-                values.audience_reseau,
-
-              p_audience_updated_at:
-                values.audience_updated_at
-            };
 
             await supabaseRequest(
               path,
               {
+
                 method: "POST",
+
                 headers: {
                   "Prefer":
                     "return=minimal"
                 },
+
                 body:
-                  JSON.stringify(body)
+                  JSON.stringify({
+
+                    p_profile_id:
+                      profileId,
+
+                    p_facebook_audience:
+                      values.facebook_audience ?? null,
+
+                    p_instagram_audience:
+                      values.instagram_audience ?? null,
+
+                    p_x_audience:
+                      values.x_audience ?? null,
+
+                    p_youtube_audience:
+                      values.youtube_audience ?? null,
+
+                    p_tiktok_audience:
+                      values.tiktok_audience ?? null,
+
+                    p_audience_max:
+                      values.audience_max ?? null,
+
+                    p_audience_reseau:
+                      values.audience_reseau ?? null,
+
+                    p_audience_updated_at:
+                      values.audience_updated_at ?? null
+
+                  })
+
               }
             );
           }
 
-          /*
-           * ---------------------------------------------------------
-           * CALCUL AUDIENCE MAX
-           * ---------------------------------------------------------
-           */
 
-          function calculerAudienceMax(
-            profile
-          ) {
+          // ============================================================
+          // MAIN
+          // ============================================================
 
-            const reseaux = [
-              {
-                nom: "Facebook",
-                valeur:
-                  Number(
-                    profile.facebook_audience || 0
-                  )
-              },
+          async function main() {
 
-              {
-                nom: "Instagram",
-                valeur:
-                  Number(
-                    profile.instagram_audience || 0
-                  )
-              },
+            const startedAt =
+              Date.now();
 
-              {
-                nom: "X",
-                valeur:
-                  Number(
-                    profile.x_audience || 0
-                  )
-              },
-
-              {
-                nom: "YouTube",
-                valeur:
-                  Number(
-                    profile.youtube_audience || 0
-                  )
-              },
-
-              {
-                nom: "TikTok",
-                valeur:
-                  Number(
-                    profile.tiktok_audience || 0
-                  )
-              }
-            ];
-
-            reseaux.sort(
-              (a, b) =>
-                b.valeur - a.valeur
-            );
-
-            return {
-              max:
-                reseaux[0]?.valeur || 0,
-
-              reseau:
-                reseaux[0]?.nom || null
-            };
-          }
-
-          /*
-           * ---------------------------------------------------------
-           * DÉBUT DU TRAITEMENT
-           * ---------------------------------------------------------
-           */
-
-          const startTime =
-            Date.now();
-
-          const profiles =
-            await getProfiles();
-
-          console.log(
-            `Profils candidats : ${profiles.length}`
-          );
-
-          /*
-           * Création de la liste des URLs.
-           *
-           * Une même URL peut appartenir à plusieurs profils.
-           *
-           * Exemple :
-           *
-           * Test → Facebook A
-           * Lex  → Facebook A
-           *
-           * Pulse ne sera appelé qu'une seule fois.
-           */
-
-          const entries = [];
-
-          for (const profile of profiles) {
-
-            const reseaux = [
-              {
-                network: "facebook",
-                url:
-                  profile.facebook_url
-              },
-
-              {
-                network: "instagram",
-                url:
-                  profile.instagram_url
-              },
-
-              {
-                network: "x",
-                url:
-                  profile.x_url
-              },
-
-              {
-                network: "youtube",
-                url:
-                  profile.youtube_url
-              },
-
-              {
-                network: "tiktok",
-                url:
-                  profile.tiktok_url
-              }
-            ];
-
-            for (const item of reseaux) {
-
-              const url =
-                normaliserUrl(item.url);
-
-              if (!url) {
-                continue;
-              }
-
-              const detected =
-                detectNetwork(url);
-
-              if (!detected) {
-                console.log(
-                  `URL ignorée — réseau inconnu : ${url}`
-                );
-
-                continue;
-              }
-
-              entries.push({
-                profile,
-                network: detected,
-                url
-              });
-            }
-          }
-
-          /*
-           * ---------------------------------------------------------
-           * DÉDUPLICATION DES URLs
-           * ---------------------------------------------------------
-           */
-
-          const uniqueUrls =
-            new Map();
-
-          for (const entry of entries) {
-
-            if (
-              !uniqueUrls.has(entry.url)
-            ) {
-              uniqueUrls.set(
-                entry.url,
-                []
-              );
-            }
-
-            uniqueUrls
-              .get(entry.url)
-              .push(entry);
-          }
-
-          /*
-           * On respecte le budget global.
-           */
-
-          const selectedUrls =
-            Array.from(
-              uniqueUrls.keys()
-            ).slice(
-              0,
-              MAX_URLS_PER_RUN
-            );
-
-          console.log(
-            `URLs sélectionnées : ${entries.length}`
-          );
-
-          console.log(
-            `URLs uniques Pulse : ${selectedUrls.length}`
-          );
-
-          /*
-           * Profils réellement concernés.
-           */
-
-          const selectedProfileIds =
-            new Set();
-
-          for (const url of selectedUrls) {
-
-            for (
-              const entry of
-              uniqueUrls.get(url)
-            ) {
-
-              selectedProfileIds.add(
-                entry.profile.id
-              );
-
-            }
-          }
-
-          console.log(
-            `Profils réellement traités : ${selectedProfileIds.size}`
-          );
-
-          /*
-           * ---------------------------------------------------------
-           * RÉSULTATS PULSE
-           * ---------------------------------------------------------
-           */
-
-          const pulseResults =
-            new Map();
-
-          let pulseOk = 0;
-          let pulseErrors = 0;
-          let pulseCalls = 0;
-
-          for (
-            const url of selectedUrls
-          ) {
-
-            const entriesForUrl =
-              uniqueUrls.get(url);
-
-            const network =
-              entriesForUrl[0]?.network ||
-              detectNetwork(url);
 
             console.log("");
             console.log(
-              `[${network}] ${url}`
+              "========================================"
             );
 
-            pulseCalls++;
+            console.log(
+              "AVANT-GARDE — UPDATE AUDIENCE"
+            );
 
-            try {
+            console.log(
+              "========================================"
+            );
 
-              const audience =
-                await getPulseAudience(
+            console.log(
+              `Limite Pulse : ${MAX_CALLS_PER_MINUTE}/min`
+            );
+
+            console.log(
+              `Budget URLs : ${MAX_URLS_PER_RUN}`
+            );
+
+
+            // ----------------------------------------------------------
+            // PROFILS
+            // ----------------------------------------------------------
+
+            const profiles =
+              await getProfiles();
+
+
+            console.log(
+              `Profils candidats : ${profiles.length}`
+            );
+
+
+            if (!profiles.length) {
+
+              console.log(
+                "Aucun profil à traiter."
+              );
+
+              return;
+            }
+
+
+            // ----------------------------------------------------------
+            // CONSTRUCTION DES ENTRÉES
+            // ----------------------------------------------------------
+
+            const entries = [];
+
+
+            for (
+              const profile
+              of profiles
+            ) {
+
+              const networks = [
+
+                {
+                  network: "facebook",
+                  url:
+                    profile.facebook_url
+                },
+
+                {
+                  network: "instagram",
+                  url:
+                    profile.instagram_url
+                },
+
+                {
+                  network: "x",
+                  url:
+                    profile.x_url
+                },
+
+                {
+                  network: "youtube",
+                  url:
+                    profile.youtube_url
+                },
+
+                {
+                  network: "tiktok",
+                  url:
+                    profile.tiktok_url
+                }
+
+              ];
+
+
+              const profileEntries = [];
+
+
+              for (
+                const item
+                of networks
+              ) {
+
+                const url =
+                  normalizeUrl(
+                    item.url
+                  );
+
+
+                if (!url) {
+                  continue;
+                }
+
+
+                const detected =
+                  detectNetwork(
+                    url
+                  );
+
+
+                if (!detected) {
+                  continue;
+                }
+
+
+                profileEntries.push({
+
+                  profile,
+
+                  network:
+                    detected,
+
                   url
+
+                });
+
+              }
+
+
+              /*
+               * On garde toujours tous les réseaux
+               * d'un même profil.
+               */
+
+              if (
+                entries.length +
+                profileEntries.length
+                <= MAX_URLS_PER_RUN
+              ) {
+
+                entries.push(
+                  ...profileEntries
                 );
 
-              pulseResults.set(
-                url,
-                audience
-              );
+              } else {
 
-              pulseOk++;
+                break;
 
-              console.log(
-                `  → ${audience}`
-              );
-
-            } catch (error) {
-
-              pulseErrors++;
-
-              console.log(
-                `  → ERREUR : ${error.message}`
-              );
-
-            }
-
-            /*
-             * Petite temporisation entre les URLs.
-             */
-
-            if (
-              pulseCalls <
-              selectedUrls.length
-            ) {
-              await sleep(
-                PULSE_DELAY_MS
-              );
-            }
-          }
-
-          /*
-           * ---------------------------------------------------------
-           * APPLICATION DES RÉSULTATS AUX PROFILS
-           * ---------------------------------------------------------
-           */
-
-          const profileResults =
-            new Map();
-
-          for (const profile of profiles) {
-
-            profileResults.set(
-              profile.id,
-              {
-                facebook_audience:
-                  profile.facebook_audience,
-
-                instagram_audience:
-                  profile.instagram_audience,
-
-                x_audience:
-                  profile.x_audience,
-
-                youtube_audience:
-                  profile.youtube_audience,
-
-                tiktok_audience:
-                  profile.tiktok_audience,
-
-                audience_max:
-                  profile.audience_max,
-
-                audience_reseau:
-                  profile.audience_reseau,
-
-                audience_updated_at:
-                  profile.audience_updated_at,
-
-                hasUpdate: false
               }
-            );
-          }
 
-          /*
-           * On applique chaque résultat Pulse
-           * à TOUS les profils qui utilisent cette URL.
-           */
-
-          for (
-            const url of selectedUrls
-          ) {
-
-            if (
-              !pulseResults.has(url)
-            ) {
-              continue;
             }
 
-            const audience =
-              pulseResults.get(url);
 
-            const entriesForUrl =
-              uniqueUrls.get(url);
+            console.log(
+              `URLs sélectionnées : ${entries.length}`
+            );
+
+
+            if (!entries.length) {
+
+              console.log(
+                "Aucune URL sociale exploitable."
+              );
+
+              return;
+            }
+
+
+            // ----------------------------------------------------------
+            // GROUPEMENT PAR PROFIL
+            // ----------------------------------------------------------
+
+            const profileMap =
+              new Map();
+
 
             for (
-              const entry of
-              entriesForUrl
+              const entry
+              of entries
             ) {
 
-              const result =
-                profileResults.get(
+              if (
+                !profileMap.has(
                   entry.profile.id
+                )
+              ) {
+
+                profileMap.set(
+                  entry.profile.id,
+                  {
+                    profile:
+                      entry.profile,
+
+                    entries: []
+                  }
                 );
 
-              if (!result) {
-                continue;
               }
 
-              switch (entry.network) {
 
-                case "facebook":
-                  result.facebook_audience =
-                    audience;
-                  break;
+              profileMap
+                .get(
+                  entry.profile.id
+                )
+                .entries
+                .push(
+                  entry
+                );
 
-                case "instagram":
-                  result.instagram_audience =
-                    audience;
-                  break;
-
-                case "x":
-                  result.x_audience =
-                    audience;
-                  break;
-
-                case "youtube":
-                  result.youtube_audience =
-                    audience;
-                  break;
-
-                case "tiktok":
-                  result.tiktok_audience =
-                    audience;
-                  break;
-              }
-
-              result.hasUpdate = true;
             }
-          }
 
-          /*
-           * ---------------------------------------------------------
-           * ENREGISTREMENT SUPABASE VIA RPC
-           * ---------------------------------------------------------
-           */
 
-          let profilesUpdated = 0;
-          let profilesErrors = 0;
+            console.log(
+              `Profils réellement traités : ${profileMap.size}`
+            );
 
-          for (const profile of profiles) {
 
-            const result =
-              profileResults.get(
-                profile.id
-              );
+            // ----------------------------------------------------------
+            // STATISTIQUES
+            // ----------------------------------------------------------
 
-            if (
-              !result ||
-              !result.hasUpdate
+            let pulseOK = 0;
+
+            let pulseErrors = 0;
+
+            let profilesUpdated = 0;
+
+
+            // ----------------------------------------------------------
+            // TRAITEMENT
+            // ----------------------------------------------------------
+
+            for (
+              const group
+              of profileMap.values()
             ) {
-              continue;
-            }
 
-            const tempProfile = {
-              facebook_audience:
-                result.facebook_audience,
+              const profile =
+                group.profile;
 
-              instagram_audience:
-                result.instagram_audience,
 
-              x_audience:
-                result.x_audience,
+              console.log("");
 
-              youtube_audience:
-                result.youtube_audience,
-
-              tiktok_audience:
-                result.tiktok_audience
-            };
-
-            const max =
-              calculerAudienceMax(
-                tempProfile
+              console.log(
+                `----- ${profile.nom || profile.id} -----`
               );
 
-            result.audience_max =
-              max.max;
 
-            result.audience_reseau =
-              max.reseau;
+              const updates = {};
 
-            result.audience_updated_at =
-              new Date().toISOString();
+              let profileHadSuccess =
+                false;
+
+
+              for (
+                const entry
+                of group.entries
+              ) {
+
+                console.log(
+                  `[${entry.network}] ${entry.url}`
+                );
+
+
+                try {
+
+                  const audience =
+                    await pulseRequest(
+                      entry.url
+                    );
+
+
+                  console.log(
+                    `  → ${audience}`
+                  );
+
+
+                  const column =
+                    audienceColumn(
+                      entry.network
+                    );
+
+
+                  updates[column] =
+                    audience;
+
+
+                  /*
+                   * Mise à jour de l'objet local
+                   * pour recalculer audience_max.
+                   */
+
+                  profile[column] =
+                    audience;
+
+
+                  pulseOK++;
+
+                  profileHadSuccess =
+                    true;
+
+
+                } catch (error) {
+
+                  pulseErrors++;
+
+
+                  console.log(
+                    `  → ERREUR : ${error.message}`
+                  );
+
+                }
+
+
+                /*
+                 * ≈ 100 requêtes/minute.
+                 */
+
+                await sleep(
+                  PULSE_DELAY_MS
+                );
+
+              }
+
+
+              // --------------------------------------------------------
+              // ÉCRITURE SUPABASE
+              // --------------------------------------------------------
+
+              if (
+                profileHadSuccess
+              ) {
+
+                const calculated =
+                  calculateAudience(
+                    profile
+                  );
+
+
+                updates.audience_max =
+                  calculated.max;
+
+
+                updates.audience_reseau =
+                  calculated.network;
+
+
+                /*
+                 * CURSEUR DE ROTATION
+                 *
+                 * Le profil vient d'être traité.
+                 * Il repart donc en fin de file.
+                 */
+
+                updates.audience_updated_at =
+                  new Date()
+                    .toISOString();
+
+
+                try {
+
+                  await updateProfile(
+                    profile.id,
+                    updates
+                  );
+
+
+                  profilesUpdated++;
+
+
+                  console.log(
+                    "  ✓ Supabase mis à jour"
+                  );
+
+
+                } catch (error) {
+
+                  console.log(
+                    `  ✗ Erreur Supabase : ${error.message}`
+                  );
+
+                }
+
+              }
+
+            }
+
+
+            // ============================================================
+            // RAPPORT
+            // ============================================================
+
+            const duration =
+              Math.round(
+                (Date.now() - startedAt) /
+                1000
+              );
+
 
             console.log("");
+
             console.log(
-              `----- ${profile.nom || profile.id} -----`
+              "========================================"
             );
 
             console.log(
-              `  Audience max : ${result.audience_max}`
+              "MISE À JOUR TERMINÉE"
             );
 
             console.log(
-              `  Réseau max : ${result.audience_reseau}`
+              "========================================"
             );
 
-            try {
+            console.log(
+              `Profils candidats : ${profiles.length}`
+            );
 
-              await updateProfileAudiences(
-                profile.id,
-                result
-              );
+            console.log(
+              `Profils traités : ${profileMap.size}`
+            );
 
-              profilesUpdated++;
+            console.log(
+              `URLs Pulse : ${entries.length}`
+            );
 
-              console.log(
-                "  ✓ Profil mis à jour via RPC"
-              );
+            console.log(
+              `Pulse OK : ${pulseOK}`
+            );
 
-            } catch (error) {
+            console.log(
+              `Pulse erreurs : ${pulseErrors}`
+            );
 
-              profilesErrors++;
+            console.log(
+              `Profils Supabase mis à jour : ${profilesUpdated}`
+            );
 
-              console.log(
-                `  ✗ Erreur Supabase : ${error.message}`
-              );
+            console.log(
+              `Durée : ${duration}s`
+            );
 
-            }
+            console.log(
+              "========================================"
+            );
+
           }
 
-          /*
-           * ---------------------------------------------------------
-           * FIN
-           * ---------------------------------------------------------
-           */
 
-          const duration =
-            Math.round(
-              (Date.now() - startTime) /
-              1000
+          // ============================================================
+          // LANCEMENT
+          // ============================================================
+
+          main()
+            .catch(
+              error => {
+
+                console.error("");
+
+                console.error(
+                  "========================================"
+                );
+
+                console.error(
+                  "ERREUR FATALE"
+                );
+
+                console.error(
+                  "========================================"
+                );
+
+                console.error(
+                  error
+                );
+
+                console.error(
+                  "========================================"
+                );
+
+                process.exit(1);
+
+              }
             );
-
-          console.log("");
-          console.log(
-            "========================================"
-          );
-          console.log(
-            "MISE À JOUR TERMINÉE"
-          );
-          console.log(
-            "========================================"
-          );
-
-          console.log(
-            `Profils candidats : ${profiles.length}`
-          );
-
-          console.log(
-            `Profils traités : ${selectedProfileIds.size}`
-          );
-
-          console.log(
-            `URLs Pulse uniques : ${selectedUrls.length}`
-          );
-
-          console.log(
-            `Pulse OK : ${pulseOk}`
-          );
-
-          console.log(
-            `Pulse erreurs : ${pulseErrors}`
-          );
-
-          console.log(
-            `Profils Supabase mis à jour : ${profilesUpdated}`
-          );
-
-          console.log(
-            `Erreurs Supabase : ${profilesErrors}`
-          );
-
-          console.log(
-            `Durée : ${duration}s`
-          );
-
-          console.log(
-            "========================================"
-          );
-
-          /*
-           * Si Pulse fonctionne mais qu'une écriture Supabase
-           * échoue, le workflow reste néanmoins visible dans les logs.
-           *
-           * On fait échouer le workflow uniquement si TOUTES
-           * les mises à jour Supabase prévues ont échoué.
-           */
-
-          const profilesToUpdate =
-            Array.from(
-              profileResults.values()
-            ).filter(
-              result => result.hasUpdate
-            ).length;
-
-          if (
-            profilesToUpdate > 0 &&
-            profilesUpdated === 0
-          ) {
-            throw new Error(
-              "Aucun profil n'a pu être mis à jour dans Supabase."
-            );
-          }
 
           EOF
