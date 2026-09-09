@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 
 <head>
@@ -12,6 +12,7 @@
 
   <title>Notre équipe — Avant-gardE</title>
 
+
   <!-- =====================================================
        STYLES COMMUNS DU SITE
   ====================================================== -->
@@ -20,6 +21,7 @@
     rel="stylesheet"
     href="css/style.css"
   >
+
 
   <!-- =====================================================
        STYLES SPÉCIFIQUES À LA PAGE ÉQUIPE
@@ -34,6 +36,7 @@
 
 
 <body>
+
 
   <!-- =====================================================
        HEADER COMMUN
@@ -139,6 +142,7 @@
 
 
       <div class="profile-content">
+
 
         <!-- =================================================
              COLONNE GAUCHE
@@ -439,13 +443,137 @@
             Région <span class="required">*</span>
           </label>
 
-          <input
-            type="text"
+
+          <select
             id="region"
             name="region"
-            maxlength="120"
             required
           >
+
+            <option value="">
+              Sélectionnez votre région
+            </option>
+
+
+            <optgroup label="France métropolitaine">
+
+              <option>
+                Auvergne-Rhône-Alpes
+              </option>
+
+              <option>
+                Bourgogne-Franche-Comté
+              </option>
+
+              <option>
+                Bretagne
+              </option>
+
+              <option>
+                Centre-Val de Loire
+              </option>
+
+              <option>
+                Corse
+              </option>
+
+              <option>
+                Grand Est
+              </option>
+
+              <option>
+                Hauts-de-France
+              </option>
+
+              <option>
+                Île-de-France
+              </option>
+
+              <option>
+                Normandie
+              </option>
+
+              <option>
+                Nouvelle-Aquitaine
+              </option>
+
+              <option>
+                Occitanie
+              </option>
+
+              <option>
+                Pays de la Loire
+              </option>
+
+              <option>
+                Provence-Alpes-Côte d’Azur
+              </option>
+
+            </optgroup>
+
+
+            <optgroup label="Outre-mer">
+
+              <option>
+                Guadeloupe
+              </option>
+
+              <option>
+                Martinique
+              </option>
+
+              <option>
+                Guyane
+              </option>
+
+              <option>
+                La Réunion
+              </option>
+
+              <option>
+                Mayotte
+              </option>
+
+            </optgroup>
+
+
+            <optgroup label="Étranger">
+
+              <option>
+                Europe
+              </option>
+
+              <option>
+                Amérique du Nord
+              </option>
+
+              <option>
+                Amérique centrale et Caraïbes
+              </option>
+
+              <option>
+                Amérique du Sud
+              </option>
+
+              <option>
+                Afrique
+              </option>
+
+              <option>
+                Asie
+              </option>
+
+              <option>
+                Océanie
+              </option>
+
+              <option>
+                Autre
+              </option>
+
+            </optgroup>
+
+          </select>
 
         </div>
 
@@ -513,14 +641,40 @@
         ================================================== -->
 
         <div class="form-section-title">
-          VOS COMPÉTENCES
+          Talents et compétences métier
         </div>
 
+
+        <div class="form-group">
+
+          <label class="main-label">
+
+            Compétences
+
+            <span
+              style="font-weight:normal;color:#8994a6;"
+            >
+              (auto-évaluation de vos compétences)
+            </span>
+
+          </label>
+
+        </div>
+
+
+        <!-- =================================================
+             COMPÉTENCES MÉTIER
+        ================================================== -->
 
         <div class="competence-group">
 
 
-          <!-- COMMUNICATION -->
+          <div class="competence-group-title">
+            Compétences métier
+          </div>
+
+
+          <!-- MAÎTRISE DE DOCTRINE -->
 
           <div class="competence">
 
@@ -529,17 +683,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Communication"
+                value="Maîtrise de doctrine"
               >
 
               <span>
 
                 <span class="competence-name">
-                  Communication
+                  Maîtrise de doctrine
                 </span>
 
                 <span class="competence-description">
-                  Réseaux sociaux, communication, rédaction.
+                  capacité à préserver la fidélité à l’idéologie d'Avant-Garde et sa cohérence dans l’action du mouvement.
                 </span>
 
               </span>
@@ -549,7 +703,7 @@
           </div>
 
 
-          <!-- ORGANISATION -->
+          <!-- TACTIQUE -->
 
           <div class="competence">
 
@@ -558,17 +712,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Organisation"
+                value="Tactique"
               >
 
               <span>
 
                 <span class="competence-name">
-                  Organisation
+                  Tactique
                 </span>
 
                 <span class="competence-description">
-                  Organisation d’événements, coordination et logistique.
+                  capacité à concevoir et mettre en œuvre des tactiques efficaces de développement d’audience, médiatique et électorale, sans renier l’idéologie.
                 </span>
 
               </span>
@@ -578,7 +732,7 @@
           </div>
 
 
-          <!-- POLITIQUE -->
+          <!-- PRESTANCE -->
 
           <div class="competence">
 
@@ -587,17 +741,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Politique"
+                value="Prestance"
               >
 
               <span>
 
                 <span class="competence-name">
-                  Politique
+                  Prestance
                 </span>
 
                 <span class="competence-description">
-                  Analyse, institutions, programme et stratégie.
+                  capacité à séduire et convaincre par la parole, le charisme, le charme ou la culture.
                 </span>
 
               </span>
@@ -607,7 +761,7 @@
           </div>
 
 
-          <!-- NUMÉRIQUE -->
+          <!-- ANALYSES PRAGMATIQUES -->
 
           <div class="competence">
 
@@ -616,17 +770,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Numérique"
+                value="Analyses pragmatiques"
               >
 
               <span>
 
                 <span class="competence-name">
-                  Numérique
+                  Analyses pragmatiques
                 </span>
 
                 <span class="competence-description">
-                  Informatique, développement, numérique et données.
+                  capacité à analyser les données, les rendements, les conséquences et les rapports de force. anticipent les évolutions et privilégient les faits.
                 </span>
 
               </span>
@@ -636,7 +790,7 @@
           </div>
 
 
-          <!-- JURIDIQUE -->
+          <!-- ANALYSES POPULISTES -->
 
           <div class="competence">
 
@@ -645,17 +799,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Juridique"
+                value="Analyses populistes"
               >
 
               <span>
 
                 <span class="competence-name">
-                  Juridique
+                  Analyses populistes
                 </span>
 
                 <span class="competence-description">
-                  Droit, réglementation et affaires publiques.
+                  capacité à analyser les ressentis, aspirations et frustrations populaires. anticipent les réactions naturelles et privilégient le vécu et l’opinion du peuple.
                 </span>
 
               </span>
@@ -665,7 +819,7 @@
           </div>
 
 
-          <!-- ÉCONOMIE -->
+          <!-- ADMINISTRATION -->
 
           <div class="competence">
 
@@ -674,17 +828,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Économie"
+                value="Administration"
               >
 
               <span>
 
                 <span class="competence-name">
-                  Économie
+                  Administration
                 </span>
 
                 <span class="competence-description">
-                  Économie, finance, entreprise et gestion.
+                  maîtrise de la gestion des structures, des ressources techniques et opérationnelles et des équipes internes.
                 </span>
 
               </span>
@@ -694,7 +848,7 @@
           </div>
 
 
-          <!-- TERRAIN -->
+          <!-- EXPERTISE ET INGÉNIERIE JURIDIQUE -->
 
           <div class="competence">
 
@@ -703,17 +857,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Terrain"
+                value="Expertise et ingénierie juridique"
               >
 
               <span>
 
                 <span class="competence-name">
-                  Terrain
+                  Expertise et ingénierie juridique
                 </span>
 
                 <span class="competence-description">
-                  Mobilisation, terrain, réunions et événements.
+                  maîtrise du droit français et européen ainsi que des mécanismes juridiques, avec capacité à en analyser les règles, les contraintes, les failles et les possibilités d’évolution.
                 </span>
 
               </span>
@@ -723,7 +877,7 @@
           </div>
 
 
-          <!-- AUTRE -->
+          <!-- EXPERTISE ET INGÉNIERIE POLITIQUE -->
 
           <div class="competence">
 
@@ -732,22 +886,97 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Autre"
+                value="Expertise et ingénierie politique"
               >
 
               <span>
 
                 <span class="competence-name">
-                  Autre
+                  Expertise et ingénierie politique
                 </span>
 
                 <span class="competence-description">
-                  Une autre compétence utile au mouvement.
+                  maîtrise d’un domaine politique ou institutionnel particulier et capacité à en apporter l’expertise.
                 </span>
 
               </span>
 
             </label>
+
+          </div>
+
+
+        </div>
+
+
+        <!-- =================================================
+             MÉDAILLES
+        ================================================== -->
+
+        <div class="competence-group">
+
+
+          <div class="competence-group-title">
+            Obtenez des médailles
+          </div>
+
+
+          <!-- VIP -->
+
+          <div class="competence medal-info">
+
+            <div class="medal-content">
+
+              <div
+                class="medal-icon"
+                aria-hidden="true"
+              >
+                ★
+              </div>
+
+              <div>
+
+                <span class="competence-name">
+                  VIP : Célébrité / Influenceur / debunker / créateur de contenu à "forte audience"
+                </span>
+
+                <span class="competence-description">
+                  dont l’influence ou la notoriété contribuent au rayonnement du mouvement.
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- MÉCÈNE -->
+
+          <div class="competence medal-info">
+
+            <div class="medal-content">
+
+              <div
+                class="medal-icon"
+                aria-hidden="true"
+              >
+                ★
+              </div>
+
+              <div>
+
+                <span class="competence-name">
+                  Mécène du mois : "Top 10 donateurs"
+                </span>
+
+                <span class="competence-description">
+                  contribuant au développement, aux évènements et à la médiatisation du mouvement.
+                </span>
+
+              </div>
+
+            </div>
 
           </div>
 
