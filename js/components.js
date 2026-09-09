@@ -309,12 +309,6 @@ try {
         .join("");
 
 
-    /*
-     * IMPORTANT :
-     * On attend deux frames afin que le navigateur ait
-     * réellement calculé la largeur du contenu avant
-     * de lancer l'animation.
-     */
     requestAnimationFrame(() => {
 
         requestAnimationFrame(() => {
@@ -351,10 +345,9 @@ DEFILEMENT EVENEMENTIEL
 
 let tickerAnimation = null;
 
-/*
-
-* Arrête proprement l'animation existante.
-  */
+/* =========================================================
+ARRET DU DEFILEMENT
+========================================================= */
 
 function arreterDefilement() {
 
@@ -371,18 +364,9 @@ if (tickerAnimation !== null) {
 
 }
 
-/*
-
-* Démarre le défilement.
-*
-* IMPORTANT :
-* On NE vérifie PAS si le contenu est plus petit
-* que la fenêtre.
-*
-* Même avec un seul événement court, celui-ci doit
-* entrer par la droite, traverser toute la barre,
-* sortir à gauche, puis recommencer.
-  */
+/* =========================================================
+DEMARRAGE DU DEFILEMENT
+========================================================= */
 
 function demarrerDefilement() {
 
@@ -416,18 +400,18 @@ if (
 
 
 /*
- * Vitesse identique à l'ancien code original.
+ * Vitesse du code originel.
  */
 
 const vitesse = 180;
 
 
 /*
- * Le contenu commence complètement à droite
- * de la fenêtre.
+ * Le texte démarre à droite de la fenêtre.
  */
 
-let position = largeurFenetre;
+let position =
+    largeurFenetre;
 
 
 let dernierTemps =
@@ -444,7 +428,8 @@ function animation(temps) {
         (temps - dernierTemps) / 1000;
 
 
-    dernierTemps = temps;
+    dernierTemps =
+        temps;
 
 
     position -=
@@ -452,8 +437,11 @@ function animation(temps) {
 
 
     /*
-     * Lorsque tout le contenu est sorti à gauche,
-     * on le replace à droite.
+     * Même avec un seul événement,
+     * on continue toujours l'animation.
+     *
+     * Quand le contenu est entièrement sorti
+     * à gauche, il revient à droite.
      */
 
     if (
@@ -756,11 +744,6 @@ document.addEventListener(
     }
 );
 
-
-/*
- * Si la fenêtre change de largeur,
- * on recalcule complètement le ticker.
- */
 
 window.addEventListener(
     "resize",
