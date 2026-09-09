@@ -310,6 +310,8 @@
 
     position: relative;
 
+    display: block;
+
     width: 100%;
 
     aspect-ratio: 1 / 1;
@@ -348,7 +350,7 @@
 .member-card-placeholder {
 
     width: 100%;
-    height: 100%;
+    aspect-ratio: 1 / 1;
 
     display: flex;
 
@@ -1867,4 +1869,19 @@
         padding-right: 15px;
     }
 
+}
+
+/* =========================================================
+   COMPATIBILITÉ JS / CLASSES RENDUES DYNAMIQUEMENT
+========================================================= */
+
+.profile-social-item { position: relative; min-width: 0; }
+.profile-social-item .profile-social-link { width: 100%; }
+.profile-social-max-star { position:absolute; top:5px; right:7px; z-index:2; color:var(--gold-light); font-size:11px; pointer-events:none; }
+
+.form-message.success { color:#9fd7b0; }
+.form-message.error { color:#ff9d95; }
+
+@media (max-width:680px) {
+    .profile-socials { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
