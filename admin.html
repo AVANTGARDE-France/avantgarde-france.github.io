@@ -2049,7 +2049,7 @@ footer{
       <div class="team-role">
 
         <h2 class="team-role-title">
-          Commissaire Fondateur
+          Architecte du Projet
         </h2>
 
         <p class="team-role-text">
@@ -3989,7 +3989,7 @@ function estAdmin(){
 function estCommissaireFondateur(){
 
   return currentProfile?.grade2 ===
-    "Commissaire Fondateur";
+    "Architecte du Projet";
 
 }
 
@@ -4215,7 +4215,7 @@ function afficherSelectionDirection(){
     tousLesMembres.find(
       membre =>
         membre.grade2 ===
-        "Commissaire Fondateur"
+        "Architecte du Projet"
     );
 
 
@@ -4453,14 +4453,14 @@ async function attribuerRoleUnique(
 
   const role =
     type === "founder"
-      ? "Commissaire Fondateur"
+      ? "Architecte du Projet"
       : "Délégué National";
 
 
   const autreRole =
     type === "founder"
       ? "Délégué National"
-      : "Commissaire Fondateur";
+      : "Architecte du Projet";
 
 
   const ancien =
@@ -4831,7 +4831,7 @@ function afficherRegionsEquipe(){
             ></div>
 
             <div class="team-permission">
-              Modification : administration, Délégué National ou Commissaire Fondateur.
+              Modification : administration, Délégué National ou Architecte du Projet.
             </div>
 
             <div
@@ -4874,7 +4874,7 @@ function afficherRegionsEquipe(){
             ></div>
 
             <div class="team-permission">
-              Modification : administration, Délégué National, Commissaire Fondateur ou Délégué Régional de cette région.
+              Modification : administration, Délégué National, Architecte du Projet ou Délégué Régional de cette région.
             </div>
 
             <div
