@@ -1,460 +1,453 @@
 /* =========================================================
-AVANT-GARDE — COMPONENTS
-js/components.js
+   AVANT-GARDE — COMPONENTS
+   js/components.js
 
-Composants communs à toutes les pages :
+   Composants communs à toutes les pages :
 
-* Barre événementielle
-* Header / navigation
-* Roue admin
-* Footer
-* Modale rendez-vous
-* Chargement des événements Supabase
-  ========================================================= */
+   - Barre événementielle
+   - Header / navigation
+   - Roue admin
+   - Footer
+   - Modale rendez-vous
+   - Chargement des événements Supabase
+========================================================= */
 
 import { supabase } from "./supabase.js";
 
+
 /* =========================================================
-HEADER
+   HEADER
 ========================================================= */
 
 function injecterHeader() {
 
-```
-const container = document.getElementById("site-header");
+    const container =
+        document.getElementById("site-header");
 
-if (!container) return;
+    if (!container) return;
 
-container.innerHTML = `
+    container.innerHTML = `
 
-    <!-- BARRE EVENEMENT -->
+        <!-- BARRE EVENEMENT -->
 
-    <div class="events-bar">
+        <div class="events-bar">
 
-        <div class="events-label">
-            EVENEMENT
-        </div>
+            <div class="events-label">
+                EVENEMENT
+            </div>
 
-        <div class="events-window">
+            <div class="events-window">
 
-            <div
-                id="eventsTrack"
-                class="events-track"
-            >
-                <div class="events-empty">
-                    Chargement…
+                <div
+                    id="eventsTrack"
+                    class="events-track"
+                >
+                    <div class="events-empty">
+                        Chargement…
+                    </div>
                 </div>
+
             </div>
 
         </div>
 
-    </div>
 
+        <!-- HEADER -->
 
-    <!-- HEADER -->
+        <header class="site-header">
 
-    <header class="site-header">
+            <div class="header-inner">
 
-        <div class="header-inner">
-
-            <a
-                href="index.html"
-                class="logo"
-                aria-label="Avant-gardE — La France libre"
-            >
-                <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
-            </a>
-
-
-            <nav class="main-nav">
-
-                <a href="manifeste.html">
-                    MANIFESTE
+                <a
+                    href="index.html"
+                    class="logo"
+                    aria-label="Avant-gardE — La France libre"
+                >
+                    <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
                 </a>
 
-                <a href="projet.html">
-                    PROJET
+
+                <nav class="main-nav">
+
+                    <a href="manifeste.html">
+                        MANIFESTE
+                    </a>
+
+                    <a href="projet.html">
+                        PROJET
+                    </a>
+
+                    <a href="inspirations.html">
+                        INSPIRATIONS
+                    </a>
+
+                    <a href="equipe.html">
+                        L'ÉQUIPE
+                    </a>
+
+                </nav>
+
+
+                <a
+                    href="admin.html"
+                    class="admin-link"
+                    aria-label="Administration"
+                    title="Administration"
+                >
+                    ⚙
                 </a>
 
-                <a href="inspirations.html">
-                    INSPIRATIONS
-                </a>
+            </div>
 
-                <a href="equipe.html">
-                    L'ÉQUIPE
-                </a>
-
-            </nav>
-
-
-            <a
-                href="admin.html"
-                class="admin-link"
-                aria-label="Administration"
-                title="Administration"
-            >
-                ⚙
-            </a>
-
-        </div>
-
-    </header>
-`;
-```
-
+        </header>
+    `;
 }
 
+
 /* =========================================================
-FOOTER
+   FOOTER
 ========================================================= */
 
 function injecterFooter() {
 
-```
-const container = document.getElementById("site-footer");
+    const container =
+        document.getElementById("site-footer");
 
-if (!container) return;
+    if (!container) return;
 
-container.innerHTML = `
+    container.innerHTML = `
 
-    <footer>
+        <footer>
 
-        <div>
-            Avant-gardE — La France libre
-        </div>
+            <div>
+                Avant-gardE — La France libre
+            </div>
 
-        <div>
-            Souveraineté · Liberté · Responsabilité
-        </div>
+            <div>
+                Souveraineté · Liberté · Responsabilité
+            </div>
 
-    </footer>
-`;
-```
-
+        </footer>
+    `;
 }
 
+
 /* =========================================================
-MODALE RENDEZ-VOUS
+   MODALE RENDEZ-VOUS
 ========================================================= */
 
 function injecterModaleRendezVous() {
 
-```
-const container = document.getElementById("site-rdv-modal");
+    const container =
+        document.getElementById("site-rdv-modal");
 
-if (!container) return;
+    if (!container) return;
 
-container.innerHTML = `
+    container.innerHTML = `
 
-    <div
-        id="rdvModal"
-        class="rdv-modal"
-        aria-hidden="true"
-    >
+        <div
+            id="rdvModal"
+            class="rdv-modal"
+            aria-hidden="true"
+        >
 
-        <div class="rdv-modal-box">
+            <div class="rdv-modal-box">
 
-            <button
-                id="rdvModalClose"
-                class="rdv-modal-close"
-                type="button"
-                aria-label="Fermer"
-            >
-                ×
-            </button>
-
-
-            <div class="rdv-modal-kicker">
-                RENDEZ-VOUS
-            </div>
+                <button
+                    id="rdvModalClose"
+                    class="rdv-modal-close"
+                    type="button"
+                    aria-label="Fermer"
+                >
+                    ×
+                </button>
 
 
-            <h2
-                id="rdvModalTitle"
-                class="rdv-modal-title"
-            >
-            </h2>
-
-
-            <div class="rdv-modal-info">
-
-                <div>
-                    <span>DATE :</span>
-                    <strong id="rdvModalDate"></strong>
+                <div class="rdv-modal-kicker">
+                    RENDEZ-VOUS
                 </div>
 
-                <div>
-                    <span>HEURE :</span>
-                    <strong id="rdvModalTime"></strong>
+
+                <h2
+                    id="rdvModalTitle"
+                    class="rdv-modal-title"
+                >
+                </h2>
+
+
+                <div class="rdv-modal-info">
+
+                    <div>
+                        <span>DATE :</span>
+                        <strong id="rdvModalDate"></strong>
+                    </div>
+
+                    <div>
+                        <span>HEURE :</span>
+                        <strong id="rdvModalTime"></strong>
+                    </div>
+
+                    <div id="rdvModalLocationWrap">
+                        <span>LIEU :</span>
+                        <strong id="rdvModalLocation"></strong>
+                    </div>
+
                 </div>
 
-                <div id="rdvModalLocationWrap">
-                    <span>LIEU :</span>
-                    <strong id="rdvModalLocation"></strong>
+
+                <div
+                    id="rdvModalDescription"
+                    class="rdv-modal-description"
+                >
                 </div>
 
+
+                <a
+                    id="rdvModalLink"
+                    class="rdv-modal-link"
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style="display:none;"
+                >
+                    EN SAVOIR PLUS
+                </a>
+
             </div>
-
-
-            <div
-                id="rdvModalDescription"
-                class="rdv-modal-description"
-            >
-            </div>
-
-
-            <a
-                id="rdvModalLink"
-                class="rdv-modal-link"
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                style="display:none;"
-            >
-                EN SAVOIR PLUS
-            </a>
 
         </div>
-
-    </div>
-`;
-```
-
+    `;
 }
 
+
 /* =========================================================
-CHARGEMENT DES EVENEMENTS
+   CHARGEMENT DES EVENEMENTS
 ========================================================= */
 
 async function chargerRendezVous() {
 
-```
-const track = document.getElementById("eventsTrack");
+    const track =
+        document.getElementById("eventsTrack");
 
-if (!track) return;
+    if (!track) return;
 
-try {
+    try {
 
-    const maintenant = new Date().toISOString();
+        const maintenant =
+            new Date().toISOString();
 
-    const { data, error } = await supabase
-        .from("rendezvous")
-        .select("*")
-        .eq("actif", true)
-        .gte("date_evenement", maintenant)
-        .order("date_evenement", {
-            ascending: true
+        const { data, error } =
+            await supabase
+                .from("rendezvous")
+                .select("*")
+                .eq("actif", true)
+                .gte("date_evenement", maintenant)
+                .order("date_evenement", {
+                    ascending: true
+                });
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        if (!data || data.length === 0) {
+
+            track.innerHTML = `
+                <div class="events-empty">
+                    Aucun événement à venir
+                </div>
+            `;
+
+            arreterDefilement();
+
+            return;
+        }
+
+
+        track.innerHTML =
+            data
+                .map((rdv, index) => {
+
+                    const date =
+                        new Date(
+                            rdv.date_evenement
+                        );
+
+                    const dateFormatee =
+                        formaterDateCourte(date);
+
+                    const heure =
+                        formaterHeure(date);
+
+
+                    return `
+
+                        ${
+                            index > 0
+                                ? `<span class="event-separator">◆</span>`
+                                : ""
+                        }
+
+                        <div
+                            class="event"
+                            data-rdv-id="${escapeHtmlComponents(String(rdv.id))}"
+                        >
+
+                            <strong>
+                                ${escapeHtmlComponents(
+                                    rdv.titre || "Événement"
+                                )}
+                            </strong>
+
+                            <span>
+                                &nbsp;·&nbsp;
+                                ${dateFormatee}
+                                &nbsp;·&nbsp;
+                                ${heure}
+                            </span>
+
+                        </div>
+                    `;
+                })
+                .join("");
+
+
+        requestAnimationFrame(() => {
+
+            requestAnimationFrame(() => {
+
+                demarrerDefilement();
+
+            });
+
         });
 
 
-    if (error) {
-        throw error;
-    }
+    } catch (error) {
 
-
-    if (!data || data.length === 0) {
+        console.error(
+            "Erreur chargement rendez-vous :",
+            error
+        );
 
         track.innerHTML = `
             <div class="events-empty">
-                Aucun événement à venir
+                Impossible de charger les événements
             </div>
         `;
 
         arreterDefilement();
-
-        return;
     }
-
-
-    track.innerHTML = data
-        .map((rdv, index) => {
-
-            const date = new Date(rdv.date_evenement);
-
-            const dateFormatee =
-                formaterDateCourte(date);
-
-            const heure =
-                formaterHeure(date);
-
-
-            return `
-
-                ${index > 0
-                    ? `<span class="event-separator">◆</span>`
-                    : ""
-                }
-
-                <div
-                    class="event"
-                    data-rdv-id="${escapeHtmlComponents(String(rdv.id))}"
-                >
-
-                    <strong>
-                        ${escapeHtmlComponents(
-                            rdv.titre || "Événement"
-                        )}
-                    </strong>
-
-                    <span>
-                        &nbsp;·&nbsp;
-                        ${dateFormatee}
-                        &nbsp;·&nbsp;
-                        ${heure}
-                    </span>
-
-                </div>
-            `;
-        })
-        .join("");
-
-
-    requestAnimationFrame(() => {
-
-        requestAnimationFrame(() => {
-
-            demarrerDefilement();
-
-        });
-
-    });
-
-
-} catch (error) {
-
-    console.error(
-        "Erreur chargement rendez-vous :",
-        error
-    );
-
-    track.innerHTML = `
-        <div class="events-empty">
-            Impossible de charger les événements
-        </div>
-    `;
-
-    arreterDefilement();
 }
-```
 
-}
 
 /* =========================================================
-DEFILEMENT EVENEMENTIEL
+   DEFILEMENT EVENEMENTIEL
 ========================================================= */
 
 let tickerAnimation = null;
 
+
 /* =========================================================
-ARRET DU DEFILEMENT
+   ARRET DU DEFILEMENT
 ========================================================= */
 
 function arreterDefilement() {
 
-```
-if (tickerAnimation !== null) {
+    if (tickerAnimation !== null) {
 
-    cancelAnimationFrame(
-        tickerAnimation
-    );
+        cancelAnimationFrame(
+            tickerAnimation
+        );
 
-    tickerAnimation = null;
+        tickerAnimation = null;
+    }
 }
-```
 
-}
 
 /* =========================================================
-DEMARRAGE DU DEFILEMENT
+   DEMARRAGE DU DEFILEMENT
 ========================================================= */
 
 function demarrerDefilement() {
 
-```
-const track =
-    document.getElementById("eventsTrack");
+    const track =
+        document.getElementById("eventsTrack");
 
-const windowElement =
-    document.querySelector(".events-window");
-
-
-if (!track || !windowElement) return;
+    const windowElement =
+        document.querySelector(".events-window");
 
 
-arreterDefilement();
+    if (!track || !windowElement) return;
 
 
-const largeurFenetre =
-    windowElement.clientWidth;
-
-const largeurContenu =
-    track.scrollWidth;
+    arreterDefilement();
 
 
-if (
-    largeurFenetre <= 0 ||
-    largeurContenu <= 0
-) {
-    return;
-}
+    const largeurFenetre =
+        windowElement.clientWidth;
 
+    const largeurContenu =
+        track.scrollWidth;
 
-/*
- * Vitesse du code originel.
- */
-
-const vitesse = 180;
-
-
-/*
- * Le texte démarre à droite de la fenêtre.
- */
-
-let position =
-    largeurFenetre;
-
-
-let dernierTemps =
-    performance.now();
-
-
-track.style.transform =
-    `translateX(${position}px)`;
-
-
-function animation(temps) {
-
-    const delta =
-        (temps - dernierTemps) / 1000;
-
-
-    dernierTemps =
-        temps;
-
-
-    position -=
-        vitesse * delta;
-
-
-    /*
-     * Même avec un seul événement,
-     * on continue toujours l'animation.
-     *
-     * Quand le contenu est entièrement sorti
-     * à gauche, il revient à droite.
-     */
 
     if (
-        position <= -largeurContenu
+        largeurFenetre <= 0 ||
+        largeurContenu <= 0
     ) {
-
-        position =
-            largeurFenetre;
+        return;
     }
+
+
+    const vitesse = 180;
+
+
+    let position =
+        largeurFenetre;
+
+
+    let dernierTemps =
+        performance.now();
 
 
     track.style.transform =
         `translateX(${position}px)`;
+
+
+    function animation(temps) {
+
+        const delta =
+            (temps - dernierTemps) / 1000;
+
+
+        dernierTemps =
+            temps;
+
+
+        position -=
+            vitesse * delta;
+
+
+        if (
+            position <= -largeurContenu
+        ) {
+
+            position =
+                largeurFenetre;
+        }
+
+
+        track.style.transform =
+            `translateX(${position}px)`;
+
+
+        tickerAnimation =
+            requestAnimationFrame(
+                animation
+            );
+    }
 
 
     tickerAnimation =
@@ -464,451 +457,472 @@ function animation(temps) {
 }
 
 
-tickerAnimation =
-    requestAnimationFrame(
-        animation
-    );
-```
-
-}
-
 /* =========================================================
-OUVERTURE DE LA MODALE
+   OUVERTURE DE LA MODALE
 ========================================================= */
 
 async function ouvrirRendezVous(id) {
 
-```
-const modal =
-    document.getElementById("rdvModal");
+    const modal =
+        document.getElementById("rdvModal");
 
-if (!modal) return;
-
-
-try {
-
-    const { data, error } = await supabase
-        .from("rendezvous")
-        .select("*")
-        .eq("id", id)
-        .single();
+    if (!modal) return;
 
 
-    if (error) {
-        throw error;
-    }
+    try {
+
+        const { data, error } =
+            await supabase
+                .from("rendezvous")
+                .select("*")
+                .eq("id", id)
+                .single();
 
 
-    if (!data) return;
-
-
-    const titre =
-        document.getElementById("rdvModalTitle");
-
-    const date =
-        document.getElementById("rdvModalDate");
-
-    const time =
-        document.getElementById("rdvModalTime");
-
-    const location =
-        document.getElementById("rdvModalLocation");
-
-    const locationWrap =
-        document.getElementById(
-            "rdvModalLocationWrap"
-        );
-
-    const description =
-        document.getElementById(
-            "rdvModalDescription"
-        );
-
-    const link =
-        document.getElementById(
-            "rdvModalLink"
-        );
-
-
-    const dateObjet =
-        new Date(data.date_evenement);
-
-
-    if (titre) {
-
-        titre.textContent =
-            data.titre || "Événement";
-    }
-
-
-    if (date) {
-
-        date.textContent =
-            formaterDateLongue(
-                dateObjet
-            );
-    }
-
-
-    if (time) {
-
-        time.textContent =
-            formaterHeure(
-                dateObjet
-            );
-    }
-
-
-    if (
-        location &&
-        locationWrap
-    ) {
-
-        if (data.lieu) {
-
-            location.textContent =
-                data.lieu;
-
-            locationWrap.style.display =
-                "";
-        } else {
-
-            location.textContent =
-                "";
-
-            locationWrap.style.display =
-                "none";
+        if (error) {
+            throw error;
         }
-    }
 
 
-    if (description) {
-
-        description.innerHTML =
-            escapeHtmlComponents(
-                data.description || ""
-            ).replace(/\n/g, "<br>");
-    }
+        if (!data) return;
 
 
-    if (link) {
+        const titre =
+            document.getElementById(
+                "rdvModalTitle"
+            );
+
+        const date =
+            document.getElementById(
+                "rdvModalDate"
+            );
+
+        const time =
+            document.getElementById(
+                "rdvModalTime"
+            );
+
+        const location =
+            document.getElementById(
+                "rdvModalLocation"
+            );
+
+        const locationWrap =
+            document.getElementById(
+                "rdvModalLocationWrap"
+            );
+
+        const description =
+            document.getElementById(
+                "rdvModalDescription"
+            );
+
+        const link =
+            document.getElementById(
+                "rdvModalLink"
+            );
+
+
+        const dateObjet =
+            new Date(
+                data.date_evenement
+            );
+
+
+        if (titre) {
+
+            titre.textContent =
+                data.titre || "Événement";
+        }
+
+
+        if (date) {
+
+            date.textContent =
+                formaterDateLongue(
+                    dateObjet
+                );
+        }
+
+
+        if (time) {
+
+            time.textContent =
+                formaterHeure(
+                    dateObjet
+                );
+        }
+
 
         if (
-            data.lien &&
-            urlValideComponents(
-                data.lien
-            )
+            location &&
+            locationWrap
         ) {
 
-            link.href =
-                data.lien;
+            if (data.lieu) {
 
-            link.style.display =
-                "inline-block";
+                location.textContent =
+                    data.lieu;
 
-        } else {
+                locationWrap.style.display =
+                    "";
 
-            link.style.display =
-                "none";
+            } else {
+
+                location.textContent =
+                    "";
+
+                locationWrap.style.display =
+                    "none";
+            }
         }
+
+
+        if (description) {
+
+            description.innerHTML =
+                escapeHtmlComponents(
+                    data.description || ""
+                ).replace(
+                    /\n/g,
+                    "<br>"
+                );
+        }
+
+
+        if (link) {
+
+            if (
+                data.lien &&
+                urlValideComponents(
+                    data.lien
+                )
+            ) {
+
+                link.href =
+                    data.lien;
+
+                link.style.display =
+                    "inline-block";
+
+            } else {
+
+                link.style.display =
+                    "none";
+            }
+        }
+
+
+        modal.classList.add("active");
+
+        modal.setAttribute(
+            "aria-hidden",
+            "false"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur ouverture rendez-vous :",
+            error
+        );
     }
-
-
-    modal.classList.add("active");
-
-    modal.setAttribute(
-        "aria-hidden",
-        "false"
-    );
-
-
-} catch (error) {
-
-    console.error(
-        "Erreur ouverture rendez-vous :",
-        error
-    );
 }
-```
 
-}
 
 /* =========================================================
-FERMETURE DE LA MODALE
+   FERMETURE DE LA MODALE
 ========================================================= */
 
 function fermerRendezVous() {
 
-```
-const modal =
-    document.getElementById("rdvModal");
+    const modal =
+        document.getElementById("rdvModal");
 
-if (!modal) return;
+    if (!modal) return;
 
 
-modal.classList.remove("active");
+    modal.classList.remove("active");
 
-modal.setAttribute(
-    "aria-hidden",
-    "true"
-);
-```
-
+    modal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
 }
 
+
 /* =========================================================
-ECOUTEURS RENDEZ-VOUS
+   ECOUTEURS RENDEZ-VOUS
 ========================================================= */
 
 function initialiserEcouteursRendezVous() {
 
-```
-const track =
-    document.getElementById("eventsTrack");
+    const track =
+        document.getElementById(
+            "eventsTrack"
+        );
 
 
-if (track) {
+    if (track) {
 
-    track.addEventListener(
-        "click",
-        event => {
+        track.addEventListener(
+            "click",
+            event => {
 
-            const eventElement =
-                event.target.closest(".event");
-
-
-            if (!eventElement) return;
-
-
-            const id =
-                eventElement.dataset.rdvId;
+                const eventElement =
+                    event.target.closest(
+                        ".event"
+                    );
 
 
-            if (!id) return;
+                if (!eventElement) return;
 
 
-            ouvrirRendezVous(id);
-        }
-    );
-}
+                const id =
+                    eventElement.dataset.rdvId;
 
 
-const close =
-    document.getElementById(
-        "rdvModalClose"
-    );
+                if (!id) return;
 
 
-if (close) {
-
-    close.addEventListener(
-        "click",
-        fermerRendezVous
-    );
-}
+                ouvrirRendezVous(id);
+            }
+        );
+    }
 
 
-const modal =
-    document.getElementById(
-        "rdvModal"
-    );
+    const close =
+        document.getElementById(
+            "rdvModalClose"
+        );
 
 
-if (modal) {
+    if (close) {
 
-    modal.addEventListener(
-        "click",
+        close.addEventListener(
+            "click",
+            fermerRendezVous
+        );
+    }
+
+
+    const modal =
+        document.getElementById(
+            "rdvModal"
+        );
+
+
+    if (modal) {
+
+        modal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target === modal
+                ) {
+
+                    fermerRendezVous();
+                }
+            }
+        );
+    }
+
+
+    document.addEventListener(
+        "keydown",
         event => {
 
             if (
-                event.target === modal
+                event.key === "Escape"
             ) {
 
                 fermerRendezVous();
             }
         }
     );
-}
 
 
-document.addEventListener(
-    "keydown",
-    event => {
+    window.addEventListener(
+        "resize",
+        () => {
 
-        if (
-            event.key === "Escape"
-        ) {
+            requestAnimationFrame(
+                () => {
 
-            fermerRendezVous();
+                    demarrerDefilement();
+
+                }
+            );
         }
-    }
-);
-
-
-window.addEventListener(
-    "resize",
-    () => {
-
-        requestAnimationFrame(
-            () => {
-
-                demarrerDefilement();
-
-            }
-        );
-    }
-);
-```
-
+    );
 }
+
 
 /* =========================================================
-FORMATAGE DATES
+   FORMATAGE DATES
 ========================================================= */
 
 function formaterDateCourte(date) {
 
-```
-if (!(date instanceof Date)) {
-    return "";
-}
-
-
-return date.toLocaleDateString(
-    "fr-FR",
-    {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric"
+    if (!(date instanceof Date)) {
+        return "";
     }
-);
-```
 
+
+    return date.toLocaleDateString(
+        "fr-FR",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
+        }
+    );
 }
+
 
 function formaterDateLongue(date) {
 
-```
-if (!(date instanceof Date)) {
-    return "";
-}
-
-
-return date.toLocaleDateString(
-    "fr-FR",
-    {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-        year: "numeric"
+    if (!(date instanceof Date)) {
+        return "";
     }
-);
-```
 
+
+    return date.toLocaleDateString(
+        "fr-FR",
+        {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        }
+    );
 }
+
 
 function formaterHeure(date) {
 
-```
-if (!(date instanceof Date)) {
-    return "";
-}
-
-
-return date.toLocaleTimeString(
-    "fr-FR",
-    {
-        hour: "2-digit",
-        minute: "2-digit"
+    if (!(date instanceof Date)) {
+        return "";
     }
-);
-```
 
+
+    return date.toLocaleTimeString(
+        "fr-FR",
+        {
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
 }
+
 
 /* =========================================================
-VALIDATION URL
+   VALIDATION URL
 ========================================================= */
 
 function urlValideComponents(url) {
 
-```
-try {
+    try {
 
-    const parsed =
-        new URL(url);
+        const parsed =
+            new URL(url);
 
-    return (
-        parsed.protocol === "http:" ||
-        parsed.protocol === "https:"
-    );
+        return (
+            parsed.protocol === "http:" ||
+            parsed.protocol === "https:"
+        );
 
-} catch {
+    } catch {
 
-    return false;
+        return false;
+    }
 }
-```
 
-}
 
 /* =========================================================
-ECHAPPEMENT HTML
+   ECHAPPEMENT HTML
 ========================================================= */
 
 function escapeHtmlComponents(value) {
 
-```
-return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-```
-
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 }
 
+
 /* =========================================================
-INITIALISATION GENERALE
+   INITIALISATION GENERALE
 ========================================================= */
 
 async function initialiserComposants() {
 
-```
-injecterHeader();
+    injecterHeader();
 
-injecterFooter();
+    injecterFooter();
 
-injecterModaleRendezVous();
-
-
-await chargerRendezVous();
+    injecterModaleRendezVous();
 
 
-initialiserEcouteursRendezVous();
-```
+    await chargerRendezVous();
 
+
+    initialiserEcouteursRendezVous();
 }
 
+
 /* =========================================================
-DOM READY
+   DOM READY
 ========================================================= */
 
 if (
-document.readyState === "loading"
+    document.readyState === "loading"
 ) {
 
-```
-document.addEventListener(
-    "DOMContentLoaded",
-    initialiserComposants
-);
-```
+    document.addEventListener(
+        "DOMContentLoaded",
+        initialiserComposants
+    );
 
 } else {
 
-```
-initialiserComposants();
-```
-
+    initialiserComposants();
 }
+:::
+
+### Très important
+
+Dans GitHub, ton fichier doit commencer directement par :
+
+`/* =========================================================`
+
+puis arriver à :
+
+`import { supabase } from "./supabase.js";`
+
+et **il ne doit absolument plus y avoir de lignes contenant trois accents graves ` ``` `**.
+
+Ton `index.html` peut rester avec la modification que je t'ai donnée précédemment :
+
+```html
+<script type="module" src="js/components.js"></script>
