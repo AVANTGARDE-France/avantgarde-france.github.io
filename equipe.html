@@ -2,7 +2,6 @@
 <html lang="fr">
 
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -10,80 +9,74 @@
     content="width=device-width, initial-scale=1.0"
   >
 
-  <title>Avant-gardE — Notre équipe</title>
+  <title>Notre équipe — Avant-gardE</title>
 
   <link
     rel="stylesheet"
     href="css/style.css"
   >
-
 </head>
-
 
 <body>
 
   <!-- =====================================================
-       COMPOSANTS COMMUNS
+       HEADER COMMUN
   ====================================================== -->
 
   <div id="site-header"></div>
 
 
   <!-- =====================================================
-       CONTENU PRINCIPAL
+       HERO
   ====================================================== -->
 
-  <main>
+  <section class="team-hero">
 
-    <!-- ===================================================
-         HERO
-    ==================================================== -->
+    <div class="hero-content">
 
-    <section class="hero">
-
-      <div class="kicker">
+      <div class="section-kicker">
         L’AVANT-GARDE
       </div>
-
 
       <h1>
         NOTRE <span>ÉQUIPE.</span>
       </h1>
 
-
       <p>
-        L’Avant-gardE rassemble des femmes et des hommes qui souhaitent
-        contribuer, chacun selon ses compétences, son influence et ses moyens,
-        à la construction d’une France libre, souveraine et responsable.
+        Découvrez les femmes et les hommes qui font vivre
+        Avant-gardE — La France libre.
       </p>
 
-
       <button
+        type="button"
         class="join-button"
         id="openJoin"
-        type="button"
       >
         REJOINDRE L’AVANT-GARDE
       </button>
 
-    </section>
+    </div>
+
+  </section>
 
 
-    <!-- ===================================================
-         EQUIPE
-    ==================================================== -->
+  <!-- =====================================================
+       ÉQUIPE
+  ====================================================== -->
+
+  <main>
 
     <section class="team-section">
 
       <div class="section-title">
 
-        <h2>
-          Les membres
-        </h2>
+        <div class="section-kicker">
+          NOS MEMBRES
+        </div>
 
-        <p>
-          Découvrez celles et ceux qui ont choisi de rendre leur engagement public.
-        </p>
+        <h2>
+          LES FORCES VIVES.
+        </h2>
 
       </div>
 
@@ -91,12 +84,10 @@
       <div
         class="team-grid"
         id="teamGrid"
+        aria-live="polite"
       >
 
-        <div
-          class="loading"
-          id="loadingMembers"
-        >
+        <div class="events-empty">
           Chargement des membres…
         </div>
 
@@ -108,116 +99,136 @@
 
 
   <!-- =====================================================
-       MODAL MEMBRE
+       MODALE PROFIL
   ====================================================== -->
 
   <div
-    class="modal"
+    class="profile-modal"
     id="memberModal"
-    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="profileModalName"
   >
 
-    <div
-      class="modal-box"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="profileModalName"
-    >
+    <div class="profile-modal-box modal-box">
 
       <button
-        class="modal-close"
-        id="closeMember"
         type="button"
+        class="profile-modal-close modal-close"
+        id="closeMember"
         aria-label="Fermer"
       >
         ×
       </button>
 
 
-      <div class="profile-modal-content">
+      <div class="profile-content">
 
-        <div class="profile-modal-photo">
+        <!-- COLONNE GAUCHE -->
 
-          <img
-            id="profileModalImage"
-            class="profile-modal-image"
-            alt=""
+        <div class="profile-left">
+
+          <div id="profileModalPhoto">
+
+            <img
+              id="profileModalImage"
+              class="profile-photo"
+              src=""
+              alt=""
+              style="display:none;"
+            >
+
+            <div
+              id="profilePlaceholder"
+              class="profile-photo-placeholder"
+            >
+              A
+            </div>
+
+          </div>
+
+
+          <h2
+            id="profileModalName"
+            class="profile-name"
           >
+          </h2>
 
 
           <div
-            id="profilePlaceholder"
-            class="profile-placeholder"
-            aria-hidden="true"
+            id="profileModalVip"
+            class="profile-modal-vip"
+            style="display:none;"
           >
-            ★
+          </div>
+
+
+          <div
+            id="profileModalGrade"
+            class="profile-grade"
+          >
+          </div>
+
+
+          <div
+            id="profileModalRegion"
+            class="profile-region"
+          >
           </div>
 
         </div>
 
 
-        <h2 id="profileModalName"></h2>
+        <!-- COLONNE DROITE -->
 
-
-        <!-- VIP -->
-        <div
-          id="profileModalVip"
-          class="profile-modal-vip"
-          style="display:none;"
-        ></div>
-
-
-        <div
-          id="profileModalGrade"
-          class="profile-grade"
-        ></div>
-
-
-        <div
-          id="profileModalRegion"
-          class="profile-region"
-        ></div>
-
-
-        <div
-          id="profileModalDescription"
-          class="profile-description"
-        ></div>
-
-
-        <!-- =================================================
-             RESEAUX SOCIAUX
-        ================================================== -->
-
-        <div
-          id="profileModalSocials"
-          class="profile-socials"
-          style="display:none;"
-        ></div>
-
-
-        <div
-          id="profileModalAudienceMax"
-          class="profile-audience-max"
-          style="display:none;"
-        ></div>
-
-
-        <!-- =================================================
-             COMPETENCES
-        ================================================== -->
-
-        <div class="profile-competences">
-
-          <h3>
-            Compétences
-          </h3>
-
+        <div class="profile-right">
 
           <div
-            class="competence-list"
-            id="profileModalCompetences"
-          ></div>
+            id="profileModalDescription"
+            class="profile-description"
+          >
+          </div>
+
+
+          <!-- RÉSEAUX -->
+
+          <div id="profileSocialSection">
+
+            <h3 class="profile-subtitle">
+              RÉSEAUX SOCIAUX
+            </h3>
+
+            <div
+              id="profileModalSocials"
+              class="profile-socials"
+            >
+            </div>
+
+            <div
+              id="profileModalAudienceMax"
+              class="profile-audience-max"
+              style="display:none;"
+            >
+            </div>
+
+          </div>
+
+
+          <!-- COMPÉTENCES -->
+
+          <div id="profileCompetenceSection">
+
+            <h3 class="profile-subtitle">
+              COMPÉTENCES
+            </h3>
+
+            <div
+              id="profileModalCompetences"
+              class="profile-competences"
+            >
+            </div>
+
+          </div>
 
         </div>
 
@@ -229,88 +240,82 @@
 
 
   <!-- =====================================================
-       MODAL INSCRIPTION
+       MODALE INSCRIPTION
   ====================================================== -->
 
   <div
-    class="modal"
+    class="join-modal"
     id="joinModal"
-    aria-hidden="true"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="joinModalTitle"
   >
 
-    <div
-      class="modal-box"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="joinModalTitle"
-    >
+    <div class="join-modal-box modal-box">
 
       <button
-        class="modal-close"
-        id="closeJoin"
         type="button"
+        class="join-modal-close modal-close"
+        id="closeJoin"
         aria-label="Fermer"
       >
         ×
       </button>
 
 
+      <div class="join-modal-kicker">
+        AVANT-GARDE
+      </div>
+
+
       <h2
-        class="form-title"
         id="joinModalTitle"
+        class="form-title"
       >
-        Rejoindre l’Avant-gardE
+        REJOINDRE.
       </h2>
 
 
       <p class="form-intro">
-        Créez votre profil et choisissez la manière dont vous souhaitez
-        apparaître au sein du mouvement.
+        Vous souhaitez participer à l’aventure Avant-gardE ?
+        Présentez-vous et indiquez vos compétences.
       </p>
 
 
-      <form id="joinForm">
+      <form
+        id="joinForm"
+        novalidate
+      >
 
-        <!-- =================================================
-             TYPE D'INSCRIPTION
-        ================================================== -->
+
+        <!-- TYPE D'INSCRIPTION -->
 
         <div class="form-group">
 
-          <label class="main-label">
-
-            S’inscrire en tant que
-
-            <span class="required">*</span>
-
+          <label>
+            VISIBILITÉ DU PROFIL
           </label>
-
 
           <div class="registration-choice">
 
+
             <div class="choice-option">
 
-              <input
-                type="radio"
-                id="typeSympathisant"
-                name="type_inscription"
-                value="sympathisant"
-                checked
-              >
+              <label class="choice-label">
 
-
-              <label
-                for="typeSympathisant"
-                class="choice-label"
-              >
+                <input
+                  type="radio"
+                  name="type_inscription"
+                  value="sympathisant"
+                  checked
+                >
 
                 <strong>
                   Sympathisant
                 </strong>
 
-
                 <span>
-                  Votre profil sera affiché dans la liste des membres.
+                  Votre nom peut apparaître sur la page équipe.
                 </span>
 
               </label>
@@ -320,26 +325,20 @@
 
             <div class="choice-option">
 
-              <input
-                type="radio"
-                id="typeAnonyme"
-                name="type_inscription"
-                value="anonyme"
-              >
+              <label class="choice-label">
 
-
-              <label
-                for="typeAnonyme"
-                class="choice-label"
-              >
+                <input
+                  type="radio"
+                  name="type_inscription"
+                  value="anonyme"
+                >
 
                 <strong>
                   Anonyme
                 </strong>
 
-
                 <span>
-                  Votre profil sera enregistré mais caché de la liste des membres.
+                  Votre inscription reste invisible publiquement.
                 </span>
 
               </label>
@@ -351,241 +350,137 @@
         </div>
 
 
-        <!-- =================================================
-             NOM
-        ================================================== -->
+        <!-- NOM -->
 
         <div class="form-group">
 
           <label
-            class="main-label"
             for="nom"
+            class="main-label"
           >
-
-            Pseudo ou nom prénom
-
-            <span class="required">*</span>
-
+            Nom / prénom <span class="required">*</span>
           </label>
-
 
           <input
             type="text"
             id="nom"
-            maxlength="100"
+            name="nom"
+            maxlength="120"
+            autocomplete="name"
             required
           >
 
         </div>
 
 
-        <!-- =================================================
-             EMAIL
-        ================================================== -->
+        <!-- EMAIL -->
 
         <div class="form-group">
 
           <label
-            class="main-label"
             for="email"
+            class="main-label"
           >
-
-            Email
-
-            <span class="required">*</span>
-
+            Adresse email <span class="required">*</span>
           </label>
-
 
           <input
             type="email"
             id="email"
+            name="email"
+            maxlength="180"
+            autocomplete="email"
             required
           >
-
-
-          <div class="help">
-            Une seule inscription est autorisée par adresse e-mail.
-          </div>
 
         </div>
 
 
-        <!-- =================================================
-             REGION
-        ================================================== -->
+        <!-- RÉGION -->
 
         <div class="form-group">
 
           <label
-            class="main-label"
             for="region"
+            class="main-label"
           >
-
-            Région
-
-            <span class="required">*</span>
-
+            Région <span class="required">*</span>
           </label>
 
-
-          <select
+          <input
+            type="text"
             id="region"
+            name="region"
+            maxlength="120"
             required
           >
-
-            <option value="">
-              Sélectionnez votre région
-            </option>
-
-
-            <optgroup label="France métropolitaine">
-
-              <option>Auvergne-Rhône-Alpes</option>
-              <option>Bourgogne-Franche-Comté</option>
-              <option>Bretagne</option>
-              <option>Centre-Val de Loire</option>
-              <option>Corse</option>
-              <option>Grand Est</option>
-              <option>Hauts-de-France</option>
-              <option>Île-de-France</option>
-              <option>Normandie</option>
-              <option>Nouvelle-Aquitaine</option>
-              <option>Occitanie</option>
-              <option>Pays de la Loire</option>
-              <option>Provence-Alpes-Côte d’Azur</option>
-
-            </optgroup>
-
-
-            <optgroup label="Outre-mer">
-
-              <option>Guadeloupe</option>
-              <option>Martinique</option>
-              <option>Guyane</option>
-              <option>La Réunion</option>
-              <option>Mayotte</option>
-
-            </optgroup>
-
-
-            <optgroup label="Étranger">
-
-              <option>Europe</option>
-              <option>Amérique du Nord</option>
-              <option>Amérique centrale et Caraïbes</option>
-              <option>Amérique du Sud</option>
-              <option>Afrique</option>
-              <option>Asie</option>
-              <option>Océanie</option>
-              <option>Autre</option>
-
-            </optgroup>
-
-          </select>
 
         </div>
 
 
-        <!-- =================================================
-             IMAGE
-        ================================================== -->
+        <!-- PHOTO -->
 
         <div class="form-group">
 
           <label
-            class="main-label"
             for="image_url"
+            class="main-label"
           >
-            Image
+            Photo
           </label>
-
 
           <input
             type="url"
             id="image_url"
+            name="image_url"
+            maxlength="1000"
             placeholder="https://..."
           >
 
-
           <div class="help">
-            Indiquez l’URL d’une image déjà hébergée en ligne.
+            URL publique d’une image.
           </div>
 
         </div>
 
 
-        <!-- =================================================
-             DESCRIPTION
-        ================================================== -->
+        <!-- DESCRIPTION -->
 
         <div class="form-group">
 
           <label
-            class="main-label"
             for="descriptionField"
+            class="main-label"
           >
-            Description
+            Présentation <span class="required">*</span>
           </label>
-
 
           <textarea
             id="descriptionField"
+            name="description"
             maxlength="300"
-            placeholder="Présentez-vous en quelques mots..."
+            required
           ></textarea>
 
-
           <div
+            id="descriptionCount"
             class="description-counter"
-            id="descriptionCounter"
           >
-
-            <span id="descriptionCount">
-              0
-            </span>
-
-            / 300
-
+            0 / 300
           </div>
 
         </div>
 
 
-        <!-- =================================================
-             COMPETENCES
-        ================================================== -->
+        <!-- COMPÉTENCES -->
 
         <div class="form-section-title">
-          Talents et compétences métier
+          VOS COMPÉTENCES
         </div>
 
-
-        <div class="form-group">
-
-          <label class="main-label">
-
-            Compétences
-
-            <span style="font-weight:normal;color:#8994a6;">
-              (auto-évaluation de vos compétences)
-            </span>
-
-          </label>
-
-        </div>
-
-
-        <!-- =================================================
-             COMPETENCES METIER
-        ================================================== -->
 
         <div class="competence-group">
 
-          <div class="competence-group-title">
-            Compétences métier
-          </div>
-
 
           <div class="competence">
 
@@ -594,19 +489,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Maîtrise de doctrine"
+                value="Communication"
               >
 
               <span>
-
                 <span class="competence-name">
-                  Maîtrise de doctrine
+                  Communication
                 </span>
 
                 <span class="competence-description">
-                  capacité à préserver la fidélité à l’idéologie d'Avant-Garde et sa cohérence dans l’action du mouvement.
+                  Réseaux sociaux, communication, rédaction.
                 </span>
-
               </span>
 
             </label>
@@ -621,19 +514,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Tactique"
+                value="Organisation"
               >
 
               <span>
-
                 <span class="competence-name">
-                  Tactique
+                  Organisation
                 </span>
 
                 <span class="competence-description">
-                  capacité à concevoir et mettre en œuvre des tactiques efficaces de développement d’audience, médiatique et électorale, sans renier l’idéologie.
+                  Organisation d’événements, coordination et logistique.
                 </span>
-
               </span>
 
             </label>
@@ -648,19 +539,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Prestance"
+                value="Politique"
               >
 
               <span>
-
                 <span class="competence-name">
-                  Prestance
+                  Politique
                 </span>
 
                 <span class="competence-description">
-                  capacité à séduire et convaincre par la parole, le charisme, le charme ou la culture.
+                  Analyse, institutions, programme et stratégie.
                 </span>
-
               </span>
 
             </label>
@@ -675,19 +564,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Analyses pragmatiques"
+                value="Numérique"
               >
 
               <span>
-
                 <span class="competence-name">
-                  Analyses pragmatiques
+                  Numérique
                 </span>
 
                 <span class="competence-description">
-                  capacité à analyser les données, les rendements, les conséquences et les rapports de force. Anticipent les évolutions et privilégient les faits.
+                  Informatique, développement, numérique et données.
                 </span>
-
               </span>
 
             </label>
@@ -702,19 +589,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Analyses populistes"
+                value="Juridique"
               >
 
               <span>
-
                 <span class="competence-name">
-                  Analyses populistes
+                  Juridique
                 </span>
 
                 <span class="competence-description">
-                  capacité à analyser les ressentis, aspirations et frustrations populaires. Anticipent les réactions naturelles et privilégient le vécu et l’opinion du peuple.
+                  Droit, réglementation et affaires publiques.
                 </span>
-
               </span>
 
             </label>
@@ -729,19 +614,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Administration"
+                value="Économie"
               >
 
               <span>
-
                 <span class="competence-name">
-                  Administration
+                  Économie
                 </span>
 
                 <span class="competence-description">
-                  maîtrise de la gestion des structures, des ressources techniques et opérationnelles et des équipes internes.
+                  Économie, finance, entreprise et gestion.
                 </span>
-
               </span>
 
             </label>
@@ -756,19 +639,17 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Expertise et ingénierie juridique"
+                value="Terrain"
               >
 
               <span>
-
                 <span class="competence-name">
-                  Expertise et ingénierie juridique
+                  Terrain
                 </span>
 
                 <span class="competence-description">
-                  maîtrise du droit français et européen ainsi que des mécanismes juridiques, avec capacité à en analyser les règles, les contraintes, les failles et les possibilités d’évolution.
+                  Mobilisation, terrain, réunions et événements.
                 </span>
-
               </span>
 
             </label>
@@ -783,113 +664,47 @@
               <input
                 type="checkbox"
                 name="competences"
-                value="Expertise et ingénierie politique"
+                value="Autre"
               >
 
               <span>
-
                 <span class="competence-name">
-                  Expertise et ingénierie politique
+                  Autre
                 </span>
 
                 <span class="competence-description">
-                  maîtrise d’un domaine politique ou institutionnel particulier et capacité à en apporter l’expertise.
+                  Une autre compétence utile au mouvement.
                 </span>
-
               </span>
 
             </label>
 
           </div>
+
 
         </div>
 
 
-        <!-- =================================================
-             INFLUENCE / BIENFAITEUR
-        ================================================== -->
-
-        <div class="competence-group">
-
-          <div class="competence-group-title">
-            Je peux vous aider en tant que
-          </div>
-
-
-          <div class="competence">
-
-            <label>
-
-              <input
-                type="checkbox"
-                name="competences"
-                value="Influenceurs / debunkers / créateurs de contenu"
-              >
-
-              <span>
-
-                <span class="competence-name">
-                  Influenceur / debunker / créateur de contenu
-                </span>
-
-                <span class="competence-description">
-                  dans le milieu médiatique et sur les réseaux sociaux, développent spontanément une audience, influencent les comportements, déconstruisent les arguments ou manipulations et produisent des contenus permettant de diffuser et de défendre les idées du mouvement. peuvent conserver une forte indépendance éditoriale.
-                </span>
-
-              </span>
-
-            </label>
-
-          </div>
-
-
-          <div class="competence">
-
-            <label>
-
-              <input
-                type="checkbox"
-                name="competences"
-                value="Bienfaiteurs"
-              >
-
-              <span>
-
-                <span class="competence-name">
-                  Bienfaiteur
-                </span>
-
-                <span class="competence-description">
-                  dans les autres milieux, mettent spontanément leur influence, leur réseau, leur carnet d’adresses, leurs moyens, leur expertise ou leur notoriété au service du développement et du rayonnement du mouvement. peuvent conserver une forte indépendance.
-                </span>
-
-              </span>
-
-            </label>
-
-          </div>
-
-        </div>
-
-
-        <!-- =================================================
-             VALIDATION
-        ================================================== -->
-
-        <button
-          type="submit"
-          class="submit-button"
-          id="submitButton"
-        >
-          REJOINDRE AVANT-GARDE
-        </button>
-
+        <!-- MESSAGE -->
 
         <div
           id="formMessage"
           class="form-message"
           aria-live="polite"
-        ></div>
+        >
+        </div>
+
+
+        <!-- BOUTON -->
+
+        <button
+          type="submit"
+          class="submit-button"
+          id="submitJoin"
+        >
+          REJOINDRE L’AVANT-GARDE
+        </button>
+
 
       </form>
 
@@ -899,7 +714,7 @@
 
 
   <!-- =====================================================
-       CONTENEUR FOOTER / MODALE EVENEMENT
+       FOOTER + MODALE ÉVÉNEMENT
   ====================================================== -->
 
   <div id="site-footer"></div>
@@ -911,14 +726,15 @@
        SCRIPTS
   ====================================================== -->
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
 
   <script src="js/supabase.js"></script>
 
   <script src="js/components.js"></script>
 
   <script src="js/equipe.js"></script>
-
 
 </body>
 
