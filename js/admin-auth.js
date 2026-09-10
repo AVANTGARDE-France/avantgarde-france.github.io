@@ -13,11 +13,12 @@
    - Actions HOME / DECONNEXION
 
    IMPORTANT :
-   Ce module ne lance plus verifierUtilisateur()
-   immédiatement pendant le chargement des modules.
+   Ce module conserve les noms historiques du monolithique :
+   - supabaseClient
+   - currentUser
+   - currentProfile
 
-   admin.js lance l'initialisation une fois que tous
-   les modules sont chargés.
+   afin d'assurer la compatibilité avec les autres modules.
 ========================================================= */
 
 
@@ -25,7 +26,7 @@
    SUPABASE
 ========================================================= */
 
-import { supabase } from "./supabase.js";
+import { supabaseClient } from "./supabase.js";
 
 
 /* =========================================================
@@ -33,10 +34,29 @@ import { supabase } from "./supabase.js";
 ========================================================= */
 
 window.currentUser =
-    window.currentUser || null;
+  window.currentUser || null;
+
 
 window.currentProfile =
-    window.currentProfile || null;
+  window.currentProfile || null;
+
+
+/*
+ * Compatibilité avec les anciens modules.
+ *
+ * Les autres fichiers utilisent encore directement :
+ * currentUser
+ * currentProfile
+ *
+ * On les expose donc également sur window.
+ */
+
+let currentUser =
+  window.currentUser;
+
+
+let currentProfile =
+  window.currentProfile;
 
 
 /* =========================================================
@@ -44,19 +64,33 @@ window.currentProfile =
 ========================================================= */
 
 const loginScreen =
-    document.getElementById("loginScreen");
+  document.getElementById(
+    "loginScreen"
+  );
+
 
 const adminScreen =
-    document.getElementById("adminScreen");
+  document.getElementById(
+    "adminScreen"
+  );
+
 
 const loginForm =
-    document.getElementById("loginForm");
+  document.getElementById(
+    "loginForm"
+  );
+
 
 const loginButton =
-    document.getElementById("loginButton");
+  document.getElementById(
+    "loginButton"
+  );
+
 
 const loginMessage =
-    document.getElementById("loginMessage");
+  document.getElementById(
+    "loginMessage"
+  );
 
 
 /* =========================================================
@@ -64,38 +98,46 @@ const loginMessage =
 ========================================================= */
 
 function afficherMessage(
-    element,
-    type,
-    texte
-) {
+  element,
+  type,
+  texte
+){
 
-    if (!element) {
+  if(!element){
 
-        return;
-    }
+    return;
 
-    element.className =
-        "message " + type;
+  }
 
-    element.textContent =
-        texte;
+
+  element.className =
+    "message " + type;
+
+
+  element.textContent =
+    texte;
+
 }
 
 
 function viderMessage(
-    element
-) {
+  element
+){
 
-    if (!element) {
+  if(!element){
 
-        return;
-    }
+    return;
 
-    element.className =
-        "message";
+  }
 
-    element.textContent =
-        "";
+
+  element.className =
+    "message";
+
+
+  element.textContent =
+    "";
+
 }
 
 
@@ -103,37 +145,46 @@ function viderMessage(
    AFFICHAGE CONNEXION
 ========================================================= */
 
-function afficherConnexion() {
+function afficherConnexion(){
 
-    if (loginScreen) {
+  if(loginScreen){
 
-        loginScreen.style.display =
-            "block";
-    }
+    loginScreen.style.display =
+      "block";
 
-    if (adminScreen) {
+  }
 
-        adminScreen.style.display =
-            "none";
-    }
 
-    if (loginButton) {
+  if(adminScreen){
 
-        loginButton.disabled =
-            false;
+    adminScreen.style.display =
+      "none";
 
-        loginButton.textContent =
-            "SE CONNECTER";
-    }
+  }
 
-    if (loginForm) {
 
-        loginForm.reset();
-    }
+  if(loginButton){
 
-    viderMessage(
-        loginMessage
-    );
+    loginButton.disabled =
+      false;
+
+    loginButton.textContent =
+      "SE CONNECTER";
+
+  }
+
+
+  if(loginForm){
+
+    loginForm.reset();
+
+  }
+
+
+  viderMessage(
+    loginMessage
+  );
+
 }
 
 
@@ -141,40 +192,48 @@ function afficherConnexion() {
    AFFICHAGE ADMIN
 ========================================================= */
 
-function afficherAdmin() {
+function afficherAdmin(){
 
-    if (loginScreen) {
+  if(loginScreen){
 
-        loginScreen.style.display =
-            "none";
-    }
+    loginScreen.style.display =
+      "none";
 
-    if (adminScreen) {
+  }
 
-        adminScreen.style.display =
-            "block";
-    }
 
-    const adminUser =
-        document.getElementById(
-            "adminUser"
-        );
+  if(adminScreen){
 
-    if (adminUser) {
+    adminScreen.style.display =
+      "block";
 
-        adminUser.innerHTML =
-            "Connecté en tant que <strong>" +
+  }
 
-            (
-                window.currentProfile?.nom ||
-                window.currentUser?.email ||
-                ""
-            ) +
 
-            "</strong>";
-    }
+  const adminUser =
+    document.getElementById(
+      "adminUser"
+    );
 
-    ajouterActionsHeader();
+
+  if(adminUser){
+
+    adminUser.innerHTML =
+      "Connecté en tant que <strong>" +
+
+      (
+        currentProfile?.nom ||
+        currentUser?.email ||
+        ""
+      ) +
+
+      "</strong>";
+
+  }
+
+
+  ajouterActionsHeader();
+
 }
 
 
@@ -182,75 +241,89 @@ function afficherAdmin() {
    HEADER ESPACE MEMBRE
 ========================================================= */
 
-function ajouterActionsHeader() {
+function ajouterActionsHeader(){
 
-    let actions =
-        document.getElementById(
-            "memberHeaderActions"
-        );
-
-    if (actions) {
-
-        return;
-    }
-
-    const header =
-        document.createElement(
-            "div"
-        );
-
-    header.id =
-        "memberHeaderActions";
-
-    header.className =
-        "header-actions";
-
-    header.innerHTML = `
-
-        <a
-            href="index.html"
-            class="header-button"
-        >
-            HOME
-        </a>
-
-        <button
-            type="button"
-            class="header-button logout-button"
-            id="logoutButton"
-        >
-            SE DÉCONNECTER
-        </button>
-
-    `;
-
-    const adminHeader =
-        document.querySelector(
-            ".admin-header"
-        );
-
-    if (!adminHeader) {
-
-        return;
-    }
-
-    adminHeader.insertBefore(
-        header,
-        adminHeader.firstChild
+  let actions =
+    document.getElementById(
+      "memberHeaderActions"
     );
 
-    const logoutButton =
-        document.getElementById(
-            "logoutButton"
-        );
 
-    if (logoutButton) {
+  if(actions){
 
-        logoutButton.addEventListener(
-            "click",
-            deconnecter
-        );
-    }
+    return;
+
+  }
+
+
+  const header =
+    document.createElement(
+      "div"
+    );
+
+
+  header.id =
+    "memberHeaderActions";
+
+
+  header.className =
+    "header-actions";
+
+
+  header.innerHTML = `
+
+    <a
+      href="index.html"
+      class="header-button"
+    >
+      HOME
+    </a>
+
+    <button
+      type="button"
+      class="header-button logout-button"
+      id="logoutButton"
+    >
+      SE DÉCONNECTER
+    </button>
+
+  `;
+
+
+  const adminHeader =
+    document.querySelector(
+      ".admin-header"
+    );
+
+
+  if(!adminHeader){
+
+    return;
+
+  }
+
+
+  adminHeader.insertBefore(
+    header,
+    adminHeader.firstChild
+  );
+
+
+  const logoutButton =
+    document.getElementById(
+      "logoutButton"
+    );
+
+
+  if(logoutButton){
+
+    logoutButton.addEventListener(
+      "click",
+      deconnecter
+    );
+
+  }
+
 }
 
 
@@ -258,70 +331,92 @@ function ajouterActionsHeader() {
    DECONNEXION
 ========================================================= */
 
-async function deconnecter() {
+async function deconnecter(){
 
-    const button =
-        document.getElementById(
-            "logoutButton"
-        );
+  const button =
+    document.getElementById(
+      "logoutButton"
+    );
 
-    if (button) {
 
-        button.disabled =
-            true;
+  if(button){
 
-        button.textContent =
-            "DÉCONNEXION…";
+    button.disabled =
+      true;
+
+    button.textContent =
+      "DÉCONNEXION…";
+
+  }
+
+
+  const {
+    error
+  } =
+    await supabaseClient.auth.signOut();
+
+
+  if(error){
+
+    console.error(
+      "Erreur déconnexion :",
+      error
+    );
+
+
+    if(button){
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        "SE DÉCONNECTER";
+
     }
 
-    const {
-        error
-    } =
-        await supabase.auth.signOut();
 
-    if (error) {
+    return;
 
-        console.error(
-            "Erreur déconnexion :",
-            error
-        );
+  }
 
-        if (button) {
 
-            button.disabled =
-                false;
+  currentUser =
+    null;
 
-            button.textContent =
-                "SE DÉCONNECTER";
-        }
+  currentProfile =
+    null;
 
-        return;
-    }
 
-    window.currentUser =
-        null;
+  window.currentUser =
+    null;
 
-    window.currentProfile =
-        null;
+  window.currentProfile =
+    null;
 
-    if (
-        typeof window.reinitialiserEtatAdmin ===
-        "function"
-    ) {
 
-        window.reinitialiserEtatAdmin();
-    }
+  if(
+    typeof window.reinitialiserEtatAdmin ===
+    "function"
+  ){
 
-    if (button) {
+    window.reinitialiserEtatAdmin();
 
-        button.disabled =
-            false;
+  }
 
-        button.textContent =
-            "SE DÉCONNECTER";
-    }
 
-    afficherConnexion();
+  if(button){
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "SE DÉCONNECTER";
+
+  }
+
+
+  afficherConnexion();
+
 }
 
 
@@ -329,268 +424,313 @@ async function deconnecter() {
    VERIFICATION UTILISATEUR
 ========================================================= */
 
-async function verifierUtilisateur() {
+async function verifierUtilisateur(){
 
-    try {
+  try{
 
-        const {
-            data: {
-                user
-            }
-        } =
-            await supabase.auth.getUser();
+    const {
+      data:{
+        user
+      },
+      error:userError
+    } =
+      await supabaseClient.auth.getUser();
 
 
-        /* -------------------------------------------------
-           AUCUNE SESSION
-        ------------------------------------------------- */
+    if(userError){
 
-        if (!user) {
+      console.error(
+        "Erreur récupération utilisateur :",
+        userError
+      );
 
-            window.currentUser =
-                null;
+      currentUser =
+        null;
 
-            window.currentProfile =
-                null;
+      currentProfile =
+        null;
 
-            afficherConnexion();
+      window.currentUser =
+        null;
 
-            return;
-        }
+      window.currentProfile =
+        null;
 
+      afficherConnexion();
 
-        /* -------------------------------------------------
-           UTILISATEUR CONNECTÉ
-        ------------------------------------------------- */
-
-        window.currentUser =
-            user;
-
-
-        /* -------------------------------------------------
-           CHARGEMENT PROFIL
-        ------------------------------------------------- */
-
-        const {
-            data: profile,
-            error
-        } =
-            await supabase
-
-                .from("profiles")
-
-                .select(`
-
-                    id,
-                    nom,
-                    grade,
-                    grade2,
-                    email,
-                    image_url,
-                    description,
-                    region,
-                    competences,
-                    anonyme,
-                    facebook_url,
-                    x_url,
-                    instagram_url,
-                    youtube_url,
-                    tiktok_url,
-                    audience_max
-
-                `)
-
-                .eq(
-                    "id",
-                    user.id
-                )
-
-                .single();
-
-
-        if (
-            error ||
-            !profile
-        ) {
-
-            console.error(
-                "Erreur chargement profil :",
-                error
-            );
-
-            await supabase.auth.signOut();
-
-            window.currentUser =
-                null;
-
-            window.currentProfile =
-                null;
-
-            afficherMessage(
-                loginMessage,
-                "error",
-                "Impossible de charger votre profil."
-            );
-
-            afficherConnexion();
-
-            return;
-        }
-
-
-        /* -------------------------------------------------
-           PROFIL GLOBAL
-        ------------------------------------------------- */
-
-        window.currentProfile =
-            profile;
-
-
-        /* -------------------------------------------------
-           SYNCHRONISATION CORE
-        ------------------------------------------------- */
-
-        if (
-            typeof window.definirEtatUtilisateur ===
-            "function"
-        ) {
-
-            window.definirEtatUtilisateur(
-                user,
-                profile
-            );
-        }
-
-
-        /* -------------------------------------------------
-           AFFICHAGE ESPACE MEMBRE
-        ------------------------------------------------- */
-
-        afficherAdmin();
-
-
-        /* -------------------------------------------------
-           REMPLISSAGE PROFIL
-        ------------------------------------------------- */
-
-        if (
-            typeof window.remplirProfil ===
-            "function"
-        ) {
-
-            window.remplirProfil(
-                profile
-            );
-        }
-
-
-        /* -------------------------------------------------
-           ONGLET RDV
-        ------------------------------------------------- */
-
-        const rdvButton =
-            document.getElementById(
-                "rdvTabButton"
-            );
-
-        if (rdvButton) {
-
-            if (
-                typeof window.peutGererRendezVous ===
-                "function" &&
-                window.peutGererRendezVous()
-            ) {
-
-                rdvButton.style.display =
-                    "block";
-
-                if (
-                    typeof window.chargerRendezVous ===
-                    "function"
-                ) {
-
-                    window.chargerRendezVous();
-                }
-
-            } else {
-
-                rdvButton.style.display =
-                    "none";
-            }
-        }
-
-
-        /* -------------------------------------------------
-           ONGLET ROLE
-        ------------------------------------------------- */
-
-        const roleButton =
-            document.getElementById(
-                "roleTabButton"
-            );
-
-        if (roleButton) {
-
-            if (
-                typeof window.peutGererRole ===
-                "function" &&
-                window.peutGererRole()
-            ) {
-
-                roleButton.style.display =
-                    "block";
-
-                if (
-                    typeof window.remplirRoles ===
-                    "function"
-                ) {
-
-                    window.remplirRoles(
-                        profile.competences
-                    );
-                }
-
-            } else {
-
-                roleButton.style.display =
-                    "none";
-            }
-        }
-
-
-        /* -------------------------------------------------
-           GESTION DES EQUIPES
-        ------------------------------------------------- */
-
-        if (
-            typeof window.chargerGestionEquipes ===
-            "function"
-        ) {
-
-            await window.chargerGestionEquipes();
-        }
-
-
-        console.log(
-            "AVANT-GARDE : espace membre initialisé."
-        );
-
-    } catch (error) {
-
-        console.error(
-            "Erreur initialisation espace membre :",
-            error
-        );
-
-        window.currentUser =
-            null;
-
-        window.currentProfile =
-            null;
-
-        afficherConnexion();
+      return;
 
     }
+
+
+    if(!user){
+
+      currentUser =
+        null;
+
+      currentProfile =
+        null;
+
+      window.currentUser =
+        null;
+
+      window.currentProfile =
+        null;
+
+      afficherConnexion();
+
+      return;
+
+    }
+
+
+    currentUser =
+      user;
+
+    window.currentUser =
+      user;
+
+
+    const {
+      data:profile,
+      error
+    } =
+      await supabaseClient
+
+        .from("profiles")
+
+        .select(`
+          id,
+          nom,
+          grade,
+          grade2,
+          email,
+          image_url,
+          description,
+          region,
+          competences,
+          anonyme,
+          facebook_url,
+          x_url,
+          instagram_url,
+          youtube_url,
+          tiktok_url,
+          audience_max
+        `)
+
+        .eq(
+          "id",
+          user.id
+        )
+
+        .single();
+
+
+    if(error || !profile){
+
+      console.error(
+        "Erreur chargement profil :",
+        error
+      );
+
+
+      await supabaseClient.auth.signOut();
+
+
+      currentUser =
+        null;
+
+      currentProfile =
+        null;
+
+      window.currentUser =
+        null;
+
+      window.currentProfile =
+        null;
+
+
+      afficherMessage(
+        loginMessage,
+        "error",
+        "Impossible de charger votre profil."
+      );
+
+
+      afficherConnexion();
+
+      return;
+
+    }
+
+
+    currentProfile =
+      profile;
+
+    window.currentProfile =
+      profile;
+
+
+    /*
+     * Synchronisation avec le Core.
+     */
+
+    if(
+      typeof window.definirEtatUtilisateur ===
+      "function"
+    ){
+
+      window.definirEtatUtilisateur(
+        user,
+        profile
+      );
+
+    }
+
+
+    afficherAdmin();
+
+
+    /*
+     * Remplissage du profil.
+     */
+
+    if(
+      typeof window.remplirProfil ===
+      "function"
+    ){
+
+      window.remplirProfil(
+        profile
+      );
+
+    }
+
+
+    /* =====================================================
+       ONGLET RDV
+    ===================================================== */
+
+    const rdvButton =
+      document.getElementById(
+        "rdvTabButton"
+      );
+
+
+    if(rdvButton){
+
+      if(
+        typeof window.peutGererRendezVous ===
+        "function" &&
+
+        window.peutGererRendezVous()
+      ){
+
+        rdvButton.style.display =
+          "block";
+
+
+        if(
+          typeof window.chargerRendezVous ===
+          "function"
+        ){
+
+          window.chargerRendezVous();
+
+        }
+
+      }else{
+
+        rdvButton.style.display =
+          "none";
+
+      }
+
+    }
+
+
+    /* =====================================================
+       ONGLET ROLE
+    ===================================================== */
+
+    const roleButton =
+      document.getElementById(
+        "roleTabButton"
+      );
+
+
+    if(roleButton){
+
+      if(
+        typeof window.peutGererRole ===
+        "function" &&
+
+        window.peutGererRole()
+      ){
+
+        roleButton.style.display =
+          "block";
+
+
+        if(
+          typeof window.remplirRoles ===
+          "function"
+        ){
+
+          window.remplirRoles(
+            profile.competences
+          );
+
+        }
+
+      }else{
+
+        roleButton.style.display =
+          "none";
+
+      }
+
+    }
+
+
+    /* =====================================================
+       GESTION DES EQUIPES
+    ===================================================== */
+
+    if(
+      typeof window.chargerGestionEquipes ===
+      "function"
+    ){
+
+      window.chargerGestionEquipes();
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "Erreur inattendue lors de la vérification utilisateur :",
+      error
+    );
+
+
+    currentUser =
+      null;
+
+    currentProfile =
+      null;
+
+    window.currentUser =
+      null;
+
+    window.currentProfile =
+      null;
+
+
+    afficherConnexion();
+
+  }
+
 }
 
 
@@ -598,122 +738,171 @@ async function verifierUtilisateur() {
    CONNEXION
 ========================================================= */
 
-if (loginForm) {
+if(loginForm){
 
-    loginForm.addEventListener(
-        "submit",
-        async event => {
+  loginForm.addEventListener(
 
-            event.preventDefault();
+    "submit",
 
-            viderMessage(
-                loginMessage
-            );
+    async event => {
 
-            if (loginButton) {
-
-                loginButton.disabled =
-                    true;
-
-                loginButton.textContent =
-                    "CONNEXION…";
-            }
-
-            const email =
-                document
-                    .getElementById(
-                        "loginEmail"
-                    )
-                    .value
-                    .trim()
-                    .toLowerCase();
-
-            const password =
-                document
-                    .getElementById(
-                        "loginPassword"
-                    )
-                    .value;
+      event.preventDefault();
 
 
-            console.log(
-                "AVANT-GARDE : tentative de connexion Supabase"
-            );
+      viderMessage(
+        loginMessage
+      );
 
 
-            try {
+      if(loginButton){
 
-                const {
-                    error
-                } =
-                    await supabase.auth.signInWithPassword({
+        loginButton.disabled =
+          true;
 
-                        email,
+        loginButton.textContent =
+          "CONNEXION…";
 
-                        password
-
-                    });
+      }
 
 
-                if (error) {
-
-                    console.error(
-                        "Erreur connexion :",
-                        error
-                    );
-
-                    afficherMessage(
-                        loginMessage,
-                        "error",
-                        "Adresse e-mail ou mot de passe incorrect."
-                    );
-
-                    if (loginButton) {
-
-                        loginButton.disabled =
-                            false;
-
-                        loginButton.textContent =
-                            "SE CONNECTER";
-                    }
-
-                    return;
-                }
+      const emailInput =
+        document.getElementById(
+          "loginEmail"
+        );
 
 
-                console.log(
-                    "AVANT-GARDE : authentification Supabase réussie"
-                );
+      const passwordInput =
+        document.getElementById(
+          "loginPassword"
+        );
 
 
-                await verifierUtilisateur();
+      const email =
+        emailInput
+          ? emailInput.value
+              .trim()
+              .toLowerCase()
+          : "";
 
-            } catch (error) {
 
-                console.error(
-                    "Erreur inattendue lors de la connexion :",
-                    error
-                );
+      const password =
+        passwordInput
+          ? passwordInput.value
+          : "";
 
-                afficherMessage(
-                    loginMessage,
-                    "error",
-                    "Une erreur est survenue lors de la connexion."
-                );
 
-                if (loginButton) {
+      console.log(
+        "AVANT-GARDE : tentative de connexion Supabase"
+      );
 
-                    loginButton.disabled =
-                        false;
 
-                    loginButton.textContent =
-                        "SE CONNECTER";
-                }
-            }
+      try{
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.auth.signInWithPassword({
+
+            email,
+
+            password
+
+          });
+
+
+        if(error){
+
+          console.error(
+            "Erreur connexion :",
+            error
+          );
+
+
+          afficherMessage(
+            loginMessage,
+            "error",
+            "Adresse e-mail ou mot de passe incorrect."
+          );
+
+
+          if(loginButton){
+
+            loginButton.disabled =
+              false;
+
+            loginButton.textContent =
+              "SE CONNECTER";
+
+          }
+
+
+          return;
 
         }
-    );
+
+
+        console.log(
+          "AVANT-GARDE : authentification Supabase réussie"
+        );
+
+
+        /*
+         * On conserve l'utilisateur immédiatement.
+         */
+
+        if(data?.user){
+
+          currentUser =
+            data.user;
+
+          window.currentUser =
+            data.user;
+
+        }
+
+
+        await verifierUtilisateur();
+
+      }catch(error){
+
+        console.error(
+          "Erreur inattendue lors de la connexion :",
+          error
+        );
+
+
+        afficherMessage(
+          loginMessage,
+          "error",
+          "Une erreur est survenue lors de la connexion."
+        );
+
+
+        if(loginButton){
+
+          loginButton.disabled =
+            false;
+
+          loginButton.textContent =
+            "SE CONNECTER";
+
+        }
+
+      }
+
+    }
+
+  );
+
 }
+
+
+/* =========================================================
+   INITIALISATION
+========================================================= */
+
+verifierUtilisateur();
 
 
 /* =========================================================
@@ -721,32 +910,46 @@ if (loginForm) {
 ========================================================= */
 
 window.verifierUtilisateur =
-    verifierUtilisateur;
+  verifierUtilisateur;
+
 
 window.afficherConnexion =
-    afficherConnexion;
+  afficherConnexion;
+
 
 window.afficherAdmin =
-    afficherAdmin;
+  afficherAdmin;
+
 
 window.ajouterActionsHeader =
-    ajouterActionsHeader;
+  ajouterActionsHeader;
+
 
 window.deconnecter =
-    deconnecter;
+  deconnecter;
 
-
-/* =========================================================
-   COMPATIBILITE MESSAGES
-========================================================= */
 
 window.afficherMessage =
-    window.afficherMessage ||
-    afficherMessage;
+  window.afficherMessage ||
+  afficherMessage;
+
 
 window.viderMessage =
-    window.viderMessage ||
-    viderMessage;
+  window.viderMessage ||
+  viderMessage;
+
+
+/*
+ * Compatibilité avec les modules qui utilisent
+ * les variables directement via window.
+ */
+
+window.currentUser =
+  currentUser;
+
+
+window.currentProfile =
+  currentProfile;
 
 
 /* =========================================================
@@ -755,15 +958,15 @@ window.viderMessage =
 
 export {
 
-    verifierUtilisateur,
+  verifierUtilisateur,
 
-    afficherConnexion,
+  afficherConnexion,
 
-    afficherAdmin,
+  afficherAdmin,
 
-    ajouterActionsHeader,
+  ajouterActionsHeader,
 
-    deconnecter
+  deconnecter
 
 };
 
