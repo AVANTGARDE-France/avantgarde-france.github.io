@@ -738,3 +738,836 @@ async function retirerRoleUnique(
   afficherRegionsEquipe();
 
 }
+/* =========================================================
+   AFFICHER UNE REGION
+========================================================= */
+
+function afficherRegionEquipe(
+  region
+){
+
+  regionEquipeActive =
+    region;
+
+
+  document
+    .querySelectorAll(
+      ".team-region-button"
+    )
+    .forEach(
+      bouton => {
+
+        bouton.classList.toggle(
+          "active",
+          bouton.dataset.region ===
+            region
+        );
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      ".team-region-panel"
+    )
+    .forEach(
+      panel => {
+
+        panel.classList.toggle(
+          "active",
+          panel.dataset.region ===
+            region
+        );
+
+      }
+    );
+
+
+  afficherEquipesRegion(
+    region
+  );
+
+}
+
+
+/* =========================================================
+   INITIALISER RECHERCHES REGIONS
+========================================================= */
+
+function initialiserRecherchesRegions(){
+
+  document
+    .querySelectorAll(
+      ".regional-search"
+    )
+    .forEach(
+      input => {
+
+        input.addEventListener(
+          "input",
+          () =>
+            afficherResultatsRegion(
+              input,
+              "Délégué Régional"
+            )
+        );
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      ".militant-search"
+    )
+    .forEach(
+      input => {
+
+        input.addEventListener(
+          "input",
+          () =>
+            afficherResultatsRegion(
+              input,
+              "Militant"
+            )
+        );
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   AFFICHER EQUIPES REGION
+========================================================= */
+
+function afficherEquipesRegion(
+  region
+){
+
+  const delegues =
+    tousLesMembres.filter(
+      membre =>
+        membre.region === region &&
+        membre.grade2 ===
+          "Délégué Régional"
+    );
+
+
+  const militants =
+    tousLesMembres.filter(
+      membre =>
+        membre.region === region &&
+        membre.grade2 ===
+          "Militant"
+    );
+
+
+  document
+    .querySelectorAll(
+      ".regional-selected"
+    )
+    .forEach(
+      container => {
+
+        if(
+          container.dataset.region ===
+          region
+        ){
+
+          afficherMembresSelectionnes(
+            container,
+            delegues,
+            region,
+            "Délégué Régional"
+          );
+
+        }
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      ".militant-selected"
+    )
+    .forEach(
+      container => {
+
+        if(
+          container.dataset.region ===
+          region
+        ){
+
+          afficherMembresSelectionnes(
+            container,
+            militants,
+            region,
+            "Militant"
+          );
+
+        }
+
+      }
+    );
+
+
+  appliquerPermissionsRegion(
+    region
+  );
+
+}
+
+
+/* =========================================================
+   PERMISSIONS REGION
+========================================================= */
+
+function appliquerPermissionsRegion(
+  region
+){
+
+  const peutDelegues =
+    peutGererEquipes();
+
+  const peutMilitants =
+    peutGererMilitants(
+      region
+    );
+
+
+  document
+    .querySelectorAll(
+      ".regional-search"
+    )
+    .forEach(
+      input => {
+
+        if(
+          input.dataset.region ===
+          region
+        ){
+
+          input.classList.toggle(
+            "team-disabled",
+            !peutDelegues
+          );
+
+        }
+
+      }
+    );
+
+
+  document
+    .querySelectorAll(
+      ".militant-search"
+    )
+    .forEach(
+      input => {
+
+        if(
+          input.dataset.region ===
+          region
+        ){
+
+          input.classList.toggle(
+            "team-disabled",
+            !peutMilitants
+          );
+
+        }
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   RESULTATS REGION
+========================================================= */
+
+function afficherResultatsRegion(
+  input,
+  role
+){
+
+  const region =
+    input.dataset.region;
+
+
+  const container =
+    document.querySelector(
+      role === "Délégué Régional"
+        ? `.regional-results[data-region="${CSS.escape(region)}"]`
+        : `.militant-results[data-region="${CSS.escape(region)}"]`
+    );
+
+
+  if(!container){
+
+    return;
+
+  }
+
+
+  container.innerHTML = "";
+
+
+  const autorise =
+    role === "Délégué Régional"
+      ? peutGererEquipes()
+      : peutGererMilitants(
+          region
+        );
+
+
+  if(!autorise){
+
+    return;
+
+  }
+
+
+  const texte =
+    input.value
+      .trim()
+      .toLowerCase();
+
+
+  if(!texte){
+
+    return;
+
+  }
+
+
+  const membres =
+    tousLesMembres
+      .filter(
+        membre =>
+          membre.region === region &&
+          String(
+            membre.nom || ""
+          )
+          .toLowerCase()
+          .includes(texte)
+      )
+      .slice(0,20);
+
+
+  membres.forEach(
+    membre => {
+
+      const bouton =
+        creerOptionMembre(
+          membre
+        );
+
+
+      bouton.addEventListener(
+        "click",
+        () =>
+          attribuerRoleRegional(
+            membre,
+            region,
+            role
+          )
+      );
+
+
+      container.appendChild(
+        bouton
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   CREER OPTION MEMBRE
+========================================================= */
+
+function creerOptionMembre(
+  membre
+){
+
+  const bouton =
+    document.createElement("button");
+
+  bouton.type =
+    "button";
+
+  bouton.className =
+    "team-member-option";
+
+
+  const image =
+    membre.image_url ||
+    "";
+
+
+  bouton.innerHTML =
+    `
+      ${
+        image
+          ? `
+            <img
+              src="${escapeHtml(image)}"
+              alt=""
+              onerror="this.style.display='none'"
+            >
+          `
+          : `
+            <div
+              style="
+                width:30px;
+                height:30px;
+                border-radius:50%;
+                border:1px solid rgba(214,173,85,.3);
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                color:var(--gold);
+                font-size:10px;
+                flex-shrink:0;
+              "
+            >
+              ★
+            </div>
+          `
+      }
+
+      <span>
+
+        <span class="team-member-option-name">
+          ${escapeHtml(membre.nom || "Membre")}
+        </span>
+
+        <span class="team-member-option-region">
+          ${escapeHtml(membre.region || "")}
+        </span>
+
+      </span>
+    `;
+
+
+  return bouton;
+
+}
+
+
+/* =========================================================
+   ATTRIBUTION REGIONALE
+========================================================= */
+
+async function attribuerRoleRegional(
+  membre,
+  region,
+  role
+){
+
+  const autorise =
+    role === "Délégué Régional"
+      ? peutGererEquipes()
+      : peutGererMilitants(
+          region
+        );
+
+
+  if(!autorise){
+
+    return;
+
+  }
+
+
+  if(membre.region !== region){
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .update({
+        grade2:role
+      })
+      .eq(
+        "id",
+        membre.id
+      )
+      .select()
+      .single();
+
+
+  if(error){
+
+    console.error(
+      "Erreur attribution rôle régional :",
+      error
+    );
+
+    afficherMessageRegion(
+      region,
+      role,
+      "error",
+      "Impossible d'enregistrer cette affectation."
+    );
+
+    return;
+
+  }
+
+
+  mettreAJourMembreLocal(
+    data
+  );
+
+
+  const searchSelector =
+    role === "Délégué Régional"
+      ? `.regional-search[data-region="${CSS.escape(region)}"]`
+      : `.militant-search[data-region="${CSS.escape(region)}"]`;
+
+
+  const search =
+    document.querySelector(
+      searchSelector
+    );
+
+
+  if(search){
+
+    search.value =
+      "";
+
+  }
+
+
+  const resultSelector =
+    role === "Délégué Régional"
+      ? `.regional-results[data-region="${CSS.escape(region)}"]`
+      : `.militant-results[data-region="${CSS.escape(region)}"]`;
+
+
+  const results =
+    document.querySelector(
+      resultSelector
+    );
+
+
+  if(results){
+
+    results.innerHTML =
+      "";
+
+  }
+
+
+  afficherEquipesRegion(
+    region
+  );
+
+
+  afficherMessageRegion(
+    region,
+    role,
+    "success",
+    "Le membre a été affecté."
+  );
+
+
+  setTimeout(
+    () =>
+      viderMessageRegion(
+        region,
+        role
+      ),
+    2200
+  );
+
+}
+
+
+/* =========================================================
+   AFFICHER MEMBRES SELECTIONNES
+========================================================= */
+
+function afficherMembresSelectionnes(
+  container,
+  membres,
+  region,
+  role
+){
+
+  container.innerHTML = "";
+
+
+  if(
+    !membres ||
+    membres.length === 0
+  ){
+
+    container.innerHTML =
+      "<div class='team-permission'>Aucun membre affecté.</div>";
+
+    return;
+
+  }
+
+
+  const autorise =
+    role === "Délégué Régional"
+      ? peutGererEquipes()
+      : peutGererMilitants(
+          region
+        );
+
+
+  membres.forEach(
+    membre => {
+
+      const item =
+        document.createElement("div");
+
+      item.className =
+        "team-selected-member";
+
+
+      item.innerHTML =
+        `
+          <span>
+            ${escapeHtml(membre.nom || "Membre")}
+          </span>
+
+          ${
+            autorise
+              ? `
+                <button
+                  type="button"
+                  title="Retirer"
+                >
+                  ×
+                </button>
+              `
+              : ""
+          }
+        `;
+
+
+      if(autorise){
+
+        item
+          .querySelector("button")
+          .addEventListener(
+            "click",
+            () =>
+              retirerRoleRegional(
+                membre,
+                region,
+                role
+              )
+          );
+
+      }
+
+
+      container.appendChild(
+        item
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   RETIRER ROLE REGIONAL
+========================================================= */
+
+async function retirerRoleRegional(
+  membre,
+  region,
+  role
+){
+
+  const autorise =
+    role === "Délégué Régional"
+      ? peutGererEquipes()
+      : peutGererMilitants(
+          region
+        );
+
+
+  if(!autorise){
+
+    return;
+
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .update({
+        grade2:null
+      })
+      .eq(
+        "id",
+        membre.id
+      )
+      .select()
+      .single();
+
+
+  if(error){
+
+    console.error(
+      "Erreur retrait rôle régional :",
+      error
+    );
+
+    afficherMessageRegion(
+      region,
+      role,
+      "error",
+      "Impossible de retirer ce membre."
+    );
+
+    return;
+
+  }
+
+
+  mettreAJourMembreLocal(
+    data
+  );
+
+
+  afficherEquipesRegion(
+    region
+  );
+
+}
+
+
+/* =========================================================
+   MESSAGE REGION
+========================================================= */
+
+function afficherMessageRegion(
+  region,
+  role,
+  type,
+  texte
+){
+
+  const selector =
+    role === "Délégué Régional"
+      ? `.regional-message[data-region="${CSS.escape(region)}"]`
+      : `.militant-message[data-region="${CSS.escape(region)}"]`;
+
+
+  const element =
+    document.querySelector(
+      selector
+    );
+
+
+  if(element){
+
+    afficherMessage(
+      element,
+      type,
+      texte
+    );
+
+  }
+
+}
+
+
+function viderMessageRegion(
+  region,
+  role
+){
+
+  const selector =
+    role === "Délégué Régional"
+      ? `.regional-message[data-region="${CSS.escape(region)}"]`
+      : `.militant-message[data-region="${CSS.escape(region)}"]`;
+
+
+  const element =
+    document.querySelector(
+      selector
+    );
+
+
+  if(element){
+
+    viderMessage(
+      element
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   MISE A JOUR MEMBRE LOCAL
+========================================================= */
+
+function mettreAJourMembreLocal(
+  membre
+){
+
+  const index =
+    tousLesMembres.findIndex(
+      profil =>
+        profil.id ===
+        membre.id
+    );
+
+
+  if(index !== -1){
+
+    tousLesMembres[index] =
+      membre;
+
+  }
+
+}
+
+
+/* =========================================================
+   ECHAPPEMENT
+========================================================= */
+
+function escapeHtml(value){
+
+  return String(value ?? "")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
