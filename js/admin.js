@@ -12,6 +12,22 @@
    - Ne contient pas la logique métier des différents modules.
    - Ne remplace aucun des modules spécialisés.
    - Sert uniquement à charger l'ensemble du système.
+
+   ORDRE DE CHARGEMENT :
+
+   1. OUTILS COMMUNS
+   2. COEUR ADMINISTRATION
+   3. PROFIL
+   4. EVENEMENTS / RDV
+   5. EQUIPES
+   6. ROLES
+   7. ONGLETS
+   8. SUPPRESSION PROFIL
+   9. AUTHENTIFICATION EN DERNIER
+
+   L'authentification est volontairement chargée en dernier
+   afin que toutes les fonctions dont elle dépend soient
+   déjà disponibles lorsqu'elle lance verifierUtilisateur().
 ========================================================= */
 
 
@@ -73,15 +89,20 @@ import "./admin-delete-profile.js";
 
 /* =========================================================
    AUTHENTIFICATION
-=========================================================
+========================================================= */
 
-   IMPORTANT :
+/*
+ * IMPORTANT :
+ *
+ * admin-auth.js lance immédiatement :
+ *
+ *     verifierUtilisateur();
+ *
+ * Il doit donc être chargé après les modules dont il utilise
+ * les fonctions et l'état partagé.
+ */
 
-   admin-auth.js est chargé EN DERNIER.
-
-   Il dépend de plusieurs fonctions exposées
-   par les modules précédents.
-
+import "./admin-auth.js";
 ========================================================= */
 
 import "./admin-auth.js";
