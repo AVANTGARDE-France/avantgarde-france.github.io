@@ -8,11 +8,6 @@
    Il charge les différents modules de l'administration
    dans un environnement commun.
 
-   IMPORTANT :
-   - Ne contient pas la logique métier des différents modules.
-   - Ne remplace aucun des modules spécialisés.
-   - Sert uniquement à charger l'ensemble du système.
-
    ORDRE DE CHARGEMENT :
 
    1. OUTILS COMMUNS
@@ -25,9 +20,6 @@
    8. SUPPRESSION PROFIL
    9. AUTHENTIFICATION EN DERNIER
 
-   L'authentification est volontairement chargée en dernier
-   afin que toutes les fonctions dont elle dépend soient
-   déjà disponibles lorsqu'elle lance verifierUtilisateur().
 ========================================================= */
 
 
@@ -81,7 +73,7 @@ import "./admin-tabs.js";
 
 
 /* =========================================================
-   SUPPRESSION PROFIL
+   SUPPRESSION DU PROFIL
 ========================================================= */
 
 import "./admin-delete-profile.js";
@@ -92,14 +84,11 @@ import "./admin-delete-profile.js";
 ========================================================= */
 
 /*
- * IMPORTANT :
+ * admin-auth.js est volontairement chargé en dernier.
  *
- * admin-auth.js lance immédiatement :
- *
- *     verifierUtilisateur();
- *
- * Il doit donc être chargé après les modules dont il utilise
- * les fonctions et l'état partagé.
+ * Il lance verifierUtilisateur() dès son chargement.
+ * Les autres modules doivent donc être chargés avant lui.
  */
 
 import "./admin-auth.js";
+
