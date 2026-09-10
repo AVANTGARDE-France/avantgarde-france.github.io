@@ -20,167 +20,159 @@
    INITIALISATION DES ONGLETS
 ========================================================= */
 
-function initialiserOngletsAdmin(){
+function initialiserOngletsAdmin() {
 
-  const onglets =
-    document.querySelectorAll(
-      ".tab"
-    );
-
-
-  if(!onglets.length){
-
-    return;
-
-  }
+    const onglets =
+        document.querySelectorAll(
+            ".tab"
+        );
 
 
-  onglets.forEach(
-    tab => {
-
-      /*
-       * Evite de brancher plusieurs fois
-       * les mêmes événements si l'initialisation
-       * est appelée plusieurs fois.
-       */
-
-      if(
-        tab.dataset.adminTabsInitialized ===
-        "true"
-      ){
+    if (!onglets.length) {
 
         return;
-
-      }
-
-
-      tab.dataset.adminTabsInitialized =
-        "true";
+    }
 
 
-      tab.addEventListener(
-        "click",
-        () => {
+    onglets.forEach(
+        tab => {
 
-          /* -------------------------------------------------
-             SECURITE — ONGLET RDV
-          ------------------------------------------------- */
+            /*
+             * Evite de brancher plusieurs fois
+             * les mêmes événements si l'initialisation
+             * est appelée plusieurs fois.
+             */
 
-          if(
-            tab.id ===
-              "rdvTabButton"
-          ){
+            if (
+                tab.dataset.adminTabsInitialized ===
+                "true"
+            ) {
 
-            if(
-              typeof window.peutGererRendezVous ===
-                "function" &&
-              !window.peutGererRendezVous()
-            ){
-
-              return;
-
+                return;
             }
 
-          }
+
+            tab.dataset.adminTabsInitialized =
+                "true";
 
 
-          /* -------------------------------------------------
-             SECURITE — ONGLET ROLE
-          ------------------------------------------------- */
+            tab.addEventListener(
+                "click",
+                () => {
 
-          if(
-            tab.id ===
-              "roleTabButton"
-          ){
+                    /* -------------------------------------------------
+                       SECURITE — ONGLET RDV
+                    ------------------------------------------------- */
 
-            if(
-              typeof window.peutGererRole ===
-                "function" &&
-              !window.peutGererRole()
-            ){
+                    if (
+                        tab.id ===
+                        "rdvTabButton"
+                    ) {
 
-              return;
+                        if (
+                            typeof window.peutGererRendezVous ===
+                                "function" &&
+                            !window.peutGererRendezVous()
+                        ) {
 
-            }
+                            return;
+                        }
+                    }
 
-          }
+
+                    /* -------------------------------------------------
+                       SECURITE — ONGLET ROLE
+                    ------------------------------------------------- */
+
+                    if (
+                        tab.id ===
+                        "roleTabButton"
+                    ) {
+
+                        if (
+                            typeof window.peutGererRole ===
+                                "function" &&
+                            !window.peutGererRole()
+                        ) {
+
+                            return;
+                        }
+                    }
 
 
-          /* -------------------------------------------------
-             DESACTIVATION DE TOUS LES ONGLETS
-          ------------------------------------------------- */
+                    /* -------------------------------------------------
+                       DESACTIVATION DE TOUS LES ONGLETS
+                    ------------------------------------------------- */
 
-          document
-            .querySelectorAll(
-              ".tab"
-            )
-            .forEach(
-              t =>
-                t.classList.remove(
-                  "active"
-                )
+                    document
+                        .querySelectorAll(
+                            ".tab"
+                        )
+                        .forEach(
+                            t =>
+                                t.classList.remove(
+                                    "active"
+                                )
+                        );
+
+
+                    /* -------------------------------------------------
+                       DESACTIVATION DE TOUS LES CONTENUS
+                    ------------------------------------------------- */
+
+                    document
+                        .querySelectorAll(
+                            ".tab-content"
+                        )
+                        .forEach(
+                            content =>
+                                content.classList.remove(
+                                    "active"
+                                )
+                        );
+
+
+                    /* -------------------------------------------------
+                       ACTIVATION DE L'ONGLET CLIQUE
+                    ------------------------------------------------- */
+
+                    tab.classList.add(
+                        "active"
+                    );
+
+
+                    /* -------------------------------------------------
+                       ACTIVATION DU CONTENU CORRESPONDANT
+                    ------------------------------------------------- */
+
+                    const cible =
+                        tab.dataset.tab;
+
+
+                    if (!cible) {
+
+                        return;
+                    }
+
+
+                    const contenu =
+                        document.getElementById(
+                            cible
+                        );
+
+
+                    if (contenu) {
+
+                        contenu.classList.add(
+                            "active"
+                        );
+                    }
+
+                }
             );
-
-
-          /* -------------------------------------------------
-             DESACTIVATION DE TOUS LES CONTENUS
-          ------------------------------------------------- */
-
-          document
-            .querySelectorAll(
-              ".tab-content"
-            )
-            .forEach(
-              content =>
-                content.classList.remove(
-                  "active"
-                )
-            );
-
-
-          /* -------------------------------------------------
-             ACTIVATION DE L'ONGLET CLIQUE
-          ------------------------------------------------- */
-
-          tab.classList.add(
-            "active"
-          );
-
-
-          /* -------------------------------------------------
-             ACTIVATION DU CONTENU CORRESPONDANT
-          ------------------------------------------------- */
-
-          const cible =
-            tab.dataset.tab;
-
-
-          if(!cible){
-
-            return;
-
-          }
-
-
-          const contenu =
-            document.getElementById(
-              cible
-            );
-
-
-          if(contenu){
-
-            contenu.classList.add(
-              "active"
-            );
-
-          }
 
         }
-      );
-
-    }
-  );
+    );
 
 }
 
@@ -190,31 +182,28 @@ function initialiserOngletsAdmin(){
 ========================================================= */
 
 window.initialiserOngletsAdmin =
-  initialiserOngletsAdmin;
+    initialiserOngletsAdmin;
 
 
 /* =========================================================
    INITIALISATION
 ========================================================= */
 
-if(
-  document.readyState ===
-  "loading"
-){
+if (
+    document.readyState ===
+    "loading"
+) {
 
-  document.addEventListener(
-    "DOMContentLoaded",
-    initialiserOngletsAdmin,
-    {
-      once:true
-    }
-  );
-
-}else{
-
-  initialiserOngletsAdmin();
-
-}
+    document.addEventListener(
+        "DOMContentLoaded",
+        initialiserOngletsAdmin,
+        {
+            once: true
+        }
     );
 
-  });
+} else {
+
+    initialiserOngletsAdmin();
+
+}
