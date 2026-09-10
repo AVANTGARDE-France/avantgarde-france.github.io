@@ -1,3 +1,4 @@
+html
 <!DOCTYPE html>
 
 <html lang="fr">
@@ -7,12 +8,22 @@
 <meta charset="UTF-8">
 
 <meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
-
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
 >
 
 <title>Avant-gardE — Administration</title>
+
+
+<!-- =======================================================
+     SUPABASE
+     Doit être chargé AVANT les modules JavaScript
+======================================================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+></script>
+
 
 <link
     rel="stylesheet"
@@ -21,7 +32,9 @@ content="width=device-width, initial-scale=1.0"
 
 </head>
 
+
 <body>
+
 
 <!-- =======================================================
      CONNEXION
@@ -112,9 +125,10 @@ content="width=device-width, initial-scale=1.0"
 
 </section>
 
+
 <!-- =======================================================
      ESPACE MEMBRE
-     
+
      IMPORTANT :
      L'espace membre est masqué par défaut.
      admin-auth.js l'affichera uniquement après
@@ -145,7 +159,6 @@ content="width=device-width, initial-scale=1.0"
     ></div>
 
 </div>
-
 
 
 <!-- =====================================================
@@ -193,7 +206,6 @@ content="width=device-width, initial-scale=1.0"
 
 
 </div>
-
 
 
 <!-- =====================================================
@@ -260,7 +272,6 @@ content="width=device-width, initial-scale=1.0"
                     </div>
 
 
-
                     <div class="choice-option">
 
                         <input
@@ -293,7 +304,6 @@ content="width=device-width, initial-scale=1.0"
             </div>
 
 
-
             <div class="profile-grid">
 
 
@@ -313,7 +323,6 @@ content="width=device-width, initial-scale=1.0"
                     >
 
                 </div>
-
 
 
                 <!-- EMAIL -->
@@ -338,7 +347,6 @@ content="width=device-width, initial-scale=1.0"
                 </div>
 
 
-
                 <!-- IMAGE -->
 
                 <div class="form-group">
@@ -360,7 +368,6 @@ content="width=device-width, initial-scale=1.0"
                 </div>
 
 
-
                 <!-- REGION -->
 
                 <div class="form-group">
@@ -377,6 +384,7 @@ content="width=device-width, initial-scale=1.0"
                         <option value="">
                             Sélectionnez votre région
                         </option>
+
 
                         <optgroup label="France métropolitaine">
 
@@ -426,7 +434,6 @@ content="width=device-width, initial-scale=1.0"
                 </div>
 
 
-
                 <!-- DESCRIPTION -->
 
                 <div class="form-group full-width">
@@ -452,7 +459,6 @@ content="width=device-width, initial-scale=1.0"
 
 
             </div>
-
 
 
             <!-- RESEAUX SOCIAUX -->
@@ -487,7 +493,6 @@ content="width=device-width, initial-scale=1.0"
                 </div>
 
 
-
                 <div class="form-group">
 
                     <label for="profileX">
@@ -501,7 +506,6 @@ content="width=device-width, initial-scale=1.0"
                     >
 
                 </div>
-
 
 
                 <div class="form-group">
@@ -519,7 +523,6 @@ content="width=device-width, initial-scale=1.0"
                 </div>
 
 
-
                 <div class="form-group">
 
                     <label for="profileYoutube">
@@ -533,7 +536,6 @@ content="width=device-width, initial-scale=1.0"
                     >
 
                 </div>
-
 
 
                 <div class="form-group">
@@ -554,7 +556,6 @@ content="width=device-width, initial-scale=1.0"
             </div>
 
 
-
             <!-- MEDAILLE VIP -->
 
             <div class="vip-title">
@@ -563,11 +564,9 @@ content="width=device-width, initial-scale=1.0"
 
 
             <div class="vip-intro">
-
                 <i>
                     (la maj de l'audience de vos réseaux peut prendre plusieurs jours. Patientez)
                 </i>
-
             </div>
 
 
@@ -607,7 +606,6 @@ content="width=device-width, initial-scale=1.0"
             </div>
 
 
-
             <!-- COMPETENCES -->
 
             <div class="section-title">
@@ -629,7 +627,6 @@ content="width=device-width, initial-scale=1.0"
                 <div class="competence-group-title">
                     Compétences métier
                 </div>
-
 
 
                 <div class="competence">
@@ -655,7 +652,6 @@ content="width=device-width, initial-scale=1.0"
                     </div>
 
                 </div>
-
 
 
                 <div class="competence">
@@ -684,7 +680,6 @@ content="width=device-width, initial-scale=1.0"
                 </div>
 
 
-
                 <div class="competence">
 
                     <label>
@@ -708,7 +703,6 @@ content="width=device-width, initial-scale=1.0"
                     </div>
 
                 </div>
-
 
 
                 <div class="competence">
@@ -737,7 +731,6 @@ content="width=device-width, initial-scale=1.0"
                 </div>
 
 
-
                 <div class="competence">
 
                     <label>
@@ -762,7 +755,6 @@ content="width=device-width, initial-scale=1.0"
                     </div>
 
                 </div>
-
 
 
                 <div class="competence">
@@ -790,7 +782,6 @@ content="width=device-width, initial-scale=1.0"
                 </div>
 
 
-
                 <div class="competence">
 
                     <label>
@@ -816,7 +807,6 @@ content="width=device-width, initial-scale=1.0"
                     </div>
 
                 </div>
-
 
 
                 <div class="competence">
@@ -847,7 +837,6 @@ content="width=device-width, initial-scale=1.0"
             </div>
 
 
-
             <button
                 type="submit"
                 class="primary-button"
@@ -866,7 +855,6 @@ content="width=device-width, initial-scale=1.0"
         </form>
 
     </div>
-
 
 
     <!-- SUPPRESSION -->
@@ -892,8 +880,8 @@ content="width=device-width, initial-scale=1.0"
 
     </div>
 
-</div>
 
+</div>
 
 
 <!-- =====================================================
@@ -948,7 +936,6 @@ content="width=device-width, initial-scale=1.0"
                 </div>
 
 
-
                 <div class="form-group">
 
                     <label for="eventDate">
@@ -962,7 +949,6 @@ content="width=device-width, initial-scale=1.0"
                     >
 
                 </div>
-
 
 
                 <div class="form-group">
@@ -980,7 +966,6 @@ content="width=device-width, initial-scale=1.0"
                 </div>
 
 
-
                 <div class="form-group">
 
                     <label for="eventPlace">
@@ -995,17 +980,17 @@ content="width=device-width, initial-scale=1.0"
                 </div>
 
 
-
                 <div class="form-group full-width">
 
                     <label for="eventText">
                         DESCRIPTION
                     </label>
 
-                    <textarea id="eventText"></textarea>
+                    <textarea
+                        id="eventText"
+                    ></textarea>
 
                 </div>
-
 
 
                 <div class="form-group full-width">
@@ -1021,7 +1006,6 @@ content="width=device-width, initial-scale=1.0"
                     >
 
                 </div>
-
 
 
                 <div class="form-group">
@@ -1088,6 +1072,7 @@ content="width=device-width, initial-scale=1.0"
                 class="message"
             ></div>
 
+
         </form>
 
 
@@ -1096,10 +1081,10 @@ content="width=device-width, initial-scale=1.0"
             id="eventList"
         ></div>
 
+
     </div>
 
 </div>
-
 
 
 <!-- =====================================================
@@ -1162,8 +1147,8 @@ content="width=device-width, initial-scale=1.0"
                 class="message"
             ></div>
 
-        </div>
 
+        </div>
 
 
         <div class="team-role">
@@ -1215,11 +1200,11 @@ content="width=device-width, initial-scale=1.0"
                 class="message"
             ></div>
 
+
         </div>
 
 
     </div>
-
 
 
     <div class="panel">
@@ -1250,10 +1235,11 @@ content="width=device-width, initial-scale=1.0"
             id="teamRegionPanels"
         ></div>
 
+
     </div>
 
-</div>
 
+</div>
 
 
 <!-- =====================================================
@@ -1286,7 +1272,6 @@ content="width=device-width, initial-scale=1.0"
             </div>
 
 
-
             <div class="competence">
 
                 <label>
@@ -1312,7 +1297,6 @@ content="width=device-width, initial-scale=1.0"
             </div>
 
 
-
             <div class="competence">
 
                 <label>
@@ -1336,7 +1320,6 @@ content="width=device-width, initial-scale=1.0"
                 </div>
 
             </div>
-
 
 
             <div class="competence">
@@ -1366,7 +1349,6 @@ content="width=device-width, initial-scale=1.0"
             </div>
 
 
-
             <div class="competence">
 
                 <label>
@@ -1390,7 +1372,6 @@ content="width=device-width, initial-scale=1.0"
                 </div>
 
             </div>
-
 
 
             <div class="competence">
@@ -1437,11 +1418,14 @@ content="width=device-width, initial-scale=1.0"
             class="message"
         ></div>
 
+
     </div>
 
 </div>
 
+
 </section>
+
 
 <!-- =======================================================
      MODAL SUPPRESSION
@@ -1454,6 +1438,7 @@ content="width=device-width, initial-scale=1.0"
 
 
 <div class="modal-box">
+
 
     <button
         class="modal-close"
@@ -1515,15 +1500,22 @@ content="width=device-width, initial-scale=1.0"
         class="message"
     ></div>
 
+
 </div>
 
 
 </div>
+
+
+<!-- =======================================================
+     APPLICATION ADMIN
+======================================================= -->
 
 <script
     type="module"
     src="./js/admin.js"
 ></script>
+
 
 </body>
 
