@@ -1,507 +1,865 @@
 /* =========================================================
    AVANT-GARDE — ADMIN AUTH
+
    js/admin-auth.js
 
-   Gestion de l'authentification de l'espace administration.
+   Gestion complète de l'authentification de l'espace membre :
 
-   IMPORTANT :
-   - Utilise le même client Supabase que l'ancien admin.html.
-   - Ne modifie pas la logique métier.
-   - Ne modifie pas les droits.
-   - Ne modifie pas les profils.
-   - Ne modifie pas les onglets.
+   - Connexion Supabase
+   - Vérification de la session existante
+   - Chargement du profil connecté
+   - grade / grade2
+   - Affichage connexion / espace membre
+   - Affichage des droits dépendant du profil
+   - Déconnexion
+   - Boutons HOME / DECONNEXION
 ========================================================= */
 
-import { supabaseClient } from "./supabase.js";
+import { supabase } from "./supabase.js";
+
+
+/* =========================================================
+   VARIABLES GLOBALES
+========================================================= */
+
+let currentUser = null;
+let currentProfile = null;
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const loginScreen =
+    document.getElementById(
+        "loginScreen"
+    );
+
+const adminScreen =
+    document.getElementById(
+        "adminScreen"
+    );
+
+const loginForm =
+    document.getElementById(
+        "loginForm"
+    );
+
+const loginButton =
+    document.getElementById(
+        "loginButton"
+    );
+
+const loginMessage =
+    document.getElementById(
+        "loginMessage"
+    );
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+function afficherMessage(
+    element,
+    type,
+    texte
+) {
+
+    if (!element) {
+        return;
+    }
+
+
+    element.className =
+        "message " + type;
+
+
+    element.textContent =
+        texte;
+}
+
+
+function viderMessage(element) {
+
+    if (!element) {
+        return;
+    }
+
+
+    element.className =
+        "message";
+
+
+    element.textContent =
+        "";
+}
+
+
+/* =========================================================
+   EXPOSITION ETAT AUTHENTIFICATION
+=========================================================
+
+   Les autres modules de l'administration utilisent
+   l'état du profil connecté.
+
+   On expose donc l'état sur window afin de conserver
+   la communication entre les modules séparés du
+   monolithe d'origine.
+========================================================= */
+
+function exposerEtat() {
+
+    window.currentUser =
+        currentUser;
+
+    window.currentProfile =
+        currentProfile;
+}
+
+
+/* =========================================================
+   AFFICHAGE CONNEXION
+========================================================= */
+
+function afficherConnexion() {
+
+    if (loginScreen) {
+
+        loginScreen.style.display =
+            "block";
+    }
+
+
+    if (adminScreen) {
+
+        adminScreen.style.display =
+            "none";
+    }
+
+
+    if (loginButton) {
+
+        loginButton.disabled =
+            false;
+
+        loginButton.textContent =
+            "CONNEXION";
+    }
+
+
+    viderMessage(
+        loginMessage
+    );
+}
+
+
+/* =========================================================
+   AFFICHAGE ADMIN
+========================================================= */
+
+function afficherAdmin() {
+
+    if (loginScreen) {
+
+        loginScreen.style.display =
+            "none";
+    }
+
+
+    if (adminScreen) {
+
+        adminScreen.style.display =
+            "block";
+    }
+
+
+    const adminUser =
+        document.getElementById(
+            "adminUser"
+        );
+
+
+    if (adminUser) {
+
+        adminUser.innerHTML =
+            "Connecté en tant que <strong>" +
+            (
+                currentProfile?.nom ||
+                currentUser?.email ||
+                ""
+            ) +
+            "</strong>";
+    }
+
+
+    ajouterActionsHeader();
+
+
+    /*
+     * Les autres modules peuvent maintenant
+     * récupérer le profil courant.
+     */
+
+    exposerEtat();
+}
+
+
+/* =========================================================
+   HEADER ESPACE MEMBRE
+========================================================= */
+
+function ajouterActionsHeader() {
+
+    let actions =
+        document.getElementById(
+            "memberHeaderActions"
+        );
+
+
+    if (actions) {
+        return;
+    }
+
+
+    const header =
+        document.createElement(
+            "div"
+        );
+
+
+    header.id =
+        "memberHeaderActions";
+
+
+    header.className =
+        "header-actions";
+
+
+    header.innerHTML = `
+
+        <a
+            href="index.html"
+            class="header-button"
+        >
+            HOME
+        </a>
+
+        <button
+            type="button"
+            class="header-button logout-button"
+            id="logoutButton"
+        >
+            SE DÉCONNECTER
+        </button>
+
+    `;
+
+
+    const adminHeader =
+        document.querySelector(
+            ".admin-header"
+        );
+
+
+    if (!adminHeader) {
+        return;
+    }
+
+
+    adminHeader.insertBefore(
+        header,
+        adminHeader.firstChild
+    );
+
+
+    const logoutButton =
+        document.getElementById(
+            "logoutButton"
+        );
+
+
+    if (logoutButton) {
+
+        logoutButton.addEventListener(
+            "click",
+            deconnecter
+        );
+    }
+}
+
+
+/* =========================================================
+   DECONNEXION
+========================================================= */
+
+async function deconnecter() {
+
+    const button =
+        document.getElementById(
+            "logoutButton"
+        );
+
+
+    if (button) {
+
+        button.disabled =
+            true;
+
+        button.textContent =
+            "DÉCONNEXION…";
+    }
+
+
+    const {
+        error
+    } =
+        await supabase.auth.signOut();
+
+
+    if (error) {
+
+        console.error(
+            "Erreur déconnexion :",
+            error
+        );
+
+
+        if (button) {
+
+            button.disabled =
+                false;
+
+            button.textContent =
+                "SE DÉCONNECTER";
+        }
+
+
+        return;
+    }
+
+
+    currentUser =
+        null;
+
+
+    currentProfile =
+        null;
+
+
+    exposerEtat();
+
+
+    if (button) {
+
+        button.disabled =
+            false;
+
+        button.textContent =
+            "SE DÉCONNECTER";
+    }
+
+
+    afficherConnexion();
+}
+
+
+/* =========================================================
+   VERIFICATION UTILISATEUR
+========================================================= */
+
+async function verifierUtilisateur() {
+
+    try {
+
+        /*
+         * Récupération de l'utilisateur réellement
+         * authentifié dans Supabase.
+         */
+
+        const {
+            data,
+            error: erreurUtilisateur
+        } =
+            await supabase.auth.getUser();
+
+
+        if (erreurUtilisateur) {
+
+            console.error(
+                "Erreur récupération utilisateur :",
+                erreurUtilisateur
+            );
+
+            currentUser =
+                null;
+
+            currentProfile =
+                null;
+
+            exposerEtat();
+
+            afficherConnexion();
+
+            return;
+        }
+
+
+        const user =
+            data?.user;
+
+
+        /*
+         * Aucune session.
+         */
+
+        if (!user) {
+
+            currentUser =
+                null;
+
+            currentProfile =
+                null;
+
+            exposerEtat();
+
+            afficherConnexion();
+
+            return;
+        }
+
+
+        /*
+         * Utilisateur authentifié.
+         */
+
+        currentUser =
+            user;
+
+
+        exposerEtat();
+
+
+        /* -------------------------------------------------
+           CHARGEMENT DU PROFIL
+        ------------------------------------------------- */
+
+        const {
+            data: profile,
+            error
+        } =
+            await supabase
+
+                .from("profiles")
+
+                .select(`
+                    id,
+                    nom,
+                    grade,
+                    grade2,
+                    email,
+                    image_url,
+                    description,
+                    region,
+                    competences,
+                    anonyme,
+                    facebook_url,
+                    x_url,
+                    instagram_url,
+                    youtube_url,
+                    tiktok_url,
+                    audience_max
+                `)
+
+                .eq(
+                    "id",
+                    user.id
+                )
+
+                .single();
+
+
+        /*
+         * Impossible de récupérer le profil.
+         */
+
+        if (
+            error ||
+            !profile
+        ) {
+
+            console.error(
+                "Erreur chargement profil :",
+                error
+            );
+
+
+            await supabase.auth.signOut();
+
+
+            currentUser =
+                null;
+
+            currentProfile =
+                null;
+
+
+            exposerEtat();
+
+
+            afficherMessage(
+                loginMessage,
+                "error",
+                "Impossible de charger votre profil."
+            );
+
+
+            afficherConnexion();
+
+
+            return;
+        }
+
+
+        /*
+         * Profil valide.
+         */
+
+        currentProfile =
+            profile;
+
+
+        exposerEtat();
+
+
+        /*
+         * Passage effectif dans l'espace membre.
+         */
+
+        afficherAdmin();
+
+
+        /* -------------------------------------------------
+           REMPLISSAGE DU PROFIL
+        ------------------------------------------------- */
+
+        if (
+            typeof window.remplirProfil ===
+            "function"
+        ) {
+
+            window.remplirProfil(
+                profile
+            );
+        }
+
+
+        /* -------------------------------------------------
+           ONGLET RDV
+        ------------------------------------------------- */
+
+        const rdvButton =
+            document.getElementById(
+                "rdvTabButton"
+            );
+
+
+        if (rdvButton) {
+
+            if (
+                typeof window.peutGererRendezVous ===
+                    "function" &&
+                window.peutGererRendezVous()
+            ) {
+
+                rdvButton.style.display =
+                    "block";
+
+
+                if (
+                    typeof window.chargerRendezVous ===
+                    "function"
+                ) {
+
+                    window.chargerRendezVous();
+                }
+
+
+            } else {
+
+                rdvButton.style.display =
+                    "none";
+            }
+        }
+
+
+        /* -------------------------------------------------
+           ONGLET ROLE
+        ------------------------------------------------- */
+
+        const roleButton =
+            document.getElementById(
+                "roleTabButton"
+            );
+
+
+        if (roleButton) {
+
+            if (
+                typeof window.peutGererRole ===
+                    "function" &&
+                window.peutGererRole()
+            ) {
+
+                roleButton.style.display =
+                    "block";
+
+
+                if (
+                    typeof window.remplirRoles ===
+                    "function"
+                ) {
+
+                    window.remplirRoles(
+                        profile.competences
+                    );
+                }
+
+
+            } else {
+
+                roleButton.style.display =
+                    "none";
+            }
+        }
+
+
+        /* -------------------------------------------------
+           GESTION DES EQUIPES
+        ------------------------------------------------- */
+
+        if (
+            typeof window.chargerGestionEquipes ===
+            "function"
+        ) {
+
+            window.chargerGestionEquipes();
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Erreur authentification :",
+            error
+        );
+
+
+        currentUser =
+            null;
+
+        currentProfile =
+            null;
+
+
+        exposerEtat();
+
+
+        afficherMessage(
+            loginMessage,
+            "error",
+            "Une erreur est survenue lors de la connexion."
+        );
+
+
+        afficherConnexion();
+    }
+}
 
 
 /* =========================================================
    CONNEXION
 ========================================================= */
 
-const loginForm = document.getElementById("loginForm");
-
 if (loginForm) {
 
-  loginForm.addEventListener("submit", async function (event) {
+    loginForm.addEventListener(
+        "submit",
+        async event => {
 
-    event.preventDefault();
-
-    const emailInput =
-      document.getElementById("loginEmail");
-
-    const passwordInput =
-      document.getElementById("loginPassword");
-
-    const loginButton =
-      document.getElementById("loginButton");
-
-    const loginMessage =
-      document.getElementById("loginMessage");
+            event.preventDefault();
 
 
-    const email =
-      emailInput?.value.trim() || "";
-
-    const password =
-      passwordInput?.value || "";
+            viderMessage(
+                loginMessage
+            );
 
 
-    /* -------------------------------------------------------
-       Vérification des champs
-    ------------------------------------------------------- */
+            if (loginButton) {
 
-    if (!email || !password) {
+                loginButton.disabled =
+                    true;
 
-      if (typeof afficherMessage === "function") {
-        afficherMessage(
-          "Veuillez renseigner votre email et votre mot de passe.",
-          "error"
-        );
-      }
-      else if (loginMessage) {
-        loginMessage.textContent =
-          "Veuillez renseigner votre email et votre mot de passe.";
-      }
-
-      return;
-    }
+                loginButton.textContent =
+                    "CONNEXION…";
+            }
 
 
-    /* -------------------------------------------------------
-       État du bouton
-    ------------------------------------------------------- */
-
-    if (loginButton) {
-      loginButton.disabled = true;
-      loginButton.textContent = "CONNEXION...";
-    }
-
-
-    if (typeof viderMessage === "function") {
-      viderMessage("loginMessage");
-    }
-    else if (loginMessage) {
-      loginMessage.textContent = "";
-    }
+            const email =
+                document
+                    .getElementById(
+                        "loginEmail"
+                    )
+                    ?.value
+                    .trim()
+                    .toLowerCase();
 
 
-    try {
-
-      /* -----------------------------------------------------
-         AUTH SUPABASE
-
-         C'est volontairement le même appel que dans
-         l'ancien admin.html.
-      ----------------------------------------------------- */
-
-      const {
-        data,
-        error
-      } =
-        await supabaseClient.auth.signInWithPassword({
-          email,
-          password
-        });
+            const password =
+                document
+                    .getElementById(
+                        "loginPassword"
+                    )
+                    ?.value;
 
 
-      /* -----------------------------------------------------
-         Erreur Supabase
-      ----------------------------------------------------- */
+            /*
+             * Sécurité supplémentaire :
+             * les deux champs doivent exister.
+             */
 
-      if (error) {
+            if (
+                !email ||
+                !password
+            ) {
 
-        console.error(
-          "Erreur Supabase lors de la connexion :",
-          error
-        );
+                afficherMessage(
+                    loginMessage,
+                    "error",
+                    "Veuillez renseigner votre adresse e-mail et votre mot de passe."
+                );
 
-        if (typeof afficherMessage === "function") {
-          afficherMessage(
-            "Email ou mot de passe incorrect.",
-            "error"
-          );
+
+                if (loginButton) {
+
+                    loginButton.disabled =
+                        false;
+
+                    loginButton.textContent =
+                        "SE CONNECTER";
+                }
+
+
+                return;
+            }
+
+
+            try {
+
+                const {
+                    error
+                } =
+                    await supabase.auth.signInWithPassword({
+                        email,
+                        password
+                    });
+
+
+                if (error) {
+
+                    console.error(
+                        "Erreur connexion :",
+                        error
+                    );
+
+
+                    afficherMessage(
+                        loginMessage,
+                        "error",
+                        "Adresse e-mail ou mot de passe incorrect."
+                    );
+
+
+                    if (loginButton) {
+
+                        loginButton.disabled =
+                            false;
+
+                        loginButton.textContent =
+                            "SE CONNECTER";
+                    }
+
+
+                    return;
+                }
+
+
+                /*
+                 * L'authentification Supabase est réussie.
+                 *
+                 * On vérifie immédiatement la session
+                 * puis le profil avant d'afficher
+                 * l'espace membre.
+                 */
+
+                await verifierUtilisateur();
+
+            } catch (error) {
+
+                console.error(
+                    "Erreur connexion :",
+                    error
+                );
+
+
+                afficherMessage(
+                    loginMessage,
+                    "error",
+                    "Une erreur est survenue lors de la connexion."
+                );
+
+
+                if (loginButton) {
+
+                    loginButton.disabled =
+                        false;
+
+                    loginButton.textContent =
+                        "SE CONNECTER";
+                }
+            }
         }
-        else if (loginMessage) {
-          loginMessage.textContent =
-            "Email ou mot de passe incorrect.";
-        }
-
-        return;
-      }
-
-
-      /* -----------------------------------------------------
-         Vérification de la session
-      ----------------------------------------------------- */
-
-      if (!data || !data.user) {
-
-        console.error(
-          "Connexion Supabase réussie mais aucun utilisateur retourné."
-        );
-
-        if (typeof afficherMessage === "function") {
-          afficherMessage(
-            "Impossible de récupérer votre compte.",
-            "error"
-          );
-        }
-        else if (loginMessage) {
-          loginMessage.textContent =
-            "Impossible de récupérer votre compte.";
-        }
-
-        return;
-      }
-
-
-      /* -----------------------------------------------------
-         Utilisateur connecté
-      ----------------------------------------------------- */
-
-      window.currentUser = data.user;
-
-
-      /* -----------------------------------------------------
-         Chargement du profil
-      ----------------------------------------------------- */
-
-      await verifierUtilisateur();
-
-
-    }
-    catch (error) {
-
-      console.error(
-        "Erreur inattendue lors de la connexion :",
-        error
-      );
-
-      if (typeof afficherMessage === "function") {
-        afficherMessage(
-          "Une erreur est survenue lors de la connexion.",
-          "error"
-        );
-      }
-      else if (loginMessage) {
-        loginMessage.textContent =
-          "Une erreur est survenue lors de la connexion.";
-      }
-
-    }
-    finally {
-
-      if (loginButton) {
-        loginButton.disabled = false;
-        loginButton.textContent = "SE CONNECTER";
-      }
-
-    }
-
-  });
-
-}
-
-
-/* =========================================================
-   VÉRIFICATION UTILISATEUR
-========================================================= */
-
-async function verifierUtilisateur() {
-
-  try {
-
-    /* -------------------------------------------------------
-       Récupération de l'utilisateur Auth actuel
-    ------------------------------------------------------- */
-
-    const {
-      data: {
-        user
-      },
-      error: authError
-    } =
-      await supabaseClient.auth.getUser();
-
-
-    if (authError) {
-
-      console.error(
-        "Erreur lors de la récupération de l'utilisateur :",
-        authError
-      );
-
-      await supabaseClient.auth.signOut();
-
-      if (typeof afficherConnexion === "function") {
-        afficherConnexion();
-      }
-
-      if (typeof afficherMessage === "function") {
-        afficherMessage(
-          "Impossible de vérifier votre compte.",
-          "error"
-        );
-      }
-
-      return;
-    }
-
-
-    if (!user) {
-
-      console.error(
-        "Aucun utilisateur Supabase Auth connecté."
-      );
-
-      if (typeof afficherConnexion === "function") {
-        afficherConnexion();
-      }
-
-      return;
-    }
-
-
-    /* -------------------------------------------------------
-       Stockage de l'utilisateur
-    ------------------------------------------------------- */
-
-    window.currentUser = user;
-
-
-    /* -------------------------------------------------------
-       Récupération du profil
-
-       Même requête que dans l'ancien admin.html.
-    ------------------------------------------------------- */
-
-    const {
-      data: profile,
-      error
-    } =
-      await supabaseClient
-        .from("profiles")
-        .select(`
-          id,
-          nom,
-          grade,
-          email,
-          image_url,
-          description,
-          region,
-          competences,
-          anonyme,
-          facebook_url,
-          x_url,
-          instagram_url,
-          youtube_url,
-          tiktok_url,
-          audience_max
-        `)
-        .eq("id", user.id)
-        .single();
-
-
-    /* -------------------------------------------------------
-       Profil introuvable / erreur
-    ------------------------------------------------------- */
-
-    if (error || !profile) {
-
-      console.error(
-        "Erreur lors du chargement du profil :",
-        error
-      );
-
-      await supabaseClient.auth.signOut();
-
-      if (typeof afficherConnexion === "function") {
-        afficherConnexion();
-      }
-
-      if (typeof afficherMessage === "function") {
-        afficherMessage(
-          "Impossible de charger votre profil.",
-          "error"
-        );
-      }
-
-      return;
-    }
-
-
-    /* -------------------------------------------------------
-       Profil valide
-    ------------------------------------------------------- */
-
-    window.currentProfile = profile;
-
-
-    /* -------------------------------------------------------
-       Affichage de l'administration
-    ------------------------------------------------------- */
-
-    if (typeof afficherAdmin === "function") {
-      afficherAdmin();
-    }
-
-
-    /* -------------------------------------------------------
-       Remplissage du profil
-    ------------------------------------------------------- */
-
-    if (typeof remplirProfil === "function") {
-      remplirProfil(profile);
-    }
-
-
-    /* -------------------------------------------------------
-       Mise à jour éventuelle de l'interface
-    ------------------------------------------------------- */
-
-    if (typeof mettreAJourInterfaceAdmin === "function") {
-      mettreAJourInterfaceAdmin(profile);
-    }
-
-  }
-  catch (error) {
-
-    console.error(
-      "Erreur dans verifierUtilisateur() :",
-      error
     );
-
-    try {
-      await supabaseClient.auth.signOut();
-    }
-    catch (signOutError) {
-      console.error(
-        "Erreur lors de la déconnexion :",
-        signOutError
-      );
-    }
-
-    if (typeof afficherConnexion === "function") {
-      afficherConnexion();
-    }
-
-    if (typeof afficherMessage === "function") {
-      afficherMessage(
-        "Impossible de charger votre profil.",
-        "error"
-      );
-    }
-
-  }
-
 }
-
-
-/* =========================================================
-   DÉCONNEXION
-========================================================= */
-
-async function deconnexion() {
-
-  try {
-
-    await supabaseClient.auth.signOut();
-
-  }
-  catch (error) {
-
-    console.error(
-      "Erreur lors de la déconnexion :",
-      error
-    );
-
-  }
-
-
-  window.currentUser = null;
-  window.currentProfile = null;
-
-
-  if (typeof afficherConnexion === "function") {
-    afficherConnexion();
-  }
-
-}
-
-
-/* =========================================================
-   VÉRIFICATION AUTOMATIQUE AU CHARGEMENT
-========================================================= */
-
-async function verifierSessionExistante() {
-
-  try {
-
-    const {
-      data: {
-        session
-      },
-      error
-    } =
-      await supabaseClient.auth.getSession();
-
-
-    if (error) {
-
-      console.error(
-        "Erreur lors de la récupération de la session :",
-        error
-      );
-
-      return;
-    }
-
-
-    if (!session || !session.user) {
-      return;
-    }
-
-
-    window.currentUser = session.user;
-
-    await verifierUtilisateur();
-
-  }
-  catch (error) {
-
-    console.error(
-      "Erreur lors de la vérification de la session :",
-      error
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   EXPOSITION GLOBALE
-
-   Les autres modules de l'ancien admin.html fonctionnaient
-   dans le même scope global.
-
-   On conserve donc ces fonctions accessibles globalement.
-========================================================= */
-
-window.verifierUtilisateur =
-  verifierUtilisateur;
-
-window.deconnexion =
-  deconnexion;
-
-window.verifierSessionExistante =
-  verifierSessionExistante;
 
 
 /* =========================================================
    INITIALISATION
 ========================================================= */
 
-verifierSessionExistante();
+/*
+ * Très important :
+ * cette fonction est appelée lorsque admin.js charge
+ * le module d'authentification.
+ *
+ * Elle permet aussi de reconnecter automatiquement
+ * un utilisateur qui possède déjà une session Supabase.
+ */
+
+verifierUtilisateur();
+
+
+/* =========================================================
+   EXPORTS
+========================================================= */
+
+export {
+    currentUser,
+    currentProfile,
+    verifierUtilisateur,
+    afficherConnexion,
+    afficherAdmin,
+    ajouterActionsHeader,
+    deconnecter
+};
 
