@@ -266,12 +266,42 @@ profileForm.addEventListener(
 
       Si grade2 est vide, l'accès ROLE est absent :
       on conserve donc les anciens rôles existants.
+
+      EXCEPTION :
+      si l'utilisateur change de région alors qu'il
+      possède un poste régional (Militant ou
+      Délégué Régional), tous ses rôles doivent être
+      supprimés avec son poste régional.
     */
 
+    const ancienneRegion =
+      currentProfile?.region || "";
+
+
+    const ancienneGrade2 =
+      currentProfile?.grade2 || null;
+
+
+    const changementRegion =
+      region !== ancienneRegion;
+
+
+    const perteDroitsRegionaux =
+      changementRegion &&
+      (
+        ancienneGrade2 === "Délégué Régional" ||
+        ancienneGrade2 === "Militant"
+      );
+
+
     const rolesFinaux =
-      peutGererRole()
-        ? rolesSelectionnes
-        : anciensRoles;
+      perteDroitsRegionaux
+        ? []
+        : (
+            peutGererRole()
+              ? rolesSelectionnes
+              : anciensRoles
+          );
 
 
     const competences =
@@ -343,26 +373,6 @@ profileForm.addEventListener(
     }
 
 
-    const ancienneRegion =
-      currentProfile?.region || "";
-
-
-    const ancienneGrade2 =
-      currentProfile?.grade2 || null;
-
-
-    const changementRegion =
-      region !== ancienneRegion;
-
-
-    const perteDroitsRegionaux =
-      changementRegion &&
-      (
-        ancienneGrade2 === "Délégué Régional" ||
-        ancienneGrade2 === "Militant"
-      );
-
-
     if(perteDroitsRegionaux){
 
       const confirmerChangement =
@@ -370,7 +380,7 @@ profileForm.addEventListener(
           "Attention : si vous changez de région, vous perdrez vos droits régionaux (« " +
           ancienneGrade2 +
           " »).\n\n" +
-          "Votre fonction régionale sera automatiquement supprimée.\n\n" +
+          "Votre fonction régionale ainsi que vos rôles seront automatiquement supprimés.\n\n" +
           "Voulez-vous confirmer ce changement de région ?"
         );
 
@@ -524,8 +534,38 @@ profileForm.addEventListener(
     }
 
 
+    /*
+      Mise à jour du profil global.
+    */
+
     currentProfile =
       data;
+
+
+    /*
+      Si le poste régional vient d'être supprimé,
+      on force également le décochage visuel de
+      toutes les cases ROLE.
+
+      Les rôles ont déjà été supprimés de la colonne
+      competences avant la sauvegarde.
+    */
+
+    if(perteDroitsRegionaux){
+
+      document
+        .querySelectorAll(
+          'input[name="roles"]'
+        )
+        .forEach(
+          input => {
+
+            input.checked = false;
+
+          }
+        );
+
+    }
 
 
     synchroniserCompetencesEtRoles(
@@ -546,13 +586,21 @@ profileForm.addEventListener(
 
     if(peutGererRole()){
 
-      roleButton.style.display =
-        "block";
+      if(roleButton){
+
+        roleButton.style.display =
+          "block";
+
+      }
 
     }else{
 
-      roleButton.style.display =
-        "none";
+      if(roleButton){
+
+        roleButton.style.display =
+          "none";
+
+      }
 
 
       /*
@@ -561,11 +609,15 @@ profileForm.addEventListener(
         on revient automatiquement sur PROFIL.
       */
 
+      const roleTab =
+        document.getElementById(
+          "roleTab"
+        );
+
+
       if(
-        document
-          .getElementById("roleTab")
-          .classList
-          .contains("active")
+        roleTab &&
+        roleTab.classList.contains("active")
       ){
 
         document
@@ -594,14 +646,28 @@ profileForm.addEventListener(
           );
 
 
-        profileTabButton.classList.add(
-          "active"
-        );
+        if(profileTabButton){
+
+          profileTabButton.classList.add(
+            "active"
+          );
+
+        }
 
 
-        document
-          .getElementById("profileTab")
-          .classList.add("active");
+        const profileTab =
+          document.getElementById(
+            "profileTab"
+          );
+
+
+        if(profileTab){
+
+          profileTab.classList.add(
+            "active"
+          );
+
+        }
 
       }
 
@@ -622,7 +688,7 @@ profileForm.addEventListener(
         profileMessage,
         "success",
         perteDroitsRegionaux
-          ? "Votre profil a bien été mis à jour. Vos droits régionaux ont été supprimés."
+          ? "Votre profil a bien été mis à jour. Votre fonction régionale et vos rôles ont été supprimés."
           : "Votre profil a bien été mis à jour."
       );
 
