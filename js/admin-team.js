@@ -108,7 +108,7 @@ obtenirProfilCourant();
 
 return (
 
-```
+
 profil?.grade2 ===
   "Délégué Régional"
 
@@ -116,7 +116,7 @@ profil?.grade2 ===
 
 profil?.region ===
   region
-```
+
 
 );
 
@@ -130,7 +130,7 @@ function peutGererRendezVous(){
 
 return (
 
-```
+
 estAdmin()
 
 ||
@@ -145,7 +145,7 @@ estDelegueNational()
 
 obtenirProfilCourant()?.grade2 ===
   "Délégué Régional"
-```
+
 
 );
 
@@ -159,13 +159,13 @@ function peutGererDirection(){
 
 return (
 
-```
+
 estAdmin()
 
 ||
 
 estArchitecteProjet()
-```
+
 
 );
 
@@ -179,7 +179,7 @@ function peutGererEquipes(){
 
 return (
 
-```
+
 estAdmin()
 
 ||
@@ -189,7 +189,7 @@ estArchitecteProjet()
 ||
 
 estDelegueNational()
-```
+
 
 );
 
@@ -203,7 +203,7 @@ function peutGererMilitants(region){
 
 return (
 
-```
+
 estAdmin()
 
 ||
@@ -217,7 +217,7 @@ estDelegueNational()
 ||
 
 estDelegueRegional(region)
-```
+
 
 );
 
@@ -239,7 +239,7 @@ function peutGererRole(){
 
 return (
 
-```
+
 estAdmin()
 
 ||
@@ -249,7 +249,7 @@ estArchitecteProjet()
 ||
 
 estDelegueNational()
-```
+
 
 );
 
@@ -315,7 +315,7 @@ obtenirProfilCourant();
 const regionParDefaut =
 profil?.region &&
 
-```
+
 regionsEquipeListe.includes(
   profil.region
 )
@@ -323,11 +323,11 @@ regionsEquipeListe.includes(
   ? profil.region
 
   : regionsEquipeListe[0];
-```
+
 
 afficherRegionEquipe(
 
-```
+
 regionEquipeActive &&
 
 regionsEquipeListe.includes(
@@ -337,7 +337,7 @@ regionsEquipeListe.includes(
   ? regionEquipeActive
 
   : regionParDefaut
-```
+
 
 );
 
@@ -355,7 +355,7 @@ error
 } =
 await supabase
 
-```
+
   .from("profiles")
 
   .select(`
@@ -374,11 +374,11 @@ await supabase
       ascending: true
     }
   );
-```
+
 
 if(error){
 
-```
+
 console.error(
   "Erreur chargement membres :",
   error
@@ -387,7 +387,7 @@ console.error(
 tousLesMembres = [];
 
 return;
-```
+
 
 }
 
@@ -417,7 +417,7 @@ peutGererDirection();
 
 if(founderMessage){
 
-```
+
 founderMessage.textContent =
   autorise
 
@@ -432,13 +432,13 @@ founderMessage.style.color =
     ? "#b9e5c4"
 
     : "#7f8998";
-```
+
 
 }
 
 if(nationalMessage){
 
-```
+
 nationalMessage.textContent =
   autorise
 
@@ -453,7 +453,7 @@ nationalMessage.style.color =
     ? "#b9e5c4"
 
     : "#7f8998";
-```
+
 
 }
 
@@ -469,23 +469,23 @@ document.getElementById(
 
 if(founderSearch){
 
-```
+
 founderSearch.classList.toggle(
   "team-disabled",
   !autorise
 );
-```
+
 
 }
 
 if(nationalSearch){
 
-```
+
 nationalSearch.classList.toggle(
   "team-disabled",
   !autorise
 );
-```
+
 
 }
 
@@ -542,9 +542,9 @@ elementId
 
 if(!container){
 
-```
+
 return;
-```
+
 
 }
 
@@ -552,12 +552,12 @@ container.innerHTML = "";
 
 if(!membre){
 
-```
+
 container.innerHTML =
   "<div class='team-permission'>Aucun membre désigné.</div>";
 
 return;
-```
+
 
 }
 
@@ -572,7 +572,7 @@ item.className =
 item.innerHTML =
 `
 
-```
+
   <span>
     ${escapeHtml(
       membre.nom ||
@@ -599,11 +599,11 @@ item.innerHTML =
   }
 
 `;
-```
+
 
 if(peutGererDirection()){
 
-```
+
 const button =
   item.querySelector(
     "button"
@@ -622,7 +622,7 @@ if(button){
   );
 
 }
-```
+
 
 }
 
@@ -650,7 +650,7 @@ document.getElementById(
 
 if(founderSearch){
 
-```
+
 founderSearch.addEventListener(
   "input",
   event =>
@@ -659,13 +659,13 @@ founderSearch.addEventListener(
       "founder"
     )
 );
-```
+
 
 }
 
 if(nationalSearch){
 
-```
+
 nationalSearch.addEventListener(
   "input",
   event =>
@@ -674,7 +674,7 @@ nationalSearch.addEventListener(
       "national"
     )
 );
-```
+
 
 }
 
@@ -692,7 +692,7 @@ type
 const container =
 document.getElementById(
 
-```
+
   type === "founder"
 
     ? "founderResults"
@@ -700,13 +700,13 @@ document.getElementById(
     : "nationalResults"
 
 );
-```
+
 
 if(!container){
 
-```
+
 return;
-```
+
 
 }
 
@@ -714,9 +714,9 @@ container.innerHTML = "";
 
 if(!peutGererDirection()){
 
-```
+
 return;
-```
+
 
 }
 
@@ -727,16 +727,16 @@ recherche
 
 if(!texte){
 
-```
+
 return;
-```
+
 
 }
 
 const membres =
 tousLesMembres
 
-```
+
   .filter(
     membre =>
       String(
@@ -750,12 +750,12 @@ tousLesMembres
     0,
     20
   );
-```
+
 
 membres.forEach(
 membre => {
 
-```
+
   const bouton =
     creerOptionMembre(
       membre
@@ -777,7 +777,7 @@ membre => {
   );
 
 }
-```
+
 
 );
 
@@ -794,20 +794,20 @@ type
 
 if(!peutGererDirection()){
 
-```
+
 return;
-```
+
 
 }
 
 const role =
 type === "founder"
 
-```
+
   ? "Architecte du Projet"
 
   : "Délégué National";
-```
+
 
 const ancien =
 tousLesMembres.find(
@@ -821,7 +821,7 @@ ancien &&
 ancien.id !== membre.id
 ){
 
-```
+
 const {
   error
 } =
@@ -872,7 +872,7 @@ if(error){
 
 ancien.grade2 =
   null;
-```
+
 
 }
 
@@ -882,7 +882,7 @@ error
 } =
 await supabase
 
-```
+
   .from("profiles")
 
   .update({
@@ -897,11 +897,11 @@ await supabase
   .select()
 
   .single();
-```
+
 
 if(error){
 
-```
+
 console.error(
   "Erreur attribution grade2 :",
   error
@@ -927,7 +927,7 @@ afficherMessage(
 
 
 return;
-```
+
 
 }
 
@@ -938,7 +938,7 @@ data
 const search =
 document.getElementById(
 
-```
+
   type === "founder"
 
     ? "founderSearch"
@@ -946,21 +946,21 @@ document.getElementById(
     : "nationalSearch"
 
 );
-```
+
 
 if(search){
 
-```
+
 search.value =
   "";
-```
+
 
 }
 
 const results =
 document.getElementById(
 
-```
+
   type === "founder"
 
     ? "founderResults"
@@ -968,14 +968,14 @@ document.getElementById(
     : "nationalResults"
 
 );
-```
+
 
 if(results){
 
-```
+
 results.innerHTML =
   "";
-```
+
 
 }
 
@@ -986,7 +986,7 @@ afficherRegionsEquipe();
 afficherMessage(
 document.getElementById(
 
-```
+
   type === "founder"
 
     ? "founderMessage"
@@ -998,7 +998,7 @@ document.getElementById(
 "success",
 
 "La fonction a été attribuée."
-```
+
 
 );
 
@@ -1007,7 +1007,7 @@ setTimeout(
 viderMessage(
 document.getElementById(
 
-```
+
       type === "founder"
 
         ? "founderMessage"
@@ -1018,7 +1018,7 @@ document.getElementById(
   ),
 
 2500
-```
+
 
 );
 
@@ -1035,9 +1035,9 @@ type
 
 if(!peutGererDirection()){
 
-```
+
 return;
-```
+
 
 }
 
@@ -1047,7 +1047,7 @@ error
 } =
 await supabase
 
-```
+
   .from("profiles")
 
   .update({
@@ -1062,11 +1062,11 @@ await supabase
   .select()
 
   .single();
-```
+
 
 if(error){
 
-```
+
 console.error(
   "Erreur retrait grade2 :",
   error
@@ -1092,7 +1092,7 @@ afficherMessage(
 
 
 return;
-```
+
 
 }
 
@@ -1127,9 +1127,9 @@ if(
 !panels
 ){
 
-```
+
 return;
-```
+
 
 }
 
@@ -1150,7 +1150,7 @@ Toutes les régions restent visibles.
 const regionParDefaut =
 profil?.region &&
 
-```
+
 regionsEquipeListe.includes(
   profil.region
 )
@@ -1158,31 +1158,31 @@ regionsEquipeListe.includes(
   ? profil.region
 
   : regionsEquipeListe[0];
-```
+
 
 if(
 
-```
+
 !regionEquipeActive ||
 
 !regionsEquipeListe.includes(
   regionEquipeActive
 )
-```
+
 
 ){
 
-```
+
 regionEquipeActive =
   regionParDefaut;
-```
+
 
 }
 
 regionsEquipeListe.forEach(
 (region,index) => {
 
-```
+
   const bouton =
     document.createElement(
       "button"
@@ -1365,7 +1365,7 @@ regionsEquipeListe.forEach(
   );
 
 }
-```
+
 
 );
 
@@ -1395,7 +1395,7 @@ document
 .forEach(
 bouton => {
 
-```
+
     bouton.classList.toggle(
       "active",
 
@@ -1406,7 +1406,7 @@ bouton => {
 
   }
 );
-```
+
 
 document
 .querySelectorAll(
@@ -1415,7 +1415,7 @@ document
 .forEach(
 panel => {
 
-```
+
     panel.classList.toggle(
       "active",
 
@@ -1426,7 +1426,7 @@ panel => {
 
   }
 );
-```
+
 
 afficherEquipesRegion(
 region
@@ -1447,7 +1447,7 @@ document
 .forEach(
 input => {
 
-```
+
     input.addEventListener(
       "input",
       () =>
@@ -1459,7 +1459,7 @@ input => {
 
   }
 );
-```
+
 
 document
 .querySelectorAll(
@@ -1468,7 +1468,7 @@ document
 .forEach(
 input => {
 
-```
+
     input.addEventListener(
       "input",
       () =>
@@ -1480,7 +1480,7 @@ input => {
 
   }
 );
-```
+
 
 }
 
@@ -1496,7 +1496,7 @@ const delegues =
 tousLesMembres.filter(
 membre =>
 
-```
+
     membre.region ===
       region
 
@@ -1506,13 +1506,13 @@ membre =>
       "Délégué Régional"
 
 );
-```
+
 
 const militants =
 tousLesMembres.filter(
 membre =>
 
-```
+
     membre.region ===
       region
 
@@ -1522,7 +1522,7 @@ membre =>
       "Militant"
 
 );
-```
+
 
 document
 .querySelectorAll(
@@ -1531,7 +1531,7 @@ document
 .forEach(
 container => {
 
-```
+
     if(
       container.dataset.region ===
       region
@@ -1548,7 +1548,7 @@ container => {
 
   }
 );
-```
+
 
 document
 .querySelectorAll(
@@ -1557,7 +1557,7 @@ document
 .forEach(
 container => {
 
-```
+
     if(
       container.dataset.region ===
       region
@@ -1574,7 +1574,7 @@ container => {
 
   }
 );
-```
+
 
 appliquerPermissionsRegion(
 region
@@ -1605,7 +1605,7 @@ document
 .forEach(
 input => {
 
-```
+
     if(
       input.dataset.region ===
       region
@@ -1620,7 +1620,7 @@ input => {
 
   }
 );
-```
+
 
 document
 .querySelectorAll(
@@ -1629,7 +1629,7 @@ document
 .forEach(
 input => {
 
-```
+
     if(
       input.dataset.region ===
       region
@@ -1644,7 +1644,7 @@ input => {
 
   }
 );
-```
+
 
 }
 
@@ -1663,7 +1663,7 @@ input.dataset.region;
 const container =
 document.querySelector(
 
-```
+
   role === "Délégué Régional"
 
     ? `.regional-results[data-region="${CSS.escape(region)}"]`
@@ -1671,13 +1671,13 @@ document.querySelector(
     : `.militant-results[data-region="${CSS.escape(region)}"]`
 
 );
-```
+
 
 if(!container){
 
-```
+
 return;
-```
+
 
 }
 
@@ -1687,19 +1687,19 @@ container.innerHTML =
 const autorise =
 role === "Délégué Régional"
 
-```
+
   ? peutGererEquipes()
 
   : peutGererMilitants(
       region
     );
-```
+
 
 if(!autorise){
 
-```
+
 return;
-```
+
 
 }
 
@@ -1710,16 +1710,16 @@ input.value
 
 if(!texte){
 
-```
+
 return;
-```
+
 
 }
 
 const membres =
 tousLesMembres
 
-```
+
   .filter(
     membre =>
 
@@ -1740,12 +1740,12 @@ tousLesMembres
     0,
     20
   );
-```
+
 
 membres.forEach(
 membre => {
 
-```
+
   const bouton =
     creerOptionMembre(
       membre
@@ -1768,7 +1768,7 @@ membre => {
   );
 
 }
-```
+
 
 );
 
@@ -1800,7 +1800,7 @@ membre.image_url ||
 bouton.innerHTML =
 `
 
-```
+
   ${
     image
 
@@ -1857,7 +1857,7 @@ bouton.innerHTML =
   </span>
 
 `;
-```
+
 
 return bouton;
 
@@ -1876,19 +1876,19 @@ role
 const autorise =
 role === "Délégué Régional"
 
-```
+
   ? peutGererEquipes()
 
   : peutGererMilitants(
       region
     );
-```
+
 
 if(!autorise){
 
-```
+
 return;
-```
+
 
 }
 
@@ -1897,9 +1897,9 @@ membre.region !==
 region
 ){
 
-```
+
 return;
-```
+
 
 }
 
@@ -1909,7 +1909,7 @@ error
 } =
 await supabase
 
-```
+
   .from("profiles")
 
   .update({
@@ -1924,11 +1924,11 @@ await supabase
   .select()
 
   .single();
-```
+
 
 if(error){
 
-```
+
 console.error(
   "Erreur attribution rôle régional :",
   error
@@ -1944,7 +1944,7 @@ afficherMessageRegion(
 
 
 return;
-```
+
 
 }
 
@@ -1955,11 +1955,11 @@ data
 const searchSelector =
 role === "Délégué Régional"
 
-```
+
   ? `.regional-search[data-region="${CSS.escape(region)}"]`
 
   : `.militant-search[data-region="${CSS.escape(region)}"]`;
-```
+
 
 const search =
 document.querySelector(
@@ -1968,21 +1968,21 @@ searchSelector
 
 if(search){
 
-```
+
 search.value =
   "";
-```
+
 
 }
 
 const resultSelector =
 role === "Délégué Régional"
 
-```
+
   ? `.regional-results[data-region="${CSS.escape(region)}"]`
 
   : `.militant-results[data-region="${CSS.escape(region)}"]`;
-```
+
 
 const results =
 document.querySelector(
@@ -1991,10 +1991,10 @@ resultSelector
 
 if(results){
 
-```
+
 results.innerHTML =
   "";
-```
+
 
 }
 
@@ -2016,9 +2016,9 @@ region,
 role
 ),
 
-```
+
 2200
-```
+
 
 );
 
@@ -2043,30 +2043,30 @@ if(
 membres.length === 0
 ){
 
-```
+
 container.innerHTML =
   "<div class='team-permission'>Aucun membre affecté.</div>";
 
 return;
-```
+
 
 }
 
 const autorise =
 role === "Délégué Régional"
 
-```
+
   ? peutGererEquipes()
 
   : peutGererMilitants(
       region
     );
-```
+
 
 membres.forEach(
 membre => {
 
-```
+
   const item =
     document.createElement(
       "div"
@@ -2139,7 +2139,7 @@ membre => {
   );
 
 }
-```
+
 
 );
 
@@ -2158,19 +2158,19 @@ role
 const autorise =
 role === "Délégué Régional"
 
-```
+
   ? peutGererEquipes()
 
   : peutGererMilitants(
       region
     );
-```
+
 
 if(!autorise){
 
-```
+
 return;
-```
+
 
 }
 
@@ -2180,7 +2180,7 @@ error
 } =
 await supabase
 
-```
+
   .from("profiles")
 
   .update({
@@ -2195,11 +2195,11 @@ await supabase
   .select()
 
   .single();
-```
+
 
 if(error){
 
-```
+
 console.error(
   "Erreur retrait rôle régional :",
   error
@@ -2215,7 +2215,7 @@ afficherMessageRegion(
 
 
 return;
-```
+
 
 }
 
@@ -2243,11 +2243,11 @@ texte
 const selector =
 role === "Délégué Régional"
 
-```
+
   ? `.regional-message[data-region="${CSS.escape(region)}"]`
 
   : `.militant-message[data-region="${CSS.escape(region)}"]`;
-```
+
 
 const element =
 document.querySelector(
@@ -2256,13 +2256,13 @@ selector
 
 if(element){
 
-```
+
 afficherMessage(
   element,
   type,
   texte
 );
-```
+
 
 }
 
@@ -2276,11 +2276,11 @@ role
 const selector =
 role === "Délégué Régional"
 
-```
+
   ? `.regional-message[data-region="${CSS.escape(region)}"]`
 
   : `.militant-message[data-region="${CSS.escape(region)}"]`;
-```
+
 
 const element =
 document.querySelector(
@@ -2289,11 +2289,11 @@ selector
 
 if(element){
 
-```
+
 viderMessage(
   element
 );
-```
+
 
 }
 
@@ -2316,10 +2316,10 @@ membre.id
 
 if(index !== -1){
 
-```
+
 tousLesMembres[index] =
   membre;
-```
+
 
 }
 
