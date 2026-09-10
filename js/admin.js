@@ -81,7 +81,7 @@ import "./admin-tabs.js";
 
 
 /* =========================================================
-   SUPPRESSION DU PROFIL
+   SUPPRESSION PROFIL
 ========================================================= */
 
 import "./admin-delete-profile.js";
@@ -101,8 +101,5 @@ import "./admin-delete-profile.js";
  * Il doit donc être chargé après les modules dont il utilise
  * les fonctions et l'état partagé.
  */
-
-import "./admin-auth.js";
-========================================================= */
 
 import "./admin-auth.js";
