@@ -55,7 +55,7 @@ COMPETENCES
 
 function normaliserCompetences(value){
 
-```
+
 if(Array.isArray(value)){
 
     return value;
@@ -79,7 +79,7 @@ if(typeof value === "string"){
 
 
 return [];
-```
+
 
 }
 
@@ -89,14 +89,14 @@ ACCES ROLE
 
 function peutGererRole(){
 
-```
+
 return (
     currentProfile?.grade2 &&
     String(
         currentProfile.grade2
     ).trim() !== ""
 );
-```
+
 
 }
 
@@ -108,7 +108,7 @@ function remplirRoles(
 competences
 ){
 
-```
+
 const liste =
     normaliserCompetences(
         competences
@@ -129,7 +129,7 @@ document
 
         }
     );
-```
+
 
 }
 
@@ -141,7 +141,7 @@ function synchroniserCompetencesEtRoles(
 competences
 ){
 
-```
+
 const liste =
     normaliserCompetences(
         competences
@@ -167,7 +167,7 @@ document
 remplirRoles(
     liste
 );
-```
+
 
 }
 
@@ -179,7 +179,7 @@ function mettreAJourMedailleVIP(
 audienceMax
 ){
 
-```
+
 const audience =
     Number(audienceMax) || 0;
 
@@ -216,7 +216,7 @@ if(audience >= 3000){
             : "Audience actuelle : —";
 
 }
-```
+
 
 }
 
@@ -226,7 +226,7 @@ COMPTEUR DESCRIPTION
 
 function mettreAJourCompteur(){
 
-```
+
 const longueur =
     descriptionField.value.length;
 
@@ -250,7 +250,7 @@ if(longueur >= 300){
     );
 
 }
-```
+
 
 }
 
@@ -260,12 +260,12 @@ ECOUTEUR COMPTEUR
 
 if(descriptionField){
 
-```
+
 descriptionField.addEventListener(
     "input",
     mettreAJourCompteur
 );
-```
+
 
 }
 
@@ -275,7 +275,7 @@ SAUVEGARDE ROLE
 
 if(saveRolesButton){
 
-```
+
 saveRolesButton.addEventListener(
     "click",
     async () => {
@@ -417,6 +417,6 @@ saveRolesButton.addEventListener(
 
     }
 );
-```
+
 
 }
