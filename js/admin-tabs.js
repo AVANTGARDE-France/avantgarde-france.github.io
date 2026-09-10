@@ -8,97 +8,213 @@
    - Affichage du contenu correspondant
    - Vérification des droits RDV
    - Vérification des droits ROLE
+
+   IMPORTANT :
+   - Ne gère PAS la visibilité initiale des onglets.
+   - La visibilité est gérée par les modules d'authentification
+     et de gestion des droits.
 ========================================================= */
 
 
 /* =========================================================
-   ONGLETS
+   INITIALISATION DES ONGLETS
 ========================================================= */
 
-document
-  .querySelectorAll(".tab")
-  .forEach(tab => {
+function initialiserOngletsAdmin(){
 
-    tab.addEventListener(
-      "click",
-      () => {
-
-        /* -------------------------------------------------
-           SECURITE — ONGLET RDV
-        ------------------------------------------------- */
-
-        if(
-          tab.id === "rdvTabButton" &&
-          typeof window.peutGererRendezVous === "function" &&
-          !window.peutGererRendezVous()
-        ){
-
-          return;
-
-        }
+  const onglets =
+    document.querySelectorAll(
+      ".tab"
+    );
 
 
-        /* -------------------------------------------------
-           SECURITE — ONGLET ROLE
-        ------------------------------------------------- */
+  if(!onglets.length){
 
-        if(
-          tab.id === "roleTabButton" &&
-          typeof window.peutGererRole === "function" &&
-          !window.peutGererRole()
-        ){
+    return;
 
-          return;
-
-        }
+  }
 
 
-        /* -------------------------------------------------
-           DESACTIVATION DE TOUS LES ONGLETS
-        ------------------------------------------------- */
+  onglets.forEach(
+    tab => {
 
-        document
-          .querySelectorAll(".tab")
-          .forEach(t =>
-            t.classList.remove("active")
-          );
+      /*
+       * Evite de brancher plusieurs fois
+       * les mêmes événements si l'initialisation
+       * est appelée plusieurs fois.
+       */
 
+      if(
+        tab.dataset.adminTabsInitialized ===
+        "true"
+      ){
 
-        /* -------------------------------------------------
-           DESACTIVATION DE TOUS LES CONTENUS
-        ------------------------------------------------- */
-
-        document
-          .querySelectorAll(".tab-content")
-          .forEach(content =>
-            content.classList.remove("active")
-          );
-
-
-        /* -------------------------------------------------
-           ACTIVATION DE L'ONGLET CLIQUE
-        ------------------------------------------------- */
-
-        tab.classList.add("active");
-
-
-        /* -------------------------------------------------
-           ACTIVATION DU CONTENU CORRESPONDANT
-        ------------------------------------------------- */
-
-        const contenu =
-          document.getElementById(
-            tab.dataset.tab
-          );
-
-
-        if(contenu){
-
-          contenu.classList.add("active");
-
-        }
+        return;
 
       }
+
+
+      tab.dataset.adminTabsInitialized =
+        "true";
+
+
+      tab.addEventListener(
+        "click",
+        () => {
+
+          /* -------------------------------------------------
+             SECURITE — ONGLET RDV
+          ------------------------------------------------- */
+
+          if(
+            tab.id ===
+              "rdvTabButton"
+          ){
+
+            if(
+              typeof window.peutGererRendezVous ===
+                "function" &&
+              !window.peutGererRendezVous()
+            ){
+
+              return;
+
+            }
+
+          }
+
+
+          /* -------------------------------------------------
+             SECURITE — ONGLET ROLE
+          ------------------------------------------------- */
+
+          if(
+            tab.id ===
+              "roleTabButton"
+          ){
+
+            if(
+              typeof window.peutGererRole ===
+                "function" &&
+              !window.peutGererRole()
+            ){
+
+              return;
+
+            }
+
+          }
+
+
+          /* -------------------------------------------------
+             DESACTIVATION DE TOUS LES ONGLETS
+          ------------------------------------------------- */
+
+          document
+            .querySelectorAll(
+              ".tab"
+            )
+            .forEach(
+              t =>
+                t.classList.remove(
+                  "active"
+                )
+            );
+
+
+          /* -------------------------------------------------
+             DESACTIVATION DE TOUS LES CONTENUS
+          ------------------------------------------------- */
+
+          document
+            .querySelectorAll(
+              ".tab-content"
+            )
+            .forEach(
+              content =>
+                content.classList.remove(
+                  "active"
+                )
+            );
+
+
+          /* -------------------------------------------------
+             ACTIVATION DE L'ONGLET CLIQUE
+          ------------------------------------------------- */
+
+          tab.classList.add(
+            "active"
+          );
+
+
+          /* -------------------------------------------------
+             ACTIVATION DU CONTENU CORRESPONDANT
+          ------------------------------------------------- */
+
+          const cible =
+            tab.dataset.tab;
+
+
+          if(!cible){
+
+            return;
+
+          }
+
+
+          const contenu =
+            document.getElementById(
+              cible
+            );
+
+
+          if(contenu){
+
+            contenu.classList.add(
+              "active"
+            );
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   EXPOSITION
+========================================================= */
+
+window.initialiserOngletsAdmin =
+  initialiserOngletsAdmin;
+
+
+/* =========================================================
+   INITIALISATION
+========================================================= */
+
+if(
+  document.readyState ===
+  "loading"
+){
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    initialiserOngletsAdmin,
+    {
+      once:true
+    }
+  );
+
+}else{
+
+  initialiserOngletsAdmin();
+
+}
     );
 
   });
