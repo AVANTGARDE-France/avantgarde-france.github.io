@@ -620,6 +620,19 @@ async function verifierUtilisateur() {
 
 
 
+    /* =====================================================
+       ETAT UTILISATEUR
+
+       IMPORTANT :
+       Le profil doit être placé dans le Core AVANT
+       toute vérification des droits.
+    ===================================================== */
+
+    window.currentUser =
+        user;
+
+
+
     window.currentProfile =
         profile;
 
@@ -643,16 +656,17 @@ async function verifierUtilisateur() {
 
 
 
+    /* =====================================================
+       AFFICHAGE ESPACE MEMBRE
+    ===================================================== */
+
     afficherAdmin();
 
 
 
-    /*
-     * Le remplissage du profil reste
-     * assuré par admin-profile.js.
-     */
-
-
+    /* =====================================================
+       REMPLISSAGE PROFIL
+    ===================================================== */
 
     if (
         typeof window.remplirProfil ===
@@ -667,13 +681,46 @@ async function verifierUtilisateur() {
 
 
 
-    /* -----------------------------------------------------
+    /* =====================================================
+       ACTUALISATION DES DROITS
 
+       IMPORTANT :
+
+       admin-core.js peut avoir effectué une première
+       vérification avant que le profil soit chargé.
+
+       Maintenant que grade et grade2 sont connus,
+       on recalcule explicitement la visibilité
+       de TOUS les onglets.
+
+       Pour Lex :
+       grade  = admin
+       grade2 = null
+
+       Résultat attendu :
+       PROFIL       → visible
+       RDV          → visible
+       EQUIPES      → visible
+       ROLE         → caché
+    ===================================================== */
+
+    if (
+        typeof window.actualiserAccesAdmin ===
+        "function"
+    ) {
+
+        window.actualiserAccesAdmin();
+
+    }
+
+
+
+    /* =====================================================
        ONGLET RDV
 
-    ----------------------------------------------------- */
-
-
+       Le Core vient déjà de calculer la visibilité.
+       On conserve ici le chargement des données RDV.
+    ===================================================== */
 
     const rdvButton =
         document.getElementById(
@@ -696,7 +743,7 @@ async function verifierUtilisateur() {
 
 
             rdvButton.style.display =
-                "block";
+                "";
 
 
 
@@ -722,13 +769,9 @@ async function verifierUtilisateur() {
 
 
 
-    /* -----------------------------------------------------
-
+    /* =====================================================
        ONGLET ROLE
-
-    ----------------------------------------------------- */
-
-
+    ===================================================== */
 
     const roleButton =
         document.getElementById(
@@ -751,7 +794,7 @@ async function verifierUtilisateur() {
 
 
             roleButton.style.display =
-                "block";
+                "";
 
 
 
@@ -779,11 +822,21 @@ async function verifierUtilisateur() {
 
 
 
-    /* -----------------------------------------------------
-
+    /* =====================================================
        GESTION DES EQUIPES
 
-    ----------------------------------------------------- */
+       Le droit est recalculé après chargement du profil.
+       Lex étant admin, l'onglet doit être visible.
+    ===================================================== */
+
+    if (
+        typeof window.actualiserAccesEquipes ===
+        "function"
+    ) {
+
+        window.actualiserAccesEquipes();
+
+    }
 
 
 
@@ -1010,6 +1063,8 @@ window.afficherMessage =
 window.viderMessage =
     window.viderMessage ||
     viderMessage;
+
+
 
 
 
