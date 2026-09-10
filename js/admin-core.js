@@ -7,25 +7,17 @@
 
    IMPORTANT :
 
-   Ce fichier ne recrée PAS les modules spécialisés.
+   Ce fichier centralise :
 
-   Modules spécialisés :
-   - admin-auth.js
-   - admin-profile.js
-   - admin-events.js
-   - admin-team.js
-   - admin-role.js
-   - admin-tabs.js
-   - admin-delete-profile.js
-   - admin-utils.js
+   - l'état utilisateur ;
+   - l'état partagé des équipes ;
+   - les fonctions communes ;
+   - les droits ;
+   - la visibilité des onglets ;
+   - les compatibilités avec les anciens modules.
 
-   Le rôle du Core est uniquement de :
-
-   - centraliser l'état partagé ;
-   - fournir les compatibilités avec l'ancien monolithe ;
-   - exposer les fonctions communes attendues par les modules ;
-   - coordonner l'affichage initial ;
-   - éviter les références JavaScript cassées après extraction.
+   Les modules spécialisés restent responsables de leurs
+   fonctionnalités propres.
 
 ========================================================= */
 
@@ -33,13 +25,6 @@
 /* =========================================================
    ETAT UTILISATEUR PARTAGÉ
 ========================================================= */
-
-/*
- * NE PAS utiliser "let currentUser" ou
- * "let currentProfile" ici.
-
- * Ces données doivent être accessibles à tous les modules.
- */
 
 if (
     typeof window.currentUser ===
@@ -132,14 +117,6 @@ function obtenirElement(
 /* =========================================================
    MESSAGES
 ========================================================= */
-
-/*
- * admin-utils.js doit normalement fournir ces fonctions.
-
- * On garde néanmoins une compatibilité de secours afin
- * qu'aucun module ne plante si son chargement intervient
- * avant l'initialisation de utils.
- */
 
 if (
     typeof window.afficherMessage !==
@@ -399,249 +376,335 @@ window.reinitialiserEtatAdmin =
 
 
 /* =========================================================
-   COMPATIBILITE DROITS
+   DROITS
+=========================================================
+
+   IMPORTANT :
+
+   LE CORE EST LA SOURCE DE VERITE DES DROITS.
+
+   Les droits sont déterminés à partir de :
+
+   - grade
+   - grade2
+   - région
+
+   Cas particulier important :
+
+   Lex :
+       grade  = "admin"
+       grade2 = null
+
+   doit conserver tous les droits administrateur.
+
 ========================================================= */
 
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
+function estAdmin() {
+
+    const profil =
+        window.currentProfile ||
+        null;
+
+
+    const grade =
+        String(
+            profil?.grade ??
+            ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    return (
+        grade ===
+        "admin"
+    );
+}
+
+
+/* =========================================================
+   ARCHITECTE DU PROJET
+========================================================= */
+
+function estArchitecteFondateur() {
+
+    const profil =
+        window.currentProfile ||
+        null;
+
+
+    return (
+        String(
+            profil?.grade2 ??
+            ""
+        )
+        .trim()
+        ===
+        "Architecte du Projet"
+    );
+}
+
+
 /*
- * IMPORTANT :
-
- * Les fonctions de droits sont normalement définies
- * dans admin-team.js / admin-role.js.
-
- * On ne les recrée pas ici avec une logique différente.
-
- * En revanche, le Core fournit des fonctions de secours
- * uniquement si aucun module ne les a encore exposées.
+ * Compatibilité avec l'ancien nom.
  */
 
+function estCommissaireFondateur() {
 
-/* ---------------------------------------------------------
-   ADMIN
---------------------------------------------------------- */
-
-if (
-    typeof window.estAdmin !==
-    "function"
-) {
-
-    window.estAdmin =
-        function () {
-
-            return (
-                window.currentProfile?.grade ===
-                "admin"
-            );
-        };
+    return estArchitecteFondateur();
 }
 
 
-/* ---------------------------------------------------------
-   COMMISSAIRE FONDATEUR
---------------------------------------------------------- */
-
-if (
-    typeof window.estCommissaireFondateur !==
-    "function"
-) {
-
-    window.estCommissaireFondateur =
-        function () {
-
-            return (
-                window.currentProfile?.grade2 ===
-                "Architecte du Projet"
-            );
-        };
-}
-
-
-/* ---------------------------------------------------------
+/* =========================================================
    DELEGUE NATIONAL
---------------------------------------------------------- */
+========================================================= */
 
-if (
-    typeof window.estDelegueNational !==
-    "function"
-) {
+function estDelegueNational() {
 
-    window.estDelegueNational =
-        function () {
+    const profil =
+        window.currentProfile ||
+        null;
 
-            return (
-                window.currentProfile?.grade2 ===
-                "Délégué National"
-            );
-        };
+
+    return (
+        String(
+            profil?.grade2 ??
+            ""
+        )
+        .trim()
+        ===
+        "Délégué National"
+    );
 }
 
 
-/* ---------------------------------------------------------
+/* =========================================================
    DELEGUE REGIONAL
---------------------------------------------------------- */
+========================================================= */
 
-if (
-    typeof window.estDelegueRegional !==
-    "function"
+function estDelegueRegional(
+    region
 ) {
 
-    window.estDelegueRegional =
-        function (
+    const profil =
+        window.currentProfile ||
+        null;
+
+
+    return (
+
+        String(
+            profil?.grade2 ??
+            ""
+        )
+        .trim()
+        ===
+        "Délégué Régional"
+
+        &&
+
+        profil?.region ===
+        region
+
+    );
+}
+
+
+/* =========================================================
+   DROIT RDV
+========================================================= */
+
+function peutGererRendezVous() {
+
+    return (
+
+        estAdmin()
+
+        ||
+
+        estArchitecteFondateur()
+
+        ||
+
+        estDelegueNational()
+
+        ||
+
+        estDelegueRegional(
+            window.currentProfile?.region
+        )
+
+    );
+}
+
+
+/* =========================================================
+   DROIT DIRECTION
+========================================================= */
+
+function peutGererDirection() {
+
+    return (
+
+        estAdmin()
+
+        ||
+
+        estArchitecteFondateur()
+
+    );
+}
+
+
+/* =========================================================
+   DROIT EQUIPES
+========================================================= */
+
+function peutGererEquipes() {
+
+    return (
+
+        estAdmin()
+
+        ||
+
+        estArchitecteFondateur()
+
+        ||
+
+        estDelegueNational()
+
+    );
+}
+
+
+/* =========================================================
+   DROIT MILITANTS
+========================================================= */
+
+function peutGererMilitants(
+    region
+) {
+
+    return (
+
+        estAdmin()
+
+        ||
+
+        estArchitecteFondateur()
+
+        ||
+
+        estDelegueNational()
+
+        ||
+
+        estDelegueRegional(
             region
-        ) {
+        )
 
-            return (
-
-                window.currentProfile?.grade2 ===
-                    "Délégué Régional"
-
-                &&
-
-                window.currentProfile?.region ===
-                    region
-
-            );
-        };
+    );
 }
 
 
-/* ---------------------------------------------------------
-   RDV
---------------------------------------------------------- */
+/* =========================================================
+   DROIT ROLE
+=========================================================
 
-if (
-    typeof window.peutGererRendezVous !==
-    "function"
-) {
+   ROLE est accessible aux :
 
-    window.peutGererRendezVous =
-        function () {
+   - administrateurs ;
+   - Architecte du Projet ;
+   - Délégué National.
 
-            return (
+   IMPORTANT :
 
-                window.estAdmin()
+   grade2 n'est PAS obligatoire pour un administrateur.
 
-                ||
+   Donc :
 
-                window.estCommissaireFondateur()
+       grade = "admin"
+       grade2 = null
 
-                ||
+   => accès ROLE = OUI
 
-                window.estDelegueNational()
+========================================================= */
 
-                ||
+function peutGererRole() {
 
-                window.currentProfile?.grade2 ===
-                    "Délégué Régional"
+    return (
 
-            );
-        };
+        estAdmin()
+
+        ||
+
+        estArchitecteFondateur()
+
+        ||
+
+        estDelegueNational()
+
+    );
 }
 
 
-/* ---------------------------------------------------------
-   DIRECTION
---------------------------------------------------------- */
+/* =========================================================
+   EXPOSITION DES DROITS
+========================================================= */
 
-if (
-    typeof window.peutGererDirection !==
-    "function"
-) {
-
-    window.peutGererDirection =
-        function () {
-
-            return (
-
-                window.estAdmin()
-
-                ||
-
-                window.estCommissaireFondateur()
-
-            );
-        };
-}
+window.estAdmin =
+    estAdmin;
 
 
-/* ---------------------------------------------------------
-   EQUIPES
---------------------------------------------------------- */
-
-if (
-    typeof window.peutGererEquipes !==
-    "function"
-) {
-
-    window.peutGererEquipes =
-        function () {
-
-            return (
-
-                window.estAdmin()
-
-                ||
-
-                window.estCommissaireFondateur()
-
-                ||
-
-                window.estDelegueNational()
-
-            );
-        };
-}
+window.estArchitecteFondateur =
+    estArchitecteFondateur;
 
 
-/* ---------------------------------------------------------
-   MILITANTS
---------------------------------------------------------- */
+/*
+ * Ancien nom conservé pour compatibilité.
+ */
 
-if (
-    typeof window.peutGererMilitants !==
-    "function"
-) {
+window.estCommissaireFondateur =
+    estCommissaireFondateur;
 
-    window.peutGererMilitants =
-        function (
-            region
-        ) {
 
-            return (
+window.estDelegueNational =
+    estDelegueNational;
 
-                window.estAdmin()
 
-                ||
+window.estDelegueRegional =
+    estDelegueRegional;
 
-                window.estCommissaireFondateur()
 
-                ||
+window.peutGererRendezVous =
+    peutGererRendezVous;
 
-                window.estDelegueNational()
 
-                ||
+window.peutGererDirection =
+    peutGererDirection;
 
-                window.estDelegueRegional(
-                    region
-                )
 
-            );
-        };
-}
+window.peutGererEquipes =
+    peutGererEquipes;
+
+
+window.peutGererMilitants =
+    peutGererMilitants;
+
+
+window.peutGererRole =
+    peutGererRole;
 
 
 /* =========================================================
    COMPATIBILITE PROFIL
 ========================================================= */
-
-/*
- * Si admin-profile.js expose déjà remplirProfil(),
- * on ne touche à rien.
-
- * Sinon, on fournit ici la fonction de remplissage
- * historique du monolithe.
-
- * Cela garantit que la fiche Lex est de nouveau remplie.
- */
 
 if (
     typeof window.remplirProfil !==
@@ -822,6 +885,7 @@ if (
                     affiche.checked =
                         true;
                 }
+
             }
 
 
@@ -833,6 +897,7 @@ if (
                 window.synchroniserCompetencesEtRoles(
                     profile.competences
                 );
+
             }
 
 
@@ -844,11 +909,12 @@ if (
                 window.mettreAJourMedailleVIP(
                     profile.audience_max
                 );
+
             }
 
 
             const compteur =
-                document.getElementById(
+                obtenirElement(
                     "descriptionCounter"
                 );
 
@@ -862,37 +928,13 @@ if (
                     description.value.length +
                     " / 300";
             }
+
         };
 }
 
 
 /* =========================================================
-   COMPATIBILITE ROLES
-========================================================= */
-
-if (
-    typeof window.peutGererRole !==
-    "function"
-) {
-
-    window.peutGererRole =
-        function () {
-
-            return !!(
-
-                window.currentProfile?.grade2 &&
-
-                String(
-                    window.currentProfile.grade2
-                ).trim() !== ""
-
-            );
-        };
-}
-
-
-/* =========================================================
-   COORDINATION AFFICHAGE ONGLET RDV
+   VISIBILITE ONGLET RDV
 ========================================================= */
 
 function actualiserAccesRDV() {
@@ -910,12 +952,7 @@ function actualiserAccesRDV() {
 
 
     const autorise =
-        typeof window.peutGererRendezVous ===
-            "function"
-
-        &&
-
-        window.peutGererRendezVous();
+        peutGererRendezVous();
 
 
     button.style.display =
@@ -926,7 +963,7 @@ function actualiserAccesRDV() {
 
 
 /* =========================================================
-   COORDINATION AFFICHAGE ONGLET ROLE
+   VISIBILITE ONGLET ROLE
 ========================================================= */
 
 function actualiserAccesRole() {
@@ -944,12 +981,7 @@ function actualiserAccesRole() {
 
 
     const autorise =
-        typeof window.peutGererRole ===
-            "function"
-
-        &&
-
-        window.peutGererRole();
+        peutGererRole();
 
 
     button.style.display =
@@ -960,7 +992,7 @@ function actualiserAccesRole() {
 
 
 /* =========================================================
-   COORDINATION AFFICHAGE ONGLET EQUIPES
+   VISIBILITE ONGLET EQUIPES
 ========================================================= */
 
 function actualiserAccesEquipes() {
@@ -977,30 +1009,19 @@ function actualiserAccesEquipes() {
     }
 
 
-    /*
-     * Le monolithe affichait l'onglet équipes
-     * dès lors que l'utilisateur disposait du droit
-     * correspondant.
+    const autorise =
+        peutGererEquipes();
 
-     * On ne le cache pas arbitrairement pour éviter
-     * de supprimer l'accès existant.
-     */
 
-    if (
-        typeof window.peutGererEquipes ===
-        "function"
-    ) {
-
-        button.style.display =
-            window.peutGererEquipes()
-                ? ""
-                : "none";
-    }
+    button.style.display =
+        autorise
+            ? ""
+            : "none";
 }
 
 
 /* =========================================================
-   ACTUALISER LES ACCES
+   ACTUALISATION GENERALE DES DROITS
 ========================================================= */
 
 function actualiserAccesAdmin() {
@@ -1014,7 +1035,7 @@ function actualiserAccesAdmin() {
 
 
 /* =========================================================
-   EXPOSITION
+   EXPOSITION VISIBILITE
 ========================================================= */
 
 window.actualiserAccesRDV =
@@ -1065,7 +1086,7 @@ window.addEventListener(
 
         /*
          * Laisser les modules spécialisés
-         * terminer leur propre initialisation.
+         * terminer leur initialisation.
          */
 
         setTimeout(
@@ -1087,6 +1108,7 @@ window.addEventListener(
             },
             0
         );
+
     }
 );
 
@@ -1098,16 +1120,16 @@ window.addEventListener(
 function initialiserAdminCore() {
 
     /*
-     * Ne pas lancer ici :
+     * Le Core ne gère PAS Supabase Auth.
      *
-     * - Supabase Auth
+     * Il ne lance pas :
+     *
      * - signInWithPassword()
      * - getUser()
      * - chargement du profil
      *
      * Tout cela appartient à admin-auth.js.
      */
-
 
     actualiserAccesAdmin();
 }
@@ -1129,6 +1151,7 @@ if (
 } else {
 
     initialiserAdminCore();
+
 }
 
 
@@ -1150,6 +1173,26 @@ export {
 
     reinitialiserEtatAdmin,
 
+    estAdmin,
+
+    estArchitecteFondateur,
+
+    estCommissaireFondateur,
+
+    estDelegueNational,
+
+    estDelegueRegional,
+
+    peutGererRendezVous,
+
+    peutGererDirection,
+
+    peutGererEquipes,
+
+    peutGererMilitants,
+
+    peutGererRole,
+
     actualiserAccesRDV,
 
     actualiserAccesRole,
@@ -1159,4 +1202,3 @@ export {
     actualiserAccesAdmin
 
 };
-
