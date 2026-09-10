@@ -1,67 +1,64 @@
 /* =========================================================
    AVANT-GARDE — ADMIN ROLE
+
    js/admin-role.js
 
-   Gestion de l'onglet ROLE :
+   Gestion :
+   - accès au panneau ROLE
+   - rôles
+   - normalisation des compétences
+   - affichage des rôles
+   - sauvegarde des rôles
+   - médaille VIP
+   - compteur de description
 
-   - Attribution des rôles
-   - Synchronisation rôles / compétences
-   - Médaille VIP
-   - Compteur de description
+   IMPORTANT :
+   Le panneau ROLE est un espace personnel.
+   Il est donc accessible à tout membre connecté,
+   quel que soit son grade ou grade2.
+
+   Les fonctions utilisées par les autres modules sont
+   exposées sur window afin de conserver le comportement
+   du monolithe après séparation en modules ES.
 ========================================================= */
 
 import { supabase } from "./supabase.js";
 
+
 /* =========================================================
-   UTILISATEUR / PROFIL COURANT
+   OUTILS INTERNES
 ========================================================= */
 
 function obtenirCurrentProfile() {
+
     return window.currentProfile || null;
 }
 
+
 function obtenirCurrentUser() {
+
     return window.currentUser || null;
 }
 
+
 /* =========================================================
-   ROLES
+   LISTE DES ROLES
 ========================================================= */
 
 const ROLES = [
+
     "Organisateurs de terrain",
+
     "Conférenciers",
+
     "Influenceurs Réseaux Sociaux",
+
     "Parrains/marraines",
+
     "Militants"
+
 ];
 
-/* =========================================================
-   DROITS — GESTION DES ROLES
-========================================================= */
-
-/*
-   Peuvent gérer les rôles :
-
-   - Administrateur
-   - Architecte du Projet
-   - Délégué National
-
-   Les Délégués Régionaux et les adhérents
-   n'ont pas accès à cet onglet.
-*/
-
-function peutGererRole() {
-    const profile = obtenirCurrentProfile();
-
-    return !!(
-        profile?.grade === "admin"
-        ||
-        profile?.grade2 === "Architecte du Projet"
-        ||
-        profile?.grade2 === "Délégué National"
-    );
-}
 
 /* =========================================================
    NORMALISATION DES COMPETENCES
@@ -70,153 +67,299 @@ function peutGererRole() {
 function normaliserCompetences(value) {
 
     if (Array.isArray(value)) {
+
         return value;
     }
 
+
     if (typeof value === "string") {
 
-        const trimmed = value.trim();
+        return value
 
-        if (!trimmed) {
-            return [];
-        }
+            .replace(/^\{|\}$/g, "")
 
-        /*
-           Gestion du format PostgreSQL :
+            .split(",")
 
-           {"Role 1","Role 2"}
-        */
-
-        if (
-            trimmed.startsWith("{") &&
-            trimmed.endsWith("}")
-        ) {
-
-            const contenu = trimmed.slice(1, -1);
-
-            if (!contenu.trim()) {
-                return [];
-            }
-
-            return contenu
-                .split(",")
-                .map(item =>
-                    item
+            .map(
+                x =>
+                    x
                         .trim()
-                        .replace(/^"(.*)"$/, "$1")
-                        .replace(/\\"/g, '"')
-                )
-                .filter(Boolean);
-        }
+                        .replace(/^"|"$/g, "")
+            )
 
-        /*
-           Si la valeur est simplement une chaîne,
-           on la considère comme une compétence unique.
-        */
-
-        return [trimmed];
+            .filter(Boolean);
     }
+
 
     return [];
 }
 
+
 /* =========================================================
-   REMPLIR LES ROLES
+   ACCES ROLE
 ========================================================= */
 
-function remplirRoles(competences) {
+/*
+ * IMPORTANT :
+ *
+ * ROLE est un espace personnel.
+ *
+ * Tous les membres connectés peuvent sélectionner
+ * et modifier leurs propres rôles.
+ *
+ * Il ne faut donc PAS tester grade ou grade2 ici.
+ *
+ * Ainsi :
+ *
+ * - ADMIN                    → accès
+ * - ARCHITECTE DU PROJET     → accès
+ * - DELEGUE NATIONAL         → accès
+ * - DELEGUE REGIONAL         → accès
+ * - MEMBRE / EQUIPE MILITANTE→ accès
+ *
+ * grade2 peut donc parfaitement être null.
+ */
 
-    const roles = normaliserCompetences(competences);
+function peutGererRole() {
 
-    const inputs = document.querySelectorAll(
-        'input[name="roles"]'
+    return !!(
+        obtenirCurrentUser() &&
+        obtenirCurrentProfile()
     );
-
-    inputs.forEach(input => {
-
-        input.checked = roles.includes(input.value);
-
-    });
 }
+
+
+/* =========================================================
+   REMPLIR ROLES
+========================================================= */
+
+function remplirRoles(
+    competences
+) {
+
+    const liste =
+        normaliserCompetences(
+            competences
+        );
+
+
+    document
+
+        .querySelectorAll(
+            'input[name="roles"]'
+        )
+
+        .forEach(
+            input => {
+
+                input.checked =
+                    liste.includes(
+                        input.value
+                    );
+
+            }
+        );
+}
+
 
 /* =========================================================
    SYNCHRONISER COMPETENCES / ROLES
 ========================================================= */
 
-function synchroniserCompetencesEtRoles(competences) {
+function synchroniserCompetencesEtRoles(
+    competences
+) {
 
-    const roles = normaliserCompetences(competences);
+    const liste =
+        normaliserCompetences(
+            competences
+        );
+
 
     /*
-       Synchronisation avec les cases de compétences
-       éventuellement présentes dans le profil.
-    */
+     * Compétences métier
+     */
 
-    const competenceInputs = document.querySelectorAll(
-        'input[name="competences"]'
+    document
+
+        .querySelectorAll(
+            'input[name="competences"]'
+        )
+
+        .forEach(
+            input => {
+
+                input.checked =
+                    liste.includes(
+                        input.value
+                    );
+
+            }
+        );
+
+
+    /*
+     * Rôles
+     */
+
+    remplirRoles(
+        liste
     );
-
-    competenceInputs.forEach(input => {
-
-        input.checked = roles.includes(input.value);
-
-    });
-
-    remplirRoles(competences);
 }
+
 
 /* =========================================================
    MEDAILLE VIP
 ========================================================= */
 
-function mettreAJourMedailleVIP(audienceMax) {
+function mettreAJourMedailleVIP(
+    audienceMax
+) {
 
-    const vipMedal = document.getElementById("vipMedal");
+    const audience =
+        Number(audienceMax) || 0;
 
-    if (!vipMedal) {
+
+    const vipMedal =
+        document.getElementById(
+            "vipMedal"
+        );
+
+
+    const vipAudience =
+        document.getElementById(
+            "vipAudience"
+        );
+
+
+    if (
+        !vipMedal ||
+        !vipAudience
+    ) {
+
         return;
     }
 
-    const audience = Number(audienceMax || 0);
 
-    if (audience > 0) {
-        vipMedal.style.display = "inline-flex";
+    if (
+        audience >= 3000
+    ) {
+
+        vipMedal.classList.add(
+            "active"
+        );
+
+
+        vipAudience.textContent =
+            "Audience actuelle : " +
+
+            audience.toLocaleString(
+                "fr-FR"
+            ) +
+
+            " followers";
+
     } else {
-        vipMedal.style.display = "none";
+
+        vipMedal.classList.remove(
+            "active"
+        );
+
+
+        vipAudience.textContent =
+            audience > 0
+
+                ? "Audience actuelle : " +
+
+                  audience.toLocaleString(
+                      "fr-FR"
+                  ) +
+
+                  " followers"
+
+                : "Audience actuelle : —";
     }
 }
 
+
 /* =========================================================
-   COMPTEUR DE DESCRIPTION
+   COMPTEUR DESCRIPTION
 ========================================================= */
 
 function initialiserCompteurDescription() {
 
-    const description = document.getElementById(
-        "profileDescription"
-    );
+    const descriptionField =
+        document.getElementById(
+            "profileDescription"
+        );
 
-    const compteur = document.getElementById(
-        "descriptionCounter"
-    );
 
-    if (!description || !compteur) {
+    const descriptionCounter =
+        document.getElementById(
+            "descriptionCounter"
+        );
+
+
+    if (
+        !descriptionField ||
+        !descriptionCounter
+    ) {
+
         return;
     }
 
-    function actualiserCompteur() {
 
-        compteur.textContent =
-            `${description.value.length}/500`;
+    function mettreAJourCompteur() {
+
+        const longueur =
+            descriptionField.value.length;
+
+
+        descriptionCounter.textContent =
+            longueur + " / 300";
+
+
+        if (
+            longueur >= 300
+        ) {
+
+            descriptionCounter.classList.add(
+                "limit"
+            );
+
+        } else {
+
+            descriptionCounter.classList.remove(
+                "limit"
+            );
+        }
     }
 
-    description.addEventListener(
-        "input",
-        actualiserCompteur
-    );
 
-    actualiserCompteur();
+    /*
+     * Evite de créer plusieurs écouteurs
+     * si le module est initialisé plusieurs fois.
+     */
+
+    if (
+        descriptionField.dataset.counterInitialized !==
+        "true"
+    ) {
+
+        descriptionField.dataset.counterInitialized =
+            "true";
+
+
+        descriptionField.addEventListener(
+            "input",
+            mettreAJourCompteur
+        );
+    }
+
+
+    mettreAJourCompteur();
 }
+
 
 /* =========================================================
    SAUVEGARDE DES ROLES
@@ -224,117 +367,305 @@ function initialiserCompteurDescription() {
 
 async function sauvegarderRoles() {
 
-    const user = obtenirCurrentUser();
-    const profile = obtenirCurrentProfile();
+    const currentUser =
+        obtenirCurrentUser();
 
-    if (!user || !profile) {
-        return;
-    }
 
-    if (!peutGererRole()) {
-        return;
-    }
+    const currentProfile =
+        obtenirCurrentProfile();
 
-    const roleInputs = document.querySelectorAll(
-        'input[name="roles"]:checked'
-    );
 
-    const rolesSelectionnes = Array.from(roleInputs)
-        .map(input => input.value);
+    const saveRolesButton =
+        document.getElementById(
+            "saveRolesButton"
+        );
+
+
+    const roleMessage =
+        document.getElementById(
+            "roleMessage"
+        );
+
 
     /*
-       On récupère les compétences existantes
-       afin de ne pas supprimer celles qui ne sont
-       pas des rôles.
-    */
+     * Vérification de connexion.
+     */
 
-    const competencesActuelles =
-        normaliserCompetences(profile.competences);
-
-    const competencesSansRoles =
-        competencesActuelles.filter(
-            competence => !ROLES.includes(competence)
-        );
-
-    const nouvellesCompetences = [
-        ...competencesSansRoles,
-        ...rolesSelectionnes
-    ];
-
-    const { data, error } = await supabase
-        .from("profiles")
-        .update({
-            competences: nouvellesCompetences
-        })
-        .eq("id", user.id)
-        .select()
-        .single();
-
-    if (error) {
-
-        console.error(
-            "Erreur lors de la sauvegarde des rôles :",
-            error
-        );
+    if (
+        !currentUser ||
+        !currentProfile
+    ) {
 
         if (
-            typeof window.afficherMessageErreur === "function"
+            typeof window.afficherMessage ===
+            "function"
         ) {
-            window.afficherMessageErreur(
-                "Erreur lors de la sauvegarde des rôles."
+
+            window.afficherMessage(
+
+                roleMessage,
+
+                "error",
+
+                "Vous devez être connecté pour modifier vos rôles."
+
             );
         }
 
+
         return;
     }
 
-    /*
-       Mise à jour du profil courant.
-    */
-
-    window.currentProfile = data;
 
     /*
-       Synchronisation de l'interface.
-    */
+     * Vérification du droit.
+     *
+     * Tous les membres connectés sont autorisés.
+     */
+
+    if (
+        !peutGererRole()
+    ) {
+
+        return;
+    }
+
+
+    if (
+        typeof window.viderMessage ===
+        "function"
+    ) {
+
+        window.viderMessage(
+            roleMessage
+        );
+    }
+
+
+    if (
+        saveRolesButton
+    ) {
+
+        saveRolesButton.disabled =
+            true;
+
+
+        saveRolesButton.textContent =
+            "ENREGISTREMENT…";
+    }
+
+
+    /*
+     * On conserve toutes les anciennes
+     * compétences qui ne sont pas des rôles.
+     */
+
+    const anciennesCompetences =
+        normaliserCompetences(
+            currentProfile.competences
+        );
+
+
+    const competencesExistantes =
+        anciennesCompetences.filter(
+            competence =>
+                !ROLES.includes(
+                    competence
+                )
+        );
+
+
+    /*
+     * Récupération des rôles cochés.
+     */
+
+    const rolesSelectionnes =
+        Array.from(
+
+            document.querySelectorAll(
+                'input[name="roles"]:checked'
+            )
+
+        )
+
+        .map(
+            input =>
+                input.value
+        );
+
+
+    /*
+     * Fusion compétences + rôles.
+     *
+     * Les doublons sont supprimés.
+     */
+
+    const competences =
+        Array.from(
+
+            new Set([
+
+                ...competencesExistantes,
+
+                ...rolesSelectionnes
+
+            ])
+
+        );
+
+
+    /*
+     * Sauvegarde Supabase.
+     */
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+
+            .from("profiles")
+
+            .update({
+
+                competences:
+                    competences
+
+            })
+
+            .eq(
+                "id",
+                currentUser.id
+            )
+
+            .select()
+            .single();
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Erreur sauvegarde rôles :",
+            error
+        );
+
+
+        if (
+            typeof window.afficherMessage ===
+            "function"
+        ) {
+
+            window.afficherMessage(
+
+                roleMessage,
+
+                "error",
+
+                "Impossible d'enregistrer vos rôles. Vérifiez les droits de la table profiles dans Supabase."
+
+            );
+        }
+
+
+        if (
+            saveRolesButton
+        ) {
+
+            saveRolesButton.disabled =
+                false;
+
+
+            saveRolesButton.textContent =
+                "ENREGISTRER MES RÔLES";
+        }
+
+
+        return;
+    }
+
+
+    /*
+     * Mise à jour du profil global.
+     */
+
+    window.currentProfile =
+        data;
+
+
+    /*
+     * Resynchronisation immédiate
+     * de l'affichage.
+     */
 
     synchroniserCompetencesEtRoles(
         data.competences
     );
 
+
     if (
-        typeof window.afficherMessageSucces === "function"
+        typeof window.afficherMessage ===
+        "function"
     ) {
 
-        window.afficherMessageSucces(
-            "Les rôles ont été enregistrés."
+        window.afficherMessage(
+
+            roleMessage,
+
+            "success",
+
+            "Vos rôles ont bien été enregistrés."
+
         );
+    }
+
+
+    if (
+        saveRolesButton
+    ) {
+
+        saveRolesButton.disabled =
+            false;
+
+
+        saveRolesButton.textContent =
+            "ENREGISTRER MES RÔLES";
     }
 }
 
+
 /* =========================================================
-   EXPORTS GLOBAUX
+   EXPOSITION GLOBALE
 ========================================================= */
 
-window.ROLES = ROLES;
+window.ROLES =
+    ROLES;
+
 
 window.normaliserCompetences =
     normaliserCompetences;
 
+
 window.peutGererRole =
     peutGererRole;
+
 
 window.remplirRoles =
     remplirRoles;
 
+
 window.synchroniserCompetencesEtRoles =
     synchroniserCompetencesEtRoles;
+
 
 window.mettreAJourMedailleVIP =
     mettreAJourMedailleVIP;
 
+
 window.sauvegarderRoles =
     sauvegarderRoles;
+
 
 /* =========================================================
    INITIALISATION
@@ -343,9 +674,21 @@ window.sauvegarderRoles =
 function initialiserRole() {
 
     const saveRolesButton =
-        document.getElementById("saveRolesButton");
+        document.getElementById(
+            "saveRolesButton"
+        );
 
-    if (saveRolesButton) {
+
+    if (
+        saveRolesButton &&
+
+        saveRolesButton.dataset.initialized !==
+            "true"
+    ) {
+
+        saveRolesButton.dataset.initialized =
+            "true";
+
 
         saveRolesButton.addEventListener(
             "click",
@@ -353,18 +696,33 @@ function initialiserRole() {
         );
     }
 
+
     initialiserCompteurDescription();
 }
 
-if (document.readyState === "loading") {
+
+/* =========================================================
+   DOM READY
+========================================================= */
+
+if (
+    document.readyState ===
+    "loading"
+) {
 
     document.addEventListener(
+
         "DOMContentLoaded",
-        initialiserRole
+
+        initialiserRole,
+
+        {
+            once: true
+        }
+
     );
 
 } else {
 
     initialiserRole();
 }
-
