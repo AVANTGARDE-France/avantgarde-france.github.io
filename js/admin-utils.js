@@ -1,131 +1,57 @@
 /* =========================================================
-   AVANT-GARDE — ADMIN UTILITIES
+   AVANT-GARDE — ADMIN UTILS
+
    js/admin-utils.js
 
-   Fonctions utilitaires communes à l'administration.
+   Fonctions communes utilisées par plusieurs modules.
 ========================================================= */
 
 
 /* =========================================================
-   MESSAGES
+   AFFICHER MESSAGE
 ========================================================= */
 
-export function afficherMessage(element, type, texte){
+function afficherMessage(
+    element,
+    type,
+    texte
+) {
 
-  element.className =
-    "message " + type;
+    if (!element) {
 
-  element.textContent =
-    texte;
-
-}
-
-
-export function viderMessage(element){
-
-  element.className =
-    "message";
-
-  element.textContent =
-    "";
-
-}
+        return;
+    }
 
 
-/* =========================================================
-   COMPETENCES
-========================================================= */
+    element.className =
+        "message " + type;
 
-export function normaliserCompetences(value){
 
-  if(Array.isArray(value)){
-    return value;
-  }
-
-  if(typeof value === "string"){
-
-    return value
-      .replace(/^\{|\}$/g,"")
-      .split(",")
-      .map(x =>
-        x.trim()
-         .replace(/^"|"$/g,"")
-      )
-      .filter(Boolean);
-
-  }
-
-  return [];
-
+    element.textContent =
+        texte;
 }
 
 
 /* =========================================================
-   REMPLIR ROLES
+   VIDER MESSAGE
 ========================================================= */
 
-export function remplirRoles(
-  competences
-){
+function viderMessage(
+    element
+) {
 
-  const liste =
-    normaliserCompetences(
-      competences
-    );
+    if (!element) {
 
-
-  document
-    .querySelectorAll(
-      'input[name="roles"]'
-    )
-    .forEach(
-      input => {
-
-        input.checked =
-          liste.includes(
-            input.value
-          );
-
-      }
-    );
-
-}
+        return;
+    }
 
 
-/* =========================================================
-   SYNCHRONISER COMPETENCES / ROLES
-========================================================= */
-
-export function synchroniserCompetencesEtRoles(
-  competences
-){
-
-  const liste =
-    normaliserCompetences(
-      competences
-    );
+    element.className =
+        "message";
 
 
-  document
-    .querySelectorAll(
-      'input[name="competences"]'
-    )
-    .forEach(
-      input => {
-
-        input.checked =
-          liste.includes(
-            input.value
-          );
-
-      }
-    );
-
-
-  remplirRoles(
-    liste
-  );
-
+    element.textContent =
+        "";
 }
 
 
@@ -133,15 +59,68 @@ export function synchroniserCompetencesEtRoles(
    ECHAPPEMENT HTML
 ========================================================= */
 
-export function escapeHtml(
-  value
-){
+function escapeHtml(
+    value
+) {
 
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    return String(
+        value ?? ""
+    )
 
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 }
+
+
+/* =========================================================
+   EXPOSITION GLOBALE
+========================================================= */
+
+window.afficherMessage =
+    afficherMessage;
+
+
+window.viderMessage =
+    viderMessage;
+
+
+window.escapeHtml =
+    escapeHtml;
+
+
+/* =========================================================
+   EXPORTS
+========================================================= */
+
+export {
+
+    afficherMessage,
+
+    viderMessage,
+
+    escapeHtml
+
+};
+
