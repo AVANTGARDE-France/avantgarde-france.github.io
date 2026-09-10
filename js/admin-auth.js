@@ -1,1962 +1,718 @@
 /* =========================================================
-   AVANT-GARDE — GESTION DES EQUIPES
+   AVANT-GARDE — ADMIN AUTH
 
-   js/admin-team.js
+   js/admin-auth.js
 
-   Gestion :
-   - Architecte du Projet
-   - Délégué National
-   - Délégués Régionaux
-   - Equipes militantes
-   - Permissions associées
+   Gestion de l'authentification de l'espace membre :
+
+   - Connexion
+   - Vérification de la session
+   - Chargement du profil connecté
+   - Affichage connexion / espace membre
+   - Déconnexion
+   - Actions HOME / DECONNEXION
+
+   IMPORTANT :
+   Ce module ne lance plus verifierUtilisateur()
+   immédiatement pendant le chargement des modules.
+
+   admin.js lance l'initialisation une fois que tous
+   les modules sont chargés.
 ========================================================= */
 
 
 /* =========================================================
-   REGIONS
+   SUPABASE
 ========================================================= */
 
-const regionsEquipeListe = [
-
-  "Auvergne-Rhône-Alpes",
-  "Bourgogne-Franche-Comté",
-  "Bretagne",
-  "Centre-Val de Loire",
-  "Corse",
-  "Grand Est",
-  "Hauts-de-France",
-  "Île-de-France",
-  "Normandie",
-  "Nouvelle-Aquitaine",
-  "Occitanie",
-  "Pays de la Loire",
-  "Provence-Alpes-Côte d’Azur",
-  "Guadeloupe",
-  "Martinique",
-  "Guyane",
-  "La Réunion",
-  "Mayotte",
-  "Europe",
-  "Amérique du Nord",
-  "Amérique centrale et Caraïbes",
-  "Amérique du Sud",
-  "Afrique",
-  "Asie",
-  "Océanie",
-  "Autre"
-
-];
+import { supabase } from "./supabase.js";
 
 
 /* =========================================================
-   DROITS
+   VARIABLES GLOBALES
 ========================================================= */
 
-function estAdmin(){
+window.currentUser =
+    window.currentUser || null;
 
-  return window.currentProfile?.grade === "admin";
-
-}
-
-
-function estArchitecteProjet(){
-
-  return window.currentProfile?.grade2 ===
-    "Architecte du Projet";
-
-}
-
-
-function estDelegueNational(){
-
-  return window.currentProfile?.grade2 ===
-    "Délégué National";
-
-}
-
-
-function estDelegueRegional(region){
-
-  return (
-    window.currentProfile?.grade2 ===
-      "Délégué Régional" &&
-    window.currentProfile?.region ===
-      region
-  );
-
-}
+window.currentProfile =
+    window.currentProfile || null;
 
 
 /* =========================================================
-   DROITS RDV
+   ELEMENTS
 ========================================================= */
 
-function peutGererRendezVous(){
+const loginScreen =
+    document.getElementById("loginScreen");
 
-  return (
-    estAdmin() ||
-    estArchitecteProjet() ||
-    estDelegueNational() ||
-    window.currentProfile?.grade2 === "Délégué Régional"
-  );
+const adminScreen =
+    document.getElementById("adminScreen");
 
-}
+const loginForm =
+    document.getElementById("loginForm");
+
+const loginButton =
+    document.getElementById("loginButton");
+
+const loginMessage =
+    document.getElementById("loginMessage");
 
 
 /* =========================================================
-   DROITS DIRECTION
+   MESSAGES
 ========================================================= */
 
-function peutGererDirection(){
+function afficherMessage(
+    element,
+    type,
+    texte
+) {
 
-  return (
-    estAdmin() ||
-    estArchitecteProjet()
-  );
+    if (!element) {
 
-}
-
-
-/* =========================================================
-   DROITS EQUIPES
-========================================================= */
-
-function peutGererEquipes(){
-
-  return (
-    estAdmin() ||
-    estArchitecteProjet() ||
-    estDelegueNational()
-  );
-
-}
-
-
-/* =========================================================
-   DROITS MILITANTS
-========================================================= */
-
-function peutGererMilitants(region){
-
-  return (
-    estAdmin() ||
-    estArchitecteProjet() ||
-    estDelegueNational() ||
-    estDelegueRegional(region)
-  );
-
-}
-
-
-/* =========================================================
-   CHARGER GESTION EQUIPES
-========================================================= */
-
-async function chargerGestionEquipes(){
-
-  await chargerTousLesMembres();
-
-  afficherPermissionsDirection();
-
-  afficherRegionsEquipe();
-
-  afficherSelectionDirection();
-
-  initialiserRechercheDirection();
-
-  /*
-    Région du profil connecté sélectionnée par défaut.
-  */
-
-  const regionParDefaut =
-    window.currentProfile?.region &&
-    regionsEquipeListe.includes(
-      window.currentProfile.region
-    )
-      ? window.currentProfile.region
-      : regionsEquipeListe[0];
-
-
-  afficherRegionEquipe(
-    window.regionEquipeActive &&
-    regionsEquipeListe.includes(
-      window.regionEquipeActive
-    )
-      ? window.regionEquipeActive
-      : regionParDefaut
-  );
-
-}
-
-
-/* =========================================================
-   CHARGER MEMBRES
-========================================================= */
-
-async function chargerTousLesMembres(){
-
-  const {
-    data,
-    error
-  } =
-    await window.supabaseClient
-      .from("profiles")
-      .select(`
-        id,
-        nom,
-        image_url,
-        region,
-        grade,
-        grade2,
-        anonyme
-      `)
-      .order(
-        "nom",
-        {
-          ascending:true
-        }
-      );
-
-
-  if(error){
-
-    console.error(
-      "Erreur chargement membres :",
-      error
-    );
-
-    window.tousLesMembres = [];
-
-    return;
-
-  }
-
-
-  window.tousLesMembres =
-    data || [];
-
-}
-
-
-/* =========================================================
-   PERMISSIONS DIRECTION
-========================================================= */
-
-function afficherPermissionsDirection(){
-
-  const founderMessage =
-    document.getElementById(
-      "founderPermissionMessage"
-    );
-
-  const nationalMessage =
-    document.getElementById(
-      "nationalPermissionMessage"
-    );
-
-
-  if(founderMessage){
-
-    founderMessage.textContent =
-      peutGererDirection()
-        ? "Modification autorisée."
-        : "Modification réservée à l’administration du site.";
-
-    founderMessage.style.color =
-      peutGererDirection()
-        ? "#b9e5c4"
-        : "#7f8998";
-
-  }
-
-
-  if(nationalMessage){
-
-    nationalMessage.textContent =
-      peutGererDirection()
-        ? "Modification autorisée."
-        : "Modification réservée à l’administration du site.";
-
-    nationalMessage.style.color =
-      peutGererDirection()
-        ? "#b9e5c4"
-        : "#7f8998";
-
-  }
-
-
-  if(!peutGererDirection()){
-
-    const founderSearch =
-      document.getElementById(
-        "founderSearch"
-      );
-
-    const nationalSearch =
-      document.getElementById(
-        "nationalSearch"
-      );
-
-
-    if(founderSearch){
-
-      founderSearch.classList.add(
-        "team-disabled"
-      );
-
+        return;
     }
 
+    element.className =
+        "message " + type;
 
-    if(nationalSearch){
+    element.textContent =
+        texte;
+}
 
-      nationalSearch.classList.add(
-        "team-disabled"
-      );
 
+function viderMessage(
+    element
+) {
+
+    if (!element) {
+
+        return;
     }
 
-  }
+    element.className =
+        "message";
 
+    element.textContent =
+        "";
 }
 
 
 /* =========================================================
-   AFFICHAGE SELECTION DIRECTION
+   AFFICHAGE CONNEXION
 ========================================================= */
 
-function afficherSelectionDirection(){
+function afficherConnexion() {
 
-  const fondateur =
-    (window.tousLesMembres || []).find(
-      membre =>
-        membre.grade2 ===
-        "Architecte du Projet"
-    );
+    if (loginScreen) {
 
-
-  const national =
-    (window.tousLesMembres || []).find(
-      membre =>
-        membre.grade2 ===
-        "Délégué National"
-    );
-
-
-  afficherSelectionUnique(
-    "founderSelected",
-    fondateur,
-    "founder"
-  );
-
-
-  afficherSelectionUnique(
-    "nationalSelected",
-    national,
-    "national"
-  );
-
-}
-
-
-/* =========================================================
-   SELECTION UNIQUE
-========================================================= */
-
-function afficherSelectionUnique(
-  elementId,
-  membre,
-  type
-){
-
-  const container =
-    document.getElementById(
-      elementId
-    );
-
-
-  if(!container){
-
-    return;
-
-  }
-
-
-  container.innerHTML = "";
-
-
-  if(!membre){
-
-    container.innerHTML =
-      "<div class='team-permission'>Aucun membre désigné.</div>";
-
-    return;
-
-  }
-
-
-  const item =
-    document.createElement("div");
-
-  item.className =
-    "team-selected-member";
-
-
-  item.innerHTML =
-    `
-      <span>
-        ${escapeHtml(membre.nom || "Membre")}
-      </span>
-
-      ${
-        peutGererDirection()
-          ? `
-            <button
-              type="button"
-              title="Retirer"
-            >
-              ×
-            </button>
-          `
-          : ""
-      }
-    `;
-
-
-  if(peutGererDirection()){
-
-    const button =
-      item.querySelector("button");
-
-
-    if(button){
-
-      button.addEventListener(
-        "click",
-        () =>
-          retirerRoleUnique(
-            membre,
-            type
-          )
-      );
-
+        loginScreen.style.display =
+            "block";
     }
 
-  }
+    if (adminScreen) {
 
-
-  container.appendChild(item);
-
-}
-
-
-/* =========================================================
-   RECHERCHE DIRECTION
-========================================================= */
-
-function initialiserRechercheDirection(){
-
-  const founderSearch =
-    document.getElementById(
-      "founderSearch"
-    );
-
-  const nationalSearch =
-    document.getElementById(
-      "nationalSearch"
-    );
-
-
-  if(founderSearch){
-
-    founderSearch.addEventListener(
-      "input",
-      event =>
-        afficherResultatsDirection(
-          event.target.value,
-          "founder"
-        )
-    );
-
-  }
-
-
-  if(nationalSearch){
-
-    nationalSearch.addEventListener(
-      "input",
-      event =>
-        afficherResultatsDirection(
-          event.target.value,
-          "national"
-        )
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   RESULTATS DIRECTION
-========================================================= */
-
-function afficherResultatsDirection(
-  recherche,
-  type
-){
-
-  const container =
-    document.getElementById(
-      type === "founder"
-        ? "founderResults"
-        : "nationalResults"
-    );
-
-
-  if(!container){
-
-    return;
-
-  }
-
-
-  container.innerHTML = "";
-
-
-  if(!peutGererDirection()){
-
-    return;
-
-  }
-
-
-  const texte =
-    recherche
-      .trim()
-      .toLowerCase();
-
-
-  if(!texte){
-
-    return;
-
-  }
-
-
-  const membres =
-    (window.tousLesMembres || [])
-      .filter(
-        membre =>
-          String(
-            membre.nom || ""
-          )
-          .toLowerCase()
-          .includes(texte)
-      )
-      .slice(0,20);
-
-
-  membres.forEach(
-    membre => {
-
-      const bouton =
-        creerOptionMembre(
-          membre
-        );
-
-
-      bouton.addEventListener(
-        "click",
-        () =>
-          attribuerRoleUnique(
-            membre,
-            type
-          )
-      );
-
-
-      container.appendChild(
-        bouton
-      );
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   ATTRIBUER ROLE UNIQUE
-========================================================= */
-
-async function attribuerRoleUnique(
-  membre,
-  type
-){
-
-  if(!peutGererDirection()){
-
-    return;
-
-  }
-
-
-  const role =
-    type === "founder"
-      ? "Architecte du Projet"
-      : "Délégué National";
-
-
-  const autreRole =
-    type === "founder"
-      ? "Délégué National"
-      : "Architecte du Projet";
-
-
-  const ancien =
-    (window.tousLesMembres || []).find(
-      profil =>
-        profil.grade2 === role
-    );
-
-
-  if(ancien && ancien.id !== membre.id){
-
-    const {
-      error
-    } =
-      await window.supabaseClient
-        .from("profiles")
-        .update({
-          grade2:null
-        })
-        .eq(
-          "id",
-          ancien.id
-        );
-
-
-    if(error){
-
-      console.error(
-        "Erreur retrait ancien titulaire :",
-        error
-      );
-
-      afficherMessage(
-        document.getElementById(
-          type === "founder"
-            ? "founderMessage"
-            : "nationalMessage"
-        ),
-        "error",
-        "Impossible de modifier le titulaire."
-      );
-
-      return;
-
+        adminScreen.style.display =
+            "none";
     }
 
-  }
+    if (loginButton) {
 
+        loginButton.disabled =
+            false;
 
-  const ancienAutre =
-    (window.tousLesMembres || []).find(
-      profil =>
-        profil.id === membre.id &&
-        profil.grade2 === autreRole
-    );
-
-
-  if(ancienAutre){
-
-    /*
-      Une personne ne peut pas cumuler
-      les deux fonctions de direction.
-    */
-
-    const {
-      error
-    } =
-      await window.supabaseClient
-        .from("profiles")
-        .update({
-          grade2:null
-        })
-        .eq(
-          "id",
-          membre.id
-        );
-
-
-    if(error){
-
-      console.error(
-        "Erreur retrait autre fonction :",
-        error
-      );
-
-      afficherMessage(
-        document.getElementById(
-          type === "founder"
-            ? "founderMessage"
-            : "nationalMessage"
-        ),
-        "error",
-        "Impossible de modifier la fonction actuelle du membre."
-      );
-
-      return;
-
+        loginButton.textContent =
+            "SE CONNECTER";
     }
 
-  }
+    if (loginForm) {
 
-
-  const {
-    data,
-    error
-  } =
-    await window.supabaseClient
-      .from("profiles")
-      .update({
-        grade2:role
-      })
-      .eq(
-        "id",
-        membre.id
-      )
-      .select()
-      .single();
-
-
-  if(error){
-
-    console.error(
-      "Erreur attribution grade2 :",
-      error
-    );
-
-    afficherMessage(
-      document.getElementById(
-        type === "founder"
-          ? "founderMessage"
-          : "nationalMessage"
-      ),
-      "error",
-      "Impossible d'enregistrer cette fonction."
-    );
-
-    return;
-
-  }
-
-
-  mettreAJourMembreLocal(
-    data
-  );
-
-
-  const search =
-    document.getElementById(
-      type === "founder"
-        ? "founderSearch"
-        : "nationalSearch"
-    );
-
-
-  if(search){
-
-    search.value = "";
-
-  }
-
-
-  const results =
-    document.getElementById(
-      type === "founder"
-        ? "founderResults"
-        : "nationalResults"
-    );
-
-
-  if(results){
-
-    results.innerHTML = "";
-
-  }
-
-
-  afficherSelectionDirection();
-
-  afficherRegionsEquipe();
-
-
-  afficherMessage(
-    document.getElementById(
-      type === "founder"
-        ? "founderMessage"
-        : "nationalMessage"
-    ),
-    "success",
-    "La fonction a été attribuée."
-  );
-
-
-  setTimeout(
-    () =>
-      viderMessage(
-        document.getElementById(
-          type === "founder"
-            ? "founderMessage"
-            : "nationalMessage"
-        )
-      ),
-    2500
-  );
-
-}
-
-
-/* =========================================================
-   RETIRER ROLE UNIQUE
-========================================================= */
-
-async function retirerRoleUnique(
-  membre,
-  type
-){
-
-  if(!peutGererDirection()){
-
-    return;
-
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await window.supabaseClient
-      .from("profiles")
-      .update({
-        grade2:null
-      })
-      .eq(
-        "id",
-        membre.id
-      )
-      .select()
-      .single();
-
-
-  if(error){
-
-    console.error(
-      "Erreur retrait grade2 :",
-      error
-    );
-
-    afficherMessage(
-      document.getElementById(
-        type === "founder"
-          ? "founderMessage"
-          : "nationalMessage"
-      ),
-      "error",
-      "Impossible de retirer cette fonction."
-    );
-
-    return;
-
-  }
-
-
-  mettreAJourMembreLocal(
-    data
-  );
-
-  afficherSelectionDirection();
-
-  afficherRegionsEquipe();
-
-}
-
-
-/* =========================================================
-   REGIONS
-========================================================= */
-
-function afficherRegionsEquipe(){
-
-  const navigation =
-    document.getElementById(
-      "teamRegions"
-    );
-
-  const panels =
-    document.getElementById(
-      "teamRegionPanels"
-    );
-
-
-  if(!navigation || !panels){
-
-    return;
-
-  }
-
-
-  navigation.innerHTML = "";
-
-  panels.innerHTML = "";
-
-
-  /*
-    Région du profil connecté par défaut.
-    Toutes les régions restent visibles.
-  */
-
-  const regionParDefaut =
-    window.currentProfile?.region &&
-    regionsEquipeListe.includes(
-      window.currentProfile.region
-    )
-      ? window.currentProfile.region
-      : regionsEquipeListe[0];
-
-
-  if(
-    !window.regionEquipeActive ||
-    !regionsEquipeListe.includes(
-      window.regionEquipeActive
-    )
-  ){
-
-    window.regionEquipeActive =
-      regionParDefaut;
-
-  }
-
-
-  regionsEquipeListe.forEach(
-    (region,index) => {
-
-      const bouton =
-        document.createElement("button");
-
-      bouton.type =
-        "button";
-
-      bouton.className =
-        "team-region-button";
-
-      bouton.dataset.region =
-        region;
-
-
-      bouton.innerHTML =
-        escapeHtml(region);
-
-
-      if(
-        region ===
-        window.regionEquipeActive
-      ){
-
-        bouton.classList.add(
-          "active"
-        );
-
-      }
-
-
-      bouton.addEventListener(
-        "click",
-        () =>
-          afficherRegionEquipe(
-            region
-          )
-      );
-
-
-      navigation.appendChild(
-        bouton
-      );
-
-
-      const panel =
-        document.createElement("div");
-
-      panel.id =
-        "team-region-" +
-        index;
-
-      panel.className =
-        "team-region-panel";
-
-      panel.dataset.region =
-        region;
-
-
-      panel.innerHTML =
-        `
-          <h3 class="team-region-title">
-            ${escapeHtml(region)}
-          </h3>
-
-          <div class="team-block">
-
-            <h4 class="team-block-title">
-              Délégués Régionaux
-            </h4>
-
-            <p class="team-block-intro">
-              Sélection multiple des membres de cette région.
-            </p>
-
-            <input
-              type="text"
-              class="team-search regional-search"
-              data-region="${escapeHtml(region)}"
-              data-role="Délégué Régional"
-              placeholder="Rechercher un membre..."
-              autocomplete="off"
-            >
-
-            <div
-              class="team-search-results regional-results"
-              data-region="${escapeHtml(region)}"
-              data-role="Délégué Régional"
-            ></div>
-
-            <div
-              class="team-selected regional-selected"
-              data-region="${escapeHtml(region)}"
-              data-role="Délégué Régional"
-            ></div>
-
-            <div class="team-permission">
-              Modification : administration, Délégué National ou Architecte du Projet.
-            </div>
-
-            <div
-              class="message regional-message"
-              data-region="${escapeHtml(region)}"
-            ></div>
-
-          </div>
-
-
-          <div class="team-block">
-
-            <h4 class="team-block-title">
-              L'équipe Militante
-            </h4>
-
-            <p class="team-block-intro">
-              Sélection multiple des membres de cette région.
-            </p>
-
-            <input
-              type="text"
-              class="team-search militant-search"
-              data-region="${escapeHtml(region)}"
-              data-role="Militant"
-              placeholder="Rechercher un membre..."
-              autocomplete="off"
-            >
-
-            <div
-              class="team-search-results militant-results"
-              data-region="${escapeHtml(region)}"
-              data-role="Militant"
-            ></div>
-
-            <div
-              class="team-selected militant-selected"
-              data-region="${escapeHtml(region)}"
-              data-role="Militant"
-            ></div>
-
-            <div class="team-permission">
-              Modification : administration, Délégué National, Architecte du Projet ou Délégué Régional de cette région.
-            </div>
-
-            <div
-              class="message militant-message"
-              data-region="${escapeHtml(region)}"
-            ></div>
-
-          </div>
-        `;
-
-
-      panels.appendChild(
-        panel
-      );
-
+        loginForm.reset();
     }
-  );
-
-
-  initialiserRecherchesRegions();
-
-  afficherRegionEquipe(
-    window.regionEquipeActive
-  );
-
-}
-
-
-/* =========================================================
-   AFFICHER UNE REGION
-========================================================= */
-
-function afficherRegionEquipe(
-  region
-){
-
-  window.regionEquipeActive =
-    region;
-
-
-  document
-    .querySelectorAll(
-      ".team-region-button"
-    )
-    .forEach(
-      bouton => {
-
-        bouton.classList.toggle(
-          "active",
-          bouton.dataset.region ===
-            region
-        );
-
-      }
-    );
-
-
-  document
-    .querySelectorAll(
-      ".team-region-panel"
-    )
-    .forEach(panel => {
-
-      panel.classList.toggle(
-        "active",
-        panel.dataset.region ===
-          region
-      );
-
-    });
-
-
-  afficherEquipesRegion(
-    region
-  );
-
-}
-
-
-/* =========================================================
-   INITIALISER RECHERCHES REGIONS
-========================================================= */
-
-function initialiserRecherchesRegions(){
-
-  document
-    .querySelectorAll(
-      ".regional-search"
-    )
-    .forEach(
-      input => {
-
-        input.addEventListener(
-          "input",
-          () =>
-            afficherResultatsRegion(
-              input,
-              "Délégué Régional"
-            )
-        );
-
-      }
-    );
-
-
-  document
-    .querySelectorAll(
-      ".militant-search"
-    )
-    .forEach(
-      input => {
-
-        input.addEventListener(
-          "input",
-          () =>
-            afficherResultatsRegion(
-              input,
-              "Militant"
-            )
-        );
-
-      }
-    );
-
-}
-
-
-/* =========================================================
-   AFFICHER EQUIPES REGION
-========================================================= */
-
-function afficherEquipesRegion(
-  region
-){
-
-  const membres =
-    window.tousLesMembres || [];
-
-
-  const delegues =
-    membres.filter(
-      membre =>
-        membre.region === region &&
-        membre.grade2 ===
-          "Délégué Régional"
-    );
-
-
-  const militants =
-    membres.filter(
-      membre =>
-        membre.region === region &&
-        membre.grade2 ===
-          "Militant"
-    );
-
-
-  document
-    .querySelectorAll(
-      ".regional-selected"
-    )
-    .forEach(
-      container => {
-
-        if(
-          container.dataset.region ===
-          region
-        ){
-
-          afficherMembresSelectionnes(
-            container,
-            delegues,
-            region,
-            "Délégué Régional"
-          );
-
-        }
-
-      }
-    );
-
-
-  document
-    .querySelectorAll(
-      ".militant-selected"
-    )
-    .forEach(
-      container => {
-
-        if(
-          container.dataset.region ===
-          region
-        ){
-
-          afficherMembresSelectionnes(
-            container,
-            militants,
-            region,
-            "Militant"
-          );
-
-        }
-
-      }
-    );
-
-
-  appliquerPermissionsRegion(
-    region
-  );
-
-}
-
-
-/* =========================================================
-   PERMISSIONS REGION
-========================================================= */
-
-function appliquerPermissionsRegion(
-  region
-){
-
-  const peutDelegues =
-    peutGererEquipes();
-
-  const peutMilitants =
-    peutGererMilitants(
-      region
-    );
-
-
-  document
-    .querySelectorAll(
-      ".regional-search"
-    )
-    .forEach(
-      input => {
-
-        if(
-          input.dataset.region ===
-          region
-        ){
-
-          input.classList.toggle(
-            "team-disabled",
-            !peutDelegues
-          );
-
-        }
-
-      }
-    );
-
-
-  document
-    .querySelectorAll(
-      ".militant-search"
-    )
-    .forEach(
-      input => {
-
-        if(
-          input.dataset.region ===
-          region
-        ){
-
-          input.classList.toggle(
-            "team-disabled",
-            !peutMilitants
-          );
-
-        }
-
-      }
-    );
-
-}
-
-
-/* =========================================================
-   RESULTATS REGION
-========================================================= */
-
-function afficherResultatsRegion(
-  input,
-  role
-){
-
-  const region =
-    input.dataset.region;
-
-
-  const container =
-    document.querySelector(
-      role === "Délégué Régional"
-        ? `.regional-results[data-region="${CSS.escape(region)}"]`
-        : `.militant-results[data-region="${CSS.escape(region)}"]`
-    );
-
-
-  if(!container){
-
-    return;
-
-  }
-
-
-  container.innerHTML = "";
-
-
-  const autorise =
-    role === "Délégué Régional"
-      ? peutGererEquipes()
-      : peutGererMilitants(
-          region
-        );
-
-
-  if(!autorise){
-
-    return;
-
-  }
-
-
-  const texte =
-    input.value
-      .trim()
-      .toLowerCase();
-
-
-  if(!texte){
-
-    return;
-
-  }
-
-
-  const membres =
-    (window.tousLesMembres || [])
-      .filter(
-        membre =>
-          membre.region === region &&
-          String(
-            membre.nom || ""
-          )
-          .toLowerCase()
-          .includes(texte)
-      )
-      .slice(0,20);
-
-
-  membres.forEach(
-    membre => {
-
-      const bouton =
-        creerOptionMembre(
-          membre
-        );
-
-
-      bouton.addEventListener(
-        "click",
-        () =>
-          attribuerRoleRegional(
-            membre,
-            region,
-            role
-          )
-      );
-
-
-      container.appendChild(
-        bouton
-      );
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   CREER OPTION MEMBRE
-========================================================= */
-
-function creerOptionMembre(
-  membre
-){
-
-  const bouton =
-    document.createElement("button");
-
-  bouton.type =
-    "button";
-
-  bouton.className =
-    "team-member-option";
-
-
-  const image =
-    membre.image_url ||
-    "";
-
-
-  bouton.innerHTML =
-    `
-      ${
-        image
-          ? `
-            <img
-              src="${escapeHtml(image)}"
-              alt=""
-              onerror="this.style.display='none'"
-            >
-          `
-          : `
-            <div
-              style="
-                width:30px;
-                height:30px;
-                border-radius:50%;
-                border:1px solid rgba(214,173,85,.3);
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                color:var(--gold);
-                font-size:10px;
-                flex-shrink:0;
-              "
-            >
-              ★
-            </div>
-          `
-      }
-
-      <span>
-
-        <span class="team-member-option-name">
-          ${escapeHtml(membre.nom || "Membre")}
-        </span>
-
-        <span class="team-member-option-region">
-          ${escapeHtml(membre.region || "")}
-        </span>
-
-      </span>
-    `;
-
-
-  return bouton;
-
-}
-
-
-/* =========================================================
-   ATTRIBUTION REGIONALE
-========================================================= */
-
-async function attribuerRoleRegional(
-  membre,
-  region,
-  role
-){
-
-  const autorise =
-    role === "Délégué Régional"
-      ? peutGererEquipes()
-      : peutGererMilitants(
-          region
-        );
-
-
-  if(!autorise){
-
-    return;
-
-  }
-
-
-  if(membre.region !== region){
-
-    return;
-
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await window.supabaseClient
-      .from("profiles")
-      .update({
-        grade2:role
-      })
-      .eq(
-        "id",
-        membre.id
-      )
-      .select()
-      .single();
-
-
-  if(error){
-
-    console.error(
-      "Erreur attribution rôle régional :",
-      error
-    );
-
-    afficherMessageRegion(
-      region,
-      role,
-      "error",
-      "Impossible d'enregistrer cette affectation."
-    );
-
-    return;
-
-  }
-
-
-  mettreAJourMembreLocal(
-    data
-  );
-
-
-  const searchSelector =
-    role === "Délégué Régional"
-      ? `.regional-search[data-region="${CSS.escape(region)}"]`
-      : `.militant-search[data-region="${CSS.escape(region)}"]`;
-
-
-  const search =
-    document.querySelector(
-      searchSelector
-    );
-
-
-  if(search){
-
-    search.value =
-      "";
-
-  }
-
-
-  const resultSelector =
-    role === "Délégué Régional"
-      ? `.regional-results[data-region="${CSS.escape(region)}"]`
-      : `.militant-results[data-region="${CSS.escape(region)}"]`;
-
-
-  const results =
-    document.querySelector(
-      resultSelector
-    );
-
-
-  if(results){
-
-    results.innerHTML =
-      "";
-
-  }
-
-
-  afficherEquipesRegion(
-    region
-  );
-
-
-  afficherMessageRegion(
-    region,
-    role,
-    "success",
-    "Le membre a été affecté."
-  );
-
-
-  setTimeout(
-    () =>
-      viderMessageRegion(
-        region,
-        role
-      ),
-    2200
-  );
-
-}
-
-
-/* =========================================================
-   AFFICHER MEMBRES SELECTIONNES
-========================================================= */
-
-function afficherMembresSelectionnes(
-  container,
-  membres,
-  region,
-  role
-){
-
-  container.innerHTML = "";
-
-
-  if(
-    !membres ||
-    membres.length === 0
-  ){
-
-    container.innerHTML =
-      "<div class='team-permission'>Aucun membre affecté.</div>";
-
-    return;
-
-  }
-
-
-  const autorise =
-    role === "Délégué Régional"
-      ? peutGererEquipes()
-      : peutGererMilitants(
-          region
-        );
-
-
-  membres.forEach(
-    membre => {
-
-      const item =
-        document.createElement("div");
-
-      item.className =
-        "team-selected-member";
-
-
-      item.innerHTML =
-        `
-          <span>
-            ${escapeHtml(membre.nom || "Membre")}
-          </span>
-
-          ${
-            autorise
-              ? `
-                <button
-                  type="button"
-                  title="Retirer"
-                >
-                  ×
-                </button>
-              `
-              : ""
-          }
-        `;
-
-
-      if(autorise){
-
-        const button =
-          item.querySelector("button");
-
-
-        if(button){
-
-          button.addEventListener(
-            "click",
-            () =>
-              retirerRoleRegional(
-                membre,
-                region,
-                role
-              )
-          );
-
-        }
-
-      }
-
-
-      container.appendChild(
-        item
-      );
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   RETIRER ROLE REGIONAL
-========================================================= */
-
-async function retirerRoleRegional(
-  membre,
-  region,
-  role
-){
-
-  const autorise =
-    role === "Délégué Régional"
-      ? peutGererEquipes()
-      : peutGererMilitants(
-          region
-        );
-
-
-  if(!autorise){
-
-    return;
-
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await window.supabaseClient
-      .from("profiles")
-      .update({
-        grade2:null
-      })
-      .eq(
-        "id",
-        membre.id
-      )
-      .select()
-      .single();
-
-
-  if(error){
-
-    console.error(
-      "Erreur retrait rôle régional :",
-      error
-    );
-
-    afficherMessageRegion(
-      region,
-      role,
-      "error",
-      "Impossible de retirer ce membre."
-    );
-
-    return;
-
-  }
-
-
-  mettreAJourMembreLocal(
-    data
-  );
-
-
-  afficherEquipesRegion(
-    region
-  );
-
-}
-
-
-/* =========================================================
-   MESSAGE REGION
-========================================================= */
-
-function afficherMessageRegion(
-  region,
-  role,
-  type,
-  texte
-){
-
-  const selector =
-    role === "Délégué Régional"
-      ? `.regional-message[data-region="${CSS.escape(region)}"]`
-      : `.militant-message[data-region="${CSS.escape(region)}"]`;
-
-
-  const element =
-    document.querySelector(
-      selector
-    );
-
-
-  if(element){
-
-    afficherMessage(
-      element,
-      type,
-      texte
-    );
-
-  }
-
-}
-
-
-function viderMessageRegion(
-  region,
-  role
-){
-
-  const selector =
-    role === "Délégué Régional"
-      ? `.regional-message[data-region="${CSS.escape(region)}"]`
-      : `.militant-message[data-region="${CSS.escape(region)}"]`;
-
-
-  const element =
-    document.querySelector(
-      selector
-    );
-
-
-  if(element){
 
     viderMessage(
-      element
+        loginMessage
     );
-
-  }
-
 }
 
 
 /* =========================================================
-   MISE A JOUR MEMBRE LOCAL
+   AFFICHAGE ADMIN
 ========================================================= */
 
-function mettreAJourMembreLocal(
-  membre
-){
+function afficherAdmin() {
 
-  if(!window.tousLesMembres){
+    if (loginScreen) {
 
-    window.tousLesMembres = [];
+        loginScreen.style.display =
+            "none";
+    }
 
-  }
+    if (adminScreen) {
 
+        adminScreen.style.display =
+            "block";
+    }
 
-  const index =
-    window.tousLesMembres.findIndex(
-      profil =>
-        profil.id ===
-        membre.id
-    );
+    const adminUser =
+        document.getElementById(
+            "adminUser"
+        );
 
+    if (adminUser) {
 
-  if(index !== -1){
+        adminUser.innerHTML =
+            "Connecté en tant que <strong>" +
 
-    window.tousLesMembres[index] =
-      membre;
+            (
+                window.currentProfile?.nom ||
+                window.currentUser?.email ||
+                ""
+            ) +
 
-  }
+            "</strong>";
+    }
 
+    ajouterActionsHeader();
 }
 
 
 /* =========================================================
-   ECHAPPEMENT
+   HEADER ESPACE MEMBRE
 ========================================================= */
 
-function escapeHtml(value){
+function ajouterActionsHeader() {
 
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+    let actions =
+        document.getElementById(
+            "memberHeaderActions"
+        );
 
+    if (actions) {
+
+        return;
+    }
+
+    const header =
+        document.createElement(
+            "div"
+        );
+
+    header.id =
+        "memberHeaderActions";
+
+    header.className =
+        "header-actions";
+
+    header.innerHTML = `
+
+        <a
+            href="index.html"
+            class="header-button"
+        >
+            HOME
+        </a>
+
+        <button
+            type="button"
+            class="header-button logout-button"
+            id="logoutButton"
+        >
+            SE DÉCONNECTER
+        </button>
+
+    `;
+
+    const adminHeader =
+        document.querySelector(
+            ".admin-header"
+        );
+
+    if (!adminHeader) {
+
+        return;
+    }
+
+    adminHeader.insertBefore(
+        header,
+        adminHeader.firstChild
+    );
+
+    const logoutButton =
+        document.getElementById(
+            "logoutButton"
+        );
+
+    if (logoutButton) {
+
+        logoutButton.addEventListener(
+            "click",
+            deconnecter
+        );
+    }
+}
+
+
+/* =========================================================
+   DECONNEXION
+========================================================= */
+
+async function deconnecter() {
+
+    const button =
+        document.getElementById(
+            "logoutButton"
+        );
+
+    if (button) {
+
+        button.disabled =
+            true;
+
+        button.textContent =
+            "DÉCONNEXION…";
+    }
+
+    const {
+        error
+    } =
+        await supabase.auth.signOut();
+
+    if (error) {
+
+        console.error(
+            "Erreur déconnexion :",
+            error
+        );
+
+        if (button) {
+
+            button.disabled =
+                false;
+
+            button.textContent =
+                "SE DÉCONNECTER";
+        }
+
+        return;
+    }
+
+    window.currentUser =
+        null;
+
+    window.currentProfile =
+        null;
+
+    if (
+        typeof window.reinitialiserEtatAdmin ===
+        "function"
+    ) {
+
+        window.reinitialiserEtatAdmin();
+    }
+
+    if (button) {
+
+        button.disabled =
+            false;
+
+        button.textContent =
+            "SE DÉCONNECTER";
+    }
+
+    afficherConnexion();
+}
+
+
+/* =========================================================
+   VERIFICATION UTILISATEUR
+========================================================= */
+
+async function verifierUtilisateur() {
+
+    try {
+
+        const {
+            data: {
+                user
+            }
+        } =
+            await supabase.auth.getUser();
+
+
+        /* -------------------------------------------------
+           AUCUNE SESSION
+        ------------------------------------------------- */
+
+        if (!user) {
+
+            window.currentUser =
+                null;
+
+            window.currentProfile =
+                null;
+
+            afficherConnexion();
+
+            return;
+        }
+
+
+        /* -------------------------------------------------
+           UTILISATEUR CONNECTÉ
+        ------------------------------------------------- */
+
+        window.currentUser =
+            user;
+
+
+        /* -------------------------------------------------
+           CHARGEMENT PROFIL
+        ------------------------------------------------- */
+
+        const {
+            data: profile,
+            error
+        } =
+            await supabase
+
+                .from("profiles")
+
+                .select(`
+
+                    id,
+                    nom,
+                    grade,
+                    grade2,
+                    email,
+                    image_url,
+                    description,
+                    region,
+                    competences,
+                    anonyme,
+                    facebook_url,
+                    x_url,
+                    instagram_url,
+                    youtube_url,
+                    tiktok_url,
+                    audience_max
+
+                `)
+
+                .eq(
+                    "id",
+                    user.id
+                )
+
+                .single();
+
+
+        if (
+            error ||
+            !profile
+        ) {
+
+            console.error(
+                "Erreur chargement profil :",
+                error
+            );
+
+            await supabase.auth.signOut();
+
+            window.currentUser =
+                null;
+
+            window.currentProfile =
+                null;
+
+            afficherMessage(
+                loginMessage,
+                "error",
+                "Impossible de charger votre profil."
+            );
+
+            afficherConnexion();
+
+            return;
+        }
+
+
+        /* -------------------------------------------------
+           PROFIL GLOBAL
+        ------------------------------------------------- */
+
+        window.currentProfile =
+            profile;
+
+
+        /* -------------------------------------------------
+           SYNCHRONISATION CORE
+        ------------------------------------------------- */
+
+        if (
+            typeof window.definirEtatUtilisateur ===
+            "function"
+        ) {
+
+            window.definirEtatUtilisateur(
+                user,
+                profile
+            );
+        }
+
+
+        /* -------------------------------------------------
+           AFFICHAGE ESPACE MEMBRE
+        ------------------------------------------------- */
+
+        afficherAdmin();
+
+
+        /* -------------------------------------------------
+           REMPLISSAGE PROFIL
+        ------------------------------------------------- */
+
+        if (
+            typeof window.remplirProfil ===
+            "function"
+        ) {
+
+            window.remplirProfil(
+                profile
+            );
+        }
+
+
+        /* -------------------------------------------------
+           ONGLET RDV
+        ------------------------------------------------- */
+
+        const rdvButton =
+            document.getElementById(
+                "rdvTabButton"
+            );
+
+        if (rdvButton) {
+
+            if (
+                typeof window.peutGererRendezVous ===
+                "function" &&
+                window.peutGererRendezVous()
+            ) {
+
+                rdvButton.style.display =
+                    "block";
+
+                if (
+                    typeof window.chargerRendezVous ===
+                    "function"
+                ) {
+
+                    window.chargerRendezVous();
+                }
+
+            } else {
+
+                rdvButton.style.display =
+                    "none";
+            }
+        }
+
+
+        /* -------------------------------------------------
+           ONGLET ROLE
+        ------------------------------------------------- */
+
+        const roleButton =
+            document.getElementById(
+                "roleTabButton"
+            );
+
+        if (roleButton) {
+
+            if (
+                typeof window.peutGererRole ===
+                "function" &&
+                window.peutGererRole()
+            ) {
+
+                roleButton.style.display =
+                    "block";
+
+                if (
+                    typeof window.remplirRoles ===
+                    "function"
+                ) {
+
+                    window.remplirRoles(
+                        profile.competences
+                    );
+                }
+
+            } else {
+
+                roleButton.style.display =
+                    "none";
+            }
+        }
+
+
+        /* -------------------------------------------------
+           GESTION DES EQUIPES
+        ------------------------------------------------- */
+
+        if (
+            typeof window.chargerGestionEquipes ===
+            "function"
+        ) {
+
+            await window.chargerGestionEquipes();
+        }
+
+
+        console.log(
+            "AVANT-GARDE : espace membre initialisé."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Erreur initialisation espace membre :",
+            error
+        );
+
+        window.currentUser =
+            null;
+
+        window.currentProfile =
+            null;
+
+        afficherConnexion();
+
+    }
+}
+
+
+/* =========================================================
+   CONNEXION
+========================================================= */
+
+if (loginForm) {
+
+    loginForm.addEventListener(
+        "submit",
+        async event => {
+
+            event.preventDefault();
+
+            viderMessage(
+                loginMessage
+            );
+
+            if (loginButton) {
+
+                loginButton.disabled =
+                    true;
+
+                loginButton.textContent =
+                    "CONNEXION…";
+            }
+
+            const email =
+                document
+                    .getElementById(
+                        "loginEmail"
+                    )
+                    .value
+                    .trim()
+                    .toLowerCase();
+
+            const password =
+                document
+                    .getElementById(
+                        "loginPassword"
+                    )
+                    .value;
+
+
+            console.log(
+                "AVANT-GARDE : tentative de connexion Supabase"
+            );
+
+
+            try {
+
+                const {
+                    error
+                } =
+                    await supabase.auth.signInWithPassword({
+
+                        email,
+
+                        password
+
+                    });
+
+
+                if (error) {
+
+                    console.error(
+                        "Erreur connexion :",
+                        error
+                    );
+
+                    afficherMessage(
+                        loginMessage,
+                        "error",
+                        "Adresse e-mail ou mot de passe incorrect."
+                    );
+
+                    if (loginButton) {
+
+                        loginButton.disabled =
+                            false;
+
+                        loginButton.textContent =
+                            "SE CONNECTER";
+                    }
+
+                    return;
+                }
+
+
+                console.log(
+                    "AVANT-GARDE : authentification Supabase réussie"
+                );
+
+
+                await verifierUtilisateur();
+
+            } catch (error) {
+
+                console.error(
+                    "Erreur inattendue lors de la connexion :",
+                    error
+                );
+
+                afficherMessage(
+                    loginMessage,
+                    "error",
+                    "Une erreur est survenue lors de la connexion."
+                );
+
+                if (loginButton) {
+
+                    loginButton.disabled =
+                        false;
+
+                    loginButton.textContent =
+                        "SE CONNECTER";
+                }
+            }
+
+        }
+    );
 }
 
 
@@ -1964,53 +720,33 @@ function escapeHtml(value){
    EXPOSITION GLOBALE
 ========================================================= */
 
-/*
-   IMPORTANT :
-   admin-auth.js appelle ces fonctions via window.
-   Sans cette exposition, les fonctions existent dans
-   le module mais restent invisibles pour les autres modules.
-*/
+window.verifierUtilisateur =
+    verifierUtilisateur;
 
-window.chargerGestionEquipes =
-  chargerGestionEquipes;
+window.afficherConnexion =
+    afficherConnexion;
 
-window.chargerTousLesMembres =
-  chargerTousLesMembres;
+window.afficherAdmin =
+    afficherAdmin;
 
-window.peutGererRendezVous =
-  peutGererRendezVous;
+window.ajouterActionsHeader =
+    ajouterActionsHeader;
 
-window.peutGererDirection =
-  peutGererDirection;
-
-window.peutGererEquipes =
-  peutGererEquipes;
-
-window.peutGererMilitants =
-  peutGererMilitants;
-
-window.estAdmin =
-  estAdmin;
-
-window.estArchitecteProjet =
-  estArchitecteProjet;
-
-window.estDelegueNational =
-  estDelegueNational;
-
-window.estDelegueRegional =
-  estDelegueRegional;
+window.deconnecter =
+    deconnecter;
 
 
 /* =========================================================
-   VARIABLES GLOBALES
+   COMPATIBILITE MESSAGES
 ========================================================= */
 
-window.tousLesMembres =
-  window.tousLesMembres || [];
+window.afficherMessage =
+    window.afficherMessage ||
+    afficherMessage;
 
-window.regionEquipeActive =
-  window.regionEquipeActive || null;
+window.viderMessage =
+    window.viderMessage ||
+    viderMessage;
 
 
 /* =========================================================
@@ -2019,24 +755,15 @@ window.regionEquipeActive =
 
 export {
 
-  chargerGestionEquipes,
+    verifierUtilisateur,
 
-  chargerTousLesMembres,
+    afficherConnexion,
 
-  peutGererRendezVous,
+    afficherAdmin,
 
-  peutGererDirection,
+    ajouterActionsHeader,
 
-  peutGererEquipes,
-
-  peutGererMilitants,
-
-  estAdmin,
-
-  estArchitecteProjet,
-
-  estDelegueNational,
-
-  estDelegueRegional
+    deconnecter
 
 };
+
