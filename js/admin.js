@@ -1,23 +1,80 @@
+```javascript
 /* =========================================================
    AVANT-GARDE — ADMIN
+
    js/admin.js
 
-   Fichier principal de l'administration.
-   Charge les différents modules et lance l'initialisation.
+   Fichier principal de l'espace membre.
+
+   Il charge les différents modules de l'administration
+   dans un environnement commun.
+
+   IMPORTANT :
+   - Ne contient pas la logique métier des différents modules.
+   - Ne remplace aucun des modules spécialisés.
+   - Sert uniquement à charger l'ensemble du système.
+========================================================= */
+
+
+/* =========================================================
+   AUTHENTIFICATION
 ========================================================= */
 
 import "./admin-auth.js";
-import "./admin-core.js";
-import "./admin-delete-profile.js";
-import "./admin-events.js";
-import "./admin-profile.js";
-import "./admin-role.js";
-import "./admin-tabs.js";
-import "./admin-team.js";
-import "./admin-utils.js";
+
 
 /* =========================================================
-   INITIALISATION
+   OUTILS COMMUNS
 ========================================================= */
 
-verifierUtilisateur();
+import "./admin-utils.js";
+
+
+/* =========================================================
+   COEUR ADMINISTRATION
+========================================================= */
+
+import "./admin-core.js";
+
+
+/* =========================================================
+   PROFIL
+========================================================= */
+
+import "./admin-profile.js";
+
+
+/* =========================================================
+   EVENEMENTS / RDV
+========================================================= */
+
+import "./admin-events.js";
+
+
+/* =========================================================
+   GESTION DES EQUIPES
+========================================================= */
+
+import "./admin-team.js";
+
+
+/* =========================================================
+   GESTION DES ROLES
+========================================================= */
+
+import "./admin-role.js";
+
+
+/* =========================================================
+   ONGLETS
+========================================================= */
+
+import "./admin-tabs.js";
+
+
+/* =========================================================
+   SUPPRESSION DU PROFIL
+========================================================= */
+
+import "./admin-delete-profile.js";
+```
