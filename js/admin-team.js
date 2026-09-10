@@ -1,5 +1,31 @@
 /* =========================================================
-   GESTION DES EQUIPES
+   AVANT-GARDE — GESTION DES EQUIPES
+
+   js/admin-team.js
+
+   Gestion complète des équipes :
+
+   - Architecte du Projet
+   - Délégué National
+   - Délégués Régionaux
+   - Militants
+   - Recherche des membres
+   - Attribution des fonctions
+   - Retrait des fonctions
+   - Gestion des permissions
+   - Sélection des régions
+
+   IMPORTANT :
+   Ce fichier fonctionne dans l'architecture modulaire
+   de l'administration.
+
+   Les données partagées avec les autres modules sont
+   récupérées via window.*.
+========================================================= */
+
+
+/* =========================================================
+   REGIONS
 ========================================================= */
 
 const regionsEquipeListe = [
@@ -40,14 +66,14 @@ const regionsEquipeListe = [
 
 function estAdmin(){
 
-  return currentProfile?.grade === "admin";
+  return window.currentProfile?.grade === "admin";
 
 }
 
 
 function estCommissaireFondateur(){
 
-  return currentProfile?.grade2 ===
+  return window.currentProfile?.grade2 ===
     "Architecte du Projet";
 
 }
@@ -55,7 +81,7 @@ function estCommissaireFondateur(){
 
 function estDelegueNational(){
 
-  return currentProfile?.grade2 ===
+  return window.currentProfile?.grade2 ===
     "Délégué National";
 
 }
@@ -64,9 +90,10 @@ function estDelegueNational(){
 function estDelegueRegional(region){
 
   return (
-    currentProfile?.grade2 ===
+    window.currentProfile?.grade2 ===
       "Délégué Régional" &&
-    currentProfile?.region ===
+
+    window.currentProfile?.region ===
       region
   );
 
@@ -80,43 +107,73 @@ function estDelegueRegional(region){
 function peutGererRendezVous(){
 
   return (
+
     estAdmin() ||
+
     estCommissaireFondateur() ||
+
     estDelegueNational() ||
-    currentProfile?.grade2 === "Délégué Régional"
+
+    window.currentProfile?.grade2 ===
+      "Délégué Régional"
+
   );
 
 }
 
+
+/* =========================================================
+   DROITS DIRECTION
+========================================================= */
 
 function peutGererDirection(){
 
   return (
+
     estAdmin() ||
+
     estCommissaireFondateur()
+
   );
 
 }
 
+
+/* =========================================================
+   DROITS EQUIPES
+========================================================= */
 
 function peutGererEquipes(){
 
   return (
+
     estAdmin() ||
+
     estCommissaireFondateur() ||
+
     estDelegueNational()
+
   );
 
 }
 
 
+/* =========================================================
+   DROITS MILITANTS
+========================================================= */
+
 function peutGererMilitants(region){
 
   return (
+
     estAdmin() ||
+
     estCommissaireFondateur() ||
+
     estDelegueNational() ||
+
     estDelegueRegional(region)
+
   );
 
 }
@@ -128,6 +185,41 @@ function peutGererMilitants(region){
 
 async function chargerGestionEquipes(){
 
+  /*
+    Le bouton existe déjà dans admin.html.
+
+    Il ne doit pas être supprimé en fonction du grade :
+    les permissions contrôlent les actions à l'intérieur
+    de l'onglet.
+  */
+
+  const teamTabButton =
+    document.getElementById(
+      "teamTabButton"
+    );
+
+  if(teamTabButton){
+
+    teamTabButton.style.display =
+      "block";
+
+  }
+
+
+  const teamTab =
+    document.getElementById(
+      "teamTab"
+    );
+
+  if(teamTab){
+
+    teamTab.classList.remove(
+      "disabled"
+    );
+
+  }
+
+
   await chargerTousLesMembres();
 
   afficherPermissionsDirection();
@@ -138,24 +230,37 @@ async function chargerGestionEquipes(){
 
   initialiserRechercheDirection();
 
+
   /*
-    Région du profil connecté sélectionnée par défaut.
+    Région du profil connecté sélectionnée
+    par défaut.
   */
 
   const regionParDefaut =
-    currentProfile?.region &&
+
+    window.currentProfile?.region &&
+
     regionsEquipeListe.includes(
-      currentProfile.region
+      window.currentProfile.region
     )
-      ? currentProfile.region
+
+      ? window.currentProfile.region
+
       : regionsEquipeListe[0];
 
 
   afficherRegionEquipe(
-    regionEquipeActive &&
-    regionsEquipeListe.includes(regionEquipeActive)
-      ? regionEquipeActive
+
+    window.regionEquipeActive &&
+
+    regionsEquipeListe.includes(
+      window.regionEquipeActive
+    )
+
+      ? window.regionEquipeActive
+
       : regionParDefaut
+
   );
 
 }
@@ -168,12 +273,19 @@ async function chargerGestionEquipes(){
 async function chargerTousLesMembres(){
 
   const {
+
     data,
+
     error
+
   } =
-    await supabaseClient
+
+    await window.supabaseClient
+
       .from("profiles")
+
       .select(`
+
         id,
         nom,
         image_url,
@@ -181,12 +293,17 @@ async function chargerTousLesMembres(){
         grade,
         grade2,
         anonyme
+
       `)
+
       .order(
+
         "nom",
+
         {
           ascending:true
         }
+
       );
 
 
@@ -197,14 +314,14 @@ async function chargerTousLesMembres(){
       error
     );
 
-    tousLesMembres = [];
+    window.tousLesMembres = [];
 
     return;
 
   }
 
 
-  tousLesMembres =
+  window.tousLesMembres =
     data || [];
 
 }
@@ -227,37 +344,73 @@ function afficherPermissionsDirection(){
     );
 
 
-  founderMessage.textContent =
-    peutGererDirection()
-      ? "Modification autorisée."
-      : "Modification réservée à l’administration du site.";
+  if(founderMessage){
 
-  founderMessage.style.color =
-    peutGererDirection()
-      ? "#b9e5c4"
-      : "#7f8998";
+    founderMessage.textContent =
+      peutGererDirection()
+
+        ? "Modification autorisée."
+
+        : "Modification réservée à l’administration du site.";
+
+    founderMessage.style.color =
+      peutGererDirection()
+
+        ? "#b9e5c4"
+
+        : "#7f8998";
+
+  }
 
 
-  nationalMessage.textContent =
-    peutGererDirection()
-      ? "Modification autorisée."
-      : "Modification réservée à l’administration du site.";
+  if(nationalMessage){
 
-  nationalMessage.style.color =
-    peutGererDirection()
-      ? "#b9e5c4"
-      : "#7f8998";
+    nationalMessage.textContent =
+      peutGererDirection()
+
+        ? "Modification autorisée."
+
+        : "Modification réservée à l’administration du site.";
+
+    nationalMessage.style.color =
+      peutGererDirection()
+
+        ? "#b9e5c4"
+
+        : "#7f8998";
+
+  }
 
 
   if(!peutGererDirection()){
 
-    document
-      .getElementById("founderSearch")
-      .classList.add("team-disabled");
+    const founderSearch =
+      document.getElementById(
+        "founderSearch"
+      );
 
-    document
-      .getElementById("nationalSearch")
-      .classList.add("team-disabled");
+    const nationalSearch =
+      document.getElementById(
+        "nationalSearch"
+      );
+
+
+    if(founderSearch){
+
+      founderSearch.classList.add(
+        "team-disabled"
+      );
+
+    }
+
+
+    if(nationalSearch){
+
+      nationalSearch.classList.add(
+        "team-disabled"
+      );
+
+    }
 
   }
 
@@ -271,32 +424,42 @@ function afficherPermissionsDirection(){
 function afficherSelectionDirection(){
 
   const fondateur =
-    tousLesMembres.find(
+    (window.tousLesMembres || []).find(
+
       membre =>
+
         membre.grade2 ===
         "Architecte du Projet"
+
     );
 
 
   const national =
-    tousLesMembres.find(
+    (window.tousLesMembres || []).find(
+
       membre =>
+
         membre.grade2 ===
         "Délégué National"
+
     );
 
 
   afficherSelectionUnique(
+
     "founderSelected",
     fondateur,
     "founder"
+
   );
 
 
   afficherSelectionUnique(
+
     "nationalSelected",
     national,
     "national"
+
   );
 
 }
@@ -307,15 +470,24 @@ function afficherSelectionDirection(){
 ========================================================= */
 
 function afficherSelectionUnique(
+
   elementId,
   membre,
   type
+
 ){
 
   const container =
     document.getElementById(
       elementId
     );
+
+
+  if(!container){
+
+    return;
+
+  }
 
 
   container.innerHTML = "";
@@ -332,50 +504,79 @@ function afficherSelectionUnique(
 
 
   const item =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
+
 
   item.className =
     "team-selected-member";
 
 
   item.innerHTML =
+
     `
+
       <span>
-        ${escapeHtml(membre.nom || "Membre")}
+        ${escapeHtml(
+          membre.nom ||
+          "Membre"
+        )}
       </span>
 
       ${
+
         peutGererDirection()
+
           ? `
+
             <button
               type="button"
               title="Retirer"
             >
               ×
             </button>
+
           `
+
           : ""
+
       }
+
     `;
 
 
   if(peutGererDirection()){
 
-    item
-      .querySelector("button")
-      .addEventListener(
+    const bouton =
+      item.querySelector(
+        "button"
+      );
+
+
+    if(bouton){
+
+      bouton.addEventListener(
+
         "click",
+
         () =>
+
           retirerRoleUnique(
             membre,
             type
           )
+
       );
+
+    }
 
   }
 
 
-  container.appendChild(item);
+  container.appendChild(
+    item
+  );
 
 }
 
@@ -386,28 +587,57 @@ function afficherSelectionUnique(
 
 function initialiserRechercheDirection(){
 
-  document
-    .getElementById("founderSearch")
-    .addEventListener(
+  const founderSearch =
+    document.getElementById(
+      "founderSearch"
+    );
+
+  const nationalSearch =
+    document.getElementById(
+      "nationalSearch"
+    );
+
+
+  if(founderSearch){
+
+    founderSearch.addEventListener(
+
       "input",
+
       event =>
+
         afficherResultatsDirection(
+
           event.target.value,
+
           "founder"
+
         )
+
     );
 
+  }
 
-  document
-    .getElementById("nationalSearch")
-    .addEventListener(
+
+  if(nationalSearch){
+
+    nationalSearch.addEventListener(
+
       "input",
+
       event =>
+
         afficherResultatsDirection(
+
           event.target.value,
+
           "national"
+
         )
+
     );
+
+  }
 
 }
 
@@ -417,19 +647,34 @@ function initialiserRechercheDirection(){
 ========================================================= */
 
 function afficherResultatsDirection(
+
   recherche,
   type
+
 ){
 
   const container =
+
     document.getElementById(
+
       type === "founder"
+
         ? "founderResults"
+
         : "nationalResults"
+
     );
 
 
-  container.innerHTML = "";
+  if(!container){
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    "";
 
 
   if(!peutGererDirection()){
@@ -440,8 +685,11 @@ function afficherResultatsDirection(
 
 
   const texte =
+
     recherche
+
       .trim()
+
       .toLowerCase();
 
 
@@ -453,19 +701,33 @@ function afficherResultatsDirection(
 
 
   const membres =
-    tousLesMembres
+
+    (window.tousLesMembres || [])
+
       .filter(
+
         membre =>
+
           String(
             membre.nom || ""
           )
-          .toLowerCase()
-          .includes(texte)
+
+            .toLowerCase()
+
+            .includes(
+              texte
+            )
+
       )
-      .slice(0,20);
+
+      .slice(
+        0,
+        20
+      );
 
 
   membres.forEach(
+
     membre => {
 
       const bouton =
@@ -475,12 +737,16 @@ function afficherResultatsDirection(
 
 
       bouton.addEventListener(
+
         "click",
+
         () =>
+
           attribuerRoleUnique(
             membre,
             type
           )
+
       );
 
 
@@ -489,6 +755,7 @@ function afficherResultatsDirection(
       );
 
     }
+
   );
 
 }
@@ -499,8 +766,10 @@ function afficherResultatsDirection(
 ========================================================= */
 
 async function attribuerRoleUnique(
+
   membre,
   type
+
 ){
 
   if(!peutGererDirection()){
@@ -511,34 +780,52 @@ async function attribuerRoleUnique(
 
 
   const role =
+
     type === "founder"
+
       ? "Architecte du Projet"
+
       : "Délégué National";
 
 
   const autreRole =
+
     type === "founder"
+
       ? "Délégué National"
+
       : "Architecte du Projet";
 
 
   const ancien =
-    tousLesMembres.find(
+
+    (window.tousLesMembres || []).find(
+
       profil =>
-        profil.grade2 === role
+
+        profil.grade2 ===
+        role
+
     );
 
 
-  if(ancien && ancien.id !== membre.id){
+  if(
+    ancien &&
+    ancien.id !== membre.id
+  ){
 
     const {
       error
     } =
-      await supabaseClient
+
+      await window.supabaseClient
+
         .from("profiles")
+
         .update({
           grade2:null
         })
+
         .eq(
           "id",
           ancien.id
@@ -548,19 +835,32 @@ async function attribuerRoleUnique(
     if(error){
 
       console.error(
+
         "Erreur retrait ancien titulaire :",
+
         error
+
       );
 
-      afficherMessage(
+
+      window.afficherMessage(
+
         document.getElementById(
+
           type === "founder"
+
             ? "founderMessage"
+
             : "nationalMessage"
+
         ),
+
         "error",
+
         "Impossible de modifier le titulaire."
+
       );
+
 
       return;
 
@@ -570,14 +870,25 @@ async function attribuerRoleUnique(
 
 
   const ancienAutre =
-    tousLesMembres.find(
+
+    (window.tousLesMembres || []).find(
+
       profil =>
+
         profil.id === membre.id &&
-        profil.grade2 === autreRole
+
+        profil.grade2 ===
+        autreRole
+
     );
 
 
   if(ancienAutre){
+
+    /*
+      Conservation de la logique historique.
+      Le nouveau rôle remplace simplement l'ancien.
+    */
 
   }
 
@@ -586,35 +897,59 @@ async function attribuerRoleUnique(
     data,
     error
   } =
-    await supabaseClient
+
+    await window.supabaseClient
+
       .from("profiles")
+
       .update({
+
         grade2:role
+
       })
+
       .eq(
+
         "id",
+
         membre.id
+
       )
+
       .select()
+
       .single();
 
 
   if(error){
 
     console.error(
+
       "Erreur attribution grade2 :",
+
       error
+
     );
 
-    afficherMessage(
+
+    window.afficherMessage(
+
       document.getElementById(
+
         type === "founder"
+
           ? "founderMessage"
+
           : "nationalMessage"
+
       ),
+
       "error",
+
       "Impossible d'enregistrer cette fonction."
+
     );
+
 
     return;
 
@@ -626,21 +961,44 @@ async function attribuerRoleUnique(
   );
 
 
-  document
-    .getElementById(
+  const search =
+    document.getElementById(
+
       type === "founder"
+
         ? "founderSearch"
+
         : "nationalSearch"
-    )
-    .value = "";
 
-
-  document
-    .getElementById(
-      type === "founderResults"
-        ? "founderResults"
-        : "nationalResults"
     );
+
+
+  if(search){
+
+    search.value =
+      "";
+
+  }
+
+
+  const results =
+    document.getElementById(
+
+      type === "founder"
+
+        ? "founderResults"
+
+        : "nationalResults"
+
+    );
+
+
+  if(results){
+
+    results.innerHTML =
+      "";
+
+  }
 
 
   afficherSelectionDirection();
@@ -648,27 +1006,45 @@ async function attribuerRoleUnique(
   afficherRegionsEquipe();
 
 
-  afficherMessage(
+  window.afficherMessage(
+
     document.getElementById(
+
       type === "founder"
+
         ? "founderMessage"
+
         : "nationalMessage"
+
     ),
+
     "success",
+
     "La fonction a été attribuée."
+
   );
 
 
   setTimeout(
+
     () =>
-      viderMessage(
+
+      window.viderMessage(
+
         document.getElementById(
+
           type === "founder"
+
             ? "founderMessage"
+
             : "nationalMessage"
+
         )
+
       ),
+
     2500
+
   );
 
 }
@@ -679,8 +1055,10 @@ async function attribuerRoleUnique(
 ========================================================= */
 
 async function retirerRoleUnique(
+
   membre,
   type
+
 ){
 
   if(!peutGererDirection()){
@@ -694,35 +1072,59 @@ async function retirerRoleUnique(
     data,
     error
   } =
-    await supabaseClient
+
+    await window.supabaseClient
+
       .from("profiles")
+
       .update({
+
         grade2:null
+
       })
+
       .eq(
+
         "id",
+
         membre.id
+
       )
+
       .select()
+
       .single();
 
 
   if(error){
 
     console.error(
+
       "Erreur retrait grade2 :",
+
       error
+
     );
 
-    afficherMessage(
+
+    window.afficherMessage(
+
       document.getElementById(
+
         type === "founder"
+
           ? "founderMessage"
+
           : "nationalMessage"
+
       ),
+
       "error",
+
       "Impossible de retirer cette fonction."
+
     );
+
 
     return;
 
@@ -733,11 +1135,278 @@ async function retirerRoleUnique(
     data
   );
 
+
   afficherSelectionDirection();
 
   afficherRegionsEquipe();
 
 }
+
+
+/* =========================================================
+   REGIONS
+========================================================= */
+
+function afficherRegionsEquipe(){
+
+  const navigation =
+    document.getElementById(
+      "teamRegions"
+    );
+
+  const panels =
+    document.getElementById(
+      "teamRegionPanels"
+    );
+
+
+  if(!navigation || !panels){
+
+    return;
+
+  }
+
+
+  navigation.innerHTML =
+    "";
+
+  panels.innerHTML =
+    "";
+
+
+  /*
+    Région du profil connecté par défaut.
+    Toutes les régions restent visibles.
+  */
+
+  const regionParDefaut =
+
+    window.currentProfile?.region &&
+
+    regionsEquipeListe.includes(
+
+      window.currentProfile.region
+
+    )
+
+      ? window.currentProfile.region
+
+      : regionsEquipeListe[0];
+
+
+  if(
+
+    !window.regionEquipeActive ||
+
+    !regionsEquipeListe.includes(
+
+      window.regionEquipeActive
+
+    )
+
+  ){
+
+    window.regionEquipeActive =
+      regionParDefaut;
+
+  }
+
+
+  regionsEquipeListe.forEach(
+
+    (region,index) => {
+
+      const bouton =
+        document.createElement(
+          "button"
+        );
+
+
+      bouton.type =
+        "button";
+
+
+      bouton.className =
+        "team-region-button";
+
+
+      bouton.dataset.region =
+        region;
+
+
+      bouton.innerHTML =
+        escapeHtml(
+          region
+        );
+
+
+      if(
+
+        region ===
+        window.regionEquipeActive
+
+      ){
+
+        bouton.classList.add(
+          "active"
+        );
+
+      }
+
+
+      bouton.addEventListener(
+
+        "click",
+
+        () =>
+
+          afficherRegionEquipe(
+            region
+          )
+
+      );
+
+
+      navigation.appendChild(
+        bouton
+      );
+
+
+      const panel =
+        document.createElement(
+          "div"
+        );
+
+
+      panel.id =
+        "team-region-" +
+        index;
+
+
+      panel.className =
+        "team-region-panel";
+
+
+      panel.dataset.region =
+        region;
+
+
+      panel.innerHTML =
+
+        `
+
+          <h3 class="team-region-title">
+            ${escapeHtml(region)}
+          </h3>
+
+
+          <div class="team-block">
+
+            <h4 class="team-block-title">
+              Délégués Régionaux
+            </h4>
+
+            <p class="team-block-intro">
+              Sélection multiple des membres de cette région.
+            </p>
+
+            <input
+              type="text"
+              class="team-search regional-search"
+              data-region="${escapeHtml(region)}"
+              data-role="Délégué Régional"
+              placeholder="Rechercher un membre..."
+              autocomplete="off"
+            >
+
+            <div
+              class="team-search-results regional-results"
+              data-region="${escapeHtml(region)}"
+              data-role="Délégué Régional"
+            ></div>
+
+            <div
+              class="team-selected regional-selected"
+              data-region="${escapeHtml(region)}"
+              data-role="Délégué Régional"
+            ></div>
+
+            <div class="team-permission">
+              Modification : administration, Délégué National ou Architecte du Projet.
+            </div>
+
+            <div
+              class="message regional-message"
+              data-region="${escapeHtml(region)}"
+            ></div>
+
+          </div>
+
+
+          <div class="team-block">
+
+            <h4 class="team-block-title">
+              L'équipe Militante
+            </h4>
+
+            <p class="team-block-intro">
+              Sélection multiple des membres de cette région.
+            </p>
+
+            <input
+              type="text"
+              class="team-search militant-search"
+              data-region="${escapeHtml(region)}"
+              data-role="Militant"
+              placeholder="Rechercher un membre..."
+              autocomplete="off"
+            >
+
+            <div
+              class="team-search-results militant-results"
+              data-region="${escapeHtml(region)}"
+              data-role="Militant"
+            ></div>
+
+            <div
+              class="team-selected militant-selected"
+              data-region="${escapeHtml(region)}"
+              data-role="Militant"
+            ></div>
+
+            <div class="team-permission">
+              Modification : administration, Délégué National, Architecte du Projet ou Délégué Régional de cette région.
+            </div>
+
+            <div
+              class="message militant-message"
+              data-region="${escapeHtml(region)}"
+            ></div>
+
+          </div>
+
+        `;
+
+
+      panels.appendChild(
+        panel
+      );
+
+    }
+
+  );
+
+
+  initialiserRecherchesRegions();
+
+
+  afficherRegionEquipe(
+    window.regionEquipeActive
+  );
+
+}
+
+
 /* =========================================================
    AFFICHER UNE REGION
 ========================================================= */
@@ -746,41 +1415,55 @@ function afficherRegionEquipe(
   region
 ){
 
-  regionEquipeActive =
+  window.regionEquipeActive =
     region;
 
 
   document
+
     .querySelectorAll(
       ".team-region-button"
     )
+
     .forEach(
+
       bouton => {
 
         bouton.classList.toggle(
+
           "active",
+
           bouton.dataset.region ===
             region
+
         );
 
       }
+
     );
 
 
   document
+
     .querySelectorAll(
       ".team-region-panel"
     )
+
     .forEach(
+
       panel => {
 
         panel.classList.toggle(
+
           "active",
+
           panel.dataset.region ===
             region
+
         );
 
       }
+
     );
 
 
@@ -798,42 +1481,64 @@ function afficherRegionEquipe(
 function initialiserRecherchesRegions(){
 
   document
+
     .querySelectorAll(
       ".regional-search"
     )
+
     .forEach(
+
       input => {
 
         input.addEventListener(
+
           "input",
+
           () =>
+
             afficherResultatsRegion(
+
               input,
+
               "Délégué Régional"
+
             )
+
         );
 
       }
+
     );
 
 
   document
+
     .querySelectorAll(
       ".militant-search"
     )
+
     .forEach(
+
       input => {
 
         input.addEventListener(
+
           "input",
+
           () =>
+
             afficherResultatsRegion(
+
               input,
+
               "Militant"
+
             )
+
         );
 
       }
+
     );
 
 }
@@ -848,70 +1553,108 @@ function afficherEquipesRegion(
 ){
 
   const delegues =
-    tousLesMembres.filter(
-      membre =>
-        membre.region === region &&
-        membre.grade2 ===
-          "Délégué Régional"
-    );
+
+    (window.tousLesMembres || [])
+
+      .filter(
+
+        membre =>
+
+          membre.region ===
+            region &&
+
+          membre.grade2 ===
+            "Délégué Régional"
+
+      );
 
 
   const militants =
-    tousLesMembres.filter(
-      membre =>
-        membre.region === region &&
-        membre.grade2 ===
-          "Militant"
-    );
+
+    (window.tousLesMembres || [])
+
+      .filter(
+
+        membre =>
+
+          membre.region ===
+            region &&
+
+          membre.grade2 ===
+            "Militant"
+
+      );
 
 
   document
+
     .querySelectorAll(
       ".regional-selected"
     )
+
     .forEach(
+
       container => {
 
         if(
+
           container.dataset.region ===
           region
+
         ){
 
           afficherMembresSelectionnes(
+
             container,
+
             delegues,
+
             region,
+
             "Délégué Régional"
+
           );
 
         }
 
       }
+
     );
 
 
   document
+
     .querySelectorAll(
       ".militant-selected"
     )
+
     .forEach(
+
       container => {
 
         if(
+
           container.dataset.region ===
           region
+
         ){
 
           afficherMembresSelectionnes(
+
             container,
+
             militants,
+
             region,
+
             "Militant"
+
           );
 
         }
 
       }
+
     );
 
 
@@ -933,6 +1676,7 @@ function appliquerPermissionsRegion(
   const peutDelegues =
     peutGererEquipes();
 
+
   const peutMilitants =
     peutGererMilitants(
       region
@@ -940,48 +1684,66 @@ function appliquerPermissionsRegion(
 
 
   document
+
     .querySelectorAll(
       ".regional-search"
     )
+
     .forEach(
+
       input => {
 
         if(
+
           input.dataset.region ===
           region
+
         ){
 
           input.classList.toggle(
+
             "team-disabled",
+
             !peutDelegues
+
           );
 
         }
 
       }
+
     );
 
 
   document
+
     .querySelectorAll(
       ".militant-search"
     )
+
     .forEach(
+
       input => {
 
         if(
+
           input.dataset.region ===
           region
+
         ){
 
           input.classList.toggle(
+
             "team-disabled",
+
             !peutMilitants
+
           );
 
         }
 
       }
+
     );
 
 }
@@ -1001,10 +1763,20 @@ function afficherResultatsRegion(
 
 
   const container =
+
     document.querySelector(
-      role === "Délégué Régional"
-        ? `.regional-results[data-region="${CSS.escape(region)}"]`
-        : `.militant-results[data-region="${CSS.escape(region)}"]`
+
+      role ===
+        "Délégué Régional"
+
+        ?
+
+          `.regional-results[data-region="${CSS.escape(region)}"]`
+
+        :
+
+          `.militant-results[data-region="${CSS.escape(region)}"]`
+
     );
 
 
@@ -1015,13 +1787,22 @@ function afficherResultatsRegion(
   }
 
 
-  container.innerHTML = "";
+  container.innerHTML =
+    "";
 
 
   const autorise =
-    role === "Délégué Régional"
-      ? peutGererEquipes()
-      : peutGererMilitants(
+
+    role ===
+      "Délégué Régional"
+
+      ?
+
+        peutGererEquipes()
+
+      :
+
+        peutGererMilitants(
           region
         );
 
@@ -1034,8 +1815,11 @@ function afficherResultatsRegion(
 
 
   const texte =
+
     input.value
+
       .trim()
+
       .toLowerCase();
 
 
@@ -1047,20 +1831,36 @@ function afficherResultatsRegion(
 
 
   const membres =
-    tousLesMembres
+
+    (window.tousLesMembres || [])
+
       .filter(
+
         membre =>
-          membre.region === region &&
+
+          membre.region ===
+            region &&
+
           String(
             membre.nom || ""
           )
-          .toLowerCase()
-          .includes(texte)
+
+            .toLowerCase()
+
+            .includes(
+              texte
+            )
+
       )
-      .slice(0,20);
+
+      .slice(
+        0,
+        20
+      );
 
 
   membres.forEach(
+
     membre => {
 
       const bouton =
@@ -1070,13 +1870,21 @@ function afficherResultatsRegion(
 
 
       bouton.addEventListener(
+
         "click",
+
         () =>
+
           attribuerRoleRegional(
+
             membre,
+
             region,
+
             role
+
           )
+
       );
 
 
@@ -1085,6 +1893,7 @@ function afficherResultatsRegion(
       );
 
     }
+
   );
 
 }
@@ -1099,10 +1908,14 @@ function creerOptionMembre(
 ){
 
   const bouton =
-    document.createElement("button");
+    document.createElement(
+      "button"
+    );
+
 
   bouton.type =
     "button";
+
 
   bouton.className =
     "team-member-option";
@@ -1114,47 +1927,69 @@ function creerOptionMembre(
 
 
   bouton.innerHTML =
+
     `
+
       ${
+
         image
-          ? `
-            <img
-              src="${escapeHtml(image)}"
-              alt=""
-              onerror="this.style.display='none'"
-            >
-          `
-          : `
-            <div
-              style="
-                width:30px;
-                height:30px;
-                border-radius:50%;
-                border:1px solid rgba(214,173,85,.3);
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                color:var(--gold);
-                font-size:10px;
-                flex-shrink:0;
-              "
-            >
-              ★
-            </div>
-          `
+
+          ?
+
+            `
+
+              <img
+                src="${escapeHtml(image)}"
+                alt=""
+                onerror="this.style.display='none'"
+              >
+
+            `
+
+          :
+
+            `
+
+              <div
+                style="
+                  width:30px;
+                  height:30px;
+                  border-radius:50%;
+                  border:1px solid rgba(214,173,85,.3);
+                  display:flex;
+                  align-items:center;
+                  justify-content:center;
+                  color:var(--gold);
+                  font-size:10px;
+                  flex-shrink:0;
+                "
+              >
+                ★
+              </div>
+
+            `
+
       }
+
 
       <span>
 
         <span class="team-member-option-name">
-          ${escapeHtml(membre.nom || "Membre")}
+          ${escapeHtml(
+            membre.nom ||
+            "Membre"
+          )}
         </span>
 
         <span class="team-member-option-region">
-          ${escapeHtml(membre.region || "")}
+          ${escapeHtml(
+            membre.region ||
+            ""
+          )}
         </span>
 
       </span>
+
     `;
 
 
@@ -1168,15 +2003,25 @@ function creerOptionMembre(
 ========================================================= */
 
 async function attribuerRoleRegional(
+
   membre,
   region,
   role
+
 ){
 
   const autorise =
-    role === "Délégué Régional"
-      ? peutGererEquipes()
-      : peutGererMilitants(
+
+    role ===
+      "Délégué Régional"
+
+      ?
+
+        peutGererEquipes()
+
+      :
+
+        peutGererMilitants(
           region
         );
 
@@ -1188,7 +2033,10 @@ async function attribuerRoleRegional(
   }
 
 
-  if(membre.region !== region){
+  if(
+    membre.region !==
+    region
+  ){
 
     return;
 
@@ -1199,32 +2047,53 @@ async function attribuerRoleRegional(
     data,
     error
   } =
-    await supabaseClient
+
+    await window.supabaseClient
+
       .from("profiles")
+
       .update({
+
         grade2:role
+
       })
+
       .eq(
+
         "id",
+
         membre.id
+
       )
+
       .select()
+
       .single();
 
 
   if(error){
 
     console.error(
+
       "Erreur attribution rôle régional :",
+
       error
+
     );
 
+
     afficherMessageRegion(
+
       region,
+
       role,
+
       "error",
+
       "Impossible d'enregistrer cette affectation."
+
     );
+
 
     return;
 
@@ -1237,9 +2106,17 @@ async function attribuerRoleRegional(
 
 
   const searchSelector =
-    role === "Délégué Régional"
-      ? `.regional-search[data-region="${CSS.escape(region)}"]`
-      : `.militant-search[data-region="${CSS.escape(region)}"]`;
+
+    role ===
+      "Délégué Régional"
+
+      ?
+
+        `.regional-search[data-region="${CSS.escape(region)}"]`
+
+      :
+
+        `.militant-search[data-region="${CSS.escape(region)}"]`;
 
 
   const search =
@@ -1257,9 +2134,17 @@ async function attribuerRoleRegional(
 
 
   const resultSelector =
-    role === "Délégué Régional"
-      ? `.regional-results[data-region="${CSS.escape(region)}"]`
-      : `.militant-results[data-region="${CSS.escape(region)}"]`;
+
+    role ===
+      "Délégué Régional"
+
+      ?
+
+        `.regional-results[data-region="${CSS.escape(region)}"]`
+
+      :
+
+        `.militant-results[data-region="${CSS.escape(region)}"]`;
 
 
   const results =
@@ -1282,20 +2167,29 @@ async function attribuerRoleRegional(
 
 
   afficherMessageRegion(
+
     region,
+
     role,
+
     "success",
+
     "Le membre a été affecté."
+
   );
 
 
   setTimeout(
+
     () =>
+
       viderMessageRegion(
         region,
         role
       ),
+
     2200
+
   );
 
 }
@@ -1306,18 +2200,25 @@ async function attribuerRoleRegional(
 ========================================================= */
 
 function afficherMembresSelectionnes(
+
   container,
   membres,
   region,
   role
+
 ){
 
-  container.innerHTML = "";
+  container.innerHTML =
+    "";
 
 
   if(
+
     !membres ||
-    membres.length === 0
+
+    membres.length ===
+      0
+
   ){
 
     container.innerHTML =
@@ -1329,57 +2230,101 @@ function afficherMembresSelectionnes(
 
 
   const autorise =
-    role === "Délégué Régional"
-      ? peutGererEquipes()
-      : peutGererMilitants(
+
+    role ===
+      "Délégué Régional"
+
+      ?
+
+        peutGererEquipes()
+
+      :
+
+        peutGererMilitants(
           region
         );
 
 
   membres.forEach(
+
     membre => {
 
       const item =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
+
 
       item.className =
         "team-selected-member";
 
 
       item.innerHTML =
+
         `
+
           <span>
-            ${escapeHtml(membre.nom || "Membre")}
+            ${escapeHtml(
+              membre.nom ||
+              "Membre"
+            )}
           </span>
 
           ${
+
             autorise
-              ? `
-                <button
-                  type="button"
-                  title="Retirer"
-                >
-                  ×
-                </button>
-              `
-              : ""
+
+              ?
+
+                `
+
+                  <button
+                    type="button"
+                    title="Retirer"
+                  >
+                    ×
+                  </button>
+
+                `
+
+              :
+
+                ""
+
           }
+
         `;
 
 
       if(autorise){
 
-        item
-          .querySelector("button")
-          .addEventListener(
-            "click",
-            () =>
-              retirerRoleRegional(
-                membre,
-                region,
-                role
-              )
+        const bouton =
+          item.querySelector(
+            "button"
           );
+
+
+        if(bouton){
+
+          bouton.addEventListener(
+
+            "click",
+
+            () =>
+
+              retirerRoleRegional(
+
+                membre,
+
+                region,
+
+                role
+
+              )
+
+          );
+
+        }
 
       }
 
@@ -1389,6 +2334,7 @@ function afficherMembresSelectionnes(
       );
 
     }
+
   );
 
 }
@@ -1399,15 +2345,25 @@ function afficherMembresSelectionnes(
 ========================================================= */
 
 async function retirerRoleRegional(
+
   membre,
   region,
   role
+
 ){
 
   const autorise =
-    role === "Délégué Régional"
-      ? peutGererEquipes()
-      : peutGererMilitants(
+
+    role ===
+      "Délégué Régional"
+
+      ?
+
+        peutGererEquipes()
+
+      :
+
+        peutGererMilitants(
           region
         );
 
@@ -1423,32 +2379,53 @@ async function retirerRoleRegional(
     data,
     error
   } =
-    await supabaseClient
+
+    await window.supabaseClient
+
       .from("profiles")
+
       .update({
+
         grade2:null
+
       })
+
       .eq(
+
         "id",
+
         membre.id
+
       )
+
       .select()
+
       .single();
 
 
   if(error){
 
     console.error(
+
       "Erreur retrait rôle régional :",
+
       error
+
     );
 
+
     afficherMessageRegion(
+
       region,
+
       role,
+
       "error",
+
       "Impossible de retirer ce membre."
+
     );
+
 
     return;
 
@@ -1472,16 +2449,26 @@ async function retirerRoleRegional(
 ========================================================= */
 
 function afficherMessageRegion(
+
   region,
   role,
   type,
   texte
+
 ){
 
   const selector =
-    role === "Délégué Régional"
-      ? `.regional-message[data-region="${CSS.escape(region)}"]`
-      : `.militant-message[data-region="${CSS.escape(region)}"]`;
+
+    role ===
+      "Délégué Régional"
+
+      ?
+
+        `.regional-message[data-region="${CSS.escape(region)}"]`
+
+      :
+
+        `.militant-message[data-region="${CSS.escape(region)}"]`;
 
 
   const element =
@@ -1492,10 +2479,14 @@ function afficherMessageRegion(
 
   if(element){
 
-    afficherMessage(
+    window.afficherMessage(
+
       element,
+
       type,
+
       texte
+
     );
 
   }
@@ -1504,14 +2495,24 @@ function afficherMessageRegion(
 
 
 function viderMessageRegion(
+
   region,
   role
+
 ){
 
   const selector =
-    role === "Délégué Régional"
-      ? `.regional-message[data-region="${CSS.escape(region)}"]`
-      : `.militant-message[data-region="${CSS.escape(region)}"]`;
+
+    role ===
+      "Délégué Régional"
+
+      ?
+
+        `.regional-message[data-region="${CSS.escape(region)}"]`
+
+      :
+
+        `.militant-message[data-region="${CSS.escape(region)}"]`;
 
 
   const element =
@@ -1522,7 +2523,7 @@ function viderMessageRegion(
 
   if(element){
 
-    viderMessage(
+    window.viderMessage(
       element
     );
 
@@ -1539,20 +2540,32 @@ function mettreAJourMembreLocal(
   membre
 ){
 
+  const membres =
+    window.tousLesMembres || [];
+
+
   const index =
-    tousLesMembres.findIndex(
+
+    membres.findIndex(
+
       profil =>
+
         profil.id ===
         membre.id
+
     );
 
 
   if(index !== -1){
 
-    tousLesMembres[index] =
+    membres[index] =
       membre;
 
   }
+
+
+  window.tousLesMembres =
+    membres;
 
 }
 
@@ -1561,13 +2574,105 @@ function mettreAJourMembreLocal(
    ECHAPPEMENT
 ========================================================= */
 
-function escapeHtml(value){
+function escapeHtml(
+  value
+){
 
-  return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+  return String(
+    value ?? ""
+  )
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 
 }
+
+
+/* =========================================================
+   COMPATIBILITE MODULES
+========================================================= */
+
+if(
+  typeof window.regionEquipeActive ===
+  "undefined"
+){
+
+  window.regionEquipeActive =
+    null;
+
+}
+
+
+window.regionsEquipeListe =
+  regionsEquipeListe;
+
+
+window.chargerGestionEquipes =
+  chargerGestionEquipes;
+
+
+window.chargerTousLesMembres =
+  chargerTousLesMembres;
+
+
+window.peutGererRendezVous =
+  peutGererRendezVous;
+
+
+window.peutGererDirection =
+  peutGererDirection;
+
+
+window.peutGererEquipes =
+  peutGererEquipes;
+
+
+window.peutGererMilitants =
+  peutGererMilitants;
+
+
+window.estAdmin =
+  estAdmin;
+
+
+window.estCommissaireFondateur =
+  estCommissaireFondateur;
+
+
+window.estDelegueNational =
+  estDelegueNational;
+
+
+window.estDelegueRegional =
+  estDelegueRegional;
+
+
+window.afficherRegionEquipe =
+  afficherRegionEquipe;
+
+
+window.afficherEquipesRegion =
+  afficherEquipesRegion;
+
