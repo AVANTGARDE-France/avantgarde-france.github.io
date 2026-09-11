@@ -7,8 +7,8 @@
 
 
 /* =========================================================
-   EVENEMENTS
-   CLASSEMENT AUTOMATIQUE PAR DATE
+   CHARGER LES EVENEMENTS
+   Classement automatique par date
 ========================================================= */
 
 async function chargerRendezVous(){
@@ -20,6 +20,12 @@ async function chargerRendezVous(){
 
   const eventList =
     document.getElementById("eventList");
+
+
+  if(!eventList){
+    return;
+  }
+
 
   eventList.innerHTML =
     "Chargement…";
@@ -47,6 +53,7 @@ async function chargerRendezVous(){
       error
     );
 
+
     eventList.innerHTML =
       "<div class='message error' style='display:block'>Impossible de charger les évènements.</div>";
 
@@ -70,6 +77,7 @@ async function chargerRendezVous(){
 
     const card =
       document.createElement("div");
+
 
     card.className =
       "event-card";
@@ -153,23 +161,43 @@ async function chargerRendezVous(){
     `;
 
 
-    card
-      .querySelector(".edit-button")
-      .addEventListener(
-        "click",
-        () => modifierEvenement(event)
+    const editButton =
+      card.querySelector(
+        ".edit-button"
       );
 
 
-    card
-      .querySelector(".delete-event-button")
-      .addEventListener(
+    if(editButton){
+
+      editButton.addEventListener(
         "click",
-        () => supprimerEvenement(event.id)
+        () =>
+          modifierEvenement(event)
+      );
+
+    }
+
+
+    const deleteButton =
+      card.querySelector(
+        ".delete-event-button"
       );
 
 
-    eventList.appendChild(card);
+    if(deleteButton){
+
+      deleteButton.addEventListener(
+        "click",
+        () =>
+          supprimerEvenement(event.id)
+      );
+
+    }
+
+
+    eventList.appendChild(
+      card
+    );
 
   });
 
@@ -251,11 +279,17 @@ function modifierEvenement(event){
       "block";
 
 
-  document
-    .getElementById("rdvTab")
-    .scrollIntoView({
+  const rdvTab =
+    document.getElementById("rdvTab");
+
+
+  if(rdvTab){
+
+    rdvTab.scrollIntoView({
       behavior:"smooth"
     });
+
+  }
 
 }
 
@@ -264,45 +298,79 @@ function modifierEvenement(event){
    RESET EVENEMENT
 ========================================================= */
 
-document
-  .getElementById("eventCancelButton")
-  .addEventListener(
-    "click",
-    resetEventForm
-  );
-
-
 function resetEventForm(){
 
-  document
-    .getElementById("eventForm")
-    .reset();
+  const eventForm =
+    document.getElementById(
+      "eventForm"
+    );
 
 
-  document
-    .getElementById("eventId")
-    .value = "";
+  if(eventForm){
+
+    eventForm.reset();
+
+  }
 
 
-  document
-    .getElementById("eventActive")
-    .checked = true;
+  const eventId =
+    document.getElementById(
+      "eventId"
+    );
 
 
-  document
-    .getElementById("eventSubmitButton")
-    .textContent =
+  if(eventId){
+
+    eventId.value = "";
+
+  }
+
+
+  const eventActive =
+    document.getElementById(
+      "eventActive"
+    );
+
+
+  if(eventActive){
+
+    eventActive.checked = true;
+
+  }
+
+
+  const eventSubmitButton =
+    document.getElementById(
+      "eventSubmitButton"
+    );
+
+
+  if(eventSubmitButton){
+
+    eventSubmitButton.textContent =
       "AJOUTER L'ÉVÈNEMENT";
 
+  }
 
-  document
-    .getElementById("eventCancelButton")
-    .style.display =
+
+  const eventCancelButton =
+    document.getElementById(
+      "eventCancelButton"
+    );
+
+
+  if(eventCancelButton){
+
+    eventCancelButton.style.display =
       "none";
+
+  }
 
 
   viderMessage(
-    document.getElementById("eventMessage")
+    document.getElementById(
+      "eventMessage"
+    )
   );
 
 }
@@ -312,9 +380,51 @@ function resetEventForm(){
    AJOUT / MODIFICATION EVENEMENT
 ========================================================= */
 
-document
-  .getElementById("eventForm")
-  .addEventListener(
+function initialiserFormulaireEvenement(){
+
+  const eventCancelButton =
+    document.getElementById(
+      "eventCancelButton"
+    );
+
+
+  if(
+    eventCancelButton &&
+    eventCancelButton.dataset.initialized !== "true"
+  ){
+
+    eventCancelButton.dataset.initialized =
+      "true";
+
+
+    eventCancelButton.addEventListener(
+      "click",
+      resetEventForm
+    );
+
+  }
+
+
+  const eventForm =
+    document.getElementById(
+      "eventForm"
+    );
+
+
+  if(
+    !eventForm ||
+    eventForm.dataset.initialized === "true"
+  ){
+
+    return;
+  }
+
+
+  eventForm.dataset.initialized =
+    "true";
+
+
+  eventForm.addEventListener(
     "submit",
     async event => {
 
@@ -327,10 +437,14 @@ document
 
 
       const message =
-        document.getElementById("eventMessage");
+        document.getElementById(
+          "eventMessage"
+        );
 
 
-      viderMessage(message);
+      viderMessage(
+        message
+      );
 
 
       const id =
@@ -393,14 +507,19 @@ document
           await supabaseClient
             .from("rendezvous")
             .update(payload)
-            .eq("id",id);
+            .eq(
+              "id",
+              id
+            );
 
       }else{
 
         result =
           await supabaseClient
             .from("rendezvous")
-            .insert(payload);
+            .insert(
+              payload
+            );
 
       }
 
@@ -419,6 +538,7 @@ document
           "Impossible d'enregistrer l'évènement."
         );
 
+
         return;
       }
 
@@ -434,10 +554,17 @@ document
 
       resetEventForm();
 
+
+      /*
+       * Recharge immédiatement la liste.
+       */
+
       chargerRendezVous();
 
     }
   );
+
+}
 
 
 /* =========================================================
@@ -456,15 +583,22 @@ async function supprimerEvenement(id){
       "Supprimer définitivement cet évènement ?"
     )
   ){
+
     return;
+
   }
 
 
-  const {error} =
+  const {
+    error
+  } =
     await supabaseClient
       .from("rendezvous")
       .delete()
-      .eq("id",id);
+      .eq(
+        "id",
+        id
+      );
 
 
   if(error){
@@ -479,6 +613,7 @@ async function supprimerEvenement(id){
       "Impossible de supprimer l’évènement."
     );
 
+
     return;
   }
 
@@ -486,3 +621,72 @@ async function supprimerEvenement(id){
   chargerRendezVous();
 
 }
+
+
+/* =========================================================
+   INITIALISATION EVENEMENTS
+========================================================= */
+
+function initialiserEvenements(){
+
+  /*
+   * Initialise le formulaire.
+   */
+
+  initialiserFormulaireEvenement();
+
+
+  /*
+   * IMPORTANT :
+   *
+   * Charge les évènements existants dès que
+   * le module est initialisé.
+   *
+   * Avant cette correction, chargerRendezVous()
+   * n'était appelé qu'après une création ou
+   * une modification.
+   */
+
+  chargerRendezVous();
+
+}
+
+
+/* =========================================================
+   DOM READY
+========================================================= */
+
+if(
+  document.readyState === "loading"
+){
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    initialiserEvenements,
+    {
+      once:true
+    }
+  );
+
+}else{
+
+  initialiserEvenements();
+
+}
+
+
+/* =========================================================
+   EXPOSITION GLOBALE
+========================================================= */
+
+window.chargerRendezVous =
+  chargerRendezVous;
+
+window.modifierEvenement =
+  modifierEvenement;
+
+window.resetEventForm =
+  resetEventForm;
+
+window.supprimerEvenement =
+  supprimerEvenement;
