@@ -224,38 +224,6 @@ estDelegueRegional(region)
 }
 
 /* =========================================================
-DROITS ROLE
-===========
-
-L'onglet ROLE est réservé aux membres autorisés
-à gérer leurs propres rôles.
-
-Pour conserver le fonctionnement actuel de
-l'administration, les administrateurs, l'Architecte
-du Projet et le Délégué National y ont accès.
-========================================================= */
-
-function peutGererRole(){
-
-return (
-
-
-estAdmin()
-
-||
-
-estArchitecteProjet()
-
-||
-
-estDelegueNational()
-
-
-);
-
-}
-
-/* =========================================================
 EXPOSITION DES DROITS
 
 IMPORTANT :
@@ -285,9 +253,6 @@ peutGererEquipes;
 
 window.peutGererMilitants =
 peutGererMilitants;
-
-window.peutGererRole =
-peutGererRole;
 
 /* =========================================================
 CHARGER GESTION EQUIPES
@@ -776,8 +741,8 @@ membre => {
     bouton
   );
 
-}
 
+}
 
 );
 
@@ -923,6 +888,7 @@ afficherMessage(
 
   "Impossible d'enregistrer cette fonction."
 
+
 );
 
 
@@ -945,8 +911,8 @@ document.getElementById(
 
     : "nationalSearch"
 
-);
 
+);
 
 if(search){
 
@@ -967,8 +933,8 @@ document.getElementById(
 
     : "nationalResults"
 
-);
 
+);
 
 if(results){
 
@@ -992,6 +958,7 @@ document.getElementById(
     ? "founderMessage"
 
     : "nationalMessage"
+
 
 ),
 
@@ -1087,6 +1054,7 @@ afficherMessage(
   "error",
 
   "Impossible de retirer cette fonction."
+
 
 );
 
@@ -1505,8 +1473,8 @@ membre =>
     membre.grade2 ===
       "Délégué Régional"
 
-);
 
+);
 
 const militants =
 tousLesMembres.filter(
@@ -1521,8 +1489,8 @@ membre =>
     membre.grade2 ===
       "Militant"
 
-);
 
+);
 
 document
 .querySelectorAll(
@@ -1767,8 +1735,8 @@ membre => {
     bouton
   );
 
-}
 
+}
 
 );
 
@@ -1857,7 +1825,6 @@ bouton.innerHTML =
   </span>
 
 `;
-
 
 return bouton;
 
@@ -1960,7 +1927,6 @@ role === "Délégué Régional"
 
   : `.militant-search[data-region="${CSS.escape(region)}"]`;
 
-
 const search =
 document.querySelector(
 searchSelector
@@ -1982,7 +1948,6 @@ role === "Délégué Régional"
   ? `.regional-results[data-region="${CSS.escape(region)}"]`
 
   : `.militant-results[data-region="${CSS.escape(region)}"]`;
-
 
 const results =
 document.querySelector(
@@ -2016,9 +1981,7 @@ region,
 role
 ),
 
-
 2200
-
 
 );
 
@@ -2248,7 +2211,6 @@ role === "Délégué Régional"
 
   : `.militant-message[data-region="${CSS.escape(region)}"]`;
 
-
 const element =
 document.querySelector(
 selector
@@ -2280,7 +2242,6 @@ role === "Délégué Régional"
   ? `.regional-message[data-region="${CSS.escape(region)}"]`
 
   : `.militant-message[data-region="${CSS.escape(region)}"]`;
-
 
 const element =
 document.querySelector(
@@ -2391,8 +2352,6 @@ peutGererDirection,
 peutGererEquipes,
 
 peutGererMilitants,
-
-peutGererRole,
 
 afficherSelectionDirection,
 
