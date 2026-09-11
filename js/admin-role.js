@@ -13,8 +13,9 @@
    - compteur de description
 
    IMPORTANT :
-   Le panneau ROLE utilise désormais la règle d'accès
-   centrale définie dans admin-core.js.
+   Le panneau ROLE est un espace personnel.
+   Il est donc accessible à tout membre connecté,
+   quel que soit son grade ou grade2.
 
    Les fonctions utilisées par les autres modules sont
    exposées sur window afin de conserver le comportement
@@ -95,6 +96,40 @@ function normaliserCompetences(value) {
 
 
 /* =========================================================
+   ACCES ROLE
+========================================================= */
+
+/*
+ * IMPORTANT :
+ *
+ * ROLE est un espace personnel.
+ *
+ * Tous les membres connectés peuvent sélectionner
+ * et modifier leurs propres rôles.
+ *
+ * Il ne faut donc PAS tester grade ou grade2 ici.
+ *
+ * Ainsi :
+ *
+ * - ADMIN                    → accès
+ * - ARCHITECTE DU PROJET     → accès
+ * - DELEGUE NATIONAL         → accès
+ * - DELEGUE REGIONAL         → accès
+ * - MEMBRE / EQUIPE MILITANTE→ accès
+ *
+ * grade2 peut donc parfaitement être null.
+ */
+
+function peutGererRole() {
+
+    return !!(
+        obtenirCurrentUser() &&
+        obtenirCurrentProfile()
+    );
+}
+
+
+/* =========================================================
    REMPLIR ROLES
 ========================================================= */
 
@@ -108,6 +143,19 @@ function remplirRoles(
         );
 
 
+    const profil =
+        obtenirCurrentProfile();
+
+
+    const grade2Existe =
+        !!(
+            profil &&
+            profil.grade2 !== null &&
+            profil.grade2 !== undefined &&
+            String(profil.grade2).trim() !== ""
+        );
+
+
     document
 
         .querySelectorAll(
@@ -117,10 +165,36 @@ function remplirRoles(
         .forEach(
             input => {
 
-                input.checked =
+                let coche =
                     liste.includes(
                         input.value
                     );
+
+
+                /*
+                 * REGLE AUTOMATIQUE :
+                 *
+                 * Tout membre ayant un grade2
+                 * est automatiquement considéré
+                 * comme militant.
+                 *
+                 * Le rôle "Militants" est donc
+                 * coché par défaut dès que grade2
+                 * n'est pas null.
+                 */
+
+                if (
+                    input.value === "Militants" &&
+                    grade2Existe
+                ) {
+
+                    coche = true;
+
+                }
+
+
+                input.checked =
+                    coche;
 
             }
         );
@@ -385,12 +459,11 @@ async function sauvegarderRoles() {
     /*
      * Vérification du droit.
      *
-     * La règle d'accès est celle définie
-     * centralement dans admin-core.js.
+     * Tous les membres connectés sont autorisés.
      */
 
     if (
-        !window.peutGererRole()
+        !peutGererRole()
     ) {
 
         return;
@@ -445,7 +518,7 @@ async function sauvegarderRoles() {
      * Récupération des rôles cochés.
      */
 
-    const rolesSelectionnes =
+    let rolesSelectionnes =
         Array.from(
 
             document.querySelectorAll(
@@ -458,6 +531,38 @@ async function sauvegarderRoles() {
             input =>
                 input.value
         );
+
+
+    /*
+     * REGLE AUTOMATIQUE :
+     *
+     * Si le membre possède un grade2,
+     * le rôle "Militants" doit obligatoirement
+     * être présent dans ses rôles.
+     *
+     * Cela garantit que le rôle ne disparaît
+     * pas simplement parce que la case a été
+     * décochée manuellement.
+     */
+
+    const grade2Existe =
+        currentProfile.grade2 !== null &&
+        currentProfile.grade2 !== undefined &&
+        String(currentProfile.grade2).trim() !== "";
+
+
+    if (
+        grade2Existe &&
+        !rolesSelectionnes.includes(
+            "Militants"
+        )
+    ) {
+
+        rolesSelectionnes.push(
+            "Militants"
+        );
+
+    }
 
 
     /*
@@ -613,12 +718,16 @@ window.normaliserCompetences =
     normaliserCompetences;
 
 
+window.peutGererRole =
+    peutGererRole;
+
+
 window.remplirRoles =
     remplirRoles;
 
 
 window.synchroniserCompetencesEtRoles =
-synchroniserCompetencesEtRoles;
+    synchroniserCompetencesEtRoles;
 
 
 window.mettreAJourMedailleVIP =
