@@ -360,7 +360,7 @@ jobs:
 
               try {
 
-                const body =
+                const result =
                   await new Promise(
                     (resolve, reject) => {
 
@@ -400,27 +400,109 @@ jobs:
                               "end",
                               () => {
 
+                                const status =
+                                  response.statusCode;
+
+
+                                // ------------------------------------------------
+                                // 429 — RATE LIMIT
+                                // ------------------------------------------------
+
                                 if (
-                                  response.statusCode < 200 ||
-                                  response.statusCode >= 300
+                                  status === 429
                                 ) {
 
                                   const error =
                                     new Error(
-                                      `Pulse HTTP ${response.statusCode}`
+                                      "Pulse HTTP 429"
                                     );
 
-                                  error.statusCode =
-                                    response.statusCode;
 
-                                  reject(error);
+                                  error.statusCode =
+                                    429;
+
+
+                                  error.retryAfter =
+                                    response.headers[
+                                      "retry-after"
+                                    ];
+
+
+                                  reject(
+                                    error
+                                  );
 
                                   return;
 
                                 }
 
 
-                                resolve(data);
+                                // ------------------------------------------------
+                                // 400 / 404 / 422
+                                // ------------------------------------------------
+
+                                if (
+                                  status === 400 ||
+                                  status === 404 ||
+                                  status === 422
+                                ) {
+
+                                  const error =
+                                    new Error(
+                                      `Pulse HTTP ${status}`
+                                    );
+
+
+                                  error.statusCode =
+                                    status;
+
+
+                                  reject(
+                                    error
+                                  );
+
+                                  return;
+
+                                }
+
+
+                                // ------------------------------------------------
+                                // AUTRES ERREURS HTTP
+                                // ------------------------------------------------
+
+                                if (
+                                  status < 200 ||
+                                  status >= 300
+                                ) {
+
+                                  const error =
+                                    new Error(
+                                      `Pulse HTTP ${status}`
+                                    );
+
+
+                                  error.statusCode =
+                                    status;
+
+
+                                  reject(
+                                    error
+                                  );
+
+                                  return;
+
+                                }
+
+
+                                resolve({
+
+                                  body:
+                                    data,
+
+                                  headers:
+                                    response.headers
+
+                                });
 
                               }
                             );
@@ -453,26 +535,39 @@ jobs:
 
 
                 return parsePulseAudience(
-                  body
+                  result.body
                 );
 
 
               } catch (error) {
 
-                lastError = error;
+                lastError =
+                  error;
 
 
-                /*
-                 * 429 et 422 :
-                 *
-                 * inutile de refaire immédiatement la même requête.
-                 *
-                 * Pulse vient déjà de répondre.
-                 */
+                // ======================================================
+                // 422
+                // ======================================================
 
                 if (
-                  error.statusCode === 429 ||
-                  error.statusCode === 422 ||
+                  error.statusCode === 422
+                ) {
+
+                  console.log(
+                    "      → Pulse indique que le profil nécessite une connexion."
+                  );
+
+
+                  throw error;
+
+                }
+
+
+                // ======================================================
+                // 400 / 404
+                // ======================================================
+
+                if (
                   error.statusCode === 400 ||
                   error.statusCode === 404
                 ) {
@@ -482,13 +577,129 @@ jobs:
                 }
 
 
+                // ======================================================
+                // 429
+                // ======================================================
+
+                if (
+                  error.statusCode === 429
+                ) {
+
+                  let waitMs =
+                    60000;
+
+
+                  /*
+                   * Retry-After peut être :
+                   *
+                   * - un nombre de secondes
+                   * - une date HTTP
+                   */
+
+                  if (
+                    error.retryAfter
+                  ) {
+
+                    const value =
+                      String(
+                        error.retryAfter
+                      ).trim();
+
+
+                    const seconds =
+                      Number(
+                        value
+                      );
+
+
+                    if (
+                      Number.isFinite(
+                        seconds
+                      )
+                    ) {
+
+                      waitMs =
+                        Math.max(
+                          1000,
+                          seconds * 1000
+                        );
+
+                    } else {
+
+                      const retryDate =
+                        Date.parse(
+                          value
+                        );
+
+
+                      if (
+                        Number.isFinite(
+                          retryDate
+                        )
+                      ) {
+
+                        waitMs =
+                          Math.max(
+                            1000,
+                            retryDate - Date.now()
+                          );
+
+                      }
+
+                    }
+
+                  }
+
+
+                  /*
+                   * Sécurité :
+                   * maximum 2 minutes d'attente par tentative.
+                   */
+
+                  waitMs =
+                    Math.min(
+                      waitMs,
+                      120000
+                    );
+
+
+                  console.log(
+                    `      Pulse 429 → attente ${Math.ceil(waitMs / 1000)}s avant nouvelle tentative`
+                  );
+
+
+                  if (
+                    attempt <
+                    MAX_RETRIES
+                  ) {
+
+                    await sleep(
+                      waitMs
+                    );
+
+
+                    continue;
+
+                  }
+
+
+                  throw error;
+
+                }
+
+
+                // ======================================================
+                // AUTRES ERREURS → RETRY
+                // ======================================================
+
                 console.log(
                   `      Tentative ${attempt}/${MAX_RETRIES} : ${error.message}`
                 );
 
 
                 if (
-                  attempt < MAX_RETRIES
+                  attempt <
+                  MAX_RETRIES
                 ) {
 
                   await sleep(
@@ -840,12 +1051,7 @@ jobs:
             /*
              * IMPORTANT :
              *
-             * On conserve exactement le principe
-             * du système qui fonctionnait :
-             *
-             * RPC dédiée :
-             *
-             * public.update_profile_audiences(...)
+             * RPC conservée telle quelle.
              */
 
             const path =
@@ -1100,17 +1306,8 @@ jobs:
             // ----------------------------------------------------------
 
             /*
-             * Une URL identique ne doit être interrogée
+             * Une URL identique n'est interrogée
              * qu'une seule fois pendant ce lancement.
-             *
-             * Exemple :
-             *
-             * Profil A → instagram.com/avantgarde
-             * Profil B → instagram.com/avantgarde
-             *
-             * Pulse n'est appelé qu'une seule fois.
-             *
-             * Le résultat — succès OU erreur — est mémorisé.
              */
 
             const pulseCache =
@@ -1152,20 +1349,6 @@ jobs:
             // ----------------------------------------------------------
             // TRAITEMENT DES PROFILS
             // ----------------------------------------------------------
-
-            /*
-             * On revient volontairement à une logique très simple :
-             *
-             * profil
-             *   ↓
-             * réseau
-             *   ↓
-             * cache Pulse
-             *   ↓
-             * mise à jour du profil
-             *
-             * Pas de seconde phase de distribution.
-             */
 
             const processedProfiles =
               new Set();
@@ -1258,11 +1441,6 @@ jobs:
                       audience;
 
 
-                    /*
-                     * Mise à jour de l'objet local
-                     * pour recalculer audience_max.
-                     */
-
                     profile[column] =
                       audience;
 
@@ -1323,11 +1501,6 @@ jobs:
                     audience;
 
 
-                  /*
-                   * Mise à jour de l'objet local
-                   * pour recalculer audience_max.
-                   */
-
                   profile[column] =
                     audience;
 
@@ -1365,9 +1538,6 @@ jobs:
 
                 /*
                  * ≈ 100 requêtes/minute.
-                 *
-                 * Le délai n'est appliqué qu'après
-                 * une véritable requête Pulse.
                  */
 
                 await sleep(
@@ -1401,9 +1571,6 @@ jobs:
 
                 /*
                  * CURSEUR DE ROTATION
-                 *
-                 * Le profil vient d'être traité.
-                 * Il repart donc en fin de file.
                  */
 
                 updates.audience_updated_at =
