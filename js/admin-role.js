@@ -13,9 +13,8 @@
    - compteur de description
 
    IMPORTANT :
-   Le panneau ROLE est un espace personnel.
-   Il est donc accessible à tout membre connecté,
-   quel que soit son grade ou grade2.
+   Le panneau ROLE utilise désormais la règle d'accès
+   centrale définie dans admin-core.js.
 
    Les fonctions utilisées par les autres modules sont
    exposées sur window afin de conserver le comportement
@@ -92,40 +91,6 @@ function normaliserCompetences(value) {
 
 
     return [];
-}
-
-
-/* =========================================================
-   ACCES ROLE
-========================================================= */
-
-/*
- * IMPORTANT :
- *
- * ROLE est un espace personnel.
- *
- * Tous les membres connectés peuvent sélectionner
- * et modifier leurs propres rôles.
- *
- * Il ne faut donc PAS tester grade ou grade2 ici.
- *
- * Ainsi :
- *
- * - ADMIN                    → accès
- * - ARCHITECTE DU PROJET     → accès
- * - DELEGUE NATIONAL         → accès
- * - DELEGUE REGIONAL         → accès
- * - MEMBRE / EQUIPE MILITANTE→ accès
- *
- * grade2 peut donc parfaitement être null.
- */
-
-function peutGererRole() {
-
-    return !!(
-        obtenirCurrentUser() &&
-        obtenirCurrentProfile()
-    );
 }
 
 
@@ -420,11 +385,12 @@ async function sauvegarderRoles() {
     /*
      * Vérification du droit.
      *
-     * Tous les membres connectés sont autorisés.
+     * La règle d'accès est celle définie
+     * centralement dans admin-core.js.
      */
 
     if (
-        !peutGererRole()
+        !window.peutGererRole()
     ) {
 
         return;
@@ -647,16 +613,12 @@ window.normaliserCompetences =
     normaliserCompetences;
 
 
-window.peutGererRole =
-    peutGererRole;
-
-
 window.remplirRoles =
     remplirRoles;
 
 
 window.synchroniserCompetencesEtRoles =
-    synchroniserCompetencesEtRoles;
+synchroniserCompetencesEtRoles;
 
 
 window.mettreAJourMedailleVIP =
