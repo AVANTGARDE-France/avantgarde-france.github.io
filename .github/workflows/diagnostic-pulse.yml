@@ -1,0 +1,161 @@
+name: Diagnostic Pulse
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnostic-pulse:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Tester Pulse
+        run: |
+          node <<'EOF'
+
+          const https = require("https");
+
+          const urls = [
+            {
+              name: "FACEBOOK",
+              url: "https://www.facebook.com/avant.garde.officiel"
+            },
+            {
+              name: "INSTAGRAM",
+              url: "https://www.instagram.com/galafr/"
+            },
+            {
+              name: "X",
+              url: "https://x.com/FranceInsoumise"
+            }
+          ];
+
+          function testPulse(name, profileUrl) {
+            return new Promise((resolve) => {
+
+              const apiUrl =
+                "https://pulse.walls.sh/profile?url=" +
+                encodeURIComponent(profileUrl);
+
+              console.log("");
+              console.log("=========================================");
+              console.log(name);
+              console.log("=========================================");
+              console.log("URL profil :", profileUrl);
+              console.log("URL Pulse  :", apiUrl);
+
+              const req = https.get(
+                apiUrl,
+                {
+                  headers: {
+                    "Accept": "application/json",
+                    "User-Agent": "Avant-garde-Pulse-Diagnostic/1.0"
+                  }
+                },
+                (res) => {
+
+                  let body = "";
+
+                  res.on("data", chunk => {
+                    body += chunk;
+                  });
+
+                  res.on("end", () => {
+
+                    console.log("");
+                    console.log("HTTP :", res.statusCode);
+
+                    console.log(
+                      "RateLimit-Limit :",
+                      res.headers["ratelimit-limit"] ?? "(absent)"
+                    );
+
+                    console.log(
+                      "RateLimit-Remaining :",
+                      res.headers["ratelimit-remaining"] ?? "(absent)"
+                    );
+
+                    console.log(
+                      "RateLimit-Reset :",
+                      res.headers["ratelimit-reset"] ?? "(absent)"
+                    );
+
+                    console.log(
+                      "Retry-After :",
+                      res.headers["retry-after"] ?? "(absent)"
+                    );
+
+                    console.log("");
+                    console.log("Réponse Pulse brute :");
+
+                    try {
+                      const json = JSON.parse(body);
+                      console.log(
+                        JSON.stringify(json, null, 2)
+                      );
+                    } catch {
+                      console.log(body);
+                    }
+
+                    resolve();
+                  });
+                }
+              );
+
+              req.setTimeout(15000, () => {
+                console.log("");
+                console.log("TIMEOUT après 15 secondes");
+                req.destroy();
+                resolve();
+              });
+
+              req.on("error", error => {
+                console.log("");
+                console.log("ERREUR réseau :", error.message);
+                resolve();
+              });
+            });
+          }
+
+          async function main() {
+
+            console.log(
+              "========================================="
+            );
+
+            console.log(
+              "AVANT-GARDE — DIAGNOSTIC PULSE"
+            );
+
+            console.log(
+              "========================================="
+            );
+
+            for (const item of urls) {
+              await testPulse(
+                item.name,
+                item.url
+              );
+            }
+
+            console.log("");
+            console.log(
+              "========================================="
+            );
+
+            console.log(
+              "FIN DU DIAGNOSTIC"
+            );
+
+            console.log(
+              "========================================="
+            );
+          }
+
+          main();
+
+          EOF
