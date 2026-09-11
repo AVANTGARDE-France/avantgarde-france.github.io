@@ -71,15 +71,15 @@ jobs:
             "https://pulse.walls.sh/profile?url=";
 
 
-          // ------------------------------------------------------------
+          // ============================================================
           // LIMITES
-          // ------------------------------------------------------------
+          // ============================================================
 
           /*
-           * Limite annoncée par Pulse :
-           * 120 requêtes / minute.
+           * Pulse :
+           * maximum annoncé = 120 requêtes/minute.
            *
-           * On reste volontairement autour de 85 requêtes/minute.
+           * On vise environ 85 requêtes/minute.
            */
 
           const MAX_CALLS_PER_MINUTE = 120;
@@ -88,8 +88,7 @@ jobs:
 
 
           /*
-           * Nombre maximum d'URLs sociales sélectionnées
-           * dans un lancement.
+           * Maximum d'URLs sociales sélectionnées par lancement.
            */
 
           const MAX_URLS_PER_RUN = 1000;
@@ -105,10 +104,7 @@ jobs:
           /*
            * Retries uniquement pour les erreurs temporaires.
            *
-           * IMPORTANT :
-           *
-           * Un 429 n'est PAS retryé.
-           * On passe directement à l'URL suivante.
+           * Les 429, 422, 400 et 404 ne sont PAS retryés.
            */
 
           const MAX_RETRIES = 2;
@@ -122,7 +118,7 @@ jobs:
 
 
           /*
-           * Délai entre les retries réseau / 502.
+           * Délai entre les retries temporaires.
            */
 
           const RETRY_DELAY_MS = 2000;
@@ -160,10 +156,9 @@ jobs:
 
 
           /*
-           * Clé utilisée uniquement pour détecter les doublons.
+           * Sert uniquement à reconnaître deux fois la même URL.
            *
-           * L'URL originale enregistrée dans Supabase n'est jamais
-           * modifiée.
+           * L'URL originale dans Supabase n'est jamais modifiée.
            */
 
           function urlKey(url) {
@@ -490,24 +485,14 @@ jobs:
                                   response.statusCode;
 
 
-                                /*
-                                 * ------------------------------------------------
-                                 * SUCCÈS
-                                 * ------------------------------------------------
-                                 */
-
                                 if (
                                   status >= 200 &&
                                   status < 300
                                 ) {
 
                                   resolve({
-
-                                    status,
-
                                     body:
                                       data
-
                                   });
 
                                   return;
@@ -572,6 +557,7 @@ jobs:
                   result.body
                 );
 
+
               } catch (error) {
 
                 lastError =
@@ -584,13 +570,11 @@ jobs:
 
                 /*
                  * ------------------------------------------------------
-                 * 429 — RATE LIMIT
+                 * 429
                  * ------------------------------------------------------
                  *
-                 * PAS DE RETRY.
-                 *
-                 * Un retry ici risquerait de prolonger inutilement
-                 * le blocage du workflow.
+                 * On abandonne immédiatement cette URL.
+                 * Aucun délai potentiellement très long.
                  */
 
                 if (
@@ -607,10 +591,7 @@ jobs:
                  * 422
                  * ------------------------------------------------------
                  *
-                 * Cas fréquent avec Instagram lorsque Pulse demande
-                 * une connexion.
-                 *
-                 * Pas de retry.
+                 * Typiquement login_required sur Instagram.
                  */
 
                 if (
@@ -626,10 +607,6 @@ jobs:
                  * ------------------------------------------------------
                  * 400 / 404
                  * ------------------------------------------------------
-                 *
-                 * URL invalide ou profil introuvable.
-                 *
-                 * Pas de retry.
                  */
 
                 if (
@@ -644,10 +621,8 @@ jobs:
 
                 /*
                  * ------------------------------------------------------
-                 * ERREURS TEMPORAIRES
+                 * ERREUR TEMPORAIRE
                  * ------------------------------------------------------
-                 *
-                 * Réseau, timeout, 5xx.
                  */
 
                 if (
@@ -870,12 +845,6 @@ jobs:
 
           async function getProfiles() {
 
-            /*
-             * IMPORTANT :
-             *
-             * La colonne est "nom", PAS "name".
-             */
-
             const fields = [
 
               "id",
@@ -1027,10 +996,6 @@ jobs:
             profileId,
             values
           ) {
-
-            /*
-             * On passe par la RPC de sécurité.
-             */
 
             const path =
               `${SUPABASE_URL}/rest/v1/rpc/update_profile_audiences`;
@@ -1262,8 +1227,8 @@ jobs:
               /*
                * On garde tous les réseaux du profil.
                *
-               * Un même réseau peut parfaitement être partagé
-               * avec un autre profil.
+               * Les mêmes URLs peuvent être présentes
+               * sur plusieurs profils.
                */
 
               if (
@@ -1302,14 +1267,8 @@ jobs:
 
 
             // ----------------------------------------------------------
-            // DÉDOUBLONNAGE DES URL
+            // DÉDOUBLONNAGE
             // ----------------------------------------------------------
-
-            /*
-             * Une même URL sociale peut appartenir à plusieurs profils.
-             *
-             * On ne contacte Pulse qu'une seule fois.
-             */
 
             const urlGroups =
               new Map();
@@ -1372,7 +1331,6 @@ jobs:
               `URLs Pulse distinctes : ${uniqueUrls.length}`
             );
 
-
             console.log(
               `URLs partagées économisées : ${duplicateCount}`
             );
@@ -1390,5 +1348,427 @@ jobs:
 
 
             // ----------------------------------------------------------
-            // RÉSULTATS PU
+            // RÉSULTATS PULSE
+            // ----------------------------------------------------------
+
+            const pulseResults =
+              new Map();
+
+
+            // ----------------------------------------------------------
+            // INTERROGATION PULSE
+            // ----------------------------------------------------------
+
+            for (
+              let index = 0;
+              index < uniqueUrls.length;
+              index++
+            ) {
+
+              const group =
+                uniqueUrls[index];
+
+
+              console.log("");
+
+              console.log(
+                `[Pulse ${index + 1}/${uniqueUrls.length}] [${group.network}] ${group.url}`
+              );
+
+
+              try {
+
+                const audience =
+                  await pulseRequest(
+                    group.url
+                  );
+
+
+                console.log(
+                  `  → ${audience}`
+                );
+
+
+                pulseResults.set(
+                  group.urlKey,
+                  {
+
+                    success:
+                      true,
+
+                    audience
+
+                  }
+                );
+
+
+                pulseOK++;
+
+              } catch (error) {
+
+                pulseErrors++;
+
+
+                console.log(
+                  `  → ERREUR : ${error.message}`
+                );
+
+
+                pulseResults.set(
+                  group.urlKey,
+                  {
+
+                    success:
+                      false,
+
+                    error:
+                      error.message,
+
+                    status:
+                      error.status || null
+
+                  }
+                );
+
+              }
+
+
+              /*
+               * Pause entre deux URLs DISTINCTES.
+               */
+
+              if (
+                index <
+                uniqueUrls.length - 1
+              ) {
+
+                await sleep(
+                  PULSE_DELAY_MS
+                );
+
+              }
+
+            }
+
+
+            // ----------------------------------------------------------
+            // PRÉPARATION DES UPDATES PAR PROFIL
+            // ----------------------------------------------------------
+
+            const profileUpdates =
+              new Map();
+
+
+            for (
+              const profile
+              of profiles
+            ) {
+
+              profileUpdates.set(
+
+                profile.id,
+
+                {
+
+                  profile,
+
+                  updates: {},
+
+                  successCount:
+                    0
+
+                }
+
+              );
+
+            }
+
+
+            // ----------------------------------------------------------
+            // DISTRIBUTION DES RÉSULTATS
+            // ----------------------------------------------------------
+
+            for (
+              const group
+              of uniqueUrls
+            ) {
+
+              const result =
+                pulseResults.get(
+                  group.urlKey
+                );
+
+
+              if (
+                !result ||
+                !result.success
+              ) {
+
+                continue;
+
+              }
+
+
+              /*
+               * Tous les profils utilisant cette URL reçoivent
+               * le même résultat.
+               */
+
+              for (
+                const entry
+                of group.entries
+              ) {
+
+                const state =
+                  profileUpdates.get(
+                    entry.profile.id
+                  );
+
+
+                if (!state) {
+                  continue;
+                }
+
+
+                const column =
+                  audienceColumn(
+                    entry.network
+                  );
+
+
+                state.updates[column] =
+                  result.audience;
+
+
+                state.profile[column] =
+                  result.audience;
+
+
+                state.successCount++;
+
+              }
+
+            }
+
+
+            // ----------------------------------------------------------
+            // ÉCRITURE SUPABASE PAR PROFIL
+            // ----------------------------------------------------------
+
+            for (
+              const state
+              of profileUpdates.values()
+            ) {
+
+              const profile =
+                state.profile;
+
+
+              /*
+               * Aucun succès :
+               *
+               * on ne modifie rien et le profil reste prioritaire
+               * pour le prochain passage.
+               */
+
+              if (
+                state.successCount === 0
+              ) {
+
+                continue;
+
+              }
+
+
+              console.log("");
+
+              console.log(
+                `----- ${profile.nom || profile.id} -----`
+              );
+
+
+              for (
+                const [column, value]
+                of Object.entries(
+                  state.updates
+                )
+              ) {
+
+                console.log(
+                  `  ${column} → ${value}`
+                );
+
+              }
+
+
+              // --------------------------------------------------------
+              // CALCUL MAXIMUM
+              // --------------------------------------------------------
+
+              const calculated =
+                calculateAudience(
+                  profile
+                );
+
+
+              state.updates.audience_max =
+                calculated.max;
+
+
+              state.updates.audience_reseau =
+                calculated.network;
+
+
+              // --------------------------------------------------------
+              // CURSEUR DE ROTATION
+              // --------------------------------------------------------
+
+              state.updates.audience_updated_at =
+                new Date()
+                  .toISOString();
+
+
+              // --------------------------------------------------------
+              // SUPABASE
+              // --------------------------------------------------------
+
+              try {
+
+                await updateProfile(
+                  profile.id,
+                  state.updates
+                );
+
+
+                profilesUpdated++;
+
+
+                console.log(
+                  "  ✓ Supabase mis à jour"
+                );
+
+              } catch (error) {
+
+                console.log(
+                  `  ✗ Erreur Supabase : ${error.message}`
+                );
+
+              }
+
+            }
+
+
+            // ============================================================
+            // RAPPORT
+            // ============================================================
+
+            const duration =
+              Math.round(
+                (Date.now() - startedAt) /
+                1000
+              );
+
+
+            const profilesSelected =
+              new Set(
+                entries.map(
+                  entry =>
+                    entry.profile.id
+                )
+              ).size;
+
+
+            console.log("");
+
+            console.log(
+              "========================================"
+            );
+
+            console.log(
+              "MISE À JOUR TERMINÉE"
+            );
+
+            console.log(
+              "========================================"
+            );
+
+            console.log(
+              `Profils candidats : ${profiles.length}`
+            );
+
+            console.log(
+              `Profils sélectionnés : ${profilesSelected}`
+            );
+
+            console.log(
+              `URLs sélectionnées : ${entries.length}`
+            );
+
+            console.log(
+              `URLs Pulse distinctes : ${uniqueUrls.length}`
+            );
+
+            console.log(
+              `URLs partagées économisées : ${duplicateCount}`
+            );
+
+            console.log(
+              `Pulse OK : ${pulseOK}`
+            );
+
+            console.log(
+              `Pulse erreurs : ${pulseErrors}`
+            );
+
+            console.log(
+              `Profils Supabase mis à jour : ${profilesUpdated}`
+            );
+
+            console.log(
+              `Durée : ${duration}s`
+            );
+
+            console.log(
+              "========================================"
+            );
+
+          }
+
+
+          // ============================================================
+          // LANCEMENT
+          // ============================================================
+
+          main()
+            .catch(
+              error => {
+
+                console.error("");
+
+                console.error(
+                  "========================================"
+                );
+
+                console.error(
+                  "ERREUR FATALE"
+                );
+
+                console.error(
+                  "========================================"
+                );
+
+                console.error(
+                  error
+                );
+
+                console.error(
+                  "========================================"
+                );
+
+                process.exit(1);
+
+              }
+            );
+
+          EOF
 
