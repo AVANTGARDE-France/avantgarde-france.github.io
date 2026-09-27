@@ -2,8 +2,9 @@
    AVANT-GARDE — IA
    js/ai.js
 
-   Envoie la question de l'utilisateur vers Mistral
-   avec le prompt générique Avant-gardE.
+   Prépare la question de l'utilisateur avec le prompt
+   générique Avant-gardE, copie le prompt complet dans
+   le presse-papiers puis ouvre Mistral.
 ========================================================= */
 
 
@@ -14,14 +15,15 @@
 const IA_CONFIG = {
 
     mistral: {
+
         nom: "Mistral",
 
-        construireURL: function(prompt) {
+        construireURL: function() {
 
-            return "https://chat.mistral.ai/chat?q=" +
-                encodeURIComponent(prompt);
+            return "https://chat.mistral.ai/";
 
         }
+
     }
 
 };
@@ -86,6 +88,10 @@ async function envoyerVersIA(typeIA) {
     const question = champQuestion.value.trim();
 
 
+    /* -----------------------------------------------------
+       Vérification de la question
+    ----------------------------------------------------- */
+
     if (!question) {
 
         if (statut) {
@@ -116,17 +122,21 @@ async function envoyerVersIA(typeIA) {
 
 
     /* -----------------------------------------------------
-       Copie de secours dans le presse-papiers
+       Copie du prompt dans le presse-papiers
     ----------------------------------------------------- */
+
+    let copieReussie = false;
 
     try {
 
         await navigator.clipboard.writeText(prompt);
 
+        copieReussie = true;
+
     } catch (erreur) {
 
         console.warn(
-            "Impossible de copier le prompt dans le presse-papiers.",
+            "Impossible de copier automatiquement le prompt dans le presse-papiers.",
             erreur
         );
 
@@ -134,15 +144,10 @@ async function envoyerVersIA(typeIA) {
 
 
     /* -----------------------------------------------------
-       Construction de l'URL Mistral
-    ----------------------------------------------------- */
-
-    const url = config.construireURL(prompt);
-
-
-    /* -----------------------------------------------------
        Ouverture de Mistral
     ----------------------------------------------------- */
+
+    const url = config.construireURL();
 
     window.open(
         url,
@@ -157,8 +162,18 @@ async function envoyerVersIA(typeIA) {
 
     if (statut) {
 
-        statut.textContent =
-            "Mistral est en cours d'ouverture avec votre question et les instructions Avant-gardE.";
+        if (copieReussie) {
+
+            statut.textContent =
+                "Mistral est ouvert. Le prompt Avant-gardE a été copié : collez-le dans la conversation avec Ctrl+V.";
+
+        } else {
+
+            statut.textContent =
+                "Mistral est ouvert. Copiez le texte de votre question et les instructions Avant-gardE si nécessaire.";
+
+        }
+
 
         setTimeout(function() {
 
@@ -168,7 +183,7 @@ async function envoyerVersIA(typeIA) {
 
             }
 
-        }, 6000);
+        }, 8000);
 
     }
 
@@ -190,3 +205,4 @@ export {
     envoyerVersIA,
     construirePrompt
 };
+
