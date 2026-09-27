@@ -2,8 +2,8 @@
    AVANT-GARDE — IA
    js/ai.js
 
-   Envoie la question de l'utilisateur uniquement vers
-   Perplexity avec le prompt générique Avant-gardE.
+   Envoie la question de l'utilisateur vers Mistral
+   avec le prompt générique Avant-gardE.
 ========================================================= */
 
 
@@ -13,17 +13,13 @@
 
 const IA_CONFIG = {
 
-    perplexity: {
-        nom: "Perplexity",
+    mistral: {
+        nom: "Mistral",
 
         construireURL: function(prompt) {
 
-            const requete =
-                "site:avantgarde-france.github.io " +
-                prompt;
-
-            return "https://www.perplexity.ai/search?q=" +
-                encodeURIComponent(requete);
+            return "https://chat.mistral.ai/chat?q=" +
+                encodeURIComponent(prompt);
 
         }
     }
@@ -69,7 +65,7 @@ Ne cherche pas artificiellement le compromis.
 
 
 /* =========================================================
-   ENVOI VERS PERPLEXITY
+   ENVOI VERS MISTRAL
 ========================================================= */
 
 async function envoyerVersIA(typeIA) {
@@ -95,7 +91,7 @@ async function envoyerVersIA(typeIA) {
         if (statut) {
 
             statut.textContent =
-                "Veuillez saisir une question avant de lancer Perplexity.";
+                "Veuillez saisir une question avant de lancer Mistral.";
 
         }
 
@@ -106,10 +102,10 @@ async function envoyerVersIA(typeIA) {
 
 
     /* -----------------------------------------------------
-       Perplexity uniquement
+       Mistral uniquement
     ----------------------------------------------------- */
 
-    const config = IA_CONFIG.perplexity;
+    const config = IA_CONFIG.mistral;
 
 
     /* -----------------------------------------------------
@@ -138,14 +134,14 @@ async function envoyerVersIA(typeIA) {
 
 
     /* -----------------------------------------------------
-       Construction de l'URL Perplexity
+       Construction de l'URL Mistral
     ----------------------------------------------------- */
 
     const url = config.construireURL(prompt);
 
 
     /* -----------------------------------------------------
-       Ouverture de Perplexity
+       Ouverture de Mistral
     ----------------------------------------------------- */
 
     window.open(
@@ -162,7 +158,7 @@ async function envoyerVersIA(typeIA) {
     if (statut) {
 
         statut.textContent =
-            "Perplexity est en cours d'ouverture avec votre question et les instructions Avant-gardE.";
+            "Mistral est en cours d'ouverture avec votre question et les instructions Avant-gardE.";
 
         setTimeout(function() {
 
@@ -194,4 +190,3 @@ export {
     envoyerVersIA,
     construirePrompt
 };
-
