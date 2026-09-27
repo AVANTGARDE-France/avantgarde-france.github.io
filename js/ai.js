@@ -4,7 +4,7 @@
 
    Prépare la question de l'utilisateur avec le prompt
    générique Avant-gardE, copie le prompt complet dans
-   le presse-papiers puis ouvre Mistral.
+   le presse-papiers puis ouvre ChatGPT.
 ========================================================= */
 
 
@@ -14,13 +14,13 @@
 
 const IA_CONFIG = {
 
-    mistral: {
+    chatgpt: {
 
-        nom: "Mistral",
+        nom: "ChatGPT",
 
         construireURL: function() {
 
-            return "https://chat.mistral.ai/";
+            return "https://chatgpt.com/";
 
         }
 
@@ -67,7 +67,7 @@ Ne cherche pas artificiellement le compromis.
 
 
 /* =========================================================
-   ENVOI VERS MISTRAL
+   ENVOI VERS CHATGPT
 ========================================================= */
 
 async function envoyerVersIA(typeIA) {
@@ -97,7 +97,7 @@ async function envoyerVersIA(typeIA) {
         if (statut) {
 
             statut.textContent =
-                "Veuillez saisir une question avant de lancer Mistral.";
+                "Veuillez saisir une question avant de lancer ChatGPT.";
 
         }
 
@@ -108,10 +108,10 @@ async function envoyerVersIA(typeIA) {
 
 
     /* -----------------------------------------------------
-       Mistral uniquement
+       ChatGPT uniquement
     ----------------------------------------------------- */
 
-    const config = IA_CONFIG.mistral;
+    const config = IA_CONFIG.chatgpt;
 
 
     /* -----------------------------------------------------
@@ -144,7 +144,7 @@ async function envoyerVersIA(typeIA) {
 
 
     /* -----------------------------------------------------
-       Ouverture de Mistral
+       Ouverture de ChatGPT
     ----------------------------------------------------- */
 
     const url = config.construireURL();
@@ -165,12 +165,12 @@ async function envoyerVersIA(typeIA) {
         if (copieReussie) {
 
             statut.textContent =
-                "Mistral est ouvert. Le prompt Avant-gardE a été copié : collez-le dans la conversation avec Ctrl+V.";
+                "ChatGPT est ouvert. Le prompt Avant-gardE a été copié : collez-le dans la conversation avec Ctrl+V.";
 
         } else {
 
             statut.textContent =
-                "Mistral est ouvert. Copiez le texte de votre question et les instructions Avant-gardE si nécessaire.";
+                "ChatGPT est ouvert. La copie automatique du prompt a échoué.";
 
         }
 
