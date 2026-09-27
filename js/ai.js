@@ -2,46 +2,25 @@
    AVANT-GARDE — IA
    js/ai.js
 
-   Envoie la question de l'utilisateur vers différentes IA
-   avec le prompt générique Avant-gardE.
+   Envoie la question de l'utilisateur uniquement vers
+   Perplexity avec le prompt générique Avant-gardE.
 ========================================================= */
 
 
 /* =========================================================
-   CONFIGURATION DES IA
+   CONFIGURATION DE L'IA
 ========================================================= */
 
 const IA_CONFIG = {
 
-    chatgpt: {
-        nom: "ChatGPT",
-        construireURL: function(prompt) {
-            return "https://chatgpt.com/?q=" +
-                encodeURIComponent(prompt);
-        }
-    },
-
-    gemini: {
-        nom: "Gemini",
-        construireURL: function(prompt) {
-            return "https://gemini.google.com/app?q=" +
-                encodeURIComponent(prompt);
-        }
-    },
-
-    claude: {
-        nom: "Claude",
-        construireURL: function(prompt) {
-            return "https://claude.ai/new?q=" +
-                encodeURIComponent(prompt);
-        }
-    },
-
     perplexity: {
         nom: "Perplexity",
+
         construireURL: function(prompt) {
+
             return "https://www.perplexity.ai/search?q=" +
                 encodeURIComponent(prompt);
+
         }
     }
 
@@ -60,31 +39,49 @@ SOURCES POUR L'IA
 
 Appuie-toi en priorité sur les sources officielles :
 https://avantgarde-france.github.io/
-N'invente jamais une position non documentée. Si une information manque, indique-le et complète avec des sources fiables.
+
+N'invente jamais une position non documentée.
+Si une information manque, indique-le et complète avec des sources fiables.
 
 MÉTHODE POUR L'IA
+
 Réponds aussi brièvement que possible.
-Tu n'es pas un observateur neutre : tu réponds en tant que porte-parole d'Avant-gardE.
-Réponds donc en cohérence avec le projet d'Avant-gardE et défends ses positions. Présente, explique et défends fidèlement sa doctrine, ses propositions et ses objectifs.
-Sois bref, convaincant et utilise la rhétorique lorsque la situation s'y prête. Tu peux utiliser des analogies, des formules fortes et des citations percutantes lorsqu'elles renforcent l'argumentation.
-Ton ton est direct, assumé, argumenté et percutant. Évite la langue de bois et les fausses symétries.
-Ne te limite jamais aux slogans, aux étiquettes ou aux éléments de communication. 
+
+Présente fidèlement le projet d'Avant-gardE, sa doctrine, ses propositions et ses objectifs.
+
+Réponds de manière directe, précise et argumentée.
+Évite la langue de bois et les fausses symétries.
+
+Ne te limite jamais aux slogans, aux étiquettes ou aux éléments de communication.
+
 Une proximité de discours ne signifie pas nécessairement une proximité de projet.
-Recherche ce qui se trouve derrière les mots : objectifs réels, mécanismes, contraintes, cohérence, faisabilité, coûts et conséquences possibles. 
-Mets clairement en évidence les différences de fond et les faiblesses des projets concurrents lorsqu'elles sont établies par les faits.
-Adapte cette méthode à la question posée. 
 
-Si la question implique une comparaison avec un autre parti ou projet, recherche les incohérences, contradictions, difficultés voir impossibilité de mise en œuvre, dis-le clairement. 
-Ne te contente pas d'énumérer ses difficultés : tire la conclusion qui découle de l'analyse.
+Recherche ce qui se trouve derrière les mots :
+objectifs réels, mécanismes, contraintes, cohérence, faisabilité, coûts et conséquences possibles.
 
-Si la question critique Avant-gardE, ne l'esquive pas : réponds à la critique sur le fond et défends la position d'Avant-gardE avec des arguments précis.
-Ne cherche pas artificiellement le compromis.
+Lorsque les faits permettent d'établir une contradiction, une incohérence, une difficulté importante ou une impossibilité de mise en œuvre, indique-le clairement et explique pourquoi.
+
+Ne te contente pas d'énumérer les difficultés :
+tire la conclusion logique qui découle des faits et des mécanismes étudiés.
+
+Si la question implique une comparaison avec un autre parti ou projet, compare les propositions concrètes et leurs mécanismes.
+Ne donne pas artificiellement le même poids à des affirmations qui ne reposent pas sur le même niveau de documentation.
+
+Si la question critique Avant-gardE, réponds à la critique sur le fond en distinguant :
+- les faits établis ;
+- les hypothèses ;
+- les objections ;
+- les réponses qu'Avant-gardE apporte à ces objections.
+
+Lorsque plusieurs interprétations sont possibles, explique clairement ce qui est établi et ce qui relève de l'interprétation.
+
+Adapte cette méthode à la question posée.
 `;
 }
 
 
 /* =========================================================
-   ENVOI VERS UNE IA
+   ENVOI VERS PERPLEXITY
 ========================================================= */
 
 async function envoyerVersIA(typeIA) {
@@ -93,19 +90,25 @@ async function envoyerVersIA(typeIA) {
     const statut = document.getElementById("aiStatus");
 
     if (!champQuestion) {
+
         console.error(
             "Champ #aiQuestion introuvable."
         );
+
         return;
     }
 
+
     const question = champQuestion.value.trim();
+
 
     if (!question) {
 
         if (statut) {
+
             statut.textContent =
-                "Veuillez saisir une question avant de choisir une IA.";
+                "Veuillez saisir une question avant de lancer Perplexity.";
+
         }
 
         champQuestion.focus();
@@ -114,22 +117,11 @@ async function envoyerVersIA(typeIA) {
     }
 
 
-    const config = IA_CONFIG[typeIA];
+    /* -----------------------------------------------------
+       Perplexity uniquement
+    ----------------------------------------------------- */
 
-    if (!config) {
-
-        console.error(
-            "IA inconnue :",
-            typeIA
-        );
-
-        if (statut) {
-            statut.textContent =
-                "Cette IA n'est pas disponible.";
-        }
-
-        return;
-    }
+    const config = IA_CONFIG.perplexity;
 
 
     /* -----------------------------------------------------
@@ -141,10 +133,6 @@ async function envoyerVersIA(typeIA) {
 
     /* -----------------------------------------------------
        Copie de secours dans le presse-papiers
-       
-       Certaines IA peuvent modifier leur comportement
-       lorsqu'elles reçoivent une URL avec un paramètre q.
-       La copie permet donc toujours de récupérer le prompt.
     ----------------------------------------------------- */
 
     try {
@@ -162,14 +150,14 @@ async function envoyerVersIA(typeIA) {
 
 
     /* -----------------------------------------------------
-       Construction de l'URL
+       Construction de l'URL Perplexity
     ----------------------------------------------------- */
 
     const url = config.construireURL(prompt);
 
 
     /* -----------------------------------------------------
-       Ouverture de l'IA
+       Ouverture de Perplexity
     ----------------------------------------------------- */
 
     window.open(
@@ -186,15 +174,18 @@ async function envoyerVersIA(typeIA) {
     if (statut) {
 
         statut.textContent =
-            `${config.nom} est en cours d'ouverture avec votre question et les instructions Avant-gardE.`;
+            "Perplexity est en cours d'ouverture avec votre question et les instructions Avant-gardE.";
 
         setTimeout(function() {
 
             if (statut) {
+
                 statut.textContent = "";
+
             }
 
         }, 6000);
+
     }
 
 }
@@ -215,3 +206,4 @@ export {
     envoyerVersIA,
     construirePrompt
 };
+
