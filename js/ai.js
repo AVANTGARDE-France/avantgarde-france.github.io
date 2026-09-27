@@ -18,8 +18,12 @@ const IA_CONFIG = {
 
         construireURL: function(prompt) {
 
+            const requete =
+                "site:avantgarde-france.github.io " +
+                prompt;
+
             return "https://www.perplexity.ai/search?q=" +
-                encodeURIComponent(prompt);
+                encodeURIComponent(requete);
 
         }
     }
