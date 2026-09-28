@@ -64,7 +64,8 @@
 
         button,
         input,
-        textarea {
+        textarea,
+        select {
 
             font: inherit;
 
@@ -762,7 +763,8 @@
 
 
         .field input,
-        .field textarea {
+        .field textarea,
+        .field select {
 
             width: 100%;
 
@@ -784,10 +786,29 @@
 
 
         .field input:focus,
-        .field textarea:focus {
+        .field textarea:focus,
+        .field select:focus {
 
             border-color:
                 var(--gold);
+
+        }
+
+
+        .field select {
+
+            cursor: pointer;
+
+        }
+
+
+        .field select option {
+
+            background:
+                #061329;
+
+            color:
+                var(--white);
 
         }
 
@@ -1475,6 +1496,23 @@
 
                     </div>
 
+
+                    <div
+                        class="field"
+                        id="structureParentField"
+                        style="display:none;"
+                    >
+
+                        <label for="structureParent">
+                            MENU PARENT
+                        </label>
+
+                        <select
+                            id="structureParent"
+                        ></select>
+
+                    </div>
+
                 </div>
 
             </div>
@@ -1550,6 +1588,19 @@
                             maxlength="200"
                             autocomplete="off"
                         >
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label for="contentParent">
+                            SOUS-MENU PARENT
+                        </label>
+
+                        <select
+                            id="contentParent"
+                        ></select>
 
                     </div>
 
@@ -1850,11 +1901,20 @@
         const structureName =
             document.getElementById("structureName");
 
+        const structureParentField =
+            document.getElementById("structureParentField");
+
+        const structureParent =
+            document.getElementById("structureParent");
+
         const contentEditorTitle =
             document.getElementById("contentEditorTitle");
 
         const contentTitle =
             document.getElementById("contentTitle");
+
+        const contentParent =
+            document.getElementById("contentParent");
 
         const wysiwyg =
             document.getElementById("wysiwyg");
@@ -2239,19 +2299,12 @@
                     );
 
 
-                    menuActions.appendChild(
-                        createIconButton(
-                            "✎",
-                            () => {
-
-                                ouvrirStructure(
-                                    "menu",
-                                    menu.id
-                                );
-
-                            }
-                        )
-                    );
+                    /*
+                     * Le crayon de modification du menu
+                     * est volontairement supprimé.
+                     *
+                     * Le nom du menu est directement cliquable.
+                     */
 
 
                     menuActions.appendChild(
@@ -2468,19 +2521,12 @@
             );
 
 
-            actions.appendChild(
-                createIconButton(
-                    "✎",
-                    () => {
-
-                        ouvrirStructure(
-                            "submenu",
-                            submenu.id
-                        );
-
-                    }
-                )
-            );
+            /*
+             * Le crayon de modification du sous-menu
+             * est volontairement supprimé.
+             *
+             * Le nom du sous-menu est directement cliquable.
+             */
 
 
             actions.appendChild(
@@ -2832,6 +2878,135 @@
 
 
         /* =================================================
+           LISTES D'AFFILIATION
+        ================================================= */
+
+        function remplirListeMenus(
+            select,
+            selectedId
+        ) {
+
+            select.innerHTML = "";
+
+
+            menus
+                .slice()
+                .sort(
+                    (a,b) =>
+                        Number(a.position) -
+                        Number(b.position)
+                )
+                .forEach(
+                    menu => {
+
+                        const option =
+                            document.createElement(
+                                "option"
+                            );
+
+                        option.value =
+                            menu.id;
+
+                        option.textContent =
+                            menu.titre;
+
+                        if (
+                            String(menu.id) ===
+                            String(selectedId)
+                        ) {
+
+                            option.selected =
+                                true;
+
+                        }
+
+                        select.appendChild(
+                            option
+                        );
+
+                    }
+                );
+
+        }
+
+
+        function remplirListeSousMenus(
+            select,
+            selectedId
+        ) {
+
+            select.innerHTML = "";
+
+
+            const sortedMenus =
+                menus
+                    .slice()
+                    .sort(
+                        (a,b) =>
+                            Number(a.position) -
+                            Number(b.position)
+                    );
+
+
+            sortedMenus.forEach(
+                menu => {
+
+                    const children =
+                        sousMenus
+
+                            .filter(
+                                submenu =>
+                                    submenu.menu_id ===
+                                    menu.id
+                            )
+
+                            .sort(
+                                (a,b) =>
+                                    Number(a.position) -
+                                    Number(b.position)
+                            );
+
+
+                    children.forEach(
+                        submenu => {
+
+                            const option =
+                                document.createElement(
+                                    "option"
+                                );
+
+                            option.value =
+                                submenu.id;
+
+                            option.textContent =
+                                menu.titre +
+                                " → " +
+                                submenu.titre;
+
+                            if (
+                                String(submenu.id) ===
+                                String(selectedId)
+                            ) {
+
+                                option.selected =
+                                    true;
+
+                            }
+
+                            select.appendChild(
+                                option
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =================================================
            SELECTION / EDITEUR STRUCTURE
         ================================================= */
 
@@ -2890,6 +3065,29 @@
             structureName.value =
                 item.titre || "";
 
+
+            if (
+                type === "submenu"
+            ) {
+
+                structureParentField.style.display =
+                    "block";
+
+                remplirListeMenus(
+                    structureParent,
+                    item.menu_id
+                );
+
+            } else {
+
+                structureParentField.style.display =
+                    "none";
+
+                structureParent.innerHTML =
+                    "";
+
+            }
+
         }
 
 
@@ -2935,39 +3133,156 @@
             }
 
 
-            const table =
+            if (
                 selectedType === "menu"
-                    ? "menus"
-                    : "sous_menus";
+            ) {
+
+                const {
+                    error
+                } =
+                    await supabase
+
+                        .from("menus")
+
+                        .update({
+                            titre
+                        })
+
+                        .eq(
+                            "id",
+                            selectedId
+                        );
 
 
-            const {
-                error
-            } =
-                await supabase
+                if (error) {
 
-                    .from(table)
+                    console.error(error);
 
-                    .update({
-                        titre
-                    })
+                    showMessage(
+                        "Impossible d'enregistrer la modification.",
+                        "error"
+                    );
 
-                    .eq(
-                        "id",
-                        selectedId
+                    return;
+
+                }
+
+            }
+
+
+            if (
+                selectedType === "submenu"
+            ) {
+
+                const submenu =
+                    sousMenus.find(
+                        item =>
+                            item.id ===
+                            selectedId
                     );
 
 
-            if (error) {
+                if (!submenu) {
 
-                console.error(error);
+                    showMessage(
+                        "Sous-menu introuvable.",
+                        "error"
+                    );
 
-                showMessage(
-                    "Impossible d'enregistrer la modification.",
-                    "error"
-                );
+                    return;
 
-                return;
+                }
+
+
+                const nouveauMenuId =
+                    structureParent.value;
+
+
+                if (!nouveauMenuId) {
+
+                    showMessage(
+                        "Le menu parent est obligatoire.",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                const ancienMenuId =
+                    submenu.menu_id;
+
+
+                /*
+                 * Si le sous-menu change de menu parent,
+                 * on le place à la fin du nouveau menu.
+                 */
+
+                let nouvellePosition =
+                    Number(submenu.position) || 0;
+
+
+                if (
+                    String(nouveauMenuId) !==
+                    String(ancienMenuId)
+                ) {
+
+                    const destination =
+                        sousMenus.filter(
+                            item =>
+                                item.menu_id ===
+                                nouveauMenuId &&
+                                item.id !==
+                                selectedId
+                        );
+
+
+                    nouvellePosition =
+                        getNextPosition(
+                            destination
+                        );
+
+                }
+
+
+                const {
+                    error
+                } =
+                    await supabase
+
+                        .from("sous_menus")
+
+                        .update({
+
+                            titre,
+
+                            menu_id:
+                                nouveauMenuId,
+
+                            position:
+                                nouvellePosition
+
+                        })
+
+                        .eq(
+                            "id",
+                            selectedId
+                        );
+
+
+                if (error) {
+
+                    console.error(error);
+
+                    showMessage(
+                        "Impossible d'enregistrer la modification.",
+                        "error"
+                    );
+
+                    return;
+
+                }
 
             }
 
@@ -3401,6 +3716,12 @@
                 item.titre || "";
 
 
+            remplirListeSousMenus(
+                contentParent,
+                item.sous_menu_id
+            );
+
+
             wysiwyg.innerHTML =
                 item.html || "";
 
@@ -3459,6 +3780,42 @@
             }
 
 
+            const contenu =
+                contenus.find(
+                    item =>
+                        item.id ===
+                        editorId
+                );
+
+
+            if (!contenu) {
+
+                showMessage(
+                    "Contenu introuvable.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            const nouveauSousMenuId =
+                contentParent.value;
+
+
+            if (!nouveauSousMenuId) {
+
+                showMessage(
+                    "Le sous-menu parent est obligatoire.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
             if (isSourceMode) {
 
                 wysiwyg.innerHTML =
@@ -3471,6 +3828,42 @@
                 wysiwyg.innerHTML;
 
 
+            const ancienSousMenuId =
+                contenu.sous_menu_id;
+
+
+            let nouvellePosition =
+                Number(contenu.position) || 0;
+
+
+            /*
+             * Si le contenu change de sous-menu,
+             * il est placé à la fin du nouveau sous-menu.
+             */
+
+            if (
+                String(nouveauSousMenuId) !==
+                String(ancienSousMenuId)
+            ) {
+
+                const destination =
+                    contenus.filter(
+                        item =>
+                            item.sous_menu_id ===
+                            nouveauSousMenuId &&
+                            item.id !==
+                            editorId
+                    );
+
+
+                nouvellePosition =
+                    getNextPosition(
+                        destination
+                    );
+
+            }
+
+
             const {
                 error
             } =
@@ -3481,7 +3874,14 @@
                     .update({
 
                         titre,
-                        html
+
+                        html,
+
+                        sous_menu_id:
+                            nouveauSousMenuId,
+
+                        position:
+                            nouvellePosition
 
                     })
 
@@ -4440,6 +4840,10 @@
                 "none";
 
             contentEditor.style.display =
+                "none";
+
+
+            structureParentField.style.display =
                 "none";
 
 
