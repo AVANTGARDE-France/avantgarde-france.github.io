@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Avant-gardE — Notre projet</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+
+    <style>
+
+        /* =====================================================
+           PAGE PROJET
+        ====================================================== */
+
+        .project-page {
+            max-width: 1200px;
+            margin: auto;
+            padding: 55px 25px 70px;
+        }
+
+
+        /* =====================================================
+           INTRODUCTION
+        ====================================================== */
+
+        .project-header {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .project-header h1 {
+            margin: 0 0 15px;
+            font-size: clamp(34px, 5vw, 52px);
+            font-weight: normal;
+        }
+
+        .project-header p {
+            max-width: 720px;
+            margin: auto;
+            color: var(--muted);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .project-line {
+            width: 80px;
+            height: 2px;
+            margin: 22px auto;
+            background: var(--gold);
+        }
+
+
+        /* =====================================================
+           LAYOUT
+        ====================================================== */
+
+        .project-layout {
+            display: grid;
+            grid-template-columns: 290px minmax(0, 1fr);
+            gap: 35px;
+            align-items: start;
+        }
+
+
+        /* =====================================================
+           NAVIGATION PROJET
+        ====================================================== */
+
+        .project-navigation {
+            position: sticky;
+            top: 25px;
+
+            border: 1px solid rgba(214,173,85,.25);
+            background: rgba(13,35,68,.32);
+        }
+
+        .project-navigation-title {
+            padding: 17px 20px;
+
+            border-bottom: 1px solid rgba(214,173,85,.25);
+
+            color: var(--gold-light);
+
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        .project-tree {
+            padding: 10px 0 12px;
+        }
+
+
+        /* =====================================================
+           MENU
+        ====================================================== */
+
+        .project-menu {
+            border-bottom: 1px solid rgba(214,173,85,.10);
+        }
+
+        .project-menu:last-child {
+            border-bottom: 0;
+        }
+
+        .project-menu-title {
+            width: 100%;
+
+            padding: 14px 18px;
+
+            border: 0;
+
+            background: transparent;
+
+            color: var(--white);
+
+            text-align: left;
+
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 16px;
+            font-weight: normal;
+
+            cursor: pointer;
+
+            transition:
+                background .2s,
+                color .2s;
+        }
+
+        .project-menu-title:hover {
+            background: rgba(214,173,85,.06);
+            color: var(--gold-light);
+        }
+
+        .project-menu-title.active {
+            color: var(--gold-light);
+        }
+
+
+        /* =====================================================
+           SOUS-MENUS
+        ====================================================== */
+
+        .project-submenus {
+            padding: 0 10px 10px 20px;
+        }
+
+        .project-submenu {
+            margin-bottom: 10px;
+        }
+
+        .project-submenu-title {
+            margin-bottom: 4px;
+
+            color: var(--gold);
+
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+
+        /* =====================================================
+           CONTENUS DANS LA NAVIGATION
+        ====================================================== */
+
+        .project-content-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-content-button {
+            display: block;
+
+            width: 100%;
+
+            padding: 7px 10px;
+
+            border: 0;
+
+            background: transparent;
+
+            color: #aeb7c5;
+
+            text-align: left;
+
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+
+            line-height: 1.4;
+
+            cursor: pointer;
+
+            transition:
+                color .2s,
+                background .2s;
+        }
+
+        .project-content-button:hover {
+            color: var(--white);
+            background: rgba(214,173,85,.05);
+        }
+
+        .project-content-button.active {
+            color: var(--gold-light);
+            background: rgba(214,173,85,.08);
+        }
+
+
+        /* =====================================================
+           LECTEUR
+        ====================================================== */
+
+        .project-reader {
+            min-width: 0;
+
+            padding: 42px 45px;
+
+            border: 1px solid rgba(214,173,85,.25);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(13,35,68,.55),
+                    rgba(5,15,32,.72)
+                );
+        }
+
+        .project-reader-kicker {
+            margin-bottom: 12px;
+
+            color: var(--gold);
+
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 2.5px;
+        }
+
+        .project-reader h2 {
+            margin: 0 0 25px;
+
+            color: var(--white);
+
+            font-size: clamp(28px, 4vw, 40px);
+            font-weight: normal;
+            line-height: 1.15;
+        }
+
+        .project-reader-line {
+            width: 65px;
+            height: 2px;
+
+            margin-bottom: 30px;
+
+            background: var(--gold);
+        }
+
+
+        /* =====================================================
+           HTML DU CONTENU
+        ====================================================== */
+
+        .project-content {
+            color: #d0d5dd;
+
+            font-family: Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .project-content h1,
+        .project-content h2,
+        .project-content h3,
+        .project-content h4 {
+            color: var(--white);
+
+            font-family: Georgia, "Times New Roman", serif;
+
+            font-weight: normal;
+
+            line-height: 1.25;
+        }
+
+        .project-content h1 {
+            font-size: 32px;
+        }
+
+        .project-content h2 {
+            font-size: 27px;
+            margin-top: 35px;
+        }
+
+        .project-content h3 {
+            font-size: 22px;
+            margin-top: 30px;
+        }
+
+        .project-content h4 {
+            font-size: 18px;
+            margin-top: 25px;
+        }
+
+        .project-content p {
+            margin: 0 0 20px;
+        }
+
+        .project-content strong {
+            color: var(--white);
+        }
+
+        .project-content a {
+            color: var(--gold-light);
+        }
+
+        .project-content ul,
+        .project-content ol {
+            margin: 0 0 22px;
+            padding-left: 25px;
+        }
+
+        .project-content li {
+            margin-bottom: 7px;
+        }
+
+        .project-content blockquote {
+            margin: 28px 0;
+
+            padding: 15px 20px;
+
+            border-left: 2px solid var(--gold);
+
+            background: rgba(214,173,85,.05);
+
+            color: #c4ccd7;
+
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 17px;
+            font-style: italic;
+        }
+
+        .project-content hr {
+            margin: 35px 0;
+
+            border: 0;
+            border-top: 1px solid rgba(214,173,85,.25);
+        }
+
+        .project-content img {
+            display: block;
+
+            max-width: 100%;
+            height: auto;
+
+            margin: 25px auto;
+
+            border: 1px solid rgba(214,173,85,.2);
+        }
+
+        .project-content video {
+            display: block;
+
+            max-width: 100%;
+
+            margin: 25px auto;
+        }
+
+
+        /* =====================================================
+           ÉTATS
+        ====================================================== */
+
+        .project-loading,
+        .project-empty,
+        .project-error {
+            padding: 45px 25px;
+
+            text-align: center;
+
+            color: var(--muted);
+
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .project-error {
+            color: #d99b9b;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ====================================================== */
+
+        @media (max-width: 850px) {
+
+            .project-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .project-navigation {
+                position: static;
+            }
+
+            .project-reader {
+                padding: 35px 28px;
+            }
+
+        }
+
+
+        @media (max-width: 520px) {
+
+            .project-page {
+                padding: 40px 15px 55px;
+            }
+
+            .project-reader {
+                padding: 28px 20px;
+            }
+
+            .project-reader h2 {
+                font-size: 28px;
+            }
+
+            .project-content {
+                font-size: 14px;
+                line-height: 1.7;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         COMPOSANTS COMMUNS
+    ====================================================== -->
+
+    <div id="site-header"></div>
+
+
+    <!-- =====================================================
+         CONTENU PRINCIPAL
+    ====================================================== -->
+
+    <main class="project-page">
+
+
+        <!-- =================================================
+             INTRODUCTION
+        ================================================== -->
+
+        <section class="project-header">
+
+            <div class="section-kicker">
+                AVANT-GARDE
+            </div>
+
+            <h1>
+                Notre projet
+            </h1>
+
+            <div class="project-line"></div>
+
+            <p>
+                Découvrez les propositions et orientations
+                d'Avant-gardE à travers notre projet politique.
+            </p>
+
+        </section>
+
+
+        <!-- =================================================
+             LECTURE
+        ================================================== -->
+
+        <div class="project-layout">
+
+
+            <!-- =============================================
+                 NAVIGATION
+            ============================================== -->
+
+            <aside class="project-navigation">
+
+                <div class="project-navigation-title">
+                    NOTRE PROJET
+                </div>
+
+                <div
+                    id="projectTree"
+                    class="project-tree"
+                >
+
+                    <div class="project-loading">
+                        Chargement...
+                    </div>
+
+                </div>
+
+            </aside>
+
+
+            <!-- =============================================
+                 LECTEUR
+            ============================================== -->
+
+            <article
+                id="projectReader"
+                class="project-reader"
+            >
+
+                <div class="project-loading">
+                    Chargement du projet...
+                </div>
+
+            </article>
+
+
+        </div>
+
+    </main>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <div id="site-footer"></div>
+
+
+    <!-- =====================================================
+         MODALE RENDEZ-VOUS
+    ====================================================== -->
+
+    <div id="site-rdv-modal"></div>
+
+
+    <!-- =====================================================
+         SUPABASE CDN
+    ====================================================== -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
+
+
+    <!-- =====================================================
+         SUPABASE
+    ====================================================== -->
+
+    <script
+        type="module"
+        src="js/supabase.js"
+    ></script>
+
+
+    <!-- =====================================================
+         COMPOSANTS COMMUNS
+    ====================================================== -->
+
+    <script
+        type="module"
+        src="js/components.js"
+    ></script>
+
+
+    <!-- =====================================================
+         LECTEUR DU PROJET
+    ====================================================== -->
+
+    <script
+        type="module"
+    >
+
+        import { supabase } from "./js/supabase.js";
+
+
+        /* =================================================
+           DONNÉES
+        ================================================= */
+
+        let menus = [];
+        let sousMenus = [];
+        let contenus = [];
+
+        let contenuActif = null;
+
+
+        /* =================================================
+           RÉFÉRENCES DOM
+        ================================================= */
+
+        const tree =
+            document.getElementById("projectTree");
+
+        const reader =
+            document.getElementById("projectReader");
+
+
+        /* =================================================
+           CHARGEMENT
+        ================================================= */
+
+        async function chargerProjet() {
+
+            try {
+
+                const [
+                    menusResult,
+                    sousMenusResult,
+                    contenusResult
+                ] = await Promise.all([
+
+                    supabase
+                        .from("menus")
+                        .select("*")
+                        .eq("valide", true)
+                        .order("position", {
+                            ascending: true
+                        }),
+
+                    supabase
+                        .from("sous_menus")
+                        .select("*")
+                        .eq("valide", true)
+                        .order("position", {
+                            ascending: true
+                        }),
+
+                    supabase
+                        .from("contenus")
+                        .select("*")
+                        .eq("valide", true)
+                        .order("position", {
+                            ascending: true
+                        })
+
+                ]);
+
+
+                if (menusResult.error) {
+                    throw menusResult.error;
+                }
+
+                if (sousMenusResult.error) {
+                    throw sousMenusResult.error;
+                }
+
+                if (contenusResult.error) {
+                    throw contenusResult.error;
+                }
+
+
+                menus = menusResult.data || [];
+                sousMenus = sousMenusResult.data || [];
+                contenus = contenusResult.data || [];
+
+
+                construireArbre();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Erreur chargement projet :",
+                    error
+                );
+
+                tree.innerHTML = `
+                    <div class="project-error">
+                        Impossible de charger le projet.
+                    </div>
+                `;
+
+                reader.innerHTML = `
+                    <div class="project-error">
+                        Une erreur est survenue lors du
+                        chargement du projet.
+                    </div>
+                `;
+
+            }
+
+        }
+
+
+        /* =================================================
+           CONSTRUCTION DE L'ARBRE
+        ================================================= */
+
+        function construireArbre() {
+
+            tree.innerHTML = "";
+
+
+            if (!menus.length) {
+
+                tree.innerHTML = `
+                    <div class="project-empty">
+                        Aucun contenu disponible.
+                    </div>
+                `;
+
+                reader.innerHTML = `
+                    <div class="project-empty">
+                        Le projet sera prochainement disponible.
+                    </div>
+                `;
+
+                return;
+
+            }
+
+
+            let premierContenu = null;
+
+
+            menus.forEach(menu => {
+
+                const menuSousMenus =
+                    sousMenus.filter(
+                        sousMenu =>
+                            sousMenu.menu_id === menu.id
+                    );
+
+
+                /*
+                 * Un menu sans sous-menu validé
+                 * n'est pas affiché.
+                 */
+
+                if (!menuSousMenus.length) {
+                    return;
+                }
+
+
+                const menuElement =
+                    document.createElement("section");
+
+                menuElement.className =
+                    "project-menu";
+
+
+                const menuButton =
+                    document.createElement("button");
+
+                menuButton.type = "button";
+
+                menuButton.className =
+                    "project-menu-title";
+
+                menuButton.textContent =
+                    menu.titre;
+
+
+                menuElement.appendChild(
+                    menuButton
+                );
+
+
+                const submenusElement =
+                    document.createElement("div");
+
+                submenusElement.className =
+                    "project-submenus";
+
+
+                menuSousMenus.forEach(sousMenu => {
+
+                    const sousMenuContenus =
+                        contenus.filter(
+                            contenu =>
+                                contenu.sous_menu_id ===
+                                sousMenu.id
+                        );
+
+
+                    if (!sousMenuContenus.length) {
+                        return;
+                    }
+
+
+                    const sousMenuElement =
+                        document.createElement("div");
+
+                    sousMenuElement.className =
+                        "project-submenu";
+
+
+                    const sousMenuTitle =
+                        document.createElement("div");
+
+                    sousMenuTitle.className =
+                        "project-submenu-title";
+
+                    sousMenuTitle.textContent =
+                        sousMenu.titre;
+
+
+                    const contentList =
+                        document.createElement("div");
+
+                    contentList.className =
+                        "project-content-list";
+
+
+                    sousMenuContenus.forEach(
+                        contenu => {
+
+                            const button =
+                                document.createElement("button");
+
+                            button.type = "button";
+
+                            button.className =
+                                "project-content-button";
+
+                            button.textContent =
+                                contenu.titre;
+
+
+                            button.addEventListener(
+                                "click",
+                                () => {
+
+                                    afficherContenu(
+                                        contenu,
+                                        menu,
+                                        sousMenu
+                                    );
+
+                                }
+                            );
+
+
+                            contentList.appendChild(
+                                button
+                            );
+
+
+                            if (!premierContenu) {
+
+                                premierContenu = {
+                                    contenu,
+                                    menu,
+                                    sousMenu,
+                                    button
+                                };
+
+                            }
+
+                        }
+                    );
+
+
+                    sousMenuElement.appendChild(
+                        sousMenuTitle
+                    );
+
+                    sousMenuElement.appendChild(
+                        contentList
+                    );
+
+                    submenusElement.appendChild(
+                        sousMenuElement
+                    );
+
+                });
+
+
+                if (!submenusElement.children.length) {
+                    return;
+                }
+
+
+                menuElement.appendChild(
+                    submenusElement
+                );
+
+                tree.appendChild(
+                    menuElement
+                );
+
+            });
+
+
+            if (!tree.children.length) {
+
+                tree.innerHTML = `
+                    <div class="project-empty">
+                        Aucun contenu disponible.
+                    </div>
+                `;
+
+                return;
+
+            }
+
+
+            /*
+             * Premier contenu affiché automatiquement.
+             */
+
+            if (premierContenu) {
+
+                afficherContenu(
+                    premierContenu.contenu,
+                    premierContenu.menu,
+                    premierContenu.sousMenu,
+                    premierContenu.button
+                );
+
+            }
+
+        }
+
+
+        /* =================================================
+           AFFICHAGE D'UN CONTENU
+        ================================================= */
+
+        function afficherContenu(
+            contenu,
+            menu,
+            sousMenu,
+            buttonActif = null
+        ) {
+
+            contenuActif = contenu;
+
+
+            /*
+             * Retire l'état actif précédent.
+             */
+
+            document
+                .querySelectorAll(
+                    ".project-content-button.active"
+                )
+                .forEach(button => {
+
+                    button.classList.remove(
+                        "active"
+                    );
+
+                });
+
+
+            /*
+             * Recherche le bouton correspondant
+             * lorsque l'appel vient d'ailleurs.
+             */
+
+            if (!buttonActif) {
+
+                const boutons =
+                    document.querySelectorAll(
+                        ".project-content-button"
+                    );
+
+
+                boutons.forEach(button => {
+
+                    if (
+                        button.textContent ===
+                        contenu.titre
+                    ) {
+
+                        buttonActif = button;
+
+                    }
+
+                });
+
+            }
+
+
+            if (buttonActif) {
+
+                buttonActif.classList.add(
+                    "active"
+                );
+
+            }
+
+
+            /*
+             * Affichage.
+             */
+
+            reader.innerHTML = "";
+
+
+            const kicker =
+                document.createElement("div");
+
+            kicker.className =
+                "project-reader-kicker";
+
+            kicker.textContent =
+                `${menu.titre} · ${sousMenu.titre}`;
+
+
+            const title =
+                document.createElement("h2");
+
+            title.textContent =
+                contenu.titre;
+
+
+            const line =
+                document.createElement("div");
+
+            line.className =
+                "project-reader-line";
+
+
+            const content =
+                document.createElement("div");
+
+            content.className =
+                "project-content";
+
+            content.innerHTML =
+                contenu.html || "";
+
+
+            reader.appendChild(kicker);
+            reader.appendChild(title);
+            reader.appendChild(line);
+            reader.appendChild(content);
+
+
+            /*
+             * Retour en haut du lecteur sur mobile.
+             */
+
+            if (
+                window.innerWidth <= 850
+            ) {
+
+                reader.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start"
+                });
+
+            }
+
+        }
+
+
+        /* =================================================
+           INITIALISATION
+        ================================================= */
+
+        chargerProjet();
+
+    </script>
+
+</body>
+
+</html>
