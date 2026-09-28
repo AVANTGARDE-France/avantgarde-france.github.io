@@ -20,7 +20,7 @@
     <style>
 
         /* =====================================================
-           PAGE PROJET
+           AVANT-GARDE — PAGE PROJET
         ====================================================== */
 
         .project-page {
@@ -31,7 +31,7 @@
 
 
         /* =====================================================
-           INTRODUCTION
+           EN-TÊTE DE PAGE
         ====================================================== */
 
         .project-header {
@@ -63,7 +63,7 @@
 
 
         /* =====================================================
-           LAYOUT
+           STRUCTURE PRINCIPALE
         ====================================================== */
 
         .project-layout {
@@ -75,7 +75,7 @@
 
 
         /* =====================================================
-           NAVIGATION PROJET
+           NAVIGATION
         ====================================================== */
 
         .project-navigation {
@@ -83,13 +83,16 @@
             top: 25px;
 
             border: 1px solid rgba(214,173,85,.25);
-            background: rgba(13,35,68,.32);
+
+            background:
+                rgba(13,35,68,.32);
         }
 
         .project-navigation-title {
             padding: 17px 20px;
 
-            border-bottom: 1px solid rgba(214,173,85,.25);
+            border-bottom:
+                1px solid rgba(214,173,85,.25);
 
             color: var(--gold-light);
 
@@ -109,7 +112,8 @@
         ====================================================== */
 
         .project-menu {
-            border-bottom: 1px solid rgba(214,173,85,.10);
+            border-bottom:
+                1px solid rgba(214,173,85,.10);
         }
 
         .project-menu:last-child {
@@ -117,6 +121,8 @@
         }
 
         .project-menu-title {
+            display: block;
+
             width: 100%;
 
             padding: 14px 18px;
@@ -129,24 +135,15 @@
 
             text-align: left;
 
-            font-family: Georgia, "Times New Roman", serif;
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
+
             font-size: 16px;
             font-weight: normal;
 
-            cursor: pointer;
-
-            transition:
-                background .2s,
-                color .2s;
-        }
-
-        .project-menu-title:hover {
-            background: rgba(214,173,85,.06);
-            color: var(--gold-light);
-        }
-
-        .project-menu-title.active {
-            color: var(--gold-light);
+            cursor: default;
         }
 
 
@@ -159,7 +156,11 @@
         }
 
         .project-submenu {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .project-submenu:last-child {
+            margin-bottom: 0;
         }
 
         .project-submenu-title {
@@ -176,7 +177,7 @@
 
 
         /* =====================================================
-           CONTENUS DANS LA NAVIGATION
+           CONTENUS
         ====================================================== */
 
         .project-content-list {
@@ -212,13 +213,17 @@
         }
 
         .project-content-button:hover {
+            background:
+                rgba(214,173,85,.05);
+
             color: var(--white);
-            background: rgba(214,173,85,.05);
         }
 
         .project-content-button.active {
+            background:
+                rgba(214,173,85,.08);
+
             color: var(--gold-light);
-            background: rgba(214,173,85,.08);
         }
 
 
@@ -231,7 +236,8 @@
 
             padding: 42px 45px;
 
-            border: 1px solid rgba(214,173,85,.25);
+            border:
+                1px solid rgba(214,173,85,.25);
 
             background:
                 linear-gradient(
@@ -257,7 +263,13 @@
 
             color: var(--white);
 
-            font-size: clamp(28px, 4vw, 40px);
+            font-size:
+                clamp(
+                    28px,
+                    4vw,
+                    40px
+                );
+
             font-weight: normal;
             line-height: 1.15;
         }
@@ -273,7 +285,7 @@
 
 
         /* =====================================================
-           HTML DU CONTENU
+           CONTENU HTML DU CMS
         ====================================================== */
 
         .project-content {
@@ -282,6 +294,8 @@
             font-family: Arial, sans-serif;
             font-size: 15px;
             line-height: 1.8;
+
+            overflow-wrap: break-word;
         }
 
         .project-content h1,
@@ -290,10 +304,12 @@
         .project-content h4 {
             color: var(--white);
 
-            font-family: Georgia, "Times New Roman", serif;
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
 
             font-weight: normal;
-
             line-height: 1.25;
         }
 
@@ -302,18 +318,18 @@
         }
 
         .project-content h2 {
-            font-size: 27px;
             margin-top: 35px;
+            font-size: 27px;
         }
 
         .project-content h3 {
-            font-size: 22px;
             margin-top: 30px;
+            font-size: 22px;
         }
 
         .project-content h4 {
-            font-size: 18px;
             margin-top: 25px;
+            font-size: 18px;
         }
 
         .project-content p {
@@ -322,6 +338,10 @@
 
         .project-content strong {
             color: var(--white);
+        }
+
+        .project-content em {
+            color: #dce1e8;
         }
 
         .project-content a {
@@ -340,16 +360,21 @@
 
         .project-content blockquote {
             margin: 28px 0;
-
             padding: 15px 20px;
 
-            border-left: 2px solid var(--gold);
+            border-left:
+                2px solid var(--gold);
 
-            background: rgba(214,173,85,.05);
+            background:
+                rgba(214,173,85,.05);
 
             color: #c4ccd7;
 
-            font-family: Georgia, "Times New Roman", serif;
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
+
             font-size: 17px;
             font-style: italic;
         }
@@ -358,7 +383,9 @@
             margin: 35px 0;
 
             border: 0;
-            border-top: 1px solid rgba(214,173,85,.25);
+
+            border-top:
+                1px solid rgba(214,173,85,.25);
         }
 
         .project-content img {
@@ -369,7 +396,8 @@
 
             margin: 25px auto;
 
-            border: 1px solid rgba(214,173,85,.2);
+            border:
+                1px solid rgba(214,173,85,.2);
         }
 
         .project-content video {
@@ -455,7 +483,7 @@
 
 
     <!-- =====================================================
-         COMPOSANTS COMMUNS
+         HEADER
     ====================================================== -->
 
     <div id="site-header"></div>
@@ -469,7 +497,7 @@
 
 
         <!-- =================================================
-             INTRODUCTION
+             EN-TÊTE
         ================================================== -->
 
         <section class="project-header">
@@ -493,14 +521,14 @@
 
 
         <!-- =================================================
-             LECTURE
+             LECTEUR
         ================================================== -->
 
         <div class="project-layout">
 
 
             <!-- =============================================
-                 NAVIGATION
+                 NAVIGATION DU PROJET
             ============================================== -->
 
             <aside class="project-navigation">
@@ -524,7 +552,7 @@
 
 
             <!-- =============================================
-                 LECTEUR
+                 ZONE DE LECTURE
             ============================================== -->
 
             <article
@@ -591,11 +619,11 @@
          LECTEUR DU PROJET
     ====================================================== -->
 
-    <script
-        type="module"
-    >
+    <script type="module">
 
-        import { supabase } from "./js/supabase.js";
+        import {
+            supabase
+        } from "./js/supabase.js";
 
 
         /* =================================================
@@ -606,27 +634,34 @@
         let sousMenus = [];
         let contenus = [];
 
-        let contenuActif = null;
-
 
         /* =================================================
            RÉFÉRENCES DOM
         ================================================= */
 
         const tree =
-            document.getElementById("projectTree");
+            document.getElementById(
+                "projectTree"
+            );
 
         const reader =
-            document.getElementById("projectReader");
+            document.getElementById(
+                "projectReader"
+            );
 
 
         /* =================================================
-           CHARGEMENT
+           CHARGEMENT DES DONNÉES
         ================================================= */
 
         async function chargerProjet() {
 
             try {
+
+                /*
+                 * Les trois requêtes ne récupèrent
+                 * que les éléments validés.
+                 */
 
                 const [
                     menusResult,
@@ -638,25 +673,34 @@
                         .from("menus")
                         .select("*")
                         .eq("valide", true)
-                        .order("position", {
-                            ascending: true
-                        }),
+                        .order(
+                            "position",
+                            {
+                                ascending: true
+                            }
+                        ),
 
                     supabase
                         .from("sous_menus")
                         .select("*")
                         .eq("valide", true)
-                        .order("position", {
-                            ascending: true
-                        }),
+                        .order(
+                            "position",
+                            {
+                                ascending: true
+                            }
+                        ),
 
                     supabase
                         .from("contenus")
                         .select("*")
                         .eq("valide", true)
-                        .order("position", {
-                            ascending: true
-                        })
+                        .order(
+                            "position",
+                            {
+                                ascending: true
+                            }
+                        )
 
                 ]);
 
@@ -674,9 +718,14 @@
                 }
 
 
-                menus = menusResult.data || [];
-                sousMenus = sousMenusResult.data || [];
-                contenus = contenusResult.data || [];
+                menus =
+                    menusResult.data || [];
+
+                sousMenus =
+                    sousMenusResult.data || [];
+
+                contenus =
+                    contenusResult.data || [];
 
 
                 construireArbre();
@@ -689,11 +738,13 @@
                     error
                 );
 
+
                 tree.innerHTML = `
                     <div class="project-error">
                         Impossible de charger le projet.
                     </div>
                 `;
+
 
                 reader.innerHTML = `
                     <div class="project-error">
@@ -708,7 +759,7 @@
 
 
         /* =================================================
-           CONSTRUCTION DE L'ARBRE
+           CONSTRUCTION DE L'ARBRE PUBLIC
         ================================================= */
 
         function construireArbre() {
@@ -716,224 +767,300 @@
             tree.innerHTML = "";
 
 
+            /*
+             * Aucun menu validé.
+             */
+
             if (!menus.length) {
 
-                tree.innerHTML = `
-                    <div class="project-empty">
-                        Aucun contenu disponible.
-                    </div>
-                `;
-
-                reader.innerHTML = `
-                    <div class="project-empty">
-                        Le projet sera prochainement disponible.
-                    </div>
-                `;
+                afficherAucunContenu();
 
                 return;
-
             }
 
 
             let premierContenu = null;
 
 
-            menus.forEach(menu => {
+            /*
+             * On parcourt uniquement les menus validés.
+             */
 
-                const menuSousMenus =
-                    sousMenus.filter(
-                        sousMenu =>
-                            sousMenu.menu_id === menu.id
-                    );
+            menus.forEach(
+                menu => {
 
+                    /*
+                     * Sous-menus dont le menu parent
+                     * est celui-ci.
+                     *
+                     * La liste "sousMenus" contient déjà
+                     * uniquement les sous-menus validés.
+                     */
 
-                /*
-                 * Un menu sans sous-menu validé
-                 * n'est pas affiché.
-                 */
-
-                if (!menuSousMenus.length) {
-                    return;
-                }
-
-
-                const menuElement =
-                    document.createElement("section");
-
-                menuElement.className =
-                    "project-menu";
-
-
-                const menuButton =
-                    document.createElement("button");
-
-                menuButton.type = "button";
-
-                menuButton.className =
-                    "project-menu-title";
-
-                menuButton.textContent =
-                    menu.titre;
-
-
-                menuElement.appendChild(
-                    menuButton
-                );
-
-
-                const submenusElement =
-                    document.createElement("div");
-
-                submenusElement.className =
-                    "project-submenus";
-
-
-                menuSousMenus.forEach(sousMenu => {
-
-                    const sousMenuContenus =
-                        contenus.filter(
-                            contenu =>
-                                contenu.sous_menu_id ===
-                                sousMenu.id
+                    const menuSousMenus =
+                        sousMenus.filter(
+                            sousMenu =>
+                                sousMenu.menu_id ===
+                                menu.id
                         );
 
 
-                    if (!sousMenuContenus.length) {
+                    /*
+                     * On ne conserve que les sous-menus
+                     * qui possèdent au moins un contenu
+                     * validé.
+                     */
+
+                    const sousMenusVisibles =
+                        menuSousMenus.filter(
+                            sousMenu =>
+                                contenus.some(
+                                    contenu =>
+                                        contenu.sous_menu_id ===
+                                        sousMenu.id
+                                )
+                        );
+
+
+                    /*
+                     * Un menu vide n'est pas affiché.
+                     */
+
+                    if (
+                        !sousMenusVisibles.length
+                    ) {
+
                         return;
                     }
 
 
-                    const sousMenuElement =
-                        document.createElement("div");
+                    const menuElement =
+                        document.createElement(
+                            "section"
+                        );
 
-                    sousMenuElement.className =
-                        "project-submenu";
-
-
-                    const sousMenuTitle =
-                        document.createElement("div");
-
-                    sousMenuTitle.className =
-                        "project-submenu-title";
-
-                    sousMenuTitle.textContent =
-                        sousMenu.titre;
+                    menuElement.className =
+                        "project-menu";
 
 
-                    const contentList =
-                        document.createElement("div");
+                    const menuTitle =
+                        document.createElement(
+                            "div"
+                        );
 
-                    contentList.className =
-                        "project-content-list";
+                    menuTitle.className =
+                        "project-menu-title";
 
-
-                    sousMenuContenus.forEach(
-                        contenu => {
-
-                            const button =
-                                document.createElement("button");
-
-                            button.type = "button";
-
-                            button.className =
-                                "project-content-button";
-
-                            button.textContent =
-                                contenu.titre;
+                    menuTitle.textContent =
+                        menu.titre;
 
 
-                            button.addEventListener(
-                                "click",
-                                () => {
+                    menuElement.appendChild(
+                        menuTitle
+                    );
 
-                                    afficherContenu(
-                                        contenu,
-                                        menu,
-                                        sousMenu
+
+                    const submenusElement =
+                        document.createElement(
+                            "div"
+                        );
+
+                    submenusElement.className =
+                        "project-submenus";
+
+
+                    sousMenusVisibles.forEach(
+                        sousMenu => {
+
+                            /*
+                             * Seuls les contenus validés
+                             * ayant ce sous-menu comme parent
+                             * sont affichés.
+                             */
+
+                            const sousMenuContenus =
+                                contenus.filter(
+                                    contenu =>
+                                        contenu.sous_menu_id ===
+                                        sousMenu.id
+                                );
+
+
+                            if (
+                                !sousMenuContenus.length
+                            ) {
+
+                                return;
+                            }
+
+
+                            const sousMenuElement =
+                                document.createElement(
+                                    "div"
+                                );
+
+                            sousMenuElement.className =
+                                "project-submenu";
+
+
+                            const sousMenuTitle =
+                                document.createElement(
+                                    "div"
+                                );
+
+                            sousMenuTitle.className =
+                                "project-submenu-title";
+
+                            sousMenuTitle.textContent =
+                                sousMenu.titre;
+
+
+                            const contentList =
+                                document.createElement(
+                                    "div"
+                                );
+
+                            contentList.className =
+                                "project-content-list";
+
+
+                            sousMenuContenus.forEach(
+                                contenu => {
+
+                                    const button =
+                                        document.createElement(
+                                            "button"
+                                        );
+
+                                    button.type =
+                                        "button";
+
+                                    button.className =
+                                        "project-content-button";
+
+                                    button.textContent =
+                                        contenu.titre;
+
+
+                                    button.addEventListener(
+                                        "click",
+                                        () => {
+
+                                            afficherContenu(
+                                                contenu,
+                                                menu,
+                                                sousMenu,
+                                                button
+                                            );
+
+                                        }
                                     );
+
+
+                                    contentList.appendChild(
+                                        button
+                                    );
+
+
+                                    /*
+                                     * Premier contenu
+                                     * disponible.
+                                     */
+
+                                    if (
+                                        !premierContenu
+                                    ) {
+
+                                        premierContenu = {
+                                            contenu,
+                                            menu,
+                                            sousMenu,
+                                            button
+                                        };
+
+                                    }
 
                                 }
                             );
 
 
-                            contentList.appendChild(
-                                button
+                            sousMenuElement.appendChild(
+                                sousMenuTitle
                             );
 
+                            sousMenuElement.appendChild(
+                                contentList
+                            );
 
-                            if (!premierContenu) {
-
-                                premierContenu = {
-                                    contenu,
-                                    menu,
-                                    sousMenu,
-                                    button
-                                };
-
-                            }
+                            submenusElement.appendChild(
+                                sousMenuElement
+                            );
 
                         }
                     );
 
 
-                    sousMenuElement.appendChild(
-                        sousMenuTitle
+                    menuElement.appendChild(
+                        submenusElement
                     );
 
-                    sousMenuElement.appendChild(
-                        contentList
+
+                    tree.appendChild(
+                        menuElement
                     );
 
-                    submenusElement.appendChild(
-                        sousMenuElement
-                    );
-
-                });
-
-
-                if (!submenusElement.children.length) {
-                    return;
                 }
+            );
 
 
-                menuElement.appendChild(
-                    submenusElement
-                );
+            /*
+             * Aucun contenu réellement visible.
+             */
 
-                tree.appendChild(
-                    menuElement
-                );
+            if (
+                !tree.children.length ||
+                !premierContenu
+            ) {
 
-            });
-
-
-            if (!tree.children.length) {
-
-                tree.innerHTML = `
-                    <div class="project-empty">
-                        Aucun contenu disponible.
-                    </div>
-                `;
+                afficherAucunContenu();
 
                 return;
-
             }
 
 
             /*
-             * Premier contenu affiché automatiquement.
+             * Affiche automatiquement
+             * le premier contenu.
              */
 
-            if (premierContenu) {
+            afficherContenu(
+                premierContenu.contenu,
+                premierContenu.menu,
+                premierContenu.sousMenu,
+                premierContenu.button
+            );
 
-                afficherContenu(
-                    premierContenu.contenu,
-                    premierContenu.menu,
-                    premierContenu.sousMenu,
-                    premierContenu.button
-                );
+        }
 
-            }
+
+        /* =================================================
+           AFFICHAGE ABSENCE DE CONTENU
+        ================================================= */
+
+        function afficherAucunContenu() {
+
+            tree.innerHTML = `
+                <div class="project-empty">
+                    Aucun contenu disponible.
+                </div>
+            `;
+
+
+            reader.innerHTML = `
+                <div class="project-empty">
+                    Le projet sera prochainement disponible.
+                </div>
+            `;
 
         }
 
@@ -946,61 +1073,35 @@
             contenu,
             menu,
             sousMenu,
-            buttonActif = null
+            bouton
         ) {
 
-            contenuActif = contenu;
-
-
             /*
-             * Retire l'état actif précédent.
+             * Retire l'état actif de tous les boutons.
              */
 
             document
                 .querySelectorAll(
                     ".project-content-button.active"
                 )
-                .forEach(button => {
+                .forEach(
+                    element => {
 
-                    button.classList.remove(
-                        "active"
-                    );
+                        element.classList.remove(
+                            "active"
+                        );
 
-                });
+                    }
+                );
 
 
             /*
-             * Recherche le bouton correspondant
-             * lorsque l'appel vient d'ailleurs.
+             * Active le bouton sélectionné.
              */
 
-            if (!buttonActif) {
+            if (bouton) {
 
-                const boutons =
-                    document.querySelectorAll(
-                        ".project-content-button"
-                    );
-
-
-                boutons.forEach(button => {
-
-                    if (
-                        button.textContent ===
-                        contenu.titre
-                    ) {
-
-                        buttonActif = button;
-
-                    }
-
-                });
-
-            }
-
-
-            if (buttonActif) {
-
-                buttonActif.classList.add(
+                bouton.classList.add(
                     "active"
                 );
 
@@ -1008,14 +1109,20 @@
 
 
             /*
-             * Affichage.
+             * Réinitialise le lecteur.
              */
 
             reader.innerHTML = "";
 
 
+            /*
+             * Kicker.
+             */
+
             const kicker =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             kicker.className =
                 "project-reader-kicker";
@@ -1024,22 +1131,40 @@
                 `${menu.titre} · ${sousMenu.titre}`;
 
 
+            /*
+             * Titre.
+             */
+
             const title =
-                document.createElement("h2");
+                document.createElement(
+                    "h2"
+                );
 
             title.textContent =
                 contenu.titre;
 
 
+            /*
+             * Ligne décorative.
+             */
+
             const line =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             line.className =
                 "project-reader-line";
 
 
+            /*
+             * Contenu HTML provenant du CMS.
+             */
+
             const content =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
 
             content.className =
                 "project-content";
@@ -1048,14 +1173,30 @@
                 contenu.html || "";
 
 
-            reader.appendChild(kicker);
-            reader.appendChild(title);
-            reader.appendChild(line);
-            reader.appendChild(content);
+            /*
+             * Assemblage.
+             */
+
+            reader.appendChild(
+                kicker
+            );
+
+            reader.appendChild(
+                title
+            );
+
+            reader.appendChild(
+                line
+            );
+
+            reader.appendChild(
+                content
+            );
 
 
             /*
-             * Retour en haut du lecteur sur mobile.
+             * Sur mobile, le lecteur devient
+             * la zone immédiatement visible.
              */
 
             if (
