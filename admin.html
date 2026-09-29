@@ -203,45 +203,21 @@ content="width=device-width, initial-scale=1.0"
 
 <button
     class="tab"
+    id="contentProjectTabButton"
+    type="button"
+    style="display:none"
+>
+    CONTENU PROJET
+</button>
+
+<button
+    class="tab"
     id="statsTabButton"
     data-tab="statsTab"
     style="display:none"
 >
     STATISTIQUES
 </button>
-
-
-</div>
-
-<!-- =====================================================
-     ACCES CONTENU PROJET
-====================================================== -->
-
-<div
-    class="content-project-access"
-    style="
-        margin: 15px 0 25px;
-        display: flex;
-        justify-content: center;
-    "
->
-
-
-<a
-    href="contenus.html"
-    class="secondary-button"
-    id="contentProjectButton"
-    style="
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        width: 100%;
-        max-width: 400px;
-    "
->
-    CONTENU PROJET
-</a>
 
 
 </div>
@@ -1818,6 +1794,9 @@ const statsMessage =
 const statsList =
     document.getElementById("statsList");
 
+const contentProjectTabButton =
+    document.getElementById("contentProjectTabButton");
+
 
 let statistiques = [];
 
@@ -2789,6 +2768,21 @@ async function initialiserStatistiques() {
      * L'onglet est rendu visible uniquement
      * pour un administrateur.
      */
+
+    if (contentProjectTabButton) {
+
+        contentProjectTabButton.style.display =
+            "";
+
+        contentProjectTabButton.addEventListener(
+            "click",
+            () => {
+                window.location.href = "contenus.html";
+            }
+        );
+
+    }
+
 
     if (statsTabButton) {
 
