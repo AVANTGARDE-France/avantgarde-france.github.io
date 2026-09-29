@@ -111,6 +111,61 @@ header{
   padding:45px 0 70px;
 }
 
+
+/* =========================================================
+   EN-TÊTE ESPACE MEMBRE
+========================================================= */
+
+.admin-header-main{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.admin-header-photo{
+  width:88px;
+  height:88px;
+  flex:0 0 88px;
+  box-sizing:border-box;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+
+  overflow:hidden;
+}
+
+.admin-header-photo img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+}
+
+.admin-header-photo.empty{
+  background:rgba(255,255,255,.02);
+}
+
+.admin-header-photo.empty::before{
+  content:"";
+  width:30px;
+  height:30px;
+
+  border:1px solid var(--border);
+  border-radius:50%;
+
+  opacity:.5;
+}
+
+.admin-header-info{
+  min-width:0;
+  flex:1;
+  text-align:center;
+}
+
 .page-kicker{
   color:var(--gold);
   font-family:Arial,sans-serif;
@@ -1090,6 +1145,20 @@ textarea{
 
   .team-regions{
     grid-template-columns:repeat(2,1fr);
+  }
+
+}
+
+@media(max-width:600px){
+
+  .admin-header-main{
+    gap:12px;
+  }
+
+  .admin-header-photo{
+    width:68px;
+    height:68px;
+    flex-basis:68px;
   }
 
 }
