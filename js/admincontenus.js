@@ -12,7 +12,7 @@
    - validation
    - ordre
    - recto des cartes
-   - statistiques liées par code
+   - statistiques liées par UUID
    - synergies liées par UUID
    - verso HTML
 ========================================================= */
@@ -348,17 +348,12 @@ async function chargerDonnees() {
                 .select(
                     `
                     id,
-                    code,
                     nom,
-                    description,
-                    icone_url,
-                    animation_url,
-                    actif,
-                    position
+                    lien
                     `
                 )
                 .order(
-                    "position",
+                    "nom",
                     {
                         ascending: true
                     }
@@ -449,32 +444,37 @@ function remplirListesStats() {
             );
 
 
-            stats
-                .filter(
-                    stat =>
-                        stat.actif !== false
-                )
-                .forEach(
-                    stat => {
+            stats.forEach(
+                stat => {
 
-                        const option =
-                            document.createElement(
-                                "option"
-                            );
-
-                        option.value =
-                            stat.code;
-
-                        option.textContent =
-                            stat.nom ||
-                            stat.code;
-
-                        select.appendChild(
-                            option
+                    const option =
+                        document.createElement(
+                            "option"
                         );
 
-                    }
-                );
+
+                    /*
+                       IMPORTANT :
+                       La valeur enregistrée dans contenus.stat_1,
+                       stat_2 et stat_3 est maintenant l'UUID
+                       de la ligne stats.id.
+                    */
+
+                    option.value =
+                        stat.id;
+
+
+                    option.textContent =
+                        stat.nom ||
+                        "Statistique sans nom";
+
+
+                    select.appendChild(
+                        option
+                    );
+
+                }
+            );
 
 
             if (valeurActuelle) {
@@ -2098,6 +2098,12 @@ function ouvrirContenu(
     remplirListesStats();
 
 
+    /*
+       Les valeurs de stat_1, stat_2 et stat_3
+       sont maintenant directement les UUID
+       des statistiques.
+    */
+
     if (cardStat1) {
         cardStat1.value =
             item.stat_1 || "";
@@ -2245,6 +2251,11 @@ async function enregistrerContenu() {
             ? cardPriorite.value.trim()
             : null;
 
+
+    /*
+       Les valeurs récupérées des trois selects
+       sont les UUID stats.id.
+    */
 
     const stat1 =
         cardStat1
