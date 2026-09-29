@@ -1,2903 +1,2973 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>Avant-gardE — Contenu du projet</title>
+<title>Avant-gardE — Contenu du projet</title>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <style>
+<style>
 
-        :root {
+    :root {
 
-            --navy: #07152d;
-            --navy2: #0d2344;
-            --gold: #d6ad55;
-            --gold-light: #f0d58a;
-            --white: #f5f3ed;
-            --blue-france: #0055A4;
-            --red: #EF4135;
-            --border: rgba(214,173,85,.28);
-            --muted: #9da8b8;
-            --danger: #b83b3b;
-            --green: #3c9b6b;
+        --navy: #07152d;
+        --navy2: #0d2344;
+        --gold: #d6ad55;
+        --gold-light: #f0d58a;
+        --white: #f5f3ed;
+        --blue-france: #0055A4;
+        --red: #EF4135;
+        --border: rgba(214,173,85,.28);
+        --muted: #9da8b8;
+        --danger: #b83b3b;
+        --green: #3c9b6b;
 
-        }
+    }
 
 
-        * {
+    * {
 
-            box-sizing: border-box;
+        box-sizing: border-box;
 
-        }
+    }
 
 
-        html,
-        body {
+    html,
+    body {
 
-            margin: 0;
-            padding: 0;
-            min-height: 100%;
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
 
-        }
+    }
 
 
-        body {
+    body {
 
-            background: var(--navy);
-            color: var(--white);
-            font-family:
-                Arial,
-                Helvetica,
-                sans-serif;
+        background: var(--navy);
+        color: var(--white);
+        font-family:
+            Arial,
+            Helvetica,
+            sans-serif;
 
-        }
+    }
 
 
-        button,
-        input,
-        textarea,
-        select {
+    button,
+    input,
+    textarea,
+    select {
 
-            font: inherit;
+        font: inherit;
 
-        }
+    }
 
 
-        button {
+    button {
 
-            cursor: pointer;
+        cursor: pointer;
 
-        }
+    }
 
 
-        /* =====================================================
-           HEADER
-        ===================================================== */
+    /* =====================================================
+       HEADER
+    ===================================================== */
 
-        .page-header {
+    .page-header {
 
-            height: 70px;
-            padding: 0 25px;
+        height: 70px;
+        padding: 0 25px;
 
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
-            background: var(--navy2);
+        background: var(--navy2);
 
-            border-bottom:
-                1px solid var(--border);
+        border-bottom:
+            1px solid var(--border);
 
-        }
+    }
 
 
-        .brand {
+    .brand {
 
-            font-size: 22px;
-            font-weight: 700;
-            letter-spacing: .5px;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: .5px;
 
-        }
+    }
 
 
-        .brand-a {
+    .brand-a {
 
-            color: var(--blue-france);
+        color: var(--blue-france);
 
-        }
+    }
 
 
-        .brand-e {
+    .brand-e {
 
-            color: var(--red);
+        color: var(--red);
 
-        }
+    }
 
 
-        .header-right {
+    .header-right {
 
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
 
-        }
+    }
 
 
-        .header-button {
+    .header-button {
 
-            border:
-                1px solid var(--border);
+        border:
+            1px solid var(--border);
 
-            background: transparent;
+        background: transparent;
 
-            color: var(--white);
+        color: var(--white);
 
-            padding:
-                9px 14px;
+        padding:
+            9px 14px;
 
-            text-decoration: none;
+        text-decoration: none;
 
-            font-size: 12px;
-            font-weight: 700;
+        font-size: 12px;
+        font-weight: 700;
 
-            letter-spacing: .5px;
+        letter-spacing: .5px;
 
-        }
+    }
 
 
-        .header-button:hover {
+    .header-button:hover {
 
-            border-color: var(--gold);
+        border-color: var(--gold);
 
-            color: var(--gold-light);
+        color: var(--gold-light);
 
-        }
+    }
 
 
-        /* =====================================================
-           LAYOUT
-        ===================================================== */
+    /* =====================================================
+       LAYOUT
+    ===================================================== */
+
+    .page-layout {
+
+        display: flex;
+
+        min-height:
+            calc(100vh - 70px);
+
+    }
+
+
+    .sidebar {
+
+        width: 360px;
+        min-width: 360px;
+
+        background: #081a35;
+
+        border-right:
+            1px solid var(--border);
+
+        padding: 18px 15px;
+
+        overflow-y: auto;
+
+    }
+
+
+    .workspace {
+
+        flex: 1;
+
+        min-width: 0;
+
+        padding: 25px;
+
+        overflow-y: auto;
+
+    }
+
+
+    /* =====================================================
+       SIDEBAR
+    ===================================================== */
+
+    .sidebar-title {
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-bottom: 18px;
+
+    }
+
+
+    .sidebar-title span {
+
+        color: var(--gold);
+
+        font-size: 13px;
+        font-weight: 700;
+
+        letter-spacing: 1px;
+
+    }
+
+
+    .tree {
+
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+
+    }
+
+
+    .tree-menu {
+
+        border:
+            1px solid rgba(255,255,255,.06);
+
+        background:
+            rgba(255,255,255,.015);
+
+    }
+
+
+    .tree-menu-header {
+
+        min-height: 44px;
+
+        display: flex;
+        align-items: center;
+
+        padding: 6px 7px 6px 10px;
+
+        gap: 6px;
+
+    }
+
+
+    .tree-item-main {
+
+        flex: 1;
+
+        min-width: 0;
+
+        border: 0;
+
+        background: transparent;
+
+        color: var(--white);
+
+        text-align: left;
+
+        padding: 6px 4px;
+
+    }
+
+
+    .tree-item-main:hover {
+
+        color: var(--gold-light);
+
+    }
+
+
+    .tree-title {
+
+        display: block;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
+
+        font-weight: 700;
+
+        font-size: 14px;
+
+    }
+
+
+    .tree-subtitle {
+
+        display: block;
+
+        margin-top: 3px;
+
+        color: var(--muted);
+
+        font-size: 10px;
+
+    }
+
+
+    .tree-actions {
+
+        display: flex;
+        align-items: center;
+        gap: 2px;
+
+    }
+
+
+    .icon-button {
+
+        width: 27px;
+        height: 27px;
+
+        padding: 0;
+
+        border:
+            1px solid transparent;
+
+        background: transparent;
+
+        color: var(--muted);
+
+        font-size: 14px;
+
+    }
+
+
+    .icon-button:hover {
+
+        color: var(--gold-light);
+
+        border-color: var(--border);
+
+    }
+
+
+    .icon-button.danger:hover {
+
+        color: #ff7d7d;
+
+        border-color:
+            rgba(184,59,59,.5);
+
+    }
+
+
+    .status-button {
+
+        min-width: 72px;
+
+        border:
+            1px solid rgba(255,255,255,.12);
+
+        background: transparent;
+
+        padding: 4px 6px;
+
+        font-size: 9px;
+        font-weight: 700;
+
+        letter-spacing: .4px;
+
+    }
+
+
+    .status-valid {
+
+        color: #8ed5ad;
+
+        border-color:
+            rgba(60,155,107,.45);
+
+    }
+
+
+    .status-draft {
+
+        color: #d0b779;
+
+        border-color:
+            rgba(214,173,85,.35);
+
+    }
+
+
+    .submenu-list {
+
+        padding:
+            0 7px 8px 25px;
+
+    }
+
+
+    .tree-submenu {
+
+        margin-top: 3px;
+
+    }
+
+
+    .tree-submenu-header {
+
+        min-height: 38px;
+
+        display: flex;
+        align-items: center;
+
+        gap: 5px;
+
+        padding: 4px 4px;
+
+        border-left:
+            1px solid rgba(214,173,85,.18);
+
+    }
+
+
+    .tree-submenu .tree-title {
+
+        font-size: 12px;
+
+        font-weight: 600;
+
+    }
+
+
+    .content-list {
+
+        padding:
+            2px 0 5px 21px;
+
+    }
+
+
+    .tree-content {
+
+        display: flex;
+        align-items: center;
+
+        gap: 4px;
+
+        min-height: 32px;
+
+        border-left:
+            1px solid rgba(255,255,255,.08);
+
+    }
+
+
+    .tree-content-button {
+
+        flex: 1;
+
+        min-width: 0;
+
+        border: 0;
+
+        background: transparent;
+
+        color: #cbd3df;
+
+        padding: 7px 5px;
+
+        text-align: left;
+
+        font-size: 11px;
+
+    }
+
+
+    .tree-content-button:hover {
+
+        color: var(--gold-light);
+
+    }
+
+
+    .empty-tree {
+
+        padding: 30px 10px;
+
+        color: var(--muted);
+
+        text-align: center;
+
+        font-size: 12px;
+
+    }
+
+
+    /* =====================================================
+       WORKSPACE
+    ===================================================== */
+
+    .welcome {
+
+        max-width: 850px;
+
+        margin:
+            40px auto;
+
+        padding:
+            50px 35px;
+
+        border:
+            1px solid var(--border);
+
+        text-align: center;
+
+        background:
+            rgba(255,255,255,.015);
+
+    }
+
+
+    .welcome h1 {
+
+        margin:
+            0 0 12px;
+
+        color: var(--gold);
+
+        font-size: 25px;
+
+        letter-spacing: 1px;
+
+    }
+
+
+    .welcome p {
+
+        margin: 0;
+
+        color: var(--muted);
+
+        line-height: 1.6;
+
+    }
+
+
+    .editor-panel {
+
+        max-width: 1100px;
+
+        margin: 0 auto;
+
+    }
+
+
+    .editor-header {
+
+        display: flex;
+
+        align-items: flex-start;
+
+        justify-content: space-between;
+
+        gap: 20px;
+
+        margin-bottom: 20px;
+
+    }
+
+
+    .editor-header h1 {
+
+        margin: 0;
+
+        font-size: 25px;
+
+        color: var(--gold);
+
+    }
+
+
+    .editor-header p {
+
+        margin:
+            7px 0 0;
+
+        color: var(--muted);
+
+        font-size: 12px;
+
+    }
+
+
+    .editor-header-actions {
+
+        display: flex;
+
+        gap: 7px;
+
+        flex-wrap: wrap;
+
+        justify-content: flex-end;
+
+    }
+
+
+    .button {
+
+        border:
+            1px solid var(--border);
+
+        background: transparent;
+
+        color: var(--white);
+
+        padding:
+            10px 14px;
+
+        font-size: 11px;
+        font-weight: 700;
+
+        letter-spacing: .4px;
+
+    }
+
+
+    .button:hover {
+
+        color: var(--gold-light);
+
+        border-color: var(--gold);
+
+    }
+
+
+    .button.primary {
+
+        background:
+            var(--gold);
+
+        border-color:
+            var(--gold);
+
+        color:
+            var(--navy);
+
+    }
+
+
+    .button.primary:hover {
+
+        background:
+            var(--gold-light);
+
+        border-color:
+            var(--gold-light);
+
+    }
+
+
+    .button.danger {
+
+        border-color:
+            rgba(184,59,59,.6);
+
+        color:
+            #ff8585;
+
+    }
+
+
+    .button:disabled {
+
+        opacity: .5;
+
+        cursor:
+            not-allowed;
+
+    }
+
+
+    .form-card {
+
+        border:
+            1px solid var(--border);
+
+        background:
+            rgba(255,255,255,.018);
+
+        padding:
+            20px;
+
+        margin-bottom:
+            18px;
+
+    }
+
+
+    .form-row {
+
+        display: grid;
+
+        grid-template-columns:
+            1fr 1fr;
+
+        gap: 15px;
+
+    }
+
+
+    .field {
+
+        margin-bottom:
+            16px;
+
+    }
+
+
+    .field:last-child {
+
+        margin-bottom: 0;
+
+    }
+
+
+    .field label {
+
+        display: block;
+
+        margin-bottom:
+            7px;
+
+        color:
+            var(--gold-light);
+
+        font-size: 10px;
+        font-weight: 700;
+
+        letter-spacing: .8px;
+
+    }
+
+
+    .field input,
+    .field textarea,
+    .field select {
+
+        width: 100%;
+
+        border:
+            1px solid rgba(255,255,255,.14);
+
+        background:
+            #061329;
+
+        color:
+            var(--white);
+
+        padding:
+            11px 12px;
+
+        outline: none;
+
+    }
+
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+
+        border-color:
+            var(--gold);
+
+    }
+
+
+    .field select {
+
+        cursor: pointer;
+
+    }
+
+
+    .field select option {
+
+        background:
+            #061329;
+
+        color:
+            var(--white);
+
+    }
+
+
+    .field textarea {
+
+        min-height: 80px;
+
+        resize:
+            vertical;
+
+    }
+
+
+    /* =====================================================
+       WYSIWYG
+    ===================================================== */
+
+    .editor-card {
+
+        border:
+            1px solid var(--border);
+
+        background:
+            #fff;
+
+        color:
+            #151515;
+
+    }
+
+
+    .toolbar {
+
+        display: flex;
+
+        flex-wrap: wrap;
+
+        align-items: center;
+
+        gap: 4px;
+
+        padding: 8px;
+
+        background:
+            #ececec;
+
+        border-bottom:
+            1px solid #ccc;
+
+    }
+
+
+    .toolbar button {
+
+        min-width: 31px;
+        height: 30px;
+
+        padding:
+            0 8px;
+
+        border:
+            1px solid #c6c6c6;
+
+        background:
+            #fff;
+
+        color:
+            #222;
+
+        font-size: 12px;
+
+    }
+
+
+    .toolbar button:hover {
+
+        background:
+            #ddd;
+
+    }
+
+
+    .toolbar-separator {
+
+        width: 1px;
+        height: 23px;
+
+        margin:
+            0 3px;
+
+        background:
+            #c4c4c4;
+
+    }
+
+
+    .wysiwyg {
+
+        min-height:
+            500px;
+
+        padding:
+            25px;
+
+        outline: none;
+
+        line-height: 1.65;
+
+    }
+
+
+    .wysiwyg:focus {
+
+        outline:
+            2px solid rgba(214,173,85,.35);
+
+        outline-offset:
+            -2px;
+
+    }
+
+
+    .wysiwyg img {
+
+        max-width:
+            100%;
+
+        height:
+            auto;
+
+    }
+
+
+    .wysiwyg video {
+
+        max-width:
+            100%;
+
+    }
+
+
+    .wysiwyg blockquote {
+
+        border-left:
+            4px solid #999;
+
+        margin-left: 0;
+
+        padding-left: 15px;
+
+        color: #555;
+
+    }
+
+
+    .source-editor {
+
+        width: 100%;
+
+        min-height:
+            500px;
+
+        padding:
+            20px;
+
+        border: 0;
+
+        outline: none;
+
+        resize: vertical;
+
+        background:
+            #101010;
+
+        color:
+            #e7e7e7;
+
+        font-family:
+            Consolas,
+            Monaco,
+            monospace;
+
+        font-size: 13px;
+
+        line-height: 1.5;
+
+        display: none;
+
+    }
+
+
+    .editor-footer {
+
+        padding:
+            10px 12px;
+
+        background:
+            #ececec;
+
+        border-top:
+            1px solid #ccc;
+
+        color:
+            #666;
+
+        font-size: 10px;
+
+    }
+
+
+    /* =====================================================
+       MODAL
+    ===================================================== */
+
+    .modal-overlay {
+
+        position: fixed;
+
+        inset: 0;
+
+        z-index: 1000;
+
+        display: none;
+
+        align-items: center;
+        justify-content: center;
+
+        padding: 20px;
+
+        background:
+            rgba(0,0,0,.75);
+
+    }
+
+
+    .modal-overlay.visible {
+
+        display: flex;
+
+    }
+
+
+    .modal {
+
+        width: 100%;
+
+        max-width: 600px;
+
+        border:
+            1px solid var(--border);
+
+        background:
+            var(--navy2);
+
+        box-shadow:
+            0 20px 70px rgba(0,0,0,.45);
+
+    }
+
+
+    .modal-header {
+
+        display: flex;
+
+        align-items: center;
+        justify-content: space-between;
+
+        padding:
+            17px 20px;
+
+        border-bottom:
+            1px solid var(--border);
+
+    }
+
+
+    .modal-header h2 {
+
+        margin: 0;
+
+        color:
+            var(--gold);
+
+        font-size: 16px;
+
+    }
+
+
+    .modal-close {
+
+        width: 30px;
+        height: 30px;
+
+        border: 0;
+
+        background: transparent;
+
+        color: var(--muted);
+
+        font-size: 20px;
+
+    }
+
+
+    .modal-close:hover {
+
+        color: #fff;
+
+    }
+
+
+    .modal-body {
+
+        padding:
+            20px;
+
+    }
+
+
+    .modal-footer {
+
+        display: flex;
+
+        justify-content: flex-end;
+
+        gap: 8px;
+
+        padding:
+            15px 20px;
+
+        border-top:
+            1px solid var(--border);
+
+    }
+
+
+    /* =====================================================
+       MESSAGES
+    ===================================================== */
+
+    .message {
+
+        position: fixed;
+
+        right: 20px;
+        bottom: 20px;
+
+        z-index: 2000;
+
+        max-width: 400px;
+
+        padding:
+            12px 16px;
+
+        border:
+            1px solid var(--border);
+
+        background:
+            var(--navy2);
+
+        box-shadow:
+            0 10px 30px rgba(0,0,0,.35);
+
+        font-size: 12px;
+
+        display: none;
+
+    }
+
+
+    .message.visible {
+
+        display: block;
+
+    }
+
+
+    .message.success {
+
+        border-color:
+            rgba(60,155,107,.6);
+
+        color:
+            #9ee0ba;
+
+    }
+
+
+    .message.error {
+
+        border-color:
+            rgba(184,59,59,.7);
+
+        color:
+            #ff9a9a;
+
+    }
+
+
+    .loading {
+
+        padding:
+            40px;
+
+        text-align: center;
+
+        color:
+            var(--muted);
+
+        font-size: 12px;
+
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media (max-width: 900px) {
 
         .page-layout {
 
-            display: flex;
-
-            min-height:
-                calc(100vh - 70px);
+            flex-direction:
+                column;
 
         }
 
 
         .sidebar {
 
-            width: 360px;
-            min-width: 360px;
-
-            background: #081a35;
-
-            border-right:
-                1px solid var(--border);
-
-            padding: 18px 15px;
-
-            overflow-y: auto;
-
-        }
-
-
-        .workspace {
-
-            flex: 1;
-
+            width: 100%;
             min-width: 0;
 
-            padding: 25px;
+            max-height:
+                45vh;
 
-            overflow-y: auto;
+            border-right: 0;
 
-        }
-
-
-        /* =====================================================
-           SIDEBAR
-        ===================================================== */
-
-        .sidebar-title {
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            margin-bottom: 18px;
-
-        }
-
-
-        .sidebar-title span {
-
-            color: var(--gold);
-
-            font-size: 13px;
-            font-weight: 700;
-
-            letter-spacing: 1px;
-
-        }
-
-
-        .tree {
-
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-
-        }
-
-
-        .tree-menu {
-
-            border:
-                1px solid rgba(255,255,255,.06);
-
-            background:
-                rgba(255,255,255,.015);
-
-        }
-
-
-        .tree-menu-header {
-
-            min-height: 44px;
-
-            display: flex;
-            align-items: center;
-
-            padding: 6px 7px 6px 10px;
-
-            gap: 6px;
-
-        }
-
-
-        .tree-item-main {
-
-            flex: 1;
-
-            min-width: 0;
-
-            border: 0;
-
-            background: transparent;
-
-            color: var(--white);
-
-            text-align: left;
-
-            padding: 6px 4px;
-
-        }
-
-
-        .tree-item-main:hover {
-
-            color: var(--gold-light);
-
-        }
-
-
-        .tree-title {
-
-            display: block;
-
-            overflow: hidden;
-
-            text-overflow: ellipsis;
-
-            white-space: nowrap;
-
-            font-weight: 700;
-
-            font-size: 14px;
-
-        }
-
-
-        .tree-subtitle {
-
-            display: block;
-
-            margin-top: 3px;
-
-            color: var(--muted);
-
-            font-size: 10px;
-
-        }
-
-
-        .tree-actions {
-
-            display: flex;
-            align-items: center;
-            gap: 2px;
-
-        }
-
-
-        .icon-button {
-
-            width: 27px;
-            height: 27px;
-
-            padding: 0;
-
-            border:
-                1px solid transparent;
-
-            background: transparent;
-
-            color: var(--muted);
-
-            font-size: 14px;
-
-        }
-
-
-        .icon-button:hover {
-
-            color: var(--gold-light);
-
-            border-color: var(--border);
-
-        }
-
-
-        .icon-button.danger:hover {
-
-            color: #ff7d7d;
-
-            border-color:
-                rgba(184,59,59,.5);
-
-        }
-
-
-        .status-button {
-
-            min-width: 72px;
-
-            border:
-                1px solid rgba(255,255,255,.12);
-
-            background: transparent;
-
-            padding: 4px 6px;
-
-            font-size: 9px;
-            font-weight: 700;
-
-            letter-spacing: .4px;
-
-        }
-
-
-        .status-valid {
-
-            color: #8ed5ad;
-
-            border-color:
-                rgba(60,155,107,.45);
-
-        }
-
-
-        .status-draft {
-
-            color: #d0b779;
-
-            border-color:
-                rgba(214,173,85,.35);
-
-        }
-
-
-        .submenu-list {
-
-            padding:
-                0 7px 8px 25px;
-
-        }
-
-
-        .tree-submenu {
-
-            margin-top: 3px;
-
-        }
-
-
-        .tree-submenu-header {
-
-            min-height: 38px;
-
-            display: flex;
-            align-items: center;
-
-            gap: 5px;
-
-            padding: 4px 4px;
-
-            border-left:
-                1px solid rgba(214,173,85,.18);
-
-        }
-
-
-        .tree-submenu .tree-title {
-
-            font-size: 12px;
-
-            font-weight: 600;
-
-        }
-
-
-        .content-list {
-
-            padding:
-                2px 0 5px 21px;
-
-        }
-
-
-        .tree-content {
-
-            display: flex;
-            align-items: center;
-
-            gap: 4px;
-
-            min-height: 32px;
-
-            border-left:
-                1px solid rgba(255,255,255,.08);
-
-        }
-
-
-        .tree-content-button {
-
-            flex: 1;
-
-            min-width: 0;
-
-            border: 0;
-
-            background: transparent;
-
-            color: #cbd3df;
-
-            padding: 7px 5px;
-
-            text-align: left;
-
-            font-size: 11px;
-
-        }
-
-
-        .tree-content-button:hover {
-
-            color: var(--gold-light);
-
-        }
-
-
-        .empty-tree {
-
-            padding: 30px 10px;
-
-            color: var(--muted);
-
-            text-align: center;
-
-            font-size: 12px;
-
-        }
-
-
-        /* =====================================================
-           WORKSPACE
-        ===================================================== */
-
-        .welcome {
-
-            max-width: 850px;
-
-            margin:
-                40px auto;
-
-            padding:
-                50px 35px;
-
-            border:
+            border-bottom:
                 1px solid var(--border);
-
-            text-align: center;
-
-            background:
-                rgba(255,255,255,.015);
-
-        }
-
-
-        .welcome h1 {
-
-            margin:
-                0 0 12px;
-
-            color: var(--gold);
-
-            font-size: 25px;
-
-            letter-spacing: 1px;
-
-        }
-
-
-        .welcome p {
-
-            margin: 0;
-
-            color: var(--muted);
-
-            line-height: 1.6;
-
-        }
-
-
-        .editor-panel {
-
-            max-width: 1100px;
-
-            margin: 0 auto;
-
-        }
-
-
-        .editor-header {
-
-            display: flex;
-
-            align-items: flex-start;
-
-            justify-content: space-between;
-
-            gap: 20px;
-
-            margin-bottom: 20px;
-
-        }
-
-
-        .editor-header h1 {
-
-            margin: 0;
-
-            font-size: 25px;
-
-            color: var(--gold);
-
-        }
-
-
-        .editor-header p {
-
-            margin:
-                7px 0 0;
-
-            color: var(--muted);
-
-            font-size: 12px;
-
-        }
-
-
-        .editor-header-actions {
-
-            display: flex;
-
-            gap: 7px;
-
-            flex-wrap: wrap;
-
-            justify-content: flex-end;
-
-        }
-
-
-        .button {
-
-            border:
-                1px solid var(--border);
-
-            background: transparent;
-
-            color: var(--white);
-
-            padding:
-                10px 14px;
-
-            font-size: 11px;
-            font-weight: 700;
-
-            letter-spacing: .4px;
-
-        }
-
-
-        .button:hover {
-
-            color: var(--gold-light);
-
-            border-color: var(--gold);
-
-        }
-
-
-        .button.primary {
-
-            background:
-                var(--gold);
-
-            border-color:
-                var(--gold);
-
-            color:
-                var(--navy);
-
-        }
-
-
-        .button.primary:hover {
-
-            background:
-                var(--gold-light);
-
-            border-color:
-                var(--gold-light);
-
-        }
-
-
-        .button.danger {
-
-            border-color:
-                rgba(184,59,59,.6);
-
-            color:
-                #ff8585;
-
-        }
-
-
-        .button:disabled {
-
-            opacity: .5;
-
-            cursor:
-                not-allowed;
-
-        }
-
-
-        .form-card {
-
-            border:
-                1px solid var(--border);
-
-            background:
-                rgba(255,255,255,.018);
-
-            padding:
-                20px;
-
-            margin-bottom:
-                18px;
 
         }
 
 
         .form-row {
 
-            display: grid;
-
             grid-template-columns:
-                1fr 1fr;
-
-            gap: 15px;
+                1fr;
 
         }
 
-
-        .field {
-
-            margin-bottom:
-                16px;
-
-        }
+    }
 
 
-        .field:last-child {
+    @media (max-width: 650px) {
 
-            margin-bottom: 0;
-
-        }
-
-
-        .field label {
-
-            display: block;
-
-            margin-bottom:
-                7px;
-
-            color:
-                var(--gold-light);
-
-            font-size: 10px;
-            font-weight: 700;
-
-            letter-spacing: .8px;
-
-        }
-
-
-        .field input,
-        .field textarea,
-        .field select {
-
-            width: 100%;
-
-            border:
-                1px solid rgba(255,255,255,.14);
-
-            background:
-                #061329;
-
-            color:
-                var(--white);
+        .page-header {
 
             padding:
-                11px 12px;
-
-            outline: none;
+                0 12px;
 
         }
 
 
-        .field input:focus,
-        .field textarea:focus,
-        .field select:focus {
+        .brand {
 
-            border-color:
-                var(--gold);
+            font-size: 18px;
 
         }
 
 
-        .field select {
-
-            cursor: pointer;
-
-        }
-
-
-        .field select option {
-
-            background:
-                #061329;
-
-            color:
-                var(--white);
-
-        }
-
-
-        .field textarea {
-
-            min-height: 80px;
-
-            resize:
-                vertical;
-
-        }
-
-
-        /* =====================================================
-           WYSIWYG
-        ===================================================== */
-
-        .editor-card {
-
-            border:
-                1px solid var(--border);
-
-            background:
-                #fff;
-
-            color:
-                #151515;
-
-        }
-
-
-        .toolbar {
-
-            display: flex;
-
-            flex-wrap: wrap;
-
-            align-items: center;
+        .header-right {
 
             gap: 4px;
 
-            padding: 8px;
-
-            background:
-                #ececec;
-
-            border-bottom:
-                1px solid #ccc;
-
         }
 
 
-        .toolbar button {
-
-            min-width: 31px;
-            height: 30px;
+        .header-button {
 
             padding:
-                0 8px;
-
-            border:
-                1px solid #c6c6c6;
-
-            background:
-                #fff;
-
-            color:
-                #222;
-
-            font-size: 12px;
+                8px 9px;
 
         }
 
 
-        .toolbar button:hover {
-
-            background:
-                #ddd;
-
-        }
-
-
-        .toolbar-separator {
-
-            width: 1px;
-            height: 23px;
-
-            margin:
-                0 3px;
-
-            background:
-                #c4c4c4;
-
-        }
-
-
-        .wysiwyg {
-
-            min-height:
-                500px;
+        .workspace {
 
             padding:
-                25px;
-
-            outline: none;
-
-            line-height: 1.65;
+                15px;
 
         }
 
 
-        .wysiwyg:focus {
+        .editor-header {
 
-            outline:
-                2px solid rgba(214,173,85,.35);
-
-            outline-offset:
-                -2px;
+            flex-direction:
+                column;
 
         }
 
 
-        .wysiwyg img {
+        .editor-header-actions {
 
-            max-width:
-                100%;
-
-            height:
-                auto;
+            justify-content:
+                flex-start;
 
         }
 
+    }
 
-        .wysiwyg video {
-
-            max-width:
-                100%;
-
-        }
-
-
-        .wysiwyg blockquote {
-
-            border-left:
-                4px solid #999;
-
-            margin-left: 0;
-
-            padding-left: 15px;
-
-            color: #555;
-
-        }
-
-
-        .source-editor {
-
-            width: 100%;
-
-            min-height:
-                500px;
-
-            padding:
-                20px;
-
-            border: 0;
-
-            outline: none;
-
-            resize: vertical;
-
-            background:
-                #101010;
-
-            color:
-                #e7e7e7;
-
-            font-family:
-                Consolas,
-                Monaco,
-                monospace;
-
-            font-size: 13px;
-
-            line-height: 1.5;
-
-            display: none;
-
-        }
-
-
-        .editor-footer {
-
-            padding:
-                10px 12px;
-
-            background:
-                #ececec;
-
-            border-top:
-                1px solid #ccc;
-
-            color:
-                #666;
-
-            font-size: 10px;
-
-        }
-
-
-        /* =====================================================
-           MODAL
-        ===================================================== */
-
-        .modal-overlay {
-
-            position: fixed;
-
-            inset: 0;
-
-            z-index: 1000;
-
-            display: none;
-
-            align-items: center;
-            justify-content: center;
-
-            padding: 20px;
-
-            background:
-                rgba(0,0,0,.75);
-
-        }
-
-
-        .modal-overlay.visible {
-
-            display: flex;
-
-        }
-
-
-        .modal {
-
-            width: 100%;
-
-            max-width: 600px;
-
-            border:
-                1px solid var(--border);
-
-            background:
-                var(--navy2);
-
-            box-shadow:
-                0 20px 70px rgba(0,0,0,.45);
-
-        }
-
-
-        .modal-header {
-
-            display: flex;
-
-            align-items: center;
-            justify-content: space-between;
-
-            padding:
-                17px 20px;
-
-            border-bottom:
-                1px solid var(--border);
-
-        }
-
-
-        .modal-header h2 {
-
-            margin: 0;
-
-            color:
-                var(--gold);
-
-            font-size: 16px;
-
-        }
-
-
-        .modal-close {
-
-            width: 30px;
-            height: 30px;
-
-            border: 0;
-
-            background: transparent;
-
-            color: var(--muted);
-
-            font-size: 20px;
-
-        }
-
-
-        .modal-close:hover {
-
-            color: #fff;
-
-        }
-
-
-        .modal-body {
-
-            padding:
-                20px;
-
-        }
-
-
-        .modal-footer {
-
-            display: flex;
-
-            justify-content: flex-end;
-
-            gap: 8px;
-
-            padding:
-                15px 20px;
-
-            border-top:
-                1px solid var(--border);
-
-        }
-
-
-        /* =====================================================
-           MESSAGES
-        ===================================================== */
-
-        .message {
-
-            position: fixed;
-
-            right: 20px;
-            bottom: 20px;
-
-            z-index: 2000;
-
-            max-width: 400px;
-
-            padding:
-                12px 16px;
-
-            border:
-                1px solid var(--border);
-
-            background:
-                var(--navy2);
-
-            box-shadow:
-                0 10px 30px rgba(0,0,0,.35);
-
-            font-size: 12px;
-
-            display: none;
-
-        }
-
-
-        .message.visible {
-
-            display: block;
-
-        }
-
-
-        .message.success {
-
-            border-color:
-                rgba(60,155,107,.6);
-
-            color:
-                #9ee0ba;
-
-        }
-
-
-        .message.error {
-
-            border-color:
-                rgba(184,59,59,.7);
-
-            color:
-                #ff9a9a;
-
-        }
-
-
-        .loading {
-
-            padding:
-                40px;
-
-            text-align: center;
-
-            color:
-                var(--muted);
-
-            font-size: 12px;
-
-        }
-
-
-        /* =====================================================
-           RESPONSIVE
-        ===================================================== */
-
-        @media (max-width: 900px) {
-
-            .page-layout {
-
-                flex-direction:
-                    column;
-
-            }
-
-
-            .sidebar {
-
-                width: 100%;
-                min-width: 0;
-
-                max-height:
-                    45vh;
-
-                border-right: 0;
-
-                border-bottom:
-                    1px solid var(--border);
-
-            }
-
-
-            .form-row {
-
-                grid-template-columns:
-                    1fr;
-
-            }
-
-        }
-
-
-        @media (max-width: 650px) {
-
-            .page-header {
-
-                padding:
-                    0 12px;
-
-            }
-
-
-            .brand {
-
-                font-size: 18px;
-
-            }
-
-
-            .header-right {
-
-                gap: 4px;
-
-            }
-
-
-            .header-button {
-
-                padding:
-                    8px 9px;
-
-            }
-
-
-            .workspace {
-
-                padding:
-                    15px;
-
-            }
-
-
-            .editor-header {
-
-                flex-direction:
-                    column;
-
-            }
-
-
-            .editor-header-actions {
-
-                justify-content:
-                    flex-start;
-
-            }
-
-        }
-
-    </style>
+</style>
 
 </head>
 
-
 <body>
 
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-    <!-- =====================================================
-         HEADER
-    ===================================================== -->
+<header class="page-header">
 
-    <header class="page-header">
+    <div class="brand">
 
-        <div class="brand">
+        <span class="brand-a">A</span>vant-gard<span class="brand-e">E</span>
 
-            <span class="brand-a">A</span>vant-gard<span class="brand-e">E</span>
-
-        </div>
+    </div>
 
 
-        <div class="header-right">
+    <div class="header-right">
 
-            <span
-                id="connectedUser"
+        <span
+            id="connectedUser"
+            style="
+                color:var(--muted);
+                font-size:11px;
+            "
+        ></span>
+
+        <a
+            href="admin.html"
+            class="header-button"
+        >
+            ADMINISTRATION
+        </a>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================================
+     LAYOUT
+===================================================== -->
+
+<main class="page-layout">
+
+
+    <!-- =================================================
+         SIDEBAR
+    ================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-title">
+
+            <span>CONTENU DU PROJET</span>
+
+            <button
+                type="button"
+                class="button primary"
+                id="addMenuButton"
                 style="
-                    color:var(--muted);
-                    font-size:11px;
+                    padding:7px 10px;
                 "
-            ></span>
-
-            <a
-                href="admin.html"
-                class="header-button"
             >
-                ADMINISTRATION
-            </a>
+                + MENU
+            </button>
 
         </div>
 
-    </header>
 
+        <div
+            id="tree"
+            class="tree"
+        >
 
-    <!-- =====================================================
-         LAYOUT
-    ===================================================== -->
-
-    <main class="page-layout">
-
-
-        <!-- =================================================
-             SIDEBAR
-        ================================================= -->
-
-        <aside class="sidebar">
-
-            <div class="sidebar-title">
-
-                <span>CONTENU DU PROJET</span>
-
-                <button
-                    type="button"
-                    class="button primary"
-                    id="addMenuButton"
-                    style="
-                        padding:7px 10px;
-                    "
-                >
-                    + MENU
-                </button>
-
+            <div class="loading">
+                Chargement…
             </div>
 
+        </div>
 
-            <div
-                id="tree"
-                class="tree"
-            >
-
-                <div class="loading">
-                    Chargement…
-                </div>
-
-            </div>
-
-        </aside>
+    </aside>
 
 
-        <!-- =================================================
-             WORKSPACE
-        ================================================= -->
+    <!-- =================================================
+         WORKSPACE
+    ================================================= -->
 
-        <section class="workspace">
-
-
-            <div
-                id="welcome"
-                class="welcome"
-            >
-
-                <h1>CONTENU DU PROJET</h1>
-
-                <p>
-                    Sélectionnez un menu, un sous-menu ou un contenu
-                    dans la colonne de gauche.
-                </p>
-
-            </div>
+    <section class="workspace">
 
 
-            <!-- =============================================
-                 MENU / SOUS-MENU EDITOR
-            ============================================== -->
+        <div
+            id="welcome"
+            class="welcome"
+        >
 
-            <div
-                id="structureEditor"
-                class="editor-panel"
-                style="display:none;"
-            >
+            <h1>CONTENU DU PROJET</h1>
 
-                <div class="editor-header">
+            <p>
+                Sélectionnez un menu, un sous-menu ou un contenu
+                dans la colonne de gauche.
+            </p>
 
-                    <div>
-
-                        <h1 id="structureTitle">
-                            Modifier
-                        </h1>
-
-                        <p id="structureDescription">
-                            Modification de la structure du projet.
-                        </p>
-
-                    </div>
+        </div>
 
 
-                    <div class="editor-header-actions">
+        <!-- =============================================
+             MENU / SOUS-MENU EDITOR
+        ============================================== -->
 
-                        <button
-                            type="button"
-                            class="button"
-                            id="structureCancelButton"
-                        >
-                            ANNULER
-                        </button>
+        <div
+            id="structureEditor"
+            class="editor-panel"
+            style="display:none;"
+        >
 
-                        <button
-                            type="button"
-                            class="button primary"
-                            id="structureSaveButton"
-                        >
-                            ENREGISTRER
-                        </button>
+            <div class="editor-header">
 
-                    </div>
+                <div>
+
+                    <h1 id="structureTitle">
+                        Modifier
+                    </h1>
+
+                    <p id="structureDescription">
+                        Modification de la structure du projet.
+                    </p>
 
                 </div>
 
 
-                <div class="form-card">
+                <div class="editor-header-actions">
 
-                    <div class="field">
-
-                        <label for="structureName">
-                            TITRE
-                        </label>
-
-                        <input
-                            type="text"
-                            id="structureName"
-                            maxlength="200"
-                            autocomplete="off"
-                        >
-
-                    </div>
-
-
-                    <div
-                        class="field"
-                        id="structureParentField"
-                        style="display:none;"
+                    <button
+                        type="button"
+                        class="button"
+                        id="structureCancelButton"
                     >
+                        ANNULER
+                    </button>
 
-                        <label for="structureParent">
-                            MENU PARENT
-                        </label>
-
-                        <select
-                            id="structureParent"
-                        ></select>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =============================================
-                 CONTENT EDITOR
-            ============================================== -->
-
-            <div
-                id="contentEditor"
-                class="editor-panel"
-                style="display:none;"
-            >
-
-                <div class="editor-header">
-
-                    <div>
-
-                        <h1 id="contentEditorTitle">
-                            Modifier le contenu
-                        </h1>
-
-                        <p>
-                            Éditeur HTML visuel.
-                        </p>
-
-                    </div>
-
-
-                    <div class="editor-header-actions">
-
-                        <button
-                            type="button"
-                            class="button"
-                            id="sourceModeButton"
-                        >
-                            CODE HTML
-                        </button>
-
-                        <button
-                            type="button"
-                            class="button"
-                            id="contentCancelButton"
-                        >
-                            ANNULER
-                        </button>
-
-                        <button
-                            type="button"
-                            class="button primary"
-                            id="contentSaveButton"
-                        >
-                            ENREGISTRER
-                        </button>
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-card">
-
-                    <div class="field">
-
-                        <label for="contentTitle">
-                            TITRE
-                        </label>
-
-                        <input
-                            type="text"
-                            id="contentTitle"
-                            maxlength="200"
-                            autocomplete="off"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label for="contentParent">
-                            SOUS-MENU PARENT
-                        </label>
-
-                        <select
-                            id="contentParent"
-                        ></select>
-
-                    </div>
-
-                </div>
-
-
-                <div class="editor-card">
-
-
-                    <div
-                        id="toolbar"
-                        class="toolbar"
+                    <button
+                        type="button"
+                        class="button primary"
+                        id="structureSaveButton"
                     >
-
-                        <button
-                            type="button"
-                            data-command="bold"
-                            title="Gras"
-                        >
-                            <strong>G</strong>
-                        </button>
-
-                        <button
-                            type="button"
-                            data-command="italic"
-                            title="Italique"
-                        >
-                            <em>I</em>
-                        </button>
-
-                        <button
-                            type="button"
-                            data-command="underline"
-                            title="Souligné"
-                        >
-                            <u>S</u>
-                        </button>
-
-
-                        <span class="toolbar-separator"></span>
-
-
-                        <button
-                            type="button"
-                            data-format="h2"
-                        >
-                            H2
-                        </button>
-
-                        <button
-                            type="button"
-                            data-format="h3"
-                        >
-                            H3
-                        </button>
-
-                        <button
-                            type="button"
-                            data-format="p"
-                        >
-                            P
-                        </button>
-
-
-                        <span class="toolbar-separator"></span>
-
-
-                        <button
-                            type="button"
-                            data-command="insertUnorderedList"
-                        >
-                            • LISTE
-                        </button>
-
-                        <button
-                            type="button"
-                            data-command="insertOrderedList"
-                        >
-                            1. LISTE
-                        </button>
-
-
-                        <span class="toolbar-separator"></span>
-
-
-                        <button
-                            type="button"
-                            id="linkButton"
-                        >
-                            LIEN
-                        </button>
-
-                        <button
-                            type="button"
-                            id="imageButton"
-                        >
-                            IMAGE
-                        </button>
-
-                        <button
-                            type="button"
-                            id="videoButton"
-                        >
-                            VIDÉO
-                        </button>
-
-
-                        <span class="toolbar-separator"></span>
-
-
-                        <button
-                            type="button"
-                            data-command="formatBlock"
-                            data-value="blockquote"
-                        >
-                            CITATION
-                        </button>
-
-                        <button
-                            type="button"
-                            data-command="insertHorizontalRule"
-                        >
-                            LIGNE
-                        </button>
-
-                    </div>
-
-
-                    <div
-                        id="wysiwyg"
-                        class="wysiwyg"
-                        contenteditable="true"
-                    ></div>
-
-
-                    <textarea
-                        id="sourceEditor"
-                        class="source-editor"
-                        spellcheck="false"
-                    ></textarea>
-
-
-                    <div class="editor-footer">
-
-                        Le contenu est enregistré sous forme de HTML.
-                        Les images peuvent être placées directement
-                        à l'endroit souhaité dans le texte.
-
-                    </div>
+                        ENREGISTRER
+                    </button>
 
                 </div>
 
             </div>
 
 
-        </section>
-
-    </main>
-
-
-    <!-- =====================================================
-         STRUCTURE MODAL
-    ===================================================== -->
-
-    <div
-        id="structureModal"
-        class="modal-overlay"
-    >
-
-        <div class="modal">
-
-            <div class="modal-header">
-
-                <h2 id="modalTitle">
-                    Nouveau
-                </h2>
-
-                <button
-                    type="button"
-                    class="modal-close"
-                    id="modalCloseButton"
-                >
-                    ×
-                </button>
-
-            </div>
-
-
-            <div class="modal-body">
+            <div class="form-card">
 
                 <div class="field">
 
-                    <label for="modalName">
+                    <label for="structureName">
                         TITRE
                     </label>
 
                     <input
                         type="text"
-                        id="modalName"
+                        id="structureName"
                         maxlength="200"
                         autocomplete="off"
                     >
 
                 </div>
 
-            </div>
 
-
-            <div class="modal-footer">
-
-                <button
-                    type="button"
-                    class="button"
-                    id="modalCancelButton"
+                <div
+                    class="field"
+                    id="structureParentField"
+                    style="display:none;"
                 >
-                    ANNULER
-                </button>
 
-                <button
-                    type="button"
-                    class="button primary"
-                    id="modalSaveButton"
-                >
-                    CRÉER
-                </button>
+                    <label for="structureParent">
+                        MENU PARENT
+                    </label>
+
+                    <select
+                        id="structureParent"
+                    ></select>
+
+                </div>
 
             </div>
 
         </div>
 
+
+        <!-- =============================================
+             CONTENT EDITOR
+        ============================================== -->
+
+        <div
+            id="contentEditor"
+            class="editor-panel"
+            style="display:none;"
+        >
+
+            <div class="editor-header">
+
+                <div>
+
+                    <h1 id="contentEditorTitle">
+                        Modifier le contenu
+                    </h1>
+
+                    <p>
+                        Éditeur HTML visuel.
+                    </p>
+
+                </div>
+
+
+                <div class="editor-header-actions">
+
+                    <button
+                        type="button"
+                        class="button"
+                        id="sourceModeButton"
+                    >
+                        CODE HTML
+                    </button>
+
+                    <button
+                        type="button"
+                        class="button"
+                        id="contentCancelButton"
+                    >
+                        ANNULER
+                    </button>
+
+                    <button
+                        type="button"
+                        class="button primary"
+                        id="contentSaveButton"
+                    >
+                        ENREGISTRER
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-card">
+
+                <div class="field">
+
+                    <label for="contentTitle">
+                        TITRE
+                    </label>
+
+                    <input
+                        type="text"
+                        id="contentTitle"
+                        maxlength="200"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="contentParent">
+                        SOUS-MENU PARENT
+                    </label>
+
+                    <select
+                        id="contentParent"
+                    ></select>
+
+                </div>
+
+            </div>
+
+
+            <div class="editor-card">
+
+
+                <div
+                    id="toolbar"
+                    class="toolbar"
+                >
+
+                    <button
+                        type="button"
+                        data-command="bold"
+                        title="Gras"
+                    >
+                        <strong>G</strong>
+                    </button>
+
+                    <button
+                        type="button"
+                        data-command="italic"
+                        title="Italique"
+                    >
+                        <em>I</em>
+                    </button>
+
+                    <button
+                        type="button"
+                        data-command="underline"
+                        title="Souligné"
+                    >
+                        <u>S</u>
+                    </button>
+
+
+                    <span class="toolbar-separator"></span>
+
+
+                    <button
+                        type="button"
+                        data-format="h2"
+                    >
+                        H2
+                    </button>
+
+                    <button
+                        type="button"
+                        data-format="h3"
+                    >
+                        H3
+                    </button>
+
+                    <button
+                        type="button"
+                        data-format="p"
+                    >
+                        P
+                    </button>
+
+
+                    <span class="toolbar-separator"></span>
+
+
+                    <button
+                        type="button"
+                        data-command="insertUnorderedList"
+                    >
+                        • LISTE
+                    </button>
+
+                    <button
+                        type="button"
+                        data-command="insertOrderedList"
+                    >
+                        1. LISTE
+                    </button>
+
+
+                    <span class="toolbar-separator"></span>
+
+
+                    <button
+                        type="button"
+                        id="linkButton"
+                    >
+                        LIEN
+                    </button>
+
+                    <button
+                        type="button"
+                        id="imageButton"
+                    >
+                        IMAGE
+                    </button>
+
+                    <button
+                        type="button"
+                        id="videoButton"
+                    >
+                        VIDÉO
+                    </button>
+
+
+                    <span class="toolbar-separator"></span>
+
+
+                    <button
+                        type="button"
+                        data-command="formatBlock"
+                        data-value="blockquote"
+                    >
+                        CITATION
+                    </button>
+
+                    <button
+                        type="button"
+                        data-command="insertHorizontalRule"
+                    >
+                        LIGNE
+                    </button>
+
+                </div>
+
+
+                <div
+                    id="wysiwyg"
+                    class="wysiwyg"
+                    contenteditable="true"
+                ></div>
+
+
+                <textarea
+                    id="sourceEditor"
+                    class="source-editor"
+                    spellcheck="false"
+                ></textarea>
+
+
+                <div class="editor-footer">
+
+                    Le contenu est enregistré sous forme de HTML.
+                    Les images peuvent être placées directement
+                    à l'endroit souhaité dans le texte.
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+</main>
+
+
+<!-- =====================================================
+     STRUCTURE MODAL
+===================================================== -->
+
+<div
+    id="structureModal"
+    class="modal-overlay"
+>
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">
+                Nouveau
+            </h2>
+
+            <button
+                type="button"
+                class="modal-close"
+                id="modalCloseButton"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="modal-body">
+
+            <div class="field">
+
+                <label for="modalName">
+                    TITRE
+                </label>
+
+                <input
+                    type="text"
+                    id="modalName"
+                    maxlength="200"
+                    autocomplete="off"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="modal-footer">
+
+            <button
+                type="button"
+                class="button"
+                id="modalCancelButton"
+            >
+                ANNULER
+            </button>
+
+            <button
+                type="button"
+                class="button primary"
+                id="modalSaveButton"
+            >
+                CRÉER
+            </button>
+
+        </div>
+
     </div>
 
-
-    <!-- =====================================================
-         MESSAGE
-    ===================================================== -->
-
-    <div
-        id="message"
-        class="message"
-    ></div>
+</div>
 
 
-    <!-- =====================================================
-         SUPABASE + APPLICATION
-    ===================================================== -->
+<!-- =====================================================
+     MESSAGE
+===================================================== -->
 
-    <script type="module">
-
-        import { supabase } from "./js/supabase.js";
-
-
-        /* =================================================
-           ETAT
-        ================================================= */
-
-        let menus = [];
-        let sousMenus = [];
-        let contenus = [];
-
-        let selectedType = null;
-        let selectedId = null;
-
-        let editorType = null;
-        let editorId = null;
-
-        let modalType = null;
-        let modalParentId = null;
-        let modalEditId = null;
-
-        let isSourceMode = false;
-
-        let currentProfile = null;
+<div
+    id="message"
+    class="message"
+></div>
 
 
-        /* =================================================
-           ELEMENTS
-        ================================================= */
+<!-- =====================================================
+     SUPABASE + APPLICATION
+===================================================== -->
 
-        const tree =
-            document.getElementById("tree");
+<script type="module">
 
-        const welcome =
-            document.getElementById("welcome");
-
-        const structureEditor =
-            document.getElementById("structureEditor");
-
-        const contentEditor =
-            document.getElementById("contentEditor");
-
-        const structureTitle =
-            document.getElementById("structureTitle");
-
-        const structureDescription =
-            document.getElementById("structureDescription");
-
-        const structureName =
-            document.getElementById("structureName");
-
-        const structureParentField =
-            document.getElementById("structureParentField");
-
-        const structureParent =
-            document.getElementById("structureParent");
-
-        const contentEditorTitle =
-            document.getElementById("contentEditorTitle");
-
-        const contentTitle =
-            document.getElementById("contentTitle");
-
-        const contentParent =
-            document.getElementById("contentParent");
-
-        const wysiwyg =
-            document.getElementById("wysiwyg");
-
-        const sourceEditor =
-            document.getElementById("sourceEditor");
-
-        const message =
-            document.getElementById("message");
-
-        const connectedUser =
-            document.getElementById("connectedUser");
-
-        const structureModal =
-            document.getElementById("structureModal");
-
-        const modalTitle =
-            document.getElementById("modalTitle");
-
-        const modalName =
-            document.getElementById("modalName");
-
-        const modalSaveButton =
-            document.getElementById("modalSaveButton");
+    import { supabase } from "./js/supabase.js";
 
 
-        /* =================================================
-           MESSAGE
-        ================================================= */
+    /* =================================================
+       ETAT
+    ================================================= */
 
-        let messageTimer = null;
+    let menus = [];
+    let sousMenus = [];
+    let contenus = [];
+
+    let selectedType = null;
+    let selectedId = null;
+
+    let editorType = null;
+    let editorId = null;
+
+    let modalType = null;
+    let modalParentId = null;
+    let modalEditId = null;
+
+    let isSourceMode = false;
+
+    let currentProfile = null;
 
 
-        function showMessage(
-            text,
-            type = "success"
+    /* =================================================
+       ELEMENTS
+    ================================================= */
+
+    const tree =
+        document.getElementById("tree");
+
+    const welcome =
+        document.getElementById("welcome");
+
+    const structureEditor =
+        document.getElementById("structureEditor");
+
+    const contentEditor =
+        document.getElementById("contentEditor");
+
+    const structureTitle =
+        document.getElementById("structureTitle");
+
+    const structureDescription =
+        document.getElementById("structureDescription");
+
+    const structureName =
+        document.getElementById("structureName");
+
+    const structureParentField =
+        document.getElementById("structureParentField");
+
+    const structureParent =
+        document.getElementById("structureParent");
+
+    const contentEditorTitle =
+        document.getElementById("contentEditorTitle");
+
+    const contentTitle =
+        document.getElementById("contentTitle");
+
+    const contentParent =
+        document.getElementById("contentParent");
+
+    const wysiwyg =
+        document.getElementById("wysiwyg");
+
+    const sourceEditor =
+        document.getElementById("sourceEditor");
+
+    const message =
+        document.getElementById("message");
+
+    const connectedUser =
+        document.getElementById("connectedUser");
+
+    const structureModal =
+        document.getElementById("structureModal");
+
+    const modalTitle =
+        document.getElementById("modalTitle");
+
+    const modalName =
+        document.getElementById("modalName");
+
+    const modalSaveButton =
+        document.getElementById("modalSaveButton");
+
+
+    /* =================================================
+       MESSAGE
+    ================================================= */
+
+    let messageTimer = null;
+
+
+    function showMessage(
+        text,
+        type = "success"
+    ) {
+
+        clearTimeout(messageTimer);
+
+        message.className =
+            "message visible " + type;
+
+        message.textContent =
+            text;
+
+        messageTimer =
+            setTimeout(
+                () => {
+
+                    message.className =
+                        "message";
+
+                },
+                3500
+            );
+
+    }
+
+
+    /* =================================================
+       ESCAPE HTML
+    ================================================= */
+
+    function escapeHtml(value) {
+
+        return String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+
+    }
+
+
+    /* =================================================
+       ADMIN
+    ================================================= */
+
+    async function verifierAdmin() {
+
+        const {
+            data: {
+                user
+            },
+            error: userError
+        } =
+            await supabase.auth.getUser();
+
+
+        if (
+            userError ||
+            !user
         ) {
 
-            clearTimeout(messageTimer);
-
-            message.className =
-                "message visible " + type;
-
-            message.textContent =
-                text;
-
-            messageTimer =
-                setTimeout(
-                    () => {
-
-                        message.className =
-                            "message";
-
-                    },
-                    3500
-                );
+            throw new Error(
+                "Vous devez être connecté."
+            );
 
         }
 
 
-        /* =================================================
-           ESCAPE HTML
-        ================================================= */
+        const {
+            data: profile,
+            error: profileError
+        } =
+            await supabase
 
-        function escapeHtml(value) {
+                .from("profiles")
 
-            return String(value ?? "")
-                .replaceAll("&", "&amp;")
-                .replaceAll("<", "&lt;")
-                .replaceAll(">", "&gt;")
-                .replaceAll('"', "&quot;")
-                .replaceAll("'", "&#039;");
+                .select(
+                    "id, nom, email, grade"
+                )
+
+                .eq(
+                    "id",
+                    user.id
+                )
+
+                .single();
+
+
+        if (
+            profileError ||
+            !profile
+        ) {
+
+            throw new Error(
+                "Impossible de charger votre profil."
+            );
 
         }
 
 
-        /* =================================================
-           ADMIN
-        ================================================= */
+        if (
+            profile.grade !== "admin"
+        ) {
 
-        async function verifierAdmin() {
+            throw new Error(
+                "Accès réservé aux administrateurs."
+            );
 
-            const {
-                data: {
-                    user
-                },
-                error: userError
-            } =
-                await supabase.auth.getUser();
+        }
 
 
-            if (
-                userError ||
-                !user
-            ) {
-
-                throw new Error(
-                    "Vous devez être connecté."
-                );
-
-            }
+        currentProfile =
+            profile;
 
 
-            const {
-                data: profile,
-                error: profileError
-            } =
-                await supabase
+        connectedUser.textContent =
+            profile.nom ||
+            profile.email ||
+            "";
 
-                    .from("profiles")
 
+        return true;
+
+    }
+
+
+    /* =================================================
+       CHARGEMENT DES DONNEES
+    ================================================= */
+
+    async function chargerDonnees() {
+
+        const [
+            menusResult,
+            sousMenusResult,
+            contenusResult
+        ] =
+            await Promise.all([
+
+                supabase
+                    .from("menus")
                     .select(
-                        "id, nom, email, grade"
+                        "id, titre, position, valide"
+                    )
+                    .order(
+                        "position",
+                        {
+                            ascending: true
+                        }
+                    ),
+
+                supabase
+                    .from("sous_menus")
+                    .select(
+                        "id, menu_id, titre, position, valide"
+                    )
+                    .order(
+                        "position",
+                        {
+                            ascending: true
+                        }
+                    ),
+
+                supabase
+                    .from("contenus")
+                    .select(
+                        "id, sous_menu_id, titre, html, position, valide"
+                    )
+                    .order(
+                        "position",
+                        {
+                            ascending: true
+                        }
                     )
 
-                    .eq(
-                        "id",
-                        user.id
-                    )
-
-                    .single();
+            ]);
 
 
-            if (
-                profileError ||
-                !profile
-            ) {
+        if (menusResult.error) {
 
-                throw new Error(
-                    "Impossible de charger votre profil."
-                );
-
-            }
-
-
-            if (
-                profile.grade !== "admin"
-            ) {
-
-                throw new Error(
-                    "Accès réservé aux administrateurs."
-                );
-
-            }
-
-
-            currentProfile =
-                profile;
-
-
-            connectedUser.textContent =
-                profile.nom ||
-                profile.email ||
-                "";
-
-
-            return true;
+            throw menusResult.error;
 
         }
 
 
-        /* =================================================
-           CHARGEMENT DES DONNEES
-        ================================================= */
+        if (sousMenusResult.error) {
 
-        async function chargerDonnees() {
-
-            const [
-                menusResult,
-                sousMenusResult,
-                contenusResult
-            ] =
-                await Promise.all([
-
-                    supabase
-                        .from("menus")
-                        .select(
-                            "id, titre, position, valide"
-                        )
-                        .order(
-                            "position",
-                            {
-                                ascending: true
-                            }
-                        ),
-
-                    supabase
-                        .from("sous_menus")
-                        .select(
-                            "id, menu_id, titre, position, valide"
-                        )
-                        .order(
-                            "position",
-                            {
-                                ascending: true
-                            }
-                        ),
-
-                    supabase
-                        .from("contenus")
-                        .select(
-                            "id, sous_menu_id, titre, html, position, valide"
-                        )
-                        .order(
-                            "position",
-                            {
-                                ascending: true
-                            }
-                        )
-
-                ]);
-
-
-            if (menusResult.error) {
-
-                throw menusResult.error;
-
-            }
-
-
-            if (sousMenusResult.error) {
-
-                throw sousMenusResult.error;
-
-            }
-
-
-            if (contenusResult.error) {
-
-                throw contenusResult.error;
-
-            }
-
-
-            menus =
-                menusResult.data || [];
-
-            sousMenus =
-                sousMenusResult.data || [];
-
-            contenus =
-                contenusResult.data || [];
-
-
-            renderTree();
+            throw sousMenusResult.error;
 
         }
 
 
-        /* =================================================
-           RENDU ARBRE
-        ================================================= */
+        if (contenusResult.error) {
 
-        function renderTree() {
+            throw contenusResult.error;
 
-            tree.innerHTML = "";
+        }
 
 
-            if (!menus.length) {
+        menus =
+            menusResult.data || [];
 
-                tree.innerHTML = `
+        sousMenus =
+            sousMenusResult.data || [];
 
-                    <div class="empty-tree">
-                        Aucun menu.
-                        <br><br>
-                        Utilisez « + MENU » pour commencer.
-                    </div>
+        contenus =
+            contenusResult.data || [];
+
+
+        renderTree();
+
+    }
+
+
+    /* =================================================
+       RENDU ARBRE
+    ================================================= */
+
+    function renderTree() {
+
+        tree.innerHTML = "";
+
+
+        if (!menus.length) {
+
+            tree.innerHTML = `
+
+                <div class="empty-tree">
+                    Aucun menu.
+                    <br><br>
+                    Utilisez « + MENU » pour commencer.
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        menus.forEach(
+            (menu, menuIndex) => {
+
+                const menuBox =
+                    document.createElement(
+                        "div"
+                    );
+
+                menuBox.className =
+                    "tree-menu";
+
+
+                const menuHeader =
+                    document.createElement(
+                        "div"
+                    );
+
+                menuHeader.className =
+                    "tree-menu-header";
+
+
+                const menuButton =
+                    document.createElement(
+                        "button"
+                    );
+
+                menuButton.type =
+                    "button";
+
+                menuButton.className =
+                    "tree-item-main";
+
+
+                menuButton.innerHTML = `
+
+                    <span class="tree-title">
+                        ${escapeHtml(menu.titre)}
+                    </span>
+
+                    <span class="tree-subtitle">
+                        MENU
+                    </span>
 
                 `;
 
-                return;
 
-            }
+                menuButton.addEventListener(
+                    "click",
+                    () => {
 
-
-            menus.forEach(
-                (menu, menuIndex) => {
-
-                    const menuBox =
-                        document.createElement(
-                            "div"
+                        ouvrirStructure(
+                            "menu",
+                            menu.id
                         );
 
-                    menuBox.className =
-                        "tree-menu";
+                    }
+                );
 
 
-                    const menuHeader =
-                        document.createElement(
-                            "div"
-                        );
+                const menuActions =
+                    document.createElement(
+                        "div"
+                    );
 
-                    menuHeader.className =
-                        "tree-menu-header";
-
-
-                    const menuButton =
-                        document.createElement(
-                            "button"
-                        );
-
-                    menuButton.type =
-                        "button";
-
-                    menuButton.className =
-                        "tree-item-main";
+                menuActions.className =
+                    "tree-actions";
 
 
-                    menuButton.innerHTML = `
-
-                        <span class="tree-title">
-                            ${escapeHtml(menu.titre)}
-                        </span>
-
-                        <span class="tree-subtitle">
-                            MENU
-                        </span>
-
-                    `;
+                menuActions.appendChild(
+                    createStatusButton(
+                        menu,
+                        "menu"
+                    )
+                );
 
 
-                    menuButton.addEventListener(
-                        "click",
+                menuActions.appendChild(
+                    createArrowButton(
+                        "↑",
+                        menuIndex > 0,
                         () => {
 
-                            ouvrirStructure(
-                                "menu",
+                            deplacerMenu(
+                                menuIndex,
+                                -1
+                            );
+
+                        }
+                    )
+                );
+
+
+                menuActions.appendChild(
+                    createArrowButton(
+                        "↓",
+                        menuIndex <
+                        menus.length - 1,
+                        () => {
+
+                            deplacerMenu(
+                                menuIndex,
+                                1
+                            );
+
+                        }
+                    )
+                );
+
+
+                /*
+                 * Le crayon de modification du menu
+                 * est volontairement supprimé.
+                 *
+                 * Le nom du menu est directement cliquable.
+                 */
+
+
+                menuActions.appendChild(
+                    createIconButton(
+                        "+",
+                        () => {
+
+                            ouvrirModalCreation(
+                                "submenu",
                                 menu.id
                             );
 
                         }
+                    )
+                );
+
+
+                menuActions.appendChild(
+                    createIconButton(
+                        "×",
+                        () => {
+
+                            supprimerMenu(
+                                menu.id
+                            );
+
+                        },
+                        true
+                    )
+                );
+
+
+                menuHeader.appendChild(
+                    menuButton
+                );
+
+                menuHeader.appendChild(
+                    menuActions
+                );
+
+                menuBox.appendChild(
+                    menuHeader
+                );
+
+
+                const childList =
+                    document.createElement(
+                        "div"
                     );
 
+                childList.className =
+                    "submenu-list";
 
-                    const menuActions =
-                        document.createElement(
-                            "div"
+
+                const children =
+                    sousMenus
+
+                        .filter(
+                            item =>
+                                item.menu_id ===
+                                menu.id
+                        )
+
+                        .sort(
+                            (a,b) =>
+                                Number(a.position) -
+                                Number(b.position)
                         );
 
-                    menuActions.className =
-                        "tree-actions";
 
+                children.forEach(
+                    (submenu, submenuIndex) => {
 
-                    menuActions.appendChild(
-                        createStatusButton(
-                            menu,
-                            "menu"
-                        )
-                    );
+                        childList.appendChild(
 
-
-                    menuActions.appendChild(
-                        createArrowButton(
-                            "↑",
-                            menuIndex > 0,
-                            () => {
-
-                                deplacerMenu(
-                                    menuIndex,
-                                    -1
-                                );
-
-                            }
-                        )
-                    );
-
-
-                    menuActions.appendChild(
-                        createArrowButton(
-                            "↓",
-                            menuIndex <
-                            menus.length - 1,
-                            () => {
-
-                                deplacerMenu(
-                                    menuIndex,
-                                    1
-                                );
-
-                            }
-                        )
-                    );
-
-
-                    /*
-                     * Le crayon de modification du menu
-                     * est volontairement supprimé.
-                     *
-                     * Le nom du menu est directement cliquable.
-                     */
-
-
-                    menuActions.appendChild(
-                        createIconButton(
-                            "+",
-                            () => {
-
-                                ouvrirModalCreation(
-                                    "submenu",
-                                    menu.id
-                                );
-
-                            }
-                        )
-                    );
-
-
-                    menuActions.appendChild(
-                        createIconButton(
-                            "×",
-                            () => {
-
-                                supprimerMenu(
-                                    menu.id
-                                );
-
-                            },
-                            true
-                        )
-                    );
-
-
-                    menuHeader.appendChild(
-                        menuButton
-                    );
-
-                    menuHeader.appendChild(
-                        menuActions
-                    );
-
-                    menuBox.appendChild(
-                        menuHeader
-                    );
-
-
-                    const childList =
-                        document.createElement(
-                            "div"
-                        );
-
-                    childList.className =
-                        "submenu-list";
-
-
-                    const children =
-                        sousMenus
-
-                            .filter(
-                                item =>
-                                    item.menu_id ===
-                                    menu.id
+                            renderSubmenu(
+                                submenu,
+                                children,
+                                submenuIndex
                             )
 
-                            .sort(
-                                (a,b) =>
-                                    Number(a.position) -
-                                    Number(b.position)
-                            );
+                        );
+
+                    }
+                );
 
 
-                    children.forEach(
-                        (submenu, submenuIndex) => {
-
-                            childList.appendChild(
-
-                                renderSubmenu(
-                                    submenu,
-                                    children,
-                                    submenuIndex
-                                )
-
-                            );
-
-                        }
-                    );
+                menuBox.appendChild(
+                    childList
+                );
 
 
-                    menuBox.appendChild(
-                        childList
-                    );
+                tree.appendChild(
+                    menuBox
+                );
+
+            }
+        );
+
+    }
 
 
-                    tree.appendChild(
-                        menuBox
+    function renderSubmenu(
+        submenu,
+        siblings,
+        index
+    ) {
+
+        const box =
+            document.createElement(
+                "div"
+            );
+
+        box.className =
+            "tree-submenu";
+
+
+        const header =
+            document.createElement(
+                "div"
+            );
+
+        header.className =
+            "tree-submenu-header";
+
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+        button.type =
+            "button";
+
+        button.className =
+            "tree-item-main";
+
+
+        button.innerHTML = `
+
+            <span class="tree-title">
+                ${escapeHtml(submenu.titre)}
+            </span>
+
+            <span class="tree-subtitle">
+                SOUS-MENU
+            </span>
+
+        `;
+
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                ouvrirStructure(
+                    "submenu",
+                    submenu.id
+                );
+
+            }
+        );
+
+
+        const actions =
+            document.createElement(
+                "div"
+            );
+
+        actions.className =
+            "tree-actions";
+
+
+        actions.appendChild(
+            createStatusButton(
+                submenu,
+                "submenu"
+            )
+        );
+
+
+        actions.appendChild(
+            createArrowButton(
+                "↑",
+                index > 0,
+                () => {
+
+                    deplacerSousMenu(
+                        submenu,
+                        siblings,
+                        -1
                     );
 
                 }
-            );
-
-        }
-
-
-        function renderSubmenu(
-            submenu,
-            siblings,
-            index
-        ) {
-
-            const box =
-                document.createElement(
-                    "div"
-                );
-
-            box.className =
-                "tree-submenu";
+            )
+        );
 
 
-            const header =
-                document.createElement(
-                    "div"
-                );
-
-            header.className =
-                "tree-submenu-header";
-
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.type =
-                "button";
-
-            button.className =
-                "tree-item-main";
-
-
-            button.innerHTML = `
-
-                <span class="tree-title">
-                    ${escapeHtml(submenu.titre)}
-                </span>
-
-                <span class="tree-subtitle">
-                    SOUS-MENU
-                </span>
-
-            `;
-
-
-            button.addEventListener(
-                "click",
+        actions.appendChild(
+            createArrowButton(
+                "↓",
+                index <
+                siblings.length - 1,
                 () => {
 
-                    ouvrirStructure(
-                        "submenu",
+                    deplacerSousMenu(
+                        submenu,
+                        siblings,
+                        1
+                    );
+
+                }
+            )
+        );
+
+
+        /*
+         * Le crayon de modification du sous-menu
+         * est volontairement supprimé.
+         *
+         * Le nom du sous-menu est directement cliquable.
+         */
+
+
+        actions.appendChild(
+            createIconButton(
+                "+",
+                () => {
+
+                    ouvrirModalCreation(
+                        "content",
                         submenu.id
                     );
 
                 }
-            );
+            )
+        );
 
 
-            const actions =
-                document.createElement(
-                    "div"
-                );
+        actions.appendChild(
+            createIconButton(
+                "×",
+                () => {
 
-            actions.className =
-                "tree-actions";
-
-
-            actions.appendChild(
-                createStatusButton(
-                    submenu,
-                    "submenu"
-                )
-            );
-
-
-            actions.appendChild(
-                createArrowButton(
-                    "↑",
-                    index > 0,
-                    () => {
-
-                        deplacerSousMenu(
-                            submenu,
-                            siblings,
-                            -1
-                        );
-
-                    }
-                )
-            );
-
-
-            actions.appendChild(
-                createArrowButton(
-                    "↓",
-                    index <
-                    siblings.length - 1,
-                    () => {
-
-                        deplacerSousMenu(
-                            submenu,
-                            siblings,
-                            1
-                        );
-
-                    }
-                )
-            );
-
-
-            /*
-             * Le crayon de modification du sous-menu
-             * est volontairement supprimé.
-             *
-             * Le nom du sous-menu est directement cliquable.
-             */
-
-
-            actions.appendChild(
-                createIconButton(
-                    "+",
-                    () => {
-
-                        ouvrirModalCreation(
-                            "content",
-                            submenu.id
-                        );
-
-                    }
-                )
-            );
-
-
-            actions.appendChild(
-                createIconButton(
-                    "×",
-                    () => {
-
-                        supprimerSousMenu(
-                            submenu.id
-                        );
-
-                    },
-                    true
-                )
-            );
-
-
-            header.appendChild(
-                button
-            );
-
-            header.appendChild(
-                actions
-            );
-
-            box.appendChild(
-                header
-            );
-
-
-            const contentList =
-                document.createElement(
-                    "div"
-                );
-
-            contentList.className =
-                "content-list";
-
-
-            const children =
-                contenus
-
-                    .filter(
-                        item =>
-                            item.sous_menu_id ===
-                            submenu.id
-                    )
-
-                    .sort(
-                        (a,b) =>
-                            Number(a.position) -
-                            Number(b.position)
+                    supprimerSousMenu(
+                        submenu.id
                     );
 
+                },
+                true
+            )
+        );
 
-            children.forEach(
-                (content, contentIndex) => {
 
-                    contentList.appendChild(
+        header.appendChild(
+            button
+        );
 
-                        renderContent(
-                            content,
-                            children,
-                            contentIndex
-                        )
+        header.appendChild(
+            actions
+        );
 
+        box.appendChild(
+            header
+        );
+
+
+        const contentList =
+            document.createElement(
+                "div"
+            );
+
+        contentList.className =
+            "content-list";
+
+
+        const children =
+            contenus
+
+                .filter(
+                    item =>
+                        item.sous_menu_id ===
+                        submenu.id
+                )
+
+                .sort(
+                    (a,b) =>
+                        Number(a.position) -
+                        Number(b.position)
+                );
+
+
+        children.forEach(
+            (content, contentIndex) => {
+
+                contentList.appendChild(
+
+                    renderContent(
+                        content,
+                        children,
+                        contentIndex
+                    )
+
+                );
+
+            }
+        );
+
+
+        box.appendChild(
+            contentList
+        );
+
+
+        return box;
+
+    }
+
+
+    function renderContent(
+        content,
+        siblings,
+        index
+    ) {
+
+        const row =
+            document.createElement(
+                "div"
+            );
+
+        row.className =
+            "tree-content";
+
+
+        const button =
+            document.createElement(
+                "button"
+            );
+
+        button.type =
+            "button";
+
+        button.className =
+            "tree-content-button";
+
+        button.innerHTML = `
+
+            <span class="tree-title">
+                ${escapeHtml(content.titre)}
+            </span>
+
+        `;
+
+
+        button.addEventListener(
+            "click",
+            () => {
+
+                ouvrirContenu(
+                    content.id
+                );
+
+            }
+        );
+
+
+        row.appendChild(
+            button
+        );
+
+
+        row.appendChild(
+            createStatusButton(
+                content,
+                "content"
+            )
+        );
+
+
+        row.appendChild(
+            createArrowButton(
+                "↑",
+                index > 0,
+                () => {
+
+                    deplacerContenu(
+                        content,
+                        siblings,
+                        -1
                     );
 
                 }
-            );
+            )
+        );
 
 
-            box.appendChild(
-                contentList
-            );
-
-
-            return box;
-
-        }
-
-
-        function renderContent(
-            content,
-            siblings,
-            index
-        ) {
-
-            const row =
-                document.createElement(
-                    "div"
-                );
-
-            row.className =
-                "tree-content";
-
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.type =
-                "button";
-
-            button.className =
-                "tree-content-button";
-
-            button.innerHTML = `
-
-                <span class="tree-title">
-                    ${escapeHtml(content.titre)}
-                </span>
-
-            `;
-
-
-            button.addEventListener(
-                "click",
+        row.appendChild(
+            createArrowButton(
+                "↓",
+                index <
+                siblings.length - 1,
                 () => {
 
-                    ouvrirContenu(
+                    deplacerContenu(
+                        content,
+                        siblings,
+                        1
+                    );
+
+                }
+            )
+        );
+
+
+        row.appendChild(
+            createIconButton(
+                "×",
+                () => {
+
+                    supprimerContenu(
                         content.id
                     );
 
-                }
+                },
+                true
+            )
+        );
+
+
+        return row;
+
+    }
+
+
+    /* =================================================
+       BOUTONS ARBRE
+    ================================================= */
+
+    function createArrowButton(
+        text,
+        enabled,
+        callback
+    ) {
+
+        const button =
+            document.createElement(
+                "button"
             );
 
+        button.type =
+            "button";
 
-            row.appendChild(
-                button
-            );
+        button.className =
+            "icon-button";
 
+        button.textContent =
+            text;
 
-            row.appendChild(
-                createStatusButton(
-                    content,
-                    "content"
-                )
-            );
+        button.disabled =
+            !enabled;
 
+        button.style.opacity =
+            enabled ? "1" : ".25";
 
-            row.appendChild(
-                createArrowButton(
-                    "↑",
-                    index > 0,
-                    () => {
+        button.addEventListener(
+            "click",
+            event => {
 
-                        deplacerContenu(
-                            content,
-                            siblings,
-                            -1
-                        );
+                event.stopPropagation();
 
-                    }
-                )
-            );
-
-
-            row.appendChild(
-                createArrowButton(
-                    "↓",
-                    index <
-                    siblings.length - 1,
-                    () => {
-
-                        deplacerContenu(
-                            content,
-                            siblings,
-                            1
-                        );
-
-                    }
-                )
-            );
-
-
-            row.appendChild(
-                createIconButton(
-                    "×",
-                    () => {
-
-                        supprimerContenu(
-                            content.id
-                        );
-
-                    },
-                    true
-                )
-            );
-
-
-            return row;
-
-        }
-
-
-        /* =================================================
-           BOUTONS ARBRE
-        ================================================= */
-
-        function createArrowButton(
-            text,
-            enabled,
-            callback
-        ) {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.type =
-                "button";
-
-            button.className =
-                "icon-button";
-
-            button.textContent =
-                text;
-
-            button.disabled =
-                !enabled;
-
-            button.style.opacity =
-                enabled ? "1" : ".25";
-
-            button.addEventListener(
-                "click",
-                event => {
-
-                    event.stopPropagation();
-
-                    if (enabled) {
-
-                        callback();
-
-                    }
-
-                }
-            );
-
-            return button;
-
-        }
-
-
-        function createIconButton(
-            text,
-            callback,
-            danger = false
-        ) {
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.type =
-                "button";
-
-            button.className =
-                "icon-button" +
-                (
-                    danger
-                        ? " danger"
-                        : ""
-                );
-
-            button.textContent =
-                text;
-
-            button.addEventListener(
-                "click",
-                event => {
-
-                    event.stopPropagation();
+                if (enabled) {
 
                     callback();
 
                 }
+
+            }
+        );
+
+        return button;
+
+    }
+
+
+    function createIconButton(
+        text,
+        callback,
+        danger = false
+    ) {
+
+        const button =
+            document.createElement(
+                "button"
             );
 
-            return button;
+        button.type =
+            "button";
 
-        }
+        button.className =
+            "icon-button" +
+            (
+                danger
+                    ? " danger"
+                    : ""
+            );
+
+        button.textContent =
+            text;
+
+        button.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+                callback();
+
+            }
+        );
+
+        return button;
+
+    }
 
 
-        function createStatusButton(
-            item,
-            type
-        ) {
+    function createStatusButton(
+        item,
+        type
+    ) {
 
-            const button =
-                document.createElement(
-                    "button"
-                );
+        const button =
+            document.createElement(
+                "button"
+            );
 
-            button.type =
-                "button";
+        button.type =
+            "button";
 
-            button.className =
-                "status-button " +
-                (
-                    item.valide
-                        ? "status-valid"
-                        : "status-draft"
-                );
-
-            button.textContent =
+        button.className =
+            "status-button " +
+            (
                 item.valide
-                    ? "VALIDÉ"
-                    : "BROUILLON";
+                    ? "status-valid"
+                    : "status-draft"
+            );
+
+        button.textContent =
+            item.valide
+                ? "VALIDÉ"
+                : "BROUILLON";
 
 
-            button.addEventListener(
-                "click",
-                event => {
+        button.addEventListener(
+            "click",
+            event => {
 
-                    event.stopPropagation();
+                event.stopPropagation();
 
-                    changerValidation(
-                        type,
-                        item
+                changerValidation(
+                    type,
+                    item
+                );
+
+            }
+        );
+
+
+        return button;
+
+    }
+
+
+    /* =================================================
+       LISTES D'AFFILIATION
+    ================================================= */
+
+    function remplirListeMenus(
+        select,
+        selectedId
+    ) {
+
+        select.innerHTML = "";
+
+
+        menus
+            .slice()
+            .sort(
+                (a,b) =>
+                    Number(a.position) -
+                    Number(b.position)
+            )
+            .forEach(
+                menu => {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+                    option.value =
+                        menu.id;
+
+                    option.textContent =
+                        menu.titre;
+
+                    if (
+                        String(menu.id) ===
+                        String(selectedId)
+                    ) {
+
+                        option.selected =
+                            true;
+
+                    }
+
+                    select.appendChild(
+                        option
                     );
 
                 }
             );
 
-
-            return button;
-
-        }
+    }
 
 
-        /* =================================================
-           LISTES D'AFFILIATION
-        ================================================= */
+    function remplirListeSousMenus(
+        select,
+        selectedId
+    ) {
 
-        function remplirListeMenus(
-            select,
-            selectedId
-        ) {
-
-            select.innerHTML = "";
+        select.innerHTML = "";
 
 
+        const sortedMenus =
             menus
                 .slice()
                 .sort(
                     (a,b) =>
                         Number(a.position) -
                         Number(b.position)
-                )
-                .forEach(
-                    menu => {
+                );
+
+
+        sortedMenus.forEach(
+            menu => {
+
+                const children =
+                    sousMenus
+
+                        .filter(
+                            submenu =>
+                                submenu.menu_id ===
+                                menu.id
+                        )
+
+                        .sort(
+                            (a,b) =>
+                                Number(a.position) -
+                                Number(b.position)
+                        );
+
+
+                children.forEach(
+                    submenu => {
 
                         const option =
                             document.createElement(
@@ -2905,13 +2975,15 @@
                             );
 
                         option.value =
-                            menu.id;
+                            submenu.id;
 
                         option.textContent =
-                            menu.titre;
+                            menu.titre +
+                            " → " +
+                            submenu.titre;
 
                         if (
-                            String(menu.id) ===
+                            String(submenu.id) ===
                             String(selectedId)
                         ) {
 
@@ -2927,851 +2999,166 @@
                     }
                 );
 
-        }
+            }
+        );
+
+    }
 
 
-        function remplirListeSousMenus(
-            select,
-            selectedId
-        ) {
+    /* =================================================
+       SELECTION / EDITEUR STRUCTURE
+    ================================================= */
 
-            select.innerHTML = "";
+    function ouvrirStructure(
+        type,
+        id
+    ) {
 
+        selectedType =
+            type;
 
-            const sortedMenus =
-                menus
-                    .slice()
-                    .sort(
-                        (a,b) =>
-                            Number(a.position) -
-                            Number(b.position)
-                    );
+        selectedId =
+            id;
 
+        const collection =
+            type === "menu"
+                ? menus
+                : sousMenus;
 
-            sortedMenus.forEach(
-                menu => {
-
-                    const children =
-                        sousMenus
-
-                            .filter(
-                                submenu =>
-                                    submenu.menu_id ===
-                                    menu.id
-                            )
-
-                            .sort(
-                                (a,b) =>
-                                    Number(a.position) -
-                                    Number(b.position)
-                            );
-
-
-                    children.forEach(
-                        submenu => {
-
-                            const option =
-                                document.createElement(
-                                    "option"
-                                );
-
-                            option.value =
-                                submenu.id;
-
-                            option.textContent =
-                                menu.titre +
-                                " → " +
-                                submenu.titre;
-
-                            if (
-                                String(submenu.id) ===
-                                String(selectedId)
-                            ) {
-
-                                option.selected =
-                                    true;
-
-                            }
-
-                            select.appendChild(
-                                option
-                            );
-
-                        }
-                    );
-
-                }
+        const item =
+            collection.find(
+                element =>
+                    element.id === id
             );
 
+
+        if (!item) {
+
+            return;
+
         }
 
 
-        /* =================================================
-           SELECTION / EDITEUR STRUCTURE
-        ================================================= */
+        welcome.style.display =
+            "none";
 
-        function ouvrirStructure(
-            type,
-            id
+        contentEditor.style.display =
+            "none";
+
+        structureEditor.style.display =
+            "block";
+
+
+        structureTitle.textContent =
+            type === "menu"
+                ? "MODIFIER LE MENU"
+                : "MODIFIER LE SOUS-MENU";
+
+
+        structureDescription.textContent =
+            type === "menu"
+                ? "Modification du menu principal."
+                : "Modification du sous-menu.";
+
+
+        structureName.value =
+            item.titre || "";
+
+
+        if (
+            type === "submenu"
         ) {
 
-            selectedType =
-                type;
-
-            selectedId =
-                id;
-
-            const collection =
-                type === "menu"
-                    ? menus
-                    : sousMenus;
-
-            const item =
-                collection.find(
-                    element =>
-                        element.id === id
-                );
-
-
-            if (!item) {
-
-                return;
-
-            }
-
-
-            welcome.style.display =
-                "none";
-
-            contentEditor.style.display =
-                "none";
-
-            structureEditor.style.display =
+            structureParentField.style.display =
                 "block";
 
-
-            structureTitle.textContent =
-                type === "menu"
-                    ? "MODIFIER LE MENU"
-                    : "MODIFIER LE SOUS-MENU";
-
-
-            structureDescription.textContent =
-                type === "menu"
-                    ? "Modification du menu principal."
-                    : "Modification du sous-menu.";
-
-
-            structureName.value =
-                item.titre || "";
-
-
-            if (
-                type === "submenu"
-            ) {
-
-                structureParentField.style.display =
-                    "block";
-
-                remplirListeMenus(
-                    structureParent,
-                    item.menu_id
-                );
-
-            } else {
-
-                structureParentField.style.display =
-                    "none";
-
-                structureParent.innerHTML =
-                    "";
-
-            }
-
-        }
-
-
-        document
-            .getElementById("structureCancelButton")
-            .addEventListener(
-                "click",
-                () => {
-
-                    fermerEditeurs();
-
-                }
+            remplirListeMenus(
+                structureParent,
+                item.menu_id
             );
 
+        } else {
 
-        document
-            .getElementById("structureSaveButton")
-            .addEventListener(
-                "click",
-                async () => {
+            structureParentField.style.display =
+                "none";
 
-                    await enregistrerStructure();
-
-                }
-            );
-
-
-        async function enregistrerStructure() {
-
-            const titre =
-                structureName.value.trim();
-
-
-            if (!titre) {
-
-                showMessage(
-                    "Le titre est obligatoire.",
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            if (
-                selectedType === "menu"
-            ) {
-
-                const {
-                    error
-                } =
-                    await supabase
-
-                        .from("menus")
-
-                        .update({
-                            titre
-                        })
-
-                        .eq(
-                            "id",
-                            selectedId
-                        );
-
-
-                if (error) {
-
-                    console.error(error);
-
-                    showMessage(
-                        "Impossible d'enregistrer la modification.",
-                        "error"
-                    );
-
-                    return;
-
-                }
-
-            }
-
-
-            if (
-                selectedType === "submenu"
-            ) {
-
-                const submenu =
-                    sousMenus.find(
-                        item =>
-                            item.id ===
-                            selectedId
-                    );
-
-
-                if (!submenu) {
-
-                    showMessage(
-                        "Sous-menu introuvable.",
-                        "error"
-                    );
-
-                    return;
-
-                }
-
-
-                const nouveauMenuId =
-                    structureParent.value;
-
-
-                if (!nouveauMenuId) {
-
-                    showMessage(
-                        "Le menu parent est obligatoire.",
-                        "error"
-                    );
-
-                    return;
-
-                }
-
-
-                const ancienMenuId =
-                    submenu.menu_id;
-
-
-                /*
-                 * Si le sous-menu change de menu parent,
-                 * on le place à la fin du nouveau menu.
-                 */
-
-                let nouvellePosition =
-                    Number(submenu.position) || 0;
-
-
-                if (
-                    String(nouveauMenuId) !==
-                    String(ancienMenuId)
-                ) {
-
-                    const destination =
-                        sousMenus.filter(
-                            item =>
-                                item.menu_id ===
-                                nouveauMenuId &&
-                                item.id !==
-                                selectedId
-                        );
-
-
-                    nouvellePosition =
-                        getNextPosition(
-                            destination
-                        );
-
-                }
-
-
-                const {
-                    error
-                } =
-                    await supabase
-
-                        .from("sous_menus")
-
-                        .update({
-
-                            titre,
-
-                            menu_id:
-                                nouveauMenuId,
-
-                            position:
-                                nouvellePosition
-
-                        })
-
-                        .eq(
-                            "id",
-                            selectedId
-                        );
-
-
-                if (error) {
-
-                    console.error(error);
-
-                    showMessage(
-                        "Impossible d'enregistrer la modification.",
-                        "error"
-                    );
-
-                    return;
-
-                }
-
-            }
-
-
-            showMessage(
-                "Modification enregistrée."
-            );
-
-
-            await chargerDonnees();
-
-            fermerEditeurs();
-
-        }
-
-
-        /* =================================================
-           CREATION
-        ================================================= */
-
-        function ouvrirModalCreation(
-            type,
-            parentId
-        ) {
-
-            modalType =
-                type;
-
-            modalParentId =
-                parentId;
-
-            modalEditId =
-                null;
-
-
-            modalTitle.textContent =
-                type === "submenu"
-                    ? "NOUVEAU SOUS-MENU"
-                    : "NOUVEAU CONTENU";
-
-
-            modalName.value =
+            structureParent.innerHTML =
                 "";
 
-
-            modalSaveButton.textContent =
-                "CRÉER";
-
-
-            structureModal.classList.add(
-                "visible"
-            );
-
-
-            setTimeout(
-                () => {
-
-                    modalName.focus();
-
-                },
-                50
-            );
-
         }
 
-
-        document
-            .getElementById("addMenuButton")
-            .addEventListener(
-                "click",
-                () => {
-
-                    modalType =
-                        "menu";
-
-                    modalParentId =
-                        null;
-
-                    modalEditId =
-                        null;
-
-                    modalTitle.textContent =
-                        "NOUVEAU MENU";
-
-                    modalName.value =
-                        "";
-
-                    modalSaveButton.textContent =
-                        "CRÉER";
-
-                    structureModal.classList.add(
-                        "visible"
-                    );
-
-                    setTimeout(
-                        () => {
-
-                            modalName.focus();
-
-                        },
-                        50
-                    );
-
-                }
-            );
+    }
 
 
-        function fermerModal() {
-
-            structureModal.classList.remove(
-                "visible"
-            );
-
-            modalType =
-                null;
-
-            modalParentId =
-                null;
-
-            modalEditId =
-                null;
-
-        }
-
-
-        document
-            .getElementById("modalCloseButton")
-            .addEventListener(
-                "click",
-                fermerModal
-            );
-
-
-        document
-            .getElementById("modalCancelButton")
-            .addEventListener(
-                "click",
-                fermerModal
-            );
-
-
-        structureModal.addEventListener(
+    document
+        .getElementById("structureCancelButton")
+        .addEventListener(
             "click",
-            event => {
+            () => {
 
-                if (
-                    event.target ===
-                    structureModal
-                ) {
-
-                    fermerModal();
-
-                }
+                fermerEditeurs();
 
             }
         );
 
 
-        modalSaveButton.addEventListener(
+    document
+        .getElementById("structureSaveButton")
+        .addEventListener(
             "click",
             async () => {
 
-                await creerElement();
+                await enregistrerStructure();
 
             }
         );
 
 
-        modalName.addEventListener(
-            "keydown",
-            event => {
+    async function enregistrerStructure() {
 
-                if (
-                    event.key === "Enter"
-                ) {
+        const titre =
+            structureName.value.trim();
 
-                    event.preventDefault();
 
-                    creerElement();
+        if (!titre) {
 
-                }
+            showMessage(
+                "Le titre est obligatoire.",
+                "error"
+            );
 
-            }
-        );
+            return;
 
+        }
 
-        async function creerElement() {
 
-            const titre =
-                modalName.value.trim();
+        if (
+            selectedType === "menu"
+        ) {
 
+            const {
+                error
+            } =
+                await supabase
 
-            if (!titre) {
+                    .from("menus")
 
-                showMessage(
-                    "Le titre est obligatoire.",
-                    "error"
-                );
+                    .update({
+                        titre
+                    })
 
-                return;
+                    .eq(
+                        "id",
+                        selectedId
+                    );
 
-            }
 
-
-            modalSaveButton.disabled =
-                true;
-
-
-            try {
-
-                if (
-                    modalType === "menu"
-                ) {
-
-                    const position =
-                        getNextPosition(
-                            menus
-                        );
-
-
-                    const {
-                        error
-                    } =
-                        await supabase
-                            .from("menus")
-                            .insert({
-                                titre,
-                                position,
-                                valide: false
-                            });
-
-
-                    if (error) {
-
-                        throw error;
-
-                    }
-
-                }
-
-
-                if (
-                    modalType === "submenu"
-                ) {
-
-                    const siblings =
-                        sousMenus.filter(
-                            item =>
-                                item.menu_id ===
-                                modalParentId
-                        );
-
-
-                    const position =
-                        getNextPosition(
-                            siblings
-                        );
-
-
-                    const {
-                        error
-                    } =
-                        await supabase
-                            .from("sous_menus")
-                            .insert({
-
-                                menu_id:
-                                    modalParentId,
-
-                                titre,
-
-                                position,
-
-                                valide: false
-
-                            });
-
-
-                    if (error) {
-
-                        throw error;
-
-                    }
-
-                }
-
-
-                if (
-                    modalType === "content"
-                ) {
-
-                    const siblings =
-                        contenus.filter(
-                            item =>
-                                item.sous_menu_id ===
-                                modalParentId
-                        );
-
-
-                    const position =
-                        getNextPosition(
-                            siblings
-                        );
-
-
-                    const {
-                        error
-                    } =
-                        await supabase
-                            .from("contenus")
-                            .insert({
-
-                                sous_menu_id:
-                                    modalParentId,
-
-                                titre,
-
-                                html:
-                                    "<p></p>",
-
-                                position,
-
-                                valide: false
-
-                            });
-
-
-                    if (error) {
-
-                        throw error;
-
-                    }
-
-                }
-
-
-                fermerModal();
-
-                await chargerDonnees();
-
-                showMessage(
-                    "Élément créé."
-                );
-
-            }
-            catch (error) {
+            if (error) {
 
                 console.error(error);
 
                 showMessage(
-                    "Impossible de créer l'élément.",
-                    "error"
-                );
-
-            }
-            finally {
-
-                modalSaveButton.disabled =
-                    false;
-
-            }
-
-        }
-
-
-        function getNextPosition(
-            items
-        ) {
-
-            if (!items.length) {
-
-                return 0;
-
-            }
-
-
-            return Math.max(
-                ...items.map(
-                    item =>
-                        Number(item.position) || 0
-                )
-            ) + 1;
-
-        }
-
-
-        /* =================================================
-           CONTENU
-        ================================================= */
-
-        function ouvrirContenu(
-            id
-        ) {
-
-            const item =
-                contenus.find(
-                    content =>
-                        content.id === id
-                );
-
-
-            if (!item) {
-
-                return;
-
-            }
-
-
-            editorType =
-                "content";
-
-            editorId =
-                id;
-
-
-            welcome.style.display =
-                "none";
-
-            structureEditor.style.display =
-                "none";
-
-            contentEditor.style.display =
-                "block";
-
-
-            contentEditorTitle.textContent =
-                "MODIFIER LE CONTENU";
-
-
-            contentTitle.value =
-                item.titre || "";
-
-
-            remplirListeSousMenus(
-                contentParent,
-                item.sous_menu_id
-            );
-
-
-            wysiwyg.innerHTML =
-                item.html || "";
-
-
-            sourceEditor.value =
-                item.html || "";
-
-
-            isSourceMode =
-                false;
-
-            actualiserModeEditeur();
-
-        }
-
-
-        document
-            .getElementById("contentCancelButton")
-            .addEventListener(
-                "click",
-                () => {
-
-                    fermerEditeurs();
-
-                }
-            );
-
-
-        document
-            .getElementById("contentSaveButton")
-            .addEventListener(
-                "click",
-                async () => {
-
-                    await enregistrerContenu();
-
-                }
-            );
-
-
-        async function enregistrerContenu() {
-
-            const titre =
-                contentTitle.value.trim();
-
-
-            if (!titre) {
-
-                showMessage(
-                    "Le titre est obligatoire.",
+                    "Impossible d'enregistrer la modification.",
                     "error"
                 );
 
@@ -3779,19 +3166,25 @@
 
             }
 
+        }
 
-            const contenu =
-                contenus.find(
+
+        if (
+            selectedType === "submenu"
+        ) {
+
+            const submenu =
+                sousMenus.find(
                     item =>
                         item.id ===
-                        editorId
+                        selectedId
                 );
 
 
-            if (!contenu) {
+            if (!submenu) {
 
                 showMessage(
-                    "Contenu introuvable.",
+                    "Sous-menu introuvable.",
                     "error"
                 );
 
@@ -3800,14 +3193,14 @@
             }
 
 
-            const nouveauSousMenuId =
-                contentParent.value;
+            const nouveauMenuId =
+                structureParent.value;
 
 
-            if (!nouveauSousMenuId) {
+            if (!nouveauMenuId) {
 
                 showMessage(
-                    "Le sous-menu parent est obligatoire.",
+                    "Le menu parent est obligatoire.",
                     "error"
                 );
 
@@ -3816,43 +3209,31 @@
             }
 
 
-            if (isSourceMode) {
-
-                wysiwyg.innerHTML =
-                    sourceEditor.value;
-
-            }
-
-
-            const html =
-                wysiwyg.innerHTML;
-
-
-            const ancienSousMenuId =
-                contenu.sous_menu_id;
-
-
-            let nouvellePosition =
-                Number(contenu.position) || 0;
+            const ancienMenuId =
+                submenu.menu_id;
 
 
             /*
-             * Si le contenu change de sous-menu,
-             * il est placé à la fin du nouveau sous-menu.
+             * Si le sous-menu change de menu parent,
+             * on le place à la fin du nouveau menu.
              */
 
+            let nouvellePosition =
+                Number(submenu.position) || 0;
+
+
             if (
-                String(nouveauSousMenuId) !==
-                String(ancienSousMenuId)
+                String(nouveauMenuId) !==
+                String(ancienMenuId)
             ) {
 
                 const destination =
-                    contenus.filter(
+                    sousMenus.filter(
                         item =>
-                            item.sous_menu_id ===
-                            nouveauSousMenuId &&
+                            item.menu_id ===
+                            nouveauMenuId &&
                             item.id !==
-                            editorId
+                            selectedId
                     );
 
 
@@ -3869,16 +3250,14 @@
             } =
                 await supabase
 
-                    .from("contenus")
+                    .from("sous_menus")
 
                     .update({
 
                         titre,
 
-                        html,
-
-                        sous_menu_id:
-                            nouveauSousMenuId,
+                        menu_id:
+                            nouveauMenuId,
 
                         position:
                             nouvellePosition
@@ -3887,7 +3266,7 @@
 
                     .eq(
                         "id",
-                        editorId
+                        selectedId
                     );
 
 
@@ -3896,7 +3275,7 @@
                 console.error(error);
 
                 showMessage(
-                    "Impossible d'enregistrer le contenu.",
+                    "Impossible d'enregistrer la modification.",
                     "error"
                 );
 
@@ -3904,781 +3283,1234 @@
 
             }
 
+        }
+
+
+        showMessage(
+            "Modification enregistrée."
+        );
+
+
+        await chargerDonnees();
+
+        fermerEditeurs();
+
+    }
+
+
+    /* =================================================
+       CREATION
+    ================================================= */
+
+    function ouvrirModalCreation(
+        type,
+        parentId
+    ) {
+
+        modalType =
+            type;
+
+        modalParentId =
+            parentId;
+
+        modalEditId =
+            null;
+
+
+        modalTitle.textContent =
+            type === "submenu"
+                ? "NOUVEAU SOUS-MENU"
+                : "NOUVEAU CONTENU";
+
+
+        modalName.value =
+            "";
+
+
+        modalSaveButton.textContent =
+            "CRÉER";
+
+
+        structureModal.classList.add(
+            "visible"
+        );
+
+
+        setTimeout(
+            () => {
+
+                modalName.focus();
+
+            },
+            50
+        );
+
+    }
+
+
+    document
+        .getElementById("addMenuButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                modalType =
+                    "menu";
+
+                modalParentId =
+                    null;
+
+                modalEditId =
+                    null;
+
+                modalTitle.textContent =
+                    "NOUVEAU MENU";
+
+                modalName.value =
+                    "";
+
+                modalSaveButton.textContent =
+                    "CRÉER";
+
+                structureModal.classList.add(
+                    "visible"
+                );
+
+                setTimeout(
+                    () => {
+
+                        modalName.focus();
+
+                    },
+                    50
+                );
+
+            }
+        );
+
+
+    function fermerModal() {
+
+        structureModal.classList.remove(
+            "visible"
+        );
+
+        modalType =
+            null;
+
+        modalParentId =
+            null;
+
+        modalEditId =
+            null;
+
+    }
+
+
+    document
+        .getElementById("modalCloseButton")
+        .addEventListener(
+            "click",
+            fermerModal
+        );
+
+
+    document
+        .getElementById("modalCancelButton")
+        .addEventListener(
+            "click",
+            fermerModal
+        );
+
+
+    structureModal.addEventListener(
+        "click",
+        event => {
+
+            if (
+                event.target ===
+                structureModal
+            ) {
+
+                fermerModal();
+
+            }
+
+        }
+    );
+
+
+    modalSaveButton.addEventListener(
+        "click",
+        async () => {
+
+            await creerElement();
+
+        }
+    );
+
+
+    modalName.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "Enter"
+            ) {
+
+                event.preventDefault();
+
+                creerElement();
+
+            }
+
+        }
+    );
+
+
+    async function creerElement() {
+
+        const titre =
+            modalName.value.trim();
+
+
+        if (!titre) {
 
             showMessage(
-                "Contenu enregistré."
+                "Le titre est obligatoire.",
+                "error"
             );
 
-
-            await chargerDonnees();
-
-            fermerEditeurs();
+            return;
 
         }
 
 
-        /* =================================================
-           WYSIWYG
-        ================================================= */
+        modalSaveButton.disabled =
+            true;
 
-        document
-            .querySelectorAll(
-                "#toolbar button[data-command]"
-            )
-            .forEach(
-                button => {
 
-                    button.addEventListener(
-                        "click",
-                        () => {
-
-                            const command =
-                                button.dataset.command;
-
-                            const value =
-                                button.dataset.value ||
-                                null;
-
-                            wysiwyg.focus();
-
-                            document.execCommand(
-                                command,
-                                false,
-                                value
-                            );
-
-                        }
-                    );
-
-                }
-            );
-
-
-        document
-            .querySelectorAll(
-                "#toolbar button[data-format]"
-            )
-            .forEach(
-                button => {
-
-                    button.addEventListener(
-                        "click",
-                        () => {
-
-                            const format =
-                                button.dataset.format;
-
-                            wysiwyg.focus();
-
-                            document.execCommand(
-                                "formatBlock",
-                                false,
-                                format
-                            );
-
-                        }
-                    );
-
-                }
-            );
-
-
-        document
-            .getElementById("linkButton")
-            .addEventListener(
-                "click",
-                () => {
-
-                    const url =
-                        prompt(
-                            "Adresse du lien :"
-                        );
-
-
-                    if (!url) {
-
-                        return;
-
-                    }
-
-
-                    wysiwyg.focus();
-
-                    document.execCommand(
-                        "createLink",
-                        false,
-                        url
-                    );
-
-                }
-            );
-
-
-        document
-            .getElementById("imageButton")
-            .addEventListener(
-                "click",
-                () => {
-
-                    const url =
-                        prompt(
-                            "URL de l'image :"
-                        );
-
-
-                    if (!url) {
-
-                        return;
-
-                    }
-
-
-                    wysiwyg.focus();
-
-                    document.execCommand(
-                        "insertImage",
-                        false,
-                        url
-                    );
-
-                }
-            );
-
-
-        document
-            .getElementById("videoButton")
-            .addEventListener(
-                "click",
-                () => {
-
-                    const url =
-                        prompt(
-                            "URL de la vidéo :"
-                        );
-
-
-                    if (!url) {
-
-                        return;
-
-                    }
-
-
-                    wysiwyg.focus();
-
-
-                    const html = `
-
-                        <p>
-                            <video
-                                controls
-                                src="${escapeHtml(url)}"
-                            ></video>
-                        </p>
-
-                    `;
-
-
-                    document.execCommand(
-                        "insertHTML",
-                        false,
-                        html
-                    );
-
-                }
-            );
-
-
-        document
-            .getElementById("sourceModeButton")
-            .addEventListener(
-                "click",
-                () => {
-
-                    if (!isSourceMode) {
-
-                        sourceEditor.value =
-                            wysiwyg.innerHTML;
-
-                        isSourceMode =
-                            true;
-
-                    } else {
-
-                        wysiwyg.innerHTML =
-                            sourceEditor.value;
-
-                        isSourceMode =
-                            false;
-
-                    }
-
-
-                    actualiserModeEditeur();
-
-                }
-            );
-
-
-        function actualiserModeEditeur() {
-
-            if (isSourceMode) {
-
-                wysiwyg.style.display =
-                    "none";
-
-                sourceEditor.style.display =
-                    "block";
-
-                document
-                    .getElementById(
-                        "sourceModeButton"
-                    )
-                    .textContent =
-                    "ÉDITEUR VISUEL";
-
-            } else {
-
-                wysiwyg.style.display =
-                    "block";
-
-                sourceEditor.style.display =
-                    "none";
-
-                document
-                    .getElementById(
-                        "sourceModeButton"
-                    )
-                    .textContent =
-                    "CODE HTML";
-
-            }
-
-        }
-
-
-        /* =================================================
-           VALIDATION
-        ================================================= */
-
-        async function changerValidation(
-            type,
-            item
-        ) {
-
-            const nouveauStatut =
-                !Boolean(item.valide);
-
-
-            const table =
-                type === "menu"
-                    ? "menus"
-                    : type === "submenu"
-                        ? "sous_menus"
-                        : "contenus";
-
-
-            const {
-                error
-            } =
-                await supabase
-
-                    .from(table)
-
-                    .update({
-                        valide:
-                            nouveauStatut
-                    })
-
-                    .eq(
-                        "id",
-                        item.id
-                    );
-
-
-            if (error) {
-
-                console.error(error);
-
-                showMessage(
-                    "Impossible de modifier le statut.",
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            item.valide =
-                nouveauStatut;
-
-
-            renderTree();
-
-
-            showMessage(
-                nouveauStatut
-                    ? "Élément validé."
-                    : "Élément passé en brouillon."
-            );
-
-        }
-
-
-        /* =================================================
-           ORDRE
-        ================================================= */
-
-        async function deplacerMenu(
-            index,
-            direction
-        ) {
-
-            const otherIndex =
-                index + direction;
-
+        try {
 
             if (
-                otherIndex < 0 ||
-                otherIndex >= menus.length
+                modalType === "menu"
             ) {
 
-                return;
-
-            }
-
-
-            const first =
-                menus[index];
-
-            const second =
-                menus[otherIndex];
-
-
-            await echangerPositions(
-                "menus",
-                first,
-                second
-            );
-
-        }
-
-
-        async function deplacerSousMenu(
-            item,
-            siblings,
-            direction
-        ) {
-
-            const index =
-                siblings.findIndex(
-                    sibling =>
-                        sibling.id ===
-                        item.id
-                );
-
-
-            const otherIndex =
-                index + direction;
-
-
-            if (
-                otherIndex < 0 ||
-                otherIndex >= siblings.length
-            ) {
-
-                return;
-
-            }
-
-
-            await echangerPositions(
-                "sous_menus",
-                item,
-                siblings[otherIndex]
-            );
-
-        }
-
-
-        async function deplacerContenu(
-            item,
-            siblings,
-            direction
-        ) {
-
-            const index =
-                siblings.findIndex(
-                    sibling =>
-                        sibling.id ===
-                        item.id
-                );
-
-
-            const otherIndex =
-                index + direction;
-
-
-            if (
-                otherIndex < 0 ||
-                otherIndex >= siblings.length
-            ) {
-
-                return;
-
-            }
-
-
-            await echangerPositions(
-                "contenus",
-                item,
-                siblings[otherIndex]
-            );
-
-        }
-
-
-        async function echangerPositions(
-            table,
-            first,
-            second
-        ) {
-
-            const firstPosition =
-                Number(first.position) || 0;
-
-            const secondPosition =
-                Number(second.position) || 0;
-
-
-            const firstUpdate =
-                await supabase
-
-                    .from(table)
-
-                    .update({
-                        position:
-                            secondPosition
-                    })
-
-                    .eq(
-                        "id",
-                        first.id
+                const position =
+                    getNextPosition(
+                        menus
                     );
 
-
-            if (firstUpdate.error) {
-
-                console.error(
-                    firstUpdate.error
-                );
-
-                showMessage(
-                    "Impossible de modifier l'ordre.",
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            const secondUpdate =
-                await supabase
-
-                    .from(table)
-
-                    .update({
-                        position:
-                            firstPosition
-                    })
-
-                    .eq(
-                        "id",
-                        second.id
-                    );
-
-
-            if (secondUpdate.error) {
-
-                console.error(
-                    secondUpdate.error
-                );
-
-                showMessage(
-                    "Impossible de modifier l'ordre.",
-                    "error"
-                );
-
-                await chargerDonnees();
-
-                return;
-
-            }
-
-
-            await chargerDonnees();
-
-        }
-
-
-        /* =================================================
-           SUPPRESSION MENU
-        ================================================= */
-
-        async function supprimerMenu(
-            id
-        ) {
-
-            const menu =
-                menus.find(
-                    item =>
-                        item.id === id
-                );
-
-
-            if (!menu) {
-
-                return;
-
-            }
-
-
-            const children =
-                sousMenus.filter(
-                    item =>
-                        item.menu_id === id
-                );
-
-
-            const childCount =
-                children.length;
-
-
-            const contentCount =
-                contenus.filter(
-                    content =>
-                        children.some(
-                            submenu =>
-                                submenu.id ===
-                                content.sous_menu_id
-                        )
-                ).length;
-
-
-            const confirmation =
-                confirm(
-
-                    "Supprimer le menu « " +
-                    menu.titre +
-                    " » ?" +
-
-                    (
-
-                        childCount ||
-                        contentCount
-
-                            ? "\n\nCela supprimera également " +
-
-                              childCount +
-                              " sous-menu(s) et " +
-
-                              contentCount +
-                              " contenu(s)."
-
-                            : ""
-
-                    )
-
-                );
-
-
-            if (!confirmation) {
-
-                return;
-
-            }
-
-
-            /*
-             * Suppression explicite des descendants.
-             *
-             * Cela évite de dépendre d'un éventuel
-             * ON DELETE CASCADE.
-             */
-
-
-            for (
-                const submenu of children
-            ) {
 
                 const {
-                    error:
-                        contentError
+                    error
                 } =
                     await supabase
+                        .from("menus")
+                        .insert({
+                            titre,
+                            position,
+                            valide: false
+                        });
 
+
+                if (error) {
+
+                    throw error;
+
+                }
+
+            }
+
+
+            if (
+                modalType === "submenu"
+            ) {
+
+                const siblings =
+                    sousMenus.filter(
+                        item =>
+                            item.menu_id ===
+                            modalParentId
+                    );
+
+
+                const position =
+                    getNextPosition(
+                        siblings
+                    );
+
+
+                const {
+                    error
+                } =
+                    await supabase
+                        .from("sous_menus")
+                        .insert({
+
+                            menu_id:
+                                modalParentId,
+
+                            titre,
+
+                            position,
+
+                            valide: false
+
+                        });
+
+
+                if (error) {
+
+                    throw error;
+
+                }
+
+            }
+
+
+            if (
+                modalType === "content"
+            ) {
+
+                const siblings =
+                    contenus.filter(
+                        item =>
+                            item.sous_menu_id ===
+                            modalParentId
+                    );
+
+
+                const position =
+                    getNextPosition(
+                        siblings
+                    );
+
+
+                const {
+                    error
+                } =
+                    await supabase
                         .from("contenus")
+                        .insert({
 
-                        .delete()
+                            sous_menu_id:
+                                modalParentId,
 
-                        .eq(
-                            "sous_menu_id",
-                            submenu.id
+                            titre,
+
+                            html:
+                                "<p></p>",
+
+                            position,
+
+                            valide: false
+
+                        });
+
+
+                if (error) {
+
+                    throw error;
+
+                }
+
+            }
+
+
+            fermerModal();
+
+            await chargerDonnees();
+
+            showMessage(
+                "Élément créé."
+            );
+
+        }
+        catch (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Impossible de créer l'élément.",
+                "error"
+            );
+
+        }
+        finally {
+
+            modalSaveButton.disabled =
+                false;
+
+        }
+
+    }
+
+
+    function getNextPosition(
+        items
+    ) {
+
+        if (!items.length) {
+
+            return 0;
+
+        }
+
+
+        return Math.max(
+            ...items.map(
+                item =>
+                    Number(item.position) || 0
+            )
+        ) + 1;
+
+    }
+
+
+    /* =================================================
+       CONTENU
+    ================================================= */
+
+    function ouvrirContenu(
+        id
+    ) {
+
+        const item =
+            contenus.find(
+                content =>
+                    content.id === id
+            );
+
+
+        if (!item) {
+
+            return;
+
+        }
+
+
+        editorType =
+            "content";
+
+        editorId =
+            id;
+
+
+        welcome.style.display =
+            "none";
+
+        structureEditor.style.display =
+            "none";
+
+        contentEditor.style.display =
+            "block";
+
+
+        contentEditorTitle.textContent =
+            "MODIFIER LE CONTENU";
+
+
+        contentTitle.value =
+            item.titre || "";
+
+
+        remplirListeSousMenus(
+            contentParent,
+            item.sous_menu_id
+        );
+
+
+        wysiwyg.innerHTML =
+            item.html || "";
+
+
+        sourceEditor.value =
+            item.html || "";
+
+
+        isSourceMode =
+            false;
+
+        actualiserModeEditeur();
+
+    }
+
+
+    document
+        .getElementById("contentCancelButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                fermerEditeurs();
+
+            }
+        );
+
+
+    document
+        .getElementById("contentSaveButton")
+        .addEventListener(
+            "click",
+            async () => {
+
+                await enregistrerContenu();
+
+            }
+        );
+
+
+    async function enregistrerContenu() {
+
+        const titre =
+            contentTitle.value.trim();
+
+
+        if (!titre) {
+
+            showMessage(
+                "Le titre est obligatoire.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        const contenu =
+            contenus.find(
+                item =>
+                    item.id ===
+                    editorId
+            );
+
+
+        if (!contenu) {
+
+            showMessage(
+                "Contenu introuvable.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        const nouveauSousMenuId =
+            contentParent.value;
+
+
+        if (!nouveauSousMenuId) {
+
+            showMessage(
+                "Le sous-menu parent est obligatoire.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        if (isSourceMode) {
+
+            wysiwyg.innerHTML =
+                sourceEditor.value;
+
+        }
+
+
+        const html =
+            wysiwyg.innerHTML;
+
+
+        const ancienSousMenuId =
+            contenu.sous_menu_id;
+
+
+        let nouvellePosition =
+            Number(contenu.position) || 0;
+
+
+        /*
+         * Si le contenu change de sous-menu,
+         * il est placé à la fin du nouveau sous-menu.
+         */
+
+        if (
+            String(nouveauSousMenuId) !==
+            String(ancienSousMenuId)
+        ) {
+
+            const destination =
+                contenus.filter(
+                    item =>
+                        item.sous_menu_id ===
+                        nouveauSousMenuId &&
+                        item.id !==
+                        editorId
+                );
+
+
+            nouvellePosition =
+                getNextPosition(
+                    destination
+                );
+
+        }
+
+
+        const {
+            error
+        } =
+            await supabase
+
+                .from("contenus")
+
+                .update({
+
+                    titre,
+
+                    html,
+
+                    sous_menu_id:
+                        nouveauSousMenuId,
+
+                    position:
+                        nouvellePosition
+
+                })
+
+                .eq(
+                    "id",
+                    editorId
+                );
+
+
+        if (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Impossible d'enregistrer le contenu.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        showMessage(
+            "Contenu enregistré."
+        );
+
+
+        await chargerDonnees();
+
+        fermerEditeurs();
+
+    }
+
+
+    /* =================================================
+       WYSIWYG
+    ================================================= */
+
+    document
+        .querySelectorAll(
+            "#toolbar button[data-command]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const command =
+                            button.dataset.command;
+
+                        const value =
+                            button.dataset.value ||
+                            null;
+
+                        wysiwyg.focus();
+
+                        document.execCommand(
+                            command,
+                            false,
+                            value
                         );
 
+                    }
+                );
 
-                if (contentError) {
+            }
+        );
 
-                    console.error(
-                        contentError
+
+    document
+        .querySelectorAll(
+            "#toolbar button[data-format]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const format =
+                            button.dataset.format;
+
+                        wysiwyg.focus();
+
+                        document.execCommand(
+                            "formatBlock",
+                            false,
+                            format
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    document
+        .getElementById("linkButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                const url =
+                    prompt(
+                        "Adresse du lien :"
                     );
 
-                    showMessage(
-                        "Suppression interrompue.",
-                        "error"
-                    );
 
-                    await chargerDonnees();
+                if (!url) {
 
                     return;
 
                 }
 
+
+                wysiwyg.focus();
+
+                document.execCommand(
+                    "createLink",
+                    false,
+                    url
+                );
+
             }
+        );
 
 
-            const {
-                error:
-                    submenuError
-            } =
-                await supabase
+    document
+        .getElementById("imageButton")
+        .addEventListener(
+            "click",
+            () => {
 
-                    .from("sous_menus")
-
-                    .delete()
-
-                    .eq(
-                        "menu_id",
-                        id
+                const url =
+                    prompt(
+                        "URL de l'image :"
                     );
 
 
-            if (submenuError) {
+                if (!url) {
 
-                console.error(
-                    submenuError
+                    return;
+
+                }
+
+
+                wysiwyg.focus();
+
+                document.execCommand(
+                    "insertImage",
+                    false,
+                    url
                 );
-
-                showMessage(
-                    "Impossible de supprimer le menu.",
-                    "error"
-                );
-
-                return;
 
             }
+        );
 
 
-            const {
-                error
-            } =
-                await supabase
+    document
+        .getElementById("videoButton")
+        .addEventListener(
+            "click",
+            () => {
 
-                    .from("menus")
-
-                    .delete()
-
-                    .eq(
-                        "id",
-                        id
+                const url =
+                    prompt(
+                        "URL de la vidéo :"
                     );
 
 
-            if (error) {
+                if (!url) {
 
-                console.error(error);
+                    return;
 
-                showMessage(
-                    "Impossible de supprimer le menu.",
-                    "error"
+                }
+
+
+                wysiwyg.focus();
+
+
+                const html = `
+
+                    <p>
+                        <video
+                            controls
+                            src="${escapeHtml(url)}"
+                        ></video>
+                    </p>
+
+                `;
+
+
+                document.execCommand(
+                    "insertHTML",
+                    false,
+                    html
                 );
 
-                return;
+            }
+        );
+
+
+    document
+        .getElementById("sourceModeButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                if (!isSourceMode) {
+
+                    sourceEditor.value =
+                        wysiwyg.innerHTML;
+
+                    isSourceMode =
+                        true;
+
+                } else {
+
+                    wysiwyg.innerHTML =
+                        sourceEditor.value;
+
+                    isSourceMode =
+                        false;
+
+                }
+
+
+                actualiserModeEditeur();
 
             }
+        );
 
 
-            fermerEditeurs();
+    function actualiserModeEditeur() {
 
-            await chargerDonnees();
+        if (isSourceMode) {
+
+            wysiwyg.style.display =
+                "none";
+
+            sourceEditor.style.display =
+                "block";
+
+            document
+                .getElementById(
+                    "sourceModeButton"
+                )
+                .textContent =
+                "ÉDITEUR VISUEL";
+
+        } else {
+
+            wysiwyg.style.display =
+                "block";
+
+            sourceEditor.style.display =
+                "none";
+
+            document
+                .getElementById(
+                    "sourceModeButton"
+                )
+                .textContent =
+                "CODE HTML";
+
+        }
+
+    }
+
+
+    /* =================================================
+       VALIDATION
+    ================================================= */
+
+    async function changerValidation(
+        type,
+        item
+    ) {
+
+        const nouveauStatut =
+            !Boolean(item.valide);
+
+
+        const table =
+            type === "menu"
+                ? "menus"
+                : type === "submenu"
+                    ? "sous_menus"
+                    : "contenus";
+
+
+        const {
+            error
+        } =
+            await supabase
+
+                .from(table)
+
+                .update({
+                    valide:
+                        nouveauStatut
+                })
+
+                .eq(
+                    "id",
+                    item.id
+                );
+
+
+        if (error) {
+
+            console.error(error);
 
             showMessage(
-                "Menu supprimé."
+                "Impossible de modifier le statut.",
+                "error"
             );
+
+            return;
 
         }
 
 
-        /* =================================================
-           SUPPRESSION SOUS-MENU
-        ================================================= */
+        item.valide =
+            nouveauStatut;
 
-        async function supprimerSousMenu(
-            id
+
+        renderTree();
+
+
+        showMessage(
+            nouveauStatut
+                ? "Élément validé."
+                : "Élément passé en brouillon."
+        );
+
+    }
+
+
+    /* =================================================
+       ORDRE
+    ================================================= */
+
+    async function deplacerMenu(
+        index,
+        direction
+    ) {
+
+        const otherIndex =
+            index + direction;
+
+
+        if (
+            otherIndex < 0 ||
+            otherIndex >= menus.length
         ) {
 
-            const submenu =
-                sousMenus.find(
-                    item =>
-                        item.id === id
+            return;
+
+        }
+
+
+        const first =
+            menus[index];
+
+        const second =
+            menus[otherIndex];
+
+
+        await echangerPositions(
+            "menus",
+            first,
+            second
+        );
+
+    }
+
+
+    async function deplacerSousMenu(
+        item,
+        siblings,
+        direction
+    ) {
+
+        const index =
+            siblings.findIndex(
+                sibling =>
+                    sibling.id ===
+                    item.id
+            );
+
+
+        const otherIndex =
+            index + direction;
+
+
+        if (
+            otherIndex < 0 ||
+            otherIndex >= siblings.length
+        ) {
+
+            return;
+
+        }
+
+
+        await echangerPositions(
+            "sous_menus",
+            item,
+            siblings[otherIndex]
+        );
+
+    }
+
+
+    async function deplacerContenu(
+        item,
+        siblings,
+        direction
+    ) {
+
+        const index =
+            siblings.findIndex(
+                sibling =>
+                    sibling.id ===
+                    item.id
+            );
+
+
+        const otherIndex =
+            index + direction;
+
+
+        if (
+            otherIndex < 0 ||
+            otherIndex >= siblings.length
+        ) {
+
+            return;
+
+        }
+
+
+        await echangerPositions(
+            "contenus",
+            item,
+            siblings[otherIndex]
+        );
+
+    }
+
+
+    async function echangerPositions(
+        table,
+        first,
+        second
+    ) {
+
+        const firstPosition =
+            Number(first.position) || 0;
+
+        const secondPosition =
+            Number(second.position) || 0;
+
+
+        const firstUpdate =
+            await supabase
+
+                .from(table)
+
+                .update({
+                    position:
+                        secondPosition
+                })
+
+                .eq(
+                    "id",
+                    first.id
                 );
 
 
-            if (!submenu) {
+        if (firstUpdate.error) {
 
-                return;
+            console.error(
+                firstUpdate.error
+            );
 
-            }
+            showMessage(
+                "Impossible de modifier l'ordre.",
+                "error"
+            );
+
+            return;
+
+        }
 
 
-            const childCount =
-                contenus.filter(
-                    item =>
-                        item.sous_menu_id ===
-                        id
-                ).length;
+        const secondUpdate =
+            await supabase
+
+                .from(table)
+
+                .update({
+                    position:
+                        firstPosition
+                })
+
+                .eq(
+                    "id",
+                    second.id
+                );
 
 
-            const confirmation =
-                confirm(
+        if (secondUpdate.error) {
 
-                    "Supprimer le sous-menu « " +
-                    submenu.titre +
-                    " » ?" +
+            console.error(
+                secondUpdate.error
+            );
 
-                    (
+            showMessage(
+                "Impossible de modifier l'ordre.",
+                "error"
+            );
 
-                        childCount
+            await chargerDonnees();
 
-                            ? "\n\nCela supprimera également " +
-                              childCount +
-                              " contenu(s)."
+            return;
 
-                            : ""
+        }
 
+
+        await chargerDonnees();
+
+    }
+
+
+    /* =================================================
+       SUPPRESSION MENU
+    ================================================= */
+
+    async function supprimerMenu(
+        id
+    ) {
+
+        const menu =
+            menus.find(
+                item =>
+                    item.id === id
+            );
+
+
+        if (!menu) {
+
+            return;
+
+        }
+
+
+        const children =
+            sousMenus.filter(
+                item =>
+                    item.menu_id === id
+            );
+
+
+        const childCount =
+            children.length;
+
+
+        const contentCount =
+            contenus.filter(
+                content =>
+                    children.some(
+                        submenu =>
+                            submenu.id ===
+                            content.sous_menu_id
                     )
+            ).length;
 
-                );
+
+        const confirmation =
+            confirm(
+
+                "Supprimer le menu « " +
+                menu.titre +
+                " » ?" +
+
+                (
+
+                    childCount ||
+                    contentCount
+
+                        ? "\n\nCela supprimera également " +
+
+                          childCount +
+                          " sous-menu(s) et " +
+
+                          contentCount +
+                          " contenu(s)."
+
+                        : ""
+
+                )
+
+            );
 
 
-            if (!confirmation) {
+        if (!confirmation) {
 
-                return;
+            return;
 
-            }
+        }
 
+
+        /*
+         * Suppression explicite des descendants.
+         *
+         * Cela évite de dépendre d'un éventuel
+         * ON DELETE CASCADE.
+         */
+
+
+        for (
+            const submenu of children
+        ) {
 
             const {
                 error:
@@ -4692,7 +4524,7 @@
 
                     .eq(
                         "sous_menu_id",
-                        id
+                        submenu.id
                     );
 
 
@@ -4703,292 +4535,458 @@
                 );
 
                 showMessage(
-                    "Impossible de supprimer les contenus.",
+                    "Suppression interrompue.",
                     "error"
                 );
+
+                await chargerDonnees();
 
                 return;
 
             }
-
-
-            const {
-                error
-            } =
-                await supabase
-
-                    .from("sous_menus")
-
-                    .delete()
-
-                    .eq(
-                        "id",
-                        id
-                    );
-
-
-            if (error) {
-
-                console.error(error);
-
-                showMessage(
-                    "Impossible de supprimer le sous-menu.",
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            fermerEditeurs();
-
-            await chargerDonnees();
-
-            showMessage(
-                "Sous-menu supprimé."
-            );
 
         }
 
 
-        /* =================================================
-           SUPPRESSION CONTENU
-        ================================================= */
+        const {
+            error:
+                submenuError
+        } =
+            await supabase
 
-        async function supprimerContenu(
-            id
+                .from("sous_menus")
+
+                .delete()
+
+                .eq(
+                    "menu_id",
+                    id
+                );
+
+
+        if (submenuError) {
+
+            console.error(
+                submenuError
+            );
+
+            showMessage(
+                "Impossible de supprimer le menu.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        const {
+            error
+        } =
+            await supabase
+
+                .from("menus")
+
+                .delete()
+
+                .eq(
+                    "id",
+                    id
+                );
+
+
+        if (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Impossible de supprimer le menu.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        fermerEditeurs();
+
+        await chargerDonnees();
+
+        showMessage(
+            "Menu supprimé."
+        );
+
+    }
+
+
+    /* =================================================
+       SUPPRESSION SOUS-MENU
+    ================================================= */
+
+    async function supprimerSousMenu(
+        id
+    ) {
+
+        const submenu =
+            sousMenus.find(
+                item =>
+                    item.id === id
+            );
+
+
+        if (!submenu) {
+
+            return;
+
+        }
+
+
+        const childCount =
+            contenus.filter(
+                item =>
+                    item.sous_menu_id ===
+                    id
+            ).length;
+
+
+        const confirmation =
+            confirm(
+
+                "Supprimer le sous-menu « " +
+                submenu.titre +
+                " » ?" +
+
+                (
+
+                    childCount
+
+                        ? "\n\nCela supprimera également " +
+                          childCount +
+                          " contenu(s)."
+
+                        : ""
+
+                )
+
+            );
+
+
+        if (!confirmation) {
+
+            return;
+
+        }
+
+
+        const {
+            error:
+                contentError
+        } =
+            await supabase
+
+                .from("contenus")
+
+                .delete()
+
+                .eq(
+                    "sous_menu_id",
+                    id
+                );
+
+
+        if (contentError) {
+
+            console.error(
+                contentError
+            );
+
+            showMessage(
+                "Impossible de supprimer les contenus.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        const {
+            error
+        } =
+            await supabase
+
+                .from("sous_menus")
+
+                .delete()
+
+                .eq(
+                    "id",
+                    id
+                );
+
+
+        if (error) {
+
+            console.error(error);
+
+            showMessage(
+                "Impossible de supprimer le sous-menu.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        fermerEditeurs();
+
+        await chargerDonnees();
+
+        showMessage(
+            "Sous-menu supprimé."
+        );
+
+    }
+
+
+    /* =================================================
+       SUPPRESSION CONTENU
+    ================================================= */
+
+    async function supprimerContenu(
+        id
+    ) {
+
+        const item =
+            contenus.find(
+                content =>
+                    content.id === id
+            );
+
+
+        if (!item) {
+
+            return;
+
+        }
+
+
+        if (
+            !confirm(
+                "Supprimer le contenu « " +
+                item.titre +
+                " » ?"
+            )
         ) {
 
-            const item =
-                contenus.find(
-                    content =>
-                        content.id === id
+            return;
+
+        }
+
+
+        const {
+            error
+        } =
+            await supabase
+
+                .from("contenus")
+
+                .delete()
+
+                .eq(
+                    "id",
+                    id
                 );
 
 
-            if (!item) {
+        if (error) {
 
-                return;
-
-            }
-
-
-            if (
-                !confirm(
-                    "Supprimer le contenu « " +
-                    item.titre +
-                    " » ?"
-                )
-            ) {
-
-                return;
-
-            }
-
-
-            const {
-                error
-            } =
-                await supabase
-
-                    .from("contenus")
-
-                    .delete()
-
-                    .eq(
-                        "id",
-                        id
-                    );
-
-
-            if (error) {
-
-                console.error(error);
-
-                showMessage(
-                    "Impossible de supprimer le contenu.",
-                    "error"
-                );
-
-                return;
-
-            }
-
-
-            fermerEditeurs();
-
-            await chargerDonnees();
+            console.error(error);
 
             showMessage(
-                "Contenu supprimé."
+                "Impossible de supprimer le contenu.",
+                "error"
             );
 
-        }
-
-
-        /* =================================================
-           FERMETURE EDITEURS
-        ================================================= */
-
-        function fermerEditeurs() {
-
-            welcome.style.display =
-                "block";
-
-            structureEditor.style.display =
-                "none";
-
-            contentEditor.style.display =
-                "none";
-
-
-            structureParentField.style.display =
-                "none";
-
-
-            selectedType =
-                null;
-
-            selectedId =
-                null;
-
-            editorType =
-                null;
-
-            editorId =
-                null;
+            return;
 
         }
 
 
-        /* =================================================
-           RACCOURCI CTRL + S
-        ================================================= */
+        fermerEditeurs();
 
-        document.addEventListener(
-            "keydown",
-            event => {
+        await chargerDonnees();
+
+        showMessage(
+            "Contenu supprimé."
+        );
+
+    }
+
+
+    /* =================================================
+       FERMETURE EDITEURS
+    ================================================= */
+
+    function fermerEditeurs() {
+
+        welcome.style.display =
+            "block";
+
+        structureEditor.style.display =
+            "none";
+
+        contentEditor.style.display =
+            "none";
+
+
+        structureParentField.style.display =
+            "none";
+
+
+        selectedType =
+            null;
+
+        selectedId =
+            null;
+
+        editorType =
+            null;
+
+        editorId =
+            null;
+
+    }
+
+
+    /* =================================================
+       RACCOURCI CTRL + S
+    ================================================= */
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                (event.ctrlKey ||
+                 event.metaKey) &&
+                event.key.toLowerCase() ===
+                "s"
+            ) {
+
+                event.preventDefault();
+
 
                 if (
-                    (event.ctrlKey ||
-                     event.metaKey) &&
-                    event.key.toLowerCase() ===
-                    "s"
+                    contentEditor.style.display !==
+                    "none"
                 ) {
 
-                    event.preventDefault();
+                    enregistrerContenu();
+
+                }
 
 
-                    if (
-                        contentEditor.style.display !==
-                        "none"
-                    ) {
+                if (
+                    structureEditor.style.display !==
+                    "none"
+                ) {
 
-                        enregistrerContenu();
-
-                    }
-
-
-                    if (
-                        structureEditor.style.display !==
-                        "none"
-                    ) {
-
-                        enregistrerStructure();
-
-                    }
+                    enregistrerStructure();
 
                 }
 
             }
-        );
+
+        }
+    );
 
 
-        /* =================================================
-           INITIALISATION
-        ================================================= */
+    /* =================================================
+       INITIALISATION
+    ================================================= */
 
-        async function initialiser() {
+    async function initialiser() {
 
-            try {
+        try {
 
-                /*
-                 * Vérification réelle du grade.
-                 */
+            /*
+             * Vérification réelle du grade.
+             */
 
-                await verifierAdmin();
-
-
-                /*
-                 * Puis chargement du contenu.
-                 */
-
-                await chargerDonnees();
-
-            }
-            catch (error) {
-
-                console.error(
-                    "CONTENUS :",
-                    error
-                );
+            await verifierAdmin();
 
 
-                tree.innerHTML = `
+            /*
+             * Puis chargement du contenu.
+             */
 
-                    <div class="empty-tree">
+            await chargerDonnees();
 
-                        ${escapeHtml(
-                            error.message ||
-                            "Accès impossible."
-                        )}
+        }
+        catch (error) {
 
-                        <br><br>
-
-                        <a
-                            href="admin.html"
-                            style="
-                                color:var(--gold-light);
-                            "
-                        >
-                            Retour à l'administration
-                        </a>
-
-                    </div>
-
-                `;
+            console.error(
+                "CONTENUS :",
+                error
+            );
 
 
-                document
-                    .getElementById("addMenuButton")
-                    .disabled =
-                    true;
+            tree.innerHTML = `
+
+                <div class="empty-tree">
+
+                    ${escapeHtml(
+                        error.message ||
+                        "Accès impossible."
+                    )}
+
+                    <br><br>
+
+                    <a
+                        href="admin.html"
+                        style="
+                            color:var(--gold-light);
+                        "
+                    >
+                        Retour à l'administration
+                    </a>
+
+                </div>
+
+            `;
 
 
-                welcome.innerHTML = `
+            document
+                .getElementById("addMenuButton")
+                .disabled =
+                true;
 
-                    <h1>ACCÈS REFUSÉ</h1>
 
-                    <p>
-                        ${escapeHtml(
-                            error.message ||
-                            "Vous n'avez pas accès à cette page."
-                        )}
-                    </p>
+            welcome.innerHTML = `
 
-                `;
+                <h1>ACCÈS REFUSÉ</h1>
 
-            }
+                <p>
+                    ${escapeHtml(
+                        error.message ||
+                        "Vous n'avez pas accès à cette page."
+                    )}
+                </p>
+
+            `;
 
         }
 
+    }
 
-        initialiser();
 
-    </script>
+    initialiser();
+
+</script>
 
 </body>
 
 </html>
-
