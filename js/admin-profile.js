@@ -4,7 +4,7 @@
 
    Gestion du profil de l'utilisateur connecté :
    - Remplissage du profil
-   - Aperçu de la photo
+   - Affichage de la photo dans l'en-tête
    - Sauvegarde du profil
    - Gestion des compétences métier
    - Gestion des rôles
@@ -15,28 +15,29 @@
 
 
 /* =========================================================
-   APERÇU PHOTO PROFIL
+   PHOTO DE PROFIL — EN-TÊTE ESPACE MEMBRE
 ========================================================= */
 
-function initialiserApercuPhoto(){
+function initialiserPhotoProfil(){
 
-  const imageInput =
+  const photoContainer =
     document.getElementById(
-      "profileImage"
+      "adminProfilePhoto"
     );
 
-  if(!imageInput){
+  if(!photoContainer){
     return;
   }
 
 
   /*
-    Styles limités à l'aperçu photo.
+    Styles limités au composant de photo
+    placé dans l'en-tête de l'espace membre.
   */
 
   if(
     !document.getElementById(
-      "profile-image-preview-styles"
+      "admin-profile-photo-styles"
     )
   ){
 
@@ -46,14 +47,14 @@ function initialiserApercuPhoto(){
       );
 
     style.id =
-      "profile-image-preview-styles";
+      "admin-profile-photo-styles";
 
     style.textContent = `
 
-      #profileImagePreview {
-        width:180px;
-        height:180px;
-        margin-top:12px;
+      #adminProfilePhoto {
+        width:110px;
+        height:110px;
+        flex:0 0 110px;
         border:1px solid var(--border);
         background:rgba(255,255,255,.025);
         display:flex;
@@ -63,35 +64,39 @@ function initialiserApercuPhoto(){
         box-sizing:border-box;
       }
 
-      #profileImagePreview img {
+      #adminProfilePhoto img {
         display:block;
         width:100%;
         height:100%;
-        object-fit:contain;
+        object-fit:cover;
+        object-position:center;
       }
 
-      #profileImagePreview.empty {
-        color:rgba(245,243,237,.35);
+      #adminProfilePhoto.empty {
+        color:rgba(245,243,237,.30);
         font-family:Arial,sans-serif;
-        font-size:10px;
+        font-size:9px;
         text-align:center;
-        letter-spacing:.04em;
+        letter-spacing:.08em;
+        line-height:1.4;
       }
 
-      #profileImagePreview.error {
-        color:rgba(245,243,237,.45);
+      #adminProfilePhoto.error {
+        color:rgba(245,243,237,.42);
         font-family:Arial,sans-serif;
-        font-size:10px;
+        font-size:9px;
         text-align:center;
-        letter-spacing:.04em;
-        padding:15px;
+        letter-spacing:.06em;
+        line-height:1.4;
+        padding:12px;
       }
 
       @media(max-width:600px){
 
-        #profileImagePreview {
-          width:150px;
-          height:150px;
+        #adminProfilePhoto {
+          width:80px;
+          height:80px;
+          flex-basis:80px;
         }
 
       }
@@ -106,75 +111,43 @@ function initialiserApercuPhoto(){
 
 
   /*
-    Récupération ou création du cadre.
+    Lecture de l'URL actuellement saisie
+    dans le profil.
   */
 
-  let preview =
-    document.getElementById(
-      "profileImagePreview"
-    );
+  function actualiserPhoto(){
 
-
-  if(!preview){
-
-    preview =
-      document.createElement(
-        "div"
+    const imageInput =
+      document.getElementById(
+        "profileImage"
       );
 
-    preview.id =
-      "profileImagePreview";
-
-    preview.setAttribute(
-      "aria-label",
-      "Aperçu de la photo de profil"
-    );
-
-
-    /*
-      Placement immédiatement après
-      le champ URL.
-    */
-
-    imageInput.insertAdjacentElement(
-      "afterend",
-      preview
-    );
-
-  }
-
-
-  /*
-    Mise à jour de l'aperçu.
-  */
-
-  function actualiserApercu(){
 
     const url =
-      imageInput.value.trim();
+      imageInput
+        ? imageInput.value.trim()
+        : "";
 
 
-    preview.innerHTML =
+    photoContainer.innerHTML =
       "";
 
-    preview.className =
+    photoContainer.className =
       "";
 
 
     /*
-      Aucun lien :
-      le cadre reste visible mais indique
-      qu'aucune image n'est renseignée.
+      Aucune image.
     */
 
     if(!url){
 
-      preview.classList.add(
+      photoContainer.classList.add(
         "empty"
       );
 
-      preview.textContent =
-        "APERÇU DE L'IMAGE";
+      photoContainer.textContent =
+        "AUCUNE PHOTO";
 
       return;
 
@@ -191,13 +164,13 @@ function initialiserApercuPhoto(){
       );
 
     image.alt =
-      "Aperçu de la photo de profil";
+      "Photo de profil";
 
 
     image.onload =
       () => {
 
-        preview.className =
+        photoContainer.className =
           "";
 
       };
@@ -206,10 +179,10 @@ function initialiserApercuPhoto(){
     image.onerror =
       () => {
 
-        preview.className =
+        photoContainer.className =
           "error";
 
-        preview.textContent =
+        photoContainer.textContent =
           "IMAGE IMPOSSIBLE À CHARGER";
 
       };
@@ -219,7 +192,7 @@ function initialiserApercuPhoto(){
       url;
 
 
-    preview.appendChild(
+    photoContainer.appendChild(
       image
     );
 
@@ -227,38 +200,44 @@ function initialiserApercuPhoto(){
 
 
   /*
-    Évite de multiplier les écouteurs
-    si la fonction est appelée plusieurs fois.
+    On évite de créer plusieurs écouteurs.
   */
 
+  const imageInput =
+    document.getElementById(
+      "profileImage"
+    );
+
+
   if(
-    imageInput.dataset.previewInitialise !==
+    imageInput &&
+    imageInput.dataset.headerPhotoInitialise !==
     "true"
   ){
 
     imageInput.addEventListener(
       "input",
-      actualiserApercu
+      actualiserPhoto
     );
 
 
     imageInput.addEventListener(
       "change",
-      actualiserApercu
+      actualiserPhoto
     );
 
 
-    imageInput.dataset.previewInitialise =
+    imageInput.dataset.headerPhotoInitialise =
       "true";
 
   }
 
 
   /*
-    Aperçu immédiat.
+    Affichage immédiat.
   */
 
-  actualiserApercu();
+  actualiserPhoto();
 
 }
 
@@ -296,11 +275,10 @@ function remplirProfil(profile){
 
 
   /*
-    Initialisation de l'aperçu après
-    le remplissage de l'URL.
+    Initialisation de la photo dans l'en-tête.
   */
 
-  initialiserApercuPhoto();
+  initialiserPhotoProfil();
 
 
   const imageInput =
@@ -308,11 +286,15 @@ function remplirProfil(profile){
       "profileImage"
     );
 
+
   if(imageInput){
 
     imageInput.dispatchEvent(
       new Event(
-        "input"
+        "input",
+        {
+          bubbles:true
+        }
       )
     );
 
@@ -543,9 +525,8 @@ profileForm.addEventListener(
 
       EXCEPTION :
       si l'utilisateur change de région alors qu'il
-      possède un poste régional (Militant ou
-      Délégué Régional), tous ses rôles doivent être
-      supprimés avec son poste régional.
+      possède un poste régional, tous ses rôles sont
+      supprimés.
     */
 
     const ancienneRegion =
@@ -820,9 +801,6 @@ profileForm.addEventListener(
       Si le poste régional vient d'être supprimé,
       on force également le décochage visuel de
       toutes les cases ROLE.
-
-      Les rôles ont déjà été supprimés de la colonne
-      competences avant la sauvegarde.
     */
 
     if(perteDroitsRegionaux){
@@ -876,12 +854,6 @@ profileForm.addEventListener(
 
       }
 
-
-      /*
-        Si ROLE vient de disparaître alors
-        que l'utilisateur était dessus,
-        on revient automatiquement sur PROFIL.
-      */
 
       const roleTab =
         document.getElementById(
@@ -983,20 +955,27 @@ profileForm.addEventListener(
 
 
     /*
-      Actualisation de l'aperçu après
-      sauvegarde éventuelle.
+      Actualisation de la photo dans l'en-tête
+      après sauvegarde.
     */
+
+    initialiserPhotoProfil();
+
 
     const imageInput =
       document.getElementById(
         "profileImage"
       );
 
+
     if(imageInput){
 
       imageInput.dispatchEvent(
         new Event(
-          "input"
+          "input",
+          {
+            bubbles:true
+          }
         )
       );
 
