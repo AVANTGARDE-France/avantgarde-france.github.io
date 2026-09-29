@@ -7,24 +7,20 @@
 <meta charset="UTF-8">
 
 <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+
 >
 
 <title>Avant-gardE — Administration</title>
 
-
-
 <!-- =======================================================
      SUPABASE
-     Doit être chargé AVANT les modules JavaScript
 ======================================================= -->
 
 <script
     src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
 ></script>
-
-
 
 <link
     rel="stylesheet"
@@ -33,11 +29,7 @@
 
 </head>
 
-
-
 <body>
-
-
 
 <!-- =======================================================
      CONNEXION
@@ -50,98 +42,88 @@
 
 <div class="login-box">
 
-    <div class="login-logo">
+```
+<div class="login-logo">
 
-        <a
-            href="index.html"
-            class="logo"
+    <a
+        href="index.html"
+        class="logo"
+    >
+        <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
+    </a>
+
+    <div class="login-subtitle">
+        ESPACE MEMBRE
+    </div>
+
+</div>
+
+
+<form id="loginForm">
+
+    <div class="form-group">
+
+        <label for="loginEmail">
+            EMAIL
+        </label>
+
+        <input
+            type="email"
+            id="loginEmail"
+            required
+            autocomplete="email"
         >
-            <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
-        </a>
-
-        <div class="login-subtitle">
-            ESPACE MEMBRE
-        </div>
 
     </div>
 
 
+    <div class="form-group">
 
-    <form id="loginForm">
+        <label for="loginPassword">
+            MOT DE PASSE
+        </label>
 
-        <div class="form-group">
-
-            <label for="loginEmail">
-                EMAIL
-            </label>
-
-            <input
-                type="email"
-                id="loginEmail"
-                required
-                autocomplete="email"
-            >
-
-        </div>
-
-
-
-        <div class="form-group">
-
-            <label for="loginPassword">
-                MOT DE PASSE
-            </label>
-
-            <input
-                type="password"
-                id="loginPassword"
-                required
-                autocomplete="current-password"
-            >
-
-        </div>
-
-
-
-        <button
-            type="submit"
-            class="primary-button"
-            id="loginButton"
+        <input
+            type="password"
+            id="loginPassword"
+            required
+            autocomplete="current-password"
         >
-            SE CONNECTER
-        </button>
+
+    </div>
 
 
+    <button
+        type="submit"
+        class="primary-button"
+        id="loginButton"
+    >
+        SE CONNECTER
+    </button>
 
-        <a
-            href="index.html"
-            class="secondary-button login-home-button"
-        >
-            HOME
-        </a>
+
+    <a
+        href="index.html"
+        class="secondary-button login-home-button"
+    >
+        HOME
+    </a>
 
 
+    <div
+        id="loginMessage"
+        class="message"
+    ></div>
 
-        <div
-            id="loginMessage"
-            class="message"
-        ></div>
-
-    </form>
+</form>
+```
 
 </div>
 
 </section>
 
-
-
 <!-- =======================================================
      ESPACE MEMBRE
-
-     IMPORTANT :
-     L'espace membre est masqué par défaut.
-     admin-auth.js l'affichera uniquement après
-     authentification et chargement du profil.
 ======================================================= -->
 
 <section
@@ -152,26 +134,24 @@
 
 <div class="admin-header">
 
-    <div class="page-kicker">
-        ESPACE MEMBRE
-    </div>
-
-
-
-    <h1 class="page-title">
-        MON <span>ESPACE.</span>
-    </h1>
-
-
-
-    <div
-        class="admin-user"
-        id="adminUser"
-    ></div>
-
+```
+<div class="page-kicker">
+    ESPACE MEMBRE
 </div>
 
 
+<h1 class="page-title">
+    MON <span>ESPACE.</span>
+</h1>
+
+
+<div
+    class="admin-user"
+    id="adminUser"
+></div>
+```
+
+</div>
 
 <!-- =====================================================
      ONGLETS
@@ -179,52 +159,59 @@
 
 <div class="tabs">
 
+```
+<button
+    class="tab active"
+    data-tab="profileTab"
+>
+    PROFIL
+</button>
 
 
-    <button
-        class="tab active"
-        data-tab="profileTab"
-    >
-        PROFIL
-    </button>
+<button
+    class="tab"
+    id="rdvTabButton"
+    data-tab="rdvTab"
+    style="display:none"
+>
+    RDV
+</button>
 
 
-
-    <button
-        class="tab"
-        id="rdvTabButton"
-        data-tab="rdvTab"
-        style="display:none"
-    >
-        RDV
-    </button>
+<button
+    class="tab"
+    id="teamTabButton"
+    data-tab="teamTab"
+>
+    GESTION DES EQUIPES
+</button>
 
 
-
-    <button
-        class="tab"
-        id="teamTabButton"
-        data-tab="teamTab"
-    >
-        GESTION DES EQUIPES
-    </button>
-
-
-
-    <button
-        class="tab"
-        id="roleTabButton"
-        data-tab="roleTab"
-        style="display:none"
-    >
-        ROLE
-    </button>
+<button
+    class="tab"
+    id="roleTabButton"
+    data-tab="roleTab"
+    style="display:none"
+>
+    ROLE
+</button>
 
 
+<!-- =================================================
+     NOUVEL ONGLET STATISTIQUES
+================================================== -->
+
+<button
+    class="tab"
+    id="statsTabButton"
+    data-tab="statsTab"
+    style="display:none"
+>
+    STATISTIQUES
+</button>
+```
 
 </div>
-
-
 
 <!-- =====================================================
      ACCES CONTENU PROJET
@@ -239,25 +226,25 @@
     "
 >
 
-    <a
-        href="contenus.html"
-        class="secondary-button"
-        id="contentProjectButton"
-        style="
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            width: 100%;
-            max-width: 400px;
-        "
-    >
-        CONTENU PROJET
-    </a>
+```
+<a
+    href="contenus.html"
+    class="secondary-button"
+    id="contentProjectButton"
+    style="
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        width: 100%;
+        max-width: 400px;
+    "
+>
+    CONTENU PROJET
+</a>
+```
 
 </div>
-
-
 
 <!-- =====================================================
      PROFIL
@@ -268,728 +255,659 @@
     class="tab-content active"
 >
 
-    <div class="panel">
+```
+<div class="panel">
 
-        <h2 class="panel-title">
-            Mon profil
-        </h2>
-
-
-
-        <p class="panel-intro">
-            Modifiez les informations qui apparaissent sur votre profil.
-            Les modifications sont enregistrées directement dans Supabase.
-        </p>
+    <h2 class="panel-title">
+        Mon profil
+    </h2>
 
 
+    <p class="panel-intro">
+        Modifiez les informations qui apparaissent sur votre profil.
+        Les modifications sont enregistrées directement dans Supabase.
+    </p>
 
-        <form id="profileForm">
+
+    <form id="profileForm">
 
 
+        <!-- VISIBILITE -->
 
-            <!-- VISIBILITE -->
+        <div class="form-group">
+
+            <label>
+                VISIBILITÉ DU PROFIL
+            </label>
+
+
+            <div class="registration-choice">
+
+                <div class="choice-option">
+
+                    <input
+                        type="radio"
+                        id="profileAffiche"
+                        name="profileVisibility"
+                        value="affiche"
+                    >
+
+                    <label
+                        for="profileAffiche"
+                        class="choice-label"
+                    >
+
+                        <strong>
+                            Affiché
+                        </strong>
+
+                        <span>
+                            Votre profil apparaît dans la liste publique des membres.
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <div class="choice-option">
+
+                    <input
+                        type="radio"
+                        id="profileAnonyme"
+                        name="profileVisibility"
+                        value="anonyme"
+                    >
+
+                    <label
+                        for="profileAnonyme"
+                        class="choice-label"
+                    >
+
+                        <strong>
+                            Anonyme
+                        </strong>
+
+                        <span>
+                            Votre profil est enregistré mais caché de la liste publique.
+                        </span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="profile-grid">
+
+
+            <!-- NOM -->
 
             <div class="form-group">
 
-                <label>
-                    VISIBILITÉ DU PROFIL
+                <label for="profileNom">
+                    PSEUDO OU NOM PRÉNOM
                 </label>
 
+                <input
+                    type="text"
+                    id="profileNom"
+                    maxlength="100"
+                    required
+                >
+
+            </div>
 
 
-                <div class="registration-choice">
+            <!-- EMAIL -->
 
+            <div class="form-group">
 
+                <label for="profileEmail">
+                    EMAIL
+                </label>
 
-                    <div class="choice-option">
+                <input
+                    type="email"
+                    id="profileEmail"
+                    required
+                    autocomplete="email"
+                >
 
-                        <input
-                            type="radio"
-                            id="profileAffiche"
-                            name="profileVisibility"
-                            value="affiche"
-                        >
-
-                        <label
-                            for="profileAffiche"
-                            class="choice-label"
-                        >
-
-                            <strong>
-                                Affiché
-                            </strong>
-
-                            <span>
-                                Votre profil apparaît dans la liste publique des membres.
-                            </span>
-
-                        </label>
-
-                    </div>
-
-
-
-                    <div class="choice-option">
-
-                        <input
-                            type="radio"
-                            id="profileAnonyme"
-                            name="profileVisibility"
-                            value="anonyme"
-                        >
-
-                        <label
-                            for="profileAnonyme"
-                            class="choice-label"
-                        >
-
-                            <strong>
-                                Anonyme
-                            </strong>
-
-                            <span>
-                                Votre profil est enregistré mais caché de la liste publique.
-                            </span>
-
-                        </label>
-
-                    </div>
-
-
-
+                <div class="help">
+                    Cette adresse est également utilisée pour votre connexion.
                 </div>
 
             </div>
 
 
+            <!-- IMAGE -->
 
-            <div class="profile-grid">
+            <div class="form-group">
 
+                <label for="profileImage">
+                    IMAGE
+                </label>
 
+                <input
+                    type="url"
+                    id="profileImage"
+                    placeholder="https://..."
+                >
 
-                <!-- NOM -->
-
-                <div class="form-group">
-
-                    <label for="profileNom">
-                        PSEUDO OU NOM PRÉNOM
-                    </label>
-
-                    <input
-                        type="text"
-                        id="profileNom"
-                        maxlength="100"
-                        required
-                    >
-
+                <div class="help">
+                    Indiquez l’URL d’une image déjà hébergée en ligne.
                 </div>
-
-
-
-                <!-- EMAIL -->
-
-                <div class="form-group">
-
-                    <label for="profileEmail">
-                        EMAIL
-                    </label>
-
-                    <input
-                        type="email"
-                        id="profileEmail"
-                        required
-                        autocomplete="email"
-                    >
-
-                    <div class="help">
-                        Cette adresse est également utilisée pour votre connexion.
-                    </div>
-
-                </div>
-
-
-
-                <!-- IMAGE -->
-
-                <div class="form-group">
-
-                    <label for="profileImage">
-                        IMAGE
-                    </label>
-
-                    <input
-                        type="url"
-                        id="profileImage"
-                        placeholder="https://..."
-                    >
-
-                    <div class="help">
-                        Indiquez l’URL d’une image déjà hébergée en ligne.
-                    </div>
-
-                </div>
-
-
-
-                <!-- REGION -->
-
-                <div class="form-group">
-
-                    <label for="profileRegion">
-                        RÉGION
-                    </label>
-
-                    <select
-                        id="profileRegion"
-                        required
-                    >
-
-                        <option value="">
-                            Sélectionnez votre région
-                        </option>
-
-
-
-                        <optgroup label="France métropolitaine">
-
-                            <option>Auvergne-Rhône-Alpes</option>
-                            <option>Bourgogne-Franche-Comté</option>
-                            <option>Bretagne</option>
-                            <option>Centre-Val de Loire</option>
-                            <option>Corse</option>
-                            <option>Grand Est</option>
-                            <option>Hauts-de-France</option>
-                            <option>Île-de-France</option>
-                            <option>Normandie</option>
-                            <option>Nouvelle-Aquitaine</option>
-                            <option>Occitanie</option>
-                            <option>Pays de la Loire</option>
-                            <option>Provence-Alpes-Côte d’Azur</option>
-
-                        </optgroup>
-
-
-
-                        <optgroup label="Outre-mer">
-
-                            <option>Guadeloupe</option>
-                            <option>Martinique</option>
-                            <option>Guyane</option>
-                            <option>La Réunion</option>
-                            <option>Mayotte</option>
-
-                        </optgroup>
-
-
-
-                        <optgroup label="Étranger">
-
-                            <option>Europe</option>
-                            <option>Amérique du Nord</option>
-                            <option>Amérique centrale et Caraïbes</option>
-                            <option>Amérique du Sud</option>
-                            <option>Afrique</option>
-                            <option>Asie</option>
-                            <option>Océanie</option>
-                            <option>Autre</option>
-
-                        </optgroup>
-
-                    </select>
-
-                </div>
-
-
-
-                <!-- DESCRIPTION -->
-
-                <div class="form-group full-width">
-
-                    <label for="profileDescription">
-                        DESCRIPTION
-                    </label>
-
-                    <textarea
-                        id="profileDescription"
-                        maxlength="300"
-                        placeholder="Présentez-vous en quelques mots..."
-                    ></textarea>
-
-                    <div
-                        id="descriptionCounter"
-                        class="description-counter"
-                    >
-                        0 / 300
-                    </div>
-
-                </div>
-
-
 
             </div>
 
 
+            <!-- REGION -->
 
-            <!-- RESEAUX SOCIAUX -->
+            <div class="form-group">
 
-            <div class="social-title">
-                Réseaux sociaux
-            </div>
+                <label for="profileRegion">
+                    RÉGION
+                </label>
 
+                <select
+                    id="profileRegion"
+                    required
+                >
 
+                    <option value="">
+                        Sélectionnez votre région
+                    </option>
 
-            <div class="social-intro">
-                Ajoutez les liens vers vos réseaux sociaux.
-                Ils apparaîtront sous forme d’icônes sur votre profil public.
-                Laissez un champ vide si vous ne souhaitez pas afficher ce réseau.
-            </div>
+                    <optgroup label="France métropolitaine">
 
+                        <option>Auvergne-Rhône-Alpes</option>
+                        <option>Bourgogne-Franche-Comté</option>
+                        <option>Bretagne</option>
+                        <option>Centre-Val de Loire</option>
+                        <option>Corse</option>
+                        <option>Grand Est</option>
+                        <option>Hauts-de-France</option>
+                        <option>Île-de-France</option>
+                        <option>Normandie</option>
+                        <option>Nouvelle-Aquitaine</option>
+                        <option>Occitanie</option>
+                        <option>Pays de la Loire</option>
+                        <option>Provence-Alpes-Côte d’Azur</option>
 
+                    </optgroup>
 
-            <div class="social-grid">
+                    <optgroup label="Outre-mer">
 
+                        <option>Guadeloupe</option>
+                        <option>Martinique</option>
+                        <option>Guyane</option>
+                        <option>La Réunion</option>
+                        <option>Mayotte</option>
 
+                    </optgroup>
 
-                <div class="form-group">
+                    <optgroup label="Étranger">
 
-                    <label for="profileFacebook">
-                        FACEBOOK
-                    </label>
+                        <option>Europe</option>
+                        <option>Amérique du Nord</option>
+                        <option>Amérique centrale et Caraïbes</option>
+                        <option>Amérique du Sud</option>
+                        <option>Afrique</option>
+                        <option>Asie</option>
+                        <option>Océanie</option>
+                        <option>Autre</option>
 
-                    <input
-                        type="url"
-                        id="profileFacebook"
-                        placeholder="https://www.facebook.com/..."
-                    >
+                    </optgroup>
 
-                </div>
-
-
-
-                <div class="form-group">
-
-                    <label for="profileX">
-                        X
-                    </label>
-
-                    <input
-                        type="url"
-                        id="profileX"
-                        placeholder="https://x.com/..."
-                    >
-
-                </div>
-
-
-
-                <div class="form-group">
-
-                    <label for="profileInstagram">
-                        INSTAGRAM
-                    </label>
-
-                    <input
-                        type="url"
-                        id="profileInstagram"
-                        placeholder="https://www.instagram.com/..."
-                    >
-
-                </div>
-
-
-
-                <div class="form-group">
-
-                    <label for="profileYoutube">
-                        YOUTUBE
-                    </label>
-
-                    <input
-                        type="url"
-                        id="profileYoutube"
-                        placeholder="https://www.youtube.com/..."
-                    >
-
-                </div>
-
-
-
-                <div class="form-group">
-
-                    <label for="profileTiktok">
-                        TIKTOK
-                    </label>
-
-                    <input
-                        type="url"
-                        id="profileTiktok"
-                        placeholder="https://www.tiktok.com/@..."
-                    >
-
-                </div>
-
-
+                </select>
 
             </div>
 
 
+            <!-- DESCRIPTION -->
 
-            <!-- MEDAILLE VIP -->
+            <div class="form-group full-width">
 
-            <div class="vip-title">
-                Médaille VIP
-            </div>
+                <label for="profileDescription">
+                    DESCRIPTION
+                </label>
 
-
-
-            <div class="vip-intro">
-                <i>
-                    (la maj de l'audience de vos réseaux peut prendre plusieurs jours. Patientez)
-                </i>
-            </div>
-
-
-
-            <div
-                id="vipMedal"
-                class="vip-medal"
-            >
+                <textarea
+                    id="profileDescription"
+                    maxlength="300"
+                    placeholder="Présentez-vous en quelques mots..."
+                ></textarea>
 
                 <div
-                    class="vip-medal-icon"
-                    aria-hidden="true"
+                    id="descriptionCounter"
+                    class="description-counter"
                 >
-                    ★
+                    0 / 300
                 </div>
 
+            </div>
 
 
-                <div class="vip-medal-text">
+        </div>
 
-                    <strong>
-                        VIP
-                    </strong>
 
-                    <span>
-                        Médaille attribuée automatiquement lorsque
-                        votre audience maximale atteint au moins 3 000 followers.
+        <!-- RESEAUX SOCIAUX -->
+
+        <div class="social-title">
+            Réseaux sociaux
+        </div>
+
+
+        <div class="social-intro">
+            Ajoutez les liens vers vos réseaux sociaux.
+            Ils apparaîtront sous forme d’icônes sur votre profil public.
+            Laissez un champ vide si vous ne souhaitez pas afficher ce réseau.
+        </div>
+
+
+        <div class="social-grid">
+
+
+            <div class="form-group">
+
+                <label for="profileFacebook">
+                    FACEBOOK
+                </label>
+
+                <input
+                    type="url"
+                    id="profileFacebook"
+                    placeholder="https://www.facebook.com/..."
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="profileX">
+                    X
+                </label>
+
+                <input
+                    type="url"
+                    id="profileX"
+                    placeholder="https://x.com/..."
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="profileInstagram">
+                    INSTAGRAM
+                </label>
+
+                <input
+                    type="url"
+                    id="profileInstagram"
+                    placeholder="https://www.instagram.com/..."
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="profileYoutube">
+                    YOUTUBE
+                </label>
+
+                <input
+                    type="url"
+                    id="profileYoutube"
+                    placeholder="https://www.youtube.com/..."
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="profileTiktok">
+                    TIKTOK
+                </label>
+
+                <input
+                    type="url"
+                    id="profileTiktok"
+                    placeholder="https://www.tiktok.com/@..."
+                >
+
+            </div>
+
+
+        </div>
+
+
+        <!-- MEDAILLE VIP -->
+
+        <div class="vip-title">
+            Médaille VIP
+        </div>
+
+
+        <div class="vip-intro">
+            <i>
+                (la maj de l'audience de vos réseaux peut prendre plusieurs jours. Patientez)
+            </i>
+        </div>
+
+
+        <div
+            id="vipMedal"
+            class="vip-medal"
+        >
+
+            <div
+                class="vip-medal-icon"
+                aria-hidden="true"
+            >
+                ★
+            </div>
+
+
+            <div class="vip-medal-text">
+
+                <strong>
+                    VIP
+                </strong>
+
+                <span>
+                    Médaille attribuée automatiquement lorsque
+                    votre audience maximale atteint au moins 3 000 followers.
+                </span>
+
+                <div
+                    id="vipAudience"
+                    class="vip-audience"
+                >
+                    Audience actuelle : —
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- COMPETENCES -->
+
+        <div class="section-title">
+            Talents et compétences métier
+        </div>
+
+
+        <div
+            class="help"
+            style="margin-bottom:10px;"
+        >
+            Sélectionnez les compétences que vous souhaitez mettre en avant.
+            Passez la souris sur une compétence pour afficher son détail.
+        </div>
+
+
+        <div class="competence-group">
+
+            <div class="competence-group-title">
+                Compétences métier
+            </div>
+
+
+            <div class="competence">
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        name="competences"
+                        value="Maîtrise de doctrine"
+                    >
+
+                    <span class="competence-name">
+                        Maîtrise de doctrine
                     </span>
 
-                    <div
-                        id="vipAudience"
-                        class="vip-audience"
+                </label>
+
+                <div class="competence-info">
+                    capacité à préserver la fidélité à l’idéologie d'Avant-Garde
+                    et sa cohérence dans l’action du mouvement.
+                </div>
+
+            </div>
+
+
+            <div class="competence">
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        name="competences"
+                        value="Tactique"
                     >
-                        Audience actuelle : —
-                    </div>
 
+                    <span class="competence-name">
+                        Tactique
+                    </span>
+
+                </label>
+
+                <div class="competence-info">
+                    capacité à concevoir et mettre en œuvre des tactiques
+                    efficaces de développement d’audience, médiatique et
+                    électorale, sans renier l’idéologie.
                 </div>
 
             </div>
 
 
+            <div class="competence">
 
-            <!-- COMPETENCES -->
+                <label>
 
-            <div class="section-title">
-                Talents et compétences métier
-            </div>
+                    <input
+                        type="checkbox"
+                        name="competences"
+                        value="Prestance"
+                    >
 
+                    <span class="competence-name">
+                        Prestance
+                    </span>
 
+                </label>
 
-            <div
-                class="help"
-                style="margin-bottom:10px;"
-            >
-                Sélectionnez les compétences que vous souhaitez mettre en avant.
-                Passez la souris sur une compétence pour afficher son détail.
-            </div>
-
-
-
-            <div class="competence-group">
-
-                <div class="competence-group-title">
-                    Compétences métier
+                <div class="competence-info">
+                    capacité à séduire et convaincre par la parole,
+                    le charisme, le charme ou la culture.
                 </div>
-
-
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Maîtrise de doctrine"
-                        >
-
-                        <span class="competence-name">
-                            Maîtrise de doctrine
-                        </span>
-
-                    </label>
-
-
-
-                    <div class="competence-info">
-                        capacité à préserver la fidélité à l’idéologie d'Avant-Garde
-                        et sa cohérence dans l’action du mouvement.
-                    </div>
-
-                </div>
-
-
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Tactique"
-                        >
-
-                        <span class="competence-name">
-                            Tactique
-                        </span>
-
-                    </label>
-
-
-
-                    <div class="competence-info">
-                        capacité à concevoir et mettre en œuvre des tactiques
-                        efficaces de développement d’audience, médiatique et
-                        électorale, sans renier l’idéologie.
-                    </div>
-
-                </div>
-
-
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Prestance"
-                        >
-
-                        <span class="competence-name">
-                            Prestance
-                        </span>
-
-                    </label>
-
-
-
-                    <div class="competence-info">
-                        capacité à séduire et convaincre par la parole,
-                        le charisme, le charme ou la culture.
-                    </div>
-
-                </div>
-
-
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Analyses pragmatiques"
-                        >
-
-                        <span class="competence-name">
-                            Analyses pragmatiques
-                        </span>
-
-                    </label>
-
-
-
-                    <div class="competence-info">
-                        capacité à analyser les données, les rendements,
-                        les conséquences et les rapports de force. anticipent
-                        les évolutions et privilégient les faits.
-                    </div>
-
-                </div>
-
-
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Analyses populistes"
-                        >
-
-                        <span class="competence-name">
-                            Analyses populistes
-                        </span>
-
-                    </label>
-
-
-
-                    <div class="competence-info">
-                        capacité à analyser les ressentis, aspirations et
-                        frustrations populaires. anticipent les réactions
-                        naturelles et privilégient le vécu et l’opinion du peuple.
-                    </div>
-
-                </div>
-
-
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Administration"
-                        >
-
-                        <span class="competence-name">
-                            Administration
-                        </span>
-
-                    </label>
-
-
-
-                    <div class="competence-info">
-                        maîtrise de la gestion des structures, des ressources
-                        techniques et opérationnelles et des équipes internes.
-                    </div>
-
-                </div>
-
-
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Expertise et ingénierie juridique"
-                        >
-
-                        <span class="competence-name">
-                            Expertise et ingénierie juridique
-                        </span>
-
-                    </label>
-
-
-
-                    <div class="competence-info">
-                        maîtrise du droit français et européen ainsi que des
-                        mécanismes juridiques, avec capacité à en analyser les
-                        règles, les contraintes, les failles et les possibilités
-                        d’évolution.
-                    </div>
-
-                </div>
-
-
-
-                <div class="competence">
-
-                    <label>
-
-                        <input
-                            type="checkbox"
-                            name="competences"
-                            value="Expertise et ingénierie politique"
-                        >
-
-                        <span class="competence-name">
-                            Expertise et ingénierie politique
-                        </span>
-
-                    </label>
-
-
-
-                    <div class="competence-info">
-                        maîtrise d’un domaine politique ou institutionnel
-                        particulier et capacité à en apporter l’expertise.
-                    </div>
-
-                </div>
-
-
 
             </div>
 
 
+            <div class="competence">
 
-            <button
-                type="submit"
-                class="primary-button"
-                id="saveProfileButton"
-            >
-                ENREGISTRER LES MODIFICATIONS
-            </button>
+                <label>
+
+                    <input
+                        type="checkbox"
+                        name="competences"
+                        value="Analyses pragmatiques"
+                    >
+
+                    <span class="competence-name">
+                        Analyses pragmatiques
+                    </span>
+
+                </label>
+
+                <div class="competence-info">
+                    capacité à analyser les données, les rendements,
+                    les conséquences et les rapports de force. anticipent
+                    les évolutions et privilégient les faits.
+                </div>
+
+            </div>
 
 
+            <div class="competence">
 
-            <div
-                id="profileMessage"
-                class="message"
-            ></div>
+                <label>
+
+                    <input
+                        type="checkbox"
+                        name="competences"
+                        value="Analyses populistes"
+                    >
+
+                    <span class="competence-name">
+                        Analyses populistes
+                    </span>
+
+                </label>
+
+                <div class="competence-info">
+                    capacité à analyser les ressentis, aspirations et
+                    frustrations populaires. anticipent les réactions
+                    naturelles et privilégient le vécu et l’opinion du peuple.
+                </div>
+
+            </div>
 
 
+            <div class="competence">
 
-        </form>
+                <label>
 
-    </div>
+                    <input
+                        type="checkbox"
+                        name="competences"
+                        value="Administration"
+                    >
+
+                    <span class="competence-name">
+                        Administration
+                    </span>
+
+                </label>
+
+                <div class="competence-info">
+                    maîtrise de la gestion des structures, des ressources
+                    techniques et opérationnelles et des équipes internes.
+                </div>
+
+            </div>
 
 
+            <div class="competence">
 
-    <!-- SUPPRESSION -->
+                <label>
 
-    <div class="panel delete-panel">
+                    <input
+                        type="checkbox"
+                        name="competences"
+                        value="Expertise et ingénierie juridique"
+                    >
 
-        <h3>
-            Supprimer ma page
-        </h3>
+                    <span class="competence-name">
+                        Expertise et ingénierie juridique
+                    </span>
 
-        <p>
-            Cette action supprimera définitivement votre profil public
-            de l’Avant-gardE. Cette opération est irréversible.
-        </p>
+                </label>
+
+                <div class="competence-info">
+                    maîtrise du droit français et européen ainsi que des
+                    mécanismes juridiques, avec capacité à en analyser les
+                    règles, les contraintes, les failles et les possibilités
+                    d’évolution.
+                </div>
+
+            </div>
+
+
+            <div class="competence">
+
+                <label>
+
+                    <input
+                        type="checkbox"
+                        name="competences"
+                        value="Expertise et ingénierie politique"
+                    >
+
+                    <span class="competence-name">
+                        Expertise et ingénierie politique
+                    </span>
+
+                </label>
+
+                <div class="competence-info">
+                    maîtrise d’un domaine politique ou institutionnel
+                    particulier et capacité à en apporter l’expertise.
+                </div>
+
+            </div>
+
+
+        </div>
+
 
         <button
-            type="button"
-            class="delete-button"
-            id="openDeleteModal"
+            type="submit"
+            class="primary-button"
+            id="saveProfileButton"
         >
-            SUPPRIMER MA PAGE
+            ENREGISTRER LES MODIFICATIONS
         </button>
 
-    </div>
+
+        <div
+            id="profileMessage"
+            class="message"
+        ></div>
 
 
+    </form>
 
 </div>
 
 
+<!-- SUPPRESSION -->
+
+<div class="panel delete-panel">
+
+    <h3>
+        Supprimer ma page
+    </h3>
+
+    <p>
+        Cette action supprimera définitivement votre profil public
+        de l’Avant-gardE. Cette opération est irréversible.
+    </p>
+
+    <button
+        type="button"
+        class="delete-button"
+        id="openDeleteModal"
+    >
+        SUPPRIMER MA PAGE
+    </button>
+
+</div>
+```
+
+</div>
 
 <!-- =====================================================
      EVENEMENTS
@@ -1000,218 +918,199 @@
     class="tab-content"
 >
 
-    <div class="panel">
+```
+<div class="panel">
 
-        <h2 class="panel-title">
-            Les Evènements Avant-gardE
-        </h2>
+    <h2 class="panel-title">
+        Les Evènements Avant-gardE
+    </h2>
 
 
+    <p
+        class="panel-intro"
+        style="margin-bottom:15px;"
+    >
+        Vous êtes connectés en tant qu’administrateur.
+        Ajoutez, modifiez ou supprimez les évènements affichés sur le site.
+        Les évènements sont automatiquement classés par ordre chronologique.
+    </p>
 
-        <p
-            class="panel-intro"
-            style="margin-bottom:15px;"
+
+    <form id="eventForm">
+
+        <input
+            type="hidden"
+            id="eventId"
         >
-            Vous êtes connectés en tant qu’administrateur.
-            Ajoutez, modifiez ou supprimez les évènements affichés sur le site.
-            Les évènements sont automatiquement classés par ordre chronologique.
-        </p>
 
 
-
-        <form id="eventForm">
-
-            <input
-                type="hidden"
-                id="eventId"
-            >
+        <div class="profile-grid">
 
 
+            <div class="form-group">
 
-            <div class="profile-grid">
+                <label for="eventTitle">
+                    TITRE COURT
+                </label>
 
-
-
-                <div class="form-group">
-
-                    <label for="eventTitle">
-                        TITRE COURT
-                    </label>
-
-                    <input
-                        type="text"
-                        id="eventTitle"
-                        required
-                    >
-
-                </div>
-
-
-
-                <div class="form-group">
-
-                    <label for="eventDate">
-                        DATE
-                    </label>
-
-                    <input
-                        type="date"
-                        id="eventDate"
-                        required
-                    >
-
-                </div>
-
-
-
-                <div class="form-group">
-
-                    <label for="eventTime">
-                        HEURE
-                    </label>
-
-                    <input
-                        type="text"
-                        id="eventTime"
-                        placeholder="20h00"
-                    >
-
-                </div>
-
-
-
-                <div class="form-group">
-
-                    <label for="eventPlace">
-                        VILLE (indiquez l'adresse exacte en description)
-                    </label>
-
-                    <input
-                        type="text"
-                        id="eventPlace"
-                    >
-
-                </div>
-
-
-
-                <div class="form-group full-width">
-
-                    <label for="eventText">
-                        DESCRIPTION
-                    </label>
-
-                    <textarea
-                        id="eventText"
-                    ></textarea>
-
-                </div>
-
-
-
-                <div class="form-group full-width">
-
-                    <label for="eventLink">
-                        LIEN
-                    </label>
-
-                    <input
-                        type="url"
-                        id="eventLink"
-                        placeholder="https://..."
-                    >
-
-                </div>
-
-
-
-                <div class="form-group">
-
-                    <label>
-                        STATUT
-                    </label>
-
-
-
-                    <label
-                        style="
-                            display:flex;
-                            align-items:center;
-                            gap:8px;
-                            font-weight:normal;
-                            margin-top:10px;
-                        "
-                    >
-
-                        <input
-                            type="checkbox"
-                            id="eventActive"
-                            checked
-                        >
-
-                        <span
-                            style="
-                                font-family:Arial,sans-serif;
-                                font-size:10px;
-                            "
-                        >
-                            Evènement actif
-                        </span>
-
-                    </label>
-
-                </div>
-
-
+                <input
+                    type="text"
+                    id="eventTitle"
+                    required
+                >
 
             </div>
 
 
+            <div class="form-group">
 
-            <button
-                type="submit"
-                class="primary-button"
-                id="eventSubmitButton"
-            >
-                AJOUTER L'ÉVÈNEMENT
-            </button>
+                <label for="eventDate">
+                    DATE
+                </label>
 
+                <input
+                    type="date"
+                    id="eventDate"
+                    required
+                >
 
-
-            <button
-                type="button"
-                class="secondary-button"
-                id="eventCancelButton"
-                style="display:none;margin-top:8px;width:100%;"
-            >
-                ANNULER LA MODIFICATION
-            </button>
+            </div>
 
 
+            <div class="form-group">
 
-            <div
-                id="eventMessage"
-                class="message"
-            ></div>
+                <label for="eventTime">
+                    HEURE
+                </label>
+
+                <input
+                    type="text"
+                    id="eventTime"
+                    placeholder="20h00"
+                >
+
+            </div>
 
 
+            <div class="form-group">
 
-        </form>
+                <label for="eventPlace">
+                    VILLE (indiquez l'adresse exacte en description)
+                </label>
 
+                <input
+                    type="text"
+                    id="eventPlace"
+                >
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label for="eventText">
+                    DESCRIPTION
+                </label>
+
+                <textarea
+                    id="eventText"
+                ></textarea>
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label for="eventLink">
+                    LIEN
+                </label>
+
+                <input
+                    type="url"
+                    id="eventLink"
+                    placeholder="https://..."
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    STATUT
+                </label>
+
+                <label
+                    style="
+                        display:flex;
+                        align-items:center;
+                        gap:8px;
+                        font-weight:normal;
+                        margin-top:10px;
+                    "
+                >
+
+                    <input
+                        type="checkbox"
+                        id="eventActive"
+                        checked
+                    >
+
+                    <span
+                        style="
+                            font-family:Arial,sans-serif;
+                            font-size:10px;
+                        "
+                    >
+                        Evènement actif
+                    </span>
+
+                </label>
+
+            </div>
+
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="primary-button"
+            id="eventSubmitButton"
+        >
+            AJOUTER L'ÉVÈNEMENT
+        </button>
+
+
+        <button
+            type="button"
+            class="secondary-button"
+            id="eventCancelButton"
+            style="display:none;margin-top:8px;width:100%;"
+        >
+            ANNULER LA MODIFICATION
+        </button>
 
 
         <div
-            class="event-list"
-            id="eventList"
+            id="eventMessage"
+            class="message"
         ></div>
 
 
+    </form>
 
-    </div>
+
+    <div
+        class="event-list"
+        id="eventList"
+    ></div>
+
 
 </div>
+```
 
-
+</div>
 
 <!-- =====================================================
      GESTION DES EQUIPES
@@ -1222,175 +1121,151 @@
     class="tab-content"
 >
 
-    <div class="panel">
+```
+<div class="panel">
 
 
+    <div class="team-role">
 
-        <div class="team-role">
-
-            <h2 class="team-role-title">
-                Architecte du Projet
-            </h2>
-
-
-
-            <p class="team-role-text">
-                Garant de l’idéologie, de la doctrine, de la stratégie et de
-                l’identité du mouvement.<br>
-                Il veille à la continuité de ses principes fondateurs, à la
-                cohérence de sa ligne idéologique et au respect de ses orientations
-                fondamentales. Il constitue l’autorité de référence en matière doctrinale.
-            </p>
-
-
-
-            <div
-                id="founderPermissionMessage"
-                class="team-permission"
-            ></div>
-
-
-
-            <input
-                type="text"
-                id="founderSearch"
-                class="team-search"
-                placeholder="Rechercher un membre..."
-                autocomplete="off"
-            >
-
-
-
-            <div
-                id="founderResults"
-                class="team-search-results"
-            ></div>
-
-
-
-            <div
-                id="founderSelected"
-                class="team-selected"
-            ></div>
-
-
-
-            <div
-                id="founderMessage"
-                class="message"
-            ></div>
-
-
-
-        </div>
-
-
-
-        <div class="team-role">
-
-            <h2 class="team-role-title">
-                Délégué National
-            </h2>
-
-
-
-            <p class="team-role-text">
-                Secrétaire général et trésorier du mouvement. Il est le
-                porte-parole officiel du mouvement.<br>
-                Il représente et met en œuvre la ligne stratégique du
-                mouvement à l’échelle nationale, assure sa direction administrative et
-                financière, coordonne les structures territoriales et veille à l’application
-                des orientations définies par le mouvement.
-            </p>
-
-
-
-            <div
-                id="nationalPermissionMessage"
-                class="team-permission"
-            ></div>
-
-
-
-            <input
-                type="text"
-                id="nationalSearch"
-                class="team-search"
-                placeholder="Rechercher un membre..."
-                autocomplete="off"
-            >
-
-
-
-            <div
-                id="nationalResults"
-                class="team-search-results"
-            ></div>
-
-
-
-            <div
-                id="nationalSelected"
-                class="team-selected"
-            ></div>
-
-
-
-            <div
-                id="nationalMessage"
-                class="message"
-            ></div>
-
-
-
-        </div>
-
-
-
-    </div>
-
-
-
-    <div class="panel">
-
-        <h2 class="panel-title">
-            Délégués régionaux et leurs équipes
+        <h2 class="team-role-title">
+            Architecte du Projet
         </h2>
 
 
-
-        <p class="panel-intro">
-            Ils représentent le mouvement à l’échelle régionale ou départementale.
-            Ils assistent le Délégué national dans ses missions, notamment administratives
-            et financières. Ils coordonnent l’action territoriale, animent les structures
-            locales et assurent le relais entre le niveau national et les membres de leur
-            territoire. Ils peuvent avoir des missions spécifiques dans le cadre de leurs
-            talents ou compétences. Leur nombre et leur répartition territoriale ne sont
-            pas définis de manière rigide.
+        <p class="team-role-text">
+            Garant de l’idéologie, de la doctrine, de la stratégie et de
+            l’identité du mouvement.<br>
+            Il veille à la continuité de ses principes fondateurs, à la
+            cohérence de sa ligne idéologique et au respect de ses orientations
+            fondamentales. Il constitue l’autorité de référence en matière doctrinale.
         </p>
 
 
-
         <div
-            id="teamRegions"
-            class="team-regions"
+            id="founderPermissionMessage"
+            class="team-permission"
         ></div>
 
 
+        <input
+            type="text"
+            id="founderSearch"
+            class="team-search"
+            placeholder="Rechercher un membre..."
+            autocomplete="off"
+        >
+
 
         <div
-            id="teamRegionPanels"
+            id="founderResults"
+            class="team-search-results"
         ></div>
 
+
+        <div
+            id="founderSelected"
+            class="team-selected"
+        ></div>
+
+
+        <div
+            id="founderMessage"
+            class="message"
+        ></div>
 
 
     </div>
 
+
+    <div class="team-role">
+
+        <h2 class="team-role-title">
+            Délégué National
+        </h2>
+
+
+        <p class="team-role-text">
+            Secrétaire général et trésorier du mouvement. Il est le
+            porte-parole officiel du mouvement.<br>
+            Il représente et met en œuvre la ligne stratégique du
+            mouvement à l’échelle nationale, assure sa direction administrative et
+            financière, coordonne les structures territoriales et veille à l’application
+            des orientations définies par le mouvement.
+        </p>
+
+
+        <div
+            id="nationalPermissionMessage"
+            class="team-permission"
+        ></div>
+
+
+        <input
+            type="text"
+            id="nationalSearch"
+            class="team-search"
+            placeholder="Rechercher un membre..."
+            autocomplete="off"
+        >
+
+
+        <div
+            id="nationalResults"
+            class="team-search-results"
+        ></div>
+
+
+        <div
+            id="nationalSelected"
+            class="team-selected"
+        ></div>
+
+
+        <div
+            id="nationalMessage"
+            class="message"
+        ></div>
+
+
+    </div>
 
 
 </div>
 
 
+<div class="panel">
+
+    <h2 class="panel-title">
+        Délégués régionaux et leurs équipes
+    </h2>
+
+
+    <p class="panel-intro">
+        Ils représentent le mouvement à l’échelle régionale ou départementale.
+        Ils assistent le Délégué national dans ses missions, notamment administratives
+        et financières. Ils coordonnent l’action territoriale, animent les structures
+        locales et assurent le relais entre le niveau national et les membres de leur
+        territoire. Ils peuvent avoir des missions spécifiques dans le cadre de leurs
+        talents ou compétences. Leur nombre et leur répartition territoriale ne sont
+        pas définis de manière rigide.
+    </p>
+
+
+    <div
+        id="teamRegions"
+        class="team-regions"
+    ></div>
+
+
+    <div
+        id="teamRegionPanels"
+    ></div>
+
+
+</div>
+```
+
+</div>
 
 <!-- =====================================================
      ROLE
@@ -1401,199 +1276,407 @@
     class="tab-content"
 >
 
-    <div class="panel">
+```
+<div class="panel">
 
-        <h2 class="panel-title">
-            Mes rôles
-        </h2>
-
-
-
-        <p class="panel-intro">
-            Sélectionnez les rôles que vous souhaitez exercer au sein
-            d’Avant-gardE. Vous pouvez sélectionner plusieurs rôles.
-            Passez la souris sur un rôle pour afficher son détail.
-        </p>
+    <h2 class="panel-title">
+        Mes rôles
+    </h2>
 
 
+    <p class="panel-intro">
+        Sélectionnez les rôles que vous souhaitez exercer au sein
+        d’Avant-gardE. Vous pouvez sélectionner plusieurs rôles.
+        Passez la souris sur un rôle pour afficher son détail.
+    </p>
 
-        <div class="competence-group">
 
-            <div class="competence-group-title">
-                Rôles
+    <div class="competence-group">
+
+        <div class="competence-group-title">
+            Rôles
+        </div>
+
+
+        <div class="competence">
+
+            <label>
+
+                <input
+                    type="checkbox"
+                    name="roles"
+                    value="Organisateurs de terrain"
+                >
+
+                <span class="competence-name">
+                    Organisateurs de terrain
+                </span>
+
+            </label>
+
+
+            <div class="competence-info">
+                organisent et gèrent de A à Z des actions ou événements
+                destinés à promouvoir, médiatiser ou animer la communauté.
             </div>
 
+        </div>
 
 
-            <div class="competence">
+        <div class="competence">
 
-                <label>
+            <label>
 
-                    <input
-                        type="checkbox"
-                        name="roles"
-                        value="Organisateurs de terrain"
-                    >
+                <input
+                    type="checkbox"
+                    name="roles"
+                    value="Conférenciers"
+                >
 
-                    <span class="competence-name">
-                        Organisateurs de terrain
-                    </span>
+                <span class="competence-name">
+                    Conférenciers
+                </span>
 
+            </label>
+
+
+            <div class="competence-info">
+                transmettent l’idéologie et transforment les sympathisants
+                en ressources militantes formées et convaincues.
+            </div>
+
+        </div>
+
+
+        <div class="competence">
+
+            <label>
+
+                <input
+                    type="checkbox"
+                    name="roles"
+                    value="Influenceurs Réseaux Sociaux"
+                >
+
+                <span class="competence-name">
+                    Influenceurs Réseaux Sociaux
+                </span>
+
+            </label>
+
+
+            <div class="competence-info">
+                développent une audience, influencent les comportements,
+                déconstruisent les arguments ou manipulations et produisent
+                des contenus permettant de diffuser et de défendre les idées
+                du mouvement.
+            </div>
+
+        </div>
+
+
+        <div class="competence">
+
+            <label>
+
+                <input
+                    type="checkbox"
+                    name="roles"
+                    value="Parrains/marraines"
+                >
+
+                <span class="competence-name">
+                    Parrains/marraines
+                </span>
+
+            </label>
+
+
+            <div class="competence-info">
+                prospectent, identifient, abordent, échangent, accompagnent
+                et parrainent de futurs adhérents.
+            </div>
+
+        </div>
+
+
+        <div class="competence">
+
+            <label>
+
+                <input
+                    type="checkbox"
+                    name="roles"
+                    value="Militants"
+                >
+
+                <span class="competence-name">
+                    Militants
+                </span>
+
+            </label>
+
+
+            <div class="competence-info">
+                entretiennent et font vivre la communauté à différentes
+                échelles, en ligne comme lors d’événements. Peuvent être
+                modérateurs, commentateurs ou simplement participer activement
+                aux actions du mouvement.
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <button
+        type="button"
+        class="primary-button"
+        id="saveRolesButton"
+    >
+        ENREGISTRER MES RÔLES
+    </button>
+
+
+    <div
+        id="roleMessage"
+        class="message"
+    ></div>
+
+
+</div>
+```
+
+</div>
+
+<!-- =====================================================
+     STATISTIQUES
+====================================================== -->
+
+<div
+    id="statsTab"
+    class="tab-content"
+>
+
+```
+<div class="panel">
+
+    <h2 class="panel-title">
+        Statistiques des mesures
+    </h2>
+
+
+    <p class="panel-intro">
+        Gérez les statistiques disponibles pour les rectos des cartes
+        de mesures. Chaque statistique possède un code unique qui peut
+        ensuite être associée à une mesure.
+    </p>
+
+
+    <!-- FORMULAIRE STATISTIQUE -->
+
+    <form id="statsForm">
+
+        <input
+            type="hidden"
+            id="statsId"
+        >
+
+
+        <div class="profile-grid">
+
+
+            <div class="form-group">
+
+                <label for="statsCode">
+                    CODE
                 </label>
 
+                <input
+                    type="text"
+                    id="statsCode"
+                    maxlength="100"
+                    placeholder="ex : croissance"
+                    required
+                >
 
-
-                <div class="competence-info">
-                    organisent et gèrent de A à Z des actions ou événements
-                    destinés à promouvoir, médiatiser ou animer la communauté.
+                <div class="help">
+                    Code interne unique utilisé pour associer la statistique
+                    aux cartes de mesures.
                 </div>
 
             </div>
 
 
+            <div class="form-group">
 
-            <div class="competence">
-
-                <label>
-
-                    <input
-                        type="checkbox"
-                        name="roles"
-                        value="Conférenciers"
-                    >
-
-                    <span class="competence-name">
-                        Conférenciers
-                    </span>
-
+                <label for="statsName">
+                    NOM
                 </label>
 
+                <input
+                    type="text"
+                    id="statsName"
+                    maxlength="150"
+                    placeholder="Nom affiché"
+                    required
+                >
+
+            </div>
 
 
-                <div class="competence-info">
-                    transmettent l’idéologie et transforment les sympathisants
-                    en ressources militantes formées et convaincues.
+            <div class="form-group full-width">
+
+                <label for="statsDescription">
+                    DESCRIPTION
+                </label>
+
+                <textarea
+                    id="statsDescription"
+                    maxlength="500"
+                    placeholder="Description de la statistique..."
+                ></textarea>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="statsIcon">
+                    ICÔNE
+                </label>
+
+                <input
+                    type="url"
+                    id="statsIcon"
+                    placeholder="https://..."
+                >
+
+                <div class="help">
+                    URL de l’icône fixe.
                 </div>
 
             </div>
 
 
+            <div class="form-group">
 
-            <div class="competence">
-
-                <label>
-
-                    <input
-                        type="checkbox"
-                        name="roles"
-                        value="Influenceurs Réseaux Sociaux"
-                    >
-
-                    <span class="competence-name">
-                        Influenceurs Réseaux Sociaux
-                    </span>
-
+                <label for="statsAnimation">
+                    ANIMATION
                 </label>
 
+                <input
+                    type="url"
+                    id="statsAnimation"
+                    placeholder="https://..."
+                >
 
-
-                <div class="competence-info">
-                    développent une audience, influencent les comportements,
-                    déconstruisent les arguments ou manipulations et produisent
-                    des contenus permettant de diffuser et de défendre les idées
-                    du mouvement.
+                <div class="help">
+                    URL éventuelle de l’animation associée.
                 </div>
 
             </div>
 
 
+            <div class="form-group">
 
-            <div class="competence">
-
-                <label>
-
-                    <input
-                        type="checkbox"
-                        name="roles"
-                        value="Parrains/marraines"
-                    >
-
-                    <span class="competence-name">
-                        Parrains/marraines
-                    </span>
-
+                <label for="statsPosition">
+                    POSITION
                 </label>
 
-
-
-                <div class="competence-info">
-                    prospectent, identifient, abordent, échangent, accompagnent
-                    et parrainent de futurs adhérents.
-                </div>
+                <input
+                    type="number"
+                    id="statsPosition"
+                    min="0"
+                    step="1"
+                    value="0"
+                >
 
             </div>
 
 
-
-            <div class="competence">
+            <div class="form-group">
 
                 <label>
+                    STATUT
+                </label>
+
+                <label
+                    style="
+                        display:flex;
+                        align-items:center;
+                        gap:8px;
+                        font-weight:normal;
+                        margin-top:10px;
+                    "
+                >
 
                     <input
                         type="checkbox"
-                        name="roles"
-                        value="Militants"
+                        id="statsActive"
+                        checked
                     >
 
-                    <span class="competence-name">
-                        Militants
+                    <span
+                        style="
+                            font-family:Arial,sans-serif;
+                            font-size:10px;
+                        "
+                    >
+                        Statistique active
                     </span>
 
                 </label>
 
-
-
-                <div class="competence-info">
-                    entretiennent et font vivre la communauté à différentes
-                    échelles, en ligne comme lors d’événements. Peuvent être
-                    modérateurs, commentateurs ou simplement participer activement
-                    aux actions du mouvement.
-                </div>
-
             </div>
-
 
 
         </div>
 
 
-
         <button
-            type="button"
+            type="submit"
             class="primary-button"
-            id="saveRolesButton"
+            id="statsSubmitButton"
         >
-            ENREGISTRER MES RÔLES
+            AJOUTER LA STATISTIQUE
         </button>
 
 
+        <button
+            type="button"
+            class="secondary-button"
+            id="statsCancelButton"
+            style="display:none;margin-top:8px;width:100%;"
+        >
+            ANNULER LA MODIFICATION
+        </button>
+
 
         <div
-            id="roleMessage"
+            id="statsMessage"
             class="message"
         ></div>
 
 
+    </form>
 
-    </div>
+
+    <!-- LISTE -->
+
+    <div
+        id="statsList"
+        style="margin-top:30px;"
+    ></div>
+
+
+</div>
+```
 
 </div>
 
-
-
 </section>
-
-
 
 <!-- =======================================================
      MODAL SUPPRESSION
@@ -1604,88 +1687,73 @@
     id="deleteModal"
 >
 
-
-
 <div class="modal-box">
 
+```
+<button
+    class="modal-close"
+    id="closeDeleteModal"
+>
+    ×
+</button>
 
 
-    <button
-        class="modal-close"
-        id="closeDeleteModal"
-    >
-        ×
-    </button>
+<h2>
+    Supprimer ma page ?
+</h2>
 
 
-
-    <h2>
-        Supprimer ma page ?
-    </h2>
-
-
-
-    <p>
-        Cette action est définitive. Votre profil sera supprimé
-        de la table <strong>profiles</strong>.
-    </p>
+<p>
+    Cette action est définitive. Votre profil sera supprimé
+    de la table <strong>profiles</strong>.
+</p>
 
 
-
-    <p>
-        Pour confirmer, saisissez exactement :
-    </p>
-
+<p>
+    Pour confirmer, saisissez exactement :
+</p>
 
 
-    <p
-        style="
-            text-align:center;
-            color:var(--gold-light);
-            font-family:Arial,sans-serif;
-            font-weight:bold;
-            letter-spacing:2px;
-        "
-    >
-        SUPPRIMER
-    </p>
+<p
+    style="
+        text-align:center;
+        color:var(--gold-light);
+        font-family:Arial,sans-serif;
+        font-weight:bold;
+        letter-spacing:2px;
+    "
+>
+    SUPPRIMER
+</p>
 
 
-
-    <input
-        type="text"
-        id="deleteConfirmation"
-        placeholder="SUPPRIMER"
-        autocomplete="off"
-    >
-
+<input
+    type="text"
+    id="deleteConfirmation"
+    placeholder="SUPPRIMER"
+    autocomplete="off"
+>
 
 
-    <button
-        type="button"
-        class="delete-button"
-        id="confirmDelete"
-        style="width:100%;margin-top:12px;"
-    >
-        CONFIRMER LA SUPPRESSION
-    </button>
+<button
+    type="button"
+    class="delete-button"
+    id="confirmDelete"
+    style="width:100%;margin-top:12px;"
+>
+    CONFIRMER LA SUPPRESSION
+</button>
 
 
-
-    <div
-        id="deleteMessage"
-        class="message"
-    ></div>
-
-
+<div
+    id="deleteMessage"
+    class="message"
+></div>
+```
 
 </div>
 
-
-
 </div>
-
-
 
 <!-- =======================================================
      APPLICATION ADMIN
@@ -1696,7 +1764,1049 @@
     src="./js/admin.js"
 ></script>
 
+<!-- =======================================================
+     GESTION DES STATISTIQUES
+======================================================= -->
 
+<script type="module">
+
+import { supabase } from "./js/supabase.js";
+
+
+const statsTabButton =
+    document.getElementById("statsTabButton");
+
+const statsTab =
+    document.getElementById("statsTab");
+
+const statsForm =
+    document.getElementById("statsForm");
+
+const statsId =
+    document.getElementById("statsId");
+
+const statsCode =
+    document.getElementById("statsCode");
+
+const statsName =
+    document.getElementById("statsName");
+
+const statsDescription =
+    document.getElementById("statsDescription");
+
+const statsIcon =
+    document.getElementById("statsIcon");
+
+const statsAnimation =
+    document.getElementById("statsAnimation");
+
+const statsPosition =
+    document.getElementById("statsPosition");
+
+const statsActive =
+    document.getElementById("statsActive");
+
+const statsSubmitButton =
+    document.getElementById("statsSubmitButton");
+
+const statsCancelButton =
+    document.getElementById("statsCancelButton");
+
+const statsMessage =
+    document.getElementById("statsMessage");
+
+const statsList =
+    document.getElementById("statsList");
+
+
+let statistiques = [];
+
+
+/* =======================================================
+   MESSAGE
+======================================================= */
+
+let statsMessageTimer = null;
+
+function afficherMessage(
+    texte,
+    type = "success"
+) {
+
+    clearTimeout(
+        statsMessageTimer
+    );
+
+    statsMessage.className =
+        "message visible " + type;
+
+    statsMessage.textContent =
+        texte;
+
+    statsMessageTimer =
+        setTimeout(
+            () => {
+
+                statsMessage.className =
+                    "message";
+
+            },
+            3500
+        );
+
+}
+
+
+/* =======================================================
+   ADMIN
+======================================================= */
+
+async function verifierAccesStatistiques() {
+
+    const {
+        data: {
+            user
+        },
+        error: authError
+    } =
+        await supabase.auth.getUser();
+
+
+    if (
+        authError ||
+        !user
+    ) {
+
+        return false;
+
+    }
+
+
+    const {
+        data: profile,
+        error
+    } =
+        await supabase
+            .from("profiles")
+            .select("grade")
+            .eq(
+                "id",
+                user.id
+            )
+            .single();
+
+
+    if (
+        error ||
+        !profile
+    ) {
+
+        return false;
+
+    }
+
+
+    return profile.grade === "admin";
+
+}
+
+
+/* =======================================================
+   CHARGEMENT
+======================================================= */
+
+async function chargerStatistiques() {
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from("stats")
+            .select(`
+                id,
+                code,
+                nom,
+                description,
+                icone_url,
+                animation_url,
+                actif,
+                position
+            `)
+            .order(
+                "position",
+                {
+                    ascending: true
+                }
+            );
+
+
+    if (error) {
+
+        console.error(
+            error
+        );
+
+        afficherMessage(
+            "Impossible de charger les statistiques.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    statistiques =
+        data || [];
+
+
+    afficherStatistiques();
+
+}
+
+
+/* =======================================================
+   RENDU
+======================================================= */
+
+function afficherStatistiques() {
+
+    statsList.innerHTML = "";
+
+
+    if (!statistiques.length) {
+
+        statsList.innerHTML = `
+
+            <div
+                class="help"
+                style="padding:20px 0;"
+            >
+                Aucune statistique créée.
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    statistiques.forEach(
+        stat => {
+
+            const row =
+                document.createElement(
+                    "div"
+                );
+
+            row.style.display =
+                "grid";
+
+            row.style.gridTemplateColumns =
+                "60px minmax(100px,1fr) minmax(150px,2fr) auto";
+
+            row.style.alignItems =
+                "center";
+
+            row.style.gap =
+                "12px";
+
+            row.style.padding =
+                "12px 0";
+
+            row.style.borderBottom =
+                "1px solid var(--border)";
+
+
+            const position =
+                document.createElement(
+                    "div"
+                );
+
+            position.textContent =
+                stat.position ?? 0;
+
+            position.style.fontFamily =
+                "Arial,sans-serif";
+
+            position.style.fontSize =
+                "11px";
+
+
+            const code =
+                document.createElement(
+                    "div"
+                );
+
+            code.textContent =
+                stat.code || "";
+
+            code.style.fontFamily =
+                "Arial,sans-serif";
+
+            code.style.fontSize =
+                "11px";
+
+            code.style.fontWeight =
+                "bold";
+
+
+            const information =
+                document.createElement(
+                    "div"
+                );
+
+
+            const name =
+                document.createElement(
+                    "strong"
+                );
+
+            name.textContent =
+                stat.nom || stat.code || "";
+
+
+            const description =
+                document.createElement(
+                    "div"
+                );
+
+            description.textContent =
+                stat.description || "";
+
+            description.style.fontSize =
+                "10px";
+
+            description.style.opacity =
+                "0.7";
+
+            description.style.marginTop =
+                "3px";
+
+
+            information.appendChild(
+                name
+            );
+
+            information.appendChild(
+                description
+            );
+
+
+            const actions =
+                document.createElement(
+                    "div"
+                );
+
+            actions.style.display =
+                "flex";
+
+            actions.style.alignItems =
+                "center";
+
+            actions.style.gap =
+                "6px";
+
+
+            const status =
+                document.createElement(
+                    "button"
+                );
+
+            status.type =
+                "button";
+
+            status.className =
+                "status-button " +
+                (
+                    stat.actif
+                        ? "status-valid"
+                        : "status-draft"
+                );
+
+            status.textContent =
+                stat.actif
+                    ? "ACTIVE"
+                    : "INACTIVE";
+
+            status.title =
+                "Modifier le statut";
+
+
+            status.addEventListener(
+                "click",
+                () =>
+                    changerStatut(
+                        stat
+                    )
+            );
+
+
+            const edit =
+                document.createElement(
+                    "button"
+                );
+
+            edit.type =
+                "button";
+
+            edit.className =
+                "icon-button";
+
+            edit.textContent =
+                "✎";
+
+            edit.title =
+                "Modifier";
+
+
+            edit.addEventListener(
+                "click",
+                () =>
+                    modifierStatistique(
+                        stat
+                    )
+            );
+
+
+            const up =
+                document.createElement(
+                    "button"
+                );
+
+            up.type =
+                "button";
+
+            up.className =
+                "icon-button";
+
+            up.textContent =
+                "↑";
+
+            up.title =
+                "Monter";
+
+
+            up.addEventListener(
+                "click",
+                () =>
+                    deplacerStatistique(
+                        stat,
+                        -1
+                    )
+            );
+
+
+            const down =
+                document.createElement(
+                    "button"
+                );
+
+            down.type =
+                "button";
+
+            down.className =
+                "icon-button";
+
+            down.textContent =
+                "↓";
+
+            down.title =
+                "Descendre";
+
+
+            down.addEventListener(
+                "click",
+                () =>
+                    deplacerStatistique(
+                        stat,
+                        1
+                    )
+            );
+
+
+            const remove =
+                document.createElement(
+                    "button"
+                );
+
+            remove.type =
+                "button";
+
+            remove.className =
+                "icon-button danger";
+
+            remove.textContent =
+                "×";
+
+            remove.title =
+                "Supprimer";
+
+
+            remove.addEventListener(
+                "click",
+                () =>
+                    supprimerStatistique(
+                        stat
+                    )
+            );
+
+
+            actions.appendChild(
+                status
+            );
+
+            actions.appendChild(
+                edit
+            );
+
+            actions.appendChild(
+                up
+            );
+
+            actions.appendChild(
+                down
+            );
+
+            actions.appendChild(
+                remove
+            );
+
+
+            row.appendChild(
+                position
+            );
+
+            row.appendChild(
+                code
+            );
+
+            row.appendChild(
+                information
+            );
+
+            row.appendChild(
+                actions
+            );
+
+
+            statsList.appendChild(
+                row
+            );
+
+        }
+    );
+
+}
+
+
+/* =======================================================
+   CREATION / MODIFICATION
+======================================================= */
+
+statsForm.addEventListener(
+    "submit",
+    async event => {
+
+        event.preventDefault();
+
+
+        const id =
+            statsId.value;
+
+
+        const code =
+            statsCode.value.trim();
+
+
+        const nom =
+            statsName.value.trim();
+
+
+        const description =
+            statsDescription.value.trim();
+
+
+        const icone =
+            statsIcon.value.trim();
+
+
+        const animation =
+            statsAnimation.value.trim();
+
+
+        const position =
+            Number(
+                statsPosition.value
+            ) || 0;
+
+
+        const actif =
+            statsActive.checked;
+
+
+        if (!code || !nom) {
+
+            afficherMessage(
+                "Le code et le nom sont obligatoires.",
+                "error"
+            );
+
+            return;
+
+        }
+
+
+        statsSubmitButton.disabled =
+            true;
+
+
+        try {
+
+            const donnees = {
+
+                code,
+
+                nom,
+
+                description:
+                    description || null,
+
+                icone_url:
+                    icone || null,
+
+                animation_url:
+                    animation || null,
+
+                position,
+
+                actif
+
+            };
+
+
+            let resultat;
+
+
+            if (id) {
+
+                resultat =
+                    await supabase
+                        .from("stats")
+                        .update(
+                            donnees
+                        )
+                        .eq(
+                            "id",
+                            id
+                        );
+
+            } else {
+
+                resultat =
+                    await supabase
+                        .from("stats")
+                        .insert(
+                            donnees
+                        );
+
+            }
+
+
+            if (resultat.error) {
+
+                throw resultat.error;
+
+            }
+
+
+            afficherMessage(
+                id
+                    ? "Statistique modifiée."
+                    : "Statistique créée."
+            );
+
+
+            reinitialiserFormulaire();
+
+            await chargerStatistiques();
+
+        }
+        catch (error) {
+
+            console.error(
+                error
+            );
+
+            afficherMessage(
+                "Impossible d'enregistrer la statistique.",
+                "error"
+            );
+
+        }
+        finally {
+
+            statsSubmitButton.disabled =
+                false;
+
+        }
+
+    }
+);
+
+
+/* =======================================================
+   MODIFIER
+======================================================= */
+
+function modifierStatistique(
+    stat
+) {
+
+    statsId.value =
+        stat.id;
+
+    statsCode.value =
+        stat.code || "";
+
+    statsName.value =
+        stat.nom || "";
+
+    statsDescription.value =
+        stat.description || "";
+
+    statsIcon.value =
+        stat.icone_url || "";
+
+    statsAnimation.value =
+        stat.animation_url || "";
+
+    statsPosition.value =
+        stat.position ?? 0;
+
+    statsActive.checked =
+        stat.actif !== false;
+
+
+    statsSubmitButton.textContent =
+        "ENREGISTRER LA MODIFICATION";
+
+    statsCancelButton.style.display =
+        "block";
+
+
+    statsCode.focus();
+
+}
+
+
+/* =======================================================
+   ANNULER
+======================================================= */
+
+statsCancelButton.addEventListener(
+    "click",
+    reinitialiserFormulaire
+);
+
+
+function reinitialiserFormulaire() {
+
+    statsForm.reset();
+
+    statsId.value =
+        "";
+
+    statsPosition.value =
+        "0";
+
+    statsActive.checked =
+        true;
+
+    statsSubmitButton.textContent =
+        "AJOUTER LA STATISTIQUE";
+
+    statsCancelButton.style.display =
+        "none";
+
+}
+
+
+/* =======================================================
+   STATUT
+======================================================= */
+
+async function changerStatut(
+    stat
+) {
+
+    const nouveauStatut =
+        !Boolean(
+            stat.actif
+        );
+
+
+    const {
+        error
+    } =
+        await supabase
+            .from("stats")
+            .update({
+
+                actif:
+                    nouveauStatut
+
+            })
+            .eq(
+                "id",
+                stat.id
+            );
+
+
+    if (error) {
+
+        console.error(
+            error
+        );
+
+        afficherMessage(
+            "Impossible de modifier le statut.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    await chargerStatistiques();
+
+}
+
+
+/* =======================================================
+   ORDRE
+======================================================= */
+
+async function deplacerStatistique(
+    stat,
+    direction
+) {
+
+    const index =
+        statistiques.findIndex(
+            item =>
+                item.id ===
+                stat.id
+        );
+
+
+    const autreIndex =
+        index + direction;
+
+
+    if (
+        autreIndex < 0 ||
+        autreIndex >= statistiques.length
+    ) {
+
+        return;
+
+    }
+
+
+    const autre =
+        statistiques[
+            autreIndex
+        ];
+
+
+    const positionStat =
+        Number(
+            stat.position
+        ) || 0;
+
+
+    const positionAutre =
+        Number(
+            autre.position
+        ) || 0;
+
+
+    const premier =
+        await supabase
+            .from("stats")
+            .update({
+
+                position:
+                    positionAutre
+
+            })
+            .eq(
+                "id",
+                stat.id
+            );
+
+
+    if (premier.error) {
+
+        console.error(
+            premier.error
+        );
+
+        afficherMessage(
+            "Impossible de modifier l'ordre.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const second =
+        await supabase
+            .from("stats")
+            .update({
+
+                position:
+                    positionStat
+
+            })
+            .eq(
+                "id",
+                autre.id
+            );
+
+
+    if (second.error) {
+
+        console.error(
+            second.error
+        );
+
+        afficherMessage(
+            "Impossible de modifier l'ordre.",
+            "error"
+        );
+
+        await chargerStatistiques();
+
+        return;
+
+    }
+
+
+    await chargerStatistiques();
+
+}
+
+
+/* =======================================================
+   SUPPRESSION
+======================================================= */
+
+async function supprimerStatistique(
+    stat
+) {
+
+    const confirmation =
+        confirm(
+
+            "Supprimer la statistique « " +
+            (stat.nom || stat.code) +
+            " » ?\n\n" +
+            "Les mesures qui l'utilisent ne seront pas supprimées."
+
+        );
+
+
+    if (!confirmation) {
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabase
+            .from("stats")
+            .delete()
+            .eq(
+                "id",
+                stat.id
+            );
+
+
+    if (error) {
+
+        console.error(
+            error
+        );
+
+        afficherMessage(
+            "Impossible de supprimer la statistique.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    afficherMessage(
+        "Statistique supprimée."
+    );
+
+
+    await chargerStatistiques();
+
+}
+
+
+/* =======================================================
+   INITIALISATION
+======================================================= */
+
+async function initialiserStatistiques() {
+
+    const admin =
+        await verifierAccesStatistiques();
+
+
+    if (!admin) {
+
+        return;
+
+    }
+
+
+    /*
+     * L'onglet est rendu visible uniquement
+     * pour un administrateur.
+     */
+
+    if (statsTabButton) {
+
+        statsTabButton.style.display =
+            "";
+
+    }
+
+
+    await chargerStatistiques();
+
+}
+
+
+initialiserStatistiques();
+
+
+</script>
 
 </body>
 
