@@ -15,6 +15,97 @@
 
 
 /* =========================================================
+   COMPTEUR DESCRIPTION
+========================================================= */
+
+function mettreAJourCompteur(){
+
+  const description =
+    document.getElementById(
+      "profileDescription"
+    );
+
+  const compteur =
+    document.getElementById(
+      "descriptionCounter"
+    );
+
+
+  if(!description || !compteur){
+    return;
+  }
+
+
+  const longueur =
+    description.value.length;
+
+
+  compteur.textContent =
+    longueur +
+    " / 300";
+
+
+  /*
+    Le compteur reste cohérent même si une valeur
+    supérieure à la limite provient de Supabase.
+  */
+
+  if(longueur > 300){
+
+    compteur.classList.add(
+      "error"
+    );
+
+  }else{
+
+    compteur.classList.remove(
+      "error"
+    );
+
+  }
+
+}
+
+
+/*
+  Initialisation unique de l'écouteur du compteur.
+*/
+
+function initialiserCompteurDescription(){
+
+  const description =
+    document.getElementById(
+      "profileDescription"
+    );
+
+
+  if(
+    !description ||
+    description.dataset.counterInitialise ===
+    "true"
+  ){
+
+    return;
+
+  }
+
+
+  description.addEventListener(
+    "input",
+    mettreAJourCompteur
+  );
+
+
+  description.dataset.counterInitialise =
+    "true";
+
+
+  mettreAJourCompteur();
+
+}
+
+
+/* =========================================================
    PHOTO DE PROFIL — EN-TÊTE ESPACE MEMBRE
 ========================================================= */
 
@@ -305,6 +396,14 @@ function remplirProfil(profile){
     .getElementById("profileDescription")
     .value =
       profile.description || "";
+
+
+  /*
+    Initialisation et actualisation du compteur
+    de description.
+  */
+
+  initialiserCompteurDescription();
 
 
   document
@@ -1017,4 +1116,3 @@ profileForm.addEventListener(
 
 window.remplirProfil =
   remplirProfil;
-
