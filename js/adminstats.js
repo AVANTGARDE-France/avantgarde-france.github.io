@@ -2,17 +2,16 @@
    AVANT-GARDE — ADMIN STATISTIQUES
    js/adminstats.js
 
-   Bibliothèque simple des statistiques / icônes animées.
+   Bibliothèque des icônes animées utilisées
+   par les cartes de mesures.
 
-   Chaque entrée possède :
-   - un nom
-   - un lien
-   - un aperçu
-   - une modification
-   - une suppression sécurisée
+   Champs :
+   - nom
+   - lien
+   - aperçu
 
-   La base de données empêche également la suppression
-   d'une statistique utilisée par un contenu.
+   Suppression protégée si la statistique est utilisée
+   par un contenu.
 ========================================================= */
 
 import { supabase } from "./supabase.js";
@@ -74,6 +73,11 @@ const statsList =
 const statsMessage =
     document.getElementById(
         "statsMessage"
+    );
+
+const statsAddButton =
+    document.getElementById(
+        "statsAddButton"
     );
 
 
@@ -222,17 +226,12 @@ async function chargerStatistiques() {
 
     if (error) {
 
-        console.error(
-            "STATS :",
-            error
-        );
-
+        console.error(error);
 
         afficherMessage(
             "Impossible de charger la bibliothèque.",
             "error"
         );
-
 
         return;
 
@@ -302,9 +301,8 @@ function renderStats() {
 
 
             const lien =
-                String(
-                    stat.lien || ""
-                ).trim();
+                stat.lien ||
+                "";
 
 
             card.innerHTML = `
@@ -312,9 +310,9 @@ function renderStats() {
                 <div
                   style="
                     display:grid;
-                    grid-template-columns:minmax(0,1fr) 180px auto;
-                    gap:20px;
+                    grid-template-columns:minmax(0,1fr) 110px auto;
                     align-items:center;
+                    gap:18px;
                   "
                 >
 
@@ -330,17 +328,17 @@ function renderStats() {
                             font-size:10px;
                             font-weight:bold;
                             letter-spacing:1px;
-                            margin-bottom:6px;
+                            margin-bottom:5px;
                           "
                         >
                             NOM
                         </div>
 
+
                         <div
                           style="
-                            font-size:16px;
+                            font-size:15px;
                             font-weight:bold;
-                            line-height:1.3;
                           "
                         >
                             ${escapeHtml(
@@ -351,13 +349,13 @@ function renderStats() {
 
                         <div
                           style="
-                            margin-top:10px;
-                            font-family:Arial,sans-serif;
+                            margin-top:8px;
                             font-size:10px;
-                            line-height:1.5;
+                            line-height:1.4;
                             word-break:break-all;
                           "
                         >
+
                             ${
                                 lien
                                     ? `
@@ -367,7 +365,6 @@ function renderStats() {
                                         rel="noopener noreferrer"
                                         style="
                                           color:var(--gold-light);
-                                          text-decoration:none;
                                         "
                                       >
                                         ${escapeHtml(lien)}
@@ -383,6 +380,7 @@ function renderStats() {
                                       </span>
                                       `
                             }
+
                         </div>
 
                     </div>
@@ -390,79 +388,58 @@ function renderStats() {
 
                     <div
                       style="
-                        min-width:0;
+                        width:110px;
+                        height:80px;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        overflow:hidden;
+                        border:1px solid var(--border);
+                        background:rgba(255,255,255,.025);
                       "
                     >
 
-                        <div
-                          style="
-                            color:var(--gold);
-                            font-size:10px;
-                            font-weight:bold;
-                            letter-spacing:1px;
-                            margin-bottom:6px;
-                          "
-                        >
-                            APERÇU
-                        </div>
+                        ${
+                            lien
+                                ? `
+                                  <img
+                                    src="${escapeHtml(lien)}"
+                                    alt="${escapeHtml(stat.nom)}"
+                                    style="
+                                      max-width:100%;
+                                      max-height:100%;
+                                      object-fit:contain;
+                                    "
+                                    onerror="
+                                      this.style.display='none';
+                                      this.nextElementSibling.style.display='block';
+                                    "
+                                  >
 
-                        <div
-                          style="
-                            height:90px;
-                            border:1px solid var(--border);
-                            background:rgba(255,255,255,.025);
-                            display:flex;
-                            align-items:center;
-                            justify-content:center;
-                            overflow:hidden;
-                          "
-                        >
-
-                            ${
-                                lien
-                                    ? `
-                                      <img
-                                        src="${escapeHtml(lien)}"
-                                        alt="${escapeHtml(stat.nom)}"
-                                        style="
-                                          max-width:100%;
-                                          max-height:80px;
-                                          object-fit:contain;
-                                        "
-                                        loading="lazy"
-                                        onerror="
-                                          this.style.display='none';
-                                          this.nextElementSibling.style.display='block';
-                                        "
-                                      >
-
-                                      <span
-                                        style="
-                                          display:none;
-                                          color:var(--muted);
-                                          font-family:Arial,sans-serif;
-                                          font-size:9px;
-                                          text-align:center;
-                                          padding:10px;
-                                        "
-                                      >
-                                        Aperçu indisponible
-                                      </span>
-                                      `
-                                    : `
-                                      <span
-                                        style="
-                                          color:var(--muted);
-                                          font-family:Arial,sans-serif;
-                                          font-size:9px;
-                                        "
-                                      >
-                                        Aucun aperçu
-                                      </span>
-                                      `
-                            }
-
-                        </div>
+                                  <span
+                                    style="
+                                      display:none;
+                                      color:var(--muted);
+                                      font-size:9px;
+                                      text-align:center;
+                                      padding:8px;
+                                    "
+                                  >
+                                    Aperçu indisponible
+                                  </span>
+                                  `
+                                : `
+                                  <span
+                                    style="
+                                      color:var(--muted);
+                                      font-size:9px;
+                                      text-align:center;
+                                    "
+                                  >
+                                    Aucun aperçu
+                                  </span>
+                                  `
+                        }
 
                     </div>
 
@@ -470,7 +447,7 @@ function renderStats() {
                     <div
                       style="
                         display:flex;
-                        gap:5px;
+                        gap:4px;
                         flex-shrink:0;
                       "
                     >
@@ -514,34 +491,129 @@ function renderStats() {
 
 
 /* =========================================================
-   ESCAPE HTML
+   ESCAPE
 ========================================================= */
 
 function escapeHtml(value) {
 
-    return String(
-        value ?? ""
-    )
-        .replaceAll(
-            "&",
-            "&amp;"
-        )
-        .replaceAll(
-            "<",
-            "&lt;"
-        )
-        .replaceAll(
-            ">",
-            "&gt;"
-        )
-        .replaceAll(
-            '"',
-            "&quot;"
-        )
-        .replaceAll(
-            "'",
-            "&#039;"
-        );
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+/* =========================================================
+   OUVERTURE FORMULAIRE
+========================================================= */
+
+function ouvrirFormulaire() {
+
+    if (!statsForm) {
+        return;
+    }
+
+
+    statsForm.style.display =
+        "block";
+
+
+    editionId =
+        null;
+
+
+    if (statsId) {
+        statsId.value =
+            "";
+    }
+
+
+    if (statsNom) {
+        statsNom.value =
+            "";
+    }
+
+
+    if (statsLien) {
+        statsLien.value =
+            "";
+    }
+
+
+    if (statsSaveButton) {
+
+        statsSaveButton.textContent =
+            "AJOUTER L'ICÔNE";
+
+    }
+
+
+    if (statsCancelButton) {
+
+        statsCancelButton.style.display =
+            "block";
+
+    }
+
+
+    statsNom?.focus();
+
+}
+
+
+/* =========================================================
+   FERMETURE / RESET
+========================================================= */
+
+function reinitialiserFormulaire() {
+
+    editionId =
+        null;
+
+
+    if (statsId) {
+        statsId.value =
+            "";
+    }
+
+
+    if (statsNom) {
+        statsNom.value =
+            "";
+    }
+
+
+    if (statsLien) {
+        statsLien.value =
+            "";
+    }
+
+
+    if (statsSaveButton) {
+
+        statsSaveButton.textContent =
+            "AJOUTER L'ICÔNE";
+
+    }
+
+
+    if (statsCancelButton) {
+
+        statsCancelButton.style.display =
+            "none";
+
+    }
+
+
+    if (statsForm) {
+
+        statsForm.style.display =
+            "none";
+
+    }
 
 }
 
@@ -595,22 +667,6 @@ if (statsForm) {
             }
 
 
-            if (
-                !/^https?:\/\//i.test(
-                    lien
-                )
-            ) {
-
-                afficherMessage(
-                    "Le lien doit commencer par http:// ou https://.",
-                    "error"
-                );
-
-                return;
-
-            }
-
-
             if (statsSaveButton) {
 
                 statsSaveButton.disabled =
@@ -629,8 +685,11 @@ if (statsForm) {
                         await supabase
                             .from("stats")
                             .update({
+
                                 nom,
+
                                 lien
+
                             })
                             .eq(
                                 "id",
@@ -644,7 +703,7 @@ if (statsForm) {
 
 
                     afficherMessage(
-                        "Statistique modifiée."
+                        "Icône modifiée."
                     );
 
                 } else {
@@ -655,8 +714,11 @@ if (statsForm) {
                         await supabase
                             .from("stats")
                             .insert({
+
                                 nom,
+
                                 lien
+
                             });
 
 
@@ -666,7 +728,7 @@ if (statsForm) {
 
 
                     afficherMessage(
-                        "Statistique ajoutée à la bibliothèque."
+                        "Icône ajoutée à la bibliothèque."
                     );
 
                 }
@@ -679,14 +741,11 @@ if (statsForm) {
             }
             catch (error) {
 
-                console.error(
-                    "STATS :",
-                    error
-                );
+                console.error(error);
 
 
                 afficherMessage(
-                    "Impossible d'enregistrer la statistique.",
+                    "Impossible d'enregistrer l'icône.",
                     "error"
                 );
 
@@ -709,7 +768,7 @@ if (statsForm) {
 
 
 /* =========================================================
-   EDITION
+   MODIFICATION
 ========================================================= */
 
 function modifierStatistique(
@@ -757,6 +816,14 @@ function modifierStatistique(
     }
 
 
+    if (statsForm) {
+
+        statsForm.style.display =
+            "block";
+
+    }
+
+
     if (statsSaveButton) {
 
         statsSaveButton.textContent =
@@ -773,82 +840,54 @@ function modifierStatistique(
     }
 
 
-    if (statsNom) {
-
-        statsNom.focus();
-
-    }
-
-
-    if (statsForm) {
-
-        statsForm.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
-
-    }
+    statsNom?.focus();
 
 }
 
 
 /* =========================================================
-   RESET
+   VERIFICATION DES DEPENDANCES
 ========================================================= */
 
-function reinitialiserFormulaire() {
+async function verifierUtilisation(
+    id
+) {
 
-    editionId =
-        null;
-
-
-    if (statsId) {
-
-        statsId.value =
-            "";
-
-    }
-
-
-    if (statsNom) {
-
-        statsNom.value =
-            "";
-
-    }
-
-
-    if (statsLien) {
-
-        statsLien.value =
-            "";
-
-    }
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from("contenus")
+            .select(
+                "id",
+                {
+                    count: "exact",
+                    head: true
+                }
+            )
+            .or(
+                [
+                    `stat_1.eq.${id}`,
+                    `stat_2.eq.${id}`,
+                    `stat_3.eq.${id}`
+                ].join(",")
+            );
 
 
-    if (statsSaveButton) {
+    if (error) {
 
-        statsSaveButton.textContent =
-            "AJOUTER LA STATISTIQUE";
+        console.error(error);
 
-    }
-
-
-    if (statsCancelButton) {
-
-        statsCancelButton.style.display =
-            "none";
+        throw new Error(
+            "Impossible de vérifier si cette statistique est utilisée."
+        );
 
     }
 
-}
 
-
-if (statsCancelButton) {
-
-    statsCancelButton.addEventListener(
-        "click",
-        reinitialiserFormulaire
+    return Number(
+        data?.length || 0
     );
 
 }
@@ -875,13 +914,56 @@ async function supprimerStatistique(
     }
 
 
+    let utilisation;
+
+
+    try {
+
+        utilisation =
+            await verifierUtilisation(
+                id
+            );
+
+    }
+    catch (error) {
+
+        afficherMessage(
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (utilisation > 0) {
+
+        afficherMessage(
+            "Impossible de supprimer « " +
+            stat.nom +
+            " » : cette statistique est utilisée par " +
+            utilisation +
+            " mesure" +
+            (
+                utilisation > 1
+                    ? "s"
+                    : ""
+            ) +
+            ". Retirez-la d’abord des contenus concernés.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
     if (
         !confirm(
-            "Supprimer « " +
+            "Supprimer l’icône « " +
             stat.nom +
-            " » de la bibliothèque ?\n\n" +
-            "La suppression sera refusée si cette statistique " +
-            "est actuellement utilisée par une mesure."
+            " » ?"
         )
     ) {
 
@@ -890,89 +972,64 @@ async function supprimerStatistique(
     }
 
 
-    try {
-
-        const {
-            error
-        } =
-            await supabase
-                .from("stats")
-                .delete()
-                .eq(
-                    "id",
-                    id
-                );
-
-
-        if (error) {
-
-            console.error(
-                "STATS SUPPRESSION :",
-                error
+    const {
+        error
+    } =
+        await supabase
+            .from("stats")
+            .delete()
+            .eq(
+                "id",
+                id
             );
 
 
-            /*
-             * PostgreSQL renvoie généralement 23503
-             * lorsqu'une clé étrangère empêche la suppression.
-             */
-            if (
-                error.code ===
-                "23503"
-            ) {
+    if (error) {
 
-                afficherMessage(
-                    "Suppression impossible : cette statistique est utilisée par au moins une mesure. Retirez-la d'abord du contenu concerné.",
-                    "error"
-                );
-
-            } else {
-
-                afficherMessage(
-                    "Impossible de supprimer cette statistique.",
-                    "error"
-                );
-
-            }
-
-
-            return;
-
-        }
+        console.error(error);
 
 
         if (
-            String(editionId) ===
-            String(id)
+            error.code ===
+            "23503"
         ) {
 
-            reinitialiserFormulaire();
+            afficherMessage(
+                "Impossible de supprimer cette statistique : elle est utilisée par un contenu.",
+                "error"
+            );
+
+        } else {
+
+            afficherMessage(
+                "Impossible de supprimer l’icône.",
+                "error"
+            );
 
         }
 
 
-        await chargerStatistiques();
-
-
-        afficherMessage(
-            "Statistique supprimée."
-        );
+        return;
 
     }
-    catch (error) {
-
-        console.error(
-            "STATS SUPPRESSION :",
-            error
-        );
 
 
-        afficherMessage(
-            "Impossible de supprimer cette statistique.",
-            "error"
-        );
+    if (
+        String(editionId) ===
+        String(id)
+    ) {
+
+        reinitialiserFormulaire();
 
     }
+
+
+    await chargerStatistiques();
+
+
+    afficherMessage(
+        "Icône supprimée."
+    );
 
 }
 
@@ -1036,6 +1093,30 @@ if (statsList) {
 
 
 /* =========================================================
+   BOUTON AJOUTER
+========================================================= */
+
+if (statsAddButton) {
+
+    statsAddButton.addEventListener(
+        "click",
+        ouvrirFormulaire
+    );
+
+}
+
+
+if (statsCancelButton) {
+
+    statsCancelButton.addEventListener(
+        "click",
+        reinitialiserFormulaire
+    );
+
+}
+
+
+/* =========================================================
    INITIALISATION
 ========================================================= */
 
@@ -1052,6 +1133,9 @@ async function initialiser() {
                 "block";
 
         }
+
+
+        reinitialiserFormulaire();
 
 
         await chargerStatistiques();
