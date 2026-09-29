@@ -30,956 +30,902 @@ Le rôle du Core est uniquement de :
 
 ========================================================= */
 
+
 /* =========================================================
 ETAT UTILISATEUR PARTAGÉ
 ========================================================= */
 
 if (
-typeof window.currentUser ===
-"undefined"
+    typeof window.currentUser ===
+    "undefined"
 ) {
 
-
-window.currentUser = null;
-
+    window.currentUser = null;
 
 }
 
 if (
-typeof window.currentProfile ===
-"undefined"
+    typeof window.currentProfile ===
+    "undefined"
 ) {
 
-
-window.currentProfile = null;
-
+    window.currentProfile = null;
 
 }
+
 
 /* =========================================================
 ETAT EQUIPES PARTAGÉ
 ========================================================= */
 
 if (
-typeof window.tousLesMembres ===
-"undefined"
+    typeof window.tousLesMembres ===
+    "undefined"
 ) {
 
-
-window.tousLesMembres = [];
-
+    window.tousLesMembres = [];
 
 }
 
 if (
-typeof window.regionsEquipe ===
-"undefined"
+    typeof window.regionsEquipe ===
+    "undefined"
 ) {
 
-
-window.regionsEquipe = [];
-
+    window.regionsEquipe = [];
 
 }
 
 if (
-typeof window.regionEquipeActive ===
-"undefined"
+    typeof window.regionEquipeActive ===
+    "undefined"
 ) {
 
-
-window.regionEquipeActive = null;
-
+    window.regionEquipeActive = null;
 
 }
+
 
 /* =========================================================
 ROLES
 ========================================================= */
 
 if (
-typeof window.ROLES ===
-"undefined"
+    typeof window.ROLES ===
+    "undefined"
 ) {
 
+    window.ROLES = [
 
-window.ROLES = [
+        "Organisateurs de terrain",
 
-    "Organisateurs de terrain",
+        "Conférenciers",
 
-    "Conférenciers",
+        "Influenceurs Réseaux Sociaux",
 
-    "Influenceurs Réseaux Sociaux",
+        "Parrains/marraines",
 
-    "Parrains/marraines",
+        "Militants"
 
-    "Militants"
-
-];
-
+    ];
 
 }
+
 
 /* =========================================================
 ELEMENTS COMMUNS
 ========================================================= */
 
 function obtenirElement(
-id
+    id
 ) {
 
-
-return document.getElementById(
-    id
-);
-
+    return document.getElementById(
+        id
+    );
 
 }
+
 
 /* =========================================================
 MESSAGES
 ========================================================= */
 
 if (
-typeof window.afficherMessage !==
-"function"
+    typeof window.afficherMessage !==
+    "function"
 ) {
 
+    window.afficherMessage =
+        function (
+            element,
+            type,
+            texte
+        ) {
 
-window.afficherMessage =
-    function (
-        element,
-        type,
-        texte
-    ) {
+            if (!element) {
 
-        if (!element) {
+                return;
 
-            return;
-        }
+            }
 
+            element.className =
+                "message " + type;
 
-        element.className =
-            "message " + type;
+            element.textContent =
+                texte;
 
-
-        element.textContent =
-            texte;
-    };
-
+        };
 
 }
+
 
 if (
-typeof window.viderMessage !==
-"function"
+    typeof window.viderMessage !==
+    "function"
 ) {
 
+    window.viderMessage =
+        function (
+            element
+        ) {
 
-window.viderMessage =
-    function (
-        element
-    ) {
+            if (!element) {
 
-        if (!element) {
+                return;
 
-            return;
-        }
+            }
 
+            element.className =
+                "message";
 
-        element.className =
-            "message";
+            element.textContent =
+                "";
 
-
-        element.textContent =
-            "";
-    };
-
+        };
 
 }
+
 
 /* =========================================================
 ECHAPPEMENT HTML
 ========================================================= */
 
 if (
-typeof window.escapeHtml !==
-"function"
+    typeof window.escapeHtml !==
+    "function"
 ) {
 
+    window.escapeHtml =
+        function (
+            value
+        ) {
 
-window.escapeHtml =
-    function (
-        value
-    ) {
-
-        return String(
-            value ?? ""
-        )
-
-            .replace(
-                /&/g,
-                "&amp;"
+            return String(
+                value ?? ""
             )
 
-            .replace(
-                /</g,
-                "&lt;"
-            )
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
 
-            .replace(
-                />/g,
-                "&gt;"
-            )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
 
-            .replace(
-                /"/g,
-                "&quot;"
-            )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
 
-            .replace(
-                /'/g,
-                "&#039;"
-            );
-    };
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
 
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
+
+        };
 
 }
+
 
 /* =========================================================
 NORMALISATION COMPETENCES
 ========================================================= */
 
 if (
-typeof window.normaliserCompetences !==
-"function"
+    typeof window.normaliserCompetences !==
+    "function"
 ) {
 
-
-window.normaliserCompetences =
-    function (
-        value
-    ) {
-
-        if (
-            Array.isArray(value)
+    window.normaliserCompetences =
+        function (
+            value
         ) {
 
-            return value;
-        }
+            if (
+                Array.isArray(value)
+            ) {
 
+                return value;
 
-        if (
-            typeof value ===
-            "string"
-        ) {
+            }
 
-            return value
+            if (
+                typeof value ===
+                "string"
+            ) {
 
-                .replace(
-                    /^\{|\}$/g,
-                    ""
-                )
+                return value
 
-                .split(",")
+                    .replace(
+                        /^\{|\}$/g,
+                        ""
+                    )
 
-                .map(
-                    x =>
-                        x
-                            .trim()
-                            .replace(
-                                /^"|"$/g,
-                                ""
-                            )
-                )
+                    .split(",")
 
-                .filter(
-                    Boolean
-                );
-        }
+                    .map(
+                        x =>
+                            x
+                                .trim()
+                                .replace(
+                                    /^"|"$/g,
+                                    ""
+                                )
+                    )
 
+                    .filter(
+                        Boolean
+                    );
 
-        return [];
-    };
+            }
 
+            return [];
+
+        };
 
 }
+
 
 /* =========================================================
 ETAT UTILISATEUR
 ========================================================= */
 
 function definirUtilisateur(
-user
+    user
 ) {
 
-
-window.currentUser =
-    user || null;
-
+    window.currentUser =
+        user || null;
 
 }
+
 
 function definirProfil(
-profile
+    profile
 ) {
 
-
-window.currentProfile =
-    profile || null;
-
+    window.currentProfile =
+        profile || null;
 
 }
+
 
 function definirEtatUtilisateur(
-user,
-profile
+    user,
+    profile
 ) {
 
+    window.currentUser =
+        user || null;
 
-window.currentUser =
-    user || null;
-
-window.currentProfile =
-    profile || null;
-
+    window.currentProfile =
+        profile || null;
 
 }
+
 
 function obtenirUtilisateur() {
 
-
-return (
-    window.currentUser ||
-    null
-);
-
+    return (
+        window.currentUser ||
+        null
+    );
 
 }
+
 
 function obtenirProfil() {
 
-
-return (
-    window.currentProfile ||
-    null
-);
-
+    return (
+        window.currentProfile ||
+        null
+    );
 
 }
+
 
 function reinitialiserEtatAdmin() {
 
+    window.currentUser =
+        null;
 
-window.currentUser =
-    null;
+    window.currentProfile =
+        null;
 
-window.currentProfile =
-    null;
+    window.tousLesMembres =
+        [];
 
-window.tousLesMembres =
-    [];
+    window.regionsEquipe =
+        [];
 
-window.regionsEquipe =
-    [];
-
-window.regionEquipeActive =
-    null;
-
+    window.regionEquipeActive =
+        null;
 
 }
+
 
 /* =========================================================
 EXPOSITION ETAT
 ========================================================= */
 
 window.definirUtilisateur =
-definirUtilisateur;
+    definirUtilisateur;
 
 window.definirProfil =
-definirProfil;
+    definirProfil;
 
 window.definirEtatUtilisateur =
-definirEtatUtilisateur;
+    definirEtatUtilisateur;
 
 window.obtenirUtilisateur =
-obtenirUtilisateur;
+    obtenirUtilisateur;
 
 window.obtenirProfil =
-obtenirProfil;
+    obtenirProfil;
 
 window.reinitialiserEtatAdmin =
-reinitialiserEtatAdmin;
+    reinitialiserEtatAdmin;
+
 
 /* =========================================================
 COMPATIBILITE DROITS
 ========================================================= */
 
-/*
-
-* IMPORTANT :
-
-* Les droits définitifs sont définis dans les modules
-
-* spécialisés admin-team.js et admin-role.js.
-
-* Le Core ne fournit ici que des fonctions de secours
-
-* afin d'éviter les références cassées pendant le
-
-* chargement des modules.
-  */
 
 /* ---------------------------------------------------------
 ADMIN
 --------------------------------------------------------- */
 
 if (
-typeof window.estAdmin !==
-"function"
+    typeof window.estAdmin !==
+    "function"
 ) {
 
+    window.estAdmin =
+        function () {
 
-window.estAdmin =
-    function () {
+            return (
+                window.currentProfile?.grade ===
+                "admin"
+            );
 
-        return (
-            window.currentProfile?.grade ===
-            "admin"
-        );
-    };
-
+        };
 
 }
+
 
 /* ---------------------------------------------------------
 ARCHITECTE DU PROJET
 --------------------------------------------------------- */
 
 if (
-typeof window.estCommissaireFondateur !==
-"function"
+    typeof window.estCommissaireFondateur !==
+    "function"
 ) {
 
+    window.estCommissaireFondateur =
+        function () {
 
-window.estCommissaireFondateur =
-    function () {
+            return (
+                window.currentProfile?.grade2 ===
+                "Architecte du Projet"
+            );
 
-        return (
-            window.currentProfile?.grade2 ===
-            "Architecte du Projet"
-        );
-    };
-
+        };
 
 }
+
 
 /* ---------------------------------------------------------
 DELEGUE NATIONAL
 --------------------------------------------------------- */
 
 if (
-typeof window.estDelegueNational !==
-"function"
+    typeof window.estDelegueNational !==
+    "function"
 ) {
 
+    window.estDelegueNational =
+        function () {
 
-window.estDelegueNational =
-    function () {
+            return (
+                window.currentProfile?.grade2 ===
+                "Délégué National"
+            );
 
-        return (
-            window.currentProfile?.grade2 ===
-            "Délégué National"
-        );
-    };
-
+        };
 
 }
+
 
 /* ---------------------------------------------------------
 DELEGUE REGIONAL
 --------------------------------------------------------- */
 
 if (
-typeof window.estDelegueRegional !==
-"function"
+    typeof window.estDelegueRegional !==
+    "function"
 ) {
 
+    window.estDelegueRegional =
+        function (
+            region
+        ) {
 
-window.estDelegueRegional =
-    function (
-        region
-    ) {
+            return (
 
-        return (
+                window.currentProfile?.grade2 ===
+                    "Délégué Régional"
 
-            window.currentProfile?.grade2 ===
-                "Délégué Régional"
+                &&
 
-            &&
+                window.currentProfile?.region ===
+                    region
 
-            window.currentProfile?.region ===
-                region
+            );
 
-        );
-    };
-
+        };
 
 }
+
 
 /* ---------------------------------------------------------
 RDV
 --------------------------------------------------------- */
 
 if (
-typeof window.peutGererRendezVous !==
-"function"
+    typeof window.peutGererRendezVous !==
+    "function"
 ) {
 
+    window.peutGererRendezVous =
+        function () {
 
-window.peutGererRendezVous =
-    function () {
+            const profile =
+                window.currentProfile;
 
-        const profile =
-            window.currentProfile;
+            return (
 
-        return (
+                profile?.grade === "admin"
 
-            profile?.grade === "admin"
+                ||
 
-            ||
+                profile?.grade2 ===
+                    "Architecte du Projet"
 
-            profile?.grade2 ===
-                "Architecte du Projet"
+                ||
 
-            ||
+                profile?.grade2 ===
+                    "Délégué National"
 
-            profile?.grade2 ===
-                "Délégué National"
+                ||
 
-            ||
+                profile?.grade2 ===
+                    "Délégué Régional"
 
-            profile?.grade2 ===
-                "Délégué Régional"
+            );
 
-        );
-    };
-
+        };
 
 }
+
 
 /* ---------------------------------------------------------
 DIRECTION
 --------------------------------------------------------- */
 
 if (
-typeof window.peutGererDirection !==
-"function"
+    typeof window.peutGererDirection !==
+    "function"
 ) {
 
+    window.peutGererDirection =
+        function () {
 
-window.peutGererDirection =
-    function () {
+            const profile =
+                window.currentProfile;
 
-        const profile =
-            window.currentProfile;
+            return (
 
-        return (
+                profile?.grade === "admin"
 
-            profile?.grade === "admin"
+                ||
 
-            ||
+                profile?.grade2 ===
+                    "Architecte du Projet"
 
-            profile?.grade2 ===
-                "Architecte du Projet"
+            );
 
-        );
-    };
-
+        };
 
 }
+
 
 /* ---------------------------------------------------------
 EQUIPES — DROIT DE MODIFICATION
 --------------------------------------------------------- */
 
-/*
-
-* ATTENTION :
-*
-* Cette fonction signifie :
-*
-* "peut modifier la composition des équipes
-* de direction/régionales".
-*
-* Un Délégué Régional ne doit PAS obtenir ce droit.
-*
-* Il dispose néanmoins de l'accès à l'onglet
-* via actualiserAccesEquipes().
-  */
-
 if (
-typeof window.peutGererEquipes !==
-"function"
+    typeof window.peutGererEquipes !==
+    "function"
 ) {
 
+    window.peutGererEquipes =
+        function () {
 
-window.peutGererEquipes =
-    function () {
+            const profile =
+                window.currentProfile;
 
-        const profile =
-            window.currentProfile;
+            return (
 
-        return (
+                profile?.grade === "admin"
 
-            profile?.grade === "admin"
+                ||
 
-            ||
+                profile?.grade2 ===
+                    "Architecte du Projet"
 
-            profile?.grade2 ===
-                "Architecte du Projet"
+                ||
 
-            ||
+                profile?.grade2 ===
+                    "Délégué National"
 
-            profile?.grade2 ===
-                "Délégué National"
+            );
 
-        );
-    };
-
+        };
 
 }
+
 
 /* ---------------------------------------------------------
 MILITANTS
 --------------------------------------------------------- */
 
 if (
-typeof window.peutGererMilitants !==
-"function"
+    typeof window.peutGererMilitants !==
+    "function"
 ) {
 
+    window.peutGererMilitants =
+        function (
+            region
+        ) {
 
-window.peutGererMilitants =
-    function (
-        region
-    ) {
+            const profile =
+                window.currentProfile;
 
-        const profile =
-            window.currentProfile;
+            return (
 
-        return (
+                profile?.grade === "admin"
 
-            profile?.grade === "admin"
+                ||
 
-            ||
-
-            profile?.grade2 ===
-                "Architecte du Projet"
-
-            ||
-
-            profile?.grade2 ===
-                "Délégué National"
-
-            ||
-
-            (
                 profile?.grade2 ===
-                    "Délégué Régional"
+                    "Architecte du Projet"
 
-                &&
+                ||
 
-                profile?.region ===
-                    region
-            )
+                profile?.grade2 ===
+                    "Délégué National"
 
-        );
-    };
+                ||
 
+                (
+                    profile?.grade2 ===
+                        "Délégué Régional"
+
+                    &&
+
+                    profile?.region ===
+                        region
+                )
+
+            );
+
+        };
 
 }
+
 
 /* =========================================================
 COMPATIBILITE PROFIL
 ========================================================= */
 
 if (
-typeof window.remplirProfil !==
-"function"
+    typeof window.remplirProfil !==
+    "function"
 ) {
 
-
-window.remplirProfil =
-    function (
-        profile
-    ) {
-
-        if (!profile) {
-
-            return;
-        }
-
-
-        const nom =
-            obtenirElement(
-                "profileNom"
-            );
-
-
-        const email =
-            obtenirElement(
-                "profileEmail"
-            );
-
-
-        const region =
-            obtenirElement(
-                "profileRegion"
-            );
-
-
-        const image =
-            obtenirElement(
-                "profileImage"
-            );
-
-
-        const description =
-            obtenirElement(
-                "profileDescription"
-            );
-
-
-        const facebook =
-            obtenirElement(
-                "profileFacebook"
-            );
-
-
-        const x =
-            obtenirElement(
-                "profileX"
-            );
-
-
-        const instagram =
-            obtenirElement(
-                "profileInstagram"
-            );
-
-
-        const youtube =
-            obtenirElement(
-                "profileYoutube"
-            );
-
-
-        const tiktok =
-            obtenirElement(
-                "profileTiktok"
-            );
-
-
-        if (nom) {
-
-            nom.value =
-                profile.nom || "";
-        }
-
-
-        if (email) {
-
-            email.value =
-                profile.email ||
-
-                window.currentUser?.email ||
-
-                "";
-        }
-
-
-        if (region) {
-
-            region.value =
-                profile.region || "";
-        }
-
-
-        if (image) {
-
-            image.value =
-                profile.image_url || "";
-        }
-
-
-        if (description) {
-
-            description.value =
-                profile.description || "";
-        }
-
-
-        if (facebook) {
-
-            facebook.value =
-                profile.facebook_url || "";
-        }
-
-
-        if (x) {
-
-            x.value =
-                profile.x_url || "";
-        }
-
-
-        if (instagram) {
-
-            instagram.value =
-                profile.instagram_url || "";
-        }
-
-
-        if (youtube) {
-
-            youtube.value =
-                profile.youtube_url || "";
-        }
-
-
-        if (tiktok) {
-
-            tiktok.value =
-                profile.tiktok_url || "";
-        }
-
-
-        const anonyme =
-            obtenirElement(
-                "profileAnonyme"
-            );
-
-
-        const affiche =
-            obtenirElement(
-                "profileAffiche"
-            );
-
-
-        if (
-            profile.anonyme
+    window.remplirProfil =
+        function (
+            profile
         ) {
 
-            if (anonyme) {
+            if (!profile) {
 
-                anonyme.checked =
-                    true;
+                return;
+
             }
 
-        } else {
+            const nom =
+                obtenirElement(
+                    "profileNom"
+                );
 
-            if (affiche) {
+            const email =
+                obtenirElement(
+                    "profileEmail"
+                );
 
-                affiche.checked =
-                    true;
+            const region =
+                obtenirElement(
+                    "profileRegion"
+                );
+
+            const image =
+                obtenirElement(
+                    "profileImage"
+                );
+
+            const description =
+                obtenirElement(
+                    "profileDescription"
+                );
+
+            const facebook =
+                obtenirElement(
+                    "profileFacebook"
+                );
+
+            const x =
+                obtenirElement(
+                    "profileX"
+                );
+
+            const instagram =
+                obtenirElement(
+                    "profileInstagram"
+                );
+
+            const youtube =
+                obtenirElement(
+                    "profileYoutube"
+                );
+
+            const tiktok =
+                obtenirElement(
+                    "profileTiktok"
+                );
+
+
+            if (nom) {
+
+                nom.value =
+                    profile.nom || "";
+
             }
-        }
+
+            if (email) {
+
+                email.value =
+                    profile.email ||
+
+                    window.currentUser?.email ||
+
+                    "";
+
+            }
+
+            if (region) {
+
+                region.value =
+                    profile.region || "";
+
+            }
+
+            if (image) {
+
+                image.value =
+                    profile.image_url || "";
+
+            }
+
+            if (description) {
+
+                description.value =
+                    profile.description || "";
+
+            }
+
+            if (facebook) {
+
+                facebook.value =
+                    profile.facebook_url || "";
+
+            }
+
+            if (x) {
+
+                x.value =
+                    profile.x_url || "";
+
+            }
+
+            if (instagram) {
+
+                instagram.value =
+                    profile.instagram_url || "";
+
+            }
+
+            if (youtube) {
+
+                youtube.value =
+                    profile.youtube_url || "";
+
+            }
+
+            if (tiktok) {
+
+                tiktok.value =
+                    profile.tiktok_url || "";
+
+            }
 
 
-        if (
-            typeof window.synchroniserCompetencesEtRoles ===
-            "function"
-        ) {
+            const anonyme =
+                obtenirElement(
+                    "profileAnonyme"
+                );
 
-            window.synchroniserCompetencesEtRoles(
-                profile.competences
-            );
-        }
-
-
-        if (
-            typeof window.mettreAJourMedailleVIP ===
-            "function"
-        ) {
-
-            window.mettreAJourMedailleVIP(
-                profile.audience_max
-            );
-        }
+            const affiche =
+                obtenirElement(
+                    "profileAffiche"
+                );
 
 
-        const compteur =
-            document.getElementById(
-                "descriptionCounter"
-            );
+            if (
+                profile.anonyme
+            ) {
+
+                if (anonyme) {
+
+                    anonyme.checked =
+                        true;
+
+                }
+
+            } else {
+
+                if (affiche) {
+
+                    affiche.checked =
+                        true;
+
+                }
+
+            }
 
 
-        if (
-            compteur &&
-            description
-        ) {
+            if (
+                typeof window.synchroniserCompetencesEtRoles ===
+                "function"
+            ) {
 
-            compteur.textContent =
-                description.value.length +
-                " / 300";
-        }
-    };
+                window.synchroniserCompetencesEtRoles(
+                    profile.competences
+                );
 
+            }
+
+
+            if (
+                typeof window.mettreAJourMedailleVIP ===
+                "function"
+            ) {
+
+                window.mettreAJourMedailleVIP(
+                    profile.audience_max
+                );
+
+            }
+
+
+            const compteur =
+                document.getElementById(
+                    "descriptionCounter"
+                );
+
+
+            if (
+                compteur &&
+                description
+            ) {
+
+                compteur.textContent =
+                    description.value.length +
+                    " / 300";
+
+            }
+
+        };
 
 }
+
 
 /* =========================================================
 COMPATIBILITE ROLE
 ========================================================= */
 
-/*
-
-* Le module admin-role.js remplacera cette fonction
-* lorsqu'il sera chargé.
-  */
-
 if (
-typeof window.peutGererRole !==
-"function"
+    typeof window.peutGererRole !==
+    "function"
 ) {
 
+    window.peutGererRole =
+        function () {
 
-window.peutGererRole =
-    function () {
+            const profile =
+                window.currentProfile;
 
-        const profile =
-            window.currentProfile;
+            return (
 
-        return (
+                profile?.grade === "admin"
 
-            profile?.grade === "admin"
+                ||
 
-            ||
+                profile?.grade2 ===
+                    "Architecte du Projet"
 
-            profile?.grade2 ===
-                "Architecte du Projet"
+                ||
 
-            ||
+                profile?.grade2 ===
+                    "Délégué National"
 
-            profile?.grade2 ===
-                "Délégué National"
+                ||
 
-            ||
+                profile?.grade2 ===
+                    "Délégué Régional"
 
-            profile?.grade2 ===
-                "Délégué Régional"
+                ||
 
-            ||
+                profile?.grade2 ===
+                    "Militant"
 
-            profile?.grade2 ===
-                "Militant"
+            );
 
-        );
-    };
-
+        };
 
 }
+
 
 /* =========================================================
 ACCES ONGLET RDV
@@ -987,35 +933,35 @@ ACCES ONGLET RDV
 
 function actualiserAccesRDV() {
 
+    const button =
+        document.getElementById(
+            "rdvTabButton"
+        );
 
-const button =
-    document.getElementById(
-        "rdvTabButton"
-    );
+
+    if (!button) {
+
+        return;
+
+    }
 
 
-if (!button) {
+    const autorise =
+        typeof window.peutGererRendezVous ===
+            "function"
 
-    return;
+        &&
+
+        window.peutGererRendezVous();
+
+
+    button.style.display =
+        autorise
+            ? ""
+            : "none";
+
 }
 
-
-const autorise =
-    typeof window.peutGererRendezVous ===
-        "function"
-
-    &&
-
-    window.peutGererRendezVous();
-
-
-button.style.display =
-    autorise
-        ? ""
-        : "none";
-
-
-}
 
 /* =========================================================
 ACCES ONGLET ROLE
@@ -1023,109 +969,129 @@ ACCES ONGLET ROLE
 
 function actualiserAccesRole() {
 
+    const button =
+        document.getElementById(
+            "roleTabButton"
+        );
 
-const button =
-    document.getElementById(
-        "roleTabButton"
-    );
+
+    if (!button) {
+
+        return;
+
+    }
 
 
-if (!button) {
+    const autorise =
+        typeof window.peutGererRole ===
+            "function"
 
-    return;
+        &&
+
+        window.peutGererRole();
+
+
+    button.style.display =
+        autorise
+            ? ""
+            : "none";
+
 }
 
-
-const autorise =
-    typeof window.peutGererRole ===
-        "function"
-
-    &&
-
-    window.peutGererRole();
-
-
-button.style.display =
-    autorise
-        ? ""
-        : "none";
-
-
-}
 
 /* =========================================================
 ACCES ONGLET EQUIPES
 ========================================================= */
 
-/*
-
-* IMPORTANT :
-*
-* Ici on distingue :
-*
-* 1. le DROIT D'ACCEDER à l'onglet ;
-* 2. le DROIT DE MODIFIER certaines équipes.
-*
-* Le Délégué Régional doit pouvoir ouvrir l'onglet
-* Gestion des équipes afin de voir/gérer son équipe.
-*
-* Il ne doit cependant pas obtenir
-* peutGererEquipes(), qui reste réservé à :
-*
-* * Admin
-* * Architecte du Projet
-* * Délégué National
-    */
-
 function actualiserAccesEquipes() {
 
+    const button =
+        document.getElementById(
+            "teamTabButton"
+        );
 
-const button =
-    document.getElementById(
-        "teamTabButton"
+
+    if (!button) {
+
+        return;
+
+    }
+
+
+    const profile =
+        window.currentProfile;
+
+
+    const autorise = !!(
+
+        profile?.grade ===
+            "admin"
+
+        ||
+
+        profile?.grade2 ===
+            "Architecte du Projet"
+
+        ||
+
+        profile?.grade2 ===
+            "Délégué National"
+
+        ||
+
+        profile?.grade2 ===
+            "Délégué Régional"
+
     );
 
 
-if (!button) {
-
-    return;
-}
-
-
-const profile =
-    window.currentProfile;
-
-
-const autorise = !!(
-
-    profile?.grade ===
-        "admin"
-
-    ||
-
-    profile?.grade2 ===
-        "Architecte du Projet"
-
-    ||
-
-    profile?.grade2 ===
-        "Délégué National"
-
-    ||
-
-    profile?.grade2 ===
-        "Délégué Régional"
-
-);
-
-
-button.style.display =
-    autorise
-        ? ""
-        : "none";
-
+    button.style.display =
+        autorise
+            ? ""
+            : "none";
 
 }
+
+
+/* =========================================================
+ACCES ONGLET CONTENU PROJET
+========================================================= */
+
+/*
+ * CONTENU PROJET est réservé aux administrateurs.
+ *
+ * Le contenu du projet est la partie éditoriale
+ * principale du site. Les autres grades n'y ont
+ * pas accès.
+ */
+
+function actualiserAccesContenuProjet() {
+
+    const button =
+        document.getElementById(
+            "contentProjectTabButton"
+        );
+
+
+    if (!button) {
+
+        return;
+
+    }
+
+
+    const autorise =
+        window.currentProfile?.grade ===
+        "admin";
+
+
+    button.style.display =
+        autorise
+            ? ""
+            : "none";
+
+}
+
 
 /* =========================================================
 ACTUALISER LES ACCES
@@ -1133,86 +1099,94 @@ ACTUALISER LES ACCES
 
 function actualiserAccesAdmin() {
 
+    actualiserAccesRDV();
 
-actualiserAccesRDV();
+    actualiserAccesRole();
 
-actualiserAccesRole();
+    actualiserAccesEquipes();
 
-actualiserAccesEquipes();
-
+    actualiserAccesContenuProjet();
 
 }
+
 
 /* =========================================================
 EXPOSITION
 ========================================================= */
 
 window.actualiserAccesRDV =
-actualiserAccesRDV;
+    actualiserAccesRDV;
 
 window.actualiserAccesRole =
-actualiserAccesRole;
+    actualiserAccesRole;
 
 window.actualiserAccesEquipes =
-actualiserAccesEquipes;
+    actualiserAccesEquipes;
+
+window.actualiserAccesContenuProjet =
+    actualiserAccesContenuProjet;
 
 window.actualiserAccesAdmin =
-actualiserAccesAdmin;
+    actualiserAccesAdmin;
+
 
 /* =========================================================
 EVENEMENT DE CONNEXION
 ========================================================= */
 
 window.addEventListener(
-"avantgarde:admin-connected",
-event => {
+    "avantgarde:admin-connected",
+    event => {
+
+        const detail =
+            event.detail || {};
 
 
-    const detail =
-        event.detail || {};
+        if (
+            detail.user
+        ) {
+
+            window.currentUser =
+                detail.user;
+
+        }
 
 
-    if (
-        detail.user
-    ) {
+        if (
+            detail.profile
+        ) {
 
-        window.currentUser =
-            detail.user;
+            window.currentProfile =
+                detail.profile;
+
+        }
+
+
+        setTimeout(
+            () => {
+
+                if (
+                    typeof window.remplirProfil ===
+                    "function"
+                ) {
+
+                    window.remplirProfil(
+                        window.currentProfile
+                    );
+
+                }
+
+
+                actualiserAccesAdmin();
+
+            },
+            0
+        );
+
     }
-
-
-    if (
-        detail.profile
-    ) {
-
-        window.currentProfile =
-            detail.profile;
-    }
-
-
-    setTimeout(
-        () => {
-
-            if (
-                typeof window.remplirProfil ===
-                "function"
-            ) {
-
-                window.remplirProfil(
-                    window.currentProfile
-                );
-            }
-
-
-            actualiserAccesAdmin();
-
-        },
-        0
-    );
-}
-
 
 );
+
 
 /* =========================================================
 INITIALISATION
@@ -1220,34 +1194,30 @@ INITIALISATION
 
 function initialiserAdminCore() {
 
-
-actualiserAccesAdmin();
-
+    actualiserAccesAdmin();
 
 }
 
+
 if (
-document.readyState ===
-"loading"
+    document.readyState ===
+    "loading"
 ) {
 
-
-document.addEventListener(
-    "DOMContentLoaded",
-    initialiserAdminCore,
-    {
-        once: true
-    }
-);
-
+    document.addEventListener(
+        "DOMContentLoaded",
+        initialiserAdminCore,
+        {
+            once: true
+        }
+    );
 
 } else {
 
-
-initialiserAdminCore();
-
+    initialiserAdminCore();
 
 }
+
 
 /* =========================================================
 EXPORTS
@@ -1255,26 +1225,26 @@ EXPORTS
 
 export {
 
+    definirUtilisateur,
 
-definirUtilisateur,
+    definirProfil,
 
-definirProfil,
+    definirEtatUtilisateur,
 
-definirEtatUtilisateur,
+    obtenirUtilisateur,
 
-obtenirUtilisateur,
+    obtenirProfil,
 
-obtenirProfil,
+    reinitialiserEtatAdmin,
 
-reinitialiserEtatAdmin,
+    actualiserAccesRDV,
 
-actualiserAccesRDV,
+    actualiserAccesRole,
 
-actualiserAccesRole,
+    actualiserAccesEquipes,
 
-actualiserAccesEquipes,
+    actualiserAccesContenuProjet,
 
-actualiserAccesAdmin
-
+    actualiserAccesAdmin
 
 };
