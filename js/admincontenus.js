@@ -14,7 +14,7 @@
    - recto des cartes
    - statistiques liées par code
    - synergies liées par UUID
-   - verso HTML existant
+   - verso HTML
 ========================================================= */
 
 import { supabase } from "./supabase.js";
@@ -109,28 +109,35 @@ const modalSaveButton =
 
 
 /* =========================================================
-   RECTO — ELEMENTS
+   RECTO
 ========================================================= */
 
 const cardPhoto =
+    document.getElementById("contentPhotoUrl") ||
     document.getElementById("cardPhoto");
 
 const cardAccroche =
+    document.getElementById("contentAccroche") ||
     document.getElementById("cardAccroche");
 
 const cardPriorite =
+    document.getElementById("contentPriorite") ||
     document.getElementById("cardPriorite");
 
 const cardStat1 =
+    document.getElementById("contentStat1") ||
     document.getElementById("cardStat1");
 
 const cardStat2 =
+    document.getElementById("contentStat2") ||
     document.getElementById("cardStat2");
 
 const cardStat3 =
+    document.getElementById("contentStat3") ||
     document.getElementById("cardStat3");
 
 const cardSynergies =
+    document.getElementById("contentSynergies") ||
     document.getElementById("cardSynergies");
 
 
@@ -144,6 +151,10 @@ function showMessage(
     text,
     type = "success"
 ) {
+
+    if (!message) {
+        return;
+    }
 
     clearTimeout(messageTimer);
 
@@ -357,30 +368,19 @@ async function chargerDonnees() {
 
 
     if (menusResult.error) {
-
         throw menusResult.error;
-
     }
-
 
     if (sousMenusResult.error) {
-
         throw sousMenusResult.error;
-
     }
-
 
     if (contenusResult.error) {
-
         throw contenusResult.error;
-
     }
 
-
     if (statsResult.error) {
-
         throw statsResult.error;
-
     }
 
 
@@ -405,7 +405,7 @@ async function chargerDonnees() {
 
 
 /* =========================================================
-   LISTES STATISTIQUES
+   STATISTIQUES
 ========================================================= */
 
 function remplirListesStats() {
@@ -421,23 +421,25 @@ function remplirListesStats() {
         select => {
 
             if (!select) {
-
                 return;
-
             }
 
 
-            const ancienneValeur =
-                select.value;
+            const valeurActuelle =
+                select.value || "";
 
 
-            select.innerHTML = "";
+            select.innerHTML =
+                "";
 
 
             const empty =
-                document.createElement("option");
+                document.createElement(
+                    "option"
+                );
 
-            empty.value = "";
+            empty.value =
+                "";
 
             empty.textContent =
                 "Aucune statistique";
@@ -475,10 +477,10 @@ function remplirListesStats() {
                 );
 
 
-            if (ancienneValeur) {
+            if (valeurActuelle) {
 
                 select.value =
-                    ancienneValeur;
+                    valeurActuelle;
 
             }
 
@@ -489,120 +491,109 @@ function remplirListesStats() {
 
 
 /* =========================================================
-   LISTE SYNERGIES
+   SYNERGIES
 ========================================================= */
 
+function normaliserSynergies(value) {
+
+    if (!Array.isArray(value)) {
+        return [];
+    }
+
+    return value
+        .filter(Boolean)
+        .map(
+            id => String(id)
+        );
+
+}
+
+
 function remplirListeSynergies(
-    valeurs = []
+    valeurs = [],
+    currentId = null
 ) {
 
     if (!cardSynergies) {
-
         return;
-
     }
 
 
-    cardSynergies.innerHTML = "";
-
-
     const selected =
-        Array.isArray(valeurs)
-            ? valeurs.map(
-                value => String(value)
-              )
-            : [];
-
-
-    contenus
-        .filter(
-            contenu =>
-                contenu.id !== editorId
-        )
-        .forEach(
-            contenu => {
-
-                const label =
-                    document.createElement(
-                        "label"
-                    );
-
-                label.style.display =
-                    "flex";
-
-                label.style.alignItems =
-                    "center";
-
-                label.style.gap =
-                    "8px";
-
-                label.style.marginBottom =
-                    "6px";
-
-
-                const checkbox =
-                    document.createElement(
-                        "input"
-                    );
-
-                checkbox.type =
-                    "checkbox";
-
-                checkbox.value =
-                    contenu.id;
-
-                checkbox.checked =
-                    selected.includes(
-                        String(contenu.id)
-                    );
-
-
-                const span =
-                    document.createElement(
-                        "span"
-                    );
-
-                span.textContent =
-                    contenu.titre;
-
-
-                label.appendChild(
-                    checkbox
-                );
-
-                label.appendChild(
-                    span
-                );
-
-
-                cardSynergies.appendChild(
-                    label
-                );
-
-            }
+        new Set(
+            normaliserSynergies(
+                valeurs
+            )
         );
 
 
-    if (
-        !cardSynergies.children.length
-    ) {
+    cardSynergies.innerHTML =
+        "";
 
-        const empty =
-            document.createElement(
-                "div"
+
+    const disponibles =
+        contenus
+            .filter(
+                contenu =>
+                    String(contenu.id) !==
+                    String(currentId)
+            )
+            .slice()
+            .sort(
+                (a, b) =>
+                    String(a.titre || "")
+                        .localeCompare(
+                            String(b.titre || ""),
+                            "fr"
+                        )
             );
 
-        empty.style.color =
-            "var(--muted)";
 
-        empty.style.fontSize =
-            "11px";
+    disponibles.forEach(
+        contenu => {
 
-        empty.textContent =
-            "Aucune autre fiche disponible.";
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                contenu.id;
+
+            option.textContent =
+                contenu.titre ||
+                "Mesure sans titre";
+
+            option.selected =
+                selected.has(
+                    String(contenu.id)
+                );
+
+            cardSynergies.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    if (
+        !disponibles.length
+    ) {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.disabled =
+            true;
+
+        option.textContent =
+            "Aucune autre mesure disponible.";
 
         cardSynergies.appendChild(
-            empty
+            option
         );
 
     }
@@ -610,28 +601,21 @@ function remplirListeSynergies(
 }
 
 
-/* =========================================================
-   RECUPERATION SYNERGIES
-========================================================= */
-
 function obtenirSynergies() {
 
     if (!cardSynergies) {
-
         return [];
-
     }
 
 
     return Array.from(
-        cardSynergies.querySelectorAll(
-            'input[type="checkbox"]:checked'
-        )
+        cardSynergies.selectedOptions
     )
         .map(
-            input =>
-                input.value
-        );
+            option =>
+                option.value
+        )
+        .filter(Boolean);
 
 }
 
@@ -642,7 +626,8 @@ function obtenirSynergies() {
 
 function renderTree() {
 
-    tree.innerHTML = "";
+    tree.innerHTML =
+        "";
 
 
     if (!menus.length) {
@@ -714,14 +699,11 @@ function renderTree() {
 
             menuButton.addEventListener(
                 "click",
-                () => {
-
+                () =>
                     ouvrirStructure(
                         "menu",
                         menu.id
-                    );
-
-                }
+                    )
             );
 
 
@@ -734,7 +716,7 @@ function renderTree() {
                 "tree-actions";
 
 
-            const upButton =
+            menuActions.appendChild(
                 creerBouton(
                     "↑",
                     "Monter",
@@ -743,10 +725,11 @@ function renderTree() {
                             menuIndex,
                             -1
                         )
-                );
+                )
+            );
 
 
-            const downButton =
+            menuActions.appendChild(
                 creerBouton(
                     "↓",
                     "Descendre",
@@ -755,16 +738,18 @@ function renderTree() {
                             menuIndex,
                             1
                         )
-                );
+                )
+            );
 
 
-            const statusButton =
+            menuActions.appendChild(
                 creerStatusButton(
                     menu
-                );
+                )
+            );
 
 
-            const addButton =
+            menuActions.appendChild(
                 creerBouton(
                     "+",
                     "Ajouter un sous-menu",
@@ -773,7 +758,8 @@ function renderTree() {
                             "submenu",
                             menu.id
                         )
-                );
+                )
+            );
 
 
             const deleteButton =
@@ -788,23 +774,6 @@ function renderTree() {
 
             deleteButton.classList.add(
                 "danger"
-            );
-
-
-            menuActions.appendChild(
-                upButton
-            );
-
-            menuActions.appendChild(
-                downButton
-            );
-
-            menuActions.appendChild(
-                statusButton
-            );
-
-            menuActions.appendChild(
-                addButton
             );
 
             menuActions.appendChild(
@@ -835,31 +804,26 @@ function renderTree() {
                 "submenu-list";
 
 
-            sousMenus
-                .filter(
-                    submenu =>
-                        submenu.menu_id ===
-                        menu.id
-                )
-                .forEach(
-                    submenu => {
-
-                        const siblings =
-                            sousMenus.filter(
-                                item =>
-                                    item.menu_id ===
-                                    menu.id
-                            );
-
-                        submenuList.appendChild(
-                            renderSousMenu(
-                                submenu,
-                                siblings
-                            )
-                        );
-
-                    }
+            const siblings =
+                sousMenus.filter(
+                    item =>
+                        String(item.menu_id) ===
+                        String(menu.id)
                 );
+
+
+            siblings.forEach(
+                submenu => {
+
+                    submenuList.appendChild(
+                        renderSousMenu(
+                            submenu,
+                            siblings
+                        )
+                    );
+
+                }
+            );
 
 
             menuBox.appendChild(
@@ -929,14 +893,11 @@ function renderSousMenu(
 
     button.addEventListener(
         "click",
-        () => {
-
+        () =>
             ouvrirStructure(
                 "submenu",
                 submenu.id
-            );
-
-        }
+            )
     );
 
 
@@ -947,14 +908,6 @@ function renderSousMenu(
 
     actions.className =
         "tree-actions";
-
-
-    const index =
-        siblings.findIndex(
-            item =>
-                item.id ===
-                submenu.id
-        );
 
 
     actions.appendChild(
@@ -1049,8 +1002,8 @@ function renderSousMenu(
     const contentSiblings =
         contenus.filter(
             content =>
-                content.sous_menu_id ===
-                submenu.id
+                String(content.sous_menu_id) ===
+                String(submenu.id)
         );
 
 
@@ -1113,13 +1066,10 @@ function renderContenu(
 
     button.addEventListener(
         "click",
-        () => {
-
+        () =>
             ouvrirContenu(
                 item.id
-            );
-
-        }
+            )
     );
 
 
@@ -1180,7 +1130,6 @@ function renderContenu(
     deleteButton.classList.add(
         "danger"
     );
-
 
     actions.appendChild(
         deleteButton
@@ -1311,7 +1260,8 @@ function remplirListeMenus(
     valeur
 ) {
 
-    select.innerHTML = "";
+    select.innerHTML =
+        "";
 
 
     menus.forEach(
@@ -1347,7 +1297,8 @@ function remplirListeSousMenus(
     valeur
 ) {
 
-    select.innerHTML = "";
+    select.innerHTML =
+        "";
 
 
     menus.forEach(
@@ -1365,8 +1316,8 @@ function remplirListeSousMenus(
             sousMenus
                 .filter(
                     submenu =>
-                        submenu.menu_id ===
-                        menu.id
+                        String(submenu.menu_id) ===
+                        String(menu.id)
                 )
                 .forEach(
                     submenu => {
@@ -1394,7 +1345,9 @@ function remplirListeSousMenus(
                 );
 
 
-            if (groupe.children.length) {
+            if (
+                groupe.children.length
+            ) {
 
                 select.appendChild(
                     groupe
@@ -1433,14 +1386,13 @@ function ouvrirStructure(
     const item =
         collection.find(
             element =>
-                element.id === id
+                String(element.id) ===
+                String(id)
         );
 
 
     if (!item) {
-
         return;
-
     }
 
 
@@ -1570,8 +1522,8 @@ async function enregistrerStructure() {
         const submenu =
             sousMenus.find(
                 item =>
-                    item.id ===
-                    selectedId
+                    String(item.id) ===
+                    String(selectedId)
             );
 
 
@@ -1603,10 +1555,6 @@ async function enregistrerStructure() {
         }
 
 
-        const ancienMenuId =
-            submenu.menu_id;
-
-
         let nouvellePosition =
             Number(
                 submenu.position
@@ -1615,16 +1563,16 @@ async function enregistrerStructure() {
 
         if (
             String(nouveauMenuId) !==
-            String(ancienMenuId)
+            String(submenu.menu_id)
         ) {
 
             const destination =
                 sousMenus.filter(
                     item =>
-                        item.menu_id ===
-                        nouveauMenuId &&
-                        item.id !==
-                        selectedId
+                        String(item.menu_id) ===
+                        String(nouveauMenuId) &&
+                        String(item.id) !==
+                        String(selectedId)
                 );
 
 
@@ -1674,14 +1622,13 @@ async function enregistrerStructure() {
     }
 
 
-    showMessage(
-        "Modification enregistrée."
-    );
-
-
     await chargerDonnees();
 
     fermerEditeurs();
+
+    showMessage(
+        "Modification enregistrée."
+    );
 
 }
 
@@ -1702,15 +1649,23 @@ function ouvrirModalCreation(
         parentId;
 
 
-    modalTitle.textContent =
+    if (
         type === "submenu"
-            ? "NOUVEAU SOUS-MENU"
-            : "NOUVEAU CONTENU";
+    ) {
+
+        modalTitle.textContent =
+            "NOUVEAU SOUS-MENU";
+
+    } else {
+
+        modalTitle.textContent =
+            "NOUVEAU CONTENU";
+
+    }
 
 
     modalName.value =
         "";
-
 
     modalSaveButton.textContent =
         "CRÉER";
@@ -1722,11 +1677,8 @@ function ouvrirModalCreation(
 
 
     setTimeout(
-        () => {
-
-            modalName.focus();
-
-        },
+        () =>
+            modalName.focus(),
         50
     );
 
@@ -1761,11 +1713,8 @@ document
             );
 
             setTimeout(
-                () => {
-
-                    modalName.focus();
-
-                },
+                () =>
+                    modalName.focus(),
                 50
             );
 
@@ -1883,12 +1832,6 @@ async function creerElement() {
             "menu"
         ) {
 
-            const position =
-                getNextPosition(
-                    menus
-                );
-
-
             const {
                 error
             } =
@@ -1898,7 +1841,10 @@ async function creerElement() {
 
                         titre,
 
-                        position,
+                        position:
+                            getNextPosition(
+                                menus
+                            ),
 
                         valide:
                             false
@@ -1907,9 +1853,7 @@ async function creerElement() {
 
 
             if (error) {
-
                 throw error;
-
             }
 
         }
@@ -1923,14 +1867,8 @@ async function creerElement() {
             const siblings =
                 sousMenus.filter(
                     item =>
-                        item.menu_id ===
-                        modalParentId
-                );
-
-
-            const position =
-                getNextPosition(
-                    siblings
+                        String(item.menu_id) ===
+                        String(modalParentId)
                 );
 
 
@@ -1946,7 +1884,10 @@ async function creerElement() {
 
                         titre,
 
-                        position,
+                        position:
+                            getNextPosition(
+                                siblings
+                            ),
 
                         valide:
                             false
@@ -1955,9 +1896,7 @@ async function creerElement() {
 
 
             if (error) {
-
                 throw error;
-
             }
 
         }
@@ -1971,14 +1910,8 @@ async function creerElement() {
             const siblings =
                 contenus.filter(
                     item =>
-                        item.sous_menu_id ===
-                        modalParentId
-                );
-
-
-            const position =
-                getNextPosition(
-                    siblings
+                        String(item.sous_menu_id) ===
+                        String(modalParentId)
                 );
 
 
@@ -1997,7 +1930,10 @@ async function creerElement() {
                         html:
                             "<p></p>",
 
-                        position,
+                        position:
+                            getNextPosition(
+                                siblings
+                            ),
 
                         valide:
                             false,
@@ -2027,9 +1963,7 @@ async function creerElement() {
 
 
             if (error) {
-
                 throw error;
-
             }
 
         }
@@ -2073,9 +2007,7 @@ function getNextPosition(
 ) {
 
     if (!items.length) {
-
         return 0;
-
     }
 
 
@@ -2102,15 +2034,13 @@ function ouvrirContenu(
     const item =
         contenus.find(
             content =>
-                content.id ===
-                id
+                String(content.id) ===
+                String(id)
         );
 
 
     if (!item) {
-
         return;
-
     }
 
 
@@ -2150,73 +2080,58 @@ function ouvrirContenu(
     ----------------------------------------------------- */
 
     if (cardPhoto) {
-
         cardPhoto.value =
             item.photo_url || "";
-
     }
-
 
     if (cardAccroche) {
-
         cardAccroche.value =
             item.accroche || "";
-
     }
-
 
     if (cardPriorite) {
-
         cardPriorite.value =
             item.priorite || "";
-
     }
+
+
+    remplirListesStats();
 
 
     if (cardStat1) {
-
         cardStat1.value =
             item.stat_1 || "";
-
     }
-
 
     if (cardStat2) {
-
         cardStat2.value =
             item.stat_2 || "";
-
     }
 
-
     if (cardStat3) {
-
         cardStat3.value =
             item.stat_3 || "";
-
     }
 
 
     remplirListeSynergies(
-        item.synergies || []
+        item.synergies || [],
+        item.id
     );
 
 
     /* -----------------------------------------------------
-       VERSO HTML — INCHANGE
+       VERSO HTML
     ----------------------------------------------------- */
 
     wysiwyg.innerHTML =
         item.html || "";
 
-
     sourceEditor.value =
         item.html || "";
 
-
     isSourceMode =
         false;
-
 
     actualiserModeEditeur();
 
@@ -2224,7 +2139,7 @@ function ouvrirContenu(
 
 
 /* =========================================================
-   ANNULER CONTENU
+   SAUVEGARDE CONTENU
 ========================================================= */
 
 document
@@ -2236,10 +2151,6 @@ document
         fermerEditeurs
     );
 
-
-/* =========================================================
-   ENREGISTRER CONTENU
-========================================================= */
 
 document
     .getElementById(
@@ -2272,8 +2183,8 @@ async function enregistrerContenu() {
     const contenu =
         contenus.find(
             item =>
-                item.id ===
-                editorId
+                String(item.id) ===
+                String(editorId)
         );
 
 
@@ -2305,10 +2216,6 @@ async function enregistrerContenu() {
     }
 
 
-    /* -----------------------------------------------------
-       HTML
-    ----------------------------------------------------- */
-
     if (isSourceMode) {
 
         wysiwyg.innerHTML =
@@ -2320,10 +2227,6 @@ async function enregistrerContenu() {
     const html =
         wysiwyg.innerHTML;
 
-
-    /* -----------------------------------------------------
-       RECTO
-    ----------------------------------------------------- */
 
     const photo =
         cardPhoto
@@ -2365,37 +2268,6 @@ async function enregistrerContenu() {
         obtenirSynergies();
 
 
-    /* -----------------------------------------------------
-       VERIFICATION : 3 STATS MAXIMUM
-    ----------------------------------------------------- */
-
-    const statistiques =
-        [
-            stat1,
-            stat2,
-            stat3
-        ].filter(Boolean);
-
-
-    if (
-        statistiques.length >
-        3
-    ) {
-
-        showMessage(
-            "Trois statistiques maximum.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    /* -----------------------------------------------------
-       POSITION
-    ----------------------------------------------------- */
-
     const ancienSousMenuId =
         contenu.sous_menu_id;
 
@@ -2414,10 +2286,10 @@ async function enregistrerContenu() {
         const destination =
             contenus.filter(
                 item =>
-                    item.sous_menu_id ===
-                    nouveauSousMenuId &&
-                    item.id !==
-                    editorId
+                    String(item.sous_menu_id) ===
+                    String(nouveauSousMenuId) &&
+                    String(item.id) !==
+                    String(editorId)
             );
 
 
@@ -2428,10 +2300,6 @@ async function enregistrerContenu() {
 
     }
 
-
-    /* -----------------------------------------------------
-       UPDATE
-    ----------------------------------------------------- */
 
     const {
         error
@@ -2492,14 +2360,13 @@ async function enregistrerContenu() {
     }
 
 
-    showMessage(
-        "Contenu enregistré."
-    );
-
-
     await chargerDonnees();
 
     fermerEditeurs();
+
+    showMessage(
+        "Contenu enregistré."
+    );
 
 }
 
@@ -2583,13 +2450,9 @@ document
                     "Adresse du lien :"
                 );
 
-
             if (!url) {
-
                 return;
-
             }
-
 
             wysiwyg.focus();
 
@@ -2616,13 +2479,9 @@ document
                     "URL de l'image :"
                 );
 
-
             if (!url) {
-
                 return;
-
             }
-
 
             wysiwyg.focus();
 
@@ -2649,13 +2508,9 @@ document
                     "URL de la vidéo :"
                 );
 
-
             if (!url) {
-
                 return;
-
             }
-
 
             wysiwyg.focus();
 
@@ -2710,7 +2565,6 @@ document
 
             }
 
-
             actualiserModeEditeur();
 
         }
@@ -2718,6 +2572,12 @@ document
 
 
 function actualiserModeEditeur() {
+
+    const button =
+        document.getElementById(
+            "sourceModeButton"
+        );
+
 
     if (isSourceMode) {
 
@@ -2727,12 +2587,10 @@ function actualiserModeEditeur() {
         sourceEditor.style.display =
             "block";
 
-        document
-            .getElementById(
-                "sourceModeButton"
-            )
-            .textContent =
-            "ÉDITEUR VISUEL";
+        if (button) {
+            button.textContent =
+                "ÉDITEUR VISUEL";
+        }
 
     } else {
 
@@ -2742,12 +2600,10 @@ function actualiserModeEditeur() {
         sourceEditor.style.display =
             "none";
 
-        document
-            .getElementById(
-                "sourceModeButton"
-            )
-            .textContent =
-            "CODE HTML";
+        if (button) {
+            button.textContent =
+                "CODE HTML";
+        }
 
     }
 
@@ -2769,18 +2625,37 @@ async function changerValidation(
         );
 
 
-    const table =
+    let table;
+
+
+    if (
         menus.some(
             element =>
-                element.id === id
+                String(element.id) ===
+                String(id)
         )
-            ? "menus"
-            : sousMenus.some(
-                element =>
-                    element.id === id
-            )
-                ? "sous_menus"
-                : "contenus";
+    ) {
+
+        table =
+            "menus";
+
+    } else if (
+        sousMenus.some(
+            element =>
+                String(element.id) ===
+                String(id)
+        )
+    ) {
+
+        table =
+            "sous_menus";
+
+    } else {
+
+        table =
+            "contenus";
+
+    }
 
 
     const {
@@ -2847,9 +2722,7 @@ async function deplacerMenu(
         otherIndex < 0 ||
         otherIndex >= menus.length
     ) {
-
         return;
-
     }
 
 
@@ -2871,8 +2744,8 @@ async function deplacerSousMenu(
     const index =
         siblings.findIndex(
             sibling =>
-                sibling.id ===
-                item.id
+                String(sibling.id) ===
+                String(item.id)
         );
 
 
@@ -2884,9 +2757,7 @@ async function deplacerSousMenu(
         otherIndex < 0 ||
         otherIndex >= siblings.length
     ) {
-
         return;
-
     }
 
 
@@ -2908,8 +2779,8 @@ async function deplacerContenu(
     const index =
         siblings.findIndex(
             sibling =>
-                sibling.id ===
-                item.id
+                String(sibling.id) ===
+                String(item.id)
         );
 
 
@@ -2921,9 +2792,7 @@ async function deplacerContenu(
         otherIndex < 0 ||
         otherIndex >= siblings.length
     ) {
-
         return;
-
     }
 
 
@@ -2958,10 +2827,8 @@ async function echangerPositions(
         await supabase
             .from(table)
             .update({
-
                 position:
                     secondPosition
-
             })
             .eq(
                 "id",
@@ -2989,10 +2856,8 @@ async function echangerPositions(
         await supabase
             .from(table)
             .update({
-
                 position:
                     firstPosition
-
             })
             .eq(
                 "id",
@@ -3034,21 +2899,21 @@ async function supprimerMenu(
     const menu =
         menus.find(
             item =>
-                item.id === id
+                String(item.id) ===
+                String(id)
         );
 
 
     if (!menu) {
-
         return;
-
     }
 
 
     const children =
         sousMenus.filter(
             item =>
-                item.menu_id === id
+                String(item.menu_id) ===
+                String(id)
         );
 
 
@@ -3057,8 +2922,8 @@ async function supprimerMenu(
             content =>
                 children.some(
                     submenu =>
-                        submenu.id ===
-                        content.sous_menu_id
+                        String(submenu.id) ===
+                        String(content.sous_menu_id)
                 )
         ).length;
 
@@ -3071,7 +2936,6 @@ async function supprimerMenu(
             " » ?" +
 
             (
-
                 children.length ||
                 contentCount
 
@@ -3089,9 +2953,7 @@ async function supprimerMenu(
 
 
     if (!confirmation) {
-
         return;
-
     }
 
 
@@ -3206,22 +3068,21 @@ async function supprimerSousMenu(
     const submenu =
         sousMenus.find(
             item =>
-                item.id === id
+                String(item.id) ===
+                String(id)
         );
 
 
     if (!submenu) {
-
         return;
-
     }
 
 
     const childCount =
         contenus.filter(
             item =>
-                item.sous_menu_id ===
-                id
+                String(item.sous_menu_id) ===
+                String(id)
         ).length;
 
 
@@ -3325,14 +3186,13 @@ async function supprimerContenu(
     const item =
         contenus.find(
             content =>
-                content.id === id
+                String(content.id) ===
+                String(id)
         );
 
 
     if (!item) {
-
         return;
-
     }
 
 
@@ -3400,7 +3260,6 @@ function fermerEditeurs() {
 
     contentEditor.style.display =
         "none";
-
 
     structureParentField.style.display =
         "none";
@@ -3543,4 +3402,3 @@ async function initialiser() {
 
 
 initialiser();
-
