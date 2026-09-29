@@ -4,6 +4,7 @@
 
    Gestion du profil de l'utilisateur connecté :
    - Remplissage du profil
+   - Aperçu de la photo
    - Sauvegarde du profil
    - Gestion des compétences métier
    - Gestion des rôles
@@ -11,6 +12,234 @@
    - Gestion du changement d'e-mail
    - Gestion de la médaille VIP
 ========================================================= */
+
+
+/* =========================================================
+   APERÇU PHOTO PROFIL
+========================================================= */
+
+function initialiserApercuPhoto(){
+
+  const imageInput =
+    document.getElementById(
+      "profileImage"
+    );
+
+  if(!imageInput){
+    return;
+  }
+
+
+  /*
+    Évite de créer plusieurs fois
+    l'aperçu si la fonction est appelée
+    plusieurs fois.
+  */
+
+  if(
+    document.getElementById(
+      "profileImagePreview"
+    )
+  ){
+    return;
+  }
+
+
+  /*
+    Styles limités à l'aperçu photo.
+  */
+
+  const style =
+    document.createElement(
+      "style"
+    );
+
+  style.id =
+    "profile-image-preview-styles";
+
+  style.textContent = `
+
+    #profileImagePreview {
+      width:180px;
+      height:180px;
+      margin-top:12px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.025);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      box-sizing:border-box;
+    }
+
+    #profileImagePreview.empty {
+      display:none;
+    }
+
+    #profileImagePreview img {
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+    }
+
+    #profileImagePreview.error {
+      display:flex;
+      color:rgba(245,243,237,.45);
+      font-family:Arial,sans-serif;
+      font-size:10px;
+      text-align:center;
+      letter-spacing:.04em;
+      padding:15px;
+    }
+
+    @media(max-width:600px){
+
+      #profileImagePreview {
+        width:150px;
+        height:150px;
+      }
+
+    }
+
+  `;
+
+  document.head.appendChild(
+    style
+  );
+
+
+  /*
+    Création du cadre.
+  */
+
+  const preview =
+    document.createElement(
+      "div"
+    );
+
+  preview.id =
+    "profileImagePreview";
+
+  preview.className =
+    "empty";
+
+  preview.setAttribute(
+    "aria-label",
+    "Aperçu de la photo de profil"
+  );
+
+
+  /*
+    Le cadre est placé directement
+    sous le champ URL.
+  */
+
+  imageInput.parentElement.appendChild(
+    preview
+  );
+
+
+  /*
+    Mise à jour de l'aperçu.
+  */
+
+  function actualiserApercu(){
+
+    const url =
+      imageInput.value.trim();
+
+
+    preview.innerHTML = "";
+
+    preview.classList.remove(
+      "error"
+    );
+
+
+    if(!url){
+
+      preview.classList.add(
+        "empty"
+      );
+
+      return;
+
+    }
+
+
+    preview.classList.remove(
+      "empty"
+    );
+
+
+    const image =
+      document.createElement(
+        "img"
+      );
+
+    image.alt =
+      "Aperçu de la photo de profil";
+
+
+    image.onload =
+      () => {
+
+        preview.classList.remove(
+          "error"
+        );
+
+      };
+
+
+    image.onerror =
+      () => {
+
+        preview.innerHTML =
+          "IMAGE IMPOSSIBLE À CHARGER";
+
+        preview.classList.add(
+          "error"
+        );
+
+      };
+
+
+    image.src =
+      url;
+
+
+    preview.appendChild(
+      image
+    );
+
+  }
+
+
+  /*
+    Aperçu en temps réel.
+  */
+
+  imageInput.addEventListener(
+    "input",
+    actualiserApercu
+  );
+
+
+  imageInput.addEventListener(
+    "change",
+    actualiserApercu
+  );
+
+
+  /*
+    Aperçu initial si une URL
+    est déjà présente.
+  */
+
+  actualiserApercu();
+
+}
 
 
 /* =========================================================
@@ -43,6 +272,30 @@ function remplirProfil(profile){
     .getElementById("profileImage")
     .value =
       profile.image_url || "";
+
+
+  /*
+    Mise à jour de l'aperçu après
+    le remplissage de l'URL.
+  */
+
+  initialiserApercuPhoto();
+
+
+  const imageInput =
+    document.getElementById(
+      "profileImage"
+    );
+
+  if(imageInput){
+
+    imageInput.dispatchEvent(
+      new Event(
+        "input"
+      )
+    );
+
+  }
 
 
   document
@@ -706,6 +959,27 @@ profileForm.addEventListener(
         "Connecté en tant que <strong>" +
         (data.nom || currentUser.email) +
         "</strong>";
+
+
+    /*
+      Actualisation de l'aperçu après
+      sauvegarde éventuelle.
+    */
+
+    const imageInput =
+      document.getElementById(
+        "profileImage"
+      );
+
+    if(imageInput){
+
+      imageInput.dispatchEvent(
+        new Event(
+          "input"
+        )
+      );
+
+    }
 
 
     if(perteDroitsRegionaux){
