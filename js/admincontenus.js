@@ -736,15 +736,58 @@ function injectTreeStyles() {
         }
 
 
+        /* -------------------------------------------------
+           BOUTON DE STATUT
+        ------------------------------------------------- */
+
         #tree .status-button {
             min-width:58px;
             height:21px;
             padding:0 6px;
+            border:1px solid rgba(214,173,85,.28);
             border-radius:4px;
+            background:rgba(214,173,85,.08);
+            color:rgba(245,243,237,.58);
             font-size:7px;
             font-weight:600;
             letter-spacing:.06em;
             cursor:pointer;
+        }
+
+
+        /* -------------------------------------------------
+           STATUT VALIDÉ
+        ------------------------------------------------- */
+
+        #tree .status-button.status-valid {
+            border-color:rgba(70,180,100,.45);
+            background:rgba(70,180,100,.14);
+            color:#69d38a;
+        }
+
+
+        #tree .status-button.status-valid:hover {
+            border-color:rgba(70,180,100,.65);
+            background:rgba(70,180,100,.22);
+            color:#8be8a5;
+        }
+
+
+        /* -------------------------------------------------
+           STATUT BROUILLON
+        ------------------------------------------------- */
+
+        #tree .status-button.status-draft {
+            border-color:rgba(214,173,85,.28);
+            background:rgba(214,173,85,.08);
+            color:rgba(245,243,237,.58);
+        }
+
+
+        #tree .status-button.status-draft:hover {
+            border-color:rgba(214,173,85,.45);
+            background:rgba(214,173,85,.14);
+            color:var(--gold-light);
         }
 
 
@@ -1737,7 +1780,7 @@ function renderContenu(
                     siblings,
                     1
                 )
-            )
+        )
     );
 
 
