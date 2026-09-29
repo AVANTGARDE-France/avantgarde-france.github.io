@@ -941,7 +941,6 @@ function remplirListesStats() {
             select.innerHTML =
                 "";
 
-
             const empty =
                 document.createElement(
                     "option"
@@ -2218,7 +2217,7 @@ function ouvrirModalCreation(
 
 
     structureModal.classList.add(
-        "visible"
+        "active"
     );
 
 
@@ -2258,9 +2257,11 @@ function ouvrirCreationMenu() {
     modalSaveButton.textContent =
         "CRÉER";
 
+
     structureModal.classList.add(
-        "visible"
+        "active"
     );
+
 
     setTimeout(
         () =>
@@ -2276,7 +2277,7 @@ function fermerModal() {
     if (structureModal) {
 
         structureModal.classList.remove(
-            "visible"
+            "active"
         );
 
     }
