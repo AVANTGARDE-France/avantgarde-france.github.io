@@ -26,6 +26,71 @@
     href="./css/admin.css"
 >
 
+<!-- =======================================================
+     CONTENU PROJET — STRUCTURE
+     Styles volontairement limités à cet onglet.
+======================================================= -->
+
+<style>
+
+#contentProjectTab .project-layout {
+    display:grid;
+    grid-template-columns:320px minmax(0, 1fr);
+    gap:24px;
+    align-items:start;
+}
+
+#contentProjectTab .project-tree-panel {
+    padding:0;
+    overflow:hidden;
+}
+
+#contentProjectTab .project-tree-header {
+    padding:16px 18px;
+    border-bottom:1px solid var(--border);
+    background:rgba(7,21,45,.35);
+}
+
+#contentProjectTab .project-tree-header h3 {
+    margin:0;
+    font-size:14px;
+    letter-spacing:.08em;
+    color:var(--gold-light);
+}
+
+#contentProjectTab .project-tree-container {
+    padding:10px;
+    max-height:calc(100vh - 250px);
+    overflow-y:auto;
+}
+
+#contentProjectTab .project-tree-container::-webkit-scrollbar {
+    width:6px;
+}
+
+#contentProjectTab .project-tree-container::-webkit-scrollbar-track {
+    background:transparent;
+}
+
+#contentProjectTab .project-tree-container::-webkit-scrollbar-thumb {
+    background:rgba(214,173,85,.28);
+    border-radius:10px;
+}
+
+@media (max-width:900px) {
+
+    #contentProjectTab .project-layout {
+        grid-template-columns:1fr;
+    }
+
+    #contentProjectTab .project-tree-container {
+        max-height:450px;
+    }
+
+}
+
+</style>
+
 </head>
 
 <body>
@@ -1239,32 +1304,28 @@
          ARBRE + EDITEUR
     ==================================================== -->
 
-    <div
-        style="
-            display:grid;
-            grid-template-columns:minmax(280px, 1fr) minmax(0, 2fr);
-            gap:20px;
-            align-items:start;
-        "
-    >
+    <div class="project-layout">
 
 
         <!-- ===============================================
              ARBORESCENCE
         ================================================ -->
 
-        <div class="panel">
+        <div
+            class="panel project-tree-panel"
+        >
 
-            <h3
-                class="panel-title"
-                style="font-size:14px;"
-            >
-                STRUCTURE DU PROJET
-            </h3>
+            <div class="project-tree-header">
+
+                <h3>
+                    STRUCTURE DU PROJET
+                </h3>
+
+            </div>
 
             <div
                 id="tree"
-                class="content-tree"
+                class="content-tree project-tree-container"
             ></div>
 
         </div>
