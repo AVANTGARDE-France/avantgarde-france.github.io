@@ -2,7 +2,17 @@
    AVANT-GARDE — ADMIN STATISTIQUES
    js/adminstats.js
 
-   Gestion de la bibliothèque des statistiques.
+   Bibliothèque simple des statistiques / icônes animées.
+
+   Chaque entrée possède :
+   - un nom
+   - un lien
+   - un aperçu
+   - une modification
+   - une suppression sécurisée
+
+   La base de données empêche également la suppression
+   d'une statistique utilisée par un contenu.
 ========================================================= */
 
 import { supabase } from "./supabase.js";
@@ -36,34 +46,14 @@ const statsId =
         "statsId"
     );
 
-const statsCode =
-    document.getElementById(
-        "statsCode"
-    );
-
 const statsNom =
     document.getElementById(
         "statsNom"
     );
 
-const statsDescription =
+const statsLien =
     document.getElementById(
-        "statsDescription"
-    );
-
-const statsIconeUrl =
-    document.getElementById(
-        "statsIconeUrl"
-    );
-
-const statsAnimationUrl =
-    document.getElementById(
-        "statsAnimationUrl"
-    );
-
-const statsActif =
-    document.getElementById(
-        "statsActif"
+        "statsLien"
     );
 
 const statsSaveButton =
@@ -93,6 +83,7 @@ const statsMessage =
 
 let messageTimer = null;
 
+
 function afficherMessage(
     texte,
     type = "success"
@@ -102,13 +93,19 @@ function afficherMessage(
         return;
     }
 
-    clearTimeout(messageTimer);
+
+    clearTimeout(
+        messageTimer
+    );
+
 
     statsMessage.className =
         "message visible " + type;
 
+
     statsMessage.textContent =
         texte;
+
 
     messageTimer =
         setTimeout(
@@ -211,17 +208,12 @@ async function chargerStatistiques() {
             .select(
                 `
                 id,
-                code,
                 nom,
-                description,
-                icone_url,
-                animation_url,
-                actif,
-                position
+                lien
                 `
             )
             .order(
-                "position",
+                "nom",
                 {
                     ascending: true
                 }
@@ -230,12 +222,17 @@ async function chargerStatistiques() {
 
     if (error) {
 
-        console.error(error);
+        console.error(
+            "STATS :",
+            error
+        );
+
 
         afficherMessage(
-            "Impossible de charger les statistiques.",
+            "Impossible de charger la bibliothèque.",
             "error"
         );
+
 
         return;
 
@@ -257,6 +254,11 @@ async function chargerStatistiques() {
 
 function renderStats() {
 
+    if (!statsList) {
+        return;
+    }
+
+
     statsList.innerHTML =
         "";
 
@@ -272,7 +274,7 @@ function renderStats() {
                 padding:20px 0;
               "
             >
-                Aucune statistique configurée.
+                Aucune icône animée dans la bibliothèque.
             </div>
 
         `;
@@ -283,12 +285,13 @@ function renderStats() {
 
 
     statistiques.forEach(
-        (stat, index) => {
+        stat => {
 
             const card =
                 document.createElement(
                     "div"
                 );
+
 
             card.className =
                 "event-card";
@@ -298,143 +301,202 @@ function renderStats() {
                 "10px";
 
 
+            const lien =
+                String(
+                    stat.lien || ""
+                ).trim();
+
+
             card.innerHTML = `
 
                 <div
                   style="
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:flex-start;
-                    gap:15px;
+                    display:grid;
+                    grid-template-columns:minmax(0,1fr) 180px auto;
+                    gap:20px;
+                    align-items:center;
                   "
                 >
 
-                  <div>
-
                     <div
                       style="
-                        color:var(--gold);
-                        font-size:10px;
-                        font-weight:bold;
-                        letter-spacing:1px;
+                        min-width:0;
                       "
                     >
-                      ${escapeHtml(
-                          stat.code
-                      )}
+
+                        <div
+                          style="
+                            color:var(--gold);
+                            font-size:10px;
+                            font-weight:bold;
+                            letter-spacing:1px;
+                            margin-bottom:6px;
+                          "
+                        >
+                            NOM
+                        </div>
+
+                        <div
+                          style="
+                            font-size:16px;
+                            font-weight:bold;
+                            line-height:1.3;
+                          "
+                        >
+                            ${escapeHtml(
+                                stat.nom
+                            )}
+                        </div>
+
+
+                        <div
+                          style="
+                            margin-top:10px;
+                            font-family:Arial,sans-serif;
+                            font-size:10px;
+                            line-height:1.5;
+                            word-break:break-all;
+                          "
+                        >
+                            ${
+                                lien
+                                    ? `
+                                      <a
+                                        href="${escapeHtml(lien)}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style="
+                                          color:var(--gold-light);
+                                          text-decoration:none;
+                                        "
+                                      >
+                                        ${escapeHtml(lien)}
+                                      </a>
+                                      `
+                                    : `
+                                      <span
+                                        style="
+                                          color:var(--muted);
+                                        "
+                                      >
+                                        Aucun lien
+                                      </span>
+                                      `
+                            }
+                        </div>
+
                     </div>
 
 
                     <div
                       style="
-                        font-size:16px;
-                        font-weight:bold;
-                        margin-top:5px;
+                        min-width:0;
                       "
                     >
-                      ${escapeHtml(
-                          stat.nom
-                      )}
+
+                        <div
+                          style="
+                            color:var(--gold);
+                            font-size:10px;
+                            font-weight:bold;
+                            letter-spacing:1px;
+                            margin-bottom:6px;
+                          "
+                        >
+                            APERÇU
+                        </div>
+
+                        <div
+                          style="
+                            height:90px;
+                            border:1px solid var(--border);
+                            background:rgba(255,255,255,.025);
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            overflow:hidden;
+                          "
+                        >
+
+                            ${
+                                lien
+                                    ? `
+                                      <img
+                                        src="${escapeHtml(lien)}"
+                                        alt="${escapeHtml(stat.nom)}"
+                                        style="
+                                          max-width:100%;
+                                          max-height:80px;
+                                          object-fit:contain;
+                                        "
+                                        loading="lazy"
+                                        onerror="
+                                          this.style.display='none';
+                                          this.nextElementSibling.style.display='block';
+                                        "
+                                      >
+
+                                      <span
+                                        style="
+                                          display:none;
+                                          color:var(--muted);
+                                          font-family:Arial,sans-serif;
+                                          font-size:9px;
+                                          text-align:center;
+                                          padding:10px;
+                                        "
+                                      >
+                                        Aperçu indisponible
+                                      </span>
+                                      `
+                                    : `
+                                      <span
+                                        style="
+                                          color:var(--muted);
+                                          font-family:Arial,sans-serif;
+                                          font-size:9px;
+                                        "
+                                      >
+                                        Aucun aperçu
+                                      </span>
+                                      `
+                            }
+
+                        </div>
+
                     </div>
-
-
-                    ${
-                        stat.description
-                            ? `
-                              <div
-                                style="
-                                  color:var(--muted);
-                                  font-size:11px;
-                                  line-height:1.5;
-                                  margin-top:6px;
-                                "
-                              >
-                                ${escapeHtml(
-                                    stat.description
-                                )}
-                              </div>
-                              `
-                            : ""
-                    }
 
 
                     <div
                       style="
-                        color:${stat.actif ? "#8ed5ad" : "#d0b779"};
-                        font-size:9px;
-                        margin-top:8px;
-                        font-weight:bold;
+                        display:flex;
+                        gap:5px;
+                        flex-shrink:0;
                       "
                     >
-                      ${
-                        stat.actif
-                            ? "ACTIVE"
-                            : "INACTIVE"
-                      }
+
+                        <button
+                          type="button"
+                          class="icon-button"
+                          title="Modifier"
+                          data-action="edit"
+                          data-id="${stat.id}"
+                        >
+                            ✎
+                        </button>
+
+
+                        <button
+                          type="button"
+                          class="icon-button danger"
+                          title="Supprimer"
+                          data-action="delete"
+                          data-id="${stat.id}"
+                        >
+                            ×
+                        </button>
+
                     </div>
-
-                  </div>
-
-
-                  <div
-                    style="
-                      display:flex;
-                      gap:4px;
-                      flex-shrink:0;
-                    "
-                  >
-
-                    <button
-                      type="button"
-                      class="icon-button"
-                      title="Monter"
-                      data-action="up"
-                      data-id="${stat.id}"
-                      ${index === 0 ? "disabled" : ""}
-                    >
-                      ↑
-                    </button>
-
-
-                    <button
-                      type="button"
-                      class="icon-button"
-                      title="Descendre"
-                      data-action="down"
-                      data-id="${stat.id}"
-                      ${
-                          index ===
-                          statistiques.length - 1
-                              ? "disabled"
-                              : ""
-                      }
-                    >
-                      ↓
-                    </button>
-
-
-                    <button
-                      type="button"
-                      class="icon-button"
-                      title="Modifier"
-                      data-action="edit"
-                      data-id="${stat.id}"
-                    >
-                      ✎
-                    </button>
-
-
-                    <button
-                      type="button"
-                      class="icon-button danger"
-                      title="Supprimer"
-                      data-action="delete"
-                      data-id="${stat.id}"
-                    >
-                      ×
-                    </button>
-
-                  </div>
 
                 </div>
 
@@ -452,17 +514,34 @@ function renderStats() {
 
 
 /* =========================================================
-   ESCAPE
+   ESCAPE HTML
 ========================================================= */
 
 function escapeHtml(value) {
 
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    return String(
+        value ?? ""
+    )
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 
 }
 
@@ -471,187 +550,140 @@ function escapeHtml(value) {
    CREATION / MODIFICATION
 ========================================================= */
 
-statsForm.addEventListener(
-    "submit",
-    async event => {
+if (statsForm) {
 
-        event.preventDefault();
+    statsForm.addEventListener(
+        "submit",
+        async event => {
 
-
-        const code =
-            statsCode.value
-                .trim();
-
-        const nom =
-            statsNom.value
-                .trim();
-
-        const description =
-            statsDescription.value
-                .trim();
-
-        const icone_url =
-            statsIconeUrl.value
-                .trim();
-
-        const animation_url =
-            statsAnimationUrl.value
-                .trim();
-
-        const actif =
-            statsActif.checked;
+            event.preventDefault();
 
 
-        if (!code) {
-
-            afficherMessage(
-                "Le code est obligatoire.",
-                "error"
-            );
-
-            return;
-
-        }
+            const nom =
+                statsNom
+                    ? statsNom.value.trim()
+                    : "";
 
 
-        if (!nom) {
-
-            afficherMessage(
-                "Le nom est obligatoire.",
-                "error"
-            );
-
-            return;
-
-        }
+            const lien =
+                statsLien
+                    ? statsLien.value.trim()
+                    : "";
 
 
-        statsSaveButton.disabled =
-            true;
-
-
-        try {
-
-            if (editionId) {
-
-                const {
-                    error
-                } =
-                    await supabase
-                        .from("stats")
-                        .update({
-
-                            code,
-
-                            nom,
-
-                            description:
-                                description ||
-                                null,
-
-                            icone_url:
-                                icone_url ||
-                                null,
-
-                            animation_url:
-                                animation_url ||
-                                null,
-
-                            actif
-
-                        })
-                        .eq(
-                            "id",
-                            editionId
-                        );
-
-
-                if (error) {
-                    throw error;
-                }
-
+            if (!nom) {
 
                 afficherMessage(
-                    "Statistique modifiée."
+                    "Le nom est obligatoire.",
+                    "error"
                 );
 
-            } else {
-
-                const position =
-                    statistiques.length
-                        ? Math.max(
-                            ...statistiques.map(
-                                stat =>
-                                    Number(
-                                        stat.position
-                                    ) || 0
-                            )
-                          ) + 1
-                        : 0;
-
-
-                const {
-                    error
-                } =
-                    await supabase
-                        .from("stats")
-                        .insert({
-
-                            code,
-
-                            nom,
-
-                            description:
-                                description ||
-                                null,
-
-                            icone_url:
-                                icone_url ||
-                                null,
-
-                            animation_url:
-                                animation_url ||
-                                null,
-
-                            actif,
-
-                            position
-
-                        });
-
-
-                if (error) {
-                    throw error;
-                }
-
-
-                afficherMessage(
-                    "Statistique créée."
-                );
+                return;
 
             }
 
 
-            reinitialiserFormulaire();
-
-            await chargerStatistiques();
-
-        }
-        catch (error) {
-
-            console.error(error);
-
-            if (
-                error.code ===
-                "23505"
-            ) {
+            if (!lien) {
 
                 afficherMessage(
-                    "Ce code de statistique existe déjà.",
+                    "Le lien est obligatoire.",
                     "error"
                 );
 
-            } else {
+                return;
+
+            }
+
+
+            if (
+                !/^https?:\/\//i.test(
+                    lien
+                )
+            ) {
+
+                afficherMessage(
+                    "Le lien doit commencer par http:// ou https://.",
+                    "error"
+                );
+
+                return;
+
+            }
+
+
+            if (statsSaveButton) {
+
+                statsSaveButton.disabled =
+                    true;
+
+            }
+
+
+            try {
+
+                if (editionId) {
+
+                    const {
+                        error
+                    } =
+                        await supabase
+                            .from("stats")
+                            .update({
+                                nom,
+                                lien
+                            })
+                            .eq(
+                                "id",
+                                editionId
+                            );
+
+
+                    if (error) {
+                        throw error;
+                    }
+
+
+                    afficherMessage(
+                        "Statistique modifiée."
+                    );
+
+                } else {
+
+                    const {
+                        error
+                    } =
+                        await supabase
+                            .from("stats")
+                            .insert({
+                                nom,
+                                lien
+                            });
+
+
+                    if (error) {
+                        throw error;
+                    }
+
+
+                    afficherMessage(
+                        "Statistique ajoutée à la bibliothèque."
+                    );
+
+                }
+
+
+                reinitialiserFormulaire();
+
+                await chargerStatistiques();
+
+            }
+            catch (error) {
+
+                console.error(
+                    "STATS :",
+                    error
+                );
+
 
                 afficherMessage(
                     "Impossible d'enregistrer la statistique.",
@@ -659,17 +691,21 @@ statsForm.addEventListener(
                 );
 
             }
+            finally {
+
+                if (statsSaveButton) {
+
+                    statsSaveButton.disabled =
+                        false;
+
+                }
+
+            }
 
         }
-        finally {
+    );
 
-            statsSaveButton.disabled =
-                false;
-
-        }
-
-    }
-);
+}
 
 
 /* =========================================================
@@ -697,36 +733,61 @@ function modifierStatistique(
         stat.id;
 
 
-    statsId.value =
-        stat.id;
+    if (statsId) {
 
-    statsCode.value =
-        stat.code || "";
+        statsId.value =
+            stat.id;
 
-    statsNom.value =
-        stat.nom || "";
-
-    statsDescription.value =
-        stat.description || "";
-
-    statsIconeUrl.value =
-        stat.icone_url || "";
-
-    statsAnimationUrl.value =
-        stat.animation_url || "";
-
-    statsActif.checked =
-        stat.actif !== false;
+    }
 
 
-    statsSaveButton.textContent =
-        "ENREGISTRER LA MODIFICATION";
+    if (statsNom) {
 
-    statsCancelButton.style.display =
-        "block";
+        statsNom.value =
+            stat.nom || "";
+
+    }
 
 
-    statsCode.focus();
+    if (statsLien) {
+
+        statsLien.value =
+            stat.lien || "";
+
+    }
+
+
+    if (statsSaveButton) {
+
+        statsSaveButton.textContent =
+            "ENREGISTRER LA MODIFICATION";
+
+    }
+
+
+    if (statsCancelButton) {
+
+        statsCancelButton.style.display =
+            "block";
+
+    }
+
+
+    if (statsNom) {
+
+        statsNom.focus();
+
+    }
+
+
+    if (statsForm) {
+
+        statsForm.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    }
 
 }
 
@@ -740,41 +801,57 @@ function reinitialiserFormulaire() {
     editionId =
         null;
 
-    statsId.value =
-        "";
 
-    statsCode.value =
-        "";
+    if (statsId) {
 
-    statsNom.value =
-        "";
+        statsId.value =
+            "";
 
-    statsDescription.value =
-        "";
-
-    statsIconeUrl.value =
-        "";
-
-    statsAnimationUrl.value =
-        "";
-
-    statsActif.checked =
-        true;
+    }
 
 
-    statsSaveButton.textContent =
-        "CRÉER LA STATISTIQUE";
+    if (statsNom) {
 
-    statsCancelButton.style.display =
-        "none";
+        statsNom.value =
+            "";
+
+    }
+
+
+    if (statsLien) {
+
+        statsLien.value =
+            "";
+
+    }
+
+
+    if (statsSaveButton) {
+
+        statsSaveButton.textContent =
+            "AJOUTER LA STATISTIQUE";
+
+    }
+
+
+    if (statsCancelButton) {
+
+        statsCancelButton.style.display =
+            "none";
+
+    }
 
 }
 
 
-statsCancelButton.addEventListener(
-    "click",
-    reinitialiserFormulaire
-);
+if (statsCancelButton) {
+
+    statsCancelButton.addEventListener(
+        "click",
+        reinitialiserFormulaire
+    );
+
+}
 
 
 /* =========================================================
@@ -800,11 +877,11 @@ async function supprimerStatistique(
 
     if (
         !confirm(
-            "Supprimer la statistique « " +
+            "Supprimer « " +
             stat.nom +
-            " » ?\n\n" +
-            "Les mesures qui utilisent ce code " +
-            "ne seront pas automatiquement modifiées."
+            " » de la bibliothèque ?\n\n" +
+            "La suppression sera refusée si cette statistique " +
+            "est actuellement utilisée par une mesure."
         )
     ) {
 
@@ -813,165 +890,89 @@ async function supprimerStatistique(
     }
 
 
-    const {
-        error
-    } =
-        await supabase
-            .from("stats")
-            .delete()
-            .eq(
-                "id",
-                id
+    try {
+
+        const {
+            error
+        } =
+            await supabase
+                .from("stats")
+                .delete()
+                .eq(
+                    "id",
+                    id
+                );
+
+
+        if (error) {
+
+            console.error(
+                "STATS SUPPRESSION :",
+                error
             );
 
 
-    if (error) {
+            /*
+             * PostgreSQL renvoie généralement 23503
+             * lorsqu'une clé étrangère empêche la suppression.
+             */
+            if (
+                error.code ===
+                "23503"
+            ) {
 
-        console.error(error);
+                afficherMessage(
+                    "Suppression impossible : cette statistique est utilisée par au moins une mesure. Retirez-la d'abord du contenu concerné.",
+                    "error"
+                );
+
+            } else {
+
+                afficherMessage(
+                    "Impossible de supprimer cette statistique.",
+                    "error"
+                );
+
+            }
+
+
+            return;
+
+        }
+
+
+        if (
+            String(editionId) ===
+            String(id)
+        ) {
+
+            reinitialiserFormulaire();
+
+        }
+
+
+        await chargerStatistiques();
+
 
         afficherMessage(
-            "Impossible de supprimer la statistique.",
-            "error"
+            "Statistique supprimée."
         );
 
-        return;
-
     }
-
-
-    if (
-        String(editionId) ===
-        String(id)
-    ) {
-
-        reinitialiserFormulaire();
-
-    }
-
-
-    await chargerStatistiques();
-
-    afficherMessage(
-        "Statistique supprimée."
-    );
-
-}
-
-
-/* =========================================================
-   ORDRE
-========================================================= */
-
-async function deplacerStatistique(
-    id,
-    direction
-) {
-
-    const index =
-        statistiques.findIndex(
-            item =>
-                String(item.id) ===
-                String(id)
-        );
-
-
-    if (index < 0) {
-        return;
-    }
-
-
-    const autreIndex =
-        index + direction;
-
-
-    if (
-        autreIndex < 0 ||
-        autreIndex >=
-        statistiques.length
-    ) {
-
-        return;
-
-    }
-
-
-    const first =
-        statistiques[index];
-
-    const second =
-        statistiques[autreIndex];
-
-
-    const firstPosition =
-        Number(
-            first.position
-        ) || 0;
-
-    const secondPosition =
-        Number(
-            second.position
-        ) || 0;
-
-
-    const firstUpdate =
-        await supabase
-            .from("stats")
-            .update({
-                position:
-                    secondPosition
-            })
-            .eq(
-                "id",
-                first.id
-            );
-
-
-    if (firstUpdate.error) {
+    catch (error) {
 
         console.error(
-            firstUpdate.error
+            "STATS SUPPRESSION :",
+            error
         );
 
+
         afficherMessage(
-            "Impossible de modifier l'ordre.",
+            "Impossible de supprimer cette statistique.",
             "error"
         );
 
-        return;
-
     }
-
-
-    const secondUpdate =
-        await supabase
-            .from("stats")
-            .update({
-                position:
-                    firstPosition
-            })
-            .eq(
-                "id",
-                second.id
-            );
-
-
-    if (secondUpdate.error) {
-
-        console.error(
-            secondUpdate.error
-        );
-
-        afficherMessage(
-            "Impossible de modifier l'ordre.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    await chargerStatistiques();
 
 }
 
@@ -980,79 +981,58 @@ async function deplacerStatistique(
    ACTIONS LISTE
 ========================================================= */
 
-statsList.addEventListener(
-    "click",
-    event => {
+if (statsList) {
 
-        const button =
-            event.target.closest(
-                "button[data-action]"
-            );
+    statsList.addEventListener(
+        "click",
+        event => {
 
-
-        if (!button) {
-            return;
-        }
+            const button =
+                event.target.closest(
+                    "button[data-action]"
+                );
 
 
-        const id =
-            button.dataset.id;
-
-        const action =
-            button.dataset.action;
+            if (!button) {
+                return;
+            }
 
 
-        if (
-            action ===
-            "edit"
-        ) {
-
-            modifierStatistique(
-                id
-            );
-
-        }
+            const id =
+                button.dataset.id;
 
 
-        if (
-            action ===
-            "delete"
-        ) {
-
-            supprimerStatistique(
-                id
-            );
-
-        }
+            const action =
+                button.dataset.action;
 
 
-        if (
-            action ===
-            "up"
-        ) {
+            if (
+                action ===
+                "edit"
+            ) {
 
-            deplacerStatistique(
-                id,
-                -1
-            );
+                modifierStatistique(
+                    id
+                );
+
+            }
+
+
+            if (
+                action ===
+                "delete"
+            ) {
+
+                supprimerStatistique(
+                    id
+                );
+
+            }
 
         }
+    );
 
-
-        if (
-            action ===
-            "down"
-        ) {
-
-            deplacerStatistique(
-                id,
-                1
-            );
-
-        }
-
-    }
-);
+}
 
 
 /* =========================================================
