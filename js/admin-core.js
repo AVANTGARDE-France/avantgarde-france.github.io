@@ -1058,12 +1058,11 @@ ACCES ONGLET CONTENU PROJET
 ========================================================= */
 
 /*
- * CONTENU PROJET est réservé aux administrateurs.
- *
- * Le contenu du projet est la partie éditoriale
- * principale du site. Les autres grades n'y ont
- * pas accès.
- */
+   CONTENU PROJET est réservé aux administrateurs.
+
+   Le contenu éditorial du projet ne peut être géré
+   que par un profil dont le grade principal est "admin".
+*/
 
 function actualiserAccesContenuProjet() {
 
@@ -1248,3 +1247,4 @@ export {
     actualiserAccesAdmin
 
 };
+
