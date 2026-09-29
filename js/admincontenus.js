@@ -195,6 +195,387 @@ function escapeHtml(value) {
 
 
 /* =========================================================
+   STYLE ARBRE
+========================================================= */
+
+function injectTreeStyles() {
+
+    if (
+        document.getElementById(
+            "avantgarde-content-tree-styles"
+        )
+    ) {
+        return;
+    }
+
+
+    const style =
+        document.createElement("style");
+
+    style.id =
+        "avantgarde-content-tree-styles";
+
+
+    style.textContent = `
+
+        /* -------------------------------------------------
+           ARBRE GENERAL
+        ------------------------------------------------- */
+
+        #tree {
+            width:100%;
+            box-sizing:border-box;
+        }
+
+
+        #tree .tree-menu {
+            margin:0 0 8px 0;
+            padding:0;
+        }
+
+
+        #tree .tree-menu:last-child {
+            margin-bottom:0;
+        }
+
+
+        /* -------------------------------------------------
+           MENU
+        ------------------------------------------------- */
+
+        #tree .tree-menu-header {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            min-width:0;
+            padding:7px 6px 7px 8px;
+            border-radius:6px;
+            background:rgba(214,173,85,.09);
+            border:1px solid rgba(214,173,85,.20);
+        }
+
+
+        #tree .tree-menu-header:hover {
+            background:rgba(214,173,85,.13);
+        }
+
+
+        /* -------------------------------------------------
+           SOUS-MENUS
+        ------------------------------------------------- */
+
+        #tree .submenu-list {
+            position:relative;
+            margin:4px 0 0 15px;
+            padding-left:15px;
+        }
+
+
+        #tree .submenu-list::before {
+            content:"";
+            position:absolute;
+            left:0;
+            top:0;
+            bottom:8px;
+            width:1px;
+            background:rgba(214,173,85,.18);
+        }
+
+
+        #tree .tree-submenu {
+            position:relative;
+            margin:0 0 3px 0;
+        }
+
+
+        #tree .tree-submenu::before {
+            content:"";
+            position:absolute;
+            left:-15px;
+            top:18px;
+            width:12px;
+            height:1px;
+            background:rgba(214,173,85,.18);
+        }
+
+
+        #tree .tree-submenu-header {
+            display:flex;
+            align-items:center;
+            gap:6px;
+            min-width:0;
+            padding:4px 4px 4px 5px;
+            border-radius:5px;
+        }
+
+
+        #tree .tree-submenu-header:hover {
+            background:rgba(255,255,255,.035);
+        }
+
+
+        /* -------------------------------------------------
+           CONTENUS
+        ------------------------------------------------- */
+
+        #tree .content-list {
+            position:relative;
+            margin:2px 0 3px 16px;
+            padding-left:15px;
+        }
+
+
+        #tree .content-list::before {
+            content:"";
+            position:absolute;
+            left:0;
+            top:0;
+            bottom:7px;
+            width:1px;
+            background:rgba(255,255,255,.09);
+        }
+
+
+        #tree .tree-content {
+            position:relative;
+            display:flex;
+            align-items:center;
+            gap:5px;
+            min-width:0;
+            margin:1px 0;
+            padding:3px 3px 3px 5px;
+            border-radius:4px;
+        }
+
+
+        #tree .tree-content::before {
+            content:"";
+            position:absolute;
+            left:-15px;
+            top:15px;
+            width:12px;
+            height:1px;
+            background:rgba(255,255,255,.09);
+        }
+
+
+        #tree .tree-content:hover {
+            background:rgba(255,255,255,.035);
+        }
+
+
+        /* -------------------------------------------------
+           ELEMENT PRINCIPAL
+        ------------------------------------------------- */
+
+        #tree .tree-item-main {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            flex:1 1 auto;
+            min-width:0;
+            margin:0;
+            padding:0;
+            border:0;
+            background:none;
+            color:inherit;
+            text-align:left;
+            cursor:pointer;
+        }
+
+
+        #tree .tree-item-main:hover {
+            color:var(--gold-light);
+        }
+
+
+        #tree .tree-title {
+            min-width:0;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            font-size:13px;
+            line-height:1.35;
+            font-weight:500;
+        }
+
+
+        #tree .tree-menu .tree-title {
+            font-size:13px;
+            font-weight:600;
+            color:var(--white);
+        }
+
+
+        #tree .tree-submenu .tree-title {
+            font-size:12.5px;
+            color:rgba(245,243,237,.92);
+        }
+
+
+        #tree .tree-content-button {
+            flex:1 1 auto;
+            min-width:0;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            margin:0;
+            padding:2px 0;
+            border:0;
+            background:none;
+            color:rgba(245,243,237,.72);
+            font:inherit;
+            font-size:12px;
+            text-align:left;
+            cursor:pointer;
+        }
+
+
+        #tree .tree-content-button:hover {
+            color:var(--gold-light);
+        }
+
+
+        /* -------------------------------------------------
+           ETIQUETTES
+        ------------------------------------------------- */
+
+        #tree .tree-subtitle {
+            flex:0 0 auto;
+            font-size:8px;
+            line-height:1;
+            letter-spacing:.10em;
+            color:rgba(214,173,85,.70);
+            white-space:nowrap;
+        }
+
+
+        /* -------------------------------------------------
+           ACTIONS
+        ------------------------------------------------- */
+
+        #tree .tree-actions {
+            display:flex;
+            align-items:center;
+            justify-content:flex-end;
+            flex:0 0 auto;
+            gap:2px;
+            margin-left:4px;
+            opacity:.72;
+        }
+
+
+        #tree .tree-menu-header:hover .tree-actions,
+        #tree .tree-submenu-header:hover .tree-actions,
+        #tree .tree-content:hover .tree-actions {
+            opacity:1;
+        }
+
+
+        #tree .icon-button {
+            width:22px;
+            height:22px;
+            min-width:22px;
+            padding:0;
+            border:1px solid transparent;
+            border-radius:4px;
+            background:transparent;
+            color:rgba(245,243,237,.58);
+            font-size:12px;
+            line-height:20px;
+            cursor:pointer;
+        }
+
+
+        #tree .icon-button:hover {
+            border-color:rgba(214,173,85,.30);
+            background:rgba(214,173,85,.08);
+            color:var(--gold-light);
+        }
+
+
+        #tree .icon-button.danger:hover {
+            border-color:rgba(239,65,53,.35);
+            background:rgba(239,65,53,.08);
+            color:#ef4135;
+        }
+
+
+        #tree .status-button {
+            min-width:58px;
+            height:21px;
+            padding:0 6px;
+            border-radius:4px;
+            font-size:7px;
+            font-weight:600;
+            letter-spacing:.06em;
+            cursor:pointer;
+        }
+
+
+        /* -------------------------------------------------
+           ETAT VIDE
+        ------------------------------------------------- */
+
+        #tree .empty-tree {
+            padding:25px 12px;
+            color:rgba(245,243,237,.48);
+            font-size:12px;
+            line-height:1.6;
+            text-align:center;
+        }
+
+
+        /* -------------------------------------------------
+           MOBILE
+        ------------------------------------------------- */
+
+        @media (max-width:600px) {
+
+            #tree .tree-subtitle {
+                display:none;
+            }
+
+            #tree .tree-actions {
+                opacity:1;
+            }
+
+            #tree .status-button {
+                min-width:0;
+                width:22px;
+                padding:0;
+                overflow:hidden;
+                font-size:0;
+            }
+
+            #tree .status-button::after {
+                content:"";
+                display:block;
+                width:6px;
+                height:6px;
+                margin:auto;
+                border-radius:50%;
+            }
+
+            #tree .status-valid::after {
+                background:currentColor;
+            }
+
+            #tree .status-draft::after {
+                background:currentColor;
+            }
+
+        }
+
+    `;
+
+
+    document.head.appendChild(style);
+
+}
+
+
+/* =========================================================
    ADMIN
 ========================================================= */
 
@@ -453,13 +834,6 @@ function remplirListesStats() {
                         );
 
 
-                    /*
-                       IMPORTANT :
-                       La valeur enregistrée dans contenus.stat_1,
-                       stat_2 et stat_3 est maintenant l'UUID
-                       de la ligne stats.id.
-                    */
-
                     option.value =
                         stat.id;
 
@@ -626,6 +1000,9 @@ function obtenirSynergies() {
 
 function renderTree() {
 
+    injectTreeStyles();
+
+
     tree.innerHTML =
         "";
 
@@ -663,6 +1040,10 @@ function renderTree() {
             menuBox.className =
                 "tree-menu";
 
+
+            /* -------------------------------------------------
+               MENU
+            ------------------------------------------------- */
 
             const menuHeader =
                 document.createElement(
@@ -795,6 +1176,10 @@ function renderTree() {
             );
 
 
+            /* -------------------------------------------------
+               SOUS-MENUS
+            ------------------------------------------------- */
+
             const submenuList =
                 document.createElement(
                     "div"
@@ -829,6 +1214,7 @@ function renderTree() {
             menuBox.appendChild(
                 submenuList
             );
+
 
             tree.appendChild(
                 menuBox
@@ -990,6 +1376,10 @@ function renderSousMenu(
     );
 
 
+    /* -------------------------------------------------
+       CONTENUS
+    ------------------------------------------------- */
+
     const contentList =
         document.createElement(
             "div"
@@ -1061,7 +1451,13 @@ function renderContenu(
         "tree-content-button";
 
     button.textContent =
-        item.titre;
+        item.titre ||
+        "Contenu sans titre";
+
+
+    button.title =
+        item.titre ||
+        "Contenu sans titre";
 
 
     button.addEventListener(
@@ -2098,12 +2494,6 @@ function ouvrirContenu(
     remplirListesStats();
 
 
-    /*
-       Les valeurs de stat_1, stat_2 et stat_3
-       sont maintenant directement les UUID
-       des statistiques.
-    */
-
     if (cardStat1) {
         cardStat1.value =
             item.stat_1 || "";
@@ -2251,11 +2641,6 @@ async function enregistrerContenu() {
             ? cardPriorite.value.trim()
             : null;
 
-
-    /*
-       Les valeurs récupérées des trois selects
-       sont les UUID stats.id.
-    */
 
     const stat1 =
         cardStat1
