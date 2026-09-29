@@ -35,6 +35,11 @@ const statsTabButton =
         "statsTabButton"
     );
 
+const statsEditor =
+    document.getElementById(
+        "statsEditor"
+    );
+
 const statsForm =
     document.getElementById(
         "statsForm"
@@ -512,13 +517,9 @@ function escapeHtml(value) {
 
 function ouvrirFormulaire() {
 
-    if (!statsForm) {
+    if (!statsEditor) {
         return;
     }
-
-
-    statsForm.style.display =
-        "block";
 
 
     editionId =
@@ -526,20 +527,26 @@ function ouvrirFormulaire() {
 
 
     if (statsId) {
+
         statsId.value =
             "";
+
     }
 
 
     if (statsNom) {
+
         statsNom.value =
             "";
+
     }
 
 
     if (statsLien) {
+
         statsLien.value =
             "";
+
     }
 
 
@@ -559,6 +566,10 @@ function ouvrirFormulaire() {
     }
 
 
+    statsEditor.style.display =
+        "block";
+
+
     statsNom?.focus();
 
 }
@@ -575,20 +586,26 @@ function reinitialiserFormulaire() {
 
 
     if (statsId) {
+
         statsId.value =
             "";
+
     }
 
 
     if (statsNom) {
+
         statsNom.value =
             "";
+
     }
 
 
     if (statsLien) {
+
         statsLien.value =
             "";
+
     }
 
 
@@ -608,9 +625,9 @@ function reinitialiserFormulaire() {
     }
 
 
-    if (statsForm) {
+    if (statsEditor) {
 
-        statsForm.style.display =
+        statsEditor.style.display =
             "none";
 
     }
@@ -816,9 +833,9 @@ function modifierStatistique(
     }
 
 
-    if (statsForm) {
+    if (statsEditor) {
 
-        statsForm.style.display =
+        statsEditor.style.display =
             "block";
 
     }
