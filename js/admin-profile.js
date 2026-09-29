@@ -31,113 +31,117 @@ function initialiserApercuPhoto(){
 
 
   /*
-    Évite de créer plusieurs fois
-    l'aperçu si la fonction est appelée
-    plusieurs fois.
+    Styles limités à l'aperçu photo.
   */
 
   if(
-    document.getElementById(
-      "profileImagePreview"
+    !document.getElementById(
+      "profile-image-preview-styles"
     )
   ){
-    return;
+
+    const style =
+      document.createElement(
+        "style"
+      );
+
+    style.id =
+      "profile-image-preview-styles";
+
+    style.textContent = `
+
+      #profileImagePreview {
+        width:180px;
+        height:180px;
+        margin-top:12px;
+        border:1px solid var(--border);
+        background:rgba(255,255,255,.025);
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        overflow:hidden;
+        box-sizing:border-box;
+      }
+
+      #profileImagePreview img {
+        display:block;
+        width:100%;
+        height:100%;
+        object-fit:contain;
+      }
+
+      #profileImagePreview.empty {
+        color:rgba(245,243,237,.35);
+        font-family:Arial,sans-serif;
+        font-size:10px;
+        text-align:center;
+        letter-spacing:.04em;
+      }
+
+      #profileImagePreview.error {
+        color:rgba(245,243,237,.45);
+        font-family:Arial,sans-serif;
+        font-size:10px;
+        text-align:center;
+        letter-spacing:.04em;
+        padding:15px;
+      }
+
+      @media(max-width:600px){
+
+        #profileImagePreview {
+          width:150px;
+          height:150px;
+        }
+
+      }
+
+    `;
+
+    document.head.appendChild(
+      style
+    );
+
   }
 
 
   /*
-    Styles limités à l'aperçu photo.
+    Récupération ou création du cadre.
   */
 
-  const style =
-    document.createElement(
-      "style"
+  let preview =
+    document.getElementById(
+      "profileImagePreview"
     );
 
-  style.id =
-    "profile-image-preview-styles";
 
-  style.textContent = `
+  if(!preview){
 
-    #profileImagePreview {
-      width:180px;
-      height:180px;
-      margin-top:12px;
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.025);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-      box-sizing:border-box;
-    }
+    preview =
+      document.createElement(
+        "div"
+      );
 
-    #profileImagePreview.empty {
-      display:none;
-    }
+    preview.id =
+      "profileImagePreview";
 
-    #profileImagePreview img {
-      display:block;
-      width:100%;
-      height:100%;
-      object-fit:contain;
-    }
-
-    #profileImagePreview.error {
-      display:flex;
-      color:rgba(245,243,237,.45);
-      font-family:Arial,sans-serif;
-      font-size:10px;
-      text-align:center;
-      letter-spacing:.04em;
-      padding:15px;
-    }
-
-    @media(max-width:600px){
-
-      #profileImagePreview {
-        width:150px;
-        height:150px;
-      }
-
-    }
-
-  `;
-
-  document.head.appendChild(
-    style
-  );
-
-
-  /*
-    Création du cadre.
-  */
-
-  const preview =
-    document.createElement(
-      "div"
+    preview.setAttribute(
+      "aria-label",
+      "Aperçu de la photo de profil"
     );
 
-  preview.id =
-    "profileImagePreview";
 
-  preview.className =
-    "empty";
+    /*
+      Placement immédiatement après
+      le champ URL.
+    */
 
-  preview.setAttribute(
-    "aria-label",
-    "Aperçu de la photo de profil"
-  );
+    imageInput.insertAdjacentElement(
+      "afterend",
+      preview
+    );
 
-
-  /*
-    Le cadre est placé directement
-    sous le champ URL.
-  */
-
-  imageInput.parentElement.appendChild(
-    preview
-  );
+  }
 
 
   /*
@@ -150,12 +154,18 @@ function initialiserApercuPhoto(){
       imageInput.value.trim();
 
 
-    preview.innerHTML = "";
+    preview.innerHTML =
+      "";
 
-    preview.classList.remove(
-      "error"
-    );
+    preview.className =
+      "";
 
+
+    /*
+      Aucun lien :
+      le cadre reste visible mais indique
+      qu'aucune image n'est renseignée.
+    */
 
     if(!url){
 
@@ -163,15 +173,17 @@ function initialiserApercuPhoto(){
         "empty"
       );
 
+      preview.textContent =
+        "APERÇU DE L'IMAGE";
+
       return;
 
     }
 
 
-    preview.classList.remove(
-      "empty"
-    );
-
+    /*
+      Création de l'image.
+    */
 
     const image =
       document.createElement(
@@ -185,9 +197,8 @@ function initialiserApercuPhoto(){
     image.onload =
       () => {
 
-        preview.classList.remove(
-          "error"
-        );
+        preview.className =
+          "";
 
       };
 
@@ -195,12 +206,11 @@ function initialiserApercuPhoto(){
     image.onerror =
       () => {
 
-        preview.innerHTML =
-          "IMAGE IMPOSSIBLE À CHARGER";
+        preview.className =
+          "error";
 
-        preview.classList.add(
-          "error"
-        );
+        preview.textContent =
+          "IMAGE IMPOSSIBLE À CHARGER";
 
       };
 
@@ -217,24 +227,35 @@ function initialiserApercuPhoto(){
 
 
   /*
-    Aperçu en temps réel.
+    Évite de multiplier les écouteurs
+    si la fonction est appelée plusieurs fois.
   */
 
-  imageInput.addEventListener(
-    "input",
-    actualiserApercu
-  );
+  if(
+    imageInput.dataset.previewInitialise !==
+    "true"
+  ){
+
+    imageInput.addEventListener(
+      "input",
+      actualiserApercu
+    );
 
 
-  imageInput.addEventListener(
-    "change",
-    actualiserApercu
-  );
+    imageInput.addEventListener(
+      "change",
+      actualiserApercu
+    );
+
+
+    imageInput.dataset.previewInitialise =
+      "true";
+
+  }
 
 
   /*
-    Aperçu initial si une URL
-    est déjà présente.
+    Aperçu immédiat.
   */
 
   actualiserApercu();
@@ -275,7 +296,7 @@ function remplirProfil(profile){
 
 
   /*
-    Mise à jour de l'aperçu après
+    Initialisation de l'aperçu après
     le remplissage de l'URL.
   */
 
