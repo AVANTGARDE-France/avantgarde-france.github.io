@@ -142,6 +142,202 @@ const cardSynergies =
 
 
 /* =========================================================
+   APERCU IMAGE RECTO
+========================================================= */
+
+function initialiserApercuImageContenu() {
+
+    if (!cardPhoto) {
+        return;
+    }
+
+
+    if (
+        document.getElementById(
+            "avantgarde-content-photo-preview-styles"
+        )
+    ) {
+        return;
+    }
+
+
+    const style =
+        document.createElement("style");
+
+
+    style.id =
+        "avantgarde-content-photo-preview-styles";
+
+
+    style.textContent = `
+
+        #contentPhotoPreview {
+            width:260px;
+            height:180px;
+            margin-top:10px;
+            padding:8px;
+            box-sizing:border-box;
+
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            border:1px solid var(--border);
+            border-radius:8px;
+
+            background:rgba(7,21,45,.45);
+
+            overflow:hidden;
+        }
+
+
+        #contentPhotoPreview img {
+            display:block;
+
+            width:100%;
+            height:100%;
+
+            object-fit:contain;
+            object-position:center;
+
+            border-radius:4px;
+        }
+
+
+        #contentPhotoPreview.empty {
+            color:rgba(245,243,237,.38);
+            font-size:11px;
+            text-align:center;
+            line-height:1.5;
+        }
+
+
+        #contentPhotoPreview.error {
+            color:rgba(239,65,53,.82);
+            font-size:11px;
+            text-align:center;
+            line-height:1.5;
+        }
+
+
+        @media (max-width:600px) {
+
+            #contentPhotoPreview {
+                width:100%;
+                max-width:260px;
+                height:180px;
+            }
+
+        }
+
+    `;
+
+
+    document.head.appendChild(style);
+
+
+    const preview =
+        document.createElement("div");
+
+
+    preview.id =
+        "contentPhotoPreview";
+
+    preview.className =
+        "empty";
+
+    preview.textContent =
+        "Aucune image";
+
+
+    cardPhoto.insertAdjacentElement(
+        "afterend",
+        preview
+    );
+
+
+    function actualiserApercu() {
+
+        const url =
+            cardPhoto.value.trim();
+
+
+        preview.innerHTML =
+            "";
+
+
+        preview.className =
+            "empty";
+
+
+        if (!url) {
+
+            preview.textContent =
+                "Aucune image";
+
+            return;
+
+        }
+
+
+        const image =
+            document.createElement("img");
+
+
+        image.alt =
+            "Aperçu de l'image";
+
+
+        image.onload =
+            () => {
+
+                preview.className =
+                    "";
+
+            };
+
+
+        image.onerror =
+            () => {
+
+                preview.className =
+                    "error";
+
+                preview.textContent =
+                    "Impossible de charger cette image.";
+
+            };
+
+
+        image.src =
+            url;
+
+
+        preview.appendChild(
+            image
+        );
+
+    }
+
+
+    cardPhoto.addEventListener(
+        "input",
+        actualiserApercu
+    );
+
+
+    cardPhoto.addEventListener(
+        "change",
+        actualiserApercu
+    );
+
+
+    actualiserApercu();
+
+}
+
+
+/* =========================================================
    MESSAGE
 ========================================================= */
 
@@ -1376,9 +1572,9 @@ function renderSousMenu(
     );
 
 
-    /* -------------------------------------------------
+    /* -----------------------------------------------------
        CONTENUS
-    ------------------------------------------------- */
+    ----------------------------------------------------- */
 
     const contentList =
         document.createElement(
@@ -2478,6 +2674,15 @@ function ouvrirContenu(
     if (cardPhoto) {
         cardPhoto.value =
             item.photo_url || "";
+
+        cardPhoto.dispatchEvent(
+            new Event(
+                "input",
+                {
+                    bubbles:true
+                }
+            )
+        );
     }
 
     if (cardAccroche) {
@@ -3726,6 +3931,8 @@ document.addEventListener(
 async function initialiser() {
 
     try {
+
+        initialiserApercuImageContenu();
 
         await verifierAdmin();
 
