@@ -77,6 +77,48 @@
     border-radius:10px;
 }
 
+
+/* =======================================================
+   APERÇU IMAGE — CARTE PORTRAIT
+======================================================= */
+
+#contentProjectTab #contentImagePreview {
+    width:260px;
+    height:360px;
+    margin-top:12px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.025);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    box-sizing:border-box;
+}
+
+#contentProjectTab #contentImagePreview img {
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+#contentProjectTab #contentImagePreview.empty {
+    color:rgba(245,243,237,.35);
+    font-family:Arial,sans-serif;
+    font-size:10px;
+    text-align:center;
+    letter-spacing:.04em;
+}
+
+#contentProjectTab #contentImagePreview.error {
+    color:rgba(245,243,237,.45);
+    font-family:Arial,sans-serif;
+    font-size:10px;
+    text-align:center;
+    letter-spacing:.04em;
+    padding:15px;
+}
+
 @media (max-width:900px) {
 
     #contentProjectTab .project-layout {
@@ -85,6 +127,15 @@
 
     #contentProjectTab .project-tree-container {
         max-height:450px;
+    }
+
+}
+
+@media (max-width:600px) {
+
+    #contentProjectTab #contentImagePreview {
+        width:210px;
+        height:290px;
     }
 
 }
@@ -1284,15 +1335,11 @@
     </div>
 
 
-    <!-- UTILISÉ PAR admincontenus.js POUR LES MESSAGES -->
-
     <div
         id="message"
         class="message"
     ></div>
 
-
-    <!-- UTILISÉ PAR admincontenus.js -->
 
     <div
         id="connectedUser"
@@ -1300,16 +1347,10 @@
     ></div>
 
 
-    <!-- ===================================================
-         ARBRE + EDITEUR
-    ==================================================== -->
-
     <div class="project-layout">
 
 
-        <!-- ===============================================
-             ARBORESCENCE
-        ================================================ -->
+        <!-- ARBORESCENCE -->
 
         <div
             class="panel project-tree-panel"
@@ -1331,11 +1372,10 @@
         </div>
 
 
-        <!-- ===============================================
-             ZONE EDITEUR
-        ================================================ -->
+        <!-- ZONE EDITEUR -->
 
         <div>
+
 
             <!-- ACCUEIL EDITEUR -->
 
@@ -1356,9 +1396,7 @@
             </div>
 
 
-            <!-- ===========================================
-                 EDITEUR STRUCTURE
-            ============================================ -->
+            <!-- EDITEUR STRUCTURE -->
 
             <div
                 id="structureEditor"
@@ -1422,9 +1460,7 @@
             </div>
 
 
-            <!-- ===========================================
-                 EDITEUR CONTENU
-            ============================================ -->
+            <!-- EDITEUR CONTENU -->
 
             <div
                 id="contentEditor"
@@ -1474,9 +1510,7 @@
                 </div>
 
 
-                <!-- =======================================
-                     RECTO DE LA CARTE
-                ======================================== -->
+                <!-- RECTO DE LA CARTE -->
 
                 <div
                     class="section-title"
@@ -1499,6 +1533,17 @@
                             id="contentPhotoUrl"
                             placeholder="https://..."
                         >
+
+                        <div class="help">
+                            Aperçu au format portrait, comme une carte.
+                        </div>
+
+                        <div
+                            id="contentImagePreview"
+                            class="empty"
+                        >
+                            APERÇU DE L'IMAGE
+                        </div>
 
                     </div>
 
@@ -1525,11 +1570,24 @@
                             PRIORITÉ
                         </label>
 
-                        <input
-                            type="text"
+                        <select
                             id="contentPriorite"
-                            placeholder="Ex. 1"
+                            required
                         >
+
+                            <option value="Secondaire">
+                                Secondaire
+                            </option>
+
+                            <option value="Prioritaire">
+                                Prioritaire
+                            </option>
+
+                            <option value="Absolue">
+                                Absolue
+                            </option>
+
+                        </select>
 
                     </div>
 
@@ -1594,9 +1652,7 @@
                 </div>
 
 
-                <!-- =======================================
-                     VERSO HTML
-                ======================================== -->
+                <!-- VERSO HTML -->
 
                 <div
                     class="section-title"
@@ -1788,9 +1844,7 @@
 </div>
 
 
-<!-- =======================================================
-     MODAL CREATION MENU / SOUS-MENU / CONTENU
-======================================================= -->
+<!-- MODAL CREATION -->
 
 <div
     id="structureModal"
