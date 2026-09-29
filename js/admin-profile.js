@@ -996,3 +996,25 @@ profileForm.addEventListener(
 
   }
 );
+
+
+/* =========================================================
+   EXPOSITION POUR LES AUTRES MODULES
+========================================================= */
+
+/*
+   admin-auth.js appelle explicitement :
+
+   window.remplirProfil(profile)
+
+   Les modules ES6 ne placent pas automatiquement
+   leurs fonctions dans window.
+
+   Cette exposition est donc nécessaire pour permettre
+   au module d'authentification de remplir le profil
+   après chargement de la session.
+*/
+
+window.remplirProfil =
+  remplirProfil;
+
