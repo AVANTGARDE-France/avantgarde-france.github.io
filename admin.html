@@ -183,6 +183,7 @@
 <button
     class="tab"
     id="contentProjectTabButton"
+    data-tab="contentProjectTab"
     type="button"
     style="display:none"
 >
@@ -1301,6 +1302,384 @@
 </div>
 
 <!-- =====================================================
+     CONTENU PROJET
+====================================================== -->
+
+<div
+    id="contentProjectTab"
+    class="tab-content"
+>
+
+<div class="panel">
+
+    <h2 class="panel-title">
+        Contenu du projet
+    </h2>
+
+    <p class="panel-intro">
+        Gérez la structure et les contenus affichés dans la section
+        « Notre projet ».
+    </p>
+
+    <div
+        id="connectedUser"
+        class="admin-user"
+        style="margin-bottom:20px;"
+    ></div>
+
+    <!-- =================================================
+         ARBORESCENCE
+    ================================================== -->
+
+    <div
+        id="tree"
+        class="content-tree"
+    ></div>
+
+    <!-- =================================================
+         MESSAGE D'ACCUEIL
+    ================================================== -->
+
+    <div
+        id="welcome"
+        class="content-welcome"
+    >
+        Sélectionnez un élément dans l’arborescence pour le modifier.
+    </div>
+
+    <!-- =================================================
+         EDITEUR DE STRUCTURE
+    ================================================== -->
+
+    <div
+        id="structureEditor"
+        style="display:none;"
+    >
+
+        <h3 class="panel-title">
+            Structure
+        </h3>
+
+        <form id="structureEditorForm">
+
+            <input
+                type="hidden"
+                id="structureTitle"
+            >
+
+            <div class="form-group">
+
+                <label for="structureName">
+                    NOM
+                </label>
+
+                <input
+                    type="text"
+                    id="structureName"
+                    maxlength="150"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="structureDescription">
+                    DESCRIPTION
+                </label>
+
+                <textarea
+                    id="structureDescription"
+                ></textarea>
+
+            </div>
+
+            <div
+                id="structureParentField"
+                class="form-group"
+            >
+
+                <label for="structureParent">
+                    PARENT
+                </label>
+
+                <select id="structureParent"></select>
+
+            </div>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                ENREGISTRER
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- =================================================
+         EDITEUR DE CONTENU
+    ================================================== -->
+
+    <div
+        id="contentEditor"
+        style="display:none;"
+    >
+
+        <h3
+            id="contentEditorTitle"
+            class="panel-title"
+        >
+            Contenu
+        </h3>
+
+        <form id="contentEditorForm">
+
+            <div class="form-group">
+
+                <label for="contentTitle">
+                    TITRE
+                </label>
+
+                <input
+                    type="text"
+                    id="contentTitle"
+                    maxlength="200"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="contentParent">
+                    PARENT
+                </label>
+
+                <select id="contentParent"></select>
+
+            </div>
+
+            <!-- =================================================
+                 CARTE
+            ================================================== -->
+
+            <div class="section-title">
+                CARTE DE MESURE
+            </div>
+
+            <div class="profile-grid">
+
+                <div class="form-group">
+
+                    <label for="contentPhotoUrl">
+                        PHOTO / IMAGE
+                    </label>
+
+                    <input
+                        type="url"
+                        id="contentPhotoUrl"
+                        placeholder="https://..."
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="contentAccroche">
+                        ACCROCHE
+                    </label>
+
+                    <input
+                        type="text"
+                        id="contentAccroche"
+                        maxlength="300"
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="contentPriorite">
+                        PRIORITÉ
+                    </label>
+
+                    <input
+                        type="number"
+                        id="contentPriorite"
+                        min="0"
+                    >
+
+                </div>
+
+            </div>
+
+            <!-- =================================================
+                 STATISTIQUES
+            ================================================== -->
+
+            <div class="section-title">
+                STATISTIQUES
+            </div>
+
+            <div class="profile-grid">
+
+                <div class="form-group">
+
+                    <label for="contentStat1">
+                        STATISTIQUE 1
+                    </label>
+
+                    <select id="contentStat1">
+                        <option value="">
+                            Aucune
+                        </option>
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="contentStat2">
+                        STATISTIQUE 2
+                    </label>
+
+                    <select id="contentStat2">
+                        <option value="">
+                            Aucune
+                        </option>
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="contentStat3">
+                        STATISTIQUE 3
+                    </label>
+
+                    <select id="contentStat3">
+                        <option value="">
+                            Aucune
+                        </option>
+                    </select>
+
+                </div>
+
+            </div>
+
+            <!-- =================================================
+                 SYNERGIES
+            ================================================== -->
+
+            <div class="form-group">
+
+                <label for="contentSynergies">
+                    SYNERGIES
+                </label>
+
+                <select
+                    id="contentSynergies"
+                    multiple
+                ></select>
+
+                <div class="help">
+                    Sélectionnez les autres contenus associés à cette mesure.
+                </div>
+
+            </div>
+
+            <!-- =================================================
+                 EDITEUR WYSIWYG
+            ================================================== -->
+
+            <div class="section-title">
+                CONTENU
+            </div>
+
+            <div
+                id="wysiwygToolbar"
+                class="wysiwyg-toolbar"
+            ></div>
+
+            <div
+                id="wysiwyg"
+                class="wysiwyg-editor"
+                contenteditable="true"
+            ></div>
+
+            <textarea
+                id="sourceEditor"
+                style="display:none;"
+            ></textarea>
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                ENREGISTRER LE CONTENU
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- =================================================
+     MODALE CREATION STRUCTURE / CONTENU
+================================================== -->
+
+<div
+    id="structureModal"
+    class="modal"
+>
+
+<div class="modal-box">
+
+<button
+    type="button"
+    class="modal-close"
+    id="structureModalClose"
+>
+    ×
+</button>
+
+<h2 id="modalTitle">
+    Ajouter
+</h2>
+
+<div class="form-group">
+
+    <label for="modalName">
+        NOM
+    </label>
+
+    <input
+        type="text"
+        id="modalName"
+        maxlength="150"
+        required
+    >
+
+</div>
+
+<button
+    type="button"
+    class="primary-button"
+    id="modalSaveButton"
+>
+    AJOUTER
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- =====================================================
      STATISTIQUES
 ====================================================== -->
 
@@ -1349,7 +1728,6 @@
         Bibliothèque des icônes animées utilisées sur les cartes de mesures.
         Chaque statistique possède un nom et un lien vers son animation.
     </p>
-
 
     <!-- =================================================
          AJOUT / MODIFICATION
@@ -1465,7 +1843,6 @@
         </form>
 
     </div>
-
 
     <!-- =================================================
          BIBLIOTHÈQUE
