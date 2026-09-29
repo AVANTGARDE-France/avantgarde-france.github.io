@@ -148,20 +148,12 @@ const cardSynergies =
 let contentPhotoPreview = null;
 
 
-/* ---------------------------------------------------------
-   INITIALISATION
---------------------------------------------------------- */
-
 function initialiserApercuImageContenu() {
 
     if (!cardPhoto) {
         return;
     }
 
-
-    /* -----------------------------------------------------
-       STYLE
-    ----------------------------------------------------- */
 
     if (
         !document.getElementById(
@@ -172,10 +164,8 @@ function initialiserApercuImageContenu() {
         const style =
             document.createElement("style");
 
-
         style.id =
             "avantgarde-content-photo-preview-styles";
-
 
         style.textContent = `
 
@@ -198,19 +188,14 @@ function initialiserApercuImageContenu() {
                 overflow:hidden;
             }
 
-
             #contentPhotoPreview img {
                 display:block;
-
                 width:100%;
                 height:100%;
-
                 object-fit:contain;
                 object-position:center;
-
                 border-radius:4px;
             }
-
 
             #contentPhotoPreview.empty {
                 color:rgba(245,243,237,.38);
@@ -219,14 +204,12 @@ function initialiserApercuImageContenu() {
                 line-height:1.5;
             }
 
-
             #contentPhotoPreview.error {
                 color:rgba(239,65,53,.82);
                 font-size:11px;
                 text-align:center;
                 line-height:1.5;
             }
-
 
             @media (max-width:600px) {
 
@@ -240,17 +223,10 @@ function initialiserApercuImageContenu() {
 
         `;
 
-
-        document.head.appendChild(
-            style
-        );
+        document.head.appendChild(style);
 
     }
 
-
-    /* -----------------------------------------------------
-       REUTILISATION SI DEJA CREE
-    ----------------------------------------------------- */
 
     contentPhotoPreview =
         document.getElementById(
@@ -263,18 +239,14 @@ function initialiserApercuImageContenu() {
         contentPhotoPreview =
             document.createElement("div");
 
-
         contentPhotoPreview.id =
             "contentPhotoPreview";
-
 
         contentPhotoPreview.className =
             "empty";
 
-
         contentPhotoPreview.textContent =
             "Aucune image";
-
 
         cardPhoto.insertAdjacentElement(
             "afterend",
@@ -284,15 +256,10 @@ function initialiserApercuImageContenu() {
     }
 
 
-    /* -----------------------------------------------------
-       ACTUALISATION
-    ----------------------------------------------------- */
-
     function actualiserApercu() {
 
         const url =
             cardPhoto.value.trim();
-
 
         contentPhotoPreview.innerHTML =
             "";
@@ -313,7 +280,6 @@ function initialiserApercuImageContenu() {
 
         const image =
             document.createElement("img");
-
 
         image.alt =
             "Aperçu de l'image";
@@ -351,25 +317,15 @@ function initialiserApercuImageContenu() {
     }
 
 
-    /* -----------------------------------------------------
-       EVENEMENTS
-    ----------------------------------------------------- */
-
     cardPhoto.addEventListener(
         "input",
         actualiserApercu
     );
 
-
     cardPhoto.addEventListener(
         "change",
         actualiserApercu
     );
-
-
-    /* -----------------------------------------------------
-       APERCU INITIAL
-    ----------------------------------------------------- */
 
     actualiserApercu();
 
@@ -453,30 +409,19 @@ function injectTreeStyles() {
 
     style.textContent = `
 
-        /* -------------------------------------------------
-           ARBRE GENERAL
-        ------------------------------------------------- */
-
         #tree {
             width:100%;
             box-sizing:border-box;
         }
-
 
         #tree .tree-menu {
             margin:0 0 8px 0;
             padding:0;
         }
 
-
         #tree .tree-menu:last-child {
             margin-bottom:0;
         }
-
-
-        /* -------------------------------------------------
-           MENU
-        ------------------------------------------------- */
 
         #tree .tree-menu-header {
             display:flex;
@@ -489,22 +434,15 @@ function injectTreeStyles() {
             border:1px solid rgba(214,173,85,.20);
         }
 
-
         #tree .tree-menu-header:hover {
             background:rgba(214,173,85,.13);
         }
-
-
-        /* -------------------------------------------------
-           SOUS-MENUS
-        ------------------------------------------------- */
 
         #tree .submenu-list {
             position:relative;
             margin:4px 0 0 15px;
             padding-left:15px;
         }
-
 
         #tree .submenu-list::before {
             content:"";
@@ -516,12 +454,10 @@ function injectTreeStyles() {
             background:rgba(214,173,85,.18);
         }
 
-
         #tree .tree-submenu {
             position:relative;
             margin:0 0 3px 0;
         }
-
 
         #tree .tree-submenu::before {
             content:"";
@@ -533,7 +469,6 @@ function injectTreeStyles() {
             background:rgba(214,173,85,.18);
         }
 
-
         #tree .tree-submenu-header {
             display:flex;
             align-items:center;
@@ -543,22 +478,15 @@ function injectTreeStyles() {
             border-radius:5px;
         }
 
-
         #tree .tree-submenu-header:hover {
             background:rgba(255,255,255,.035);
         }
-
-
-        /* -------------------------------------------------
-           CONTENUS
-        ------------------------------------------------- */
 
         #tree .content-list {
             position:relative;
             margin:2px 0 3px 16px;
             padding-left:15px;
         }
-
 
         #tree .content-list::before {
             content:"";
@@ -569,7 +497,6 @@ function injectTreeStyles() {
             width:1px;
             background:rgba(255,255,255,.09);
         }
-
 
         #tree .tree-content {
             position:relative;
@@ -582,7 +509,6 @@ function injectTreeStyles() {
             border-radius:4px;
         }
 
-
         #tree .tree-content::before {
             content:"";
             position:absolute;
@@ -593,15 +519,9 @@ function injectTreeStyles() {
             background:rgba(255,255,255,.09);
         }
 
-
         #tree .tree-content:hover {
             background:rgba(255,255,255,.035);
         }
-
-
-        /* -------------------------------------------------
-           ELEMENT PRINCIPAL
-        ------------------------------------------------- */
 
         #tree .tree-item-main {
             display:flex;
@@ -618,11 +538,9 @@ function injectTreeStyles() {
             cursor:pointer;
         }
 
-
         #tree .tree-item-main:hover {
             color:var(--gold-light);
         }
-
 
         #tree .tree-title {
             min-width:0;
@@ -634,19 +552,16 @@ function injectTreeStyles() {
             font-weight:500;
         }
 
-
         #tree .tree-menu .tree-title {
             font-size:13px;
             font-weight:600;
             color:var(--white);
         }
 
-
         #tree .tree-submenu .tree-title {
             font-size:12.5px;
             color:rgba(245,243,237,.92);
         }
-
 
         #tree .tree-content-button {
             flex:1 1 auto;
@@ -665,15 +580,9 @@ function injectTreeStyles() {
             cursor:pointer;
         }
 
-
         #tree .tree-content-button:hover {
             color:var(--gold-light);
         }
-
-
-        /* -------------------------------------------------
-           ETIQUETTES
-        ------------------------------------------------- */
 
         #tree .tree-subtitle {
             flex:0 0 auto;
@@ -683,11 +592,6 @@ function injectTreeStyles() {
             color:rgba(214,173,85,.70);
             white-space:nowrap;
         }
-
-
-        /* -------------------------------------------------
-           ACTIONS
-        ------------------------------------------------- */
 
         #tree .tree-actions {
             display:flex;
@@ -699,13 +603,11 @@ function injectTreeStyles() {
             opacity:.72;
         }
 
-
         #tree .tree-menu-header:hover .tree-actions,
         #tree .tree-submenu-header:hover .tree-actions,
         #tree .tree-content:hover .tree-actions {
             opacity:1;
         }
-
 
         #tree .icon-button {
             width:22px;
@@ -721,13 +623,11 @@ function injectTreeStyles() {
             cursor:pointer;
         }
 
-
         #tree .icon-button:hover {
             border-color:rgba(214,173,85,.30);
             background:rgba(214,173,85,.08);
             color:var(--gold-light);
         }
-
 
         #tree .icon-button.danger:hover {
             border-color:rgba(239,65,53,.35);
@@ -735,65 +635,40 @@ function injectTreeStyles() {
             color:#ef4135;
         }
 
-
-        /* -------------------------------------------------
-           BOUTON DE STATUT
-        ------------------------------------------------- */
-
         #tree .status-button {
             min-width:58px;
             height:21px;
             padding:0 6px;
-            border:1px solid rgba(214,173,85,.28);
             border-radius:4px;
-            background:rgba(214,173,85,.08);
-            color:rgba(245,243,237,.58);
             font-size:7px;
             font-weight:600;
             letter-spacing:.06em;
             cursor:pointer;
         }
 
-
-        /* -------------------------------------------------
-           STATUT VALIDÉ
-        ------------------------------------------------- */
-
         #tree .status-button.status-valid {
-            border-color:rgba(70,180,100,.45);
-            background:rgba(70,180,100,.14);
-            color:#69d38a;
+            border:1px solid rgba(80,190,120,.45);
+            background:rgba(80,190,120,.12);
+            color:#65d28a;
         }
-
-
-        #tree .status-button.status-valid:hover {
-            border-color:rgba(70,180,100,.65);
-            background:rgba(70,180,100,.22);
-            color:#8be8a5;
-        }
-
-
-        /* -------------------------------------------------
-           STATUT BROUILLON
-        ------------------------------------------------- */
 
         #tree .status-button.status-draft {
-            border-color:rgba(214,173,85,.28);
+            border:1px solid rgba(214,173,85,.30);
             background:rgba(214,173,85,.08);
-            color:rgba(245,243,237,.58);
+            color:rgba(214,173,85,.82);
         }
 
+        #tree .status-button.status-valid:hover {
+            border-color:rgba(80,190,120,.70);
+            background:rgba(80,190,120,.18);
+            color:#7be69b;
+        }
 
         #tree .status-button.status-draft:hover {
             border-color:rgba(214,173,85,.45);
-            background:rgba(214,173,85,.14);
+            background:rgba(214,173,85,.12);
             color:var(--gold-light);
         }
-
-
-        /* -------------------------------------------------
-           ETAT VIDE
-        ------------------------------------------------- */
 
         #tree .empty-tree {
             padding:25px 12px;
@@ -802,11 +677,6 @@ function injectTreeStyles() {
             line-height:1.6;
             text-align:center;
         }
-
-
-        /* -------------------------------------------------
-           MOBILE
-        ------------------------------------------------- */
 
         @media (max-width:600px) {
 
@@ -833,13 +703,6 @@ function injectTreeStyles() {
                 height:6px;
                 margin:auto;
                 border-radius:50%;
-            }
-
-            #tree .status-valid::after {
-                background:currentColor;
-            }
-
-            #tree .status-draft::after {
                 background:currentColor;
             }
 
@@ -960,7 +823,7 @@ async function chargerDonnees() {
                 .order(
                     "position",
                     {
-                        ascending: true
+                        ascending:true
                     }
                 ),
 
@@ -972,14 +835,13 @@ async function chargerDonnees() {
                 .order(
                     "position",
                     {
-                        ascending: true
+                        ascending:true
                     }
                 ),
 
             supabase
                 .from("contenus")
-                .select(
-                    `
+                .select(`
                     id,
                     sous_menu_id,
                     titre,
@@ -993,28 +855,25 @@ async function chargerDonnees() {
                     stat_2,
                     stat_3,
                     synergies
-                    `
-                )
+                `)
                 .order(
                     "position",
                     {
-                        ascending: true
+                        ascending:true
                     }
                 ),
 
             supabase
                 .from("stats")
-                .select(
-                    `
+                .select(`
                     id,
                     nom,
                     lien
-                    `
-                )
+                `)
                 .order(
                     "nom",
                     {
-                        ascending: true
+                        ascending:true
                     }
                 )
 
@@ -1064,14 +923,11 @@ async function chargerDonnees() {
 
 function remplirListesStats() {
 
-    const selects = [
+    [
         cardStat1,
         cardStat2,
         cardStat3
-    ];
-
-
-    selects.forEach(
+    ].forEach(
         select => {
 
             if (!select) {
@@ -1081,7 +937,6 @@ function remplirListesStats() {
 
             const valeurActuelle =
                 select.value || "";
-
 
             select.innerHTML =
                 "";
@@ -1111,15 +966,12 @@ function remplirListesStats() {
                             "option"
                         );
 
-
                     option.value =
                         stat.id;
-
 
                     option.textContent =
                         stat.nom ||
                         "Statistique sans nom";
-
 
                     select.appendChild(
                         option
@@ -1130,10 +982,8 @@ function remplirListesStats() {
 
 
             if (valeurActuelle) {
-
                 select.value =
                     valeurActuelle;
-
             }
 
         }
@@ -1155,7 +1005,8 @@ function normaliserSynergies(value) {
     return value
         .filter(Boolean)
         .map(
-            id => String(id)
+            id =>
+                String(id)
         );
 
 }
@@ -1192,7 +1043,7 @@ function remplirListeSynergies(
             )
             .slice()
             .sort(
-                (a, b) =>
+                (a,b) =>
                     String(a.titre || "")
                         .localeCompare(
                             String(b.titre || ""),
@@ -1229,9 +1080,7 @@ function remplirListeSynergies(
     );
 
 
-    if (
-        !disponibles.length
-    ) {
+    if (!disponibles.length) {
 
         const option =
             document.createElement(
@@ -1259,7 +1108,6 @@ function obtenirSynergies() {
         return [];
     }
 
-
     return Array.from(
         cardSynergies.selectedOptions
     )
@@ -1279,7 +1127,6 @@ function obtenirSynergies() {
 function renderTree() {
 
     injectTreeStyles();
-
 
     tree.innerHTML =
         "";
@@ -1318,10 +1165,6 @@ function renderTree() {
             menuBox.className =
                 "tree-menu";
 
-
-            /* -------------------------------------------------
-               MENU
-            ------------------------------------------------- */
 
             const menuHeader =
                 document.createElement(
@@ -1448,15 +1291,10 @@ function renderTree() {
                 menuActions
             );
 
-
             menuBox.appendChild(
                 menuHeader
             );
 
-
-            /* -------------------------------------------------
-               SOUS-MENUS
-            ------------------------------------------------- */
 
             const submenuList =
                 document.createElement(
@@ -1492,7 +1330,6 @@ function renderTree() {
             menuBox.appendChild(
                 submenuList
             );
-
 
             tree.appendChild(
                 menuBox
@@ -1654,10 +1491,6 @@ function renderSousMenu(
     );
 
 
-    /* -----------------------------------------------------
-       CONTENUS
-    ----------------------------------------------------- */
-
     const contentList =
         document.createElement(
             "div"
@@ -1731,7 +1564,6 @@ function renderContenu(
     button.textContent =
         item.titre ||
         "Contenu sans titre";
-
 
     button.title =
         item.titre ||
@@ -1851,6 +1683,7 @@ function creerBouton(
     button.title =
         title;
 
+
     button.addEventListener(
         "click",
         event => {
@@ -1934,6 +1767,11 @@ function remplirListeMenus(
     valeur
 ) {
 
+    if (!select) {
+        return;
+    }
+
+
     select.innerHTML =
         "";
 
@@ -1970,6 +1808,11 @@ function remplirListeSousMenus(
     select,
     valeur
 ) {
+
+    if (!select) {
+        return;
+    }
+
 
     select.innerHTML =
         "";
@@ -2070,38 +1913,56 @@ function ouvrirStructure(
     }
 
 
-    welcome.style.display =
-        "none";
+    if (welcome) {
+        welcome.style.display =
+            "none";
+    }
 
-    contentEditor.style.display =
-        "none";
+    if (contentEditor) {
+        contentEditor.style.display =
+            "none";
+    }
 
-    structureEditor.style.display =
-        "block";
-
-
-    structureTitle.textContent =
-        type === "menu"
-            ? "MODIFIER LE MENU"
-            : "MODIFIER LE SOUS-MENU";
-
-
-    structureDescription.textContent =
-        type === "menu"
-            ? "Modification du menu principal."
-            : "Modification du sous-menu.";
+    if (structureEditor) {
+        structureEditor.style.display =
+            "block";
+    }
 
 
-    structureName.value =
-        item.titre || "";
+    if (structureTitle) {
+
+        structureTitle.textContent =
+            type === "menu"
+                ? "MODIFIER LE MENU"
+                : "MODIFIER LE SOUS-MENU";
+
+    }
+
+
+    if (structureDescription) {
+
+        structureDescription.textContent =
+            type === "menu"
+                ? "Modification du menu principal."
+                : "Modification du sous-menu.";
+
+    }
+
+
+    if (structureName) {
+        structureName.value =
+            item.titre || "";
+    }
 
 
     if (
         type === "submenu"
     ) {
 
-        structureParentField.style.display =
-            "block";
+        if (structureParentField) {
+            structureParentField.style.display =
+                "block";
+        }
 
         remplirListeMenus(
             structureParent,
@@ -2110,11 +1971,15 @@ function ouvrirStructure(
 
     } else {
 
-        structureParentField.style.display =
-            "none";
+        if (structureParentField) {
+            structureParentField.style.display =
+                "none";
+        }
 
-        structureParent.innerHTML =
-            "";
+        if (structureParent) {
+            structureParent.innerHTML =
+                "";
+        }
 
     }
 
@@ -2125,17 +1990,12 @@ function ouvrirStructure(
    SAUVEGARDE STRUCTURE
 ========================================================= */
 
-document
-    .getElementById(
-        "structureSaveButton"
-    )
-    .addEventListener(
-        "click",
-        enregistrerStructure
-    );
-
-
 async function enregistrerStructure() {
+
+    if (!structureName) {
+        return;
+    }
+
 
     const titre =
         structureName.value.trim();
@@ -2214,7 +2074,9 @@ async function enregistrerStructure() {
 
 
         const nouveauMenuId =
-            structureParent.value;
+            structureParent
+                ? structureParent.value
+                : "";
 
 
         if (!nouveauMenuId) {
@@ -2316,6 +2178,16 @@ function ouvrirModalCreation(
     parentId
 ) {
 
+    if (
+        !modalTitle ||
+        !modalName ||
+        !modalSaveButton ||
+        !structureModal
+    ) {
+        return;
+    }
+
+
     modalType =
         type;
 
@@ -2359,48 +2231,56 @@ function ouvrirModalCreation(
 }
 
 
-document
-    .getElementById(
-        "addMenuButton"
-    )
-    .addEventListener(
-        "click",
-        () => {
+function ouvrirCreationMenu() {
 
-            modalType =
-                "menu";
+    if (
+        !modalTitle ||
+        !modalName ||
+        !modalSaveButton ||
+        !structureModal
+    ) {
+        return;
+    }
 
-            modalParentId =
-                null;
 
-            modalTitle.textContent =
-                "NOUVEAU MENU";
+    modalType =
+        "menu";
 
-            modalName.value =
-                "";
+    modalParentId =
+        null;
 
-            modalSaveButton.textContent =
-                "CRÉER";
+    modalTitle.textContent =
+        "NOUVEAU MENU";
 
-            structureModal.classList.add(
-                "visible"
-            );
+    modalName.value =
+        "";
 
-            setTimeout(
-                () =>
-                    modalName.focus(),
-                50
-            );
+    modalSaveButton.textContent =
+        "CRÉER";
 
-        }
+    structureModal.classList.add(
+        "visible"
     );
+
+    setTimeout(
+        () =>
+            modalName.focus(),
+        50
+    );
+
+}
 
 
 function fermerModal() {
 
-    structureModal.classList.remove(
-        "visible"
-    );
+    if (structureModal) {
+
+        structureModal.classList.remove(
+            "visible"
+        );
+
+    }
+
 
     modalType =
         null;
@@ -2411,66 +2291,130 @@ function fermerModal() {
 }
 
 
-document
-    .getElementById(
-        "modalCloseButton"
-    )
-    .addEventListener(
-        "click",
-        fermerModal
-    );
+/* =========================================================
+   EVENEMENTS STRUCTURE / CREATION
+========================================================= */
+
+function initialiserEvenementsStructure() {
+
+    const structureSaveButton =
+        document.getElementById(
+            "structureSaveButton"
+        );
 
 
-document
-    .getElementById(
-        "modalCancelButton"
-    )
-    .addEventListener(
-        "click",
-        fermerModal
-    );
+    if (structureSaveButton) {
 
-
-structureModal.addEventListener(
-    "click",
-    event => {
-
-        if (
-            event.target ===
-            structureModal
-        ) {
-
-            fermerModal();
-
-        }
+        structureSaveButton.addEventListener(
+            "click",
+            enregistrerStructure
+        );
 
     }
-);
 
 
-modalSaveButton.addEventListener(
-    "click",
-    creerElement
-);
+    const addMenuButton =
+        document.getElementById(
+            "addMenuButton"
+        );
 
 
-modalName.addEventListener(
-    "keydown",
-    event => {
+    if (addMenuButton) {
 
-        if (
-            event.key ===
-            "Enter"
-        ) {
-
-            event.preventDefault();
-
-            creerElement();
-
-        }
+        addMenuButton.addEventListener(
+            "click",
+            ouvrirCreationMenu
+        );
 
     }
-);
+
+
+    const modalCloseButton =
+        document.getElementById(
+            "modalCloseButton"
+        );
+
+
+    if (modalCloseButton) {
+
+        modalCloseButton.addEventListener(
+            "click",
+            fermerModal
+        );
+
+    }
+
+
+    const modalCancelButton =
+        document.getElementById(
+            "modalCancelButton"
+        );
+
+
+    if (modalCancelButton) {
+
+        modalCancelButton.addEventListener(
+            "click",
+            fermerModal
+        );
+
+    }
+
+
+    if (structureModal) {
+
+        structureModal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    structureModal
+                ) {
+
+                    fermerModal();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if (modalSaveButton) {
+
+        modalSaveButton.addEventListener(
+            "click",
+            creerElement
+        );
+
+    }
+
+
+    if (modalName) {
+
+        modalName.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.key ===
+                    "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    creerElement();
+
+                }
+
+            }
+        );
+
+    }
+
+}
 
 
 /* =========================================================
@@ -2478,6 +2422,11 @@ modalName.addEventListener(
 ========================================================= */
 
 async function creerElement() {
+
+    if (!modalName || !modalSaveButton) {
+        return;
+    }
+
 
     const titre =
         modalName.value.trim();
@@ -2725,22 +2674,36 @@ function ouvrirContenu(
         id;
 
 
-    welcome.style.display =
-        "none";
+    if (welcome) {
+        welcome.style.display =
+            "none";
+    }
 
-    structureEditor.style.display =
-        "none";
+    if (structureEditor) {
+        structureEditor.style.display =
+            "none";
+    }
 
-    contentEditor.style.display =
-        "block";
+    if (contentEditor) {
+        contentEditor.style.display =
+            "block";
+    }
 
 
-    contentEditorTitle.textContent =
-        "MODIFIER LE CONTENU";
+    if (contentEditorTitle) {
+
+        contentEditorTitle.textContent =
+            "MODIFIER LE CONTENU";
+
+    }
 
 
-    contentTitle.value =
-        item.titre || "";
+    if (contentTitle) {
+
+        contentTitle.value =
+            item.titre || "";
+
+    }
 
 
     remplirListeSousMenus(
@@ -2749,15 +2712,10 @@ function ouvrirContenu(
     );
 
 
-    /* -----------------------------------------------------
-       RECTO
-    ----------------------------------------------------- */
-
     if (cardPhoto) {
 
         cardPhoto.value =
             item.photo_url || "";
-
 
         cardPhoto.dispatchEvent(
             new Event(
@@ -2807,15 +2765,15 @@ function ouvrirContenu(
     );
 
 
-    /* -----------------------------------------------------
-       VERSO HTML
-    ----------------------------------------------------- */
+    if (wysiwyg) {
+        wysiwyg.innerHTML =
+            item.html || "";
+    }
 
-    wysiwyg.innerHTML =
-        item.html || "";
-
-    sourceEditor.value =
-        item.html || "";
+    if (sourceEditor) {
+        sourceEditor.value =
+            item.html || "";
+    }
 
     isSourceMode =
         false;
@@ -2829,27 +2787,12 @@ function ouvrirContenu(
    SAUVEGARDE CONTENU
 ========================================================= */
 
-document
-    .getElementById(
-        "contentCancelButton"
-    )
-    .addEventListener(
-        "click",
-        fermerEditeurs
-    );
-
-
-document
-    .getElementById(
-        "contentSaveButton"
-    )
-    .addEventListener(
-        "click",
-        enregistrerContenu
-    );
-
-
 async function enregistrerContenu() {
+
+    if (!contentTitle) {
+        return;
+    }
+
 
     const titre =
         contentTitle.value.trim();
@@ -2888,7 +2831,9 @@ async function enregistrerContenu() {
 
 
     const nouveauSousMenuId =
-        contentParent.value;
+        contentParent
+            ? contentParent.value
+            : "";
 
 
     if (!nouveauSousMenuId) {
@@ -2903,7 +2848,11 @@ async function enregistrerContenu() {
     }
 
 
-    if (isSourceMode) {
+    if (
+        isSourceMode &&
+        wysiwyg &&
+        sourceEditor
+    ) {
 
         wysiwyg.innerHTML =
             sourceEditor.value;
@@ -2912,7 +2861,9 @@ async function enregistrerContenu() {
 
 
     const html =
-        wysiwyg.innerHTML;
+        wysiwyg
+            ? wysiwyg.innerHTML
+            : "";
 
 
     const photo =
@@ -3062,200 +3013,282 @@ async function enregistrerContenu() {
    WYSIWYG
 ========================================================= */
 
-document
-    .querySelectorAll(
-        "#toolbar button[data-command]"
-    )
-    .forEach(
-        button => {
+function initialiserEvenementsEditeur() {
 
-            button.addEventListener(
-                "click",
-                () => {
+    document
+        .querySelectorAll(
+            "#toolbar button[data-command]"
+        )
+        .forEach(
+            button => {
 
-                    const command =
-                        button.dataset.command;
+                button.addEventListener(
+                    "click",
+                    () => {
 
-                    const value =
-                        button.dataset.value ||
-                        null;
+                        const command =
+                            button.dataset.command;
 
-                    wysiwyg.focus();
+                        const value =
+                            button.dataset.value ||
+                            null;
 
-                    document.execCommand(
-                        command,
-                        false,
-                        value
+                        if (!wysiwyg) {
+                            return;
+                        }
+
+                        wysiwyg.focus();
+
+                        document.execCommand(
+                            command,
+                            false,
+                            value
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            "#toolbar button[data-format]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        const format =
+                            button.dataset.format;
+
+                        if (!wysiwyg) {
+                            return;
+                        }
+
+                        wysiwyg.focus();
+
+                        document.execCommand(
+                            "formatBlock",
+                            false,
+                            format
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    const linkButton =
+        document.getElementById(
+            "linkButton"
+        );
+
+
+    if (linkButton) {
+
+        linkButton.addEventListener(
+            "click",
+            () => {
+
+                const url =
+                    prompt(
+                        "Adresse du lien :"
                     );
 
+                if (!url || !wysiwyg) {
+                    return;
                 }
-            );
 
-        }
-    );
+                wysiwyg.focus();
+
+                document.execCommand(
+                    "createLink",
+                    false,
+                    url
+                );
+
+            }
+        );
+
+    }
 
 
-document
-    .querySelectorAll(
-        "#toolbar button[data-format]"
-    )
-    .forEach(
-        button => {
+    const imageButton =
+        document.getElementById(
+            "imageButton"
+        );
 
-            button.addEventListener(
-                "click",
-                () => {
 
-                    const format =
-                        button.dataset.format;
+    if (imageButton) {
 
-                    wysiwyg.focus();
+        imageButton.addEventListener(
+            "click",
+            () => {
 
-                    document.execCommand(
-                        "formatBlock",
-                        false,
-                        format
+                const url =
+                    prompt(
+                        "URL de l'image :"
                     );
 
+                if (!url || !wysiwyg) {
+                    return;
                 }
-            );
 
-        }
-    );
+                wysiwyg.focus();
 
-
-document
-    .getElementById(
-        "linkButton"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            const url =
-                prompt(
-                    "Adresse du lien :"
+                document.execCommand(
+                    "insertImage",
+                    false,
+                    url
                 );
 
-            if (!url) {
-                return;
             }
+        );
 
-            wysiwyg.focus();
-
-            document.execCommand(
-                "createLink",
-                false,
-                url
-            );
-
-        }
-    );
+    }
 
 
-document
-    .getElementById(
-        "imageButton"
-    )
-    .addEventListener(
-        "click",
-        () => {
+    const videoButton =
+        document.getElementById(
+            "videoButton"
+        );
 
-            const url =
-                prompt(
-                    "URL de l'image :"
+
+    if (videoButton) {
+
+        videoButton.addEventListener(
+            "click",
+            () => {
+
+                const url =
+                    prompt(
+                        "URL de la vidéo :"
+                    );
+
+                if (!url || !wysiwyg) {
+                    return;
+                }
+
+                wysiwyg.focus();
+
+
+                const html = `
+
+                    <p>
+
+                        <video
+                            controls
+                            src="${escapeHtml(url)}"
+                        ></video>
+
+                    </p>
+
+                `;
+
+
+                document.execCommand(
+                    "insertHTML",
+                    false,
+                    html
                 );
 
-            if (!url) {
-                return;
             }
+        );
 
-            wysiwyg.focus();
-
-            document.execCommand(
-                "insertImage",
-                false,
-                url
-            );
-
-        }
-    );
+    }
 
 
-document
-    .getElementById(
-        "videoButton"
-    )
-    .addEventListener(
-        "click",
-        () => {
-
-            const url =
-                prompt(
-                    "URL de la vidéo :"
-                );
-
-            if (!url) {
-                return;
-            }
-
-            wysiwyg.focus();
+    const sourceModeButton =
+        document.getElementById(
+            "sourceModeButton"
+        );
 
 
-            const html = `
+    if (sourceModeButton) {
 
-                <p>
+        sourceModeButton.addEventListener(
+            "click",
+            () => {
 
-                    <video
-                        controls
-                        src="${escapeHtml(url)}"
-                    ></video>
+                if (!isSourceMode) {
 
-                </p>
+                    if (
+                        wysiwyg &&
+                        sourceEditor
+                    ) {
 
-            `;
+                        sourceEditor.value =
+                            wysiwyg.innerHTML;
 
+                    }
 
-            document.execCommand(
-                "insertHTML",
-                false,
-                html
-            );
+                    isSourceMode =
+                        true;
 
-        }
-    );
+                } else {
 
+                    if (
+                        wysiwyg &&
+                        sourceEditor
+                    ) {
 
-document
-    .getElementById(
-        "sourceModeButton"
-    )
-    .addEventListener(
-        "click",
-        () => {
+                        wysiwyg.innerHTML =
+                            sourceEditor.value;
 
-            if (!isSourceMode) {
+                    }
 
-                sourceEditor.value =
-                    wysiwyg.innerHTML;
+                    isSourceMode =
+                        false;
 
-                isSourceMode =
-                    true;
+                }
 
-            } else {
-
-                wysiwyg.innerHTML =
-                    sourceEditor.value;
-
-                isSourceMode =
-                    false;
+                actualiserModeEditeur();
 
             }
+        );
 
-            actualiserModeEditeur();
+    }
 
-        }
-    );
+
+    const contentCancelButton =
+        document.getElementById(
+            "contentCancelButton"
+        );
+
+
+    if (contentCancelButton) {
+
+        contentCancelButton.addEventListener(
+            "click",
+            fermerEditeurs
+        );
+
+    }
+
+
+    const contentSaveButton =
+        document.getElementById(
+            "contentSaveButton"
+        );
+
+
+    if (contentSaveButton) {
+
+        contentSaveButton.addEventListener(
+            "click",
+            enregistrerContenu
+        );
+
+    }
+
+}
 
 
 function actualiserModeEditeur() {
@@ -3264,6 +3297,14 @@ function actualiserModeEditeur() {
         document.getElementById(
             "sourceModeButton"
         );
+
+
+    if (
+        !wysiwyg ||
+        !sourceEditor
+    ) {
+        return;
+    }
 
 
     if (isSourceMode) {
@@ -3939,17 +3980,25 @@ async function supprimerContenu(
 
 function fermerEditeurs() {
 
-    welcome.style.display =
-        "block";
+    if (welcome) {
+        welcome.style.display =
+            "block";
+    }
 
-    structureEditor.style.display =
-        "none";
+    if (structureEditor) {
+        structureEditor.style.display =
+            "none";
+    }
 
-    contentEditor.style.display =
-        "none";
+    if (contentEditor) {
+        contentEditor.style.display =
+            "none";
+    }
 
-    structureParentField.style.display =
-        "none";
+    if (structureParentField) {
+        structureParentField.style.display =
+            "none";
+    }
 
 
     selectedType =
@@ -3971,43 +4020,49 @@ function fermerEditeurs() {
    CTRL + S
 ========================================================= */
 
-document.addEventListener(
-    "keydown",
-    event => {
+function initialiserEvenementClavier() {
 
-        if (
-            (event.ctrlKey ||
-             event.metaKey) &&
-            event.key.toLowerCase() ===
-            "s"
-        ) {
-
-            event.preventDefault();
-
+    document.addEventListener(
+        "keydown",
+        event => {
 
             if (
-                contentEditor.style.display !==
-                "none"
+                (event.ctrlKey ||
+                 event.metaKey) &&
+                event.key.toLowerCase() ===
+                "s"
             ) {
 
-                enregistrerContenu();
-
-            }
+                event.preventDefault();
 
 
-            if (
-                structureEditor.style.display !==
-                "none"
-            ) {
+                if (
+                    contentEditor &&
+                    contentEditor.style.display !==
+                    "none"
+                ) {
 
-                enregistrerStructure();
+                    enregistrerContenu();
+
+                }
+
+
+                if (
+                    structureEditor &&
+                    structureEditor.style.display !==
+                    "none"
+                ) {
+
+                    enregistrerStructure();
+
+                }
 
             }
 
         }
+    );
 
-    }
-);
+}
 
 
 /* =========================================================
@@ -4017,6 +4072,12 @@ document.addEventListener(
 async function initialiser() {
 
     try {
+
+        initialiserEvenementsStructure();
+
+        initialiserEvenementsEditeur();
+
+        initialiserEvenementClavier();
 
         initialiserApercuImageContenu();
 
@@ -4033,29 +4094,33 @@ async function initialiser() {
         );
 
 
-        tree.innerHTML = `
+        if (tree) {
 
-            <div class="empty-tree">
+            tree.innerHTML = `
 
-                ${escapeHtml(
-                    error.message ||
-                    "Accès impossible."
-                )}
+                <div class="empty-tree">
 
-                <br><br>
+                    ${escapeHtml(
+                        error.message ||
+                        "Accès impossible."
+                    )}
 
-                <a
-                    href="admin.html"
-                    style="
-                        color:var(--gold-light);
-                    "
-                >
-                    Retour à l'administration
-                </a>
+                    <br><br>
 
-            </div>
+                    <a
+                        href="admin.html"
+                        style="
+                            color:var(--gold-light);
+                        "
+                    >
+                        Retour à l'administration
+                    </a>
 
-        `;
+                </div>
+
+            `;
+
+        }
 
 
         const addMenuButton =
@@ -4072,22 +4137,47 @@ async function initialiser() {
         }
 
 
-        welcome.innerHTML = `
+        if (welcome) {
 
-            <h1>ACCÈS REFUSÉ</h1>
+            welcome.innerHTML = `
 
-            <p>
-                ${escapeHtml(
-                    error.message ||
-                    "Vous n'avez pas accès à cette page."
-                )}
-            </p>
+                <h1>ACCÈS REFUSÉ</h1>
 
-        `;
+                <p>
+                    ${escapeHtml(
+                        error.message ||
+                        "Vous n'avez pas accès à cette page."
+                    )}
+                </p>
+
+            `;
+
+        }
 
     }
 
 }
 
 
-initialiser();
+/* =========================================================
+   DOM READY
+========================================================= */
+
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initialiser,
+        {
+            once:true
+        }
+    );
+
+} else {
+
+    initialiser();
+
+}
