@@ -854,7 +854,7 @@ async function verifierUtilisation(
 ) {
 
     const {
-        data,
+        count,
         error
     } =
         await supabase
@@ -887,7 +887,7 @@ async function verifierUtilisation(
 
 
     return Number(
-        data?.length || 0
+        count || 0
     );
 
 }
