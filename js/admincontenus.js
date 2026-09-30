@@ -4179,21 +4179,15 @@ function initialiserEvenementClavier() {
 async function initialiser() {
     alert("initialiser est appelé");
 
-    /*
-     * Les événements sont installés immédiatement.
-     *
-     * Cela évite qu'une erreur de chargement des données
-     * empêche les contrôles de recevoir leurs événements.
-     */
+    alert("avant événements structure");
 
     initialiserEvenementsStructure();
 
+    alert("après événements structure");
+
     initialiserEvenementsEditeur();
-
     initialiserEvenementClavier();
-
     initialiserApercuImageContenu();
-
 
     try {
 
