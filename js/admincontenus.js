@@ -19,6 +19,7 @@
 
 import { supabase } from "./supabase.js";
 
+
 /* =========================================================
    ETAT
 ========================================================= */
@@ -41,9 +42,11 @@ let isSourceMode = false;
 
 let currentProfile = null;
 
+let messageTimer = null;
+
 
 /* =========================================================
-   ELEMENTS
+   ELEMENTS DOM
 ========================================================= */
 
 const tree =
@@ -73,6 +76,12 @@ const structureParentField =
 const structureParent =
     document.getElementById("structureParent");
 
+const structureSaveButton =
+    document.getElementById("structureSaveButton");
+
+const structureCancelButton =
+    document.getElementById("structureCancelButton");
+
 const contentEditorTitle =
     document.getElementById("contentEditorTitle");
 
@@ -81,6 +90,12 @@ const contentTitle =
 
 const contentParent =
     document.getElementById("contentParent");
+
+const contentCancelButton =
+    document.getElementById("contentCancelButton");
+
+const contentSaveButton =
+    document.getElementById("contentSaveButton");
 
 const wysiwyg =
     document.getElementById("wysiwyg");
@@ -105,6 +120,15 @@ const modalName =
 
 const modalSaveButton =
     document.getElementById("modalSaveButton");
+
+const modalCloseButton =
+    document.getElementById("modalCloseButton");
+
+const modalCancelButton =
+    document.getElementById("modalCancelButton");
+
+const addMenuButton =
+    document.getElementById("addMenuButton");
 
 
 /* =========================================================
@@ -141,7 +165,81 @@ const cardSynergies =
 
 
 /* =========================================================
-   APERCU IMAGE RECTO
+   OUTILS
+========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+function toId(value) {
+
+    return String(value ?? "");
+
+}
+
+
+function getNextPosition(items) {
+
+    if (!Array.isArray(items) || !items.length) {
+        return 0;
+    }
+
+    return Math.max(
+        ...items.map(
+            item =>
+                Number(item.position) || 0
+        )
+    ) + 1;
+
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+function showMessage(
+    text,
+    type = "success"
+) {
+
+    if (!message) {
+        return;
+    }
+
+    clearTimeout(messageTimer);
+
+    message.className =
+        "message visible " + type;
+
+    message.textContent =
+        text;
+
+    messageTimer =
+        setTimeout(
+            () => {
+
+                message.className =
+                    "message";
+
+            },
+            3500
+        );
+
+}
+
+
+/* =========================================================
+   APERCU PHOTO
 ========================================================= */
 
 let contentPhotoPreview = null;
@@ -174,16 +272,12 @@ function initialiserApercuImageContenu() {
                 margin-top:10px;
                 padding:8px;
                 box-sizing:border-box;
-
                 display:flex;
                 align-items:center;
                 justify-content:center;
-
                 border:1px solid var(--border);
                 border-radius:8px;
-
                 background:rgba(7,21,45,.45);
-
                 overflow:hidden;
             }
 
@@ -262,6 +356,7 @@ function initialiserApercuImageContenu() {
                 cardPhoto.value || ""
             ).trim();
 
+
         contentPhotoPreview.innerHTML =
             "";
 
@@ -328,66 +423,14 @@ function initialiserApercuImageContenu() {
         actualiserApercu
     );
 
+
     actualiserApercu();
 
 }
 
 
 /* =========================================================
-   MESSAGE
-========================================================= */
-
-let messageTimer = null;
-
-function showMessage(
-    text,
-    type = "success"
-) {
-
-    if (!message) {
-        return;
-    }
-
-    clearTimeout(messageTimer);
-
-    message.className =
-        "message visible " + type;
-
-    message.textContent =
-        text;
-
-    messageTimer =
-        setTimeout(
-            () => {
-
-                message.className =
-                    "message";
-
-            },
-            3500
-        );
-
-}
-
-
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
-
-function escapeHtml(value) {
-
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-}
-
-
-/* =========================================================
-   STYLE ARBRE
+   STYLES ARBRE
 ========================================================= */
 
 function injectTreeStyles() {
@@ -659,18 +702,6 @@ function injectTreeStyles() {
             color:rgba(214,173,85,.82);
         }
 
-        #tree .status-button.status-valid:hover {
-            border-color:rgba(80,190,120,.70);
-            background:rgba(80,190,120,.18);
-            color:#7be69b;
-        }
-
-        #tree .status-button.status-draft:hover {
-            border-color:rgba(214,173,85,.45);
-            background:rgba(214,173,85,.12);
-            color:var(--gold-light);
-        }
-
         #tree .empty-tree {
             padding:25px 12px;
             color:rgba(245,243,237,.48);
@@ -724,17 +755,16 @@ function injectTreeStyles() {
 async function verifierAdmin() {
 
     const {
-        data: {
-            user
-        },
-        error: userError
+        data,
+        error
     } =
         await supabase.auth.getUser();
 
 
     if (
-        userError ||
-        !user
+        error ||
+        !data ||
+        !data.user
     ) {
 
         throw new Error(
@@ -742,6 +772,10 @@ async function verifierAdmin() {
         );
 
     }
+
+
+    const user =
+        data.user;
 
 
     const {
@@ -757,23 +791,31 @@ async function verifierAdmin() {
                 "id",
                 user.id
             )
-            .single();
+            .maybeSingle();
 
 
-    if (
-        profileError ||
-        !profile
-    ) {
+    if (profileError) {
 
         throw new Error(
-            "Impossible de charger votre profil."
+            "Impossible de charger votre profil : " +
+            profileError.message
+        );
+
+    }
+
+
+    if (!profile) {
+
+        throw new Error(
+            "Aucun profil administrateur trouvé."
         );
 
     }
 
 
     if (
-        profile.grade !== "admin"
+        String(profile.grade || "").toLowerCase() !==
+        "admin"
     ) {
 
         throw new Error(
@@ -797,13 +839,18 @@ async function verifierAdmin() {
     }
 
 
+    if (addMenuButton) {
+        addMenuButton.disabled = false;
+    }
+
+
     return true;
 
 }
 
 
 /* =========================================================
-   CHARGEMENT DES DONNEES
+   CHARGEMENT MENUS / SOUS-MENUS / CONTENUS
 ========================================================= */
 
 async function chargerDonnees() {
@@ -867,56 +914,99 @@ async function chargerDonnees() {
 
 
     if (menusResult.error) {
-        throw menusResult.error;
+        throw new Error(
+            "Menus : " +
+            menusResult.error.message
+        );
     }
+
 
     if (sousMenusResult.error) {
-        throw sousMenusResult.error;
+        throw new Error(
+            "Sous-menus : " +
+            sousMenusResult.error.message
+        );
     }
 
+
     if (contenusResult.error) {
-        throw contenusResult.error;
+        throw new Error(
+            "Contenus : " +
+            contenusResult.error.message
+        );
     }
 
 
     menus =
-        menusResult.data || [];
+        Array.isArray(menusResult.data)
+            ? menusResult.data
+            : [];
+
 
     sousMenus =
-        sousMenusResult.data || [];
+        Array.isArray(sousMenusResult.data)
+            ? sousMenusResult.data
+            : [];
+
 
     contenus =
-        contenusResult.data || [];
+        Array.isArray(contenusResult.data)
+            ? contenusResult.data
+            : [];
 
 
-    const statsResult =
-        await supabase
-            .from("stats")
-            .select(`
-                id,
-                nom
-            `)
-            .order(
-                "nom",
-                {
-                    ascending:true
-                }
+    /*
+     * Les statistiques sont secondaires.
+     * Si elles ne sont pas accessibles, les contenus
+     * restent utilisables.
+     */
+
+    try {
+
+        const {
+            data: statsData,
+            error: statsError
+        } =
+            await supabase
+                .from("stats")
+                .select(
+                    "id, nom"
+                )
+                .order(
+                    "nom",
+                    {
+                        ascending:true
+                    }
+                );
+
+
+        if (statsError) {
+
+            console.warn(
+                "Statistiques indisponibles :",
+                statsError.message
             );
 
+            stats = [];
 
-    if (statsResult.error) {
+        } else {
+
+            stats =
+                Array.isArray(statsData)
+                    ? statsData
+                    : [];
+
+        }
+
+    }
+    catch (error) {
 
         console.warn(
-            "STATISTIQUES : chargement impossible.",
-            statsResult.error
+            "Statistiques indisponibles :",
+            error
         );
 
         stats = [];
-
-    } else {
-
-        stats =
-            statsResult.data || [];
 
     }
 
@@ -938,13 +1028,10 @@ function remplirListesStats() {
         cardStat1,
         cardStat2,
         cardStat3
-    ].forEach(
+    ]
+    .filter(Boolean)
+    .forEach(
         select => {
-
-            if (!select) {
-                return;
-            }
-
 
             const valeurActuelle =
                 select.value || "";
@@ -955,9 +1042,7 @@ function remplirListesStats() {
 
 
             const empty =
-                document.createElement(
-                    "option"
-                );
+                document.createElement("option");
 
             empty.value =
                 "";
@@ -1057,7 +1142,7 @@ function remplirListeSynergies(
             )
             .slice()
             .sort(
-                (a,b) =>
+                (a, b) =>
                     String(a.titre || "")
                         .localeCompare(
                             String(b.titre || ""),
@@ -1122,20 +1207,21 @@ function obtenirSynergies() {
         return [];
     }
 
+
     return Array.from(
         cardSynergies.selectedOptions
     )
-        .map(
-            option =>
-                option.value
-        )
-        .filter(Boolean);
+    .map(
+        option =>
+            option.value
+    )
+    .filter(Boolean);
 
 }
 
 
 /* =========================================================
-   RENDU ARBRE
+   ARBRE
 ========================================================= */
 
 function renderTree() {
@@ -1147,6 +1233,7 @@ function renderTree() {
 
     injectTreeStyles();
 
+
     tree.innerHTML =
         "";
 
@@ -1156,14 +1243,10 @@ function renderTree() {
         tree.innerHTML = `
 
             <div class="empty-tree">
-
                 Aucun menu.
-
                 <br><br>
-
                 Utilisez « + MENU »
                 pour commencer.
-
             </div>
 
         `;
@@ -1177,27 +1260,21 @@ function renderTree() {
         (menu, menuIndex) => {
 
             const menuBox =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
 
             menuBox.className =
                 "tree-menu";
 
 
             const menuHeader =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
 
             menuHeader.className =
                 "tree-menu-header";
 
 
             const menuButton =
-                document.createElement(
-                    "button"
-                );
+                document.createElement("button");
 
             menuButton.type =
                 "button";
@@ -1228,16 +1305,14 @@ function renderTree() {
             );
 
 
-            const menuActions =
-                document.createElement(
-                    "div"
-                );
+            const actions =
+                document.createElement("div");
 
-            menuActions.className =
+            actions.className =
                 "tree-actions";
 
 
-            menuActions.appendChild(
+            actions.appendChild(
                 creerBouton(
                     "↑",
                     "Monter",
@@ -1250,7 +1325,7 @@ function renderTree() {
             );
 
 
-            menuActions.appendChild(
+            actions.appendChild(
                 creerBouton(
                     "↓",
                     "Descendre",
@@ -1263,14 +1338,12 @@ function renderTree() {
             );
 
 
-            menuActions.appendChild(
-                creerStatusButton(
-                    menu
-                )
+            actions.appendChild(
+                creerStatusButton(menu)
             );
 
 
-            menuActions.appendChild(
+            actions.appendChild(
                 creerBouton(
                     "+",
                     "Ajouter un sous-menu",
@@ -1297,7 +1370,7 @@ function renderTree() {
                 "danger"
             );
 
-            menuActions.appendChild(
+            actions.appendChild(
                 deleteButton
             );
 
@@ -1307,8 +1380,9 @@ function renderTree() {
             );
 
             menuHeader.appendChild(
-                menuActions
+                actions
             );
+
 
             menuBox.appendChild(
                 menuHeader
@@ -1316,20 +1390,24 @@ function renderTree() {
 
 
             const submenuList =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
 
             submenuList.className =
                 "submenu-list";
 
 
             const siblings =
-                sousMenus.filter(
-                    item =>
-                        String(item.menu_id) ===
-                        String(menu.id)
-                );
+                sousMenus
+                    .filter(
+                        item =>
+                            toId(item.menu_id) ===
+                            toId(menu.id)
+                    )
+                    .sort(
+                        (a, b) =>
+                            (Number(a.position) || 0) -
+                            (Number(b.position) || 0)
+                    );
 
 
             siblings.forEach(
@@ -1350,6 +1428,7 @@ function renderTree() {
                 submenuList
             );
 
+
             tree.appendChild(
                 menuBox
             );
@@ -1361,7 +1440,7 @@ function renderTree() {
 
 
 /* =========================================================
-   RENDU SOUS-MENU
+   SOUS-MENU
 ========================================================= */
 
 function renderSousMenu(
@@ -1370,27 +1449,21 @@ function renderSousMenu(
 ) {
 
     const box =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     box.className =
         "tree-submenu";
 
 
     const header =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     header.className =
         "tree-submenu-header";
 
 
     const button =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
     button.type =
         "button";
@@ -1422,9 +1495,7 @@ function renderSousMenu(
 
 
     const actions =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     actions.className =
         "tree-actions";
@@ -1459,9 +1530,7 @@ function renderSousMenu(
 
 
     actions.appendChild(
-        creerStatusButton(
-            submenu
-        )
+        creerStatusButton(submenu)
     );
 
 
@@ -1505,26 +1574,31 @@ function renderSousMenu(
         actions
     );
 
+
     box.appendChild(
         header
     );
 
 
     const contentList =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     contentList.className =
         "content-list";
 
 
     const contentSiblings =
-        contenus.filter(
-            content =>
-                String(content.sous_menu_id) ===
-                String(submenu.id)
-        );
+        contenus
+            .filter(
+                content =>
+                    toId(content.sous_menu_id) ===
+                    toId(submenu.id)
+            )
+            .sort(
+                (a, b) =>
+                    (Number(a.position) || 0) -
+                    (Number(b.position) || 0)
+            );
 
 
     contentSiblings.forEach(
@@ -1552,7 +1626,7 @@ function renderSousMenu(
 
 
 /* =========================================================
-   RENDU CONTENU
+   CONTENU
 ========================================================= */
 
 function renderContenu(
@@ -1561,18 +1635,14 @@ function renderContenu(
 ) {
 
     const row =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     row.className =
         "tree-content";
 
 
     const button =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
     button.type =
         "button";
@@ -1599,9 +1669,7 @@ function renderContenu(
 
 
     const actions =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     actions.className =
         "tree-actions";
@@ -1636,9 +1704,7 @@ function renderContenu(
 
 
     actions.appendChild(
-        creerStatusButton(
-            item
-        )
+        creerStatusButton(item)
     );
 
 
@@ -1686,9 +1752,7 @@ function creerBouton(
 ) {
 
     const button =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
     button.type =
         "button";
@@ -1707,6 +1771,8 @@ function creerBouton(
         "click",
         event => {
 
+            event.preventDefault();
+
             event.stopPropagation();
 
             action();
@@ -1720,14 +1786,10 @@ function creerBouton(
 }
 
 
-function creerStatusButton(
-    item
-) {
+function creerStatusButton(item) {
 
     const button =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
     button.type =
         "button";
@@ -1736,7 +1798,7 @@ function creerStatusButton(
         "status-button";
 
 
-    if (item.valide) {
+    if (Boolean(item.valide)) {
 
         button.classList.add(
             "status-valid"
@@ -1761,6 +1823,8 @@ function creerStatusButton(
         "click",
         event => {
 
+            event.preventDefault();
+
             event.stopPropagation();
 
             changerValidation(
@@ -1778,7 +1842,7 @@ function creerStatusButton(
 
 
 /* =========================================================
-   LISTES
+   LISTE MENUS
 ========================================================= */
 
 function remplirListeMenus(
@@ -1799,9 +1863,7 @@ function remplirListeMenus(
         menu => {
 
             const option =
-                document.createElement(
-                    "option"
-                );
+                document.createElement("option");
 
             option.value =
                 menu.id;
@@ -1810,8 +1872,8 @@ function remplirListeMenus(
                 menu.titre;
 
             option.selected =
-                String(menu.id) ===
-                String(valeur);
+                toId(menu.id) ===
+                toId(valeur);
 
             select.appendChild(
                 option
@@ -1822,6 +1884,10 @@ function remplirListeMenus(
 
 }
 
+
+/* =========================================================
+   LISTE SOUS-MENUS
+========================================================= */
 
 function remplirListeSousMenus(
     select,
@@ -1841,9 +1907,7 @@ function remplirListeSousMenus(
         menu => {
 
             const groupe =
-                document.createElement(
-                    "optgroup"
-                );
+                document.createElement("optgroup");
 
             groupe.label =
                 menu.titre;
@@ -1852,8 +1916,13 @@ function remplirListeSousMenus(
             sousMenus
                 .filter(
                     submenu =>
-                        String(submenu.menu_id) ===
-                        String(menu.id)
+                        toId(submenu.menu_id) ===
+                        toId(menu.id)
+                )
+                .sort(
+                    (a, b) =>
+                        (Number(a.position) || 0) -
+                        (Number(b.position) || 0)
                 )
                 .forEach(
                     submenu => {
@@ -1870,8 +1939,8 @@ function remplirListeSousMenus(
                             submenu.titre;
 
                         option.selected =
-                            String(submenu.id) ===
-                            String(valeur);
+                            toId(submenu.id) ===
+                            toId(valeur);
 
                         groupe.appendChild(
                             option
@@ -1898,20 +1967,13 @@ function remplirListeSousMenus(
 
 
 /* =========================================================
-   STRUCTURE
+   OUVRIR STRUCTURE
 ========================================================= */
 
 function ouvrirStructure(
     type,
     id
 ) {
-
-    selectedType =
-        type;
-
-    selectedId =
-        id;
-
 
     const collection =
         type === "menu"
@@ -1922,14 +1984,21 @@ function ouvrirStructure(
     const item =
         collection.find(
             element =>
-                String(element.id) ===
-                String(id)
+                toId(element.id) ===
+                toId(id)
         );
 
 
     if (!item) {
         return;
     }
+
+
+    selectedType =
+        type;
+
+    selectedId =
+        id;
 
 
     if (welcome) {
@@ -1969,18 +2038,20 @@ function ouvrirStructure(
 
 
     if (structureName) {
+
         structureName.value =
             item.titre || "";
+
     }
 
 
-    if (
-        type === "submenu"
-    ) {
+    if (type === "submenu") {
 
         if (structureParentField) {
+
             structureParentField.style.display =
                 "block";
+
         }
 
         remplirListeMenus(
@@ -1991,13 +2062,17 @@ function ouvrirStructure(
     } else {
 
         if (structureParentField) {
+
             structureParentField.style.display =
                 "none";
+
         }
 
         if (structureParent) {
+
             structureParent.innerHTML =
                 "";
+
         }
 
     }
@@ -2006,7 +2081,7 @@ function ouvrirStructure(
 
 
 /* =========================================================
-   SAUVEGARDE STRUCTURE
+   ENREGISTRER STRUCTURE
 ========================================================= */
 
 async function enregistrerStructure() {
@@ -2053,10 +2128,9 @@ async function enregistrerStructure() {
 
         if (error) {
 
-            console.error(error);
-
             showMessage(
-                "Impossible d'enregistrer la modification.",
+                "Impossible d'enregistrer le menu : " +
+                error.message,
                 "error"
             );
 
@@ -2075,8 +2149,8 @@ async function enregistrerStructure() {
         const submenu =
             sousMenus.find(
                 item =>
-                    String(item.id) ===
-                    String(selectedId)
+                    toId(item.id) ===
+                    toId(selectedId)
             );
 
 
@@ -2111,30 +2185,26 @@ async function enregistrerStructure() {
 
 
         let nouvellePosition =
-            Number(
-                submenu.position
-            ) || 0;
+            Number(submenu.position) || 0;
 
 
         if (
-            String(nouveauMenuId) !==
-            String(submenu.menu_id)
+            toId(nouveauMenuId) !==
+            toId(submenu.menu_id)
         ) {
 
             const destination =
                 sousMenus.filter(
                     item =>
-                        String(item.menu_id) ===
-                        String(nouveauMenuId) &&
-                        String(item.id) !==
-                        String(selectedId)
+                        toId(item.menu_id) ===
+                        toId(nouveauMenuId) &&
+                        toId(item.id) !==
+                        toId(selectedId)
                 );
 
 
             nouvellePosition =
-                getNextPosition(
-                    destination
-                );
+                getNextPosition(destination);
 
         }
 
@@ -2163,10 +2233,9 @@ async function enregistrerStructure() {
 
         if (error) {
 
-            console.error(error);
-
             showMessage(
-                "Impossible d'enregistrer la modification.",
+                "Impossible d'enregistrer le sous-menu : " +
+                error.message,
                 "error"
             );
 
@@ -2189,7 +2258,7 @@ async function enregistrerStructure() {
 
 
 /* =========================================================
-   CREATION
+   MODAL CREATION
 ========================================================= */
 
 function ouvrirModalCreation(
@@ -2198,10 +2267,9 @@ function ouvrirModalCreation(
 ) {
 
     if (
+        !structureModal ||
         !modalTitle ||
-        !modalName ||
-        !modalSaveButton ||
-        !structureModal
+        !modalName
     ) {
         return;
     }
@@ -2214,26 +2282,25 @@ function ouvrirModalCreation(
         parentId;
 
 
-    if (
+    modalTitle.textContent =
         type === "submenu"
-    ) {
-
-        modalTitle.textContent =
-            "NOUVEAU SOUS-MENU";
-
-    } else {
-
-        modalTitle.textContent =
-            "NOUVEAU CONTENU";
-
-    }
+            ? "NOUVEAU SOUS-MENU"
+            : "NOUVEAU CONTENU";
 
 
     modalName.value =
         "";
 
-    modalSaveButton.textContent =
-        "CRÉER";
+
+    if (modalSaveButton) {
+
+        modalSaveButton.textContent =
+            "CRÉER";
+
+        modalSaveButton.disabled =
+            false;
+
+    }
 
 
     structureModal.classList.add(
@@ -2242,8 +2309,11 @@ function ouvrirModalCreation(
 
 
     setTimeout(
-        () =>
-            modalName.focus(),
+        () => {
+
+            modalName.focus();
+
+        },
         50
     );
 
@@ -2253,10 +2323,9 @@ function ouvrirModalCreation(
 function ouvrirCreationMenu() {
 
     if (
+        !structureModal ||
         !modalTitle ||
-        !modalName ||
-        !modalSaveButton ||
-        !structureModal
+        !modalName
     ) {
         return;
     }
@@ -2277,8 +2346,15 @@ function ouvrirCreationMenu() {
         "";
 
 
-    modalSaveButton.textContent =
-        "CRÉER";
+    if (modalSaveButton) {
+
+        modalSaveButton.textContent =
+            "CRÉER";
+
+        modalSaveButton.disabled =
+            false;
+
+    }
 
 
     structureModal.classList.add(
@@ -2287,8 +2363,11 @@ function ouvrirCreationMenu() {
 
 
     setTimeout(
-        () =>
-            modalName.focus(),
+        () => {
+
+            modalName.focus();
+
+        },
         50
     );
 
@@ -2316,166 +2395,15 @@ function fermerModal() {
 
 
 /* =========================================================
-   EVENEMENTS STRUCTURE / CREATION
-========================================================= */
-
-function initialiserEvenementsStructure() {
-
-    const structureSaveButton =
-        document.getElementById(
-            "structureSaveButton"
-        );
-
-
-    if (structureSaveButton) {
-
-        structureSaveButton.addEventListener(
-            "click",
-            enregistrerStructure
-        );
-
-    }
-
-
-    const structureCancelButton =
-        document.getElementById(
-            "structureCancelButton"
-        );
-
-
-    if (structureCancelButton) {
-
-        structureCancelButton.addEventListener(
-            "click",
-            fermerEditeurs
-        );
-
-    }
-
-
-    const addMenuButton =
-        document.getElementById(
-            "addMenuButton"
-        );
-
-
-    if (addMenuButton) {
-
-        addMenuButton.disabled =
-            false;
-
-        addMenuButton.addEventListener(
-            "click",
-            event => {
-
-                event.preventDefault();
-
-                event.stopPropagation();
-
-                ouvrirCreationMenu();
-
-            }
-        );
-
-    }
-
-
-    const modalCloseButton =
-        document.getElementById(
-            "modalCloseButton"
-        );
-
-
-    if (modalCloseButton) {
-
-        modalCloseButton.addEventListener(
-            "click",
-            fermerModal
-        );
-
-    }
-
-
-    const modalCancelButton =
-        document.getElementById(
-            "modalCancelButton"
-        );
-
-
-    if (modalCancelButton) {
-
-        modalCancelButton.addEventListener(
-            "click",
-            fermerModal
-        );
-
-    }
-
-
-    if (structureModal) {
-
-        structureModal.addEventListener(
-            "click",
-            event => {
-
-                if (
-                    event.target ===
-                    structureModal
-                ) {
-
-                    fermerModal();
-
-                }
-
-            }
-        );
-
-    }
-
-
-    if (modalSaveButton) {
-
-        modalSaveButton.addEventListener(
-            "click",
-            creerElement
-        );
-
-    }
-
-
-    if (modalName) {
-
-        modalName.addEventListener(
-            "keydown",
-            event => {
-
-                if (
-                    event.key ===
-                    "Enter"
-                ) {
-
-                    event.preventDefault();
-
-                    creerElement();
-
-                }
-
-            }
-
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   CREER ELEMENT
+   CREATION
 ========================================================= */
 
 async function creerElement() {
 
-    if (!modalName || !modalSaveButton) {
+    if (
+        !modalName ||
+        !modalSaveButton
+    ) {
         return;
     }
 
@@ -2534,16 +2462,23 @@ async function creerElement() {
         }
 
 
-        if (
+        else if (
             modalType ===
             "submenu"
         ) {
 
+            if (!modalParentId) {
+                throw new Error(
+                    "Menu parent manquant."
+                );
+            }
+
+
             const siblings =
                 sousMenus.filter(
                     item =>
-                        String(item.menu_id) ===
-                        String(modalParentId)
+                        toId(item.menu_id) ===
+                        toId(modalParentId)
                 );
 
 
@@ -2577,16 +2512,23 @@ async function creerElement() {
         }
 
 
-        if (
+        else if (
             modalType ===
             "content"
         ) {
 
+            if (!modalParentId) {
+                throw new Error(
+                    "Sous-menu parent manquant."
+                );
+            }
+
+
             const siblings =
                 contenus.filter(
                     item =>
-                        String(item.sous_menu_id) ===
-                        String(modalParentId)
+                        toId(item.sous_menu_id) ===
+                        toId(modalParentId)
                 );
 
 
@@ -2655,8 +2597,6 @@ async function creerElement() {
     }
     catch (error) {
 
-        console.error(error);
-
         showMessage(
             error?.message
                 ? "Impossible de créer l'élément : " +
@@ -2677,43 +2617,16 @@ async function creerElement() {
 
 
 /* =========================================================
-   POSITION
-========================================================= */
-
-function getNextPosition(
-    items
-) {
-
-    if (!items.length) {
-        return 0;
-    }
-
-
-    return Math.max(
-        ...items.map(
-            item =>
-                Number(
-                    item.position
-                ) || 0
-        )
-    ) + 1;
-
-}
-
-
-/* =========================================================
    OUVRIR CONTENU
 ========================================================= */
 
-function ouvrirContenu(
-    id
-) {
+function ouvrirContenu(id) {
 
     const item =
         contenus.find(
             content =>
-                String(content.id) ===
-                String(id)
+                toId(content.id) ===
+                toId(id)
         );
 
 
@@ -2792,28 +2705,13 @@ function ouvrirContenu(
     }
 
 
-    /* =====================================================
-       PRIORITE
-    ===================================================== */
-
     if (cardPriorite) {
 
-        if (
-            item.priorite !== null &&
-            item.priorite !== undefined
-        ) {
-
-            cardPriorite.value =
-                String(
-                    item.priorite
-                );
-
-        } else {
-
-            cardPriorite.value =
-                "";
-
-        }
+        cardPriorite.value =
+            item.priorite === null ||
+            item.priorite === undefined
+                ? ""
+                : String(item.priorite);
 
     }
 
@@ -2876,13 +2774,14 @@ function ouvrirContenu(
     isSourceMode =
         false;
 
+
     actualiserModeEditeur();
 
 }
 
 
 /* =========================================================
-   SAUVEGARDE CONTENU
+   ENREGISTRER CONTENU
 ========================================================= */
 
 async function enregistrerContenu() {
@@ -2911,8 +2810,8 @@ async function enregistrerContenu() {
     const contenu =
         contenus.find(
             item =>
-                String(item.id) ===
-                String(editorId)
+                toId(item.id) ===
+                toId(editorId)
         );
 
 
@@ -2968,7 +2867,7 @@ async function enregistrerContenu() {
         cardPhoto
             ? String(
                 cardPhoto.value || ""
-              ).trim()
+            ).trim()
             : "";
 
 
@@ -2976,19 +2875,15 @@ async function enregistrerContenu() {
         cardAccroche
             ? String(
                 cardAccroche.value || ""
-              ).trim()
+            ).trim()
             : "";
 
-
-    /* =====================================================
-       PRIORITE
-    ===================================================== */
 
     const priorite =
         cardPriorite
             ? String(
                 cardPriorite.value ?? ""
-              ).trim()
+            ).trim()
             : "";
 
 
@@ -3014,10 +2909,6 @@ async function enregistrerContenu() {
         obtenirSynergies();
 
 
-    const ancienSousMenuId =
-        contenu.sous_menu_id;
-
-
     let nouvellePosition =
         Number(
             contenu.position
@@ -3025,17 +2916,17 @@ async function enregistrerContenu() {
 
 
     if (
-        String(nouveauSousMenuId) !==
-        String(ancienSousMenuId)
+        toId(nouveauSousMenuId) !==
+        toId(contenu.sous_menu_id)
     ) {
 
         const destination =
             contenus.filter(
                 item =>
-                    String(item.sous_menu_id) ===
-                    String(nouveauSousMenuId) &&
-                    String(item.id) !==
-                    String(editorId)
+                    toId(item.sous_menu_id) ===
+                    toId(nouveauSousMenuId) &&
+                    toId(item.id) !==
+                    toId(editorId)
             );
 
 
@@ -3047,81 +2938,95 @@ async function enregistrerContenu() {
     }
 
 
-    const {
-        error
-    } =
-        await supabase
-            .from("contenus")
-            .update({
+    if (contentSaveButton) {
+        contentSaveButton.disabled = true;
+    }
 
-                titre,
 
-                html,
+    try {
 
-                sous_menu_id:
-                    nouveauSousMenuId,
+        const {
+            error
+        } =
+            await supabase
+                .from("contenus")
+                .update({
 
-                position:
-                    nouvellePosition,
+                    titre,
 
-                photo_url:
-                    photo || null,
+                    html,
 
-                accroche:
-                    accroche || null,
+                    sous_menu_id:
+                        nouveauSousMenuId,
 
-                priorite:
-                    priorite || null,
+                    position:
+                        nouvellePosition,
 
-                stat_1:
-                    stat1,
+                    photo_url:
+                        photo || null,
 
-                stat_2:
-                    stat2,
+                    accroche:
+                        accroche || null,
 
-                stat_3:
-                    stat3,
+                    priorite:
+                        priorite || null,
 
-                synergies:
+                    stat_1:
+                        stat1,
+
+                    stat_2:
+                        stat2,
+
+                    stat_3:
+                        stat3,
+
                     synergies
 
-            })
-            .eq(
-                "id",
-                editorId
-            );
+                })
+                .eq(
+                    "id",
+                    editorId
+                );
 
 
-    if (error) {
+        if (error) {
+            throw error;
+        }
 
-        console.error(error);
+
+        await chargerDonnees();
+
+        fermerEditeurs();
 
         showMessage(
-            error.message
+            "Contenu enregistré."
+        );
+
+    }
+    catch (error) {
+
+        showMessage(
+            error?.message
                 ? "Impossible d'enregistrer le contenu : " +
                   error.message
                 : "Impossible d'enregistrer le contenu.",
             "error"
         );
 
-        return;
+    }
+    finally {
+
+        if (contentSaveButton) {
+            contentSaveButton.disabled = false;
+        }
 
     }
-
-
-    await chargerDonnees();
-
-    fermerEditeurs();
-
-    showMessage(
-        "Contenu enregistré."
-    );
 
 }
 
 
 /* =========================================================
-   WYSIWYG
+   EDITEUR
 ========================================================= */
 
 function initialiserEvenementsEditeur() {
@@ -3135,7 +3040,9 @@ function initialiserEvenementsEditeur() {
 
                 button.addEventListener(
                     "click",
-                    () => {
+                    event => {
+
+                        event.preventDefault();
 
                         const command =
                             button.dataset.command;
@@ -3144,11 +3051,14 @@ function initialiserEvenementsEditeur() {
                             button.dataset.value ||
                             null;
 
+
                         if (!wysiwyg) {
                             return;
                         }
 
+
                         wysiwyg.focus();
+
 
                         document.execCommand(
                             command,
@@ -3172,16 +3082,21 @@ function initialiserEvenementsEditeur() {
 
                 button.addEventListener(
                     "click",
-                    () => {
+                    event => {
+
+                        event.preventDefault();
 
                         const format =
                             button.dataset.format;
+
 
                         if (!wysiwyg) {
                             return;
                         }
 
+
                         wysiwyg.focus();
+
 
                         document.execCommand(
                             "formatBlock",
@@ -3206,18 +3121,27 @@ function initialiserEvenementsEditeur() {
 
         linkButton.addEventListener(
             "click",
-            () => {
+            event => {
+
+                event.preventDefault();
+
 
                 const url =
                     prompt(
                         "Adresse du lien :"
                     );
 
-                if (!url || !wysiwyg) {
+
+                if (
+                    !url ||
+                    !wysiwyg
+                ) {
                     return;
                 }
 
+
                 wysiwyg.focus();
+
 
                 document.execCommand(
                     "createLink",
@@ -3241,18 +3165,27 @@ function initialiserEvenementsEditeur() {
 
         imageButton.addEventListener(
             "click",
-            () => {
+            event => {
+
+                event.preventDefault();
+
 
                 const url =
                     prompt(
                         "URL de l'image :"
                     );
 
-                if (!url || !wysiwyg) {
+
+                if (
+                    !url ||
+                    !wysiwyg
+                ) {
                     return;
                 }
 
+
                 wysiwyg.focus();
+
 
                 document.execCommand(
                     "insertImage",
@@ -3276,16 +3209,24 @@ function initialiserEvenementsEditeur() {
 
         videoButton.addEventListener(
             "click",
-            () => {
+            event => {
+
+                event.preventDefault();
+
 
                 const url =
                     prompt(
                         "URL de la vidéo :"
                     );
 
-                if (!url || !wysiwyg) {
+
+                if (
+                    !url ||
+                    !wysiwyg
+                ) {
                     return;
                 }
+
 
                 wysiwyg.focus();
 
@@ -3326,7 +3267,10 @@ function initialiserEvenementsEditeur() {
 
         sourceModeButton.addEventListener(
             "click",
-            () => {
+            event => {
+
+                event.preventDefault();
+
 
                 if (!isSourceMode) {
 
@@ -3360,6 +3304,7 @@ function initialiserEvenementsEditeur() {
 
                 }
 
+
                 actualiserModeEditeur();
 
             }
@@ -3368,33 +3313,33 @@ function initialiserEvenementsEditeur() {
     }
 
 
-    const contentCancelButton =
-        document.getElementById(
-            "contentCancelButton"
-        );
-
-
     if (contentCancelButton) {
 
         contentCancelButton.addEventListener(
             "click",
-            fermerEditeurs
+            event => {
+
+                event.preventDefault();
+
+                fermerEditeurs();
+
+            }
         );
 
     }
-
-
-    const contentSaveButton =
-        document.getElementById(
-            "contentSaveButton"
-        );
 
 
     if (contentSaveButton) {
 
         contentSaveButton.addEventListener(
             "click",
-            enregistrerContenu
+            event => {
+
+                event.preventDefault();
+
+                enregistrerContenu();
+
+            }
         );
 
     }
@@ -3404,7 +3349,7 @@ function initialiserEvenementsEditeur() {
 
 function actualiserModeEditeur() {
 
-    const button =
+    const sourceModeButton =
         document.getElementById(
             "sourceModeButton"
         );
@@ -3426,9 +3371,12 @@ function actualiserModeEditeur() {
         sourceEditor.style.display =
             "block";
 
-        if (button) {
-            button.textContent =
+
+        if (sourceModeButton) {
+
+            sourceModeButton.textContent =
                 "ÉDITEUR VISUEL";
+
         }
 
     } else {
@@ -3439,9 +3387,12 @@ function actualiserModeEditeur() {
         sourceEditor.style.display =
             "none";
 
-        if (button) {
-            button.textContent =
+
+        if (sourceModeButton) {
+
+            sourceModeButton.textContent =
                 "CODE HTML";
+
         }
 
     }
@@ -3459,40 +3410,59 @@ async function changerValidation(
 ) {
 
     const nouveauStatut =
-        !Boolean(
-            item.valide
-        );
+        !Boolean(item.valide);
 
 
-    let table;
+    let table =
+        null;
 
 
     if (
         menus.some(
             element =>
-                String(element.id) ===
-                String(id)
+                toId(element.id) ===
+                toId(id)
         )
     ) {
 
         table =
             "menus";
 
-    } else if (
+    }
+    else if (
         sousMenus.some(
             element =>
-                String(element.id) ===
-                String(id)
+                toId(element.id) ===
+                toId(id)
         )
     ) {
 
         table =
             "sous_menus";
 
-    } else {
+    }
+    else if (
+        contenus.some(
+            element =>
+                toId(element.id) ===
+                toId(id)
+        )
+    ) {
 
         table =
             "contenus";
+
+    }
+
+
+    if (!table) {
+
+        showMessage(
+            "Élément introuvable.",
+            "error"
+        );
+
+        return;
 
     }
 
@@ -3503,10 +3473,8 @@ async function changerValidation(
         await supabase
             .from(table)
             .update({
-
                 valide:
                     nouveauStatut
-
             })
             .eq(
                 "id",
@@ -3516,10 +3484,9 @@ async function changerValidation(
 
     if (error) {
 
-        console.error(error);
-
         showMessage(
-            "Impossible de modifier le statut.",
+            "Impossible de modifier le statut : " +
+            error.message,
             "error"
         );
 
@@ -3583,8 +3550,8 @@ async function deplacerSousMenu(
     const index =
         siblings.findIndex(
             sibling =>
-                String(sibling.id) ===
-                String(item.id)
+                toId(sibling.id) ===
+                toId(item.id)
         );
 
 
@@ -3618,8 +3585,8 @@ async function deplacerContenu(
     const index =
         siblings.findIndex(
             sibling =>
-                String(sibling.id) ===
-                String(item.id)
+                toId(sibling.id) ===
+                toId(item.id)
         );
 
 
@@ -3651,15 +3618,10 @@ async function echangerPositions(
 ) {
 
     const firstPosition =
-        Number(
-            first.position
-        ) || 0;
-
+        Number(first.position) || 0;
 
     const secondPosition =
-        Number(
-            second.position
-        ) || 0;
+        Number(second.position) || 0;
 
 
     const firstUpdate =
@@ -3677,12 +3639,9 @@ async function echangerPositions(
 
     if (firstUpdate.error) {
 
-        console.error(
-            firstUpdate.error
-        );
-
         showMessage(
-            "Impossible de modifier l'ordre.",
+            "Impossible de modifier l'ordre : " +
+            firstUpdate.error.message,
             "error"
         );
 
@@ -3706,12 +3665,9 @@ async function echangerPositions(
 
     if (secondUpdate.error) {
 
-        console.error(
-            secondUpdate.error
-        );
-
         showMessage(
-            "Impossible de modifier l'ordre.",
+            "Impossible de modifier l'ordre : " +
+            secondUpdate.error.message,
             "error"
         );
 
@@ -3731,15 +3687,13 @@ async function echangerPositions(
    SUPPRESSION MENU
 ========================================================= */
 
-async function supprimerMenu(
-    id
-) {
+async function supprimerMenu(id) {
 
     const menu =
         menus.find(
             item =>
-                String(item.id) ===
-                String(id)
+                toId(item.id) ===
+                toId(id)
         );
 
 
@@ -3751,8 +3705,8 @@ async function supprimerMenu(
     const children =
         sousMenus.filter(
             item =>
-                String(item.menu_id) ===
-                String(id)
+                toId(item.menu_id) ===
+                toId(id)
         );
 
 
@@ -3761,8 +3715,8 @@ async function supprimerMenu(
             content =>
                 children.some(
                     submenu =>
-                        String(submenu.id) ===
-                        String(content.sous_menu_id)
+                        toId(submenu.id) ===
+                        toId(content.sous_menu_id)
                 )
         ).length;
 
@@ -3814,10 +3768,9 @@ async function supprimerMenu(
 
         if (error) {
 
-            console.error(error);
-
             showMessage(
-                "Suppression interrompue.",
+                "Suppression interrompue : " +
+                error.message,
                 "error"
             );
 
@@ -3831,8 +3784,7 @@ async function supprimerMenu(
 
 
     const {
-        error:
-            submenuError
+        error: submenuError
     } =
         await supabase
             .from("sous_menus")
@@ -3845,12 +3797,9 @@ async function supprimerMenu(
 
     if (submenuError) {
 
-        console.error(
-            submenuError
-        );
-
         showMessage(
-            "Impossible de supprimer le menu.",
+            "Impossible de supprimer le menu : " +
+            submenuError.message,
             "error"
         );
 
@@ -3873,10 +3822,9 @@ async function supprimerMenu(
 
     if (error) {
 
-        console.error(error);
-
         showMessage(
-            "Impossible de supprimer le menu.",
+            "Impossible de supprimer le menu : " +
+            error.message,
             "error"
         );
 
@@ -3900,15 +3848,13 @@ async function supprimerMenu(
    SUPPRESSION SOUS-MENU
 ========================================================= */
 
-async function supprimerSousMenu(
-    id
-) {
+async function supprimerSousMenu(id) {
 
     const submenu =
         sousMenus.find(
             item =>
-                String(item.id) ===
-                String(id)
+                toId(item.id) ===
+                toId(id)
         );
 
 
@@ -3920,8 +3866,8 @@ async function supprimerSousMenu(
     const childCount =
         contenus.filter(
             item =>
-                String(item.sous_menu_id) ===
-                String(id)
+                toId(item.sous_menu_id) ===
+                toId(id)
         ).length;
 
 
@@ -3949,8 +3895,7 @@ async function supprimerSousMenu(
 
 
     const {
-        error:
-            contentError
+        error: contentError
     } =
         await supabase
             .from("contenus")
@@ -3963,12 +3908,9 @@ async function supprimerSousMenu(
 
     if (contentError) {
 
-        console.error(
-            contentError
-        );
-
         showMessage(
-            "Impossible de supprimer les contenus.",
+            "Impossible de supprimer les contenus : " +
+            contentError.message,
             "error"
         );
 
@@ -3991,10 +3933,9 @@ async function supprimerSousMenu(
 
     if (error) {
 
-        console.error(error);
-
         showMessage(
-            "Impossible de supprimer le sous-menu.",
+            "Impossible de supprimer le sous-menu : " +
+            error.message,
             "error"
         );
 
@@ -4018,15 +3959,13 @@ async function supprimerSousMenu(
    SUPPRESSION CONTENU
 ========================================================= */
 
-async function supprimerContenu(
-    id
-) {
+async function supprimerContenu(id) {
 
     const item =
         contenus.find(
             content =>
-                String(content.id) ===
-                String(id)
+                toId(content.id) ===
+                toId(id)
         );
 
 
@@ -4062,10 +4001,9 @@ async function supprimerContenu(
 
     if (error) {
 
-        console.error(error);
-
         showMessage(
-            "Impossible de supprimer le contenu.",
+            "Impossible de supprimer le contenu : " +
+            error.message,
             "error"
         );
 
@@ -4086,7 +4024,7 @@ async function supprimerContenu(
 
 
 /* =========================================================
-   FERMETURE EDITEURS
+   FERMER EDITEURS
 ========================================================= */
 
 function fermerEditeurs() {
@@ -4124,6 +4062,166 @@ function fermerEditeurs() {
     editorId =
         null;
 
+    isSourceMode =
+        false;
+
+
+    actualiserModeEditeur();
+
+}
+
+
+/* =========================================================
+   EVENEMENTS STRUCTURE
+========================================================= */
+
+function initialiserEvenementsStructure() {
+
+    if (structureSaveButton) {
+
+        structureSaveButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                enregistrerStructure();
+
+            }
+        );
+
+    }
+
+
+    if (structureCancelButton) {
+
+        structureCancelButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                fermerEditeurs();
+
+            }
+        );
+
+    }
+
+
+    if (addMenuButton) {
+
+        addMenuButton.disabled =
+            false;
+
+
+        addMenuButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                event.stopPropagation();
+
+                ouvrirCreationMenu();
+
+            }
+        );
+
+    }
+
+
+    if (modalCloseButton) {
+
+        modalCloseButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                fermerModal();
+
+            }
+        );
+
+    }
+
+
+    if (modalCancelButton) {
+
+        modalCancelButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                fermerModal();
+
+            }
+        );
+
+    }
+
+
+    if (structureModal) {
+
+        structureModal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    structureModal
+                ) {
+
+                    fermerModal();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if (modalSaveButton) {
+
+        modalSaveButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                creerElement();
+
+            }
+        );
+
+    }
+
+
+    if (modalName) {
+
+        modalName.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.key ===
+                    "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    creerElement();
+
+                }
+
+            }
+        );
+
+    }
+
 }
 
 
@@ -4138,8 +4236,10 @@ function initialiserEvenementClavier() {
         event => {
 
             if (
-                (event.ctrlKey ||
-                 event.metaKey) &&
+                (
+                    event.ctrlKey ||
+                    event.metaKey
+                ) &&
                 event.key.toLowerCase() ===
                 "s"
             ) {
@@ -4154,6 +4254,8 @@ function initialiserEvenementClavier() {
                 ) {
 
                     enregistrerContenu();
+
+                    return;
 
                 }
 
@@ -4182,6 +4284,12 @@ function initialiserEvenementClavier() {
 
 async function initialiser() {
 
+    /*
+     * Les événements sont initialisés avant Supabase.
+     * Ainsi l'interface ne devient pas morte si le chargement
+     * des données rencontre un problème.
+     */
+
     initialiserEvenementsStructure();
 
     initialiserEvenementsEditeur();
@@ -4195,15 +4303,16 @@ async function initialiser() {
 
         await verifierAdmin();
 
-        await chargerDonnees();
-
     }
     catch (error) {
 
-        console.error(
-            "CONTENUS :",
-            error
-        );
+        currentProfile =
+            null;
+
+
+        if (addMenuButton) {
+            addMenuButton.disabled = true;
+        }
 
 
         if (tree) {
@@ -4213,7 +4322,7 @@ async function initialiser() {
                 <div class="empty-tree">
 
                     ${escapeHtml(
-                        error.message ||
+                        error?.message ||
                         "Accès impossible."
                     )}
 
@@ -4235,68 +4344,84 @@ async function initialiser() {
         }
 
 
+        return;
+
+    }
+
+
+    try {
+
+        await chargerDonnees();
+
+    }
+    catch (error) {
+
         /*
-         * Le bouton + MENU ne doit être désactivé
-         * QUE si l'utilisateur n'est pas authentifié
-         * ou n'est pas administrateur.
-         *
-         * Une erreur de chargement des données ne doit
-         * pas désactiver arbitrairement l'interface.
+         * L'utilisateur est bien authentifié et administrateur.
+         * On conserve donc l'accès à l'interface.
          */
-        const addMenuButton =
-            document.getElementById(
-                "addMenuButton"
-            );
+
+        console.error(
+            "CONTENUS — chargement :",
+            error
+        );
+
+
+        if (tree) {
+
+            tree.innerHTML = `
+
+                <div class="empty-tree">
+
+                    Impossible de charger
+                    la structure des contenus.
+
+                    <br><br>
+
+                    <span
+                        style="
+                            color:rgba(239,65,53,.85);
+                        "
+                    >
+                        ${escapeHtml(
+                            error?.message ||
+                            "Erreur de chargement."
+                        )}
+                    </span>
+
+                </div>
+
+            `;
+
+        }
 
 
         if (
             addMenuButton &&
             currentProfile &&
-            currentProfile.grade === "admin"
+            String(
+                currentProfile.grade || ""
+            ).toLowerCase() ===
+            "admin"
         ) {
 
             addMenuButton.disabled =
                 false;
 
         }
-        else if (
-            addMenuButton &&
-            !currentProfile
-        ) {
-
-            addMenuButton.disabled =
-                true;
-
-        }
-        else if (
-            addMenuButton &&
-            currentProfile &&
-            currentProfile.grade !== "admin"
-        ) {
-
-            addMenuButton.disabled =
-                true;
-
-        }
 
 
-        if (welcome) {
+        return;
 
-            welcome.innerHTML = `
+    }
 
-                <h1>ACCÈS REFUSÉ</h1>
 
-                <p>
-                    ${escapeHtml(
-                        error.message ||
-                        "Vous n'avez pas accès à cette page."
-                    )}
-                </p>
+    /*
+     * Tout est correctement chargé.
+     */
 
-            `;
-
-        }
-
+    if (addMenuButton) {
+        addMenuButton.disabled = false;
     }
 
 }
@@ -4319,7 +4444,8 @@ if (
         }
     );
 
-} else {
+}
+else {
 
     initialiser();
 
