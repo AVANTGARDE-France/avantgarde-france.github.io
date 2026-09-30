@@ -121,8 +121,8 @@ const cardAccroche =
     document.getElementById("cardAccroche");
 
 const cardPriorite =
-    document.getElementById("contentPriorite") ||
-    document.getElementById("cardPriorite");
+    document.getElementById("contentPriority") ||
+    document.getElementById("cardPriority");
 
 const cardStat1 =
     document.getElementById("contentStat1") ||
