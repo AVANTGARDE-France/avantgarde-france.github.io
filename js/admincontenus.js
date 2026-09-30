@@ -165,6 +165,100 @@ const cardSynergies =
 
 
 /* =========================================================
+   PRIORITES
+========================================================= */
+
+const PRIORITES = [
+    {
+        value: "absolue",
+        label: "Absolue"
+    },
+    {
+        value: "prioritaire",
+        label: "Prioritaire"
+    },
+    {
+        value: "secondaire",
+        label: "Secondaire"
+    }
+];
+
+
+function initialiserListePriorite() {
+
+    if (!cardPriorite) {
+        return;
+    }
+
+
+    const valeurActuelle =
+        String(
+            cardPriorite.value || ""
+        ).toLowerCase();
+
+
+    cardPriorite.innerHTML =
+        "";
+
+
+    const optionVide =
+        document.createElement("option");
+
+    optionVide.value =
+        "";
+
+    optionVide.textContent =
+        "Aucune priorité";
+
+    cardPriorite.appendChild(
+        optionVide
+    );
+
+
+    PRIORITES.forEach(
+        priorite => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                priorite.value;
+
+            option.textContent =
+                priorite.label;
+
+            cardPriorite.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    if (
+        PRIORITES.some(
+            priorite =>
+                priorite.value ===
+                valeurActuelle
+        )
+    ) {
+
+        cardPriorite.value =
+            valeurActuelle;
+
+    } else {
+
+        cardPriorite.value =
+            "";
+
+    }
+
+}
+
+
+/* =========================================================
    OUTILS
 ========================================================= */
 
@@ -1006,6 +1100,7 @@ async function chargerDonnees() {
 
 
     remplirListesStats();
+    initialiserListePriorite();
 
     renderTree();
 
@@ -2255,19 +2350,6 @@ async function enregistrerStructure() {
    MODAL CREATION
 ========================================================= */
 
-/*
- * IMPORTANT :
- *
- * On ne réutilise pas ici uniquement les références DOM
- * déclarées au chargement du module.
- *
- * Le modal est recherché au moment exact où l'utilisateur
- * clique sur +.
- *
- * Cela permet d'éviter qu'une référence DOM soit nulle ou
- * obsolète alors que le clic, lui, arrive correctement.
- */
-
 function obtenirElementsModal() {
 
     return {
@@ -2383,20 +2465,11 @@ function ouvrirModalCreation(
     }
 
 
-    /*
-     * Le fonctionnement normal reste basé sur la classe
-     * "visible".
-     */
     modal.classList.add(
         "visible"
     );
 
 
-    /*
-     * Si le CSS de la page ne rend pas immédiatement la
-     * classe visible, on force uniquement l'affichage
-     * du modal.
-     */
     modal.style.display =
         "flex";
 
@@ -2878,13 +2951,41 @@ function ouvrirContenu(id) {
     }
 
 
+    /*
+     * PRIORITÉ
+     *
+     * On recharge uniquement l'une des trois valeurs
+     * autorisées.
+     */
+
+    initialiserListePriorite();
+
+
     if (cardPriorite) {
 
-        cardPriorite.value =
-            item.priorite === null ||
-            item.priorite === undefined
-                ? ""
-                : String(item.priorite);
+        const priorite =
+            String(
+                item.priorite || ""
+            ).toLowerCase();
+
+
+        if (
+            PRIORITES.some(
+                option =>
+                    option.value ===
+                    priorite
+            )
+        ) {
+
+            cardPriorite.value =
+                priorite;
+
+        } else {
+
+            cardPriorite.value =
+                "";
+
+        }
 
     }
 
@@ -3052,12 +3153,35 @@ async function enregistrerContenu() {
             : "";
 
 
-    const priorite =
+    /*
+     * PRIORITÉ
+     *
+     * Une seule valeur parmi :
+     * absolue
+     * prioritaire
+     * secondaire
+     */
+
+    let priorite =
         cardPriorite
             ? String(
-                cardPriorite.value ?? ""
-            ).trim()
+                cardPriorite.value || ""
+            ).trim().toLowerCase()
             : "";
+
+
+    if (
+        !PRIORITES.some(
+            option =>
+                option.value ===
+                priorite
+        )
+    ) {
+
+        priorite =
+            "";
+
+    }
 
 
     const stat1 =
@@ -4464,6 +4588,8 @@ async function initialiser() {
     initialiserEvenementClavier();
 
     initialiserApercuImageContenu();
+
+    initialiserListePriorite();
 
 
     try {
