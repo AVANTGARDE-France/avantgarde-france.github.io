@@ -845,23 +845,346 @@ button {
 }
 
 
-/*
-   Sélection multiple des synergies
-*/
+/* =====================================================
+   SYNERGIES
+===================================================== */
 
-#contentSynergies {
-
-    min-height:
-        150px;
+.synergy-box {
 
     width: 100%;
 
 }
 
-#contentSynergies option {
+.synergy-search {
+
+    width: 100%;
+
+    margin-bottom: 10px;
+
+}
+
+.synergy-search input {
+
+    width: 100%;
+
+    border:
+        1px solid rgba(255,255,255,.14);
+
+    background:
+        #061329;
+
+    color:
+        var(--white);
 
     padding:
-        7px 8px;
+        11px 12px;
+
+    outline: none;
+
+}
+
+.synergy-search input:focus {
+
+    border-color:
+        var(--gold);
+
+}
+
+.synergy-columns {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 12px;
+
+}
+
+.synergy-panel {
+
+    min-width: 0;
+
+    border:
+        1px solid rgba(255,255,255,.12);
+
+    background:
+        rgba(6,19,41,.65);
+
+}
+
+.synergy-panel-header {
+
+    min-height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding:
+        9px 11px;
+
+    border-bottom:
+        1px solid rgba(255,255,255,.10);
+
+}
+
+.synergy-panel-title {
+
+    color:
+        var(--gold-light);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: .7px;
+
+}
+
+.synergy-panel-count {
+
+    color:
+        var(--muted);
+
+    font-size: 9px;
+
+    white-space: nowrap;
+
+}
+
+.synergy-list {
+
+    min-height:
+        175px;
+
+    max-height:
+        330px;
+
+    overflow-y: auto;
+
+    padding:
+        5px;
+
+}
+
+.synergy-item {
+
+    width: 100%;
+
+    min-height: 38px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin: 2px 0;
+
+    padding:
+        8px 9px;
+
+    border:
+        1px solid transparent;
+
+    background:
+        rgba(255,255,255,.025);
+
+    color:
+        var(--white);
+
+    text-align: left;
+
+}
+
+.synergy-item:hover {
+
+    border-color:
+        rgba(214,173,85,.35);
+
+    background:
+        rgba(214,173,85,.08);
+
+}
+
+.synergy-item-title {
+
+    flex: 1;
+
+    min-width: 0;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+
+    font-size: 11px;
+
+    line-height: 1.35;
+
+}
+
+.synergy-item-action {
+
+    flex: 0 0 auto;
+
+    color:
+        var(--gold);
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+    letter-spacing: .5px;
+
+}
+
+.synergy-selected-item {
+
+    border-color:
+        rgba(214,173,85,.16);
+
+    background:
+        rgba(214,173,85,.045);
+
+}
+
+.synergy-selected-item .synergy-item-action {
+
+    color:
+        #d99a9a;
+
+}
+
+.synergy-selected-item:hover {
+
+    border-color:
+        rgba(184,59,59,.45);
+
+    background:
+        rgba(184,59,59,.08);
+
+}
+
+.synergy-empty {
+
+    min-height:
+        165px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding:
+        20px;
+
+    color:
+        var(--muted);
+
+    font-size: 10px;
+
+    line-height: 1.5;
+
+    text-align: center;
+
+}
+
+.synergy-footer {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    margin-top: 9px;
+
+}
+
+.synergy-footer-help {
+
+    color:
+        var(--muted);
+
+    font-size: 9px;
+
+    line-height: 1.4;
+
+}
+
+.synergy-clear-button {
+
+    flex: 0 0 auto;
+
+    border:
+        1px solid rgba(184,59,59,.45);
+
+    background:
+        transparent;
+
+    color:
+        #e28a8a;
+
+    padding:
+        7px 10px;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+    letter-spacing: .4px;
+
+}
+
+.synergy-clear-button:hover {
+
+    border-color:
+        rgba(184,59,59,.8);
+
+    background:
+        rgba(184,59,59,.08);
+
+    color:
+        #ffaaaa;
+
+}
+
+.synergy-clear-button:disabled {
+
+    opacity: .35;
+
+    cursor:
+        not-allowed;
+
+}
+
+@media (max-width: 700px) {
+
+    .synergy-columns {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .synergy-list {
+
+        max-height:
+            250px;
+
+    }
 
 }
 
@@ -1780,21 +2103,128 @@ button {
 
                 <div class="field">
 
-                    <label for="contentSynergies">
+                    <label for="synergySearch">
                         SYNERGIES
                     </label>
 
-                    <select
-                        id="contentSynergies"
-                        multiple
-                        size="7"
-                    ></select>
 
-                    <small class="field-help">
-                        Sélectionnez une ou plusieurs autres mesures
-                        liées à cette mesure. Maintenez Ctrl
-                        (ou Cmd sur Mac) pour sélectionner plusieurs éléments.
-                    </small>
+                    <div
+                        id="contentSynergies"
+                        class="synergy-box"
+                    >
+
+
+                        <div class="synergy-search">
+
+                            <input
+                                type="search"
+                                id="synergySearch"
+                                placeholder="Rechercher une mesure…"
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+
+                        <div class="synergy-columns">
+
+
+                            <!-- =================================
+                                 SYNERGIES DISPONIBLES
+                            ================================== -->
+
+                            <div class="synergy-panel">
+
+                                <div class="synergy-panel-header">
+
+                                    <span class="synergy-panel-title">
+                                        MESURES DISPONIBLES
+                                    </span>
+
+                                    <span
+                                        id="synergyAvailableCount"
+                                        class="synergy-panel-count"
+                                    >
+                                        0 mesure
+                                    </span>
+
+                                </div>
+
+
+                                <div
+                                    id="synergyAvailable"
+                                    class="synergy-list"
+                                >
+
+                                    <div class="synergy-empty">
+                                        Aucune mesure disponible.
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 SYNERGIES SELECTIONNEES
+                            ================================== -->
+
+                            <div class="synergy-panel">
+
+                                <div class="synergy-panel-header">
+
+                                    <span class="synergy-panel-title">
+                                        SYNERGIES SÉLECTIONNÉES
+                                    </span>
+
+                                    <span
+                                        id="synergySelectedCount"
+                                        class="synergy-panel-count"
+                                    >
+                                        0 sélectionnée
+                                    </span>
+
+                                </div>
+
+
+                                <div
+                                    id="synergySelected"
+                                    class="synergy-list"
+                                >
+
+                                    <div class="synergy-empty">
+                                        Aucune synergie sélectionnée.
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <div class="synergy-footer">
+
+                            <span class="synergy-footer-help">
+                                Cliquez sur une mesure pour l'ajouter.
+                                Cliquez sur une synergie sélectionnée
+                                pour la retirer.
+                            </span>
+
+
+                            <button
+                                type="button"
+                                id="synergyClearButton"
+                                class="synergy-clear-button"
+                            >
+                                TOUT RETIRER
+                            </button>
+
+                        </div>
+
+
+                    </div>
 
                 </div>
 
