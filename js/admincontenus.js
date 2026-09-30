@@ -18,7 +18,6 @@
 ========================================================= */
 
 import { supabase } from "./supabase.js";
-alert("admincontenus.js est bien chargé");
 
 /* =========================================================
    ETAT
@@ -4178,6 +4177,7 @@ function initialiserEvenementClavier() {
 ========================================================= */
 
 async function initialiser() {
+    alert("initialiser est appelé");
 
     /*
      * Les événements sont installés immédiatement.
