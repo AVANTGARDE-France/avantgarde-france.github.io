@@ -259,7 +259,9 @@ function initialiserApercuImageContenu() {
     function actualiserApercu() {
 
         const url =
-            cardPhoto.value.trim();
+            String(
+                cardPhoto.value || ""
+            ).trim();
 
         contentPhotoPreview.innerHTML =
             "";
@@ -807,11 +809,33 @@ async function verifierAdmin() {
 
 async function chargerDonnees() {
 
+    /*
+     * IMPORTANT :
+     *
+     * Les trois sources principales doivent être chargées
+     * ensemble car elles sont indispensables à l'arbre.
+     *
+     * Les statistiques sont volontairement chargées
+     * séparément.
+     *
+     * Ainsi, une erreur éventuelle sur la table "stats"
+     * ne bloque plus :
+     *
+     * - les menus
+     * - les sous-menus
+     * - les contenus
+     * - les boutons +
+     * - l'édition
+     * - la suppression
+     * - la validation
+     * - l'ordre
+     */
+
+
     const [
         menusResult,
         sousMenusResult,
-        contenusResult,
-        statsResult
+        contenusResult
     ] =
         await Promise.all([
 
@@ -861,28 +885,6 @@ async function chargerDonnees() {
                     {
                         ascending:true
                     }
-                ),
-
-            /*
-             * IMPORTANT :
-             * Cette page n'utilise que l'id et le nom
-             * des statistiques.
-             *
-             * L'ancien champ "lien" pouvait provoquer
-             * l'échec de toute l'initialisation si cette
-             * colonne n'existe plus dans la table stats.
-             */
-            supabase
-                .from("stats")
-                .select(`
-                    id,
-                    nom
-                `)
-                .order(
-                    "nom",
-                    {
-                        ascending:true
-                    }
                 )
 
         ]);
@@ -900,10 +902,6 @@ async function chargerDonnees() {
         throw contenusResult.error;
     }
 
-    if (statsResult.error) {
-        throw statsResult.error;
-    }
-
 
     menus =
         menusResult.data || [];
@@ -914,8 +912,44 @@ async function chargerDonnees() {
     contenus =
         contenusResult.data || [];
 
-    stats =
-        statsResult.data || [];
+
+    /*
+     * Les statistiques ne doivent jamais empêcher
+     * l'affichage et le fonctionnement de l'arbre.
+     *
+     * On ne sélectionne que les deux colonnes réellement
+     * utilisées par cette page.
+     */
+    const statsResult =
+        await supabase
+            .from("stats")
+            .select(`
+                id,
+                nom
+            `)
+            .order(
+                "nom",
+                {
+                    ascending:true
+                }
+            );
+
+
+    if (statsResult.error) {
+
+        console.warn(
+            "STATISTIQUES : chargement impossible.",
+            statsResult.error
+        );
+
+        stats = [];
+
+    } else {
+
+        stats =
+            statsResult.data || [];
+
+    }
 
 
     remplirListesStats();
@@ -946,8 +980,10 @@ function remplirListesStats() {
             const valeurActuelle =
                 select.value || "";
 
+
             select.innerHTML =
                 "";
+
 
             const empty =
                 document.createElement(
@@ -989,8 +1025,10 @@ function remplirListesStats() {
 
 
             if (valeurActuelle) {
+
                 select.value =
                     valeurActuelle;
+
             }
 
         }
@@ -1132,6 +1170,11 @@ function obtenirSynergies() {
 ========================================================= */
 
 function renderTree() {
+
+    if (!tree) {
+        return;
+    }
+
 
     injectTreeStyles();
 
@@ -2322,9 +2365,6 @@ function initialiserEvenementsStructure() {
     }
 
 
-    /*
-     * Bouton ANNULER de l'éditeur de structure.
-     */
     const structureCancelButton =
         document.getElementById(
             "structureCancelButton"
@@ -2634,7 +2674,10 @@ async function creerElement() {
         console.error(error);
 
         showMessage(
-            "Impossible de créer l'élément.",
+            error?.message
+                ? "Impossible de créer l'élément : " +
+                  error.message
+                : "Impossible de créer l'élément.",
             "error"
         );
 
@@ -2758,22 +2801,40 @@ function ouvrirContenu(
 
 
     if (cardAccroche) {
+
         cardAccroche.value =
             item.accroche || "";
+
     }
+
 
     /*
      * PRIORITE
      *
-     * On conserve volontairement la valeur exacte
-     * venant de Supabase.
+     * On force explicitement la conversion en chaîne
+     * afin que la valeur provenant de Supabase soit
+     * correctement affichée quelle que soit sa nature
+     * (integer, numeric, text, etc.).
      */
     if (cardPriorite) {
-        cardPriorite.value =
+
+        if (
             item.priorite !== null &&
             item.priorite !== undefined
-                ? String(item.priorite)
-                : "";
+        ) {
+
+            cardPriorite.value =
+                String(
+                    item.priorite
+                );
+
+        } else {
+
+            cardPriorite.value =
+                "";
+
+        }
+
     }
 
 
@@ -2781,18 +2842,32 @@ function ouvrirContenu(
 
 
     if (cardStat1) {
+
         cardStat1.value =
-            item.stat_1 || "";
+            item.stat_1
+                ? String(item.stat_1)
+                : "";
+
     }
+
 
     if (cardStat2) {
+
         cardStat2.value =
-            item.stat_2 || "";
+            item.stat_2
+                ? String(item.stat_2)
+                : "";
+
     }
 
+
     if (cardStat3) {
+
         cardStat3.value =
-            item.stat_3 || "";
+            item.stat_3
+                ? String(item.stat_3)
+                : "";
+
     }
 
 
@@ -2803,14 +2878,20 @@ function ouvrirContenu(
 
 
     if (wysiwyg) {
+
         wysiwyg.innerHTML =
             item.html || "";
+
     }
 
+
     if (sourceEditor) {
+
         sourceEditor.value =
             item.html || "";
+
     }
+
 
     isSourceMode =
         false;
@@ -2905,22 +2986,32 @@ async function enregistrerContenu() {
 
     const photo =
         cardPhoto
-            ? cardPhoto.value.trim()
-            : null;
+            ? String(
+                cardPhoto.value || ""
+              ).trim()
+            : "";
 
 
     const accroche =
         cardAccroche
-            ? cardAccroche.value.trim()
-            : null;
+            ? String(
+                cardAccroche.value || ""
+              ).trim()
+            : "";
 
 
+    /*
+     * PRIORITE
+     *
+     * On conserve la valeur exacte saisie.
+     * Le champ vide devient NULL en base.
+     */
     const priorite =
         cardPriorite
             ? String(
-                cardPriorite.value
+                cardPriorite.value ?? ""
               ).trim()
-            : null;
+            : "";
 
 
     const stat1 =
@@ -3028,7 +3119,10 @@ async function enregistrerContenu() {
         console.error(error);
 
         showMessage(
-            "Impossible d'enregistrer le contenu.",
+            error.message
+                ? "Impossible d'enregistrer le contenu : " +
+                  error.message
+                : "Impossible d'enregistrer le contenu.",
             "error"
         );
 
@@ -4112,6 +4206,11 @@ async function initialiser() {
 
     try {
 
+        /*
+         * Les événements sont installés AVANT le chargement
+         * Supabase. Une erreur de données ne doit donc pas
+         * empêcher les contrôles de fonctionner.
+         */
         initialiserEvenementsStructure();
 
         initialiserEvenementsEditeur();
@@ -4162,13 +4261,26 @@ async function initialiser() {
         }
 
 
+        /*
+         * On ne désactive le bouton + MENU que si
+         * l'authentification / l'autorisation elle-même
+         * a échoué.
+         *
+         * Une erreur de statistiques ne passe plus ici.
+         */
         const addMenuButton =
             document.getElementById(
                 "addMenuButton"
             );
 
 
-        if (addMenuButton) {
+        if (
+            addMenuButton &&
+            (
+                !currentProfile ||
+                currentProfile.grade !== "admin"
+            )
+        ) {
 
             addMenuButton.disabled =
                 true;
