@@ -2192,10 +2192,143 @@ async function enregistrerStructure() {
    CREATION
 ========================================================= */
 
+function afficherTestModal(
+    texte
+) {
+
+    const ancienTest =
+        document.getElementById(
+            "testClick"
+        );
+
+    if (ancienTest) {
+        ancienTest.remove();
+    }
+
+
+    const testClick =
+        document.createElement(
+            "div"
+        );
+
+
+    testClick.id =
+        "testClick";
+
+
+    testClick.textContent =
+        texte;
+
+
+    testClick.style.position =
+        "fixed";
+
+    testClick.style.top =
+        "20px";
+
+    testClick.style.left =
+        "20px";
+
+    testClick.style.zIndex =
+        "999999";
+
+    testClick.style.background =
+        "#ef4135";
+
+    testClick.style.color =
+        "#ffffff";
+
+    testClick.style.padding =
+        "20px";
+
+    testClick.style.fontSize =
+        "18px";
+
+    testClick.style.fontWeight =
+        "700";
+
+    testClick.style.borderRadius =
+        "6px";
+
+    testClick.style.boxShadow =
+        "0 5px 20px rgba(0,0,0,.5)";
+
+
+    document.body.appendChild(
+        testClick
+    );
+
+}
+
+
+function forcerAffichageModal() {
+
+    if (!structureModal) {
+        return;
+    }
+
+
+    structureModal.style.display =
+        "flex";
+
+    structureModal.style.visibility =
+        "visible";
+
+    structureModal.style.opacity =
+        "1";
+
+    structureModal.style.pointerEvents =
+        "auto";
+
+    structureModal.style.position =
+        "fixed";
+
+    structureModal.style.inset =
+        "0";
+
+    structureModal.style.zIndex =
+        "999999";
+
+
+    const modal =
+        structureModal.querySelector(
+            ".modal"
+        );
+
+
+    if (modal) {
+
+        modal.style.display =
+            "block";
+
+        modal.style.visibility =
+            "visible";
+
+        modal.style.opacity =
+            "1";
+
+        modal.style.position =
+            "relative";
+
+        modal.style.zIndex =
+            "1000000";
+
+    }
+
+}
+
+
 function ouvrirModalCreation(
     type,
     parentId
 ) {
+
+    afficherTestModal(
+        type === "submenu"
+            ? "CLIC SOUS-MENU REÇU"
+            : "CLIC CONTENU REÇU"
+    );
+
 
     if (
         !modalTitle ||
@@ -2241,6 +2374,16 @@ function ouvrirModalCreation(
     );
 
 
+    /*
+     * TEST TEMPORAIRE :
+     * on force directement l'affichage.
+     *
+     * Si la modale apparaît avec ce forçage,
+     * le problème vient du CSS normal de la modale.
+     */
+    forcerAffichageModal();
+
+
     setTimeout(
         () =>
             modalName.focus(),
@@ -2252,72 +2395,10 @@ function ouvrirModalCreation(
 
 function ouvrirCreationMenu() {
 
-    /* =====================================================
-       TEST TEMPORAIRE — VERIFICATION DU CLIC
-    ===================================================== */
-
-    const ancienTest =
-        document.getElementById(
-            "testClick"
-        );
-
-    if (ancienTest) {
-        ancienTest.remove();
-    }
-
-
-    const testClick =
-        document.createElement(
-            "div"
-        );
-
-    testClick.id =
-        "testClick";
-
-    testClick.textContent =
-        "CLIC MENU REÇU";
-
-    testClick.style.position =
-        "fixed";
-
-    testClick.style.top =
-        "20px";
-
-    testClick.style.left =
-        "20px";
-
-    testClick.style.zIndex =
-        "999999";
-
-    testClick.style.background =
-        "#ef4135";
-
-    testClick.style.color =
-        "#ffffff";
-
-    testClick.style.padding =
-        "20px";
-
-    testClick.style.fontSize =
-        "18px";
-
-    testClick.style.fontWeight =
-        "700";
-
-    testClick.style.borderRadius =
-        "6px";
-
-    testClick.style.boxShadow =
-        "0 5px 20px rgba(0,0,0,.5)";
-
-    document.body.appendChild(
-        testClick
+    afficherTestModal(
+        "CLIC MENU REÇU"
     );
 
-
-    /* =====================================================
-       OUVERTURE NORMALE DE LA MODALE
-    ===================================================== */
 
     if (
         !modalTitle ||
@@ -2335,11 +2416,14 @@ function ouvrirCreationMenu() {
     modalParentId =
         null;
 
+
     modalTitle.textContent =
         "NOUVEAU MENU";
 
+
     modalName.value =
         "";
+
 
     modalSaveButton.textContent =
         "CRÉER";
@@ -2348,6 +2432,13 @@ function ouvrirCreationMenu() {
     structureModal.classList.add(
         "visible"
     );
+
+
+    /*
+     * TEST TEMPORAIRE :
+     * on force directement l'affichage.
+     */
+    forcerAffichageModal();
 
 
     setTimeout(
@@ -2367,6 +2458,69 @@ function fermerModal() {
             "visible"
         );
 
+
+        /*
+         * RETRAIT DES FORÇAGES TEMPORAIRES
+         */
+
+        structureModal.style.display =
+            "";
+
+        structureModal.style.visibility =
+            "";
+
+        structureModal.style.opacity =
+            "";
+
+        structureModal.style.pointerEvents =
+            "";
+
+        structureModal.style.position =
+            "";
+
+        structureModal.style.inset =
+            "";
+
+        structureModal.style.zIndex =
+            "";
+
+
+        const modal =
+            structureModal.querySelector(
+                ".modal"
+            );
+
+
+        if (modal) {
+
+            modal.style.display =
+                "";
+
+            modal.style.visibility =
+                "";
+
+            modal.style.opacity =
+                "";
+
+            modal.style.position =
+                "";
+
+            modal.style.zIndex =
+                "";
+
+        }
+
+    }
+
+
+    const testClick =
+        document.getElementById(
+            "testClick"
+        );
+
+
+    if (testClick) {
+        testClick.remove();
     }
 
 
