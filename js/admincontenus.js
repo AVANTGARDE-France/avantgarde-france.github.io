@@ -2252,6 +2252,73 @@ function ouvrirModalCreation(
 
 function ouvrirCreationMenu() {
 
+    /* =====================================================
+       TEST TEMPORAIRE — VERIFICATION DU CLIC
+    ===================================================== */
+
+    const ancienTest =
+        document.getElementById(
+            "testClick"
+        );
+
+    if (ancienTest) {
+        ancienTest.remove();
+    }
+
+
+    const testClick =
+        document.createElement(
+            "div"
+        );
+
+    testClick.id =
+        "testClick";
+
+    testClick.textContent =
+        "CLIC MENU REÇU";
+
+    testClick.style.position =
+        "fixed";
+
+    testClick.style.top =
+        "20px";
+
+    testClick.style.left =
+        "20px";
+
+    testClick.style.zIndex =
+        "999999";
+
+    testClick.style.background =
+        "#ef4135";
+
+    testClick.style.color =
+        "#ffffff";
+
+    testClick.style.padding =
+        "20px";
+
+    testClick.style.fontSize =
+        "18px";
+
+    testClick.style.fontWeight =
+        "700";
+
+    testClick.style.borderRadius =
+        "6px";
+
+    testClick.style.boxShadow =
+        "0 5px 20px rgba(0,0,0,.5)";
+
+    document.body.appendChild(
+        testClick
+    );
+
+
+    /* =====================================================
+       OUVERTURE NORMALE DE LA MODALE
+    ===================================================== */
+
     if (
         !modalTitle ||
         !modalName ||
@@ -2458,6 +2525,7 @@ function initialiserEvenementsStructure() {
                 }
 
             }
+
         );
 
     }
@@ -4177,17 +4245,15 @@ function initialiserEvenementClavier() {
 ========================================================= */
 
 async function initialiser() {
-    alert("initialiser est appelé");
-
-    alert("avant événements structure");
 
     initialiserEvenementsStructure();
 
-    alert("après événements structure");
-
     initialiserEvenementsEditeur();
+
     initialiserEvenementClavier();
+
     initialiserApercuImageContenu();
+
 
     try {
 
