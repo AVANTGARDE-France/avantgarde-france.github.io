@@ -7,9 +7,8 @@
 <meta charset="UTF-8">
 
 <meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
-
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
 >
 
 <title>Avant-gardE — Administration</title>
@@ -40,82 +39,78 @@ content="width=device-width, initial-scale=1.0"
     class="login-container"
 >
 
-<div class="login-box">
+    <div class="login-box">
 
-<div class="login-logo">
+        <div class="login-logo">
 
-```
-<a
-    href="index.html"
-    class="logo"
->
-    <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
-</a>
+            <a
+                href="index.html"
+                class="logo"
+            >
+                <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
+            </a>
 
-<div class="login-subtitle">
-    ESPACE MEMBRE
-</div>
-```
+            <div class="login-subtitle">
+                ESPACE MEMBRE
+            </div>
 
-</div>
+        </div>
 
-<form id="loginForm">
+        <form id="loginForm">
 
-```
-<div class="form-group">
+            <div class="form-group">
 
-    <label for="loginEmail">
-        EMAIL
-    </label>
+                <label for="loginEmail">
+                    EMAIL
+                </label>
 
-    <input
-        type="email"
-        id="loginEmail"
-        required
-        autocomplete="email"
-    >
+                <input
+                    type="email"
+                    id="loginEmail"
+                    required
+                    autocomplete="email"
+                >
 
-</div>
+            </div>
 
-<div class="form-group">
+            <div class="form-group">
 
-    <label for="loginPassword">
-        MOT DE PASSE
-    </label>
+                <label for="loginPassword">
+                    MOT DE PASSE
+                </label>
 
-    <input
-        type="password"
-        id="loginPassword"
-        required
-        autocomplete="current-password"
-    >
+                <input
+                    type="password"
+                    id="loginPassword"
+                    required
+                    autocomplete="current-password"
+                >
 
-</div>
+            </div>
 
-<button
-    type="submit"
-    class="primary-button"
-    id="loginButton"
->
-    SE CONNECTER
-</button>
+            <button
+                type="submit"
+                class="primary-button"
+                id="loginButton"
+            >
+                SE CONNECTER
+            </button>
 
-<a
-    href="index.html"
-    class="secondary-button login-home-button"
->
-    HOME
-</a>
+            <a
+                href="index.html"
+                class="secondary-button login-home-button"
+            >
+                HOME
+            </a>
 
-<div
-    id="loginMessage"
-    class="message"
-></div>
-```
+            <div
+                id="loginMessage"
+                class="message"
+            ></div>
 
-</form>
+        </form>
 
-</div>
+    </div>
 
 </section>
 
@@ -129,1190 +124,1185 @@ content="width=device-width, initial-scale=1.0"
     style="display:none;"
 >
 
-<div class="admin-header">
+    <div class="admin-header">
 
-<div class="admin-header-main">
+        <div class="admin-header-main">
 
-```
-<!-- ===================================================
-     PHOTO DE PROFIL
-==================================================== -->
-
-<div
-    id="adminProfilePhoto"
-    class="admin-header-photo empty"
-    aria-label="Photo de profil"
-></div>
-
-
-<!-- ===================================================
-     TITRE
-==================================================== -->
-
-<div class="admin-header-info">
-
-    <div class="page-kicker">
-        ESPACE MEMBRE
-    </div>
-
-    <h1 class="page-title">
-        MON <span>ESPACE.</span>
-    </h1>
-
-    <div
-        class="admin-user"
-        id="adminUser"
-    ></div>
-
-</div>
-```
-
-</div>
-
-</div>
-
-<!-- =======================================================
-     ONGLETS
-======================================================= -->
-
-<div class="tabs">
-
-<button
-class="tab active"
-data-tab="profileTab"
-
->
-
-```
-PROFIL
-```
-
-</button>
-
-<button
-class="tab"
-id="rdvTabButton"
-data-tab="rdvTab"
-style="display:none"
-
->
-
-```
-RDV
-```
-
-</button>
-
-<button
-class="tab"
-id="teamTabButton"
-data-tab="teamTab"
-
->
-
-```
-GESTION DES EQUIPES
-```
-
-</button>
-
-<button
-class="tab"
-id="roleTabButton"
-data-tab="roleTab"
-style="display:none"
-
->
-
-```
-ROLE
-```
-
-</button>
-
-<!-- ===================================================
-     BASCULE VERS CONTENUS.HTML
-==================================================== -->
-
-<button
-class="tab"
-id="contentProjectTabButton"
-type="button"
-style="display:none"
-onclick="window.location.href='contenus.html'"
-
->
-
-```
-CONTENU PROJET
-```
-
-</button>
-
-<button
-class="tab"
-id="statsTabButton"
-type="button"
-style="display:none"
-onclick="window.location.href='contenus.html#statistiques'"
-
->
-
-```
-STATISTIQUES
-```
-
-</button>
-
-</div>
-
-<!-- =======================================================
-     PROFIL
-======================================================= -->
-
-<div
-    id="profileTab"
-    class="tab-content active"
->
-
-<div class="panel">
-
-```
-<h2 class="panel-title">
-    Mon profil
-</h2>
-
-<p class="panel-intro">
-    Modifiez les informations qui apparaissent sur votre profil.
-    Les modifications sont enregistrées directement dans Supabase.
-</p>
-
-<form id="profileForm">
-
-    <div class="form-group">
-
-        <label>
-            VISIBILITÉ DU PROFIL
-        </label>
-
-        <div class="registration-choice">
-
-            <div class="choice-option">
-
-                <input
-                    type="radio"
-                    id="profileAffiche"
-                    name="profileVisibility"
-                    value="affiche"
-                >
-
-                <label
-                    for="profileAffiche"
-                    class="choice-label"
-                >
-
-                    <strong>
-                        Affiché
-                    </strong>
-
-                    <span>
-                        Votre profil apparaît dans la liste publique des membres.
-                    </span>
-
-                </label>
-
-            </div>
-
-            <div class="choice-option">
-
-                <input
-                    type="radio"
-                    id="profileAnonyme"
-                    name="profileVisibility"
-                    value="anonyme"
-                >
-
-                <label
-                    for="profileAnonyme"
-                    class="choice-label"
-                >
-
-                    <strong>
-                        Anonyme
-                    </strong>
-
-                    <span>
-                        Votre profil est enregistré mais caché de la liste publique.
-                    </span>
-
-                </label>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <div class="profile-grid">
-
-        <div class="form-group">
-
-            <label for="profileNom">
-                PSEUDO OU NOM PRÉNOM
-            </label>
-
-            <input
-                type="text"
-                id="profileNom"
-                maxlength="100"
-                required
-            >
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label for="profileEmail">
-                EMAIL
-            </label>
-
-            <input
-                type="email"
-                id="profileEmail"
-                required
-                autocomplete="email"
-            >
-
-            <div class="help">
-                Cette adresse est également utilisée pour votre connexion.
-            </div>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label for="profileImage">
-                IMAGE
-            </label>
-
-            <input
-                type="url"
-                id="profileImage"
-                placeholder="https://..."
-            >
-
-            <div class="help">
-                Indiquez l’URL d’une image déjà hébergée en ligne.
-            </div>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label for="profileRegion">
-                RÉGION
-            </label>
-
-            <select
-                id="profileRegion"
-                required
-            >
-
-                <option value="">
-                    Sélectionnez votre région
-                </option>
-
-                <optgroup label="France métropolitaine">
-                    <option>Auvergne-Rhône-Alpes</option>
-                    <option>Bourgogne-Franche-Comté</option>
-                    <option>Bretagne</option>
-                    <option>Centre-Val de Loire</option>
-                    <option>Corse</option>
-                    <option>Grand Est</option>
-                    <option>Hauts-de-France</option>
-                    <option>Île-de-France</option>
-                    <option>Normandie</option>
-                    <option>Nouvelle-Aquitaine</option>
-                    <option>Occitanie</option>
-                    <option>Pays de la Loire</option>
-                    <option>Provence-Alpes-Côte d’Azur</option>
-                </optgroup>
-
-                <optgroup label="Outre-mer">
-                    <option>Guadeloupe</option>
-                    <option>Martinique</option>
-                    <option>Guyane</option>
-                    <option>La Réunion</option>
-                    <option>Mayotte</option>
-                </optgroup>
-
-                <optgroup label="Étranger">
-                    <option>Europe</option>
-                    <option>Amérique du Nord</option>
-                    <option>Amérique centrale et Caraïbes</option>
-                    <option>Amérique du Sud</option>
-                    <option>Afrique</option>
-                    <option>Asie</option>
-                    <option>Océanie</option>
-                    <option>Autre</option>
-                </optgroup>
-
-            </select>
-
-        </div>
-
-
-        <div class="form-group full-width">
-
-            <label for="profileDescription">
-                DESCRIPTION
-            </label>
-
-            <textarea
-                id="profileDescription"
-                maxlength="300"
-                placeholder="Présentez-vous en quelques mots..."
-            ></textarea>
+            <!-- ===================================================
+                 PHOTO DE PROFIL
+            ==================================================== -->
 
             <div
-                id="descriptionCounter"
-                class="description-counter"
-            >
-                0 / 300
+                id="adminProfilePhoto"
+                class="admin-header-photo empty"
+                aria-label="Photo de profil"
+            ></div>
+
+            <!-- ===================================================
+                 TITRE
+            ==================================================== -->
+
+            <div class="admin-header-info">
+
+                <div class="page-kicker">
+                    ESPACE MEMBRE
+                </div>
+
+                <h1 class="page-title">
+                    MON <span>ESPACE.</span>
+                </h1>
+
+                <div
+                    class="admin-user"
+                    id="adminUser"
+                ></div>
+
             </div>
 
         </div>
 
     </div>
 
+    <!-- =======================================================
+         ONGLETS
+    ======================================================= -->
 
-    <div class="social-title">
-        Réseaux sociaux
-    </div>
+    <div class="tabs">
 
-    <div class="social-intro">
-        Ajoutez les liens vers vos réseaux sociaux.
-        Ils apparaîtront sous forme d’icônes sur votre profil public.
-        Laissez un champ vide si vous ne souhaitez pas afficher ce réseau.
-    </div>
-
-    <div class="social-grid">
-
-        <div class="form-group">
-            <label for="profileFacebook">FACEBOOK</label>
-            <input
-                type="url"
-                id="profileFacebook"
-                placeholder="https://www.facebook.com/..."
-            >
-        </div>
-
-        <div class="form-group">
-            <label for="profileX">X</label>
-            <input
-                type="url"
-                id="profileX"
-                placeholder="https://x.com/..."
-            >
-        </div>
-
-        <div class="form-group">
-            <label for="profileInstagram">INSTAGRAM</label>
-            <input
-                type="url"
-                id="profileInstagram"
-                placeholder="https://www.instagram.com/..."
-            >
-        </div>
-
-        <div class="form-group">
-            <label for="profileYoutube">YOUTUBE</label>
-            <input
-                type="url"
-                id="profileYoutube"
-                placeholder="https://www.youtube.com/..."
-            >
-        </div>
-
-        <div class="form-group">
-            <label for="profileTiktok">TIKTOK</label>
-            <input
-                type="url"
-                id="profileTiktok"
-                placeholder="https://www.tiktok.com/@..."
-            >
-        </div>
-
-    </div>
-
-
-    <div class="vip-title">
-        Médaille VIP
-    </div>
-
-    <div class="vip-intro">
-        <i>
-            (la maj de l'audience de vos réseaux peut prendre plusieurs jours. Patientez)
-        </i>
-    </div>
-
-    <div
-        id="vipMedal"
-        class="vip-medal"
-    >
-
-        <div
-            class="vip-medal-icon"
-            aria-hidden="true"
+        <button
+            class="tab active"
+            data-tab="profileTab"
         >
-            ★
+            PROFIL
+        </button>
+
+        <button
+            class="tab"
+            id="rdvTabButton"
+            data-tab="rdvTab"
+            style="display:none"
+        >
+            RDV
+        </button>
+
+        <button
+            class="tab"
+            id="teamTabButton"
+            data-tab="teamTab"
+        >
+            GESTION DES EQUIPES
+        </button>
+
+        <button
+            class="tab"
+            id="roleTabButton"
+            data-tab="roleTab"
+            style="display:none"
+        >
+            ROLE
+        </button>
+
+        <!-- ===================================================
+             ACCÈS À CONTENUS.HTML
+        ==================================================== -->
+
+        <button
+            class="tab"
+            id="contentProjectTabButton"
+            type="button"
+            onclick="window.location.href='contenus.html'"
+        >
+            CONTENU PROJET
+        </button>
+
+        <button
+            class="tab"
+            id="statsTabButton"
+            type="button"
+            onclick="window.location.href='contenus.html#statistiques'"
+        >
+            STATISTIQUES
+        </button>
+
+    </div>
+
+    <!-- =======================================================
+         PROFIL
+    ======================================================= -->
+
+    <div
+        id="profileTab"
+        class="tab-content active"
+    >
+
+        <div class="panel">
+
+            <h2 class="panel-title">
+                Mon profil
+            </h2>
+
+            <p class="panel-intro">
+                Modifiez les informations qui apparaissent sur votre profil.
+                Les modifications sont enregistrées directement dans Supabase.
+            </p>
+
+            <form id="profileForm">
+
+                <div class="form-group">
+
+                    <label>
+                        VISIBILITÉ DU PROFIL
+                    </label>
+
+                    <div class="registration-choice">
+
+                        <div class="choice-option">
+
+                            <input
+                                type="radio"
+                                id="profileAffiche"
+                                name="profileVisibility"
+                                value="affiche"
+                            >
+
+                            <label
+                                for="profileAffiche"
+                                class="choice-label"
+                            >
+
+                                <strong>
+                                    Affiché
+                                </strong>
+
+                                <span>
+                                    Votre profil apparaît dans la liste publique des membres.
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                        <div class="choice-option">
+
+                            <input
+                                type="radio"
+                                id="profileAnonyme"
+                                name="profileVisibility"
+                                value="anonyme"
+                            >
+
+                            <label
+                                for="profileAnonyme"
+                                class="choice-label"
+                            >
+
+                                <strong>
+                                    Anonyme
+                                </strong>
+
+                                <span>
+                                    Votre profil est enregistré mais caché de la liste publique.
+                                </span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="profile-grid">
+
+                    <div class="form-group">
+
+                        <label for="profileNom">
+                            PSEUDO OU NOM PRÉNOM
+                        </label>
+
+                        <input
+                            type="text"
+                            id="profileNom"
+                            maxlength="100"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="profileEmail">
+                            EMAIL
+                        </label>
+
+                        <input
+                            type="email"
+                            id="profileEmail"
+                            required
+                            autocomplete="email"
+                        >
+
+                        <div class="help">
+                            Cette adresse est également utilisée pour votre connexion.
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="profileImage">
+                            IMAGE
+                        </label>
+
+                        <input
+                            type="url"
+                            id="profileImage"
+                            placeholder="https://..."
+                        >
+
+                        <div class="help">
+                            Indiquez l’URL d’une image déjà hébergée en ligne.
+                        </div>
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="profileRegion">
+                            RÉGION
+                        </label>
+
+                        <select
+                            id="profileRegion"
+                            required
+                        >
+
+                            <option value="">
+                                Sélectionnez votre région
+                            </option>
+
+                            <optgroup label="France métropolitaine">
+                                <option>Auvergne-Rhône-Alpes</option>
+                                <option>Bourgogne-Franche-Comté</option>
+                                <option>Bretagne</option>
+                                <option>Centre-Val de Loire</option>
+                                <option>Corse</option>
+                                <option>Grand Est</option>
+                                <option>Hauts-de-France</option>
+                                <option>Île-de-France</option>
+                                <option>Normandie</option>
+                                <option>Nouvelle-Aquitaine</option>
+                                <option>Occitanie</option>
+                                <option>Pays de la Loire</option>
+                                <option>Provence-Alpes-Côte d’Azur</option>
+                            </optgroup>
+
+                            <optgroup label="Outre-mer">
+                                <option>Guadeloupe</option>
+                                <option>Martinique</option>
+                                <option>Guyane</option>
+                                <option>La Réunion</option>
+                                <option>Mayotte</option>
+                            </optgroup>
+
+                            <optgroup label="Étranger">
+                                <option>Europe</option>
+                                <option>Amérique du Nord</option>
+                                <option>Amérique centrale et Caraïbes</option>
+                                <option>Amérique du Sud</option>
+                                <option>Afrique</option>
+                                <option>Asie</option>
+                                <option>Océanie</option>
+                                <option>Autre</option>
+                            </optgroup>
+
+                        </select>
+
+                    </div>
+
+                    <div class="form-group full-width">
+
+                        <label for="profileDescription">
+                            DESCRIPTION
+                        </label>
+
+                        <textarea
+                            id="profileDescription"
+                            maxlength="300"
+                            placeholder="Présentez-vous en quelques mots..."
+                        ></textarea>
+
+                        <div
+                            id="descriptionCounter"
+                            class="description-counter"
+                        >
+                            0 / 300
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="social-title">
+                    Réseaux sociaux
+                </div>
+
+                <div class="social-intro">
+                    Ajoutez les liens vers vos réseaux sociaux.
+                    Ils apparaîtront sous forme d’icônes sur votre profil public.
+                    Laissez un champ vide si vous ne souhaitez pas afficher ce réseau.
+                </div>
+
+                <div class="social-grid">
+
+                    <div class="form-group">
+                        <label for="profileFacebook">FACEBOOK</label>
+
+                        <input
+                            type="url"
+                            id="profileFacebook"
+                            placeholder="https://www.facebook.com/..."
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profileX">X</label>
+
+                        <input
+                            type="url"
+                            id="profileX"
+                            placeholder="https://x.com/..."
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profileInstagram">INSTAGRAM</label>
+
+                        <input
+                            type="url"
+                            id="profileInstagram"
+                            placeholder="https://www.instagram.com/..."
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profileYoutube">YOUTUBE</label>
+
+                        <input
+                            type="url"
+                            id="profileYoutube"
+                            placeholder="https://www.youtube.com/..."
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profileTiktok">TIKTOK</label>
+
+                        <input
+                            type="url"
+                            id="profileTiktok"
+                            placeholder="https://www.tiktok.com/@..."
+                        >
+                    </div>
+
+                </div>
+
+                <div class="vip-title">
+                    Médaille VIP
+                </div>
+
+                <div class="vip-intro">
+                    <i>
+                        (la maj de l'audience de vos réseaux peut prendre plusieurs jours. Patientez)
+                    </i>
+                </div>
+
+                <div
+                    id="vipMedal"
+                    class="vip-medal"
+                >
+
+                    <div
+                        class="vip-medal-icon"
+                        aria-hidden="true"
+                    >
+                        ★
+                    </div>
+
+                    <div class="vip-medal-text">
+
+                        <strong>
+                            VIP
+                        </strong>
+
+                        <span>
+                            Médaille attribuée automatiquement lorsque
+                            votre audience maximale atteint au moins 3 000 followers.
+                        </span>
+
+                        <div
+                            id="vipAudience"
+                            class="vip-audience"
+                        >
+                            Audience actuelle : —
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="section-title">
+                    Auto-évaluation talents ou compétences métier
+                </div>
+
+                <div
+                    class="help"
+                    style="margin-bottom:10px;"
+                >
+                    Sélectionnez les compétences que vous souhaitez mettre en avant.
+                    Passez la souris sur une compétence pour afficher son détail.
+                </div>
+
+                <div class="competence-group">
+
+                    <div class="competence-group-title">
+                        Compétences métier
+                    </div>
+
+                    <div class="competence">
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="competences"
+                                value="Maîtrise de doctrine"
+                            >
+
+                            <span class="competence-name">
+                                Maîtrise de doctrine
+                            </span>
+                        </label>
+
+                        <div class="competence-info">
+                            capacité à préserver la fidélité à l’idéologie d'Avant-Garde
+                            et sa cohérence dans l’action du mouvement.
+                        </div>
+                    </div>
+
+                    <div class="competence">
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="competences"
+                                value="Tactique"
+                            >
+
+                            <span class="competence-name">
+                                Tactique
+                            </span>
+                        </label>
+
+                        <div class="competence-info">
+                            capacité à concevoir et mettre en œuvre des tactiques
+                            efficaces de développement d’audience, médiatique et
+                            électorale, sans renier l’idéologie.
+                        </div>
+                    </div>
+
+                    <div class="competence">
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="competences"
+                                value="Prestance"
+                            >
+
+                            <span class="competence-name">
+                                Prestance
+                            </span>
+                        </label>
+
+                        <div class="competence-info">
+                            capacité à séduire et convaincre par la parole,
+                            le charisme, le charme ou la culture.
+                        </div>
+                    </div>
+
+                    <div class="competence">
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="competences"
+                                value="Analyses pragmatiques"
+                            >
+
+                            <span class="competence-name">
+                                Analyses pragmatiques
+                            </span>
+                        </label>
+
+                        <div class="competence-info">
+                            capacité à analyser les données, les rendements,
+                            les conséquences et les rapports de force. anticipent
+                            les évolutions et privilégient les faits.
+                        </div>
+                    </div>
+
+                    <div class="competence">
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="competences"
+                                value="Analyses populistes"
+                            >
+
+                            <span class="competence-name">
+                                Analyses populistes
+                            </span>
+                        </label>
+
+                        <div class="competence-info">
+                            capacité à analyser les ressentis, aspirations et
+                            frustrations populaires. anticipent les réactions
+                            naturelles et privilégient le vécu et l’opinion du peuple.
+                        </div>
+                    </div>
+
+                    <div class="competence">
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="competences"
+                                value="Administration"
+                            >
+
+                            <span class="competence-name">
+                                Administration
+                            </span>
+                        </label>
+
+                        <div class="competence-info">
+                            maîtrise de la gestion des structures, des ressources
+                            techniques et opérationnelles et des équipes internes.
+                        </div>
+                    </div>
+
+                    <div class="competence">
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="competences"
+                                value="Expertise et ingénierie juridique"
+                            >
+
+                            <span class="competence-name">
+                                Expertise et ingénierie juridique
+                            </span>
+                        </label>
+
+                        <div class="competence-info">
+                            maîtrise du droit français et européen ainsi que des
+                            mécanismes juridiques, avec capacité à en analyser les
+                            règles, les contraintes, les failles et les possibilités
+                            d’évolution.
+                        </div>
+                    </div>
+
+                    <div class="competence">
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="competences"
+                                value="Expertise et ingénierie politique"
+                            >
+
+                            <span class="competence-name">
+                                Expertise et ingénierie politique
+                            </span>
+                        </label>
+
+                        <div class="competence-info">
+                            maîtrise d’un domaine politique ou institutionnel
+                            particulier et capacité à en apporter l’expertise.
+                        </div>
+                    </div>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                    id="saveProfileButton"
+                >
+                    ENREGISTRER LES MODIFICATIONS
+                </button>
+
+                <div
+                    id="profileMessage"
+                    class="message"
+                ></div>
+
+            </form>
+
         </div>
 
-        <div class="vip-medal-text">
+        <div class="panel delete-panel">
 
-            <strong>
-                VIP
-            </strong>
+            <h3>
+                Supprimer ma page
+            </h3>
 
-            <span>
-                Médaille attribuée automatiquement lorsque
-                votre audience maximale atteint au moins 3 000 followers.
-            </span>
+            <p>
+                Cette action supprimera définitivement votre profil public
+                de l’Avant-gardE. Cette opération est irréversible.
+            </p>
+
+            <button
+                type="button"
+                class="delete-button"
+                id="openDeleteModal"
+            >
+                SUPPRIMER MA PAGE
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- =======================================================
+         EVENEMENTS
+    ======================================================= -->
+
+    <div
+        id="rdvTab"
+        class="tab-content"
+    >
+
+        <div class="panel">
+
+            <h2 class="panel-title">
+                Les Evènements Avant-gardE
+            </h2>
+
+            <p
+                class="panel-intro"
+                style="margin-bottom:15px;"
+            >
+                Vous êtes connectés en tant qu’administrateur.
+                Ajoutez, modifiez ou supprimez les évènements affichés sur le site.
+                Les évènements sont automatiquement classés par ordre chronologique.
+            </p>
+
+            <form id="eventForm">
+
+                <input
+                    type="hidden"
+                    id="eventId"
+                >
+
+                <div class="profile-grid">
+
+                    <div class="form-group">
+                        <label for="eventTitle">TITRE COURT</label>
+
+                        <input
+                            type="text"
+                            id="eventTitle"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventDate">DATE</label>
+
+                        <input
+                            type="date"
+                            id="eventDate"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventTime">HEURE</label>
+
+                        <input
+                            type="text"
+                            id="eventTime"
+                            placeholder="20h00"
+                        >
+                    </div>
+
+                    <div class="form-group">
+
+                        <label for="eventPlace">
+                            VILLE (indiquez l'adresse exacte en description)
+                        </label>
+
+                        <input
+                            type="text"
+                            id="eventPlace"
+                        >
+                    </div>
+
+                    <div class="form-group full-width">
+
+                        <label for="eventText">
+                            DESCRIPTION
+                        </label>
+
+                        <textarea id="eventText"></textarea>
+
+                    </div>
+
+                    <div class="form-group full-width">
+
+                        <label for="eventLink">
+                            LIEN
+                        </label>
+
+                        <input
+                            type="url"
+                            id="eventLink"
+                            placeholder="https://..."
+                        >
+
+                    </div>
+
+                    <div class="form-group">
+
+                        <label>
+                            STATUT
+                        </label>
+
+                        <label
+                            style="
+                                display:flex;
+                                align-items:center;
+                                gap:8px;
+                                font-weight:normal;
+                                margin-top:10px;
+                            "
+                        >
+
+                            <input
+                                type="checkbox"
+                                id="eventActive"
+                                checked
+                            >
+
+                            <span
+                                style="
+                                    font-family:Arial,sans-serif;
+                                    font-size:10px;
+                                "
+                            >
+                                Evènement actif
+                            </span>
+
+                        </label>
+
+                    </div>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                    id="eventSubmitButton"
+                >
+                    AJOUTER L'ÉVÈNEMENT
+                </button>
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    id="eventCancelButton"
+                    style="display:none;margin-top:8px;width:100%;"
+                >
+                    ANNULER LA MODIFICATION
+                </button>
+
+                <div
+                    id="eventMessage"
+                    class="message"
+                ></div>
+
+            </form>
 
             <div
-                id="vipAudience"
-                class="vip-audience"
-            >
-                Audience actuelle : —
-            </div>
+                class="event-list"
+                id="eventList"
+            ></div>
 
         </div>
 
     </div>
 
-
-    <div class="section-title">
-        Auto-évaluation talents ou compétences métier
-    </div>
+    <!-- =======================================================
+         GESTION DES EQUIPES
+    ======================================================= -->
 
     <div
-        class="help"
-        style="margin-bottom:10px;"
+        id="teamTab"
+        class="tab-content"
     >
-        Sélectionnez les compétences que vous souhaitez mettre en avant.
-        Passez la souris sur une compétence pour afficher son détail.
-    </div>
 
-    <div class="competence-group">
+        <div class="panel">
 
-        <div class="competence-group-title">
-            Compétences métier
+            <div class="team-role">
+
+                <h2 class="team-role-title">
+                    Architecte du Projet
+                </h2>
+
+                <p class="team-role-text">
+                    Garant de l’idéologie, de la doctrine, de la stratégie et de
+                    l’identité du mouvement.<br>
+                    Il veille à la continuité de ses principes fondateurs, à la
+                    cohérence de sa ligne idéologique et au respect de ses orientations
+                    fondamentales. Il constitue l’autorité de référence en matière doctrinale.
+                </p>
+
+                <div
+                    id="founderPermissionMessage"
+                    class="team-permission"
+                ></div>
+
+                <input
+                    type="text"
+                    id="founderSearch"
+                    class="team-search"
+                    placeholder="Rechercher un membre..."
+                    autocomplete="off"
+                >
+
+                <div
+                    id="founderResults"
+                    class="team-search-results"
+                ></div>
+
+                <div
+                    id="founderSelected"
+                    class="team-selected"
+                ></div>
+
+                <div
+                    id="founderMessage"
+                    class="message"
+                ></div>
+
+            </div>
+
+            <div class="team-role">
+
+                <h2 class="team-role-title">
+                    Délégué National
+                </h2>
+
+                <p class="team-role-text">
+                    Secrétaire général et trésorier du mouvement. Il est le
+                    porte-parole officiel du mouvement.<br>
+                    Il représente et met en œuvre la ligne stratégique du
+                    mouvement à l’échelle nationale, assure sa direction administrative et
+                    financière, coordonne les structures territoriales et veille à l’application
+                    des orientations définies par le mouvement.
+                </p>
+
+                <div
+                    id="nationalPermissionMessage"
+                    class="team-permission"
+                ></div>
+
+                <input
+                    type="text"
+                    id="nationalSearch"
+                    class="team-search"
+                    placeholder="Rechercher un membre..."
+                    autocomplete="off"
+                >
+
+                <div
+                    id="nationalResults"
+                    class="team-search-results"
+                ></div>
+
+                <div
+                    id="nationalSelected"
+                    class="team-selected"
+                ></div>
+
+                <div
+                    id="nationalMessage"
+                    class="message"
+                ></div>
+
+            </div>
+
         </div>
 
-        <div class="competence">
-            <label>
-                <input
-                    type="checkbox"
-                    name="competences"
-                    value="Maîtrise de doctrine"
-                >
-                <span class="competence-name">
-                    Maîtrise de doctrine
-                </span>
-            </label>
-            <div class="competence-info">
-                capacité à préserver la fidélité à l’idéologie d'Avant-Garde
-                et sa cohérence dans l’action du mouvement.
-            </div>
-        </div>
+        <div class="panel">
 
-        <div class="competence">
-            <label>
-                <input
-                    type="checkbox"
-                    name="competences"
-                    value="Tactique"
-                >
-                <span class="competence-name">
-                    Tactique
-                </span>
-            </label>
-            <div class="competence-info">
-                capacité à concevoir et mettre en œuvre des tactiques
-                efficaces de développement d’audience, médiatique et
-                électorale, sans renier l’idéologie.
-            </div>
-        </div>
+            <h2 class="panel-title">
+                Délégués régionaux et leurs équipes
+            </h2>
 
-        <div class="competence">
-            <label>
-                <input
-                    type="checkbox"
-                    name="competences"
-                    value="Prestance"
-                >
-                <span class="competence-name">
-                    Prestance
-                </span>
-            </label>
-            <div class="competence-info">
-                capacité à séduire et convaincre par la parole,
-                le charisme, le charme ou la culture.
-            </div>
-        </div>
+            <p class="panel-intro">
+                Ils représentent le mouvement à l’échelle régionale ou départementale.
+                Ils assistent le Délégué national dans ses missions, notamment administratives
+                et financières. Ils coordonnent l’action territoriale, animent les structures
+                locales et assurent le relais entre le niveau national et les membres de leur
+                territoire. Ils peuvent avoir des missions spécifiques dans le cadre de leurs
+                talents ou compétences. Leur nombre et leur répartition territoriale ne sont
+                pas définis de manière rigide.
+            </p>
 
-        <div class="competence">
-            <label>
-                <input
-                    type="checkbox"
-                    name="competences"
-                    value="Analyses pragmatiques"
-                >
-                <span class="competence-name">
-                    Analyses pragmatiques
-                </span>
-            </label>
-            <div class="competence-info">
-                capacité à analyser les données, les rendements,
-                les conséquences et les rapports de force. anticipent
-                les évolutions et privilégient les faits.
-            </div>
-        </div>
+            <div
+                id="teamRegions"
+                class="team-regions"
+            ></div>
 
-        <div class="competence">
-            <label>
-                <input
-                    type="checkbox"
-                    name="competences"
-                    value="Analyses populistes"
-                >
-                <span class="competence-name">
-                    Analyses populistes
-                </span>
-            </label>
-            <div class="competence-info">
-                capacité à analyser les ressentis, aspirations et
-                frustrations populaires. anticipent les réactions
-                naturelles et privilégient le vécu et l’opinion du peuple.
-            </div>
-        </div>
+            <div
+                id="teamRegionPanels"
+            ></div>
 
-        <div class="competence">
-            <label>
-                <input
-                    type="checkbox"
-                    name="competences"
-                    value="Administration"
-                >
-                <span class="competence-name">
-                    Administration
-                </span>
-            </label>
-            <div class="competence-info">
-                maîtrise de la gestion des structures, des ressources
-                techniques et opérationnelles et des équipes internes.
-            </div>
-        </div>
-
-        <div class="competence">
-            <label>
-                <input
-                    type="checkbox"
-                    name="competences"
-                    value="Expertise et ingénierie juridique"
-                >
-                <span class="competence-name">
-                    Expertise et ingénierie juridique
-                </span>
-            </label>
-            <div class="competence-info">
-                maîtrise du droit français et européen ainsi que des
-                mécanismes juridiques, avec capacité à en analyser les
-                règles, les contraintes, les failles et les possibilités
-                d’évolution.
-            </div>
-        </div>
-
-        <div class="competence">
-            <label>
-                <input
-                    type="checkbox"
-                    name="competences"
-                    value="Expertise et ingénierie politique"
-                >
-                <span class="competence-name">
-                    Expertise et ingénierie politique
-                </span>
-            </label>
-            <div class="competence-info">
-                maîtrise d’un domaine politique ou institutionnel
-                particulier et capacité à en apporter l’expertise.
-            </div>
         </div>
 
     </div>
 
-
-    <button
-        type="submit"
-        class="primary-button"
-        id="saveProfileButton"
-    >
-        ENREGISTRER LES MODIFICATIONS
-    </button>
+    <!-- =======================================================
+         ROLE
+    ======================================================= -->
 
     <div
-        id="profileMessage"
-        class="message"
-    ></div>
-
-</form>
-```
-
-</div>
-
-<div class="panel delete-panel">
-
-```
-<h3>
-    Supprimer ma page
-</h3>
-
-<p>
-    Cette action supprimera définitivement votre profil public
-    de l’Avant-gardE. Cette opération est irréversible.
-</p>
-
-<button
-    type="button"
-    class="delete-button"
-    id="openDeleteModal"
->
-    SUPPRIMER MA PAGE
-</button>
-```
-
-</div>
-
-</div>
-
-<!-- =======================================================
-     EVENEMENTS
-======================================================= -->
-
-<div
-    id="rdvTab"
-    class="tab-content"
->
-
-<div class="panel">
-
-```
-<h2 class="panel-title">
-    Les Evènements Avant-gardE
-</h2>
-
-<p
-    class="panel-intro"
-    style="margin-bottom:15px;"
->
-    Vous êtes connectés en tant qu’administrateur.
-    Ajoutez, modifiez ou supprimez les évènements affichés sur le site.
-    Les évènements sont automatiquement classés par ordre chronologique.
-</p>
-
-<form id="eventForm">
-
-    <input
-        type="hidden"
-        id="eventId"
+        id="roleTab"
+        class="tab-content"
     >
 
-    <div class="profile-grid">
+        <div class="panel">
 
-        <div class="form-group">
-            <label for="eventTitle">TITRE COURT</label>
-            <input
-                type="text"
-                id="eventTitle"
-                required
+            <h2 class="panel-title">
+                Mes rôles
+            </h2>
+
+            <p class="panel-intro">
+                Sélectionnez les rôles que vous souhaitez exercer au sein
+                d’Avant-gardE. Vous pouvez sélectionner plusieurs rôles.
+                Passez la souris sur un rôle pour afficher son détail.
+            </p>
+
+            <div class="competence-group">
+
+                <div class="competence-group-title">
+                    Rôles
+                </div>
+
+                <div class="competence">
+
+                    <label>
+
+                        <input
+                            type="checkbox"
+                            name="roles"
+                            value="Organisateurs de terrain"
+                        >
+
+                        <span class="competence-name">
+                            Organisateurs de terrain
+                        </span>
+
+                    </label>
+
+                    <div class="competence-info">
+                        organisent et gèrent de A à Z des actions ou événements
+                        destinés à promouvoir, médiatiser ou animer la communauté.
+                    </div>
+
+                </div>
+
+                <div class="competence">
+
+                    <label>
+
+                        <input
+                            type="checkbox"
+                            name="roles"
+                            value="Conférenciers"
+                        >
+
+                        <span class="competence-name">
+                            Conférenciers
+                        </span>
+
+                    </label>
+
+                    <div class="competence-info">
+                        transmettent l’idéologie et transforment les sympathisants
+                        en ressources militantes formées et convaincues.
+                    </div>
+
+                </div>
+
+                <div class="competence">
+
+                    <label>
+
+                        <input
+                            type="checkbox"
+                            name="roles"
+                            value="Influenceurs Réseaux Sociaux"
+                        >
+
+                        <span class="competence-name">
+                            Influenceurs Réseaux Sociaux
+                        </span>
+
+                    </label>
+
+                    <div class="competence-info">
+                        développent une audience, influencent les comportements,
+                        déconstruisent les arguments ou manipulations et produisent
+                        des contenus permettant de diffuser et de défendre les idées
+                        du mouvement.
+                    </div>
+
+                </div>
+
+                <div class="competence">
+
+                    <label>
+
+                        <input
+                            type="checkbox"
+                            name="roles"
+                            value="Parrains/marraines"
+                        >
+
+                        <span class="competence-name">
+                            Parrains/marraines
+                        </span>
+
+                    </label>
+
+                    <div class="competence-info">
+                        prospectent, identifient, abordent, échangent, accompagnent
+                        et parrainent de futurs adhérents.
+                    </div>
+
+                </div>
+
+                <div class="competence">
+
+                    <label>
+
+                        <input
+                            type="checkbox"
+                            name="roles"
+                            value="Militants"
+                        >
+
+                        <span class="competence-name">
+                            Militants
+                        </span>
+
+                    </label>
+
+                    <div class="competence-info">
+                        entretiennent et font vivre la communauté à différentes
+                        échelles, en ligne comme lors d’événements. Peuvent être
+                        modérateurs, commentateurs ou simplement participer activement
+                        aux actions du mouvement.
+                    </div>
+
+                </div>
+
+            </div>
+
+            <button
+                type="button"
+                class="primary-button"
+                id="saveRolesButton"
             >
+                ENREGISTRER MES RÔLES
+            </button>
+
+            <div
+                id="roleMessage"
+                class="message"
+            ></div>
+
         </div>
 
-        <div class="form-group">
-            <label for="eventDate">DATE</label>
-            <input
-                type="date"
-                id="eventDate"
-                required
+    </div>
+
+    <!-- =======================================================
+         MODAL SUPPRESSION PROFIL
+    ======================================================= -->
+
+    <div
+        class="modal"
+        id="deleteModal"
+    >
+
+        <div class="modal-box">
+
+            <button
+                type="button"
+                class="modal-close"
+                id="closeDeleteModal"
             >
-        </div>
+                ×
+            </button>
 
-        <div class="form-group">
-            <label for="eventTime">HEURE</label>
-            <input
-                type="text"
-                id="eventTime"
-                placeholder="20h00"
-            >
-        </div>
+            <h2>
+                Supprimer ma page ?
+            </h2>
 
-        <div class="form-group">
-            <label for="eventPlace">
-                VILLE (indiquez l'adresse exacte en description)
-            </label>
-            <input
-                type="text"
-                id="eventPlace"
-            >
-        </div>
+            <p>
+                Cette action est définitive. Votre profil sera supprimé
+                de la table <strong>profiles</strong>.
+            </p>
 
-        <div class="form-group full-width">
-            <label for="eventText">DESCRIPTION</label>
-            <textarea id="eventText"></textarea>
-        </div>
+            <p>
+                Pour confirmer, saisissez exactement :
+            </p>
 
-        <div class="form-group full-width">
-            <label for="eventLink">LIEN</label>
-            <input
-                type="url"
-                id="eventLink"
-                placeholder="https://..."
-            >
-        </div>
-
-        <div class="form-group">
-
-            <label>
-                STATUT
-            </label>
-
-            <label
+            <p
                 style="
-                    display:flex;
-                    align-items:center;
-                    gap:8px;
-                    font-weight:normal;
-                    margin-top:10px;
+                    text-align:center;
+                    color:var(--gold-light);
+                    font-family:Arial,sans-serif;
+                    font-weight:bold;
+                    letter-spacing:2px;
                 "
             >
+                SUPPRIMER
+            </p>
 
-                <input
-                    type="checkbox"
-                    id="eventActive"
-                    checked
-                >
-
-                <span
-                    style="
-                        font-family:Arial,sans-serif;
-                        font-size:10px;
-                    "
-                >
-                    Evènement actif
-                </span>
-
-            </label>
-
-        </div>
-
-    </div>
-
-    <button
-        type="submit"
-        class="primary-button"
-        id="eventSubmitButton"
-    >
-        AJOUTER L'ÉVÈNEMENT
-    </button>
-
-    <button
-        type="button"
-        class="secondary-button"
-        id="eventCancelButton"
-        style="display:none;margin-top:8px;width:100%;"
-    >
-        ANNULER LA MODIFICATION
-    </button>
-
-    <div
-        id="eventMessage"
-        class="message"
-    ></div>
-
-</form>
-
-<div
-    class="event-list"
-    id="eventList"
-></div>
-```
-
-</div>
-
-</div>
-
-<!-- =======================================================
-     GESTION DES EQUIPES
-======================================================= -->
-
-<div
-    id="teamTab"
-    class="tab-content"
->
-
-<div class="panel">
-
-```
-<div class="team-role">
-
-    <h2 class="team-role-title">
-        Architecte du Projet
-    </h2>
-
-    <p class="team-role-text">
-        Garant de l’idéologie, de la doctrine, de la stratégie et de
-        l’identité du mouvement.<br>
-        Il veille à la continuité de ses principes fondateurs, à la
-        cohérence de sa ligne idéologique et au respect de ses orientations
-        fondamentales. Il constitue l’autorité de référence en matière doctrinale.
-    </p>
-
-    <div
-        id="founderPermissionMessage"
-        class="team-permission"
-    ></div>
-
-    <input
-        type="text"
-        id="founderSearch"
-        class="team-search"
-        placeholder="Rechercher un membre..."
-        autocomplete="off"
-    >
-
-    <div
-        id="founderResults"
-        class="team-search-results"
-    ></div>
-
-    <div
-        id="founderSelected"
-        class="team-selected"
-    ></div>
-
-    <div
-        id="founderMessage"
-        class="message"
-    ></div>
-
-</div>
-
-
-<div class="team-role">
-
-    <h2 class="team-role-title">
-        Délégué National
-    </h2>
-
-    <p class="team-role-text">
-        Secrétaire général et trésorier du mouvement. Il est le
-        porte-parole officiel du mouvement.<br>
-        Il représente et met en œuvre la ligne stratégique du
-        mouvement à l’échelle nationale, assure sa direction administrative et
-        financière, coordonne les structures territoriales et veille à l’application
-        des orientations définies par le mouvement.
-    </p>
-
-    <div
-        id="nationalPermissionMessage"
-        class="team-permission"
-    ></div>
-
-    <input
-        type="text"
-        id="nationalSearch"
-        class="team-search"
-        placeholder="Rechercher un membre..."
-        autocomplete="off"
-    >
-
-    <div
-        id="nationalResults"
-        class="team-search-results"
-    ></div>
-
-    <div
-        id="nationalSelected"
-        class="team-selected"
-    ></div>
-
-    <div
-        id="nationalMessage"
-        class="message"
-    ></div>
-
-</div>
-```
-
-</div>
-
-<div class="panel">
-
-```
-<h2 class="panel-title">
-    Délégués régionaux et leurs équipes
-</h2>
-
-<p class="panel-intro">
-    Ils représentent le mouvement à l’échelle régionale ou départementale.
-    Ils assistent le Délégué national dans ses missions, notamment administratives
-    et financières. Ils coordonnent l’action territoriale, animent les structures
-    locales et assurent le relais entre le niveau national et les membres de leur
-    territoire. Ils peuvent avoir des missions spécifiques dans le cadre de leurs
-    talents ou compétences. Leur nombre et leur répartition territoriale ne sont
-    pas définis de manière rigide.
-</p>
-
-<div
-    id="teamRegions"
-    class="team-regions"
-></div>
-
-<div
-    id="teamRegionPanels"
-></div>
-```
-
-</div>
-
-</div>
-
-<!-- =======================================================
-     ROLE
-======================================================= -->
-
-<div
-    id="roleTab"
-    class="tab-content"
->
-
-<div class="panel">
-
-```
-<h2 class="panel-title">
-    Mes rôles
-</h2>
-
-<p class="panel-intro">
-    Sélectionnez les rôles que vous souhaitez exercer au sein
-    d’Avant-gardE. Vous pouvez sélectionner plusieurs rôles.
-    Passez la souris sur un rôle pour afficher son détail.
-</p>
-
-<div class="competence-group">
-
-    <div class="competence-group-title">
-        Rôles
-    </div>
-
-    <div class="competence">
-        <label>
             <input
-                type="checkbox"
-                name="roles"
-                value="Organisateurs de terrain"
+                type="text"
+                id="deleteConfirmation"
+                placeholder="SUPPRIMER"
+                autocomplete="off"
             >
-            <span class="competence-name">
-                Organisateurs de terrain
-            </span>
-        </label>
 
-        <div class="competence-info">
-            organisent et gèrent de A à Z des actions ou événements
-            destinés à promouvoir, médiatiser ou animer la communauté.
+            <button
+                type="button"
+                class="delete-button"
+                id="confirmDelete"
+                style="width:100%;margin-top:12px;"
+            >
+                CONFIRMER LA SUPPRESSION
+            </button>
+
+            <div
+                id="deleteMessage"
+                class="message"
+            ></div>
+
         </div>
+
     </div>
 
-    <div class="competence">
-        <label>
-            <input
-                type="checkbox"
-                name="roles"
-                value="Conférenciers"
-            >
-            <span class="competence-name">
-                Conférenciers
-            </span>
-        </label>
-
-        <div class="competence-info">
-            transmettent l’idéologie et transforment les sympathisants
-            en ressources militantes formées et convaincues.
-        </div>
-    </div>
-
-    <div class="competence">
-        <label>
-            <input
-                type="checkbox"
-                name="roles"
-                value="Influenceurs Réseaux Sociaux"
-            >
-            <span class="competence-name">
-                Influenceurs Réseaux Sociaux
-            </span>
-        </label>
-
-        <div class="competence-info">
-            développent une audience, influencent les comportements,
-            déconstruisent les arguments ou manipulations et produisent
-            des contenus permettant de diffuser et de défendre les idées
-            du mouvement.
-        </div>
-    </div>
-
-    <div class="competence">
-        <label>
-            <input
-                type="checkbox"
-                name="roles"
-                value="Parrains/marraines"
-            >
-            <span class="competence-name">
-                Parrains/marraines
-            </span>
-        </label>
-
-        <div class="competence-info">
-            prospectent, identifient, abordent, échangent, accompagnent
-            et parrainent de futurs adhérents.
-        </div>
-    </div>
-
-    <div class="competence">
-        <label>
-            <input
-                type="checkbox"
-                name="roles"
-                value="Militants"
-            >
-            <span class="competence-name">
-                Militants
-            </span>
-        </label>
-
-        <div class="competence-info">
-            entretiennent et font vivre la communauté à différentes
-            échelles, en ligne comme lors d’événements. Peuvent être
-            modérateurs, commentateurs ou simplement participer activement
-            aux actions du mouvement.
-        </div>
-    </div>
-
-</div>
-
-<button
-    type="button"
-    class="primary-button"
-    id="saveRolesButton"
->
-    ENREGISTRER MES RÔLES
-</button>
-
-<div
-    id="roleMessage"
-    class="message"
-></div>
-```
-
-</div>
-
-</div>
-
-<!-- =======================================================
-     MODAL SUPPRESSION PROFIL
-======================================================= -->
-
-<div
-    class="modal"
-    id="deleteModal"
->
-
-<div class="modal-box">
-
-<button
-type="button"
-class="modal-close"
-id="closeDeleteModal"
-
->
-
-```
-×
-```
-
-</button>
-
-<h2>
-    Supprimer ma page ?
-</h2>
-
-<p>
-    Cette action est définitive. Votre profil sera supprimé
-    de la table <strong>profiles</strong>.
-</p>
-
-<p>
-    Pour confirmer, saisissez exactement :
-</p>
-
-<p
-    style="
-        text-align:center;
-        color:var(--gold-light);
-        font-family:Arial,sans-serif;
-        font-weight:bold;
-        letter-spacing:2px;
-    "
->
-    SUPPRIMER
-</p>
-
-<input
-type="text"
-id="deleteConfirmation"
-placeholder="SUPPRIMER"
-autocomplete="off"
-
->
-
-<button
-type="button"
-class="delete-button"
-id="confirmDelete"
-style="width:100%;margin-top:12px;"
-
->
-
-```
-CONFIRMER LA SUPPRESSION
-```
-
-</button>
-
-<div
-    id="deleteMessage"
-    class="message"
-></div>
-
-</div>
-
-</div>
+</section>
 
 <!-- =======================================================
      APPLICATION ADMIN
