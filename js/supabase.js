@@ -12,6 +12,7 @@ import { createClient } from
 const SUPABASE_URL =
     "https://wlhtegrciehmtxqecopv.supabase.co";
 
+
 const SUPABASE_KEY =
     "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
 
