@@ -3661,7 +3661,7 @@ async function creerElement() {
                             null,
 
                         priorite:
-                            null,
+                            "secondaire",
 
                         stat_1:
                             null,
