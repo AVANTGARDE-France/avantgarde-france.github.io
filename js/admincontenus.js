@@ -12,9 +12,9 @@
    - validation
    - ordre
    - recto des cartes
-   - statistiques liées par code
+   - statistiques liées par UUID
    - synergies liées par UUID
-   - verso HTML existant
+   - verso HTML
 ========================================================= */
 
 import { supabase } from "./supabase.js";
@@ -42,9 +42,19 @@ let isSourceMode = false;
 
 let currentProfile = null;
 
+let messageTimer = null;
+
 
 /* =========================================================
-   ELEMENTS
+   ETAT SYNERGIES
+========================================================= */
+
+let selectedSynergyIds = [];
+let currentSynergyContentId = null;
+
+
+/* =========================================================
+   ELEMENTS DOM
 ========================================================= */
 
 const tree =
@@ -74,6 +84,12 @@ const structureParentField =
 const structureParent =
     document.getElementById("structureParent");
 
+const structureSaveButton =
+    document.getElementById("structureSaveButton");
+
+const structureCancelButton =
+    document.getElementById("structureCancelButton");
+
 const contentEditorTitle =
     document.getElementById("contentEditorTitle");
 
@@ -82,6 +98,12 @@ const contentTitle =
 
 const contentParent =
     document.getElementById("contentParent");
+
+const contentCancelButton =
+    document.getElementById("contentCancelButton");
+
+const contentSaveButton =
+    document.getElementById("contentSaveButton");
 
 const wysiwyg =
     document.getElementById("wysiwyg");
@@ -107,43 +129,194 @@ const modalName =
 const modalSaveButton =
     document.getElementById("modalSaveButton");
 
+const modalCloseButton =
+    document.getElementById("modalCloseButton");
 
-/* =========================================================
-   RECTO — ELEMENTS
-========================================================= */
+const modalCancelButton =
+    document.getElementById("modalCancelButton");
 
-const contentPhoto =
-    document.getElementById("contentPhoto");
-
-const contentAccroche =
-    document.getElementById("contentAccroche");
-
-const contentPriority =
-    document.getElementById("contentPriority");
-
-const contentStat1 =
-    document.getElementById("contentStat1");
-
-const contentStat2 =
-    document.getElementById("contentStat2");
-
-const contentStat3 =
-    document.getElementById("contentStat3");
-
-const contentSynergies =
-    document.getElementById("contentSynergies");
+const addMenuButton =
+    document.getElementById("addMenuButton");
 
 
 /* =========================================================
-   MESSAGE
+   RECTO
 ========================================================= */
 
-let messageTimer = null;
+const cardPhoto =
+    document.getElementById("contentPhoto") ||
+    document.getElementById("cardPhoto");
+
+const cardAccroche =
+    document.getElementById("contentAccroche") ||
+    document.getElementById("cardAccroche");
+
+const cardPriorite =
+    document.getElementById("contentPriority") ||
+    document.getElementById("cardPriority");
+
+const cardStat1 =
+    document.getElementById("contentStat1") ||
+    document.getElementById("cardStat1");
+
+const cardStat2 =
+    document.getElementById("contentStat2") ||
+    document.getElementById("cardStat2");
+
+const cardStat3 =
+    document.getElementById("contentStat3") ||
+    document.getElementById("cardStat3");
+
+const cardSynergies =
+    document.getElementById("contentSynergies") ||
+    document.getElementById("cardSynergies");
+
+
+/* =========================================================
+   PRIORITES
+========================================================= */
+
+const PRIORITES = [
+    {
+        value: "absolue",
+        label: "Absolue"
+    },
+    {
+        value: "prioritaire",
+        label: "Prioritaire"
+    },
+    {
+        value: "secondaire",
+        label: "Secondaire"
+    }
+];
+
+
+function initialiserListePriorite() {
+
+    if (!cardPriorite) {
+        return;
+    }
+
+
+    const valeurActuelle =
+        String(
+            cardPriorite.value || ""
+        ).toLowerCase();
+
+
+    cardPriorite.innerHTML =
+        "";
+
+
+    const optionVide =
+        document.createElement("option");
+
+    optionVide.value =
+        "";
+
+    optionVide.textContent =
+        "Aucune priorité";
+
+    cardPriorite.appendChild(
+        optionVide
+    );
+
+
+    PRIORITES.forEach(
+        priorite => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                priorite.value;
+
+            option.textContent =
+                priorite.label;
+
+            cardPriorite.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    if (
+        PRIORITES.some(
+            priorite =>
+                priorite.value ===
+                valeurActuelle
+        )
+    ) {
+
+        cardPriorite.value =
+            valeurActuelle;
+
+    } else {
+
+        cardPriorite.value =
+            "";
+
+    }
+
+}
+
+
+/* =========================================================
+   OUTILS
+========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+function toId(value) {
+
+    return String(value ?? "");
+
+}
+
+
+function getNextPosition(items) {
+
+    if (!Array.isArray(items) || !items.length) {
+        return 0;
+    }
+
+    return Math.max(
+        ...items.map(
+            item =>
+                Number(item.position) || 0
+        )
+    ) + 1;
+
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
 
 function showMessage(
     text,
     type = "success"
 ) {
+
+    if (!message) {
+        return;
+    }
 
     clearTimeout(messageTimer);
 
@@ -168,17 +341,511 @@ function showMessage(
 
 
 /* =========================================================
-   ESCAPE HTML
+   APERCU PHOTO
 ========================================================= */
 
-function escapeHtml(value) {
+let contentPhotoPreview = null;
 
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+
+function initialiserApercuImageContenu() {
+
+    if (!cardPhoto) {
+        return;
+    }
+
+
+    if (
+        !document.getElementById(
+            "avantgarde-content-photo-preview-styles"
+        )
+    ) {
+
+        const style =
+            document.createElement("style");
+
+        style.id =
+            "avantgarde-content-photo-preview-styles";
+
+        style.textContent = `
+
+            #contentPhotoPreview {
+                width:260px;
+                height:180px;
+                margin-top:10px;
+                padding:8px;
+                box-sizing:border-box;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                border:1px solid var(--border);
+                border-radius:8px;
+                background:rgba(7,21,45,.45);
+                overflow:hidden;
+            }
+
+            #contentPhotoPreview img {
+                display:block;
+                width:100%;
+                height:100%;
+                object-fit:contain;
+                object-position:center;
+                border-radius:4px;
+            }
+
+            #contentPhotoPreview.empty {
+                color:rgba(245,243,237,.38);
+                font-size:11px;
+                text-align:center;
+                line-height:1.5;
+            }
+
+            #contentPhotoPreview.error {
+                color:rgba(239,65,53,.82);
+                font-size:11px;
+                text-align:center;
+                line-height:1.5;
+            }
+
+            @media (max-width:600px) {
+
+                #contentPhotoPreview {
+                    width:100%;
+                    max-width:260px;
+                    height:180px;
+                }
+
+            }
+
+        `;
+
+        document.head.appendChild(style);
+
+    }
+
+
+    contentPhotoPreview =
+        document.getElementById(
+            "contentPhotoPreview"
+        );
+
+
+    if (!contentPhotoPreview) {
+
+        contentPhotoPreview =
+            document.createElement("div");
+
+        contentPhotoPreview.id =
+            "contentPhotoPreview";
+
+        contentPhotoPreview.className =
+            "empty";
+
+        contentPhotoPreview.textContent =
+            "Aucune image";
+
+        cardPhoto.insertAdjacentElement(
+            "afterend",
+            contentPhotoPreview
+        );
+
+    }
+
+
+    function actualiserApercu() {
+
+        const url =
+            String(
+                cardPhoto.value || ""
+            ).trim();
+
+
+        contentPhotoPreview.innerHTML =
+            "";
+
+        contentPhotoPreview.className =
+            "empty";
+
+
+        if (!url) {
+
+            contentPhotoPreview.textContent =
+                "Aucune image";
+
+            return;
+
+        }
+
+
+        const image =
+            document.createElement("img");
+
+        image.alt =
+            "Aperçu de l'image";
+
+
+        image.onload =
+            () => {
+
+                contentPhotoPreview.className =
+                    "";
+
+            };
+
+
+        image.onerror =
+            () => {
+
+                contentPhotoPreview.className =
+                    "error";
+
+                contentPhotoPreview.textContent =
+                    "Impossible de charger cette image.";
+
+            };
+
+
+        image.src =
+            url;
+
+
+        contentPhotoPreview.appendChild(
+            image
+        );
+
+    }
+
+
+    cardPhoto.addEventListener(
+        "input",
+        actualiserApercu
+    );
+
+    cardPhoto.addEventListener(
+        "change",
+        actualiserApercu
+    );
+
+
+    actualiserApercu();
+
+}
+
+
+/* =========================================================
+   STYLES ARBRE
+========================================================= */
+
+function injectTreeStyles() {
+
+    if (
+        document.getElementById(
+            "avantgarde-content-tree-styles"
+        )
+    ) {
+        return;
+    }
+
+
+    const style =
+        document.createElement("style");
+
+    style.id =
+        "avantgarde-content-tree-styles";
+
+
+    style.textContent = `
+
+        #tree {
+            width:100%;
+            box-sizing:border-box;
+        }
+
+        #tree .tree-menu {
+            margin:0 0 8px 0;
+            padding:0;
+        }
+
+        #tree .tree-menu:last-child {
+            margin-bottom:0;
+        }
+
+        #tree .tree-menu-header {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            min-width:0;
+            padding:7px 6px 7px 8px;
+            border-radius:6px;
+            background:rgba(214,173,85,.09);
+            border:1px solid rgba(214,173,85,.20);
+        }
+
+        #tree .tree-menu-header:hover {
+            background:rgba(214,173,85,.13);
+        }
+
+        #tree .submenu-list {
+            position:relative;
+            margin:4px 0 0 15px;
+            padding-left:15px;
+        }
+
+        #tree .submenu-list::before {
+            content:"";
+            position:absolute;
+            left:0;
+            top:0;
+            bottom:8px;
+            width:1px;
+            background:rgba(214,173,85,.18);
+        }
+
+        #tree .tree-submenu {
+            position:relative;
+            margin:0 0 3px 0;
+        }
+
+        #tree .tree-submenu::before {
+            content:"";
+            position:absolute;
+            left:-15px;
+            top:18px;
+            width:12px;
+            height:1px;
+            background:rgba(214,173,85,.18);
+        }
+
+        #tree .tree-submenu-header {
+            display:flex;
+            align-items:center;
+            gap:6px;
+            min-width:0;
+            padding:4px 4px 4px 5px;
+            border-radius:5px;
+        }
+
+        #tree .tree-submenu-header:hover {
+            background:rgba(255,255,255,.035);
+        }
+
+        #tree .content-list {
+            position:relative;
+            margin:2px 0 3px 16px;
+            padding-left:15px;
+        }
+
+        #tree .content-list::before {
+            content:"";
+            position:absolute;
+            left:0;
+            top:0;
+            bottom:7px;
+            width:1px;
+            background:rgba(255,255,255,.09);
+        }
+
+        #tree .tree-content {
+            position:relative;
+            display:flex;
+            align-items:center;
+            gap:5px;
+            min-width:0;
+            margin:1px 0;
+            padding:3px 3px 3px 5px;
+            border-radius:4px;
+        }
+
+        #tree .tree-content::before {
+            content:"";
+            position:absolute;
+            left:-15px;
+            top:15px;
+            width:12px;
+            height:1px;
+            background:rgba(255,255,255,.09);
+        }
+
+        #tree .tree-content:hover {
+            background:rgba(255,255,255,.035);
+        }
+
+        #tree .tree-item-main {
+            display:flex;
+            align-items:center;
+            gap:8px;
+            flex:1 1 auto;
+            min-width:0;
+            margin:0;
+            padding:0;
+            border:0;
+            background:none;
+            color:inherit;
+            text-align:left;
+            cursor:pointer;
+        }
+
+        #tree .tree-item-main:hover {
+            color:var(--gold-light);
+        }
+
+        #tree .tree-title {
+            min-width:0;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            font-size:13px;
+            line-height:1.35;
+            font-weight:500;
+        }
+
+        #tree .tree-menu .tree-title {
+            font-size:13px;
+            font-weight:600;
+            color:var(--white);
+        }
+
+        #tree .tree-submenu .tree-title {
+            font-size:12.5px;
+            color:rgba(245,243,237,.92);
+        }
+
+        #tree .tree-content-button {
+            flex:1 1 auto;
+            min-width:0;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+            margin:0;
+            padding:2px 0;
+            border:0;
+            background:none;
+            color:rgba(245,243,237,.72);
+            font:inherit;
+            font-size:12px;
+            text-align:left;
+            cursor:pointer;
+        }
+
+        #tree .tree-content-button:hover {
+            color:var(--gold-light);
+        }
+
+        #tree .tree-subtitle {
+            flex:0 0 auto;
+            font-size:8px;
+            line-height:1;
+            letter-spacing:.10em;
+            color:rgba(214,173,85,.70);
+            white-space:nowrap;
+        }
+
+        #tree .tree-actions {
+            display:flex;
+            align-items:center;
+            justify-content:flex-end;
+            flex:0 0 auto;
+            gap:2px;
+            margin-left:4px;
+            opacity:.72;
+        }
+
+        #tree .tree-menu-header:hover .tree-actions,
+        #tree .tree-submenu-header:hover .tree-actions,
+        #tree .tree-content:hover .tree-actions {
+            opacity:1;
+        }
+
+        #tree .icon-button {
+            width:22px;
+            height:22px;
+            min-width:22px;
+            padding:0;
+            border:1px solid transparent;
+            border-radius:4px;
+            background:transparent;
+            color:rgba(245,243,237,.58);
+            font-size:12px;
+            line-height:20px;
+            cursor:pointer;
+        }
+
+        #tree .icon-button:hover {
+            border-color:rgba(214,173,85,.30);
+            background:rgba(214,173,85,.08);
+            color:var(--gold-light);
+        }
+
+        #tree .icon-button.danger:hover {
+            border-color:rgba(239,65,53,.35);
+            background:rgba(239,65,53,.08);
+            color:#ef4135;
+        }
+
+        #tree .status-button {
+            min-width:58px;
+            height:21px;
+            padding:0 6px;
+            border-radius:4px;
+            font-size:7px;
+            font-weight:600;
+            letter-spacing:.06em;
+            cursor:pointer;
+        }
+
+        #tree .status-button.status-valid {
+            border:1px solid rgba(80,190,120,.45);
+            background:rgba(80,190,120,.12);
+            color:#65d28a;
+        }
+
+        #tree .status-button.status-draft {
+            border:1px solid rgba(214,173,85,.30);
+            background:rgba(214,173,85,.08);
+            color:rgba(214,173,85,.82);
+        }
+
+        #tree .empty-tree {
+            padding:25px 12px;
+            color:rgba(245,243,237,.48);
+            font-size:12px;
+            line-height:1.6;
+            text-align:center;
+        }
+
+        @media (max-width:600px) {
+
+            #tree .tree-subtitle {
+                display:none;
+            }
+
+            #tree .tree-actions {
+                opacity:1;
+            }
+
+            #tree .status-button {
+                min-width:0;
+                width:22px;
+                padding:0;
+                overflow:hidden;
+                font-size:0;
+            }
+
+            #tree .status-button::after {
+                content:"";
+                display:block;
+                width:6px;
+                height:6px;
+                margin:auto;
+                border-radius:50%;
+                background:currentColor;
+            }
+
+        }
+
+    `;
+
+
+    document.head.appendChild(style);
 
 }
 
@@ -190,25 +857,27 @@ function escapeHtml(value) {
 async function verifierAdmin() {
 
     const {
-        data: {
-            user
-        },
-        error: userError
+        data,
+        error
     } =
         await supabase.auth.getUser();
 
 
     if (
-        userError ||
-        !user
+        error ||
+        !data ||
+        !data.user
     ) {
 
-        window.location.href =
-            "admin.html";
-
-        return false;
+        throw new Error(
+            "Vous devez être connecté."
+        );
 
     }
+
+
+    const user =
+        data.user;
 
 
     const {
@@ -216,8 +885,10 @@ async function verifierAdmin() {
         error: profileError
     } =
         await supabase
-            .from("profils")
-            .select("*")
+            .from("profiles")
+            .select(
+                "id, nom, email, grade"
+            )
             .eq(
                 "id",
                 user.id
@@ -227,26 +898,31 @@ async function verifierAdmin() {
 
     if (profileError) {
 
-        console.error(
-            profileError
+        throw new Error(
+            "Impossible de charger votre profil : " +
+            profileError.message
         );
-
-        showMessage(
-            "Impossible de vérifier votre profil.",
-            "error"
-        );
-
-        return false;
 
     }
 
 
     if (!profile) {
 
-        window.location.href =
-            "admin.html";
+        throw new Error(
+            "Aucun profil administrateur trouvé."
+        );
 
-        return false;
+    }
+
+
+    if (
+        String(profile.grade || "").toLowerCase() !==
+        "admin"
+    ) {
+
+        throw new Error(
+            "Accès réservé aux administrateurs."
+        );
 
     }
 
@@ -255,48 +931,18 @@ async function verifierAdmin() {
         profile;
 
 
-    const role =
-        String(
-            profile.role ||
-            profile.grade ||
-            ""
-        )
-            .toLowerCase()
-            .trim();
+    if (connectedUser) {
 
-
-    const autorise =
-        [
-            "admin",
-            "administrateur",
-            "fondateur",
-            "commissaire fondateur",
-            "délégué national"
-        ]
-            .some(
-                value =>
-                    role.includes(value)
-            );
-
-
-    if (!autorise) {
-
-        window.location.href =
-            "admin.html";
-
-        return false;
+        connectedUser.textContent =
+            profile.nom ||
+            profile.email ||
+            "";
 
     }
 
 
-    if (connectedUser) {
-
-        connectedUser.textContent =
-            profile.nom_affiche ||
-            profile.nom ||
-            user.email ||
-            "";
-
+    if (addMenuButton) {
+        addMenuButton.disabled = false;
     }
 
 
@@ -306,64 +952,63 @@ async function verifierAdmin() {
 
 
 /* =========================================================
-   CHARGEMENT DES DONNEES
+   CHARGEMENT MENUS / SOUS-MENUS / CONTENUS
 ========================================================= */
 
 async function chargerDonnees() {
 
-    tree.innerHTML =
-        `
-            <div class="loading">
-                Chargement…
-            </div>
-        `;
-
-
     const [
         menusResult,
         sousMenusResult,
-        contenusResult,
-        statsResult
+        contenusResult
     ] =
         await Promise.all([
 
             supabase
                 .from("menus")
-                .select("*")
+                .select(
+                    "id, titre, position, valide"
+                )
                 .order(
                     "position",
                     {
-                        ascending: true
+                        ascending:true
                     }
                 ),
 
             supabase
                 .from("sous_menus")
-                .select("*")
+                .select(
+                    "id, menu_id, titre, position, valide"
+                )
                 .order(
                     "position",
                     {
-                        ascending: true
+                        ascending:true
                     }
                 ),
 
             supabase
                 .from("contenus")
-                .select("*")
+                .select(`
+                    id,
+                    sous_menu_id,
+                    titre,
+                    html,
+                    position,
+                    valide,
+                    photo_url,
+                    accroche,
+                    priorite,
+                    stat_1,
+                    stat_2,
+                    stat_3,
+                    synergies
+                `)
                 .order(
                     "position",
                     {
-                        ascending: true
-                    }
-                ),
-
-            supabase
-                .from("statistiques")
-                .select("*")
-                .order(
-                    "position",
-                    {
-                        ascending: true
+                        ascending:true
                     }
                 )
 
@@ -371,81 +1016,99 @@ async function chargerDonnees() {
 
 
     if (menusResult.error) {
-
-        console.error(
-            menusResult.error
+        throw new Error(
+            "Menus : " +
+            menusResult.error.message
         );
-
-        showMessage(
-            "Impossible de charger les menus.",
-            "error"
-        );
-
-        return;
-
     }
 
 
     if (sousMenusResult.error) {
-
-        console.error(
-            sousMenusResult.error
+        throw new Error(
+            "Sous-menus : " +
+            sousMenusResult.error.message
         );
-
-        showMessage(
-            "Impossible de charger les sous-menus.",
-            "error"
-        );
-
-        return;
-
     }
 
 
     if (contenusResult.error) {
-
-        console.error(
-            contenusResult.error
+        throw new Error(
+            "Contenus : " +
+            contenusResult.error.message
         );
-
-        showMessage(
-            "Impossible de charger les contenus.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    if (statsResult.error) {
-
-        console.error(
-            statsResult.error
-        );
-
-        showMessage(
-            "Impossible de charger les statistiques.",
-            "error"
-        );
-
-        return;
-
     }
 
 
     menus =
-        menusResult.data || [];
+        Array.isArray(menusResult.data)
+            ? menusResult.data
+            : [];
+
 
     sousMenus =
-        sousMenusResult.data || [];
+        Array.isArray(sousMenusResult.data)
+            ? sousMenusResult.data
+            : [];
+
 
     contenus =
-        contenusResult.data || [];
+        Array.isArray(contenusResult.data)
+            ? contenusResult.data
+            : [];
 
-    stats =
-        statsResult.data || [];
 
+    try {
+
+        const {
+            data: statsData,
+            error: statsError
+        } =
+            await supabase
+                .from("stats")
+                .select(
+                    "id, nom"
+                )
+                .order(
+                    "nom",
+                    {
+                        ascending:true
+                    }
+                );
+
+
+        if (statsError) {
+
+            console.warn(
+                "Statistiques indisponibles :",
+                statsError.message
+            );
+
+            stats = [];
+
+        } else {
+
+            stats =
+                Array.isArray(statsData)
+                    ? statsData
+                    : [];
+
+        }
+
+    }
+    catch (error) {
+
+        console.warn(
+            "Statistiques indisponibles :",
+            error
+        );
+
+        stats = [];
+
+    }
+
+
+    remplirListesStats();
+    initialiserListePriorite();
 
     renderTree();
 
@@ -453,22 +1116,821 @@ async function chargerDonnees() {
 
 
 /* =========================================================
-   TREE
+   STATISTIQUES
+========================================================= */
+
+function remplirListesStats() {
+
+    [
+        cardStat1,
+        cardStat2,
+        cardStat3
+    ]
+    .filter(Boolean)
+    .forEach(
+        select => {
+
+            const valeurActuelle =
+                select.value || "";
+
+
+            select.innerHTML =
+                "";
+
+
+            const empty =
+                document.createElement("option");
+
+            empty.value =
+                "";
+
+            empty.textContent =
+                "Aucune statistique";
+
+            select.appendChild(
+                empty
+            );
+
+
+            stats.forEach(
+                stat => {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+                    option.value =
+                        stat.id;
+
+                    option.textContent =
+                        stat.nom ||
+                        "Statistique sans nom";
+
+                    select.appendChild(
+                        option
+                    );
+
+                }
+            );
+
+
+            if (valeurActuelle) {
+
+                select.value =
+                    valeurActuelle;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   SYNERGIES — NOUVELLE INTERFACE
+========================================================= */
+
+/*
+ * L'interface HTML utilise maintenant deux listes :
+ *   - #synergyAvailable : contenus disponibles
+ *   - #synergySelected  : contenus déjà sélectionnés
+ *
+ * La colonne contenus.synergies reste la source de vérité :
+ * elle contient les UUID des contenus liés.
+ *
+ * Cette couche accepte les formats que Supabase peut renvoyer :
+ *   - tableau JavaScript
+ *   - tableau JSON sérialisé
+ *   - tableau PostgreSQL {uuid,uuid}
+ *   - objets { id: uuid } ou { uuid: uuid }
+ */
+
+function normaliserSynergies(value) {
+
+    if (
+        value === null ||
+        value === undefined ||
+        value === ""
+    ) {
+        return [];
+    }
+
+
+    let valeurs = value;
+
+
+    /* JSON : ["uuid","uuid"] */
+    if (typeof valeurs === "string") {
+
+        const texte = valeurs.trim();
+
+
+        if (!texte) {
+            return [];
+        }
+
+
+        try {
+
+            const json = JSON.parse(texte);
+
+
+            if (Array.isArray(json)) {
+                valeurs = json;
+            }
+            else if (
+                json &&
+                typeof json === "object" &&
+                Array.isArray(json.synergies)
+            ) {
+                valeurs = json.synergies;
+            }
+            else {
+                valeurs = [];
+            }
+
+        }
+        catch (error) {
+
+            /* PostgreSQL array : {uuid,uuid} ou {"uuid","uuid"} */
+            if (
+                texte.startsWith("{") &&
+                texte.endsWith("}")
+            ) {
+
+                const contenu =
+                    texte.slice(1, -1).trim();
+
+
+                if (!contenu) {
+                    return [];
+                }
+
+
+                valeurs =
+                    contenu
+                        .split(",")
+                        .map(element =>
+                            element
+                                .trim()
+                                .replace(/^"|"$/g, "")
+                                .trim()
+                        );
+
+            }
+            else {
+
+                return [];
+
+            }
+
+        }
+
+    }
+
+
+    if (!Array.isArray(valeurs)) {
+        return [];
+    }
+
+
+    return Array.from(
+        new Set(
+            valeurs
+                .map(element => {
+
+                    if (
+                        element &&
+                        typeof element === "object"
+                    ) {
+
+                        return String(
+                            element.id ||
+                            element.uuid ||
+                            element.content_id ||
+                            ""
+                        ).trim();
+
+                    }
+
+                    return String(
+                        element || ""
+                    ).trim();
+
+                })
+                .filter(Boolean)
+        )
+    );
+
+}
+
+
+function normaliserRechercheSynergie(value) {
+
+    return String(value || "")
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .toLowerCase()
+        .trim();
+
+}
+
+
+function obtenirElementsSynergies() {
+
+    return {
+
+        search:
+            document.getElementById(
+                "synergySearch"
+            ),
+
+        available:
+            document.getElementById(
+                "synergyAvailable"
+            ),
+
+        availableCount:
+            document.getElementById(
+                "synergyAvailableCount"
+            ),
+
+        selected:
+            document.getElementById(
+                "synergySelected"
+            ),
+
+        selectedCount:
+            document.getElementById(
+                "synergySelectedCount"
+            ),
+
+        clear:
+            document.getElementById(
+                "synergyClearButton"
+            )
+
+    };
+
+}
+
+
+function obtenirContenuSynergie(id) {
+
+    const identifiant =
+        String(id || "").trim();
+
+
+    if (!identifiant) {
+        return null;
+    }
+
+
+    return contenus.find(
+        contenu =>
+            String(contenu.id || "") ===
+            identifiant
+    ) || null;
+
+}
+
+
+function initialiserSynergies(
+    valeurs = [],
+    currentId = null
+) {
+
+    currentSynergyContentId =
+        currentId
+            ? String(currentId)
+            : null;
+
+
+    selectedSynergyIds =
+        normaliserSynergies(valeurs)
+            .filter(
+                id =>
+                    !currentSynergyContentId ||
+                    String(id) !==
+                    String(currentSynergyContentId)
+            );
+
+
+    const elements =
+        obtenirElementsSynergies();
+
+
+    if (elements.search) {
+        elements.search.value = "";
+    }
+
+
+    rendreSynergies();
+
+}
+
+
+function creerLigneSynergie(
+    contenu,
+    action,
+    classe,
+    callback
+) {
+
+    const row =
+        document.createElement("button");
+
+    row.type = "button";
+
+    row.className =
+        "synergy-item " +
+        classe;
+
+
+    row.title =
+        action === "AJOUTER"
+            ? "Ajouter cette mesure aux synergies"
+            : "Retirer cette mesure des synergies";
+
+
+    const title =
+        document.createElement("span");
+
+    title.className =
+        "synergy-item-title";
+
+    title.textContent =
+        contenu.titre ||
+        "Mesure sans titre";
+
+    title.title =
+        contenu.titre ||
+        "Mesure sans titre";
+
+
+    const actionElement =
+        document.createElement("span");
+
+    actionElement.className =
+        "synergy-item-action";
+
+    actionElement.textContent =
+        action;
+
+
+    row.appendChild(title);
+    row.appendChild(actionElement);
+
+
+    row.addEventListener(
+        "click",
+        event => {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            callback(
+                contenu.id
+            );
+
+        }
+    );
+
+
+    return row;
+
+}
+
+
+function rendreSynergies() {
+
+    const elements =
+        obtenirElementsSynergies();
+
+
+    const available =
+        elements.available;
+
+    const selected =
+        elements.selected;
+
+
+    if (!available || !selected) {
+        return;
+    }
+
+
+    /*
+     * On renormalise systématiquement l'état local.
+     * Cela évite les doublons et les valeurs parasites.
+     */
+    selectedSynergyIds =
+        normaliserSynergies(
+            selectedSynergyIds
+        ).filter(
+            id =>
+                !currentSynergyContentId ||
+                String(id) !==
+                String(currentSynergyContentId)
+        );
+
+
+    const recherche =
+        normaliserRechercheSynergie(
+            elements.search
+                ? elements.search.value
+                : ""
+        );
+
+
+    const selectedSet =
+        new Set(
+            selectedSynergyIds.map(
+                id => String(id)
+            )
+        );
+
+
+    /* =====================================================
+       MESURES DISPONIBLES
+    ===================================================== */
+
+    const disponibles =
+        contenus
+            .filter(contenu => {
+
+                const id =
+                    String(
+                        contenu.id || ""
+                    ).trim();
+
+
+                if (!id) {
+                    return false;
+                }
+
+
+                if (
+                    currentSynergyContentId &&
+                    id ===
+                    String(currentSynergyContentId)
+                ) {
+                    return false;
+                }
+
+
+                if (selectedSet.has(id)) {
+                    return false;
+                }
+
+
+                if (!recherche) {
+                    return true;
+                }
+
+
+                return normaliserRechercheSynergie(
+                    contenu.titre ||
+                    "Mesure sans titre"
+                ).includes(
+                    recherche
+                );
+
+            })
+            .slice()
+            .sort(
+                (a, b) =>
+                    String(a.titre || "")
+                        .localeCompare(
+                            String(b.titre || ""),
+                            "fr",
+                            {
+                                sensitivity:"base"
+                            }
+                        )
+            );
+
+
+    available.innerHTML = "";
+
+
+    /*
+     * On garde une limite d'affichage raisonnable.
+     * La recherche permet de retrouver les autres mesures.
+     */
+    const limiteAffichage = 50;
+
+    const visibles =
+        disponibles.slice(
+            0,
+            limiteAffichage
+        );
+
+
+    if (!visibles.length) {
+
+        const empty =
+            document.createElement("div");
+
+        empty.className =
+            "synergy-empty";
+
+        empty.textContent =
+            recherche
+                ? "Aucune mesure ne correspond à la recherche."
+                : "Aucune autre mesure disponible.";
+
+        available.appendChild(empty);
+
+    }
+    else {
+
+        visibles.forEach(
+            contenu => {
+
+                available.appendChild(
+                    creerLigneSynergie(
+                        contenu,
+                        "AJOUTER",
+                        "synergy-available-item",
+                        ajouterSynergie
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    if (elements.availableCount) {
+
+        if (
+            disponibles.length >
+            limiteAffichage
+        ) {
+
+            elements.availableCount.textContent =
+                disponibles.length +
+                " résultats — " +
+                limiteAffichage +
+                " affichés";
+
+        }
+        else {
+
+            elements.availableCount.textContent =
+                disponibles.length +
+                (
+                    disponibles.length > 1
+                        ? " mesures"
+                        : " mesure"
+                );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       SYNERGIES SÉLECTIONNÉES
+    ===================================================== */
+
+    selected.innerHTML = "";
+
+
+    const selectedObjects =
+        selectedSynergyIds
+            .map(obtenirContenuSynergie)
+            .filter(Boolean);
+
+
+    if (!selectedObjects.length) {
+
+        const empty =
+            document.createElement("div");
+
+        empty.className =
+            "synergy-empty";
+
+        empty.textContent =
+            "Aucune synergie sélectionnée.";
+
+        selected.appendChild(empty);
+
+    }
+    else {
+
+        selectedObjects.forEach(
+            contenu => {
+
+                selected.appendChild(
+                    creerLigneSynergie(
+                        contenu,
+                        "RETIRER",
+                        "synergy-selected-item",
+                        retirerSynergie
+                    )
+                );
+
+            }
+        );
+
+    }
+
+
+    if (elements.selectedCount) {
+
+        const nombre =
+            selectedObjects.length;
+
+        elements.selectedCount.textContent =
+            nombre +
+            (
+                nombre > 1
+                    ? " sélectionnées"
+                    : " sélectionnée"
+            );
+
+    }
+
+
+    if (elements.clear) {
+
+        elements.clear.disabled =
+            selectedSynergyIds.length === 0;
+
+    }
+
+}
+
+
+function ajouterSynergie(id) {
+
+    const identifiant =
+        String(id || "").trim();
+
+
+    if (!identifiant) {
+        return;
+    }
+
+
+    /* Une mesure ne peut pas être sa propre synergie. */
+    if (
+        currentSynergyContentId &&
+        identifiant ===
+        String(currentSynergyContentId)
+    ) {
+        return;
+    }
+
+
+    /* On ne peut sélectionner qu'un contenu existant. */
+    if (!obtenirContenuSynergie(identifiant)) {
+        return;
+    }
+
+
+    if (
+        selectedSynergyIds.some(
+            selectedId =>
+                String(selectedId) ===
+                identifiant
+        )
+    ) {
+        return;
+    }
+
+
+    selectedSynergyIds.push(
+        identifiant
+    );
+
+
+    rendreSynergies();
+
+}
+
+
+function retirerSynergie(id) {
+
+    const identifiant =
+        String(id || "").trim();
+
+
+    selectedSynergyIds =
+        normaliserSynergies(
+            selectedSynergyIds
+        ).filter(
+            selectedId =>
+                String(selectedId) !==
+                identifiant
+        );
+
+
+    rendreSynergies();
+
+}
+
+
+function retirerToutesLesSynergies() {
+
+    selectedSynergyIds = [];
+
+    rendreSynergies();
+
+}
+
+
+function obtenirSynergies() {
+
+    return normaliserSynergies(
+        selectedSynergyIds
+    ).filter(
+        id =>
+            !currentSynergyContentId ||
+            String(id) !==
+            String(currentSynergyContentId)
+    );
+
+}
+
+
+function initialiserEvenementsSynergies() {
+
+    const elements =
+        obtenirElementsSynergies();
+
+
+    if (elements.search) {
+
+        elements.search.addEventListener(
+            "input",
+            () => {
+
+                rendreSynergies();
+
+            }
+        );
+
+    }
+
+
+    if (elements.clear) {
+
+        elements.clear.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                retirerToutesLesSynergies();
+
+            }
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   ARBRE
 ========================================================= */
 
 function renderTree() {
 
-    tree.innerHTML = "";
+    if (!tree) {
+        return;
+    }
+
+
+    injectTreeStyles();
+
+
+    tree.innerHTML =
+        "";
 
 
     if (!menus.length) {
 
-        tree.innerHTML =
-            `
-                <div class="empty-tree">
-                    Aucun menu.
-                </div>
-            `;
+        tree.innerHTML = `
+
+            <div class="empty-tree">
+                Aucun menu.
+                <br><br>
+                Utilisez « + MENU »
+                pour commencer.
+            </div>
+
+        `;
 
         return;
 
@@ -476,168 +1938,126 @@ function renderTree() {
 
 
     menus.forEach(
-        menu => {
+        (menu, menuIndex) => {
 
             const menuBox =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
 
             menuBox.className =
                 "tree-menu";
 
 
             const menuHeader =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
 
             menuHeader.className =
                 "tree-menu-header";
 
 
-            const menuMain =
-                document.createElement(
-                    "button"
-                );
+            const menuButton =
+                document.createElement("button");
 
-            menuMain.type =
+            menuButton.type =
                 "button";
 
-            menuMain.className =
+            menuButton.className =
                 "tree-item-main";
 
+            menuButton.innerHTML = `
 
-            const menuTitle =
-                document.createElement(
-                    "span"
-                );
+                <span class="tree-title">
+                    ${escapeHtml(menu.titre)}
+                </span>
 
-            menuTitle.className =
-                "tree-title";
+                <span class="tree-subtitle">
+                    MENU
+                </span>
 
-            menuTitle.textContent =
-                menu.titre ||
-                "Menu sans titre";
-
-
-            const menuSubtitle =
-                document.createElement(
-                    "span"
-                );
-
-            menuSubtitle.className =
-                "tree-subtitle";
-
-            menuSubtitle.textContent =
-                "MENU";
+            `;
 
 
-            menuMain.appendChild(
-                menuTitle
-            );
-
-            menuMain.appendChild(
-                menuSubtitle
-            );
-
-
-            menuMain.addEventListener(
+            menuButton.addEventListener(
                 "click",
-                () => {
-
+                () =>
                     ouvrirStructure(
                         "menu",
                         menu.id
-                    );
-
-                }
+                    )
             );
 
 
             const actions =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
 
             actions.className =
                 "tree-actions";
 
 
-            const up =
-                creerBoutonIcone(
+            actions.appendChild(
+                creerBouton(
                     "↑",
                     "Monter",
                     () =>
-                        deplacerElement(
-                            "menu",
-                            menu.id,
+                        deplacerMenu(
+                            menuIndex,
                             -1
                         )
-                );
-
-
-            const down =
-                creerBoutonIcone(
-                    "↓",
-                    "Descendre",
-                    () =>
-                        deplacerElement(
-                            "menu",
-                            menu.id,
-                            1
-                        )
-                );
-
-
-            const add =
-                creerBoutonIcone(
-                    "+",
-                    "Ajouter un sous-menu",
-                    () =>
-                        ouvrirModal(
-                            "submenu",
-                            menu.id
-                        )
-                );
-
-
-            const remove =
-                creerBoutonIcone(
-                    "×",
-                    "Supprimer",
-                    () =>
-                        supprimerElement(
-                            "menu",
-                            menu.id
-                        )
-                );
-
-            remove.classList.add(
-                "danger"
+                )
             );
 
 
-            actions.appendChild(up);
-            actions.appendChild(down);
-            actions.appendChild(add);
-            actions.appendChild(remove);
-
-
-            const status =
-                creerStatusButton(
-                    menu,
-                    "menu"
-                );
+            actions.appendChild(
+                creerBouton(
+                    "↓",
+                    "Descendre",
+                    () =>
+                        deplacerMenu(
+                            menuIndex,
+                            1
+                        )
+                )
+            );
 
 
             actions.appendChild(
-                status
+                creerStatusButton(menu)
+            );
+
+
+            actions.appendChild(
+                creerBouton(
+                    "+",
+                    "Ajouter un sous-menu",
+                    () =>
+                        ouvrirModalCreation(
+                            "submenu",
+                            menu.id
+                        )
+                )
+            );
+
+
+            const deleteButton =
+                creerBouton(
+                    "×",
+                    "Supprimer",
+                    () =>
+                        supprimerMenu(
+                            menu.id
+                        )
+                );
+
+            deleteButton.classList.add(
+                "danger"
+            );
+
+            actions.appendChild(
+                deleteButton
             );
 
 
             menuHeader.appendChild(
-                menuMain
+                menuButton
             );
 
             menuHeader.appendChild(
@@ -651,47 +2071,33 @@ function renderTree() {
 
 
             const submenuList =
-                document.createElement(
-                    "div"
-                );
+                document.createElement("div");
 
             submenuList.className =
                 "submenu-list";
 
 
-            const children =
+            const siblings =
                 sousMenus
                     .filter(
                         item =>
-                            String(
-                                item.menu_id
-                            ) ===
-                            String(
-                                menu.id
-                            )
+                            toId(item.menu_id) ===
+                            toId(menu.id)
                     )
                     .sort(
-                        (
-                            a,
-                            b
-                        ) =>
-                            (
-                                Number(a.position) ||
-                                0
-                            ) -
-                            (
-                                Number(b.position) ||
-                                0
-                            )
+                        (a, b) =>
+                            (Number(a.position) || 0) -
+                            (Number(b.position) || 0)
                     );
 
 
-            children.forEach(
+            siblings.forEach(
                 submenu => {
 
                     submenuList.appendChild(
-                        renderSubmenu(
-                            submenu
+                        renderSousMenu(
+                            submenu,
+                            siblings
                         )
                     );
 
@@ -715,107 +2121,75 @@ function renderTree() {
 
 
 /* =========================================================
-   RENDER SOUS-MENU
+   SOUS-MENU
 ========================================================= */
 
-function renderSubmenu(
-    submenu
+function renderSousMenu(
+    submenu,
+    siblings
 ) {
 
     const box =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     box.className =
         "tree-submenu";
 
 
     const header =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     header.className =
         "tree-submenu-header";
 
 
-    const main =
-        document.createElement(
-            "button"
-        );
+    const button =
+        document.createElement("button");
 
-    main.type =
+    button.type =
         "button";
 
-    main.className =
+    button.className =
         "tree-item-main";
 
+    button.innerHTML = `
 
-    const title =
-        document.createElement(
-            "span"
-        );
+        <span class="tree-title">
+            ${escapeHtml(submenu.titre)}
+        </span>
 
-    title.className =
-        "tree-title";
+        <span class="tree-subtitle">
+            SOUS-MENU
+        </span>
 
-    title.textContent =
-        submenu.titre ||
-        "Sous-menu sans titre";
-
-
-    const subtitle =
-        document.createElement(
-            "span"
-        );
-
-    subtitle.className =
-        "tree-subtitle";
-
-    subtitle.textContent =
-        "SOUS-MENU";
+    `;
 
 
-    main.appendChild(
-        title
-    );
-
-    main.appendChild(
-        subtitle
-    );
-
-
-    main.addEventListener(
+    button.addEventListener(
         "click",
-        () => {
-
+        () =>
             ouvrirStructure(
                 "submenu",
                 submenu.id
-            );
-
-        }
+            )
     );
 
 
     const actions =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     actions.className =
         "tree-actions";
 
 
     actions.appendChild(
-        creerBoutonIcone(
+        creerBouton(
             "↑",
             "Monter",
             () =>
-                deplacerElement(
-                    "submenu",
-                    submenu.id,
+                deplacerSousMenu(
+                    submenu,
+                    siblings,
                     -1
                 )
         )
@@ -823,13 +2197,13 @@ function renderSubmenu(
 
 
     actions.appendChild(
-        creerBoutonIcone(
+        creerBouton(
             "↓",
             "Descendre",
             () =>
-                deplacerElement(
-                    "submenu",
-                    submenu.id,
+                deplacerSousMenu(
+                    submenu,
+                    siblings,
                     1
                 )
         )
@@ -837,11 +2211,16 @@ function renderSubmenu(
 
 
     actions.appendChild(
-        creerBoutonIcone(
+        creerStatusButton(submenu)
+    );
+
+
+    actions.appendChild(
+        creerBouton(
             "+",
             "Ajouter un contenu",
             () =>
-                ouvrirModal(
+                ouvrirModalCreation(
                     "content",
                     submenu.id
                 )
@@ -849,36 +2228,27 @@ function renderSubmenu(
     );
 
 
-    const remove =
-        creerBoutonIcone(
+    const deleteButton =
+        creerBouton(
             "×",
             "Supprimer",
             () =>
-                supprimerElement(
-                    "submenu",
+                supprimerSousMenu(
                     submenu.id
                 )
         );
 
-    remove.classList.add(
+    deleteButton.classList.add(
         "danger"
     );
 
     actions.appendChild(
-        remove
-    );
-
-
-    actions.appendChild(
-        creerStatusButton(
-            submenu,
-            "submenu"
-        )
+        deleteButton
     );
 
 
     header.appendChild(
-        main
+        button
     );
 
     header.appendChild(
@@ -892,47 +2262,33 @@ function renderSubmenu(
 
 
     const contentList =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     contentList.className =
         "content-list";
 
 
-    const children =
+    const contentSiblings =
         contenus
             .filter(
-                item =>
-                    String(
-                        item.sous_menu_id
-                    ) ===
-                    String(
-                        submenu.id
-                    )
+                content =>
+                    toId(content.sous_menu_id) ===
+                    toId(submenu.id)
             )
             .sort(
-                (
-                    a,
-                    b
-                ) =>
-                    (
-                        Number(a.position) ||
-                        0
-                    ) -
-                    (
-                        Number(b.position) ||
-                        0
-                    )
+                (a, b) =>
+                    (Number(a.position) || 0) -
+                    (Number(b.position) || 0)
             );
 
 
-    children.forEach(
-        contenu => {
+    contentSiblings.forEach(
+        content => {
 
             contentList.appendChild(
-                renderContent(
-                    contenu
+                renderContenu(
+                    content,
+                    contentSiblings
                 )
             );
 
@@ -951,73 +2307,63 @@ function renderSubmenu(
 
 
 /* =========================================================
-   RENDER CONTENU
+   CONTENU
 ========================================================= */
 
-function renderContent(
-    contenu
+function renderContenu(
+    item,
+    siblings
 ) {
 
     const row =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     row.className =
         "tree-content";
 
 
-    const main =
-        document.createElement(
-            "button"
-        );
+    const button =
+        document.createElement("button");
 
-    main.type =
+    button.type =
         "button";
 
-    main.className =
+    button.className =
         "tree-content-button";
 
+    button.textContent =
+        item.titre ||
+        "Contenu sans titre";
 
-    main.textContent =
-        contenu.titre ||
+    button.title =
+        item.titre ||
         "Contenu sans titre";
 
 
-    main.addEventListener(
+    button.addEventListener(
         "click",
-        () => {
-
+        () =>
             ouvrirContenu(
-                contenu.id
-            );
-
-        }
-    );
-
-
-    row.appendChild(
-        main
+                item.id
+            )
     );
 
 
     const actions =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
     actions.className =
         "tree-actions";
 
 
     actions.appendChild(
-        creerBoutonIcone(
+        creerBouton(
             "↑",
             "Monter",
             () =>
-                deplacerElement(
-                    "content",
-                    contenu.id,
+                deplacerContenu(
+                    item,
+                    siblings,
                     -1
                 )
         )
@@ -1025,47 +2371,46 @@ function renderContent(
 
 
     actions.appendChild(
-        creerBoutonIcone(
+        creerBouton(
             "↓",
             "Descendre",
             () =>
-                deplacerElement(
-                    "content",
-                    contenu.id,
+                deplacerContenu(
+                    item,
+                    siblings,
                     1
                 )
         )
     );
 
 
-    const remove =
-        creerBoutonIcone(
+    actions.appendChild(
+        creerStatusButton(item)
+    );
+
+
+    const deleteButton =
+        creerBouton(
             "×",
             "Supprimer",
             () =>
-                supprimerElement(
-                    "content",
-                    contenu.id
+                supprimerContenu(
+                    item.id
                 )
         );
 
-    remove.classList.add(
+    deleteButton.classList.add(
         "danger"
     );
 
-
     actions.appendChild(
-        remove
+        deleteButton
     );
 
 
-    actions.appendChild(
-        creerStatusButton(
-            contenu,
-            "content"
-        )
+    row.appendChild(
+        button
     );
-
 
     row.appendChild(
         actions
@@ -1078,19 +2423,17 @@ function renderContent(
 
 
 /* =========================================================
-   BOUTON ICONE
+   BOUTONS
 ========================================================= */
 
-function creerBoutonIcone(
-    text,
+function creerBouton(
+    texte,
     title,
-    callback
+    action
 ) {
 
     const button =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
     button.type =
         "button";
@@ -1099,18 +2442,21 @@ function creerBoutonIcone(
         "icon-button";
 
     button.textContent =
-        text;
+        texte;
 
     button.title =
         title;
+
 
     button.addEventListener(
         "click",
         event => {
 
+            event.preventDefault();
+
             event.stopPropagation();
 
-            callback();
+            action();
 
         }
     );
@@ -1121,19 +2467,10 @@ function creerBoutonIcone(
 }
 
 
-/* =========================================================
-   STATUT
-========================================================= */
-
-function creerStatusButton(
-    item,
-    type
-) {
+function creerStatusButton(item) {
 
     const button =
-        document.createElement(
-            "button"
-        );
+        document.createElement("button");
 
     button.type =
         "button";
@@ -1142,41 +2479,38 @@ function creerStatusButton(
         "status-button";
 
 
-    const valide =
-        Boolean(
-            item.valide
+    if (Boolean(item.valide)) {
+
+        button.classList.add(
+            "status-valid"
         );
 
+        button.textContent =
+            "VALIDÉ";
 
-    button.textContent =
-        valide
-            ? "VALIDÉ"
-            : "BROUILLON";
+    } else {
 
+        button.classList.add(
+            "status-draft"
+        );
 
-    button.classList.add(
-        valide
-            ? "status-valid"
-            : "status-draft"
-    );
+        button.textContent =
+            "BROUILLON";
 
-
-    button.title =
-        valide
-            ? "Cliquer pour repasser en brouillon"
-            : "Cliquer pour valider";
+    }
 
 
     button.addEventListener(
         "click",
         event => {
 
+            event.preventDefault();
+
             event.stopPropagation();
 
-            basculerValidation(
-                type,
+            changerValidation(
                 item.id,
-                !valide
+                item
             );
 
         }
@@ -1189,907 +2523,123 @@ function creerStatusButton(
 
 
 /* =========================================================
-   MODAL
+   LISTE MENUS
 ========================================================= */
 
-function ouvrirModal(
-    type,
-    parentId
+function remplirListeMenus(
+    select,
+    valeur
 ) {
 
-    modalType =
-        type;
-
-    modalParentId =
-        parentId ||
-        null;
+    if (!select) {
+        return;
+    }
 
 
-    modalName.value =
+    select.innerHTML =
         "";
 
 
-    if (type === "menu") {
+    menus.forEach(
+        menu => {
 
-        modalTitle.textContent =
-            "Nouveau menu";
+            const option =
+                document.createElement("option");
 
-        modalSaveButton.textContent =
-            "CRÉER";
+            option.value =
+                menu.id;
 
-    }
+            option.textContent =
+                menu.titre;
 
+            option.selected =
+                toId(menu.id) ===
+                toId(valeur);
 
-    if (type === "submenu") {
-
-        modalTitle.textContent =
-            "Nouveau sous-menu";
-
-        modalSaveButton.textContent =
-            "CRÉER";
-
-    }
-
-
-    if (type === "content") {
-
-        modalTitle.textContent =
-            "Nouveau contenu";
-
-        modalSaveButton.textContent =
-            "CRÉER";
-
-    }
-
-
-    structureModal.classList.add(
-        "visible"
-    );
-
-
-    setTimeout(
-        () => {
-
-            modalName.focus();
-
-        },
-        50
-    );
-
-}
-
-
-function fermerModal() {
-
-    structureModal.classList.remove(
-        "visible"
-    );
-
-    modalType =
-        null;
-
-    modalParentId =
-        null;
-
-    modalName.value =
-        "";
-
-}
-
-
-/* =========================================================
-   CREATION
-========================================================= */
-
-async function creerElement() {
-
-    const titre =
-        modalName.value.trim();
-
-
-    if (!titre) {
-
-        showMessage(
-            "Le titre est obligatoire.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    modalSaveButton.disabled =
-        true;
-
-
-    try {
-
-        if (
-            modalType ===
-            "menu"
-        ) {
-
-            const position =
-                getNextPosition(
-                    menus
-                );
-
-
-            const {
-                error
-            } =
-                await supabase
-                    .from("menus")
-                    .insert({
-
-                        titre,
-
-                        position,
-
-                        valide:
-                            false
-
-                    });
-
-
-            if (error) {
-
-                throw error;
-
-            }
-
-        }
-
-
-        if (
-            modalType ===
-            "submenu"
-        ) {
-
-            const siblings =
-                sousMenus.filter(
-                    item =>
-                        item.menu_id ===
-                        modalParentId
-                );
-
-
-            const position =
-                getNextPosition(
-                    siblings
-                );
-
-
-            const {
-                error
-            } =
-                await supabase
-                    .from("sous_menus")
-                    .insert({
-
-                        menu_id:
-                            modalParentId,
-
-                        titre,
-
-                        position,
-
-                        valide:
-                            false
-
-                    });
-
-
-            if (error) {
-
-                throw error;
-
-            }
-
-        }
-
-
-        if (
-            modalType ===
-            "content"
-        ) {
-
-            const siblings =
-                contenus.filter(
-                    item =>
-                        item.sous_menu_id ===
-                        modalParentId
-                );
-
-
-            const position =
-                getNextPosition(
-                    siblings
-                );
-
-
-            const {
-                error
-            } =
-                await supabase
-                    .from("contenus")
-                    .insert({
-
-                        sous_menu_id:
-                            modalParentId,
-
-                        titre,
-
-                        html:
-                            "<p></p>",
-
-                        position,
-
-                        photo_url:
-                            null,
-
-                        accroche:
-                            null,
-
-                        priorite:
-                            null,
-
-                        stat_1:
-                            null,
-
-                        stat_2:
-                            null,
-
-                        stat_3:
-                            null,
-
-                        synergies:
-                            [],
-
-                        valide:
-                            false
-
-                    });
-
-
-            if (error) {
-
-                throw error;
-
-            }
-
-        }
-
-
-        fermerModal();
-
-        await chargerDonnees();
-
-        showMessage(
-            "Élément créé."
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            error
-        );
-
-        showMessage(
-            "Impossible de créer l'élément.",
-            "error"
-        );
-
-    }
-    finally {
-
-        modalSaveButton.disabled =
-            false;
-
-    }
-
-}
-
-
-/* =========================================================
-   POSITION
-========================================================= */
-
-function getNextPosition(
-    items
-) {
-
-    if (
-        !items.length
-    ) {
-
-        return 0;
-
-    }
-
-
-    return Math.max(
-        ...items.map(
-            item =>
-                Number(
-                    item.position
-                ) || 0
-        )
-    ) + 1;
-
-}
-
-
-/* =========================================================
-   RECTO — SYNERGIES
-========================================================= */
-
-let synergySelectedIds = [];
-
-let synergySearchTerm = "";
-
-
-function normaliserRechercheSynergie(
-    value
-) {
-
-    return String(
-        value || ""
-    )
-        .normalize("NFD")
-        .replace(
-            /[\u0300-\u036f]/g,
-            ""
-        )
-        .toLowerCase()
-        .trim();
-
-}
-
-
-function obtenirTitreSynergie(
-    id
-) {
-
-    const item =
-        contenus.find(
-            contenu =>
-                String(
-                    contenu.id
-                ) ===
-                String(id)
-        );
-
-
-    return item
-        ? (
-            item.titre ||
-            "Mesure sans titre"
-        )
-        : "Mesure introuvable";
-
-}
-
-
-function remplirListeSynergies(
-    selectedIds = [],
-    currentId = null
-) {
-
-    synergySelectedIds =
-        Array.from(
-            new Set(
-                (selectedIds || [])
-                    .map(
-                        id =>
-                            String(id)
-                    )
-                    .filter(
-                        id =>
-                            id &&
-                            id !==
-                            String(
-                                currentId
-                            )
-                    )
-            )
-        );
-
-
-    synergySearchTerm =
-        "";
-
-
-    const search =
-        document.getElementById(
-            "synergySearch"
-        );
-
-
-    if (search) {
-
-        search.value =
-            "";
-
-    }
-
-
-    renderSynergyPicker();
-
-}
-
-
-function renderSynergyPicker() {
-
-    if (!contentSynergies) {
-
-        return;
-
-    }
-
-
-    const available =
-        document.getElementById(
-            "synergyAvailable"
-        );
-
-    const selected =
-        document.getElementById(
-            "synergySelected"
-        );
-
-    const availableCount =
-        document.getElementById(
-            "synergyAvailableCount"
-        );
-
-    const selectedCount =
-        document.getElementById(
-            "synergySelectedCount"
-        );
-
-
-    if (
-        !available ||
-        !selected
-    ) {
-
-        return;
-
-    }
-
-
-    const currentId =
-        String(
-            editorId || ""
-        );
-
-
-    const selectedSet =
-        new Set(
-            synergySelectedIds.map(
-                id =>
-                    String(id)
-            )
-        );
-
-
-    const searchTerm =
-        normaliserRechercheSynergie(
-            synergySearchTerm
-        );
-
-
-    const allAvailable =
-        contenus
-            .filter(
-                item =>
-                    String(
-                        item.id
-                    ) !==
-                    currentId
-            )
-            .slice()
-            .sort(
-                (
-                    a,
-                    b
-                ) =>
-                    String(
-                        a.titre || ""
-                    ).localeCompare(
-                        String(
-                            b.titre || ""
-                        ),
-                        "fr"
-                    )
+            select.appendChild(
+                option
             );
 
+        }
+    );
 
-    const filteredAvailable =
-        allAvailable.filter(
-            item => {
-
-                if (
-                    selectedSet.has(
-                        String(
-                            item.id
-                        )
-                    )
-                ) {
-
-                    return false;
-
-                }
+}
 
 
-                if (!searchTerm) {
+/* =========================================================
+   LISTE SOUS-MENUS
+========================================================= */
 
-                    return true;
+function remplirListeSousMenus(
+    select,
+    valeur
+) {
 
-                }
-
-
-                return normaliserRechercheSynergie(
-                    item.titre
-                ).includes(
-                    searchTerm
-                );
-
-            }
-        );
+    if (!select) {
+        return;
+    }
 
 
-    available.innerHTML =
+    select.innerHTML =
         "";
 
 
-    if (
-        !filteredAvailable.length
-    ) {
+    menus.forEach(
+        menu => {
 
-        const empty =
-            document.createElement(
-                "div"
-            );
+            const groupe =
+                document.createElement("optgroup");
 
-        empty.className =
-            "synergy-empty";
+            groupe.label =
+                menu.titre;
 
 
-        empty.textContent =
-            searchTerm
-                ? "Aucune mesure ne correspond à votre recherche."
-                : "Aucune mesure disponible.";
+            sousMenus
+                .filter(
+                    submenu =>
+                        toId(submenu.menu_id) ===
+                        toId(menu.id)
+                )
+                .sort(
+                    (a, b) =>
+                        (Number(a.position) || 0) -
+                        (Number(b.position) || 0)
+                )
+                .forEach(
+                    submenu => {
 
+                        const option =
+                            document.createElement(
+                                "option"
+                            );
 
-        available.appendChild(
-            empty
-        );
+                        option.value =
+                            submenu.id;
 
-    }
-    else {
+                        option.textContent =
+                            submenu.titre;
 
-        filteredAvailable.forEach(
-            item => {
+                        option.selected =
+                            toId(submenu.id) ===
+                            toId(valeur);
 
-                const button =
-                    document.createElement(
-                        "button"
-                    );
-
-                button.type =
-                    "button";
-
-                button.className =
-                    "synergy-item";
-
-
-                const title =
-                    document.createElement(
-                        "span"
-                    );
-
-                title.className =
-                    "synergy-item-title";
-
-                title.textContent =
-                    item.titre ||
-                    "Mesure sans titre";
-
-
-                const action =
-                    document.createElement(
-                        "span"
-                    );
-
-                action.className =
-                    "synergy-item-action";
-
-                action.textContent =
-                    "AJOUTER";
-
-
-                button.appendChild(
-                    title
-                );
-
-                button.appendChild(
-                    action
-                );
-
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        ajouterSynergie(
-                            item.id
+                        groupe.appendChild(
+                            option
                         );
 
                     }
                 );
 
 
-                available.appendChild(
-                    button
+            if (
+                groupe.children.length
+            ) {
+
+                select.appendChild(
+                    groupe
                 );
 
             }
-        );
-
-    }
-
-
-    selected.innerHTML =
-        "";
-
-
-    const selectedItems =
-        synergySelectedIds
-            .map(
-                id =>
-                    contenus.find(
-                        item =>
-                            String(
-                                item.id
-                            ) ===
-                            String(id)
-                    )
-            )
-            .filter(Boolean);
-
-
-    if (
-        !selectedItems.length
-    ) {
-
-        const empty =
-            document.createElement(
-                "div"
-            );
-
-        empty.className =
-            "synergy-empty";
-
-        empty.textContent =
-            "Aucune synergie sélectionnée.";
-
-
-        selected.appendChild(
-            empty
-        );
-
-    }
-    else {
-
-        selectedItems.forEach(
-            item => {
-
-                const button =
-                    document.createElement(
-                        "button"
-                    );
-
-                button.type =
-                    "button";
-
-                button.className =
-                    "synergy-item synergy-selected-item";
-
-
-                const title =
-                    document.createElement(
-                        "span"
-                    );
-
-                title.className =
-                    "synergy-item-title";
-
-                title.textContent =
-                    item.titre ||
-                    "Mesure sans titre";
-
-
-                const action =
-                    document.createElement(
-                        "span"
-                    );
-
-                action.className =
-                    "synergy-item-action";
-
-                action.textContent =
-                    "RETIRER";
-
-
-                button.appendChild(
-                    title
-                );
-
-                button.appendChild(
-                    action
-                );
-
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        retirerSynergie(
-                            item.id
-                        );
-
-                    }
-                );
-
-
-                selected.appendChild(
-                    button
-                );
-
-            }
-        );
-
-    }
-
-
-    if (availableCount) {
-
-        availableCount.textContent =
-            filteredAvailable.length ===
-            1
-                ? "1 mesure"
-                : (
-                    filteredAvailable.length +
-                    " mesures"
-                );
-
-    }
-
-
-    if (selectedCount) {
-
-        selectedCount.textContent =
-            synergySelectedIds.length ===
-            1
-                ? "1 sélectionnée"
-                : (
-                    synergySelectedIds.length +
-                    " sélectionnées"
-                );
-
-    }
-
-}
-
-
-function ajouterSynergie(
-    id
-) {
-
-    const stringId =
-        String(id);
-
-
-    if (
-        !synergySelectedIds.includes(
-            stringId
-        )
-    ) {
-
-        synergySelectedIds.push(
-            stringId
-        );
-
-    }
-
-
-    renderSynergyPicker();
-
-}
-
-
-function retirerSynergie(
-    id
-) {
-
-    const stringId =
-        String(id);
-
-
-    synergySelectedIds =
-        synergySelectedIds.filter(
-            item =>
-                String(item) !==
-                stringId
-        );
-
-
-    renderSynergyPicker();
-
-}
-
-
-function retirerToutesLesSynergies() {
-
-    synergySelectedIds =
-        [];
-
-    renderSynergyPicker();
-
-}
-
-
-function obtenirSynergies() {
-
-    return synergySelectedIds.slice();
-
-}
-
-
-/* =========================================================
-   RECHERCHE SYNERGIES
-========================================================= */
-
-const synergySearch =
-    document.getElementById(
-        "synergySearch"
-    );
-
-
-if (synergySearch) {
-
-    synergySearch.addEventListener(
-        "input",
-        () => {
-
-            synergySearchTerm =
-                synergySearch.value;
-
-            renderSynergyPicker();
-
-        }
-    );
-
-}
-
-
-const synergyClearButton =
-    document.getElementById(
-        "synergyClearButton"
-    );
-
-
-if (synergyClearButton) {
-
-    synergyClearButton.addEventListener(
-        "click",
-        () => {
-
-            retirerToutesLesSynergies();
 
         }
     );
@@ -2115,19 +2665,13 @@ function ouvrirStructure(
     const item =
         collection.find(
             element =>
-                element.id === id
+                toId(element.id) ===
+                toId(id)
         );
 
 
     if (!item) {
-
-        showMessage(
-            "Élément introuvable.",
-            "error"
-        );
-
         return;
-
     }
 
 
@@ -2137,128 +2681,94 @@ function ouvrirStructure(
     selectedId =
         id;
 
-    editorType =
-        type;
 
-    editorId =
-        id;
+    if (welcome) {
+        welcome.style.display =
+            "none";
+    }
 
+    if (contentEditor) {
+        contentEditor.style.display =
+            "none";
+    }
 
-    welcome.style.display =
-        "none";
-
-    contentEditor.style.display =
-        "none";
-
-    structureEditor.style.display =
-        "block";
-
-
-    structureTitle.textContent =
-        type === "menu"
-            ? "Modifier le menu"
-            : "Modifier le sous-menu";
-
-
-    structureDescription.textContent =
-        type === "menu"
-            ? "Modification de la structure du projet."
-            : "Modification du sous-menu et de son menu parent.";
-
-
-    structureName.value =
-        item.titre || "";
-
-
-    if (
-        type === "submenu"
-    ) {
-
-        structureParentField.style.display =
+    if (structureEditor) {
+        structureEditor.style.display =
             "block";
+    }
 
 
-        remplirParentMenus(
+    if (structureTitle) {
+
+        structureTitle.textContent =
+            type === "menu"
+                ? "MODIFIER LE MENU"
+                : "MODIFIER LE SOUS-MENU";
+
+    }
+
+
+    if (structureDescription) {
+
+        structureDescription.textContent =
+            type === "menu"
+                ? "Modification du menu principal."
+                : "Modification du sous-menu.";
+
+    }
+
+
+    if (structureName) {
+
+        structureName.value =
+            item.titre || "";
+
+    }
+
+
+    if (type === "submenu") {
+
+        if (structureParentField) {
+
+            structureParentField.style.display =
+                "block";
+
+        }
+
+        remplirListeMenus(
+            structureParent,
             item.menu_id
         );
 
-    }
-    else {
+    } else {
 
-        structureParentField.style.display =
-            "none";
+        if (structureParentField) {
 
-    }
-
-}
-
-
-/* =========================================================
-   PARENT MENUS
-========================================================= */
-
-function remplirParentMenus(
-    selectedId
-) {
-
-    structureParent.innerHTML =
-        "";
-
-
-    menus.forEach(
-        menu => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value =
-                menu.id;
-
-            option.textContent =
-                menu.titre ||
-                "Menu sans titre";
-
-
-            if (
-                String(
-                    menu.id
-                ) ===
-                String(
-                    selectedId
-                )
-            ) {
-
-                option.selected =
-                    true;
-
-            }
-
-
-            structureParent.appendChild(
-                option
-            );
+            structureParentField.style.display =
+                "none";
 
         }
-    );
+
+        if (structureParent) {
+
+            structureParent.innerHTML =
+                "";
+
+        }
+
+    }
 
 }
 
 
 /* =========================================================
-   SAUVEGARDE STRUCTURE
+   ENREGISTRER STRUCTURE
 ========================================================= */
 
-async function sauvegarderStructure() {
+async function enregistrerStructure() {
 
-    if (
-        !editorType ||
-        !editorId
-    ) {
-
+    if (!structureName) {
         return;
-
     }
 
 
@@ -2279,7 +2789,7 @@ async function sauvegarderStructure() {
 
 
     if (
-        editorType ===
+        selectedType ===
         "menu"
     ) {
 
@@ -2289,24 +2799,19 @@ async function sauvegarderStructure() {
             await supabase
                 .from("menus")
                 .update({
-
                     titre
-
                 })
                 .eq(
                     "id",
-                    editorId
+                    selectedId
                 );
 
 
         if (error) {
 
-            console.error(
-                error
-            );
-
             showMessage(
-                "Impossible d'enregistrer le menu.",
+                "Impossible d'enregistrer le menu : " +
+                error.message,
                 "error"
             );
 
@@ -2318,35 +2823,19 @@ async function sauvegarderStructure() {
 
 
     if (
-        editorType ===
+        selectedType ===
         "submenu"
     ) {
 
-        const nouveauMenuId =
-            structureParent.value;
-
-
-        if (!nouveauMenuId) {
-
-            showMessage(
-                "Le menu parent est obligatoire.",
-                "error"
-            );
-
-            return;
-
-        }
-
-
-        const sousMenu =
+        const submenu =
             sousMenus.find(
                 item =>
-                    item.id ===
-                    editorId
+                    toId(item.id) ===
+                    toId(selectedId)
             );
 
 
-        if (!sousMenu) {
+        if (!submenu) {
 
             showMessage(
                 "Sous-menu introuvable.",
@@ -2358,119 +2847,16 @@ async function sauvegarderStructure() {
         }
 
 
-        let nouvellePosition =
-            Number(
-                sousMenu.position
-            ) || 0;
+    const nouveauMenuId =
+        structureParent
+            ? structureParent.value
+            : "";
 
 
-        if (
-            String(
-                nouveauMenuId
-            ) !==
-            String(
-                sousMenu.menu_id
-            )
-        ) {
-
-            const destination =
-                sousMenus.filter(
-                    item =>
-                        String(
-                            item.menu_id
-                        ) ===
-                        String(
-                            nouveauMenuId
-                        ) &&
-                        String(
-                            item.id
-                        ) !==
-                        String(
-                            editorId
-                        )
-                );
-
-
-            nouvellePosition =
-                getNextPosition(
-                    destination
-                );
-
-        }
-
-
-        const {
-            error
-        } =
-            await supabase
-                .from("sous_menus")
-                .update({
-
-                    titre,
-
-                    menu_id:
-                        nouveauMenuId,
-
-                    position:
-                        nouvellePosition
-
-                })
-                .eq(
-                    "id",
-                    editorId
-                );
-
-
-        if (error) {
-
-            console.error(
-                error
-            );
-
-            showMessage(
-                "Impossible d'enregistrer le sous-menu.",
-                "error"
-            );
-
-            return;
-
-        }
-
-    }
-
-
-    showMessage(
-        "Structure enregistrée."
-    );
-
-
-    await chargerDonnees();
-
-    fermerEditeurs();
-
-}
-
-
-/* =========================================================
-   OUVRIR CONTENU
-========================================================= */
-
-function ouvrirContenu(
-    id
-) {
-
-    const item =
-        contenus.find(
-            content =>
-                content.id ===
-                id
-        );
-
-
-    if (!item) {
+    if (!nouveauMenuId) {
 
         showMessage(
-            "Contenu introuvable.",
+            "Le menu parent est obligatoire.",
             "error"
         );
 
@@ -2479,11 +2865,613 @@ function ouvrirContenu(
     }
 
 
-    selectedType =
-        "content";
+    let nouvellePosition =
+        Number(submenu.position) || 0;
 
-    selectedId =
-        id;
+
+    if (
+        toId(nouveauMenuId) !==
+        toId(submenu.menu_id)
+    ) {
+
+        const destination =
+            sousMenus.filter(
+                item =>
+                    toId(item.menu_id) ===
+                    toId(nouveauMenuId) &&
+                    toId(item.id) !==
+                    toId(selectedId)
+            );
+
+
+        nouvellePosition =
+            getNextPosition(destination);
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabase
+            .from("sous_menus")
+            .update({
+
+                titre,
+
+                menu_id:
+                    nouveauMenuId,
+
+                position:
+                    nouvellePosition
+
+            })
+            .eq(
+                "id",
+                selectedId
+            );
+
+
+    if (error) {
+
+        showMessage(
+            "Impossible d'enregistrer le sous-menu : " +
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+}
+
+
+await chargerDonnees();
+
+fermerEditeurs();
+
+showMessage(
+    "Modification enregistrée."
+);
+
+}
+
+
+/* =========================================================
+   MODAL CREATION
+========================================================= */
+
+function obtenirElementsModal() {
+
+    return {
+
+        modal:
+            document.getElementById(
+                "structureModal"
+            ),
+
+        title:
+            document.getElementById(
+                "modalTitle"
+            ),
+
+        name:
+            document.getElementById(
+                "modalName"
+            ),
+
+        save:
+            document.getElementById(
+                "modalSaveButton"
+            )
+
+    };
+
+}
+
+
+function ouvrirModalCreation(
+    type,
+    parentId
+) {
+
+    const elements =
+        obtenirElementsModal();
+
+
+    const modal =
+        elements.modal;
+
+    const title =
+        elements.title;
+
+    const name =
+        elements.name;
+
+    const save =
+        elements.save;
+
+
+    if (!modal) {
+
+        showMessage(
+            "Impossible d'ouvrir la création : fenêtre introuvable.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (!title) {
+
+        showMessage(
+            "Impossible d'ouvrir la création : titre de la fenêtre introuvable.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (!name) {
+
+        showMessage(
+            "Impossible d'ouvrir la création : champ de nom introuvable.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    modalType =
+        type;
+
+    modalParentId =
+        parentId;
+
+
+    title.textContent =
+        type === "submenu"
+            ? "NOUVEAU SOUS-MENU"
+            : "NOUVEAU CONTENU";
+
+
+    name.value =
+        "";
+
+
+    if (save) {
+
+        save.textContent =
+            "CRÉER";
+
+        save.disabled =
+            false;
+
+    }
+
+
+    modal.classList.add(
+        "visible"
+    );
+
+
+    modal.style.display =
+        "flex";
+
+
+    setTimeout(
+        () => {
+
+            if (
+                document.body.contains(name)
+            ) {
+
+                name.focus();
+
+            }
+
+        },
+        50
+    );
+
+}
+
+
+function ouvrirCreationMenu() {
+
+    const elements =
+        obtenirElementsModal();
+
+
+    const modal =
+        elements.modal;
+
+    const title =
+        elements.title;
+
+    const name =
+        elements.name;
+
+    const save =
+        elements.save;
+
+
+    if (!modal) {
+
+        showMessage(
+            "Impossible d'ouvrir la création : fenêtre introuvable.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (!title) {
+
+        showMessage(
+            "Impossible d'ouvrir la création : titre de la fenêtre introuvable.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (!name) {
+
+        showMessage(
+            "Impossible d'ouvrir la création : champ de nom introuvable.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    modalType =
+        "menu";
+
+    modalParentId =
+        null;
+
+
+    title.textContent =
+        "NOUVEAU MENU";
+
+
+    name.value =
+        "";
+
+
+    if (save) {
+
+        save.textContent =
+            "CRÉER";
+
+        save.disabled =
+            false;
+
+    }
+
+
+    modal.classList.add(
+        "visible"
+    );
+
+
+    modal.style.display =
+        "flex";
+
+
+    setTimeout(
+        () => {
+
+            if (
+                document.body.contains(name)
+            ) {
+
+                name.focus();
+
+            }
+
+        },
+        50
+    );
+
+}
+
+
+function fermerModal() {
+
+    const modal =
+        document.getElementById(
+            "structureModal"
+        );
+
+
+    if (modal) {
+
+        modal.classList.remove(
+            "visible"
+        );
+
+        modal.style.display =
+            "";
+
+    }
+
+
+    modalType =
+        null;
+
+    modalParentId =
+        null;
+
+}
+
+
+/* =========================================================
+   CREATION
+========================================================= */
+
+async function creerElement() {
+
+    const name =
+        document.getElementById(
+            "modalName"
+        );
+
+    const save =
+        document.getElementById(
+            "modalSaveButton"
+        );
+
+
+    if (
+        !name ||
+        !save
+    ) {
+        return;
+    }
+
+
+    const titre =
+        name.value.trim();
+
+
+    if (!titre) {
+
+        showMessage(
+            "Le titre est obligatoire.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    save.disabled =
+        true;
+
+
+    try {
+
+        if (
+            modalType ===
+            "menu"
+        ) {
+
+            const {
+                error
+            } =
+                await supabase
+                    .from("menus")
+                    .insert({
+
+                        titre,
+
+                        position:
+                            getNextPosition(
+                                menus
+                            ),
+
+                        valide:
+                            false
+
+                    });
+
+
+            if (error) {
+                throw error;
+            }
+
+        }
+
+
+        else if (
+            modalType ===
+            "submenu"
+        ) {
+
+            if (!modalParentId) {
+                throw new Error(
+                    "Menu parent manquant."
+                );
+            }
+
+
+            const siblings =
+                sousMenus.filter(
+                    item =>
+                        toId(item.menu_id) ===
+                        toId(modalParentId)
+                );
+
+
+            const {
+                error
+            } =
+                await supabase
+                    .from("sous_menus")
+                    .insert({
+
+                        menu_id:
+                            modalParentId,
+
+                        titre,
+
+                        position:
+                            getNextPosition(
+                                siblings
+                            ),
+
+                        valide:
+                            false
+
+                    });
+
+
+            if (error) {
+                throw error;
+            }
+
+        }
+
+
+        else if (
+            modalType ===
+            "content"
+        ) {
+
+            if (!modalParentId) {
+                throw new Error(
+                    "Sous-menu parent manquant."
+                );
+            }
+
+
+            const siblings =
+                contenus.filter(
+                    item =>
+                        toId(item.sous_menu_id) ===
+                        toId(modalParentId)
+                );
+
+
+            const {
+                error
+            } =
+                await supabase
+                    .from("contenus")
+                    .insert({
+
+                        sous_menu_id:
+                            modalParentId,
+
+                        titre,
+
+                        html:
+                            "<p></p>",
+
+                        position:
+                            getNextPosition(
+                                siblings
+                            ),
+
+                        valide:
+                            false,
+
+                        photo_url:
+                            null,
+
+                        accroche:
+                            null,
+
+                        priorite:
+                            null,
+
+                        stat_1:
+                            null,
+
+                        stat_2:
+                            null,
+
+                        stat_3:
+                            null,
+
+                        synergies:
+                            []
+
+                    });
+
+
+            if (error) {
+                throw error;
+            }
+
+        }
+
+
+        fermerModal();
+
+        await chargerDonnees();
+
+        showMessage(
+            "Élément créé."
+        );
+
+    }
+    catch (error) {
+
+        showMessage(
+            error?.message
+                ? "Impossible de créer l'élément : " +
+                  error.message
+                : "Impossible de créer l'élément.",
+            "error"
+        );
+
+    }
+    finally {
+
+        save.disabled =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   OUVRIR CONTENU
+========================================================= */
+
+function ouvrirContenu(id) {
+
+    const item =
+        contenus.find(
+            content =>
+                toId(content.id) ===
+                toId(id)
+        );
+
+
+    if (!item) {
+        return;
+    }
+
 
     editorType =
         "content";
@@ -2492,345 +3480,186 @@ function ouvrirContenu(
         id;
 
 
-    welcome.style.display =
-        "none";
+    if (welcome) {
+        welcome.style.display =
+            "none";
+    }
 
-    structureEditor.style.display =
-        "none";
+    if (structureEditor) {
+        structureEditor.style.display =
+            "none";
+    }
 
-    contentEditor.style.display =
-        "block";
-
-
-    contentEditorTitle.textContent =
-        "Modifier le contenu";
-
-
-    contentTitle.value =
-        item.titre || "";
+    if (contentEditor) {
+        contentEditor.style.display =
+            "block";
+    }
 
 
-    remplirParentSousMenus(
+    if (contentEditorTitle) {
+
+        contentEditorTitle.textContent =
+            "MODIFIER LE CONTENU";
+
+    }
+
+
+    if (contentTitle) {
+
+        contentTitle.value =
+            item.titre || "";
+
+    }
+
+
+    remplirListeSousMenus(
+        contentParent,
         item.sous_menu_id
     );
 
 
-    if (contentPhoto) {
+    if (cardPhoto) {
 
-        contentPhoto.value =
-            item.photo_url ||
-            "";
+        cardPhoto.value =
+            item.photo_url || "";
 
-    }
-
-
-    if (contentAccroche) {
-
-        contentAccroche.value =
-            item.accroche ||
-            "";
-
-    }
-
-
-    if (contentPriority) {
-
-        contentPriority.value =
-            item.priorite ||
-            "";
+        cardPhoto.dispatchEvent(
+            new Event(
+                "input",
+                {
+                    bubbles:true
+                }
+            )
+        );
 
     }
 
 
-    remplirStatistiques(
-        contentStat1
-    );
+    if (cardAccroche) {
 
-    remplirStatistiques(
-        contentStat2
-    );
+        cardAccroche.value =
+            item.accroche || "";
 
-    remplirStatistiques(
-        contentStat3
-    );
+    }
 
 
-    restaurerStatistique(
-        contentStat1,
-        item.stat_1
-    );
+    /*
+     * PRIORITÉ
+     *
+     * On recharge uniquement l'une des trois valeurs
+     * autorisées.
+     */
 
-    restaurerStatistique(
-        contentStat2,
-        item.stat_2
-    );
-
-    restaurerStatistique(
-        contentStat3,
-        item.stat_3
-    );
+    initialiserListePriorite();
 
 
-    remplirListeSynergies(
+    if (cardPriorite) {
+
+        const priorite =
+            String(
+                item.priorite || ""
+            ).toLowerCase();
+
+
+        if (
+            PRIORITES.some(
+                option =>
+                    option.value ===
+                    priorite
+            )
+        ) {
+
+            cardPriorite.value =
+                priorite;
+
+        } else {
+
+            cardPriorite.value =
+                "";
+
+        }
+
+    }
+
+
+    remplirListesStats();
+
+
+    if (cardStat1) {
+
+        cardStat1.value =
+            item.stat_1
+                ? String(item.stat_1)
+                : "";
+
+    }
+
+
+    if (cardStat2) {
+
+        cardStat2.value =
+            item.stat_2
+                ? String(item.stat_2)
+                : "";
+
+    }
+
+
+    if (cardStat3) {
+
+        cardStat3.value =
+            item.stat_3
+                ? String(item.stat_3)
+                : "";
+
+    }
+
+
+    /*
+     * SYNERGIES
+     *
+     * Les UUID sont conservés dans leur ordre
+     * de sélection.
+     */
+    initialiserSynergies(
         item.synergies || [],
         item.id
     );
 
 
-    wysiwyg.innerHTML =
-        item.html ||
-        "";
+    if (wysiwyg) {
+
+        wysiwyg.innerHTML =
+            item.html || "";
+
+    }
 
 
-    sourceEditor.value =
-        item.html ||
-        "";
+    if (sourceEditor) {
+
+        sourceEditor.value =
+            item.html || "";
+
+    }
 
 
     isSourceMode =
         false;
 
 
-    wysiwyg.style.display =
-        "block";
-
-    sourceEditor.style.display =
-        "none";
-
-
-    const sourceModeButton =
-        document.getElementById(
-            "sourceModeButton"
-        );
-
-
-    if (sourceModeButton) {
-
-        sourceModeButton.textContent =
-            "CODE HTML";
-
-    }
+    actualiserModeEditeur();
 
 }
 
 
 /* =========================================================
-   PARENT SOUS-MENUS
+   ENREGISTRER CONTENU
 ========================================================= */
 
-function remplirParentSousMenus(
-    selectedId
-) {
+async function enregistrerContenu() {
 
-    contentParent.innerHTML =
-        "";
-
-
-    sousMenus.forEach(
-        submenu => {
-
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-            option.value =
-                submenu.id;
-
-            option.textContent =
-                submenu.titre ||
-                "Sous-menu sans titre";
-
-
-            if (
-                String(
-                    submenu.id
-                ) ===
-                String(
-                    selectedId
-                )
-            ) {
-
-                option.selected =
-                    true;
-
-            }
-
-
-            contentParent.appendChild(
-                option
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   STATISTIQUES
-========================================================= */
-
-function remplirStatistiques(
-    select
-) {
-
-    if (!select) {
-
+    if (!contentTitle) {
         return;
-
-    }
-
-
-    select.innerHTML =
-        `
-            <option value="">
-                Non configurée
-            </option>
-        `;
-
-
-    stats
-        .slice()
-        .sort(
-            (
-                a,
-                b
-            ) =>
-                String(
-                    a.titre ||
-                    a.nom ||
-                    a.code ||
-                    ""
-                ).localeCompare(
-                    String(
-                        b.titre ||
-                        b.nom ||
-                        b.code ||
-                        ""
-                    ),
-                    "fr"
-                )
-        )
-        .forEach(
-            stat => {
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-
-                option.value =
-                    stat.code ||
-                    stat.id;
-
-
-                option.textContent =
-                    stat.titre ||
-                    stat.nom ||
-                    stat.code ||
-                    "Statistique";
-
-
-                select.appendChild(
-                    option
-                );
-
-            }
-        );
-
-}
-
-
-function restaurerStatistique(
-    select,
-    value
-) {
-
-    if (!select) {
-
-        return;
-
-    }
-
-
-    if (
-        value === null ||
-        value === undefined ||
-        value === ""
-    ) {
-
-        select.value =
-            "";
-
-        return;
-
-    }
-
-
-    const stringValue =
-        String(value);
-
-
-    const option =
-        Array.from(
-            select.options
-        )
-        .find(
-            item =>
-                String(
-                    item.value
-                ) ===
-                stringValue
-        );
-
-
-    if (option) {
-
-        select.value =
-            option.value;
-
-    }
-    else {
-
-        const fallback =
-            document.createElement(
-                "option"
-            );
-
-        fallback.value =
-            stringValue;
-
-        fallback.textContent =
-            stringValue;
-
-        select.appendChild(
-            fallback
-        );
-
-        select.value =
-            stringValue;
-
-    }
-
-}
-
-
-/* =========================================================
-   SAUVEGARDE CONTENU
-========================================================= */
-
-async function sauvegarderContenu() {
-
-    if (
-        editorType !==
-        "content" ||
-        !editorId
-    ) {
-
-        return;
-
     }
 
 
@@ -2853,8 +3682,8 @@ async function sauvegarderContenu() {
     const contenu =
         contenus.find(
             item =>
-                item.id ===
-                editorId
+                toId(item.id) ===
+                toId(editorId)
         );
 
 
@@ -2871,7 +3700,9 @@ async function sauvegarderContenu() {
 
 
     const nouveauSousMenuId =
-        contentParent.value;
+        contentParent
+            ? contentParent.value
+            : "";
 
 
     if (!nouveauSousMenuId) {
@@ -2886,11 +3717,11 @@ async function sauvegarderContenu() {
     }
 
 
-    /* -----------------------------------------------------
-       HTML
-    ----------------------------------------------------- */
-
-    if (isSourceMode) {
+    if (
+        isSourceMode &&
+        wysiwyg &&
+        sourceEditor
+    ) {
 
         wysiwyg.innerHTML =
             sourceEditor.value;
@@ -2899,88 +3730,85 @@ async function sauvegarderContenu() {
 
 
     const html =
-        wysiwyg.innerHTML;
+        wysiwyg
+            ? wysiwyg.innerHTML
+            : "";
 
-
-    /* -----------------------------------------------------
-       RECTO
-    ----------------------------------------------------- */
 
     const photo =
-        contentPhoto
-            ? contentPhoto.value.trim()
-            : null;
+        cardPhoto
+            ? String(
+                cardPhoto.value || ""
+            ).trim()
+            : "";
 
 
     const accroche =
-        contentAccroche
-            ? contentAccroche.value.trim()
-            : null;
+        cardAccroche
+            ? String(
+                cardAccroche.value || ""
+            ).trim()
+            : "";
 
 
-    const priorite =
-        contentPriority
-            ? contentPriority.value.trim()
-            : null;
+    /*
+     * PRIORITÉ
+     *
+     * Une seule valeur parmi :
+     * absolue
+     * prioritaire
+     * secondaire
+     */
 
-
-    const stat1 =
-        contentStat1
-            ? contentStat1.value || null
-            : null;
-
-
-    const stat2 =
-        contentStat2
-            ? contentStat2.value || null
-            : null;
-
-
-    const stat3 =
-        contentStat3
-            ? contentStat3.value || null
-            : null;
-
-
-    const synergies =
-        obtenirSynergies();
-
-
-    /* -----------------------------------------------------
-       VERIFICATION : 3 STATS MAXIMUM
-    ----------------------------------------------------- */
-
-    const statistiques =
-        [
-            stat1,
-            stat2,
-            stat3
-        ].filter(
-            Boolean
-        );
+    let priorite =
+        cardPriorite
+            ? String(
+                cardPriorite.value || ""
+            ).trim().toLowerCase()
+            : "";
 
 
     if (
-        statistiques.length >
-        3
+        !PRIORITES.some(
+            option =>
+                option.value ===
+                priorite
+        )
     ) {
 
-        showMessage(
-            "Trois statistiques maximum.",
-            "error"
-        );
-
-        return;
+        priorite =
+            "";
 
     }
 
 
-    /* -----------------------------------------------------
-       POSITION
-    ----------------------------------------------------- */
+    const stat1 =
+        cardStat1
+            ? cardStat1.value || null
+            : null;
 
-    const ancienSousMenuId =
-        contenu.sous_menu_id;
+
+    const stat2 =
+        cardStat2
+            ? cardStat2.value || null
+            : null;
+
+
+    const stat3 =
+        cardStat3
+            ? cardStat3.value || null
+            : null;
+
+
+    const synergies =
+        normaliserSynergies(
+            obtenirSynergies()
+        )
+        .filter(
+            id =>
+                toId(id) !==
+                toId(editorId)
+        );
 
 
     let nouvellePosition =
@@ -2990,21 +3818,17 @@ async function sauvegarderContenu() {
 
 
     if (
-        String(
-            nouveauSousMenuId
-        ) !==
-        String(
-            ancienSousMenuId
-        )
+        toId(nouveauSousMenuId) !==
+        toId(contenu.sous_menu_id)
     ) {
 
         const destination =
             contenus.filter(
                 item =>
-                    item.sous_menu_id ===
-                    nouveauSousMenuId &&
-                    item.id !==
-                    editorId
+                    toId(item.sous_menu_id) ===
+                    toId(nouveauSousMenuId) &&
+                    toId(item.id) !==
+                    toId(editorId)
             );
 
 
@@ -3016,66 +3840,527 @@ async function sauvegarderContenu() {
     }
 
 
-    /* -----------------------------------------------------
-       UPDATE
-    ----------------------------------------------------- */
+    if (contentSaveButton) {
+        contentSaveButton.disabled = true;
+    }
 
-    const {
-        error
-    } =
-        await supabase
-            .from("contenus")
-            .update({
 
-                titre,
+    try {
 
-                html,
+        const {
+            error
+        } =
+            await supabase
+                .from("contenus")
+                .update({
 
-                sous_menu_id:
-                    nouveauSousMenuId,
+                    titre,
 
-                position:
-                    nouvellePosition,
+                    html,
 
-                photo_url:
-                    photo ||
-                    null,
+                    sous_menu_id:
+                        nouveauSousMenuId,
 
-                accroche:
-                    accroche ||
-                    null,
+                    position:
+                        nouvellePosition,
 
-                priorite:
-                    priorite ||
-                    null,
+                    photo_url:
+                        photo || null,
 
-                stat_1:
-                    stat1,
+                    accroche:
+                        accroche || null,
 
-                stat_2:
-                    stat2,
+                    priorite:
+                        priorite || null,
 
-                stat_3:
-                    stat3,
+                    stat_1:
+                        stat1,
 
-                synergies:
+                    stat_2:
+                        stat2,
+
+                    stat_3:
+                        stat3,
+
                     synergies
 
-            })
-            .eq(
-                "id",
-                editorId
-            );
+                })
+                .eq(
+                    "id",
+                    editorId
+                );
 
 
-    if (error) {
+        if (error) {
+            throw error;
+        }
 
-        console.error(
-            error
-        );
+
+        await chargerDonnees();
+
+        fermerEditeurs();
 
         showMessage(
-            "Impossible d'enregistrer le contenu.",
+            "Contenu enregistré."
+        );
+
+    }
+    catch (error) {
+
+        showMessage(
+            error?.message
+                ? "Impossible d'enregistrer le contenu : " +
+                  error.message
+                : "Impossible d'enregistrer le contenu.",
+            "error"
+        );
+
+    }
+    finally {
+
+        if (contentSaveButton) {
+            contentSaveButton.disabled = false;
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   EDITEUR
+========================================================= */
+
+function initialiserEvenementsEditeur() {
+
+    document
+        .querySelectorAll(
+            "#toolbar button[data-command]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    event => {
+
+                        event.preventDefault();
+
+                        const command =
+                            button.dataset.command;
+
+                        const value =
+                            button.dataset.value ||
+                            null;
+
+
+                        if (!wysiwyg) {
+                            return;
+                        }
+
+
+                        wysiwyg.focus();
+
+
+                        document.execCommand(
+                            command,
+                            false,
+                            value
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            "#toolbar button[data-format]"
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    event => {
+
+                        event.preventDefault();
+
+                        const format =
+                            button.dataset.format;
+
+
+                        if (!wysiwyg) {
+                            return;
+                        }
+
+
+                        wysiwyg.focus();
+
+
+                        document.execCommand(
+                            "formatBlock",
+                            false,
+                            format
+                        );
+
+                    }
+                );
+
+            }
+        );
+
+
+    const linkButton =
+        document.getElementById(
+            "linkButton"
+        );
+
+
+    if (linkButton) {
+
+        linkButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+
+                const url =
+                    prompt(
+                        "Adresse du lien :"
+                    );
+
+
+                if (
+                    !url ||
+                    !wysiwyg
+                ) {
+                    return;
+                }
+
+
+                wysiwyg.focus();
+
+
+                document.execCommand(
+                    "createLink",
+                    false,
+                    url
+                );
+
+            }
+        );
+
+    }
+
+
+    const imageButton =
+        document.getElementById(
+            "imageButton"
+        );
+
+
+    if (imageButton) {
+
+        imageButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+
+                const url =
+                    prompt(
+                        "URL de l'image :"
+                    );
+
+
+                if (
+                    !url ||
+                    !wysiwyg
+                ) {
+                    return;
+                }
+
+
+                wysiwyg.focus();
+
+
+                document.execCommand(
+                    "insertImage",
+                    false,
+                    url
+                );
+
+            }
+        );
+
+    }
+
+
+    const videoButton =
+        document.getElementById(
+            "videoButton"
+        );
+
+
+    if (videoButton) {
+
+        videoButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+
+                const url =
+                    prompt(
+                        "URL de la vidéo :"
+                    );
+
+
+                if (
+                    !url ||
+                    !wysiwyg
+                ) {
+                    return;
+                }
+
+
+                wysiwyg.focus();
+
+
+                const html = `
+
+                    <p>
+
+                        <video
+                            controls
+                            src="${escapeHtml(url)}"
+                        ></video>
+
+                    </p>
+
+                `;
+
+
+                document.execCommand(
+                    "insertHTML",
+                    false,
+                    html
+                );
+
+            }
+        );
+
+    }
+
+
+    const sourceModeButton =
+        document.getElementById(
+            "sourceModeButton"
+        );
+
+
+    if (sourceModeButton) {
+
+        sourceModeButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+
+                if (!isSourceMode) {
+
+                    if (
+                        wysiwyg &&
+                        sourceEditor
+                    ) {
+
+                        sourceEditor.value =
+                            wysiwyg.innerHTML;
+
+                    }
+
+                    isSourceMode =
+                        true;
+
+                } else {
+
+                    if (
+                        wysiwyg &&
+                        sourceEditor
+                    ) {
+
+                        wysiwyg.innerHTML =
+                            sourceEditor.value;
+
+                    }
+
+                    isSourceMode =
+                        false;
+
+                }
+
+
+                actualiserModeEditeur();
+
+            }
+        );
+
+    }
+
+
+    if (contentCancelButton) {
+
+        contentCancelButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                fermerEditeurs();
+
+            }
+        );
+
+    }
+
+
+    if (contentSaveButton) {
+
+        contentSaveButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                enregistrerContenu();
+
+            }
+        );
+
+    }
+
+}
+
+
+function actualiserModeEditeur() {
+
+    const sourceModeButton =
+        document.getElementById(
+            "sourceModeButton"
+        );
+
+
+    if (
+        !wysiwyg ||
+        !sourceEditor
+    ) {
+        return;
+    }
+
+
+    if (isSourceMode) {
+
+        wysiwyg.style.display =
+            "none";
+
+        sourceEditor.style.display =
+            "block";
+
+
+        if (sourceModeButton) {
+
+            sourceModeButton.textContent =
+                "ÉDITEUR VISUEL";
+
+        }
+
+    } else {
+
+        wysiwyg.style.display =
+            "block";
+
+        sourceEditor.style.display =
+            "none";
+
+
+        if (sourceModeButton) {
+
+            sourceModeButton.textContent =
+                "CODE HTML";
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   VALIDATION
+========================================================= */
+
+async function changerValidation(
+    id,
+    item
+) {
+
+    const nouveauStatut =
+        !Boolean(item.valide);
+
+
+    let table =
+        null;
+
+
+    if (
+        menus.some(
+            element =>
+                toId(element.id) ===
+                toId(id)
+        )
+    ) {
+
+        table =
+            "menus";
+
+    }
+    else if (
+        sousMenus.some(
+            element =>
+                toId(element.id) ===
+                toId(id)
+        )
+    ) {
+
+        table =
+            "sous_menus";
+
+    }
+    else if (
+        contenus.some(
+            element =>
+                toId(element.id) ===
+                toId(id)
+        )
+    ) {
+
+        table =
+            "contenus";
+
+    }
+
+
+    if (!table) {
+
+        showMessage(
+            "Élément introuvable.",
             "error"
         );
 
@@ -3084,14 +4369,558 @@ async function sauvegarderContenu() {
     }
 
 
+    const {
+        error
+    } =
+        await supabase
+            .from(table)
+            .update({
+                valide:
+                    nouveauStatut
+            })
+            .eq(
+                "id",
+                id
+            );
+
+
+    if (error) {
+
+        showMessage(
+            "Impossible de modifier le statut : " +
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    item.valide =
+        nouveauStatut;
+
+
+    renderTree();
+
+
     showMessage(
-        "Contenu enregistré."
+        nouveauStatut
+            ? "Élément validé."
+            : "Élément passé en brouillon."
     );
+
+}
+
+
+/* =========================================================
+   ORDRE
+========================================================= */
+
+async function deplacerMenu(
+    index,
+    direction
+) {
+
+    const otherIndex =
+        index + direction;
+
+
+    if (
+        otherIndex < 0 ||
+        otherIndex >= menus.length
+    ) {
+        return;
+    }
+
+
+    await echangerPositions(
+        "menus",
+        menus[index],
+        menus[otherIndex]
+    );
+
+}
+
+
+async function deplacerSousMenu(
+    item,
+    siblings,
+    direction
+) {
+
+    const index =
+        siblings.findIndex(
+            sibling =>
+                toId(sibling.id) ===
+                toId(item.id)
+        );
+
+
+    const otherIndex =
+        index + direction;
+
+
+    if (
+        otherIndex < 0 ||
+        otherIndex >= siblings.length
+    ) {
+        return;
+    }
+
+
+    await echangerPositions(
+        "sous_menus",
+        item,
+        siblings[otherIndex]
+    );
+
+}
+
+
+async function deplacerContenu(
+    item,
+    siblings,
+    direction
+) {
+
+    const index =
+        siblings.findIndex(
+            sibling =>
+                toId(sibling.id) ===
+                toId(item.id)
+        );
+
+
+    const otherIndex =
+        index + direction;
+
+
+    if (
+        otherIndex < 0 ||
+        otherIndex >= siblings.length
+    ) {
+        return;
+    }
+
+
+    await echangerPositions(
+        "contenus",
+        item,
+        siblings[otherIndex]
+    );
+
+}
+
+
+async function echangerPositions(
+    table,
+    first,
+    second
+) {
+
+    const firstPosition =
+        Number(first.position) || 0;
+
+    const secondPosition =
+        Number(second.position) || 0;
+
+
+    const firstUpdate =
+        await supabase
+            .from(table)
+            .update({
+                position:
+                    secondPosition
+            })
+            .eq(
+                "id",
+                first.id
+            );
+
+
+    if (firstUpdate.error) {
+
+        showMessage(
+            "Impossible de modifier l'ordre : " +
+            firstUpdate.error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const secondUpdate =
+        await supabase
+            .from(table)
+            .update({
+                position:
+                    firstPosition
+            })
+            .eq(
+                "id",
+                second.id
+            );
+
+
+    if (secondUpdate.error) {
+
+        showMessage(
+            "Impossible de modifier l'ordre : " +
+            secondUpdate.error.message,
+            "error"
+        );
+
+        await chargerDonnees();
+
+        return;
+
+    }
 
 
     await chargerDonnees();
 
+}
+
+
+/* =========================================================
+   SUPPRESSION MENU
+========================================================= */
+
+async function supprimerMenu(id) {
+
+    const menu =
+        menus.find(
+            item =>
+                toId(item.id) ===
+                toId(id)
+        );
+
+
+    if (!menu) {
+        return;
+    }
+
+
+    const children =
+        sousMenus.filter(
+            item =>
+                toId(item.menu_id) ===
+                toId(id)
+        );
+
+
+    const contentCount =
+        contenus.filter(
+            content =>
+                children.some(
+                    submenu =>
+                        toId(submenu.id) ===
+                        toId(content.sous_menu_id)
+                )
+        ).length;
+
+
+    const confirmation =
+        confirm(
+
+            "Supprimer le menu « " +
+            menu.titre +
+            " » ?" +
+
+            (
+                children.length ||
+                contentCount
+
+                    ? "\n\nCela supprimera également " +
+                      children.length +
+                      " sous-menu(s) et " +
+                      contentCount +
+                      " contenu(s)."
+
+                    : ""
+
+            )
+
+        );
+
+
+    if (!confirmation) {
+        return;
+    }
+
+
+    for (
+        const submenu of children
+    ) {
+
+        const {
+            error
+        } =
+            await supabase
+                .from("contenus")
+                .delete()
+                .eq(
+                    "sous_menu_id",
+                    submenu.id
+                );
+
+
+        if (error) {
+
+            showMessage(
+                "Suppression interrompue : " +
+                error.message,
+                "error"
+            );
+
+            await chargerDonnees();
+
+            return;
+
+        }
+
+    }
+
+
+    const {
+        error: submenuError
+    } =
+        await supabase
+            .from("sous_menus")
+            .delete()
+            .eq(
+                "menu_id",
+                id
+            );
+
+
+    if (submenuError) {
+
+        showMessage(
+            "Impossible de supprimer le menu : " +
+            submenuError.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabase
+            .from("menus")
+            .delete()
+            .eq(
+                "id",
+                id
+            );
+
+
+    if (error) {
+
+        showMessage(
+            "Impossible de supprimer le menu : " +
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
     fermerEditeurs();
+
+    await chargerDonnees();
+
+    showMessage(
+        "Menu supprimé."
+    );
+
+}
+
+
+/* =========================================================
+   SUPPRESSION SOUS-MENU
+========================================================= */
+
+async function supprimerSousMenu(id) {
+
+    const submenu =
+        sousMenus.find(
+            item =>
+                toId(item.id) ===
+                toId(id)
+        );
+
+
+    if (!submenu) {
+        return;
+    }
+
+
+    const childCount =
+        contenus.filter(
+            item =>
+                toId(item.sous_menu_id) ===
+                toId(id)
+        ).length;
+
+
+    if (
+        !confirm(
+
+            "Supprimer le sous-menu « " +
+            submenu.titre +
+            " » ?" +
+
+            (
+                childCount
+                    ? "\n\nCela supprimera également " +
+                      childCount +
+                      " contenu(s)."
+                    : ""
+            )
+
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const {
+        error: contentError
+    } =
+        await supabase
+            .from("contenus")
+            .delete()
+            .eq(
+                "sous_menu_id",
+                id
+            );
+
+
+    if (contentError) {
+
+        showMessage(
+            "Impossible de supprimer les contenus : " +
+            contentError.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabase
+            .from("sous_menus")
+            .delete()
+            .eq(
+                "id",
+                id
+            );
+
+
+    if (error) {
+
+        showMessage(
+            "Impossible de supprimer le sous-menu : " +
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    fermerEditeurs();
+
+    await chargerDonnees();
+
+    showMessage(
+        "Sous-menu supprimé."
+    );
+
+}
+
+
+/* =========================================================
+   SUPPRESSION CONTENU
+========================================================= */
+
+async function supprimerContenu(id) {
+
+    const item =
+        contenus.find(
+            content =>
+                toId(content.id) ===
+                toId(id)
+        );
+
+
+    if (!item) {
+        return;
+    }
+
+
+    if (
+        !confirm(
+            "Supprimer le contenu « " +
+            item.titre +
+            " » ?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabase
+            .from("contenus")
+            .delete()
+            .eq(
+                "id",
+                id
+            );
+
+
+    if (error) {
+
+        showMessage(
+            "Impossible de supprimer le contenu : " +
+            error.message,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    fermerEditeurs();
+
+    await chargerDonnees();
+
+    showMessage(
+        "Contenu supprimé."
+    );
 
 }
 
@@ -3102,14 +4931,25 @@ async function sauvegarderContenu() {
 
 function fermerEditeurs() {
 
-    welcome.style.display =
-        "block";
+    if (welcome) {
+        welcome.style.display =
+            "block";
+    }
 
-    structureEditor.style.display =
-        "none";
+    if (structureEditor) {
+        structureEditor.style.display =
+            "none";
+    }
 
-    contentEditor.style.display =
-        "none";
+    if (contentEditor) {
+        contentEditor.style.display =
+            "none";
+    }
+
+    if (structureParentField) {
+        structureParentField.style.display =
+            "none";
+    }
 
 
     selectedType =
@@ -3124,920 +4964,23 @@ function fermerEditeurs() {
     editorId =
         null;
 
-
     isSourceMode =
         false;
 
 
-    synergySelectedIds =
+    /*
+     * Réinitialisation de l'état des synergies.
+     * Les données ne sont pas enregistrées ici :
+     * elles le sont uniquement via enregistrerContenu().
+     */
+    selectedSynergyIds =
         [];
 
-    synergySearchTerm =
-        "";
+    currentSynergyContentId =
+        null;
 
-}
 
-
-/* =========================================================
-   SUPPRESSION
-========================================================= */
-
-async function supprimerElement(
-    type,
-    id
-) {
-
-    let messageConfirmation =
-        "Supprimer cet élément ?";
-
-
-    if (
-        type ===
-        "menu"
-    ) {
-
-        const enfants =
-            sousMenus.filter(
-                item =>
-                    String(
-                        item.menu_id
-                    ) ===
-                    String(id)
-            );
-
-
-        const hasContents =
-            enfants.some(
-                submenu =>
-                    contenus.some(
-                        contenu =>
-                            String(
-                                contenu.sous_menu_id
-                            ) ===
-                            String(
-                                submenu.id
-                            )
-                    )
-            );
-
-
-        if (
-            enfants.length ||
-            hasContents
-        ) {
-
-            messageConfirmation =
-                "Ce menu contient des sous-menus ou contenus. Voulez-vous vraiment le supprimer ?";
-
-        }
-
-    }
-
-
-    if (
-        !window.confirm(
-            messageConfirmation
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    try {
-
-        if (
-            type ===
-            "menu"
-        ) {
-
-            const {
-                error
-            } =
-                await supabase
-                    .from("menus")
-                    .delete()
-                    .eq(
-                        "id",
-                        id
-                    );
-
-
-            if (error) {
-
-                throw error;
-
-            }
-
-        }
-
-
-        if (
-            type ===
-            "submenu"
-        ) {
-
-            const {
-                error
-            } =
-                await supabase
-                    .from("sous_menus")
-                    .delete()
-                    .eq(
-                        "id",
-                        id
-                    );
-
-
-            if (error) {
-
-                throw error;
-
-            }
-
-        }
-
-
-        if (
-            type ===
-            "content"
-        ) {
-
-            const {
-                error
-            } =
-                await supabase
-                    .from("contenus")
-                    .delete()
-                    .eq(
-                        "id",
-                        id
-                    );
-
-
-            if (error) {
-
-                throw error;
-
-            }
-
-
-            await nettoyerSynergiesApresSuppression(
-                id
-            );
-
-        }
-
-
-        fermerEditeurs();
-
-        await chargerDonnees();
-
-        showMessage(
-            "Élément supprimé."
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            error
-        );
-
-        showMessage(
-            "Impossible de supprimer l'élément.",
-            "error"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   NETTOYAGE DES SYNERGIES
-========================================================= */
-
-async function nettoyerSynergiesApresSuppression(
-    deletedId
-) {
-
-    const deletedString =
-        String(
-            deletedId
-        );
-
-
-    const affected =
-        contenus.filter(
-            contenu =>
-                Array.isArray(
-                    contenu.synergies
-                ) &&
-                contenu.synergies.some(
-                    id =>
-                        String(id) ===
-                        deletedString
-                )
-        );
-
-
-    for (
-        const contenu
-        of affected
-    ) {
-
-        const synergies =
-            contenu.synergies.filter(
-                id =>
-                    String(id) !==
-                    deletedString
-            );
-
-
-        const {
-            error
-        } =
-            await supabase
-                .from("contenus")
-                .update({
-
-                    synergies
-
-                })
-                .eq(
-                    "id",
-                    contenu.id
-                );
-
-
-        if (error) {
-
-            console.error(
-                error
-            );
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   VALIDATION
-========================================================= */
-
-async function basculerValidation(
-    type,
-    id,
-    valide
-) {
-
-    let table;
-
-
-    if (
-        type ===
-        "menu"
-    ) {
-
-        table =
-            "menus";
-
-    }
-    else if (
-        type ===
-        "submenu"
-    ) {
-
-        table =
-            "sous_menus";
-
-    }
-    else {
-
-        table =
-            "contenus";
-
-    }
-
-
-    const {
-        error
-    } =
-        await supabase
-            .from(table)
-            .update({
-
-                valide
-
-            })
-            .eq(
-                "id",
-                id
-            );
-
-
-    if (error) {
-
-        console.error(
-            error
-        );
-
-        showMessage(
-            "Impossible de modifier le statut.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    await chargerDonnees();
-
-
-    showMessage(
-        valide
-            ? "Élément validé."
-            : "Élément repassé en brouillon."
-    );
-
-}
-
-
-/* =========================================================
-   DEPLACEMENT
-========================================================= */
-
-async function deplacerElement(
-    type,
-    id,
-    direction
-) {
-
-    let collection;
-
-    let item;
-
-    let siblings;
-
-
-    if (
-        type ===
-        "menu"
-    ) {
-
-        collection =
-            menus;
-
-        item =
-            menus.find(
-                element =>
-                    element.id ===
-                    id
-            );
-
-        siblings =
-            menus
-                .slice()
-                .sort(
-                    (
-                        a,
-                        b
-                    ) =>
-                        (
-                            Number(a.position) ||
-                            0
-                        ) -
-                        (
-                            Number(b.position) ||
-                            0
-                        )
-                );
-
-    }
-    else if (
-        type ===
-        "submenu"
-    ) {
-
-        collection =
-            sousMenus;
-
-        item =
-            sousMenus.find(
-                element =>
-                    element.id ===
-                    id
-            );
-
-
-        if (!item) {
-
-            return;
-
-        }
-
-
-        siblings =
-            sousMenus
-                .filter(
-                    element =>
-                        String(
-                            element.menu_id
-                        ) ===
-                        String(
-                            item.menu_id
-                        )
-                )
-                .slice()
-                .sort(
-                    (
-                        a,
-                        b
-                    ) =>
-                        (
-                            Number(a.position) ||
-                            0
-                        ) -
-                        (
-                            Number(b.position) ||
-                            0
-                        )
-                );
-
-    }
-    else {
-
-        collection =
-            contenus;
-
-        item =
-            contenus.find(
-                element =>
-                    element.id ===
-                    id
-            );
-
-
-        if (!item) {
-
-            return;
-
-        }
-
-
-        siblings =
-            contenus
-                .filter(
-                    element =>
-                        String(
-                            element.sous_menu_id
-                        ) ===
-                        String(
-                            item.sous_menu_id
-                        )
-                )
-                .slice()
-                .sort(
-                    (
-                        a,
-                        b
-                    ) =>
-                        (
-                            Number(a.position) ||
-                            0
-                        ) -
-                        (
-                            Number(b.position) ||
-                            0
-                        )
-                );
-
-    }
-
-
-    if (!item) {
-
-        return;
-
-    }
-
-
-    const index =
-        siblings.findIndex(
-            element =>
-                element.id ===
-                id
-        );
-
-
-    if (
-        index < 0
-    ) {
-
-        return;
-
-    }
-
-
-    const targetIndex =
-        index +
-        direction;
-
-
-    if (
-        targetIndex < 0 ||
-        targetIndex >=
-        siblings.length
-    ) {
-
-        return;
-
-    }
-
-
-    const other =
-        siblings[
-            targetIndex
-        ];
-
-
-    const table =
-        type === "menu"
-            ? "menus"
-            : type === "submenu"
-                ? "sous_menus"
-                : "contenus";
-
-
-    const oldPosition =
-        Number(
-            item.position
-        ) || 0;
-
-
-    const newPosition =
-        Number(
-            other.position
-        ) || 0;
-
-
-    const {
-        error:
-            error1
-    } =
-        await supabase
-            .from(table)
-            .update({
-
-                position:
-                    newPosition
-
-            })
-            .eq(
-                "id",
-                item.id
-            );
-
-
-    if (error1) {
-
-        console.error(
-            error1
-        );
-
-        showMessage(
-            "Impossible de déplacer l'élément.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    const {
-        error:
-            error2
-    } =
-        await supabase
-            .from(table)
-            .update({
-
-                position:
-                    oldPosition
-
-            })
-            .eq(
-                "id",
-                other.id
-            );
-
-
-    if (error2) {
-
-        console.error(
-            error2
-        );
-
-        showMessage(
-            "Impossible de finaliser le déplacement.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
-    await chargerDonnees();
-
-}
-
-
-/* =========================================================
-   OUTILS WYSIWYG
-========================================================= */
-
-function executerCommande(
-    command,
-    value = null
-) {
-
-    wysiwyg.focus();
-
-
-    try {
-
-        document.execCommand(
-            command,
-            false,
-            value
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            error
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   TOOLBAR
-========================================================= */
-
-document
-    .querySelectorAll(
-        "[data-command]"
-    )
-    .forEach(
-        button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    const command =
-                        button.dataset.command;
-
-                    const value =
-                        button.dataset.value ||
-                        null;
-
-
-                    executerCommande(
-                        command,
-                        value
-                    );
-
-                }
-            );
-
-        }
-    );
-
-
-document
-    .querySelectorAll(
-        "[data-format]"
-    )
-    .forEach(
-        button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    executerCommande(
-                        "formatBlock",
-                        button.dataset.format
-                    );
-
-                }
-            );
-
-        }
-    );
-
-
-/* =========================================================
-   LIEN
-========================================================= */
-
-const linkButton =
-    document.getElementById(
-        "linkButton"
-    );
-
-
-if (linkButton) {
-
-    linkButton.addEventListener(
-        "click",
-        () => {
-
-            const url =
-                window.prompt(
-                    "URL du lien :",
-                    "https://"
-                );
-
-
-            if (!url) {
-
-                return;
-
-            }
-
-
-            executerCommande(
-                "createLink",
-                url
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   IMAGE
-========================================================= */
-
-const imageButton =
-    document.getElementById(
-        "imageButton"
-    );
-
-
-if (imageButton) {
-
-    imageButton.addEventListener(
-        "click",
-        () => {
-
-            const url =
-                window.prompt(
-                    "URL de l'image :",
-                    "https://"
-                );
-
-
-            if (!url) {
-
-                return;
-
-            }
-
-
-            executerCommande(
-                "insertImage",
-                url
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   VIDEO
-========================================================= */
-
-const videoButton =
-    document.getElementById(
-        "videoButton"
-    );
-
-
-if (videoButton) {
-
-    videoButton.addEventListener(
-        "click",
-        () => {
-
-            const url =
-                window.prompt(
-                    "URL de la vidéo :",
-                    "https://"
-                );
-
-
-            if (!url) {
-
-                return;
-
-            }
-
-
-            const html =
-                `
-                    <p>
-                        <video
-                            controls
-                            src="${escapeHtml(url)}"
-                        ></video>
-                    </p>
-                `;
-
-
-            executerCommande(
-                "insertHTML",
-                html
-            );
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   MODE SOURCE
-========================================================= */
-
-const sourceModeButton =
-    document.getElementById(
-        "sourceModeButton"
-    );
-
-
-if (sourceModeButton) {
-
-    sourceModeButton.addEventListener(
-        "click",
-        () => {
-
-            if (!isSourceMode) {
-
-                sourceEditor.value =
-                    wysiwyg.innerHTML;
-
-                wysiwyg.style.display =
-                    "none";
-
-                sourceEditor.style.display =
-                    "block";
-
-                sourceModeButton.textContent =
-                    "ÉDITEUR VISUEL";
-
-                isSourceMode =
-                    true;
-
-            }
-            else {
-
-                wysiwyg.innerHTML =
-                    sourceEditor.value;
-
-                wysiwyg.style.display =
-                    "block";
-
-                sourceEditor.style.display =
-                    "none";
-
-                sourceModeButton.textContent =
-                    "CODE HTML";
-
-                isSourceMode =
-                    false;
-
-            }
-
-        }
-    );
+    actualiserModeEditeur();
 
 }
 
@@ -4046,263 +4989,207 @@ if (sourceModeButton) {
    EVENEMENTS STRUCTURE
 ========================================================= */
 
-const addMenuButton =
-    document.getElementById(
-        "addMenuButton"
-    );
+function initialiserEvenementsStructure() {
+
+    if (structureSaveButton) {
+
+        structureSaveButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                enregistrerStructure();
+
+            }
+        );
+
+    }
 
 
-if (addMenuButton) {
+    if (structureCancelButton) {
 
-    addMenuButton.addEventListener(
-        "click",
-        () => {
+        structureCancelButton.addEventListener(
+            "click",
+            event => {
 
-            ouvrirModal(
-                "menu",
-                null
-            );
+                event.preventDefault();
 
-        }
-    );
+                fermerEditeurs();
 
-}
+            }
+        );
 
-
-const structureSaveButton =
-    document.getElementById(
-        "structureSaveButton"
-    );
+    }
 
 
-if (structureSaveButton) {
+    if (addMenuButton) {
 
-    structureSaveButton.addEventListener(
-        "click",
-        () => {
-
-            sauvegarderStructure();
-
-        }
-    );
-
-}
+        addMenuButton.disabled =
+            false;
 
 
-const structureCancelButton =
-    document.getElementById(
-        "structureCancelButton"
-    );
+        addMenuButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                event.stopPropagation();
+
+                ouvrirCreationMenu();
+
+            }
+        );
+
+    }
 
 
-if (structureCancelButton) {
+    if (modalCloseButton) {
 
-    structureCancelButton.addEventListener(
-        "click",
-        () => {
+        modalCloseButton.addEventListener(
+            "click",
+            event => {
 
-            fermerEditeurs();
+                event.preventDefault();
 
-        }
-    );
+                fermerModal();
+
+            }
+        );
+
+    }
+
+
+    if (modalCancelButton) {
+
+        modalCancelButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                fermerModal();
+
+            }
+        );
+
+    }
+
+
+    if (structureModal) {
+
+        structureModal.addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target ===
+                    structureModal
+                ) {
+
+                    fermerModal();
+
+                }
+
+            }
+        );
+
+    }
+
+
+    if (modalSaveButton) {
+
+        modalSaveButton.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                creerElement();
+
+            }
+        );
+
+    }
+
+
+    if (modalName) {
+
+        modalName.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.key ===
+                    "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    creerElement();
+
+                }
+
+            }
+        );
+
+    }
 
 }
 
 
 /* =========================================================
-   EVENEMENTS CONTENU
+   CTRL + S
 ========================================================= */
 
-const contentSaveButton =
-    document.getElementById(
-        "contentSaveButton"
-    );
+function initialiserEvenementClavier() {
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                (
+                    event.ctrlKey ||
+                    event.metaKey
+                ) &&
+                event.key.toLowerCase() ===
+                "s"
+            ) {
+
+                event.preventDefault();
 
 
-if (contentSaveButton) {
+                if (
+                    contentEditor &&
+                    contentEditor.style.display !==
+                    "none"
+                ) {
 
-    contentSaveButton.addEventListener(
-        "click",
-        () => {
+                    enregistrerContenu();
 
-            sauvegarderContenu();
+                    return;
 
-        }
-    );
-
-}
-
-
-const contentCancelButton =
-    document.getElementById(
-        "contentCancelButton"
-    );
+                }
 
 
-if (contentCancelButton) {
+                if (
+                    structureEditor &&
+                    structureEditor.style.display !==
+                    "none"
+                ) {
 
-    contentCancelButton.addEventListener(
-        "click",
-        () => {
+                    enregistrerStructure();
 
-            fermerEditeurs();
+                }
 
-        }
-    );
-
-}
-
-
-/* =========================================================
-   EVENEMENTS MODAL
-========================================================= */
-
-const modalCloseButton =
-    document.getElementById(
-        "modalCloseButton"
-    );
-
-
-if (modalCloseButton) {
-
-    modalCloseButton.addEventListener(
-        "click",
-        () => {
-
-            fermerModal();
+            }
 
         }
     );
 
 }
-
-
-const modalCancelButton =
-    document.getElementById(
-        "modalCancelButton"
-    );
-
-
-if (modalCancelButton) {
-
-    modalCancelButton.addEventListener(
-        "click",
-        () => {
-
-            fermerModal();
-
-        }
-    );
-
-}
-
-
-if (modalSaveButton) {
-
-    modalSaveButton.addEventListener(
-        "click",
-        () => {
-
-            creerElement();
-
-        }
-    );
-
-}
-
-
-structureModal.addEventListener(
-    "click",
-    event => {
-
-        if (
-            event.target ===
-            structureModal
-        ) {
-
-            fermerModal();
-
-        }
-
-    }
-);
-
-
-modalName.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key ===
-            "Enter"
-        ) {
-
-            event.preventDefault();
-
-            creerElement();
-
-        }
-
-
-        if (
-            event.key ===
-            "Escape"
-        ) {
-
-            event.preventDefault();
-
-            fermerModal();
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   RACCOURCI ESC
-========================================================= */
-
-document.addEventListener(
-    "keydown",
-    event => {
-
-        if (
-            event.key !==
-            "Escape"
-        ) {
-
-            return;
-
-        }
-
-
-        if (
-            structureModal.classList.contains(
-                "visible"
-            )
-        ) {
-
-            fermerModal();
-
-            return;
-
-        }
-
-
-        if (
-            structureEditor.style.display !==
-                "none" ||
-            contentEditor.style.display !==
-                "none"
-        ) {
-
-            fermerEditeurs();
-
-        }
-
-    }
-);
 
 
 /* =========================================================
@@ -4311,21 +5198,165 @@ document.addEventListener(
 
 async function initialiser() {
 
-    const admin =
+    initialiserEvenementsStructure();
+
+    initialiserEvenementsEditeur();
+
+    initialiserEvenementsSynergies();
+
+    initialiserEvenementClavier();
+
+    initialiserApercuImageContenu();
+
+    initialiserListePriorite();
+
+
+    try {
+
         await verifierAdmin();
 
+    }
+    catch (error) {
 
-    if (!admin) {
+        currentProfile =
+            null;
+
+
+        if (addMenuButton) {
+            addMenuButton.disabled = true;
+        }
+
+
+        if (tree) {
+
+            tree.innerHTML = `
+
+                <div class="empty-tree">
+
+                    ${escapeHtml(
+                        error?.message ||
+                        "Accès impossible."
+                    )}
+
+                    <br><br>
+
+                    <a
+                        href="admin.html"
+                        style="
+                            color:var(--gold-light);
+                        "
+                    >
+                        Retour à l'administration
+                    </a>
+
+                </div>
+
+            `;
+
+        }
+
 
         return;
 
     }
 
 
-    await chargerDonnees();
+    try {
+
+        await chargerDonnees();
+
+    }
+    catch (error) {
+
+        console.error(
+            "CONTENUS — chargement :",
+            error
+        );
+
+
+        if (tree) {
+
+            tree.innerHTML = `
+
+                <div class="empty-tree">
+
+                    Impossible de charger
+                    la structure des contenus.
+
+                    <br><br>
+
+                    <span
+                        style="
+                            color:rgba(239,65,53,.85);
+                        "
+                    >
+                        ${escapeHtml(
+                            error?.message ||
+                            "Erreur de chargement."
+                        )}
+                    </span>
+
+                </div>
+
+            `;
+
+        }
+
+
+        if (
+            addMenuButton &&
+            currentProfile &&
+            String(
+                currentProfile.grade || ""
+            ).toLowerCase() ===
+            "admin"
+        ) {
+
+            addMenuButton.disabled =
+                false;
+
+        }
+
+
+        return;
+
+    }
+
+
+    if (addMenuButton) {
+        addMenuButton.disabled = false;
+    }
+
+
+    /*
+     * On rafraîchit également l'interface des synergies
+     * si elle existe déjà dans la page.
+     */
+    rendreSynergies();
 
 }
 
 
-initialiser();
+/* =========================================================
+   DOM READY
+========================================================= */
 
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initialiser,
+        {
+            once:true
+        }
+    );
+
+}
+else {
+
+    initialiser();
+
+}
