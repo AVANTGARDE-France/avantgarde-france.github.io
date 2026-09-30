@@ -28,6 +28,5 @@ export const supabase =
  * Compatibilité avec les anciens scripts du site.
  *
  * equipe.js utilise encore supabaseClient.
- * On conserve donc cet alias.
  */
 window.supabaseClient = supabase;
