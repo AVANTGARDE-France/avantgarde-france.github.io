@@ -1,4 +1,4 @@
-/* =========================================================
+le dernier fesait 5249 lignes : /* =========================================================
    AVANT-GARDE — ADMIN CONTENUS
    js/admincontenus.js
 
