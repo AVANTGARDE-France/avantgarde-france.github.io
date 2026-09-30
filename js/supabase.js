@@ -5,17 +5,28 @@
    Connexion Supabase unique utilisée par les pages du site.
 ========================================================= */
 
+import { createClient } from
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+
+const SUPABASE_URL =
+    "https://wlhtegrciehmtxqecopv.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs";
+
+
 export const supabase =
-    window.supabase.createClient(
-        "https://wlhtegrciehmtxqecopv.supabase.co",
-        "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs"
+    createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
     );
+
 
 /*
  * Compatibilité avec les anciens scripts du site.
  *
  * equipe.js utilise encore supabaseClient.
- * On conserve donc cet alias sans modifier toute la logique
- * existante de la page équipe.
+ * On conserve donc cet alias.
  */
 window.supabaseClient = supabase;
