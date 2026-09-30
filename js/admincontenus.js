@@ -809,29 +809,6 @@ async function verifierAdmin() {
 
 async function chargerDonnees() {
 
-    /*
-     * IMPORTANT :
-     *
-     * Les trois sources principales doivent être chargées
-     * ensemble car elles sont indispensables à l'arbre.
-     *
-     * Les statistiques sont volontairement chargées
-     * séparément.
-     *
-     * Ainsi, une erreur éventuelle sur la table "stats"
-     * ne bloque plus :
-     *
-     * - les menus
-     * - les sous-menus
-     * - les contenus
-     * - les boutons +
-     * - l'édition
-     * - la suppression
-     * - la validation
-     * - l'ordre
-     */
-
-
     const [
         menusResult,
         sousMenusResult,
@@ -913,13 +890,6 @@ async function chargerDonnees() {
         contenusResult.data || [];
 
 
-    /*
-     * Les statistiques ne doivent jamais empêcher
-     * l'affichage et le fonctionnement de l'arbre.
-     *
-     * On ne sélectionne que les deux colonnes réellement
-     * utilisées par cette page.
-     */
     const statsResult =
         await supabase
             .from("stats")
@@ -2389,9 +2359,20 @@ function initialiserEvenementsStructure() {
 
     if (addMenuButton) {
 
+        addMenuButton.disabled =
+            false;
+
         addMenuButton.addEventListener(
             "click",
-            ouvrirCreationMenu
+            event => {
+
+                event.preventDefault();
+
+                event.stopPropagation();
+
+                ouvrirCreationMenu();
+
+            }
         );
 
     }
@@ -2808,14 +2789,10 @@ function ouvrirContenu(
     }
 
 
-    /*
-     * PRIORITE
-     *
-     * On force explicitement la conversion en chaîne
-     * afin que la valeur provenant de Supabase soit
-     * correctement affichée quelle que soit sa nature
-     * (integer, numeric, text, etc.).
-     */
+    /* =====================================================
+       PRIORITE
+    ===================================================== */
+
     if (cardPriorite) {
 
         if (
@@ -3000,12 +2977,10 @@ async function enregistrerContenu() {
             : "";
 
 
-    /*
-     * PRIORITE
-     *
-     * On conserve la valeur exacte saisie.
-     * Le champ vide devient NULL en base.
-     */
+    /* =====================================================
+       PRIORITE
+    ===================================================== */
+
     const priorite =
         cardPriorite
             ? String(
@@ -4204,20 +4179,23 @@ function initialiserEvenementClavier() {
 
 async function initialiser() {
 
+    /*
+     * Les événements sont installés immédiatement.
+     *
+     * Cela évite qu'une erreur de chargement des données
+     * empêche les contrôles de recevoir leurs événements.
+     */
+
+    initialiserEvenementsStructure();
+
+    initialiserEvenementsEditeur();
+
+    initialiserEvenementClavier();
+
+    initialiserApercuImageContenu();
+
+
     try {
-
-        /*
-         * Les événements sont installés AVANT le chargement
-         * Supabase. Une erreur de données ne doit donc pas
-         * empêcher les contrôles de fonctionner.
-         */
-        initialiserEvenementsStructure();
-
-        initialiserEvenementsEditeur();
-
-        initialiserEvenementClavier();
-
-        initialiserApercuImageContenu();
 
         await verifierAdmin();
 
@@ -4262,11 +4240,12 @@ async function initialiser() {
 
 
         /*
-         * On ne désactive le bouton + MENU que si
-         * l'authentification / l'autorisation elle-même
-         * a échoué.
+         * Le bouton + MENU ne doit être désactivé
+         * QUE si l'utilisateur n'est pas authentifié
+         * ou n'est pas administrateur.
          *
-         * Une erreur de statistiques ne passe plus ici.
+         * Une erreur de chargement des données ne doit
+         * pas désactiver arbitrairement l'interface.
          */
         const addMenuButton =
             document.getElementById(
@@ -4276,10 +4255,27 @@ async function initialiser() {
 
         if (
             addMenuButton &&
-            (
-                !currentProfile ||
-                currentProfile.grade !== "admin"
-            )
+            currentProfile &&
+            currentProfile.grade === "admin"
+        ) {
+
+            addMenuButton.disabled =
+                false;
+
+        }
+        else if (
+            addMenuButton &&
+            !currentProfile
+        ) {
+
+            addMenuButton.disabled =
+                true;
+
+        }
+        else if (
+            addMenuButton &&
+            currentProfile &&
+            currentProfile.grade !== "admin"
         ) {
 
             addMenuButton.disabled =
