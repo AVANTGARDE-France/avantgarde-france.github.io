@@ -863,12 +863,20 @@ async function chargerDonnees() {
                     }
                 ),
 
+            /*
+             * IMPORTANT :
+             * Cette page n'utilise que l'id et le nom
+             * des statistiques.
+             *
+             * L'ancien champ "lien" pouvait provoquer
+             * l'échec de toute l'initialisation si cette
+             * colonne n'existe plus dans la table stats.
+             */
             supabase
                 .from("stats")
                 .select(`
                     id,
-                    nom,
-                    lien
+                    nom
                 `)
                 .order(
                     "nom",
@@ -2314,6 +2322,25 @@ function initialiserEvenementsStructure() {
     }
 
 
+    /*
+     * Bouton ANNULER de l'éditeur de structure.
+     */
+    const structureCancelButton =
+        document.getElementById(
+            "structureCancelButton"
+        );
+
+
+    if (structureCancelButton) {
+
+        structureCancelButton.addEventListener(
+            "click",
+            fermerEditeurs
+        );
+
+    }
+
+
     const addMenuButton =
         document.getElementById(
             "addMenuButton"
@@ -2735,9 +2762,18 @@ function ouvrirContenu(
             item.accroche || "";
     }
 
+    /*
+     * PRIORITE
+     *
+     * On conserve volontairement la valeur exacte
+     * venant de Supabase.
+     */
     if (cardPriorite) {
         cardPriorite.value =
-            item.priorite || "";
+            item.priorite !== null &&
+            item.priorite !== undefined
+                ? String(item.priorite)
+                : "";
     }
 
 
@@ -2881,7 +2917,9 @@ async function enregistrerContenu() {
 
     const priorite =
         cardPriorite
-            ? cardPriorite.value.trim()
+            ? String(
+                cardPriorite.value
+              ).trim()
             : null;
 
 
