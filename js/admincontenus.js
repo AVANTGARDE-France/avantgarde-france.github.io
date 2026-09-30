@@ -237,15 +237,6 @@ function initialiserListePriorite() {
 
     champ.innerHTML = "";
 
-    const vide =
-        document.createElement("option");
-
-    vide.value = "";
-    vide.textContent =
-        "Aucune priorité";
-
-    champ.appendChild(vide);
-
     PRIORITES.forEach(priorite => {
 
         const option =
@@ -274,7 +265,7 @@ function initialiserListePriorite() {
     } else {
 
         champ.value =
-            "";
+            "secondaire";
 
     }
 
@@ -3863,7 +3854,7 @@ function ouvrirContenu(id) {
                     priorite
             )
                 ? priorite
-                : "";
+                : "secondaire";
 
     }
 
@@ -4065,7 +4056,7 @@ async function enregistrerContenu() {
     ) {
 
         priorite =
-            "";
+            "secondaire";
 
     }
 
