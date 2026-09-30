@@ -113,7 +113,7 @@ const modalSaveButton =
 ========================================================= */
 
 const cardPhoto =
-    document.getElementById("contentPhotoUrl") ||
+    document.getElementById("contentPhoto") ||
     document.getElementById("cardPhoto");
 
 const cardAccroche =
@@ -2217,7 +2217,7 @@ function ouvrirModalCreation(
 
 
     structureModal.classList.add(
-        "active"
+        "visible"
     );
 
 
@@ -2259,7 +2259,7 @@ function ouvrirCreationMenu() {
 
 
     structureModal.classList.add(
-        "active"
+        "visible"
     );
 
 
@@ -2277,7 +2277,7 @@ function fermerModal() {
     if (structureModal) {
 
         structureModal.classList.remove(
-            "active"
+            "visible"
         );
 
     }
