@@ -148,18 +148,20 @@ const PRIORITES = [
 ];
 
 
-function obtenirChampPriorite() {
+function initialiserListePriorite() {
 
-    let champ =
-        $("contentPriority") ||
-        $("cardPriority");
-
-    if (!champ) {
-        return null;
+    if (!cardPriorite) {
+        return;
     }
 
+
+    /* -----------------------------------------------------
+       On force définitivement le champ à être un SELECT.
+       Aucune saisie libre n'est autorisée.
+    ----------------------------------------------------- */
+
     if (
-        champ.tagName.toLowerCase() !==
+        cardPriorite.tagName.toLowerCase() !==
         "select"
     ) {
 
@@ -167,107 +169,79 @@ function obtenirChampPriorite() {
             document.createElement("select");
 
         select.id =
-            champ.id ||
+            cardPriorite.id ||
             "contentPriority";
 
         select.className =
-            champ.className ||
-            "";
+            cardPriorite.className || "";
 
         select.name =
-            champ.name ||
+            cardPriorite.name ||
             "priorite";
 
-        select.disabled =
-            Boolean(champ.disabled);
-
-        select.required =
-            Boolean(champ.required);
-
-        select.title =
-            champ.title ||
-            "";
-
-        select.setAttribute(
-            "aria-label",
-            champ.getAttribute("aria-label") ||
-            "Priorité"
+        cardPriorite.parentNode.replaceChild(
+            select,
+            cardPriorite
         );
 
-        const parent =
-            champ.parentNode;
-
-        if (parent) {
-
-            parent.replaceChild(
-                select,
-                champ
-            );
-
-        }
-
-        champ =
+        cardPriorite =
             select;
 
     }
 
-    cardPriorite =
-        champ;
 
-    return champ;
-
-}
-
-
-function initialiserListePriorite() {
-
-    const champ =
-        obtenirChampPriorite();
-
-    if (!champ) {
-        return;
-    }
-
-    const valeur =
+    const valeurActuelle =
         String(
-            champ.value || ""
+            cardPriorite.value || ""
         )
-        .trim()
-        .toLowerCase();
+            .trim()
+            .toLowerCase();
 
-    champ.innerHTML = "";
 
-    PRIORITES.forEach(priorite => {
+    cardPriorite.innerHTML =
+        "";
 
-        const option =
-            document.createElement("option");
 
-        option.value =
-            priorite.value;
+    PRIORITES.forEach(
+        priorite => {
 
-        option.textContent =
-            priorite.label;
+            const option =
+                document.createElement(
+                    "option"
+                );
 
-        champ.appendChild(option);
+            option.value =
+                priorite.value;
 
-    });
+            option.textContent =
+                priorite.label;
 
-    if (
+            cardPriorite.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    /* -----------------------------------------------------
+       VALEUR PAR DEFAUT
+       Si aucune valeur valide n'existe :
+       SECONDaire
+    ----------------------------------------------------- */
+
+    const valeurValide =
         PRIORITES.some(
-            item =>
-                item.value === valeur
-        )
-    ) {
+            option =>
+                option.value ===
+                valeurActuelle
+        );
 
-        champ.value =
-            valeur;
 
-    } else {
-
-        champ.value =
-            "secondaire";
-
-    }
+    cardPriorite.value =
+        valeurValide
+            ? valeurActuelle
+            : "secondaire";
 
 }
 
@@ -3840,23 +3814,23 @@ function ouvrirContenu(id) {
 
     if (cardPriorite) {
 
-        const priorite =
-            String(
-                item.priorite || ""
-            )
-            .trim()
-            .toLowerCase();
+    const priorite =
+        String(
+            item.priorite || ""
+        )
+        .trim()
+        .toLowerCase();
 
-        cardPriorite.value =
-            PRIORITES.some(
-                option =>
-                    option.value ===
-                    priorite
-            )
-                ? priorite
-                : "secondaire";
+    cardPriorite.value =
+        PRIORITES.some(
+            option =>
+                option.value ===
+                priorite
+        )
+            ? priorite
+            : "secondaire";
 
-    }
+}
 
 
     /* -----------------------------------------------------
