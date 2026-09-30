@@ -46,6 +46,14 @@ let messageTimer = null;
 
 
 /* =========================================================
+   ETAT SYNERGIES
+========================================================= */
+
+let selectedSynergyIds = [];
+let currentSynergyContentId = null;
+
+
+/* =========================================================
    ELEMENTS DOM
 ========================================================= */
 
@@ -1200,34 +1208,185 @@ function normaliserSynergies(value) {
 }
 
 
-function remplirListeSynergies(
+/*
+ * Recherche insensible aux accents.
+ *
+ * Exemple :
+ * "économie" devient "economie"
+ * "État" devient "etat"
+ */
+function normaliserRechercheSynergie(value) {
+
+    return String(value || "")
+        .normalize("NFD")
+        .replace(
+            /[\u0300-\u036f]/g,
+            ""
+        )
+        .toLowerCase()
+        .trim();
+
+}
+
+
+function obtenirElementsSynergies() {
+
+    return {
+
+        search:
+            document.getElementById(
+                "synergySearch"
+            ),
+
+        available:
+            document.getElementById(
+                "synergyAvailable"
+            ),
+
+        availableCount:
+            document.getElementById(
+                "synergyAvailableCount"
+            ),
+
+        selected:
+            document.getElementById(
+                "synergySelected"
+            ),
+
+        selectedCount:
+            document.getElementById(
+                "synergySelectedCount"
+            ),
+
+        clear:
+            document.getElementById(
+                "synergyClearButton"
+            )
+
+    };
+
+}
+
+
+function initialiserSynergies(
     valeurs = [],
     currentId = null
 ) {
 
-    if (!cardSynergies) {
-        return;
-    }
+    currentSynergyContentId =
+        currentId
+            ? String(currentId)
+            : null;
 
 
-    const selected =
-        new Set(
-            normaliserSynergies(
-                valeurs
-            )
+    selectedSynergyIds =
+        normaliserSynergies(
+            valeurs
+        )
+        .filter(
+            id =>
+                id !==
+                currentSynergyContentId
         );
 
 
-    cardSynergies.innerHTML =
-        "";
+    rendreSynergies();
+
+}
+
+
+function rendreSynergies() {
+
+    const elements =
+        obtenirElementsSynergies();
+
+
+    const available =
+        elements.available;
+
+    const selected =
+        elements.selected;
+
+    const availableCount =
+        elements.availableCount;
+
+    const selectedCount =
+        elements.selectedCount;
+
+
+    if (
+        !available ||
+        !selected
+    ) {
+
+        return;
+
+    }
+
+
+    const recherche =
+        normaliserRechercheSynergie(
+            elements.search
+                ? elements.search.value
+                : ""
+        );
+
+
+    const selectedSet =
+        new Set(
+            selectedSynergyIds
+                .map(id => String(id))
+        );
 
 
     const disponibles =
         contenus
             .filter(
-                contenu =>
-                    String(contenu.id) !==
-                    String(currentId)
+                contenu => {
+
+                    const id =
+                        String(
+                            contenu.id
+                        );
+
+
+                    if (
+                        currentSynergyContentId &&
+                        id ===
+                        currentSynergyContentId
+                    ) {
+
+                        return false;
+
+                    }
+
+
+                    if (
+                        selectedSet.has(id)
+                    ) {
+
+                        return false;
+
+                    }
+
+
+                    if (!recherche) {
+                        return true;
+                    }
+
+
+                    const titre =
+                        normaliserRechercheSynergie(
+                            contenu.titre ||
+                            "Mesure sans titre"
+                        );
+
+
+                    return titre.includes(
+                        recherche
+                    );
+
+                }
             )
             .slice()
             .sort(
@@ -1240,71 +1399,398 @@ function remplirListeSynergies(
             );
 
 
-    disponibles.forEach(
-        contenu => {
+    const totalDisponible =
+        disponibles.length;
 
-            const option =
-                document.createElement(
-                    "option"
+
+    const limiteAffichage =
+        50;
+
+
+    const visibles =
+        disponibles.slice(
+            0,
+            limiteAffichage
+        );
+
+
+    available.innerHTML =
+        "";
+
+
+    if (!visibles.length) {
+
+        const empty =
+            document.createElement("div");
+
+        empty.className =
+            "synergy-empty";
+
+        empty.textContent =
+            recherche
+                ? "Aucune mesure ne correspond à la recherche."
+                : "Aucune autre mesure disponible.";
+
+        available.appendChild(
+            empty
+        );
+
+    } else {
+
+        visibles.forEach(
+            contenu => {
+
+                const row =
+                    document.createElement(
+                        "button"
+                    );
+
+                row.type =
+                    "button";
+
+                row.className =
+                    "synergy-item synergy-available-item";
+
+
+                const title =
+                    document.createElement(
+                        "span"
+                    );
+
+                title.className =
+                    "synergy-item-title";
+
+                title.textContent =
+                    contenu.titre ||
+                    "Mesure sans titre";
+
+
+                const action =
+                    document.createElement(
+                        "span"
+                    );
+
+                action.className =
+                    "synergy-item-action";
+
+                action.textContent =
+                    "AJOUTER";
+
+
+                row.appendChild(
+                    title
                 );
 
-            option.value =
-                contenu.id;
-
-            option.textContent =
-                contenu.titre ||
-                "Mesure sans titre";
-
-            option.selected =
-                selected.has(
-                    String(contenu.id)
+                row.appendChild(
+                    action
                 );
 
-            cardSynergies.appendChild(
-                option
-            );
+
+                row.addEventListener(
+                    "click",
+                    event => {
+
+                        event.preventDefault();
+
+                        ajouterSynergie(
+                            contenu.id
+                        );
+
+                    }
+                );
+
+
+                available.appendChild(
+                    row
+                );
+
+            }
+        );
+
+    }
+
+
+    if (availableCount) {
+
+        if (
+            totalDisponible >
+            limiteAffichage
+        ) {
+
+            availableCount.textContent =
+                totalDisponible +
+                " résultats — " +
+                limiteAffichage +
+                " affichés";
+
+        } else {
+
+            availableCount.textContent =
+                totalDisponible +
+                (
+                    totalDisponible > 1
+                        ? " mesures"
+                        : " mesure"
+                );
 
         }
-    );
+
+    }
 
 
-    if (!disponibles.length) {
+    selected.innerHTML =
+        "";
 
-        const option =
-            document.createElement(
-                "option"
+
+    const selectedObjects =
+        selectedSynergyIds
+            .map(
+                id =>
+                    contenus.find(
+                        contenu =>
+                            String(
+                                contenu.id
+                            ) ===
+                            String(id)
+                    )
+            )
+            .filter(Boolean);
+
+
+    if (!selectedObjects.length) {
+
+        const empty =
+            document.createElement("div");
+
+        empty.className =
+            "synergy-empty";
+
+        empty.textContent =
+            "Aucune synergie sélectionnée.";
+
+        selected.appendChild(
+            empty
+        );
+
+    } else {
+
+        selectedObjects.forEach(
+            contenu => {
+
+                const row =
+                    document.createElement(
+                        "button"
+                    );
+
+                row.type =
+                    "button";
+
+                row.className =
+                    "synergy-item synergy-selected-item";
+
+
+                const title =
+                    document.createElement(
+                        "span"
+                    );
+
+                title.className =
+                    "synergy-item-title";
+
+                title.textContent =
+                    contenu.titre ||
+                    "Mesure sans titre";
+
+
+                const action =
+                    document.createElement(
+                        "span"
+                    );
+
+                action.className =
+                    "synergy-item-action";
+
+                action.textContent =
+                    "RETIRER";
+
+
+                row.appendChild(
+                    title
+                );
+
+                row.appendChild(
+                    action
+                );
+
+
+                row.addEventListener(
+                    "click",
+                    event => {
+
+                        event.preventDefault();
+
+                        retirerSynergie(
+                            contenu.id
+                        );
+
+                    }
+                );
+
+
+                selected.appendChild(
+                    row
+                );
+
+            }
+        );
+
+    }
+
+
+    if (selectedCount) {
+
+        const nombre =
+            selectedSynergyIds.length;
+
+
+        selectedCount.textContent =
+            nombre +
+            (
+                nombre > 1
+                    ? " sélectionnées"
+                    : " sélectionnée"
             );
 
-        option.disabled =
-            true;
+    }
 
-        option.textContent =
-            "Aucune autre mesure disponible.";
 
-        cardSynergies.appendChild(
-            option
-        );
+    if (elements.clear) {
+
+        elements.clear.disabled =
+            selectedSynergyIds.length === 0;
 
     }
 
 }
 
 
-function obtenirSynergies() {
+function ajouterSynergie(id) {
 
-    if (!cardSynergies) {
-        return [];
+    const identifiant =
+        String(id || "");
+
+
+    if (!identifiant) {
+        return;
     }
 
 
-    return Array.from(
-        cardSynergies.selectedOptions
-    )
-    .map(
-        option =>
-            option.value
-    )
-    .filter(Boolean);
+    if (
+        currentSynergyContentId &&
+        identifiant ===
+        currentSynergyContentId
+    ) {
+        return;
+    }
+
+
+    if (
+        selectedSynergyIds.some(
+            selectedId =>
+                String(selectedId) ===
+                identifiant
+        )
+    ) {
+        return;
+    }
+
+
+    selectedSynergyIds.push(
+        identifiant
+    );
+
+
+    rendreSynergies();
+
+}
+
+
+function retirerSynergie(id) {
+
+    const identifiant =
+        String(id || "");
+
+
+    selectedSynergyIds =
+        selectedSynergyIds.filter(
+            selectedId =>
+                String(selectedId) !==
+                identifiant
+        );
+
+
+    rendreSynergies();
+
+}
+
+
+function retirerToutesLesSynergies() {
+
+    selectedSynergyIds =
+        [];
+
+
+    rendreSynergies();
+
+}
+
+
+function obtenirSynergies() {
+
+    return selectedSynergyIds
+        .map(
+            id =>
+                String(id)
+        )
+        .filter(Boolean);
+
+}
+
+
+function initialiserEvenementsSynergies() {
+
+    const elements =
+        obtenirElementsSynergies();
+
+
+    if (elements.search) {
+
+        elements.search.addEventListener(
+            "input",
+            () => {
+
+                rendreSynergies();
+
+            }
+        );
+
+    }
+
+
+    if (elements.clear) {
+
+        elements.clear.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                retirerToutesLesSynergies();
+
+            }
+        );
+
+    }
 
 }
 
@@ -3023,7 +3509,13 @@ function ouvrirContenu(id) {
     }
 
 
-    remplirListeSynergies(
+    /*
+     * SYNERGIES
+     *
+     * Les UUID sont conservés dans leur ordre
+     * de sélection.
+     */
+    initialiserSynergies(
         item.synergies || [],
         item.id
     );
@@ -4363,6 +4855,18 @@ function fermerEditeurs() {
         false;
 
 
+    /*
+     * Réinitialisation de l'état des synergies.
+     * Les données ne sont pas enregistrées ici :
+     * elles le sont uniquement via enregistrerContenu().
+     */
+    selectedSynergyIds =
+        [];
+
+    currentSynergyContentId =
+        null;
+
+
     actualiserModeEditeur();
 
 }
@@ -4585,6 +5089,8 @@ async function initialiser() {
 
     initialiserEvenementsEditeur();
 
+    initialiserEvenementsSynergies();
+
     initialiserEvenementClavier();
 
     initialiserApercuImageContenu();
@@ -4707,6 +5213,13 @@ async function initialiser() {
     if (addMenuButton) {
         addMenuButton.disabled = false;
     }
+
+
+    /*
+     * On rafraîchit également l'interface des synergies
+     * si elle existe déjà dans la page.
+     */
+    rendreSynergies();
 
 }
 
