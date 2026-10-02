@@ -3356,6 +3356,259 @@ function ouvrirContenu(id) {
 
 }
 
+/* =========================================================
+   SYNCHRONISATION DES SYNERGIES
+   Les synergies sont obligatoirement bidirectionnelles.
+========================================================= */
+
+async function synchroniserSynergiesBidirectionnelles(
+    contenuId,
+    anciennesSynergies,
+    nouvellesSynergies
+) {
+
+    const idPrincipal =
+        String(
+            contenuId || ""
+        ).trim();
+
+    if (!idPrincipal) {
+        throw new Error(
+            "Identifiant du contenu manquant."
+        );
+    }
+
+
+    /*
+     * Anciennes synergies
+     */
+
+    const anciennes =
+        new Set(
+            normaliserSynergies(
+                anciennesSynergies
+            )
+            .map(
+                id =>
+                    String(id).trim()
+            )
+            .filter(Boolean)
+            .filter(
+                id =>
+                    id !== idPrincipal
+            )
+        );
+
+
+    /*
+     * Nouvelles synergies
+     */
+
+    const nouvelles =
+        new Set(
+            normaliserSynergies(
+                nouvellesSynergies
+            )
+            .map(
+                id =>
+                    String(id).trim()
+            )
+            .filter(Boolean)
+            .filter(
+                id =>
+                    id !== idPrincipal
+            )
+        );
+
+
+    /*
+     * Synergies ajoutées
+     */
+
+    const ajoutees =
+        [...nouvelles]
+        .filter(
+            id =>
+                !anciennes.has(id)
+        );
+
+
+    /*
+     * Synergies retirées
+     */
+
+    const retirees =
+        [...anciennes]
+        .filter(
+            id =>
+                !nouvelles.has(id)
+        );
+
+
+    /* -----------------------------------------------------
+       AJOUTS
+       Si A devient une synergie de B,
+       B devient automatiquement une synergie de A.
+    ----------------------------------------------------- */
+
+    for (
+        const synergieId of ajoutees
+    ) {
+
+        const {
+            data: contenuSynergie,
+            error: lectureError
+        } =
+            await supabase
+                .from("contenus")
+                .select(
+                    "id, synergies"
+                )
+                .eq(
+                    "id",
+                    synergieId
+                )
+                .maybeSingle();
+
+        if (lectureError) {
+            throw lectureError;
+        }
+
+        if (!contenuSynergie) {
+            continue;
+        }
+
+
+        const synergiesExistantes =
+            normaliserSynergies(
+                contenuSynergie.synergies
+            )
+            .map(
+                id =>
+                    String(id).trim()
+            )
+            .filter(Boolean)
+            .filter(
+                id =>
+                    id !== synergieId
+            );
+
+
+        /*
+         * On ajoute le contenu principal
+         * uniquement s'il n'existe pas déjà.
+         */
+
+        if (
+            !synergiesExistantes.some(
+                id =>
+                    id === idPrincipal
+            )
+        ) {
+
+            synergiesExistantes.push(
+                idPrincipal
+            );
+
+        }
+
+
+        const {
+            error
+        } =
+            await supabase
+                .from("contenus")
+                .update({
+                    synergies:
+                        synergiesExistantes
+                })
+                .eq(
+                    "id",
+                    synergieId
+                );
+
+        if (error) {
+            throw error;
+        }
+
+    }
+
+
+    /* -----------------------------------------------------
+       RETRAITS
+       Si A est retiré des synergies de B,
+       B est automatiquement retiré des synergies de A.
+    ----------------------------------------------------- */
+
+    for (
+        const synergieId of retirees
+    ) {
+
+        const {
+            data: contenuSynergie,
+            error: lectureError
+        } =
+            await supabase
+                .from("contenus")
+                .select(
+                    "id, synergies"
+                )
+                .eq(
+                    "id",
+                    synergieId
+                )
+                .maybeSingle();
+
+        if (lectureError) {
+            throw lectureError;
+        }
+
+        /*
+         * Le contenu peut avoir été supprimé
+         * entre-temps. Dans ce cas, rien à modifier.
+         */
+
+        if (!contenuSynergie) {
+            continue;
+        }
+
+
+        const synergiesExistantes =
+            normaliserSynergies(
+                contenuSynergie.synergies
+            )
+            .map(
+                id =>
+                    String(id).trim()
+            )
+            .filter(Boolean)
+            .filter(
+                id =>
+                    id !== idPrincipal
+            );
+
+
+        const {
+            error
+        } =
+            await supabase
+                .from("contenus")
+                .update({
+                    synergies:
+                        synergiesExistantes
+                })
+                .eq(
+                    "id",
+                    synergieId
+                );
+
+        if (error) {
+            throw error;
+        }
+
+    }
+
+}
 
 /* =========================================================
    ENREGISTRER CONTENU
@@ -3502,15 +3755,22 @@ async function enregistrerContenu() {
             ? cardStat3.value || null
             : null;
 
-
     /* -----------------------------------------------------
-       SYNERGIES
-    ----------------------------------------------------- */
+   SYNERGIES
+----------------------------------------------------- */
 
-    const synergies =
-        obtenirSynergies();
+/*
+ * On conserve les anciennes synergies afin de
+ * déterminer précisément les ajouts et les retraits.
+ */
+const anciennesSynergies =
+    normaliserSynergies(
+        contenu.synergies
+    );
 
-
+const synergies =
+    obtenirSynergies();
+   
     /* -----------------------------------------------------
        POSITION
     ----------------------------------------------------- */
@@ -3608,18 +3868,32 @@ async function enregistrerContenu() {
                     editorId
                 );
 
-        if (error) {
-            throw error;
-        }
+       if (error) {
+    throw error;
+}
 
-        await chargerDonnees();
 
-        fermerEditeurs();
+/*
+ * Synchronisation bidirectionnelle des synergies.
+ *
+ * Le contenu actuellement édité est déjà enregistré.
+ * On met maintenant à jour les contenus associés afin
+ * que la relation soit identique dans les deux sens.
+ */
+await synchroniserSynergiesBidirectionnelles(
+    editorId,
+    anciennesSynergies,
+    synergies
+);
 
-        showMessage(
-            "Contenu enregistré."
-        );
 
+await chargerDonnees();
+
+fermerEditeurs();
+
+showMessage(
+    "Contenu enregistré."
+);
     }
     catch (error) {
 
