@@ -5,10 +5,20 @@
    Bibliothèque des icônes animées utilisées
    par les cartes de mesures.
 
-   Champs :
+   Champs statistiques :
+   - id
    - nom
    - lien
    - aperçu
+
+   Une statistique peut être utilisée par une mesure
+   via :
+   - stat_1
+   - stat_2
+   - stat_3
+
+   La carte de chaque statistique affiche automatiquement
+   la liste des mesures qui l'utilisent.
 
    Suppression protégée si la statistique est utilisée
    par un contenu.
@@ -22,6 +32,8 @@ import { supabase } from "./supabase.js";
 ========================================================= */
 
 let statistiques = [];
+
+let mesures = [];
 
 let editionId = null;
 
@@ -203,7 +215,7 @@ async function verifierAdmin() {
 
 
 /* =========================================================
-   CHARGEMENT
+   CHARGEMENT DES STATISTIQUES
 ========================================================= */
 
 async function chargerStatistiques() {
@@ -231,14 +243,14 @@ async function chargerStatistiques() {
 
     if (error) {
 
-        console.error(error);
-
-        afficherMessage(
-            "Impossible de charger la bibliothèque.",
-            "error"
+        console.error(
+            "CHARGEMENT STATS :",
+            error
         );
 
-        return;
+        throw new Error(
+            "Impossible de charger la bibliothèque."
+        );
 
     }
 
@@ -246,8 +258,94 @@ async function chargerStatistiques() {
     statistiques =
         data || [];
 
+}
 
-    renderStats();
+
+/* =========================================================
+   CHARGEMENT DES MESURES
+========================================================= */
+
+async function chargerMesures() {
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+            .from("contenus")
+            .select(
+                `
+                id,
+                titre,
+                stat_1,
+                stat_2,
+                stat_3
+                `
+            )
+            .order(
+                "titre",
+                {
+                    ascending: true
+                }
+            );
+
+
+    if (error) {
+
+        console.error(
+            "CHARGEMENT MESURES :",
+            error
+        );
+
+        throw new Error(
+            "Impossible de charger les mesures."
+        );
+
+    }
+
+
+    mesures =
+        data || [];
+
+}
+
+
+/* =========================================================
+   MESURES UTILISANT UNE STATISTIQUE
+========================================================= */
+
+function obtenirMesuresPourStatistique(
+    statId
+) {
+
+    return mesures.filter(
+        mesure => {
+
+            return (
+
+                String(
+                    mesure.stat_1 ?? ""
+                ) ===
+                String(statId)
+
+                ||
+
+                String(
+                    mesure.stat_2 ?? ""
+                ) ===
+                String(statId)
+
+                ||
+
+                String(
+                    mesure.stat_3 ?? ""
+                ) ===
+                String(statId)
+
+            );
+
+        }
+    );
 
 }
 
@@ -310,16 +408,31 @@ function renderStats() {
                 "";
 
 
+            /*
+             * Toutes les mesures qui utilisent
+             * cette statistique dans stat_1,
+             * stat_2 ou stat_3.
+             */
+            const mesuresStat =
+                obtenirMesuresPourStatistique(
+                    stat.id
+                );
+
+
             card.innerHTML = `
 
                 <div
                   style="
                     display:grid;
                     grid-template-columns:minmax(0,1fr) 110px auto;
-                    align-items:center;
+                    align-items:start;
                     gap:18px;
                   "
                 >
+
+                    <!-- =================================================
+                         INFORMATIONS STATISTIQUE
+                    ================================================== -->
 
                     <div
                       style="
@@ -388,8 +501,136 @@ function renderStats() {
 
                         </div>
 
+
+                        <!-- =============================================
+                             EFFET STATISTIQUE
+                        ============================================== -->
+
+                        <div
+                          style="
+                            margin-top:18px;
+                            padding-top:12px;
+                            border-top:1px solid var(--border);
+                          "
+                        >
+
+                            <div
+                              style="
+                                color:var(--gold);
+                                font-size:10px;
+                                font-weight:bold;
+                                letter-spacing:1px;
+                                margin-bottom:8px;
+                              "
+                            >
+                                EFFET STATISTIQUE
+                            </div>
+
+
+                            <div
+                              style="
+                                color:var(--muted);
+                                font-size:10px;
+                                margin-bottom:8px;
+                              "
+                            >
+                                ${
+                                    mesuresStat.length
+                                }
+                                mesure${
+                                    mesuresStat.length > 1
+                                        ? "s"
+                                        : ""
+                                }
+                                concernée${
+                                    mesuresStat.length > 1
+                                        ? "s"
+                                        : ""
+                                }
+                            </div>
+
+
+                            ${
+                                mesuresStat.length > 0
+
+                                    ? `
+
+                                      <div
+                                        style="
+                                          display:flex;
+                                          flex-direction:column;
+                                          gap:5px;
+                                        "
+                                      >
+
+                                        ${
+                                            mesuresStat
+                                                .map(
+                                                    mesure => `
+
+                                                        <div
+                                                          style="
+                                                            display:flex;
+                                                            align-items:flex-start;
+                                                            gap:7px;
+                                                            padding:6px 8px;
+                                                            background:rgba(255,255,255,.025);
+                                                            border:1px solid var(--border);
+                                                            font-size:11px;
+                                                            line-height:1.35;
+                                                          "
+                                                        >
+
+                                                            <span
+                                                              style="
+                                                                color:var(--gold);
+                                                                flex-shrink:0;
+                                                              "
+                                                            >
+                                                                •
+                                                            </span>
+
+                                                            <span>
+                                                                ${escapeHtml(
+                                                                    mesure.titre
+                                                                )}
+                                                            </span>
+
+                                                        </div>
+
+                                                    `
+                                                )
+                                                .join("")
+                                        }
+
+                                      </div>
+
+                                      `
+
+                                    : `
+
+                                      <div
+                                        style="
+                                          color:var(--muted);
+                                          font-size:10px;
+                                          font-style:italic;
+                                        "
+                                      >
+                                        Cette statistique n'est utilisée
+                                        par aucune mesure.
+                                      </div>
+
+                                      `
+                            }
+
+                        </div>
+
                     </div>
 
+
+                    <!-- =================================================
+                         APERÇU
+                    ================================================== -->
 
                     <div
                       style="
@@ -449,6 +690,10 @@ function renderStats() {
                     </div>
 
 
+                    <!-- =================================================
+                         ACTIONS
+                    ================================================== -->
+
                     <div
                       style="
                         display:flex;
@@ -462,7 +707,7 @@ function renderStats() {
                           class="icon-button"
                           title="Modifier"
                           data-action="edit"
-                          data-id="${stat.id}"
+                          data-id="${escapeHtml(stat.id)}"
                         >
                             ✎
                         </button>
@@ -473,7 +718,7 @@ function renderStats() {
                           class="icon-button danger"
                           title="Supprimer"
                           data-action="delete"
-                          data-id="${stat.id}"
+                          data-id="${escapeHtml(stat.id)}"
                         >
                             ×
                         </button>
@@ -755,10 +1000,15 @@ if (statsForm) {
 
                 await chargerStatistiques();
 
+                renderStats();
+
             }
             catch (error) {
 
-                console.error(error);
+                console.error(
+                    "ENREGISTREMENT STAT :",
+                    error
+                );
 
 
                 afficherMessage(
@@ -894,7 +1144,10 @@ async function verifierUtilisation(
 
     if (error) {
 
-        console.error(error);
+        console.error(
+            "VERIFICATION UTILISATION :",
+            error
+        );
 
         throw new Error(
             "Impossible de vérifier si cette statistique est utilisée."
@@ -1003,7 +1256,10 @@ async function supprimerStatistique(
 
     if (error) {
 
-        console.error(error);
+        console.error(
+            "SUPPRESSION STAT :",
+            error
+        );
 
 
         if (
@@ -1042,6 +1298,9 @@ async function supprimerStatistique(
 
 
     await chargerStatistiques();
+
+
+    renderStats();
 
 
     afficherMessage(
@@ -1155,7 +1414,21 @@ async function initialiser() {
         reinitialiserFormulaire();
 
 
-        await chargerStatistiques();
+        /*
+         * On charge les deux sources avant
+         * d'effectuer le rendu.
+         */
+        await Promise.all([
+            chargerStatistiques(),
+            chargerMesures()
+        ]);
+
+
+        /*
+         * Un seul rendu une fois que les statistiques
+         * ET les mesures sont disponibles.
+         */
+        renderStats();
 
     }
     catch (error) {
@@ -1173,9 +1446,20 @@ async function initialiser() {
 
         }
 
+
+        afficherMessage(
+            error.message ||
+            "Impossible de charger les statistiques.",
+            "error"
+        );
+
     }
 
 }
 
+
+/* =========================================================
+   LANCEMENT
+========================================================= */
 
 initialiser();
