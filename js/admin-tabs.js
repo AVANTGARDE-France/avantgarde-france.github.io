@@ -5,10 +5,10 @@
 
    Gestion des onglets de l'espace membre :
 
-   - Navigation entre les onglets
-   - Rechargement complet de admin.html à chaque clic
+   - Navigation entre les onglets SANS rechargement de page
+   - Mise à jour de l'URL via ?tab=
    - Lecture de l'onglet demandé via ?tab=
-   - Affichage du contenu correspondant
+   - Gestion du bouton précédent / suivant du navigateur
    - Vérification des droits RDV
    - Vérification des droits ROLE
    - Vérification des droits EQUIPES
@@ -19,15 +19,16 @@
    L'authentification est prioritaire.
 
    Tant que admin-auth.js n'a pas terminé de charger
-   l'utilisateur et son profil, ce fichier NE DOIT PAS
-   décider que l'onglet demandé doit être profileTab.
+   l'utilisateur et son profil :
 
-   L'état est signalé par :
+       window.adminAuthReady = false
 
-       window.adminAuthReady
+   Une fois le profil chargé :
 
-   false  = authentification en cours
-   true   = authentification terminée
+       window.adminAuthReady = true
+
+   Le changement d'onglet est ensuite effectué
+   directement dans la page, sans rechargement complet.
 
 ========================================================= */
 
@@ -37,20 +38,17 @@
 ========================================================= */
 
 /*
- * Très important :
+ * admin-tabs.js peut être chargé avant admin-auth.js.
  *
- * On initialise explicitement l'état à false.
- *
- * admin-tabs.js peut être chargé avant admin-auth.js
- * ou avant la fin de sa requête Supabase.
- *
- * Dans ce cas, aucun onglet ne doit être forcé sur PROFIL.
+ * On initialise donc l'état uniquement s'il n'existe pas
+ * encore.
  */
 
 if (
     typeof window.adminAuthReady ===
     "undefined"
 ) {
+
     window.adminAuthReady =
         false;
 }
@@ -61,6 +59,7 @@ if (
 ========================================================= */
 
 const ONGLETS_ADMIN_AUTORISES = [
+
     "profileTab",
     "rdvTab",
     "teamTab",
@@ -68,6 +67,7 @@ const ONGLETS_ADMIN_AUTORISES = [
     "contentProjectTab",
     "contentOtherTab",
     "statsTab"
+
 ];
 
 
@@ -82,10 +82,12 @@ function obtenirOngletDepuisURL() {
             window.location.search
         );
 
+
     const tab =
         params.get(
             "tab"
         );
+
 
     if (
         tab &&
@@ -93,8 +95,10 @@ function obtenirOngletDepuisURL() {
             tab
         )
     ) {
+
         return tab;
     }
+
 
     return "profileTab";
 }
@@ -108,23 +112,22 @@ function peutAccederOnglet(
     cible
 ) {
 
-    /*
-     * PROFIL
-     *
-     * Toujours accessible une fois connecté.
-     */
+    /* =====================================================
+       PROFIL
+    ===================================================== */
 
     if (
         cible ===
         "profileTab"
     ) {
+
         return true;
     }
 
 
-    /*
-     * RDV
-     */
+    /* =====================================================
+       RDV
+    ===================================================== */
 
     if (
         cible ===
@@ -132,32 +135,36 @@ function peutAccederOnglet(
     ) {
 
         /*
-         * Si le profil n'est pas encore disponible,
-         * on NE considère PAS l'accès comme refusé.
+         * L'authentification n'est pas terminée.
          *
-         * L'authentification n'est simplement pas prête.
+         * null signifie :
+         * "attendre avant de décider".
          */
 
         if (
             !window.adminAuthReady
         ) {
+
             return null;
         }
+
 
         if (
             typeof window.peutGererRendezVous ===
             "function"
         ) {
+
             return window.peutGererRendezVous();
         }
+
 
         return false;
     }
 
 
-    /*
-     * ROLE
-     */
+    /* =====================================================
+       ROLE
+    ===================================================== */
 
     if (
         cible ===
@@ -167,26 +174,27 @@ function peutAccederOnglet(
         if (
             !window.adminAuthReady
         ) {
+
             return null;
         }
+
 
         if (
             typeof window.peutGererRole ===
             "function"
         ) {
+
             return window.peutGererRole();
         }
+
 
         return false;
     }
 
 
-    /*
-     * EQUIPES
-     *
-     * On reprend exactement la logique utilisée
-     * par admin-core.js pour afficher l'onglet.
-     */
+    /* =====================================================
+       EQUIPES
+    ===================================================== */
 
     if (
         cible ===
@@ -196,37 +204,48 @@ function peutAccederOnglet(
         if (
             !window.adminAuthReady
         ) {
+
             return null;
         }
+
 
         const profile =
             window.currentProfile;
 
+
         if (!profile) {
+
             return false;
         }
 
+
         return !!(
+
             profile.grade ===
                 "admin"
+
             ||
+
             profile.grade2 ===
                 "Architecte du Projet"
+
             ||
+
             profile.grade2 ===
                 "Délégué National"
+
             ||
+
             profile.grade2 ===
                 "Délégué Régional"
+
         );
     }
 
 
-    /*
-     * CONTENU PROJET
-     *
-     * Réservé aux administrateurs.
-     */
+    /* =====================================================
+       CONTENU PROJET
+    ===================================================== */
 
     if (
         cible ===
@@ -236,15 +255,20 @@ function peutAccederOnglet(
         if (
             !window.adminAuthReady
         ) {
+
             return null;
         }
+
 
         const profile =
             window.currentProfile;
 
+
         if (!profile) {
+
             return false;
         }
+
 
         return (
             profile.grade ===
@@ -253,29 +277,98 @@ function peutAccederOnglet(
     }
 
 
-    /*
-     * AUTRES CONTENUS
-     *
-     * Pour le moment, ces onglets ne possèdent
-     * pas de restriction supplémentaire ici.
-     */
+    /* =====================================================
+       AUTRES CONTENUS
+    ===================================================== */
 
     if (
         cible ===
             "contentOtherTab"
+
         ||
+
         cible ===
             "statsTab"
     ) {
+
         return true;
     }
 
 
-    /*
-     * Par sécurité, un onglet inconnu est refusé.
-     */
+    /* =====================================================
+       SECURITE
+    ===================================================== */
 
     return false;
+}
+
+
+/* =========================================================
+   MISE A JOUR DE L'URL
+========================================================= */
+
+function mettreOngletDansURL(
+    cible,
+    remplacer = false
+) {
+
+    try {
+
+        const url =
+            new URL(
+                window.location.href
+            );
+
+
+        url.searchParams.set(
+            "tab",
+            cible
+        );
+
+
+        if (remplacer) {
+
+            window.history.replaceState(
+                {
+                    tab: cible
+                },
+                "",
+                url.toString()
+            );
+
+        } else {
+
+            window.history.pushState(
+                {
+                    tab: cible
+                },
+                "",
+                url.toString()
+            );
+        }
+
+    } catch (
+        error
+    ) {
+
+        console.error(
+            "Erreur mise à jour URL onglet :",
+            error
+        );
+    }
+}
+
+
+/* =========================================================
+   RETOUR AU PROFIL DANS L'URL
+========================================================= */
+
+function remettreProfilDansURL() {
+
+    mettreOngletDansURL(
+        "profileTab",
+        true
+    );
 }
 
 
@@ -292,6 +385,7 @@ function activerOngletAdmin(
      */
 
     if (!cible) {
+
         cible =
             "profileTab";
     }
@@ -306,10 +400,12 @@ function activerOngletAdmin(
             cible
         );
 
+
     if (!contenu) {
 
         cible =
             "profileTab";
+
 
         contenu =
             document.getElementById(
@@ -318,9 +414,9 @@ function activerOngletAdmin(
     }
 
 
-    /*
-     * Désactivation de tous les onglets.
-     */
+    /* =====================================================
+       DESACTIVATION DES ONGLETS
+    ===================================================== */
 
     document
         .querySelectorAll(
@@ -336,9 +432,9 @@ function activerOngletAdmin(
         );
 
 
-    /*
-     * Désactivation de tous les contenus.
-     */
+    /* =====================================================
+       DESACTIVATION DES CONTENUS
+    ===================================================== */
 
     document
         .querySelectorAll(
@@ -354,14 +450,15 @@ function activerOngletAdmin(
         );
 
 
-    /*
-     * Activation de l'onglet visuel.
-     */
+    /* =====================================================
+       ACTIVATION ONGLET VISUEL
+    ===================================================== */
 
     const onglet =
         document.querySelector(
             `.tab[data-tab="${cible}"]`
         );
+
 
     if (onglet) {
 
@@ -371,14 +468,15 @@ function activerOngletAdmin(
     }
 
 
-    /*
-     * Activation du contenu.
-     */
+    /* =====================================================
+       ACTIVATION CONTENU
+    ===================================================== */
 
     const contenuFinal =
         document.getElementById(
             cible
         );
+
 
     if (contenuFinal) {
 
@@ -390,57 +488,144 @@ function activerOngletAdmin(
 
 
 /* =========================================================
-   NETTOYAGE DE L'URL
+   CHANGEMENT D'ONGLET
 ========================================================= */
 
-function remettreProfilDansURL() {
+/*
+ * Fonction centrale de navigation.
+ *
+ * Elle remplace désormais le comportement précédent
+ * consistant à laisser le navigateur recharger admin.html.
+ */
 
-    try {
+function changerOngletAdmin(
+    cible,
+    mettreAJourHistorique = true
+) {
 
-        const url =
-            new URL(
-                window.location.href
-            );
+    if (!cible) {
 
-        url.searchParams.set(
-            "tab",
+        cible =
+            "profileTab";
+    }
+
+
+    /* =====================================================
+       AUTHENTIFICATION
+    ===================================================== */
+
+    if (
+        !window.adminAuthReady
+    ) {
+
+        return;
+    }
+
+
+    /* =====================================================
+       VERIFICATION DES DROITS
+    ===================================================== */
+
+    const autorisation =
+        peutAccederOnglet(
+            cible
+        );
+
+
+    /*
+     * null :
+     * authentification pas encore disponible.
+     */
+
+    if (
+        autorisation ===
+        null
+    ) {
+
+        return;
+    }
+
+
+    /* =====================================================
+       ONGLET INTERDIT
+    ===================================================== */
+
+    if (
+        autorisation ===
+        false
+    ) {
+
+        /*
+         * On revient au profil.
+         *
+         * replaceState évite de créer une entrée
+         * supplémentaire dans l'historique.
+         */
+
+        remettreProfilDansURL();
+
+
+        activerOngletAdmin(
             "profileTab"
         );
 
-        window.history.replaceState(
-            {},
-            "",
-            url.toString()
-        );
 
-    } catch (
-        error
+        return;
+    }
+
+
+    /* =====================================================
+       ONGLET AUTORISÉ
+    ===================================================== */
+
+    if (
+        mettreAJourHistorique
     ) {
 
-        console.error(
-            "Erreur mise à jour URL onglet :",
-            error
+        mettreOngletDansURL(
+            cible
         );
     }
+
+
+    activerOngletAdmin(
+        cible
+    );
+
+
+    /*
+     * Permet aux autres modules de réagir à l'ouverture
+     * d'un onglet sans provoquer de rechargement de page.
+     */
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "avantgarde:admin-tab-changed",
+            {
+                detail: {
+                    tab: cible
+                }
+            }
+        )
+    );
 }
 
 
 /* =========================================================
-   ACTIVATION DE L'ONGLET DEMANDÉ
+   APPLICATION DE L'ONGLET DEPUIS L'URL
 ========================================================= */
 
 function appliquerOngletDepuisURL() {
 
     /*
-     * Sécurité absolue :
-     *
      * Tant que l'authentification n'est pas terminée,
-     * cette fonction ne fait RIEN.
+     * on ne touche à aucun onglet.
      */
 
     if (
         !window.adminAuthReady
     ) {
+
         return;
     }
 
@@ -449,10 +634,6 @@ function appliquerOngletDepuisURL() {
         obtenirOngletDepuisURL();
 
 
-    /*
-     * Vérification des droits.
-     */
-
     const autorisation =
         peutAccederOnglet(
             ongletDemandé
@@ -460,24 +641,21 @@ function appliquerOngletDepuisURL() {
 
 
     /*
-     * null signifie que l'authentification
-     * n'est pas encore disponible.
-     *
-     * On attend.
+     * L'authentification n'est finalement pas prête.
      */
 
     if (
         autorisation ===
         null
     ) {
+
         return;
     }
 
 
-    /*
-     * Onglet interdit :
-     * retour au profil.
-     */
+    /* =====================================================
+       ONGLET INTERDIT
+    ===================================================== */
 
     if (
         autorisation ===
@@ -486,27 +664,45 @@ function appliquerOngletDepuisURL() {
 
         remettreProfilDansURL();
 
+
         activerOngletAdmin(
             "profileTab"
         );
+
 
         return;
     }
 
 
-    /*
-     * Onglet autorisé :
-     * on l'active.
-     */
+    /* =====================================================
+       ONGLET AUTORISÉ
+    ===================================================== */
 
     activerOngletAdmin(
         ongletDemandé
+    );
+
+
+    /*
+     * Informe les modules que l'onglet demandé
+     * depuis l'URL vient d'être ouvert.
+     */
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "avantgarde:admin-tab-changed",
+            {
+                detail: {
+                    tab: ongletDemandé
+                }
+            }
+        )
     );
 }
 
 
 /* =========================================================
-   INITIALISATION DES CLICS
+   CLICS SUR LES ONGLETS
 ========================================================= */
 
 function initialiserClicsOnglets() {
@@ -516,7 +712,9 @@ function initialiserClicsOnglets() {
             ".tab"
         );
 
+
     if (!onglets.length) {
+
         return;
     }
 
@@ -525,16 +723,17 @@ function initialiserClicsOnglets() {
         tab => {
 
             /*
-             * Evite d'ajouter plusieurs fois
-             * le même événement.
+             * Evite les doubles listeners.
              */
 
             if (
                 tab.dataset.adminTabsInitialized ===
                 "true"
             ) {
+
                 return;
             }
+
 
             tab.dataset.adminTabsInitialized =
                 "true";
@@ -547,65 +746,86 @@ function initialiserClicsOnglets() {
                     const cible =
                         tab.dataset.tab;
 
+
                     if (!cible) {
+
                         return;
                     }
 
 
                     /*
-                     * Si l'authentification n'est pas
-                     * encore terminée, on ne bloque pas
-                     * inutilement le navigateur.
+                     * IMPORTANT :
                      *
-                     * En pratique, les onglets sont des liens
-                     * et le rechargement sera traité par
-                     * admin-auth.js.
+                     * On bloque maintenant le comportement
+                     * naturel du lien.
+                     *
+                     * Cela empêche le rechargement complet
+                     * de admin.html.
                      */
 
-                    if (
-                        !window.adminAuthReady
-                    ) {
-                        return;
-                    }
-
-
-                    const autorisation =
-                        peutAccederOnglet(
-                            cible
-                        );
+                    event.preventDefault();
 
 
                     /*
-                     * Onglet interdit :
-                     * empêcher la navigation.
+                     * Le changement est effectué
+                     * directement dans la page.
                      */
 
-                    if (
-                        autorisation ===
-                        false
-                    ) {
-
-                        event.preventDefault();
-
-                        activerOngletAdmin(
-                            "profileTab"
-                        );
-
-                        remettreProfilDansURL();
-
-                        return;
-                    }
-
-                    /*
-                     * Pour un onglet autorisé,
-                     * on NE bloque PAS le clic.
-                     *
-                     * Le navigateur recharge :
-                     *
-                     * admin.html?tab=xxxx
-                     */
+                    changerOngletAdmin(
+                        cible,
+                        true
+                    );
                 }
             );
+        }
+    );
+}
+
+
+/* =========================================================
+   BOUTONS PRECEDENT / SUIVANT DU NAVIGATEUR
+========================================================= */
+
+function initialiserHistoriqueOnglets() {
+
+    /*
+     * Evite de créer plusieurs listeners.
+     */
+
+    if (
+        window.adminTabsHistoryInitialized
+    ) {
+
+        return;
+    }
+
+
+    window.adminTabsHistoryInitialized =
+        true;
+
+
+    window.addEventListener(
+        "popstate",
+        () => {
+
+            /*
+             * Le navigateur vient de modifier
+             * ?tab=...
+             *
+             * On applique simplement l'onglet
+             * correspondant sans créer une nouvelle
+             * entrée dans l'historique.
+             */
+
+            if (
+                !window.adminAuthReady
+            ) {
+
+                return;
+            }
+
+
+            appliquerOngletDepuisURL();
         }
     );
 }
@@ -625,37 +845,41 @@ function initialiserOngletsAdmin() {
         document.readyState ===
         "loading"
     ) {
+
         return;
     }
 
 
     /*
-     * Toujours installer les clics.
+     * Installation des clics.
      */
 
     initialiserClicsOnglets();
 
 
     /*
-     * IMPORTANT :
-     *
-     * Si l'authentification n'est pas terminée,
-     * on s'arrête ici.
-     *
-     * On ne sélectionne surtout PAS profileTab.
+     * Installation de la navigation navigateur.
+     */
+
+    initialiserHistoriqueOnglets();
+
+
+    /*
+     * Tant que l'authentification n'est pas terminée,
+     * on ne sélectionne aucun onglet.
      */
 
     if (
         !window.adminAuthReady
     ) {
+
         return;
     }
 
 
     /*
-     * L'authentification est terminée.
-     *
-     * On peut maintenant appliquer ?tab=...
+     * L'authentification est terminée :
+     * application de ?tab=...
      */
 
     appliquerOngletDepuisURL();
@@ -677,6 +901,9 @@ window.obtenirOngletDepuisURL =
 
 window.appliquerOngletDepuisURL =
     appliquerOngletDepuisURL;
+
+window.changerOngletAdmin =
+    changerOngletAdmin;
 
 
 /* =========================================================
@@ -707,9 +934,17 @@ if (
 ========================================================= */
 
 export {
+
     initialiserOngletsAdmin,
+
     activerOngletAdmin,
+
     obtenirOngletDepuisURL,
+
     appliquerOngletDepuisURL,
-    peutAccederOnglet
+
+    peutAccederOnglet,
+
+    changerOngletAdmin
+
 };
