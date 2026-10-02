@@ -69,6 +69,11 @@
     font-size:10px;
 }
 
+
+/* =======================================================
+   ARBORESCENCE PROJET
+======================================================= */
+
 #contentProjectTab .project-tree-container {
     padding:10px;
     max-height:calc(100vh - 250px);
@@ -91,7 +96,6 @@
 
 /* =======================================================
    ONGLETS TOUJOURS VISIBLES
-   Ces boutons ne dépendent pas encore du JavaScript.
 ======================================================= */
 
 #rdvTabButton,
@@ -104,31 +108,106 @@
 
 
 /* =======================================================
-   CONTENU AUTRES — PLACEHOLDER
+   CONTENU AUTRES
 ======================================================= */
 
-#contentOtherTab .other-content-placeholder {
-    padding:40px 25px;
-    text-align:center;
+#contentOtherTab .other-content-editor {
+    margin-top:25px;
+}
+
+#contentOtherTab .other-content-section {
+    margin-bottom:30px;
+    padding:20px;
     border:1px solid var(--border);
     background:rgba(255,255,255,.02);
 }
 
-#contentOtherTab .other-content-placeholder h2 {
-    margin:0 0 12px;
-    color:var(--gold-light);
-    font-size:18px;
-    letter-spacing:.08em;
+#contentOtherTab .other-content-section:last-child {
+    margin-bottom:0;
 }
 
-#contentOtherTab .other-content-placeholder p {
-    margin:0;
-    color:rgba(245,243,237,.65);
-    font-family:Arial,sans-serif;
-    font-size:13px;
+#contentOtherTab .other-content-section-title {
+    margin:0 0 18px;
+    color:var(--gold-light);
+    font-size:15px;
+    letter-spacing:.08em;
+    font-weight:bold;
+}
+
+#contentOtherTab .other-content-toolbar {
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    margin-bottom:8px;
+}
+
+#contentOtherTab .other-content-wysiwyg {
+    min-height:350px;
+    padding:18px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.03);
+    color:var(--white);
+    outline:none;
+    overflow:auto;
     line-height:1.6;
 }
 
+#contentOtherTab .other-content-wysiwyg:focus {
+    border-color:rgba(214,173,85,.55);
+}
+
+#contentOtherTab .other-content-source {
+    display:none;
+    width:100%;
+    min-height:350px;
+    padding:18px;
+    box-sizing:border-box;
+    border:1px solid var(--border);
+    background:#07152d;
+    color:var(--white);
+    outline:none;
+    font-family:monospace;
+    font-size:13px;
+    line-height:1.5;
+    resize:vertical;
+}
+
+#contentOtherTab .other-content-actions {
+    display:flex;
+    gap:8px;
+    margin-top:15px;
+}
+
+#contentOtherTab .other-content-actions button {
+    margin:0;
+}
+
+#contentOtherTab .other-content-message {
+    margin-top:10px;
+}
+
+#contentOtherTab .other-content-wysiwyg img {
+    max-width:100%;
+    height:auto;
+}
+
+#contentOtherTab .other-content-wysiwyg video,
+#contentOtherTab .other-content-wysiwyg iframe {
+    max-width:100%;
+}
+
+#contentOtherTab .other-content-wysiwyg h2 {
+    color:var(--gold-light);
+}
+
+#contentOtherTab .other-content-wysiwyg h3 {
+    color:var(--gold-light);
+}
+
+
+/* =======================================================
+   RESPONSIVE
+======================================================= */
 
 @media (max-width:900px) {
 
@@ -2200,16 +2279,350 @@
     </p>
 
 
-    <div class="other-content-placeholder">
 
-        <h2>
-            CONTENU AUTRES
-        </h2>
+    <!-- ===================================================
+         MANIFESTE
+    ==================================================== -->
 
-        <p>
-            Cette section est prête à recevoir son éditeur.
-            Le JavaScript de gestion sera ajouté ultérieurement.
-        </p>
+    <div class="other-content-editor">
+
+        <div class="other-content-section">
+
+            <h3 class="other-content-section-title">
+                MANIFESTE
+            </h3>
+
+
+            <div
+                id="manifestToolbar"
+                class="other-content-toolbar"
+            >
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-command="bold"
+                    title="Gras"
+                >
+                    B
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-command="italic"
+                    title="Italique"
+                >
+                    I
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-command="underline"
+                    title="Souligné"
+                >
+                    U
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-format="h2"
+                    title="Titre"
+                >
+                    H2
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-format="h3"
+                    title="Sous-titre"
+                >
+                    H3
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-format="p"
+                    title="Paragraphe"
+                >
+                    P
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-command="insertUnorderedList"
+                    title="Liste"
+                >
+                    •
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    id="manifestLinkButton"
+                    title="Lien"
+                >
+                    LIEN
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    id="manifestImageButton"
+                    title="Image"
+                >
+                    IMAGE
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    id="manifestVideoButton"
+                    title="Vidéo"
+                >
+                    VIDÉO
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    id="manifestSourceModeButton"
+                    title="Code HTML"
+                >
+                    CODE HTML
+                </button>
+
+            </div>
+
+
+            <div
+                id="manifestWysiwyg"
+                class="other-content-wysiwyg"
+                contenteditable="true"
+            ></div>
+
+
+            <textarea
+                id="manifestSourceEditor"
+                class="other-content-source"
+            ></textarea>
+
+
+            <div class="other-content-actions">
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="manifestSaveButton"
+                >
+                    ENREGISTRER
+                </button>
+
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    id="manifestCancelButton"
+                >
+                    ANNULER
+                </button>
+
+            </div>
+
+
+            <div
+                id="manifestMessage"
+                class="message other-content-message"
+            ></div>
+
+        </div>
+
+
+
+        <!-- ===================================================
+             INSPIRATIONS
+        ==================================================== -->
+
+        <div class="other-content-section">
+
+            <h3 class="other-content-section-title">
+                INSPIRATIONS
+            </h3>
+
+
+            <div
+                id="inspirationsToolbar"
+                class="other-content-toolbar"
+            >
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-command="bold"
+                    title="Gras"
+                >
+                    B
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-command="italic"
+                    title="Italique"
+                >
+                    I
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-command="underline"
+                    title="Souligné"
+                >
+                    U
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-format="h2"
+                    title="Titre"
+                >
+                    H2
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-format="h3"
+                    title="Sous-titre"
+                >
+                    H3
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-format="p"
+                    title="Paragraphe"
+                >
+                    P
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    data-other-command="insertUnorderedList"
+                    title="Liste"
+                >
+                    •
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    id="inspirationsLinkButton"
+                    title="Lien"
+                >
+                    LIEN
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    id="inspirationsImageButton"
+                    title="Image"
+                >
+                    IMAGE
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    id="inspirationsVideoButton"
+                    title="Vidéo"
+                >
+                    VIDÉO
+                </button>
+
+
+                <button
+                    type="button"
+                    class="icon-button"
+                    id="inspirationsSourceModeButton"
+                    title="Code HTML"
+                >
+                    CODE HTML
+                </button>
+
+            </div>
+
+
+            <div
+                id="inspirationsWysiwyg"
+                class="other-content-wysiwyg"
+                contenteditable="true"
+            ></div>
+
+
+            <textarea
+                id="inspirationsSourceEditor"
+                class="other-content-source"
+            ></textarea>
+
+
+            <div class="other-content-actions">
+
+                <button
+                    type="button"
+                    class="primary-button"
+                    id="inspirationsSaveButton"
+                >
+                    ENREGISTRER
+                </button>
+
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    id="inspirationsCancelButton"
+                >
+                    ANNULER
+                </button>
+
+            </div>
+
+
+            <div
+                id="inspirationsMessage"
+                class="message other-content-message"
+            ></div>
+
+        </div>
 
     </div>
 
@@ -2501,6 +2914,17 @@
 <script
     type="module"
     src="./js/admincontenus.js"
+></script>
+
+
+
+<!-- =======================================================
+     GESTION DU CONTENU AUTRES
+======================================================= -->
+
+<script
+    type="module"
+    src="./js/adminautres.js"
 ></script>
 
 
