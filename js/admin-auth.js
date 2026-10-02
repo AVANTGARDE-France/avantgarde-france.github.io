@@ -628,6 +628,8 @@ async function verifierUtilisateur() {
        toute vérification des droits.
     ===================================================== */
 
+
+
     window.currentUser =
         user;
 
@@ -641,6 +643,8 @@ async function verifierUtilisateur() {
     /*
      * Synchronisation explicite avec le Core.
      */
+
+
 
     if (
         typeof window.definirEtatUtilisateur ===
@@ -660,6 +664,8 @@ async function verifierUtilisateur() {
        AFFICHAGE ESPACE MEMBRE
     ===================================================== */
 
+
+
     afficherAdmin();
 
 
@@ -667,6 +673,8 @@ async function verifierUtilisateur() {
     /* =====================================================
        REMPLISSAGE PROFIL
     ===================================================== */
+
+
 
     if (
         typeof window.remplirProfil ===
@@ -704,6 +712,8 @@ async function verifierUtilisateur() {
        ROLE         → caché
     ===================================================== */
 
+
+
     if (
         typeof window.actualiserAccesAdmin ===
         "function"
@@ -721,6 +731,8 @@ async function verifierUtilisateur() {
        Le Core vient déjà de calculer la visibilité.
        On conserve ici le chargement des données RDV.
     ===================================================== */
+
+
 
     const rdvButton =
         document.getElementById(
@@ -772,6 +784,8 @@ async function verifierUtilisateur() {
     /* =====================================================
        ONGLET ROLE
     ===================================================== */
+
+
 
     const roleButton =
         document.getElementById(
@@ -829,6 +843,8 @@ async function verifierUtilisateur() {
        Lex étant admin, l'onglet doit être visible.
     ===================================================== */
 
+
+
     if (
         typeof window.actualiserAccesEquipes ===
         "function"
@@ -846,6 +862,77 @@ async function verifierUtilisateur() {
     ) {
 
         window.chargerGestionEquipes();
+
+    }
+
+
+
+    /* =====================================================
+       CONTENU PROJET
+
+       Le Core gère la visibilité de cet onglet.
+       On ne modifie pas l'onglet actuellement demandé.
+    ===================================================== */
+
+
+
+    if (
+        typeof window.actualiserAccesContenuProjet ===
+        "function"
+    ) {
+
+        window.actualiserAccesContenuProjet();
+
+    }
+
+
+
+    /* =====================================================
+       ONGLET DEMANDÉ PAR L'URL
+
+       IMPORTANT :
+
+       On ne force PAS profileTab ici.
+
+       admin-tabs.js est responsable de lire :
+
+           ?tab=profileTab
+           ?tab=rdvTab
+           ?tab=teamTab
+           ?tab=roleTab
+           ?tab=contentProjectTab
+           ?tab=contentOtherTab
+           ?tab=statsTab
+
+       et d'activer le contenu correspondant.
+
+       L'appel est différé d'un tour de boucle afin de
+       laisser les autres modules terminer leur initialisation
+       après le chargement du profil et des droits.
+    ===================================================== */
+
+
+
+    if (
+        typeof window.initialiserOngletsAdmin ===
+        "function"
+    ) {
+
+        setTimeout(
+            () => {
+
+                if (
+                    typeof window.initialiserOngletsAdmin ===
+                    "function"
+                ) {
+
+                    window.initialiserOngletsAdmin();
+
+                }
+
+            },
+            0
+        );
 
     }
 
@@ -1053,6 +1140,8 @@ window.deconnecter =
  * Compatibilité avec les modules qui utilisent
  * les fonctions de message via window.
  */
+
+
 
 window.afficherMessage =
     window.afficherMessage ||
