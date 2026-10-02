@@ -1,97 +1,139 @@
 /* =========================================================
-
    AVANT-GARDE — ADMIN AUTH
 
    js/admin-auth.js
 
-
    Gestion de l'authentification de l'espace membre :
 
-
    - Connexion
-
    - Vérification de la session
-
    - Chargement du profil connecté
-
    - Affichage connexion / espace membre
-
    - Déconnexion
-
    - Actions HOME / DECONNEXION
+   - Finalisation de l'onglet demandé
+
+   IMPORTANT :
+
+   L'authentification est prioritaire sur la navigation
+   des onglets.
+
+   Tant que le profil n'est pas chargé :
+
+       window.adminAuthReady = false
+
+   Une fois le profil chargé :
+
+       window.adminAuthReady = true
+
+   admin-tabs.js peut alors afficher l'onglet demandé
+   dans ?tab=...
 
 ========================================================= */
-
-
-
-import { supabase } from "./supabase.js";
-
-
-
 
 
 /* =========================================================
-
-   VARIABLES
-
+   SUPABASE
 ========================================================= */
 
+import {
+    supabase
+} from "./supabase.js";
 
+
+/* =========================================================
+   ETAT INITIAL
+========================================================= */
+
+/*
+ * L'authentification commence toujours comme "non prête".
+ *
+ * C'est essentiel pour éviter que admin-tabs.js
+ * interprète currentProfile === null comme
+ * "l'utilisateur n'a pas les droits".
+ */
+
+window.adminAuthReady =
+    false;
+
+
+/*
+ * Compatibilité avec admin-core.js.
+ */
 
 window.currentUser =
-    window.currentUser || null;
-
-
+    window.currentUser ||
+    null;
 
 window.currentProfile =
-    window.currentProfile || null;
-
-
-
+    window.currentProfile ||
+    null;
 
 
 /* =========================================================
-
    ELEMENTS
-
 ========================================================= */
 
+/*
+ * Les éléments DOM sont récupérés après chargement
+ * du DOM dans initialiserAuthentification().
+ *
+ * Cela évite les références null si admin.js est chargé
+ * dans le <head>.
+ */
 
+let loginScreen =
+    null;
 
-const loginScreen =
-    document.getElementById("loginScreen");
+let adminScreen =
+    null;
 
+let loginForm =
+    null;
 
+let loginButton =
+    null;
 
-const adminScreen =
-    document.getElementById("adminScreen");
-
-
-
-const loginForm =
-    document.getElementById("loginForm");
-
-
-
-const loginButton =
-    document.getElementById("loginButton");
-
-
-
-const loginMessage =
-    document.getElementById("loginMessage");
-
-
-
+let loginMessage =
+    null;
 
 
 /* =========================================================
-
-   MESSAGES
-
+   RECUPERATION DES ELEMENTS
 ========================================================= */
 
+function recupererElementsAuth() {
 
+    loginScreen =
+        document.getElementById(
+            "loginScreen"
+        );
+
+    adminScreen =
+        document.getElementById(
+            "adminScreen"
+        );
+
+    loginForm =
+        document.getElementById(
+            "loginForm"
+        );
+
+    loginButton =
+        document.getElementById(
+            "loginButton"
+        );
+
+    loginMessage =
+        document.getElementById(
+            "loginMessage"
+        );
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
 
 function afficherMessage(
     element,
@@ -99,81 +141,62 @@ function afficherMessage(
     texte
 ) {
 
-
     if (!element) {
-
         return;
-
     }
 
-
-
     element.className =
-        "message " + type;
-
-
+        "message " +
+        type;
 
     element.textContent =
         texte;
-
 }
-
 
 
 function viderMessage(
     element
 ) {
 
-
     if (!element) {
-
         return;
-
     }
-
-
 
     element.className =
         "message";
 
-
-
     element.textContent =
         "";
-
 }
 
 
-
-
-
 /* =========================================================
-
    AFFICHAGE CONNEXION
-
 ========================================================= */
 
-
-
 function afficherConnexion() {
+
+    /*
+     * L'utilisateur n'est plus considéré
+     * comme authentifié.
+     */
+
+    window.adminAuthReady =
+        true;
 
 
     if (loginScreen) {
 
         loginScreen.style.display =
             "block";
-
     }
-
 
 
     if (adminScreen) {
 
         adminScreen.style.display =
             "none";
-
     }
-
 
 
     if (loginButton) {
@@ -181,60 +204,48 @@ function afficherConnexion() {
         loginButton.disabled =
             false;
 
-
-
         loginButton.textContent =
             "CONNEXION";
-
     }
-
 
 
     if (loginForm) {
 
         loginForm.reset();
-
     }
-
 
 
     viderMessage(
         loginMessage
     );
 
+
+    /*
+     * Si une session n'existe pas,
+     * aucune activation d'onglet membre
+     * ne doit être effectuée.
+     */
 }
 
 
-
-
-
 /* =========================================================
-
-   AFFICHAGE ADMIN
-
+   AFFICHAGE ESPACE MEMBRE
 ========================================================= */
 
-
-
 function afficherAdmin() {
-
 
     if (loginScreen) {
 
         loginScreen.style.display =
             "none";
-
     }
-
 
 
     if (adminScreen) {
 
         adminScreen.style.display =
             "block";
-
     }
-
 
 
     const adminUser =
@@ -243,42 +254,28 @@ function afficherAdmin() {
         );
 
 
-
     if (adminUser) {
 
-        adminUser.innerHTML =
-            "Connecté en tant que <strong>" +
+        const nom =
+            window.currentProfile?.nom ||
+            window.currentUser?.email ||
+            "";
 
-            (
-                window.currentProfile?.nom ||
-                window.currentUser?.email ||
-                ""
-            ) +
-
-            "</strong>";
-
+        adminUser.textContent =
+            "Connecté en tant que " +
+            nom;
     }
 
 
-
     ajouterActionsHeader();
-
 }
 
 
-
-
-
 /* =========================================================
-
    HEADER ESPACE MEMBRE
-
 ========================================================= */
 
-
-
 function ajouterActionsHeader() {
-
 
     let actions =
         document.getElementById(
@@ -286,13 +283,14 @@ function ajouterActionsHeader() {
         );
 
 
+    /*
+     * Déjà présent :
+     * aucune duplication.
+     */
 
     if (actions) {
-
         return;
-
     }
-
 
 
     const header =
@@ -301,19 +299,14 @@ function ajouterActionsHeader() {
         );
 
 
-
     header.id =
         "memberHeaderActions";
-
-
 
     header.className =
         "header-actions";
 
 
-
     header.innerHTML = `
-
         <a
             href="index.html"
             class="header-button"
@@ -328,9 +321,7 @@ function ajouterActionsHeader() {
         >
             SE DÉCONNECTER
         </button>
-
     `;
-
 
 
     const adminHeader =
@@ -339,13 +330,9 @@ function ajouterActionsHeader() {
         );
 
 
-
     if (!adminHeader) {
-
         return;
-
     }
-
 
 
     adminHeader.insertBefore(
@@ -354,12 +341,10 @@ function ajouterActionsHeader() {
     );
 
 
-
     const logoutButton =
         document.getElementById(
             "logoutButton"
         );
-
 
 
     if (logoutButton) {
@@ -368,25 +353,15 @@ function ajouterActionsHeader() {
             "click",
             deconnecter
         );
-
     }
-
 }
 
 
-
-
-
 /* =========================================================
-
    DECONNEXION
-
 ========================================================= */
 
-
-
 async function deconnecter() {
-
 
     const button =
         document.getElementById(
@@ -394,19 +369,14 @@ async function deconnecter() {
         );
 
 
-
     if (button) {
 
         button.disabled =
             true;
 
-
-
         button.textContent =
             "DÉCONNEXION…";
-
     }
-
 
 
     const {
@@ -415,9 +385,7 @@ async function deconnecter() {
         await supabase.auth.signOut();
 
 
-
     if (error) {
-
 
         console.error(
             "Erreur déconnexion :",
@@ -425,35 +393,31 @@ async function deconnecter() {
         );
 
 
-
         if (button) {
 
             button.disabled =
                 false;
 
-
-
             button.textContent =
                 "SE DÉCONNECTER";
-
         }
 
-
-
         return;
-
     }
 
 
+    /*
+     * Réinitialisation de l'état.
+     */
 
     window.currentUser =
         null;
 
-
-
     window.currentProfile =
         null;
 
+    window.adminAuthReady =
+        true;
 
 
     if (
@@ -462,506 +426,825 @@ async function deconnecter() {
     ) {
 
         window.reinitialiserEtatAdmin();
-
     }
-
-
-
-    if (button) {
-
-        button.disabled =
-            false;
-
-
-
-        button.textContent =
-            "SE DÉCONNECTER";
-
-    }
-
-
-
-    afficherConnexion();
-
-}
-
-
-
-
-
-/* =========================================================
-
-   VERIFICATION UTILISATEUR
-
-========================================================= */
-
-
-
-async function verifierUtilisateur() {
-
-
-    const {
-        data: {
-            user
-        }
-    } =
-        await supabase.auth.getUser();
-
-
-
-    if (!user) {
-
-
-        window.currentUser =
-            null;
-
-
-
-        window.currentProfile =
-            null;
-
-
-
-        afficherConnexion();
-
-
-
-        return;
-
-    }
-
-
-
-    window.currentUser =
-        user;
-
-
-
-    const {
-        data: profile,
-        error
-    } =
-        await supabase
-
-            .from("profiles")
-
-            .select(`
-
-                id,
-                nom,
-                grade,
-                grade2,
-                email,
-                image_url,
-                description,
-                region,
-                competences,
-                anonyme,
-                facebook_url,
-                x_url,
-                instagram_url,
-                youtube_url,
-                tiktok_url,
-                audience_max
-
-            `)
-
-            .eq(
-                "id",
-                user.id
-            )
-
-            .single();
-
-
-
-    if (
-        error ||
-        !profile
-    ) {
-
-
-        console.error(
-            "Erreur chargement profil :",
-            error
-        );
-
-
-
-        await supabase.auth.signOut();
-
-
-
-        window.currentUser =
-            null;
-
-
-
-        window.currentProfile =
-            null;
-
-
-
-        afficherMessage(
-            loginMessage,
-            "error",
-            "Impossible de charger votre profil."
-        );
-
-
-
-        afficherConnexion();
-
-
-
-        return;
-
-    }
-
-
-
-    /* =====================================================
-       ETAT UTILISATEUR
-
-       IMPORTANT :
-       Le profil doit être placé dans le Core AVANT
-       toute vérification des droits.
-    ===================================================== */
-
-
-
-    window.currentUser =
-        user;
-
-
-
-    window.currentProfile =
-        profile;
-
 
 
     /*
-     * Synchronisation explicite avec le Core.
+     * Suppression des actions du header.
      */
 
-
-
-    if (
-        typeof window.definirEtatUtilisateur ===
-        "function"
-    ) {
-
-        window.definirEtatUtilisateur(
-            user,
-            profile
-        );
-
-    }
-
-
-
-    /* =====================================================
-       AFFICHAGE ESPACE MEMBRE
-    ===================================================== */
-
-
-
-    afficherAdmin();
-
-
-
-    /* =====================================================
-       REMPLISSAGE PROFIL
-    ===================================================== */
-
-
-
-    if (
-        typeof window.remplirProfil ===
-        "function"
-    ) {
-
-        window.remplirProfil(
-            profile
-        );
-
-    }
-
-
-
-    /* =====================================================
-       ACTUALISATION DES DROITS
-
-       IMPORTANT :
-
-       admin-core.js peut avoir effectué une première
-       vérification avant que le profil soit chargé.
-
-       Maintenant que grade et grade2 sont connus,
-       on recalcule explicitement la visibilité
-       de TOUS les onglets.
-
-       Pour Lex :
-       grade  = admin
-       grade2 = null
-
-       Résultat attendu :
-       PROFIL       → visible
-       RDV          → visible
-       EQUIPES      → visible
-       ROLE         → caché
-    ===================================================== */
-
-
-
-    if (
-        typeof window.actualiserAccesAdmin ===
-        "function"
-    ) {
-
-        window.actualiserAccesAdmin();
-
-    }
-
-
-
-    /* =====================================================
-       ONGLET RDV
-
-       Le Core vient déjà de calculer la visibilité.
-       On conserve ici le chargement des données RDV.
-    ===================================================== */
-
-
-
-    const rdvButton =
+    const actions =
         document.getElementById(
-            "rdvTabButton"
+            "memberHeaderActions"
         );
 
 
+    if (actions) {
 
-    if (rdvButton) {
+        actions.remove();
+    }
 
+
+    afficherConnexion();
+}
+
+
+/* =========================================================
+   ONGLET DEMANDÉ
+========================================================= */
+
+function obtenirOngletDemandeApresAuth() {
+
+    /*
+     * On utilise la fonction du module tabs
+     * lorsqu'elle est disponible.
+     */
+
+    if (
+        typeof window.obtenirOngletDepuisURL ===
+        "function"
+    ) {
+
+        return window.obtenirOngletDepuisURL();
+    }
+
+
+    /*
+     * Sécurité / compatibilité :
+     * lecture directe de ?tab=...
+     */
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const tab =
+        params.get(
+            "tab"
+        );
+
+
+    const autorises = [
+        "profileTab",
+        "rdvTab",
+        "teamTab",
+        "roleTab",
+        "contentProjectTab",
+        "contentOtherTab",
+        "statsTab"
+    ];
+
+
+    if (
+        tab &&
+        autorises.includes(
+            tab
+        )
+    ) {
+
+        return tab;
+    }
+
+
+    return "profileTab";
+}
+
+
+/* =========================================================
+   VERIFICATION DROITS ONGLET
+========================================================= */
+
+function utilisateurPeutAccederOnglet(
+    cible
+) {
+
+    /*
+     * PROFIL
+     */
+
+    if (
+        cible ===
+        "profileTab"
+    ) {
+
+        return true;
+    }
+
+
+    /*
+     * RDV
+     */
+
+    if (
+        cible ===
+        "rdvTab"
+    ) {
 
         if (
-
             typeof window.peutGererRendezVous ===
-            "function" &&
-
-            window.peutGererRendezVous()
-
+            "function"
         ) {
 
-
-            rdvButton.style.display =
-                "";
-
-
-
-            if (
-                typeof window.chargerRendezVous ===
-                "function"
-            ) {
-
-                window.chargerRendezVous();
-
-            }
-
-
-        } else {
-
-
-            rdvButton.style.display =
-                "none";
-
+            return window.peutGererRendezVous();
         }
 
+        return false;
     }
 
 
+    /*
+     * ROLE
+     */
 
-    /* =====================================================
-       ONGLET ROLE
-    ===================================================== */
+    if (
+        cible ===
+        "roleTab"
+    ) {
+
+        if (
+            typeof window.peutGererRole ===
+            "function"
+        ) {
+
+            return window.peutGererRole();
+        }
+
+        return false;
+    }
 
 
+    /*
+     * EQUIPES
+     *
+     * Même logique que admin-core.js.
+     */
 
-    const roleButton =
-        document.getElementById(
-            "roleTabButton"
+    if (
+        cible ===
+        "teamTab"
+    ) {
+
+        const profile =
+            window.currentProfile;
+
+
+        if (!profile) {
+            return false;
+        }
+
+
+        return !!(
+            profile.grade ===
+                "admin"
+            ||
+            profile.grade2 ===
+                "Architecte du Projet"
+            ||
+            profile.grade2 ===
+                "Délégué National"
+            ||
+            profile.grade2 ===
+                "Délégué Régional"
+        );
+    }
+
+
+    /*
+     * CONTENU PROJET
+     */
+
+    if (
+        cible ===
+        "contentProjectTab"
+    ) {
+
+        return (
+            window.currentProfile?.grade ===
+            "admin"
+        );
+    }
+
+
+    /*
+     * AUTRES CONTENUS
+     */
+
+    if (
+        cible ===
+            "contentOtherTab"
+        ||
+        cible ===
+            "statsTab"
+    ) {
+
+        return true;
+    }
+
+
+    return false;
+}
+
+
+/* =========================================================
+   FINALISATION DE L'ONGLET
+========================================================= */
+
+function finaliserOngletApresAuthentification() {
+
+    /*
+     * L'utilisateur n'est pas connecté :
+     * aucun onglet membre à ouvrir.
+     */
+
+    if (
+        !window.currentUser
+        ||
+        !window.currentProfile
+    ) {
+
+        return;
+    }
+
+
+    const cible =
+        obtenirOngletDemandeApresAuth();
+
+
+    const autorise =
+        utilisateurPeutAccederOnglet(
+            cible
         );
 
 
+    /*
+     * Onglet interdit :
+     * retour au profil.
+     */
 
-    if (roleButton) {
-
+    if (
+        !autorise
+    ) {
 
         if (
-
-            typeof window.peutGererRole ===
-            "function" &&
-
-            window.peutGererRole()
-
+            typeof window.activerOngletAdmin ===
+            "function"
         ) {
 
+            window.activerOngletAdmin(
+                "profileTab"
+            );
+        }
 
-            roleButton.style.display =
-                "";
 
+        try {
 
-
-            if (
-                typeof window.remplirRoles ===
-                "function"
-            ) {
-
-                window.remplirRoles(
-                    profile.competences
+            const url =
+                new URL(
+                    window.location.href
                 );
 
-            }
+            url.searchParams.set(
+                "tab",
+                "profileTab"
+            );
 
+            window.history.replaceState(
+                {},
+                "",
+                url.toString()
+            );
 
-        } else {
+        } catch (
+            error
+        ) {
 
-
-            roleButton.style.display =
-                "none";
-
+            console.error(
+                "Erreur URL onglet :",
+                error
+            );
         }
 
+
+        return;
     }
 
 
-
-    /* =====================================================
-       GESTION DES EQUIPES
-
-       Le droit est recalculé après chargement du profil.
-       Lex étant admin, l'onglet doit être visible.
-    ===================================================== */
-
-
+    /*
+     * Onglet autorisé :
+     * activation finale.
+     */
 
     if (
-        typeof window.actualiserAccesEquipes ===
+        typeof window.activerOngletAdmin ===
         "function"
     ) {
 
-        window.actualiserAccesEquipes();
-
+        window.activerOngletAdmin(
+            cible
+        );
     }
 
 
-
-    if (
-        typeof window.chargerGestionEquipes ===
-        "function"
-    ) {
-
-        window.chargerGestionEquipes();
-
-    }
-
-
-
-    /* =====================================================
-       CONTENU PROJET
-
-       Le Core gère la visibilité de cet onglet.
-       On ne modifie pas l'onglet actuellement demandé.
-    ===================================================== */
-
-
-
-    if (
-        typeof window.actualiserAccesContenuProjet ===
-        "function"
-    ) {
-
-        window.actualiserAccesContenuProjet();
-
-    }
-
-
-
-    /* =====================================================
-       ONGLET DEMANDÉ PAR L'URL
-
-       IMPORTANT :
-
-       On ne force PAS profileTab ici.
-
-       admin-tabs.js est responsable de lire :
-
-           ?tab=profileTab
-           ?tab=rdvTab
-           ?tab=teamTab
-           ?tab=roleTab
-           ?tab=contentProjectTab
-           ?tab=contentOtherTab
-           ?tab=statsTab
-
-       et d'activer le contenu correspondant.
-
-       L'appel est différé d'un tour de boucle afin de
-       laisser les autres modules terminer leur initialisation
-       après le chargement du profil et des droits.
-    ===================================================== */
-
-
+    /*
+     * On demande également à admin-tabs.js
+     * de réappliquer son initialisation.
+     *
+     * Cela ne provoque pas de problème :
+     * l'onglet demandé est maintenant autorisé
+     * et currentProfile est disponible.
+     */
 
     if (
         typeof window.initialiserOngletsAdmin ===
         "function"
     ) {
 
-        setTimeout(
-            () => {
-
-                if (
-                    typeof window.initialiserOngletsAdmin ===
-                    "function"
-                ) {
-
-                    window.initialiserOngletsAdmin();
-
-                }
-
-            },
-            0
-        );
-
+        window.initialiserOngletsAdmin();
     }
-
 }
 
 
+/* =========================================================
+   VERIFICATION UTILISATEUR
+========================================================= */
 
+async function verifierUtilisateur() {
+
+    /*
+     * Pendant toute la requête :
+     *
+     * adminAuthReady = false
+     *
+     * admin-tabs.js ne doit donc pas choisir
+     * profileTab à cause d'un profil encore absent.
+     */
+
+    window.adminAuthReady =
+        false;
+
+
+    try {
+
+        const {
+            data: {
+                user
+            }
+        } =
+            await supabase.auth.getUser();
+
+
+        /* =================================================
+           AUCUN UTILISATEUR
+        ================================================= */
+
+        if (!user) {
+
+            window.currentUser =
+                null;
+
+            window.currentProfile =
+                null;
+
+
+            if (
+                typeof window.reinitialiserEtatAdmin ===
+                "function"
+            ) {
+
+                window.reinitialiserEtatAdmin();
+            }
+
+
+            afficherConnexion();
+
+            return;
+        }
+
+
+        /* =================================================
+           UTILISATEUR TROUVÉ
+        ================================================= */
+
+        window.currentUser =
+            user;
+
+
+        /* =================================================
+           CHARGEMENT PROFIL
+        ================================================= */
+
+        const {
+            data: profile,
+            error
+        } =
+            await supabase
+                .from("profiles")
+                .select(`
+                    id,
+                    nom,
+                    grade,
+                    grade2,
+                    email,
+                    image_url,
+                    description,
+                    region,
+                    competences,
+                    anonyme,
+                    facebook_url,
+                    x_url,
+                    instagram_url,
+                    youtube_url,
+                    tiktok_url,
+                    audience_max
+                `)
+                .eq(
+                    "id",
+                    user.id
+                )
+                .single();
+
+
+        /* =================================================
+           ERREUR PROFIL
+        ================================================= */
+
+        if (
+            error ||
+            !profile
+        ) {
+
+            console.error(
+                "Erreur chargement profil :",
+                error
+            );
+
+
+            await supabase.auth.signOut();
+
+
+            window.currentUser =
+                null;
+
+            window.currentProfile =
+                null;
+
+
+            if (
+                typeof window.reinitialiserEtatAdmin ===
+                "function"
+            ) {
+
+                window.reinitialiserEtatAdmin();
+            }
+
+
+            window.adminAuthReady =
+                true;
+
+
+            afficherConnexion();
+
+
+            afficherMessage(
+                loginMessage,
+                "error",
+                "Impossible de charger votre profil."
+            );
+
+
+            return;
+        }
+
+
+        /* =================================================
+           ETAT UTILISATEUR
+        ================================================= */
+
+        /*
+         * IMPORTANT :
+         *
+         * currentProfile est rempli AVANT :
+         *
+         * - les droits
+         * - les onglets
+         * - les chargements conditionnels
+         */
+
+        window.currentUser =
+            user;
+
+        window.currentProfile =
+            profile;
+
+
+        /*
+         * Synchronisation explicite avec admin-core.js.
+         */
+
+        if (
+            typeof window.definirEtatUtilisateur ===
+            "function"
+        ) {
+
+            window.definirEtatUtilisateur(
+                user,
+                profile
+            );
+        }
+
+
+        /* =================================================
+           AFFICHAGE ESPACE MEMBRE
+        ================================================= */
+
+        afficherAdmin();
+
+
+        /* =================================================
+           REMPLISSAGE PROFIL
+        ================================================= */
+
+        if (
+            typeof window.remplirProfil ===
+            "function"
+        ) {
+
+            window.remplirProfil(
+                profile
+            );
+        }
+
+
+        /* =================================================
+           ACTUALISATION DES DROITS
+        ================================================= */
+
+        if (
+            typeof window.actualiserAccesAdmin ===
+            "function"
+        ) {
+
+            window.actualiserAccesAdmin();
+        }
+
+
+        /* =================================================
+           ONGLET RDV
+        ================================================= */
+
+        const rdvButton =
+            document.getElementById(
+                "rdvTabButton"
+            );
+
+
+        if (rdvButton) {
+
+            const autoriseRDV =
+                typeof window.peutGererRendezVous ===
+                    "function"
+                &&
+                window.peutGererRendezVous();
+
+
+            rdvButton.style.display =
+                autoriseRDV
+                    ? ""
+                    : "none";
+
+
+            if (
+                autoriseRDV
+                &&
+                typeof window.chargerRendezVous ===
+                    "function"
+            ) {
+
+                window.chargerRendezVous();
+            }
+        }
+
+
+        /* =================================================
+           ONGLET ROLE
+        ================================================= */
+
+        const roleButton =
+            document.getElementById(
+                "roleTabButton"
+            );
+
+
+        if (roleButton) {
+
+            const autoriseRole =
+                typeof window.peutGererRole ===
+                    "function"
+                &&
+                window.peutGererRole();
+
+
+            roleButton.style.display =
+                autoriseRole
+                    ? ""
+                    : "none";
+
+
+            if (
+                autoriseRole
+                &&
+                typeof window.remplirRoles ===
+                    "function"
+            ) {
+
+                window.remplirRoles(
+                    profile.competences
+                );
+            }
+        }
+
+
+        /* =================================================
+           GESTION DES EQUIPES
+        ================================================= */
+
+        if (
+            typeof window.actualiserAccesEquipes ===
+            "function"
+        ) {
+
+            window.actualiserAccesEquipes();
+        }
+
+
+        if (
+            typeof window.chargerGestionEquipes ===
+            "function"
+        ) {
+
+            window.chargerGestionEquipes();
+        }
+
+
+        /* =================================================
+           EVENEMENT DE CONNEXION
+        ================================================= */
+
+        /*
+         * admin-core.js écoute cet événement.
+         *
+         * Le profil est déjà complètement chargé
+         * au moment où l'événement est envoyé.
+         */
+
+        window.dispatchEvent(
+            new CustomEvent(
+                "avantgarde:admin-connected",
+                {
+                    detail: {
+                        user,
+                        profile
+                    }
+                }
+            )
+        );
+
+
+        /* =================================================
+           AUTHENTIFICATION TERMINEE
+        ================================================= */
+
+        /*
+         * C'EST ICI que l'état devient prêt.
+         *
+         * Il est volontairement placé APRÈS :
+         *
+         * - getUser()
+         * - chargement profiles
+         * - currentUser
+         * - currentProfile
+         * - droits
+         * - visibilité des onglets
+         */
+
+        window.adminAuthReady =
+            true;
+
+
+        /* =================================================
+           ACTIVATION FINALE DE L'ONGLET
+        ================================================= */
+
+        /*
+         * On laisse le navigateur terminer son cycle
+         * courant avant de demander à admin-tabs.js
+         * d'activer ?tab=...
+         */
+
+        const appliquer =
+            () => {
+
+                finaliserOngletApresAuthentification();
+            };
+
+
+        if (
+            document.readyState ===
+            "loading"
+        ) {
+
+            document.addEventListener(
+                "DOMContentLoaded",
+                appliquer,
+                {
+                    once: true
+                }
+            );
+
+        } else {
+
+            setTimeout(
+                appliquer,
+                0
+            );
+        }
+
+    } catch (
+        error
+    ) {
+
+        console.error(
+            "Erreur vérification utilisateur :",
+            error
+        );
+
+
+        window.currentUser =
+            null;
+
+        window.currentProfile =
+            null;
+
+
+        if (
+            typeof window.reinitialiserEtatAdmin ===
+            "function"
+        ) {
+
+            window.reinitialiserEtatAdmin();
+        }
+
+
+        window.adminAuthReady =
+            true;
+
+
+        afficherConnexion();
+
+
+        afficherMessage(
+            loginMessage,
+            "error",
+            "Une erreur est survenue lors de la vérification de votre session."
+        );
+    }
+}
 
 
 /* =========================================================
-
-   CONNEXION
-
+   GESTION DU FORMULAIRE DE CONNEXION
 ========================================================= */
 
+function initialiserFormulaireConnexion() {
+
+    if (!loginForm) {
+        return;
+    }
 
 
-if (loginForm) {
+    /*
+     * Evite les doubles listeners.
+     */
+
+    if (
+        loginForm.dataset.authInitialized ===
+        "true"
+    ) {
+        return;
+    }
+
+
+    loginForm.dataset.authInitialized =
+        "true";
 
 
     loginForm.addEventListener(
-
         "submit",
-
         async event => {
 
-
             event.preventDefault();
-
 
 
             viderMessage(
@@ -969,86 +1252,38 @@ if (loginForm) {
             );
 
 
-
             if (loginButton) {
 
                 loginButton.disabled =
                     true;
 
-
-
                 loginButton.textContent =
                     "CONNEXION…";
-
             }
 
 
-
-            const email =
-                document
-
-                    .getElementById(
-                        "loginEmail"
-                    )
-
-                    .value
-
-                    .trim()
-
-                    .toLowerCase();
-
-
-
-            const password =
-                document
-
-                    .getElementById(
-                        "loginPassword"
-                    )
-
-                    .value;
-
-
-
-            console.log(
-                "AVANT-GARDE : tentative de connexion Supabase"
-            );
-
-
-
-            const {
-                error
-            } =
-                await supabase.auth.signInWithPassword({
-
-                    email,
-
-                    password
-
-                });
-
-
-
-            if (error) {
-
-
-                console.error(
-                    "Erreur connexion :",
-                    error
+            const emailInput =
+                document.getElementById(
+                    "loginEmail"
                 );
 
 
+            const passwordInput =
+                document.getElementById(
+                    "loginPassword"
+                );
+
+
+            if (
+                !emailInput ||
+                !passwordInput
+            ) {
 
                 afficherMessage(
-
                     loginMessage,
-
                     "error",
-
-                    "Adresse e-mail ou mot de passe incorrect."
-
+                    "Formulaire de connexion incomplet."
                 );
-
 
 
                 if (loginButton) {
@@ -1056,19 +1291,82 @@ if (loginForm) {
                     loginButton.disabled =
                         false;
 
-
-
                     loginButton.textContent =
-                        "SE CONNECTER";
-
+                        "CONNEXION";
                 }
 
 
-
                 return;
-
             }
 
+
+            const email =
+                emailInput.value
+                    .trim()
+                    .toLowerCase();
+
+
+            const password =
+                passwordInput.value;
+
+
+            console.log(
+                "AVANT-GARDE : tentative de connexion Supabase"
+            );
+
+
+            /*
+             * Pendant la connexion :
+             * aucun onglet ne doit être considéré
+             * comme prêt.
+             */
+
+            window.adminAuthReady =
+                false;
+
+
+            const {
+                error
+            } =
+                await supabase.auth.signInWithPassword(
+                    {
+                        email,
+                        password
+                    }
+                );
+
+
+            if (error) {
+
+                console.error(
+                    "Erreur connexion :",
+                    error
+                );
+
+
+                window.adminAuthReady =
+                    true;
+
+
+                afficherMessage(
+                    loginMessage,
+                    "error",
+                    "Adresse e-mail ou mot de passe incorrect."
+                );
+
+
+                if (loginButton) {
+
+                    loginButton.disabled =
+                        false;
+
+                    loginButton.textContent =
+                        "CONNEXION";
+                }
+
+
+                return;
+            }
 
 
             console.log(
@@ -1076,105 +1374,113 @@ if (loginForm) {
             );
 
 
+            /*
+             * verifierUtilisateur() recharge le profil,
+             * actualise les droits et active le bon onglet.
+             */
 
             await verifierUtilisateur();
-
         }
-
     );
-
 }
 
 
+/* =========================================================
+   INITIALISATION AUTHENTIFICATION
+========================================================= */
 
+function initialiserAuthentification() {
+
+    /*
+     * Récupération des éléments après disponibilité du DOM.
+     */
+
+    recupererElementsAuth();
+
+
+    /*
+     * Installation du formulaire.
+     */
+
+    initialiserFormulaireConnexion();
+
+
+    /*
+     * Vérification de la session existante.
+     */
+
+    verifierUtilisateur();
+}
 
 
 /* =========================================================
-
-   INITIALISATION
-
+   EXPOSITION
 ========================================================= */
-
-
-
-verifierUtilisateur();
-
-
-
-
-
-/* =========================================================
-
-   EXPOSITION DES FONCTIONS UTILISEES PAR LES AUTRES MODULES
-
-========================================================= */
-
-
 
 window.verifierUtilisateur =
     verifierUtilisateur;
 
-
-
 window.afficherConnexion =
     afficherConnexion;
-
-
 
 window.afficherAdmin =
     afficherAdmin;
 
-
-
 window.ajouterActionsHeader =
     ajouterActionsHeader;
-
-
 
 window.deconnecter =
     deconnecter;
 
+window.finaliserOngletApresAuthentification =
+    finaliserOngletApresAuthentification;
 
 
-/*
- * Compatibilité avec les modules qui utilisent
- * les fonctions de message via window.
- */
-
-
+/* =========================================================
+   COMPATIBILITE MESSAGES
+========================================================= */
 
 window.afficherMessage =
     window.afficherMessage ||
     afficherMessage;
-
-
 
 window.viderMessage =
     window.viderMessage ||
     viderMessage;
 
 
+/* =========================================================
+   INITIALISATION DOM
+========================================================= */
 
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initialiserAuthentification,
+        {
+            once: true
+        }
+    );
+
+} else {
+
+    initialiserAuthentification();
+}
 
 
 /* =========================================================
-
    EXPORTS
-
 ========================================================= */
 
-
-
 export {
-
     verifierUtilisateur,
-
     afficherConnexion,
-
     afficherAdmin,
-
     ajouterActionsHeader,
-
-    deconnecter
-
+    deconnecter,
+    finaliserOngletApresAuthentification
 };
