@@ -20,7 +20,10 @@
    La carte de chaque statistique affiche automatiquement
    la liste des mesures qui l'utilisent.
 
-   Suppression protégée si la statistique est utilisée
+   Il est possible de retirer directement le rattachement
+   d'une statistique à une mesure depuis cette page.
+
+   Suppression protégée si la statistique est encore utilisée
    par un contenu.
 ========================================================= */
 
@@ -351,6 +354,211 @@ function obtenirMesuresPourStatistique(
 
 
 /* =========================================================
+   CHAMP CONTENANT LA STATISTIQUE
+========================================================= */
+
+function trouverChampStatistique(
+    mesure,
+    statId
+) {
+
+    const champs = [
+        "stat_1",
+        "stat_2",
+        "stat_3"
+    ];
+
+
+    for (
+        const champ of champs
+    ) {
+
+        if (
+            String(
+                mesure[champ] ?? ""
+            ) ===
+            String(statId)
+        ) {
+
+            return champ;
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =========================================================
+   RETIRER LE RATTACHEMENT
+========================================================= */
+
+async function retirerRattachement(
+    statId,
+    mesureId
+) {
+
+    const mesure =
+        mesures.find(
+            item =>
+                String(item.id) ===
+                String(mesureId)
+        );
+
+
+    if (!mesure) {
+
+        afficherMessage(
+            "Mesure introuvable.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const champ =
+        trouverChampStatistique(
+            mesure,
+            statId
+        );
+
+
+    if (!champ) {
+
+        afficherMessage(
+            "Ce rattachement n'existe plus.",
+            "error"
+        );
+
+        /*
+         * On recharge tout de même les données
+         * afin de rester synchronisé avec Supabase.
+         */
+        try {
+
+            await chargerMesures();
+
+            renderStats();
+
+        }
+        catch (error) {
+
+            console.error(error);
+
+        }
+
+        return;
+
+    }
+
+
+    const confirmation =
+        confirm(
+            "Retirer la statistique « " +
+            (
+                statistiques.find(
+                    stat =>
+                        String(stat.id) ===
+                        String(statId)
+                )?.nom ||
+                "cette statistique"
+            ) +
+            " de la mesure « " +
+            (
+                mesure.titre ||
+                "Mesure sans titre"
+            ) +
+            " » ?"
+        );
+
+
+    if (!confirmation) {
+        return;
+    }
+
+
+    const bouton =
+        document.querySelector(
+            `button[data-action="detach-stat"][data-stat-id="${CSS.escape(String(statId))}"][data-mesure-id="${CSS.escape(String(mesureId))}"]`
+        );
+
+
+    if (bouton) {
+
+        bouton.disabled =
+            true;
+
+        bouton.style.opacity =
+            "0.5";
+
+        bouton.style.pointerEvents =
+            "none";
+
+    }
+
+
+    try {
+
+        const {
+            error
+        } =
+            await supabase
+                .from("contenus")
+                .update({
+
+                    [champ]: null
+
+                })
+                .eq(
+                    "id",
+                    mesureId
+                );
+
+
+        if (error) {
+            throw error;
+        }
+
+
+        /*
+         * Mise à jour locale immédiate.
+         */
+        mesure[champ] =
+            null;
+
+
+        renderStats();
+
+
+        afficherMessage(
+            "Statistique retirée de la mesure."
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "RETRAIT RATTACHEMENT :",
+            error
+        );
+
+
+        afficherMessage(
+            "Impossible de retirer cette statistique de la mesure.",
+            "error"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
    RENDU
 ========================================================= */
 
@@ -571,8 +779,8 @@ function renderStats() {
                                                         <div
                                                           style="
                                                             display:flex;
-                                                            align-items:flex-start;
-                                                            gap:7px;
+                                                            align-items:center;
+                                                            gap:8px;
                                                             padding:6px 8px;
                                                             background:rgba(255,255,255,.025);
                                                             border:1px solid var(--border);
@@ -590,11 +798,38 @@ function renderStats() {
                                                                 •
                                                             </span>
 
-                                                            <span>
+
+                                                            <span
+                                                              style="
+                                                                flex:1;
+                                                                min-width:0;
+                                                              "
+                                                            >
                                                                 ${escapeHtml(
                                                                     mesure.titre
                                                                 )}
                                                             </span>
+
+
+                                                            <button
+                                                              type="button"
+                                                              class="icon-button danger"
+                                                              title="Retirer cette statistique de cette mesure"
+                                                              data-action="detach-stat"
+                                                              data-stat-id="${escapeHtml(stat.id)}"
+                                                              data-mesure-id="${escapeHtml(mesure.id)}"
+                                                              style="
+                                                                width:24px;
+                                                                height:24px;
+                                                                min-width:24px;
+                                                                padding:0;
+                                                                font-size:15px;
+                                                                line-height:1;
+                                                                flex-shrink:0;
+                                                              "
+                                                            >
+                                                                ×
+                                                            </button>
 
                                                         </div>
 
@@ -998,7 +1233,9 @@ if (statsForm) {
 
                 reinitialiserFormulaire();
 
+
                 await chargerStatistiques();
+
 
                 renderStats();
 
@@ -1331,13 +1568,17 @@ if (statsList) {
             }
 
 
+            const action =
+                button.dataset.action;
+
+
             const id =
                 button.dataset.id;
 
 
-            const action =
-                button.dataset.action;
-
+            /* =====================================================
+               MODIFIER STATISTIQUE
+            ===================================================== */
 
             if (
                 action ===
@@ -1348,8 +1589,14 @@ if (statsList) {
                     id
                 );
 
+                return;
+
             }
 
+
+            /* =====================================================
+               SUPPRIMER STATISTIQUE
+            ===================================================== */
 
             if (
                 action ===
@@ -1359,6 +1606,34 @@ if (statsList) {
                 supprimerStatistique(
                     id
                 );
+
+                return;
+
+            }
+
+
+            /* =====================================================
+               RETIRER STATISTIQUE D'UNE MESURE
+            ===================================================== */
+
+            if (
+                action ===
+                "detach-stat"
+            ) {
+
+                const statId =
+                    button.dataset.statId;
+
+                const mesureId =
+                    button.dataset.mesureId;
+
+
+                retirerRattachement(
+                    statId,
+                    mesureId
+                );
+
+                return;
 
             }
 
@@ -1415,8 +1690,8 @@ async function initialiser() {
 
 
         /*
-         * On charge les deux sources avant
-         * d'effectuer le rendu.
+         * On charge les statistiques et les mesures
+         * avant le premier rendu.
          */
         await Promise.all([
             chargerStatistiques(),
@@ -1424,10 +1699,6 @@ async function initialiser() {
         ]);
 
 
-        /*
-         * Un seul rendu une fois que les statistiques
-         * ET les mesures sont disponibles.
-         */
         renderStats();
 
     }
