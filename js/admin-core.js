@@ -1176,6 +1176,64 @@ function actualiserAccesEffetsMesures() {
 
 
 /* =========================================================
+MASQUAGE DE SECURITE DES ONGLETS ADMIN
+========================================================= */
+
+/*
+   Ces trois onglets sont strictement réservés
+   au grade principal "admin".
+
+   Tant que le profil n'est pas encore chargé,
+   ils restent masqués.
+
+   Cela évite qu'un CSS ou une autre initialisation
+   ne les affiche momentanément avant que le profil
+   soit connu.
+*/
+
+function appliquerMasquageOngletsAdmin() {
+
+    const admin =
+        window.currentProfile?.grade ===
+        "admin";
+
+
+    const ids =
+        [
+            "contentProjectTabButton",
+            "contentOtherTabButton",
+            "statsTabButton"
+        ];
+
+
+    ids.forEach(
+        id => {
+
+            const button =
+                document.getElementById(
+                    id
+                );
+
+
+            if (!button) {
+
+                return;
+
+            }
+
+
+            button.style.display =
+                admin
+                    ? ""
+                    : "none";
+
+        }
+    );
+
+}
+
+
+/* =========================================================
 ACTUALISER LES ACCES
 ========================================================= */
 
@@ -1192,6 +1250,8 @@ function actualiserAccesAdmin() {
     actualiserAccesContenuAutres();
 
     actualiserAccesEffetsMesures();
+
+    appliquerMasquageOngletsAdmin();
 
 }
 
@@ -1217,6 +1277,9 @@ window.actualiserAccesContenuAutres =
 
 window.actualiserAccesEffetsMesures =
     actualiserAccesEffetsMesures;
+
+window.appliquerMasquageOngletsAdmin =
+    appliquerMasquageOngletsAdmin;
 
 window.actualiserAccesAdmin =
     actualiserAccesAdmin;
@@ -1281,6 +1344,28 @@ window.addEventListener(
 
 
 /* =========================================================
+EVENEMENT CHANGEMENT D'ONGLET
+========================================================= */
+
+/*
+   Certains CSS / composants peuvent réappliquer
+   leur affichage lors d'un changement d'onglet.
+
+   On réapplique donc les droits après chaque
+   changement d'onglet.
+*/
+
+window.addEventListener(
+    "avantgarde:admin-tab-changed",
+    () => {
+
+        actualiserAccesAdmin();
+
+    }
+);
+
+
+/* =========================================================
 INITIALISATION
 ========================================================= */
 
@@ -1340,6 +1425,8 @@ export {
     actualiserAccesContenuAutres,
 
     actualiserAccesEffetsMesures,
+
+    appliquerMasquageOngletsAdmin,
 
     actualiserAccesAdmin
 
