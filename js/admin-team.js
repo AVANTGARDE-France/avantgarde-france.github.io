@@ -764,7 +764,14 @@ function initialiserRechercheDirection(){
         );
 
 
-    if(founderSearch){
+    if(
+        founderSearch &&
+        founderSearch.dataset.initialized !== "true"
+    ){
+
+        founderSearch.dataset.initialized =
+            "true";
+
 
         founderSearch.addEventListener(
             "input",
@@ -778,7 +785,14 @@ function initialiserRechercheDirection(){
     }
 
 
-    if(nationalSearch){
+    if(
+        nationalSearch &&
+        nationalSearch.dataset.initialized !== "true"
+    ){
+
+        nationalSearch.dataset.initialized =
+            "true";
+
 
         nationalSearch.addEventListener(
             "input",
