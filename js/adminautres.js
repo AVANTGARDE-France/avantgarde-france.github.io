@@ -30,6 +30,11 @@
    - titre
    - contenu_html
    - updated_at
+
+   SECURITE :
+   - Module réservé aux administrateurs.
+   - Lecture réservée aux profils grade = "admin".
+   - Ecriture réservée aux profils grade = "admin".
 ========================================================= */
 
 import { supabase } from "./supabase.js";
@@ -113,6 +118,72 @@ let adminAutresTabListenerInitialized = false;
 let actualisationAutresEnCours = false;
 
 
+/*
+   Protection contre plusieurs initialisations du module.
+*/
+
+let adminAutresModuleInitialized = false;
+
+
+/* =========================================================
+   VERIFICATION ADMINISTRATEUR
+========================================================= */
+
+/*
+   AUTRES PAGES est une zone strictement réservée
+   aux administrateurs.
+
+   Le contrôle repose sur le grade principal du profil.
+
+   Important :
+   cette vérification est faite ici également et ne dépend
+   donc pas uniquement du masquage du bouton dans admin-core.js
+   ou du contrôle de navigation dans admin-tabs.js.
+*/
+
+function estAdministrateur() {
+
+    return (
+        window.currentProfile?.grade ===
+        "admin"
+    );
+
+}
+
+
+/*
+   Exige les droits administrateur.
+
+   Retourne true si l'opération est autorisée.
+   Retourne false sinon.
+*/
+
+function exigerAdministrateur() {
+
+    if (
+        !window.adminAuthReady
+    ) {
+
+        return false;
+    }
+
+
+    if (
+        !estAdministrateur()
+    ) {
+
+        console.warn(
+            "AVANT-GARDE — AUTRES PAGES : accès administrateur requis."
+        );
+
+        return false;
+    }
+
+
+    return true;
+}
+
+
 /* =========================================================
    OUTILS
 ========================================================= */
@@ -153,6 +224,10 @@ function showMessage(
 
     const config =
         getConfig(slug);
+
+    if (!config) {
+        return;
+    }
 
     const message =
         getElement(config.messageId);
@@ -199,6 +274,10 @@ function sauvegarderSelection(slug) {
 
     const config =
         getConfig(slug);
+
+    if (!config) {
+        return;
+    }
 
     const editor =
         getElement(config.wysiwygId);
@@ -271,6 +350,13 @@ function actualiserModeEditeur(
     const state =
         getState(slug);
 
+    if (
+        !config ||
+        !state
+    ) {
+        return;
+    }
+
     const wysiwyg =
         getElement(config.wysiwygId);
 
@@ -341,6 +427,13 @@ function getCurrentHtml(slug) {
     const state =
         getState(slug);
 
+    if (
+        !config ||
+        !state
+    ) {
+        return "";
+    }
+
     const wysiwyg =
         getElement(config.wysiwygId);
 
@@ -380,6 +473,13 @@ function chargerDansEditeur(
 
     const state =
         getState(slug);
+
+    if (
+        !config ||
+        !state
+    ) {
+        return;
+    }
 
     const wysiwyg =
         getElement(config.wysiwygId);
@@ -425,6 +525,10 @@ function synchroniserSource(
     const config =
         getConfig(slug);
 
+    if (!config) {
+        return;
+    }
+
     const wysiwyg =
         getElement(config.wysiwygId);
 
@@ -455,6 +559,10 @@ function synchroniserWysiwyg(
     const config =
         getConfig(slug);
 
+    if (!config) {
+        return;
+    }
+
     const wysiwyg =
         getElement(config.wysiwygId);
 
@@ -483,11 +591,24 @@ function executerCommande(
     command
 ) {
 
+    if (
+        !exigerAdministrateur()
+    ) {
+        return;
+    }
+
     const config =
         getConfig(slug);
 
     const state =
         getState(slug);
+
+    if (
+        !config ||
+        !state
+    ) {
+        return;
+    }
 
     if (state.sourceMode) {
         return;
@@ -528,11 +649,24 @@ function appliquerFormat(
     format
 ) {
 
+    if (
+        !exigerAdministrateur()
+    ) {
+        return;
+    }
+
     const config =
         getConfig(slug);
 
     const state =
         getState(slug);
+
+    if (
+        !config ||
+        !state
+    ) {
+        return;
+    }
 
     if (state.sourceMode) {
         return;
@@ -572,11 +706,24 @@ function insererLien(
     slug
 ) {
 
+    if (
+        !exigerAdministrateur()
+    ) {
+        return;
+    }
+
     const config =
         getConfig(slug);
 
     const state =
         getState(slug);
+
+    if (
+        !config ||
+        !state
+    ) {
+        return;
+    }
 
     if (state.sourceMode) {
         return;
@@ -692,11 +839,24 @@ function insererImage(
     slug
 ) {
 
+    if (
+        !exigerAdministrateur()
+    ) {
+        return;
+    }
+
     const config =
         getConfig(slug);
 
     const state =
         getState(slug);
+
+    if (
+        !config ||
+        !state
+    ) {
+        return;
+    }
 
     if (state.sourceMode) {
         return;
@@ -764,11 +924,24 @@ function insererVideo(
     slug
 ) {
 
+    if (
+        !exigerAdministrateur()
+    ) {
+        return;
+    }
+
     const config =
         getConfig(slug);
 
     const state =
         getState(slug);
+
+    if (
+        !config ||
+        !state
+    ) {
+        return;
+    }
 
     if (state.sourceMode) {
         return;
@@ -994,8 +1167,25 @@ async function chargerContenu(
     slug
 ) {
 
+    /*
+       SECURITE :
+       aucune lecture de other_contents pour un non-admin.
+    */
+
+    if (
+        !exigerAdministrateur()
+    ) {
+        return;
+    }
+
+
     const config =
         getConfig(slug);
+
+    if (!config) {
+        return;
+    }
+
 
     try {
 
@@ -1030,6 +1220,19 @@ async function chargerContenu(
         }
 
 
+        /*
+           Vérification supplémentaire :
+           le profil peut théoriquement changer pendant
+           une requête asynchrone.
+        */
+
+        if (
+            !exigerAdministrateur()
+        ) {
+            return;
+        }
+
+
         const row =
             Array.isArray(data) &&
             data.length
@@ -1060,17 +1263,28 @@ async function chargerContenu(
         );
 
 
-        chargerDansEditeur(
-            slug,
-            ""
-        );
+        /*
+           On ne réinjecte pas de contenu en cas
+           de perte des droits pendant le chargement.
+        */
+
+        if (
+            estAdministrateur()
+        ) {
+
+            chargerDansEditeur(
+                slug,
+                ""
+            );
 
 
-        showMessage(
-            slug,
-            "Impossible de charger le contenu.",
-            "error"
-        );
+            showMessage(
+                slug,
+                "Impossible de charger le contenu.",
+                "error"
+            );
+
+        }
 
     }
 
@@ -1082,6 +1296,18 @@ async function chargerContenu(
 ========================================================= */
 
 async function actualiserContenusAutres(){
+
+    /*
+       SECURITE :
+       aucune actualisation pour un non-admin.
+    */
+
+    if (
+        !exigerAdministrateur()
+    ) {
+        return;
+    }
+
 
     if(actualisationAutresEnCours){
         return;
@@ -1153,6 +1379,18 @@ function initialiserEcouteurOnglet(){
             }
 
 
+            /*
+               Même si quelqu'un déclenche manuellement
+               l'événement, le module reste protégé.
+            */
+
+            if (
+                !exigerAdministrateur()
+            ) {
+                return;
+            }
+
+
             await actualiserContenusAutres();
 
         }
@@ -1169,11 +1407,30 @@ async function enregistrerContenu(
     slug
 ) {
 
+    /*
+       SECURITE :
+       aucune écriture Supabase pour un non-admin.
+    */
+
+    if (
+        !exigerAdministrateur()
+    ) {
+        return;
+    }
+
+
     const config =
         getConfig(slug);
 
     const state =
         getState(slug);
+
+    if (
+        !config ||
+        !state
+    ) {
+        return;
+    }
 
     const saveButton =
         getElement(
@@ -1212,6 +1469,18 @@ async function enregistrerContenu(
 
 
     try {
+
+        /*
+           Vérification juste avant l'opération
+           Supabase.
+        */
+
+        if (
+            !exigerAdministrateur()
+        ) {
+            return;
+        }
+
 
         const now =
             new Date()
@@ -1273,6 +1542,19 @@ async function enregistrerContenu(
             }
 
 
+            /*
+               Vérification des droits après écriture.
+               On ne modifie pas l'état local si le profil
+               n'est plus administrateur.
+            */
+
+            if (
+                !estAdministrateur()
+            ) {
+                return;
+            }
+
+
             if (data) {
 
                 state.row =
@@ -1298,6 +1580,17 @@ async function enregistrerContenu(
             }
 
         } else {
+
+            /*
+               Nouvelle vérification avant INSERT.
+            */
+
+            if (
+                !exigerAdministrateur()
+            ) {
+                return;
+            }
+
 
             const {
                 data,
@@ -1335,6 +1628,13 @@ async function enregistrerContenu(
             }
 
 
+            if (
+                !estAdministrateur()
+            ) {
+                return;
+            }
+
+
             state.row =
                 data;
 
@@ -1366,13 +1666,19 @@ async function enregistrerContenu(
         );
 
 
-        showMessage(
-            slug,
-            error?.message
-                ? `Impossible d'enregistrer ${config.titre} : ${error.message}`
-                : `Impossible d'enregistrer ${config.titre}.`,
-            "error"
-        );
+        if (
+            estAdministrateur()
+        ) {
+
+            showMessage(
+                slug,
+                error?.message
+                    ? `Impossible d'enregistrer ${config.titre} : ${error.message}`
+                    : `Impossible d'enregistrer ${config.titre}.`,
+                "error"
+            );
+
+        }
 
     }
     finally {
@@ -1397,11 +1703,32 @@ async function annulerContenu(
     slug
 ) {
 
+    /*
+       L'annulation recharge également les données
+       depuis l'état déjà chargé : elle reste donc
+       réservée à l'administrateur.
+    */
+
+    if (
+        !exigerAdministrateur()
+    ) {
+        return;
+    }
+
+
     const config =
         getConfig(slug);
 
     const state =
         getState(slug);
+
+    if (
+        !config ||
+        !state
+    ) {
+        return;
+    }
+
 
     const confirmation =
         window.confirm(
@@ -1443,6 +1770,10 @@ function initialiserToolbar(
     const config =
         getConfig(slug);
 
+    if (!config) {
+        return;
+    }
+
     const toolbar =
         getElement(
             config.toolbarId
@@ -1451,6 +1782,24 @@ function initialiserToolbar(
     if (!toolbar) {
         return;
     }
+
+
+    /*
+       Evite les doubles listeners si le module
+       est réinitialisé après authentification.
+    */
+
+    if (
+        toolbar.dataset.adminAutresInitialized ===
+        "true"
+    ) {
+
+        return;
+    }
+
+
+    toolbar.dataset.adminAutresInitialized =
+        "true";
 
 
     toolbar
@@ -1473,6 +1822,13 @@ function initialiserToolbar(
                 button.addEventListener(
                     "click",
                     () => {
+
+                        if (
+                            !exigerAdministrateur()
+                        ) {
+                            return;
+                        }
+
 
                         sauvegarderSelection(
                             slug
@@ -1511,6 +1867,13 @@ function initialiserToolbar(
                     "click",
                     () => {
 
+                        if (
+                            !exigerAdministrateur()
+                        ) {
+                            return;
+                        }
+
+
                         sauvegarderSelection(
                             slug
                         );
@@ -1539,6 +1902,10 @@ function initialiserBoutons(
 
     const config =
         getConfig(slug);
+
+    if (!config) {
+        return;
+    }
 
 
     const linkButton =
@@ -1583,11 +1950,37 @@ function initialiserBoutons(
         );
 
 
+    /*
+       Protection contre les doubles listeners.
+    */
+
+    const editorAlreadyInitialized =
+        wysiwyg?.dataset.adminAutresInitialized ===
+        "true";
+
+
+    if (
+        editorAlreadyInitialized
+    ) {
+        return;
+    }
+
+
     if (wysiwyg) {
+
+        wysiwyg.dataset.adminAutresInitialized =
+            "true";
+
 
         wysiwyg.addEventListener(
             "mouseup",
             () => {
+
+                if (
+                    !exigerAdministrateur()
+                ) {
+                    return;
+                }
 
                 sauvegarderSelection(
                     slug
@@ -1601,6 +1994,12 @@ function initialiserBoutons(
             "keyup",
             () => {
 
+                if (
+                    !exigerAdministrateur()
+                ) {
+                    return;
+                }
+
                 sauvegarderSelection(
                     slug
                 );
@@ -1612,6 +2011,13 @@ function initialiserBoutons(
         wysiwyg.addEventListener(
             "input",
             () => {
+
+                if (
+                    !exigerAdministrateur()
+                ) {
+                    return;
+                }
+
 
                 if (
                     !getState(slug).sourceMode
@@ -1634,6 +2040,13 @@ function initialiserBoutons(
         source.addEventListener(
             "input",
             () => {
+
+                if (
+                    !exigerAdministrateur()
+                ) {
+                    return;
+                }
+
 
                 if (
                     getState(slug).sourceMode
@@ -1659,6 +2072,12 @@ function initialiserBoutons(
 
                 event.preventDefault();
 
+                if (
+                    !exigerAdministrateur()
+                ) {
+                    return;
+                }
+
                 sauvegarderSelection(
                     slug
                 );
@@ -1670,6 +2089,13 @@ function initialiserBoutons(
         linkButton.addEventListener(
             "click",
             () => {
+
+                if (
+                    !exigerAdministrateur()
+                ) {
+                    return;
+                }
+
 
                 insererLien(
                     slug
@@ -1689,6 +2115,12 @@ function initialiserBoutons(
 
                 event.preventDefault();
 
+                if (
+                    !exigerAdministrateur()
+                ) {
+                    return;
+                }
+
                 sauvegarderSelection(
                     slug
                 );
@@ -1700,6 +2132,13 @@ function initialiserBoutons(
         imageButton.addEventListener(
             "click",
             () => {
+
+                if (
+                    !exigerAdministrateur()
+                ) {
+                    return;
+                }
+
 
                 insererImage(
                     slug
@@ -1719,6 +2158,12 @@ function initialiserBoutons(
 
                 event.preventDefault();
 
+                if (
+                    !exigerAdministrateur()
+                ) {
+                    return;
+                }
+
                 sauvegarderSelection(
                     slug
                 );
@@ -1730,6 +2175,13 @@ function initialiserBoutons(
         videoButton.addEventListener(
             "click",
             () => {
+
+                if (
+                    !exigerAdministrateur()
+                ) {
+                    return;
+                }
+
 
                 insererVideo(
                     slug
@@ -1756,6 +2208,13 @@ function initialiserBoutons(
         sourceButton.addEventListener(
             "click",
             () => {
+
+                if (
+                    !exigerAdministrateur()
+                ) {
+                    return;
+                }
+
 
                 const state =
                     getState(slug);
@@ -1798,6 +2257,13 @@ function initialiserBoutons(
             "click",
             async () => {
 
+                if (
+                    !exigerAdministrateur()
+                ) {
+                    return;
+                }
+
+
                 await enregistrerContenu(
                     slug
                 );
@@ -1813,6 +2279,13 @@ function initialiserBoutons(
         cancelButton.addEventListener(
             "click",
             async () => {
+
+                if (
+                    !exigerAdministrateur()
+                ) {
+                    return;
+                }
+
 
                 await annulerContenu(
                     slug
@@ -1834,8 +2307,25 @@ async function initialiserEditeur(
     slug
 ) {
 
+    /*
+       Aucun éditeur AUTRES PAGES n'est initialisé
+       pour un non-admin.
+    */
+
+    if (
+        !exigerAdministrateur()
+    ) {
+        return;
+    }
+
+
     const config =
         getConfig(slug);
+
+    if (!config) {
+        return;
+    }
+
 
     const editor =
         getElement(
@@ -1870,17 +2360,47 @@ async function initialiserEditeur(
 async function initialiser() {
 
     /*
-       Initialisation de l'écouteur AVANT le chargement
-       initial des contenus.
+       L'écouteur doit être installé même si le profil
+       n'est pas encore disponible.
     */
 
     initialiserEcouteurOnglet();
 
 
     /*
-       Le module est chargé après le HTML.
-       On vérifie simplement que la zone existe.
+       Si l'authentification n'est pas terminée,
+       on attend l'événement admin-connected.
     */
+
+    if (
+        !window.adminAuthReady
+    ) {
+        return;
+    }
+
+
+    /*
+       Le module ne doit jamais être initialisé
+       pour un profil non-admin.
+    */
+
+    if (
+        !estAdministrateur()
+    ) {
+        return;
+    }
+
+
+    /*
+       Protection contre les doubles initialisations.
+    */
+
+    if (
+        adminAutresModuleInitialized
+    ) {
+        return;
+    }
+
 
     const contentOtherTab =
         getElement(
@@ -1890,6 +2410,10 @@ async function initialiser() {
     if (!contentOtherTab) {
         return;
     }
+
+
+    adminAutresModuleInitialized =
+        true;
 
 
     await Promise.all([
@@ -1907,6 +2431,72 @@ async function initialiser() {
 }
 
 
+/* =========================================================
+   AUTHENTIFICATION
+========================================================= */
+
+/*
+   adminautres.js peut être chargé avant admin-auth.js.
+
+   On attend donc l'événement officiel de connexion.
+
+   Le profil transmis par l'événement est également
+   recopié dans currentProfile si nécessaire.
+*/
+
+window.addEventListener(
+    "avantgarde:admin-connected",
+    event => {
+
+        const detail =
+            event?.detail || {};
+
+
+        if (
+            detail.user
+        ) {
+
+            window.currentUser =
+                detail.user;
+
+        }
+
+
+        if (
+            detail.profile
+        ) {
+
+            window.currentProfile =
+                detail.profile;
+
+        }
+
+
+        /*
+           admin-auth.js doit normalement avoir placé
+           adminAuthReady à true avant cet événement.
+           Le setTimeout garantit que les autres modules
+           ayant le même événement ont pu terminer leur
+           synchronisation.
+        */
+
+        setTimeout(
+            () => {
+
+                initialiser();
+
+            },
+            0
+        );
+
+    }
+);
+
+
+/* =========================================================
+   INITIALISATION DOM
+========================================================= */
+
 if (
     document.readyState ===
     "loading"
@@ -1914,7 +2504,19 @@ if (
 
     document.addEventListener(
         "DOMContentLoaded",
-        initialiser,
+        () => {
+
+            /*
+               Installation de l'écouteur dès que possible.
+               Si l'authentification est déjà prête,
+               initialiser() démarre immédiatement.
+               Sinon l'événement admin-connected prendra
+               le relais.
+            */
+
+            initialiser();
+
+        },
         {
             once:true
         }
