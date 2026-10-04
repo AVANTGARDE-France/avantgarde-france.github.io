@@ -13,6 +13,8 @@
    - Vérification des droits ROLE
    - Vérification des droits EQUIPES
    - Vérification du CONTENU PROJET
+   - Vérification des AUTRES CONTENUS
+   - Vérification des EFFETS / MESURES
 
    IMPORTANT :
 
@@ -105,6 +107,55 @@ function obtenirOngletDepuisURL() {
 
 
 /* =========================================================
+   VERIFICATION : ADMIN UNIQUEMENT
+========================================================= */
+
+/*
+ * Les espaces suivants sont réservés aux administrateurs :
+ *
+ * - Page PROJET
+ * - Autres Pages
+ * - Effets Mesures
+ *
+ * Cette fonction constitue la règle centrale pour ces
+ * trois onglets.
+ */
+
+function estAdministrateur() {
+
+    /*
+     * L'authentification n'est pas encore terminée.
+     *
+     * null signifie :
+     * "attendre avant de décider".
+     */
+
+    if (
+        !window.adminAuthReady
+    ) {
+
+        return null;
+    }
+
+
+    const profile =
+        window.currentProfile;
+
+
+    if (!profile) {
+
+        return false;
+    }
+
+
+    return (
+        profile.grade ===
+        "admin"
+    );
+}
+
+
+/* =========================================================
    VERIFICATION DES DROITS
 ========================================================= */
 
@@ -133,13 +184,6 @@ function peutAccederOnglet(
         cible ===
         "rdvTab"
     ) {
-
-        /*
-         * L'authentification n'est pas terminée.
-         *
-         * null signifie :
-         * "attendre avant de décider".
-         */
 
         if (
             !window.adminAuthReady
@@ -252,28 +296,7 @@ function peutAccederOnglet(
         "contentProjectTab"
     ) {
 
-        if (
-            !window.adminAuthReady
-        ) {
-
-            return null;
-        }
-
-
-        const profile =
-            window.currentProfile;
-
-
-        if (!profile) {
-
-            return false;
-        }
-
-
-        return (
-            profile.grade ===
-            "admin"
-        );
+        return estAdministrateur();
     }
 
 
@@ -283,15 +306,23 @@ function peutAccederOnglet(
 
     if (
         cible ===
-            "contentOtherTab"
-
-        ||
-
-        cible ===
-            "statsTab"
+        "contentOtherTab"
     ) {
 
-        return true;
+        return estAdministrateur();
+    }
+
+
+    /* =====================================================
+       EFFETS / MESURES
+    ===================================================== */
+
+    if (
+        cible ===
+        "statsTab"
+    ) {
+
+        return estAdministrateur();
     }
 
 
@@ -490,13 +521,6 @@ function activerOngletAdmin(
 /* =========================================================
    CHANGEMENT D'ONGLET
 ========================================================= */
-
-/*
- * Fonction centrale de navigation.
- *
- * Elle remplace désormais le comportement précédent
- * consistant à laisser le navigateur recharger admin.html.
- */
 
 function changerOngletAdmin(
     cible,
@@ -754,13 +778,7 @@ function initialiserClicsOnglets() {
 
 
                     /*
-                     * IMPORTANT :
-                     *
-                     * On bloque maintenant le comportement
-                     * naturel du lien.
-                     *
-                     * Cela empêche le rechargement complet
-                     * de admin.html.
+                     * Bloque le comportement naturel du lien.
                      */
 
                     event.preventDefault();
