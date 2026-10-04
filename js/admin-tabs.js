@@ -905,6 +905,78 @@ function initialiserOngletsAdmin() {
 
 
 /* =========================================================
+   SYNCHRONISATION APRES AUTHENTIFICATION
+========================================================= */
+
+/*
+ * Ce listener est important lorsque admin-tabs.js est
+ * initialisé avant que admin-auth.js ait terminé.
+ *
+ * Dès que le profil réel est connu, on réapplique l'onglet
+ * demandé dans l'URL avec les droits définitifs.
+ *
+ * Exemple :
+ *
+ * /admin.html?tab=statsTab
+ *
+ * Si le profil connecté n'est pas admin :
+ *
+ * -> statsTab est refusé
+ * -> URL ramenée vers profileTab
+ * -> profileTab activé
+ *
+ * Si le profil est admin :
+ *
+ * -> statsTab reste accessible
+ */
+
+window.addEventListener(
+    "avantgarde:admin-connected",
+    () => {
+
+        /*
+         * L'événement de connexion transporte normalement
+         * le profil, mais on laisse admin-auth.js définir
+         * adminAuthReady avant de procéder.
+         */
+
+        const appliquer =
+            () => {
+
+                if (
+                    !window.adminAuthReady
+                ) {
+
+                    return;
+                }
+
+
+                initialiserClicsOnglets();
+
+                initialiserHistoriqueOnglets();
+
+                appliquerOngletDepuisURL();
+
+            };
+
+
+        /*
+         * L'ordre de chargement des modules peut varier.
+         *
+         * On laisse donc le temps à admin-auth.js de
+         * finaliser currentProfile et adminAuthReady.
+         */
+
+        setTimeout(
+            appliquer,
+            0
+        );
+
+    }
+);
+
+
+/* =========================================================
    EXPOSITION
 ========================================================= */
 
