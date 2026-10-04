@@ -1,44 +1,39 @@
 /* =========================================================
-   AVANT-GARDE — ADMIN CONTENU AUTRES
+   AVANT-GARDE — ADMIN AUTRES PAGES
+
    js/adminautres.js
 
-   Gestion :
+   Gestion des pages :
    - MANIFESTE
    - INSPIRATIONS
-   - éditeur HTML visuel
-   - code HTML source
-   - gras
-   - italique
-   - souligné
-   - H2
-   - H3
-   - paragraphe
-   - liste
-   - lien
-   - image
-   - vidéo
-   - enregistrement Supabase
-   - annulation / rechargement
-   - actualisation dynamique lors du changement d'onglet
 
-   Table :
-   other_contents
-
-   Colonnes utilisées :
-   - id
-   - slug
-   - titre
-   - contenu_html
-   - updated_at
-
-   SECURITE :
-   - Module réservé aux administrateurs.
-   - Lecture réservée aux profils grade = "admin".
-   - Ecriture réservée aux profils grade = "admin".
+   Fonctions :
+   - Chargement depuis Supabase
+   - Éditeur WYSIWYG
+   - Éditeur HTML source
+   - Synchronisation WYSIWYG / HTML
+   - Mise en forme
+   - Liens
+   - Images
+   - Vidéos
+   - Enregistrement
+   - Annulation
+   - Rafraîchissement au changement d’onglet
+   - Accès réservé aux administrateurs
 ========================================================= */
 
 
+/* =========================================================
+   IMPORTS
+========================================================= */
+
 import { supabase } from "./supabase.js";
+
+import {
+    afficherMessage,
+    viderMessage,
+    escapeHtml
+} from "./admin-utils.js";
 
 
 /* =========================================================
@@ -52,6 +47,7 @@ const CONTENTS = {
         slug: "manifeste",
         titre: "Manifeste",
 
+        editorId: "manifestEditor",
         wysiwygId: "manifestWysiwyg",
         sourceId: "manifestSourceEditor",
 
@@ -60,10 +56,12 @@ const CONTENTS = {
         linkButtonId: "manifestLinkButton",
         imageButtonId: "manifestImageButton",
         videoButtonId: "manifestVideoButton",
+
         sourceButtonId: "manifestSourceModeButton",
 
         saveButtonId: "manifestSaveButton",
         cancelButtonId: "manifestCancelButton",
+
         messageId: "manifestMessage"
     },
 
@@ -73,6 +71,7 @@ const CONTENTS = {
         slug: "inspirations",
         titre: "Inspirations",
 
+        editorId: "inspirationsEditor",
         wysiwygId: "inspirationsWysiwyg",
         sourceId: "inspirationsSourceEditor",
 
@@ -81,18 +80,19 @@ const CONTENTS = {
         linkButtonId: "inspirationsLinkButton",
         imageButtonId: "inspirationsImageButton",
         videoButtonId: "inspirationsVideoButton",
+
         sourceButtonId: "inspirationsSourceModeButton",
 
         saveButtonId: "inspirationsSaveButton",
         cancelButtonId: "inspirationsCancelButton",
+
         messageId: "inspirationsMessage"
     }
-
 };
 
 
 /* =========================================================
-   ETAT
+   ÉTAT
 ========================================================= */
 
 const states = {
@@ -106,43 +106,67 @@ const states = {
         row: null,
         sourceMode: false
     }
-
 };
 
 
-let adminAutresTabListenerInitialized = false;
-let actualisationAutresEnCours = false;
+/* =========================================================
+   ÉTAT GLOBAL D'INITIALISATION
+========================================================= */
 
-let adminAutresModuleInitialized = false;
+let moduleInitialized = false;
+let tabListenerInitialized = false;
+let authListenerInitialized = false;
 
 
 /* =========================================================
-   VERIFICATION ADMINISTRATEUR
+   OUTILS DOM
+========================================================= */
+
+function getElement(id) {
+
+    if (!id) {
+        return null;
+    }
+
+    return document.getElementById(id);
+}
+
+
+function getConfig(slug) {
+
+    return CONTENTS[slug] || null;
+}
+
+
+function getState(slug) {
+
+    return states[slug] || null;
+}
+
+
+/* =========================================================
+   ADMINISTRATION
 ========================================================= */
 
 function estAdministrateur() {
 
-    return (
-        window.currentProfile?.grade ===
-        "admin"
-    );
-
+    return window.currentProfile?.grade === "admin";
 }
 
 
 function exigerAdministrateur() {
 
-    if (
-        !window.adminAuthReady
-    ) {
+    if (!window.adminAuthReady) {
+
+        console.warn(
+            "AVANT-GARDE — AUTRES PAGES : authentification administrateur non prête."
+        );
 
         return false;
     }
 
 
-    if (
-        !estAdministrateur()
-    ) {
+    if (!estAdministrateur()) {
 
         console.warn(
             "AVANT-GARDE — AUTRES PAGES : accès administrateur requis."
@@ -157,946 +181,771 @@ function exigerAdministrateur() {
 
 
 /* =========================================================
-   OUTILS
-========================================================= */
-
-function getElement(id) {
-
-    return document.getElementById(id);
-
-}
-
-
-function getConfig(slug) {
-
-    return CONTENTS[slug];
-
-}
-
-
-function getState(slug) {
-
-    return states[slug];
-
-}
-
-
-/* =========================================================
    MESSAGES
 ========================================================= */
 
-const messageTimers = {};
+function showMessage(slug, message, type = "info") {
 
-
-function showMessage(
-    slug,
-    text,
-    type = "success"
-) {
-
-    const config =
-        getConfig(slug);
+    const config = getConfig(slug);
 
     if (!config) {
         return;
     }
 
-    const message =
-        getElement(config.messageId);
+    const element = getElement(config.messageId);
 
-    if (!message) {
+    if (!element) {
         return;
     }
 
-    clearTimeout(
-        messageTimers[slug]
-    );
 
-    message.className =
-        "message visible " + type;
+    if (!message) {
 
-    message.textContent =
-        text;
+        if (typeof viderMessage === "function") {
+            viderMessage(element);
+        } else {
+            element.textContent = "";
+            element.className = "message";
+        }
 
-    messageTimers[slug] =
-        setTimeout(
-            () => {
+        return;
+    }
 
-                message.className =
-                    "message";
 
-                message.textContent =
-                    "";
+    if (typeof afficherMessage === "function") {
 
-            },
-            3500
+        afficherMessage(
+            element,
+            message,
+            type
         );
 
+        return;
+    }
+
+
+    element.textContent = message;
+    element.className = "message visible " + type;
 }
 
 
 /* =========================================================
-   SELECTION EDITEUR
+   SÉLECTION ÉDITEUR
 ========================================================= */
 
-const savedSelections = {};
+const selections = {};
 
 
 function sauvegarderSelection(slug) {
 
-    const config =
-        getConfig(slug);
+    const config = getConfig(slug);
 
     if (!config) {
         return;
     }
 
-    const editor =
-        getElement(config.wysiwygId);
+    const editor = getElement(config.editorId);
 
     if (!editor) {
         return;
     }
 
-    const selection =
-        window.getSelection();
 
-    if (
-        !selection ||
-        selection.rangeCount === 0
-    ) {
+    const selection = window.getSelection();
+
+    if (!selection || selection.rangeCount === 0) {
         return;
     }
 
-    const range =
-        selection.getRangeAt(0);
+
+    const range = selection.getRangeAt(0);
+
 
     if (
-        !editor.contains(
-            range.commonAncestorContainer
-        )
+        editor.contains(range.commonAncestorContainer) ||
+        range.commonAncestorContainer === editor
     ) {
-        return;
+
+        selections[slug] = range.cloneRange();
     }
-
-    savedSelections[slug] =
-        range.cloneRange();
-
 }
 
 
 function restaurerSelection(slug) {
 
-    const range =
-        savedSelections[slug];
+    const range = selections[slug];
 
     if (!range) {
-        return;
+        return false;
     }
 
-    const selection =
-        window.getSelection();
+
+    const selection = window.getSelection();
 
     if (!selection) {
-        return;
+        return false;
     }
 
-    selection.removeAllRanges();
 
+    selection.removeAllRanges();
     selection.addRange(range);
 
+    return true;
 }
 
 
 /* =========================================================
-   MODE EDITEUR
+   MODE ÉDITEUR
 ========================================================= */
 
-function actualiserModeEditeur(
-    slug
-) {
+function actualiserModeEditeur(slug) {
 
-    const config =
-        getConfig(slug);
+    const config = getConfig(slug);
+    const state = getState(slug);
 
-    const state =
-        getState(slug);
-
-    if (
-        !config ||
-        !state
-    ) {
+    if (!config || !state) {
         return;
     }
 
-    const wysiwyg =
-        getElement(config.wysiwygId);
 
-    const source =
-        getElement(config.sourceId);
+    const wysiwyg = getElement(config.wysiwygId);
+    const source = getElement(config.sourceId);
+    const button = getElement(config.sourceButtonId);
 
-    const sourceButton =
-        getElement(config.sourceButtonId);
-
-    if (
-        !wysiwyg ||
-        !source
-    ) {
+    if (!wysiwyg || !source) {
         return;
     }
 
 
     if (state.sourceMode) {
 
-        source.classList.add(
-            "active"
-        );
+        wysiwyg.style.display = "none";
+        source.style.display = "block";
 
-        wysiwyg.classList.add(
-            "hidden"
-        );
-
-        if (sourceButton) {
-
-            sourceButton.classList.add(
-                "active"
-            );
-
+        if (button) {
+            button.classList.add("active");
+            button.setAttribute("aria-pressed", "true");
         }
 
     } else {
 
-        source.classList.remove(
-            "active"
-        );
+        source.style.display = "none";
+        wysiwyg.style.display = "block";
 
-        wysiwyg.classList.remove(
-            "hidden"
-        );
-
-        if (sourceButton) {
-
-            sourceButton.classList.remove(
-                "active"
-            );
-
+        if (button) {
+            button.classList.remove("active");
+            button.setAttribute("aria-pressed", "false");
         }
-
     }
-
 }
 
 
 /* =========================================================
-   RECUPERATION DU HTML
+   HTML COURANT
 ========================================================= */
 
 function getCurrentHtml(slug) {
 
-    const config =
-        getConfig(slug);
+    const config = getConfig(slug);
+    const state = getState(slug);
 
-    const state =
-        getState(slug);
-
-    if (
-        !config ||
-        !state
-    ) {
+    if (!config || !state) {
         return "";
     }
 
-    const wysiwyg =
-        getElement(config.wysiwygId);
 
-    const source =
-        getElement(config.sourceId);
+    const wysiwyg = getElement(config.wysiwygId);
+    const source = getElement(config.sourceId);
 
 
     if (state.sourceMode) {
 
-        return (
-            source?.value ||
-            ""
-        );
-
+        return source
+            ? source.value || ""
+            : "";
     }
 
 
-    return (
-        wysiwyg?.innerHTML ||
-        ""
-    );
-
+    return wysiwyg
+        ? wysiwyg.innerHTML || ""
+        : "";
 }
 
 
 /* =========================================================
-   CHARGEMENT DANS L'EDITEUR
+   CHARGEMENT DANS L'ÉDITEUR
 ========================================================= */
 
-function chargerDansEditeur(
-    slug,
-    html
-) {
+function chargerDansEditeur(slug, html) {
 
-    const config =
-        getConfig(slug);
+    const config = getConfig(slug);
+    const state = getState(slug);
 
-    const state =
-        getState(slug);
-
-    if (
-        !config ||
-        !state
-    ) {
+    if (!config || !state) {
         return;
     }
 
-    const wysiwyg =
-        getElement(config.wysiwygId);
 
-    const source =
-        getElement(config.sourceId);
+    const contenu = html || "";
+
+    const wysiwyg = getElement(config.wysiwygId);
+    const source = getElement(config.sourceId);
 
 
     if (wysiwyg) {
-
-        wysiwyg.innerHTML =
-            html || "";
-
+        wysiwyg.innerHTML = contenu;
     }
 
 
     if (source) {
-
-        source.value =
-            html || "";
-
+        source.value = contenu;
     }
 
 
-    state.sourceMode =
-        false;
-
-    actualiserModeEditeur(
-        slug
-    );
-
+    actualiserModeEditeur(slug);
 }
 
 
 /* =========================================================
-   SYNCHRONISATION VISUEL -> SOURCE
+   SYNCHRONISATION WYSIWYG → SOURCE
 ========================================================= */
 
-function synchroniserSource(
-    slug
-) {
+function synchroniserSourceDepuisWysiwyg(slug) {
 
-    const config =
-        getConfig(slug);
+    const config = getConfig(slug);
 
     if (!config) {
         return;
     }
 
-    const wysiwyg =
-        getElement(config.wysiwygId);
 
-    const source =
-        getElement(config.sourceId);
+    const wysiwyg = getElement(config.wysiwygId);
+    const source = getElement(config.sourceId);
 
-    if (
-        !wysiwyg ||
-        !source
-    ) {
+    if (!wysiwyg || !source) {
         return;
     }
 
-    source.value =
-        wysiwyg.innerHTML;
 
+    source.value = wysiwyg.innerHTML || "";
 }
 
 
 /* =========================================================
-   SYNCHRONISATION SOURCE -> VISUEL
+   SYNCHRONISATION SOURCE → WYSIWYG
 ========================================================= */
 
-function synchroniserWysiwyg(
-    slug
-) {
+function synchroniserWysiwygDepuisSource(slug) {
 
-    const config =
-        getConfig(slug);
+    const config = getConfig(slug);
 
     if (!config) {
         return;
     }
 
-    const wysiwyg =
-        getElement(config.wysiwygId);
 
-    const source =
-        getElement(config.sourceId);
+    const wysiwyg = getElement(config.wysiwygId);
+    const source = getElement(config.sourceId);
 
-    if (
-        !wysiwyg ||
-        !source
-    ) {
+    if (!wysiwyg || !source) {
         return;
     }
 
-    wysiwyg.innerHTML =
-        source.value;
 
+    wysiwyg.innerHTML = source.value || "";
 }
 
 
 /* =========================================================
-   COMMANDES DE FORMATAGE
+   COMMANDES WYSIWYG
 ========================================================= */
 
-function executerCommande(
-    slug,
-    command
-) {
+function executerCommande(slug, command) {
 
-    if (
-        !exigerAdministrateur()
-    ) {
+    const config = getConfig(slug);
+    const state = getState(slug);
+
+    if (!config || !state || state.sourceMode) {
         return;
     }
 
-    const config =
-        getConfig(slug);
 
-    const state =
-        getState(slug);
+    const editor = getElement(config.editorId);
 
-    if (
-        !config ||
-        !state
-    ) {
+    if (!editor) {
         return;
     }
 
-    if (state.sourceMode) {
-        return;
-    }
 
-    restaurerSelection(
-        slug
-    );
+    editor.focus();
 
-    const wysiwyg =
-        getElement(config.wysiwygId);
-
-    if (!wysiwyg) {
-        return;
-    }
-
-    wysiwyg.focus();
-
-    document.execCommand(
-        command,
-        false,
-        null
-    );
-
-    sauvegarderSelection(
-        slug
-    );
-
-}
+    restaurerSelection(slug);
 
 
-/* =========================================================
-   FORMAT BLOCK
-========================================================= */
+    try {
 
-function appliquerFormat(
-    slug,
-    format
-) {
-
-    if (
-        !exigerAdministrateur()
-    ) {
-        return;
-    }
-
-    const config =
-        getConfig(slug);
-
-    const state =
-        getState(slug);
-
-    if (
-        !config ||
-        !state
-    ) {
-        return;
-    }
-
-    if (state.sourceMode) {
-        return;
-    }
-
-    restaurerSelection(
-        slug
-    );
-
-    const wysiwyg =
-        getElement(config.wysiwygId);
-
-    if (!wysiwyg) {
-        return;
-    }
-
-    wysiwyg.focus();
-
-    document.execCommand(
-        "formatBlock",
-        false,
-        `<${format}>`
-    );
-
-    sauvegarderSelection(
-        slug
-    );
-
-}
-
-
-/* =========================================================
-   LIEN
-========================================================= */
-
-function insererLien(
-    slug
-) {
-
-    if (
-        !exigerAdministrateur()
-    ) {
-        return;
-    }
-
-    const config =
-        getConfig(slug);
-
-    const state =
-        getState(slug);
-
-    if (
-        !config ||
-        !state
-    ) {
-        return;
-    }
-
-    if (state.sourceMode) {
-        return;
-    }
-
-    restaurerSelection(
-        slug
-    );
-
-    const selection =
-        window.getSelection();
-
-    let texte =
-        selection
-            ? selection.toString()
-            : "";
-
-    if (!texte) {
-
-        texte =
-            window.prompt(
-                "Texte du lien :"
-            );
-
-        if (
-            texte === null ||
-            !texte.trim()
-        ) {
-            return;
-        }
-
-    }
-
-
-    const url =
-        window.prompt(
-            "URL du lien :"
+        document.execCommand(
+            command,
+            false,
+            null
         );
 
-    if (
-        url === null ||
-        !url.trim()
-    ) {
+    } catch (error) {
+
+        console.error(
+            "AVANT-GARDE — AUTRES PAGES : erreur execCommand.",
+            error
+        );
+
+        showMessage(
+            slug,
+            "Impossible d'appliquer cette mise en forme.",
+            "error"
+        );
+
         return;
     }
 
 
-    const wysiwyg =
-        getElement(config.wysiwygId);
+    synchroniserSourceDepuisWysiwyg(slug);
+}
 
-    if (!wysiwyg) {
+
+/* =========================================================
+   FORMATAGE
+========================================================= */
+
+function appliquerFormat(slug, format) {
+
+    const config = getConfig(slug);
+    const state = getState(slug);
+
+    if (!config || !state || state.sourceMode) {
         return;
     }
 
 
-    wysiwyg.focus();
+    const editor = getElement(config.editorId);
+
+    if (!editor) {
+        return;
+    }
 
 
-    const safeUrl =
-        url.trim();
+    editor.focus();
+
+    restaurerSelection(slug);
 
 
-    if (
-        selection &&
-        selection.rangeCount
-    ) {
+    let valeur = format || "p";
 
-        const range =
-            selection.getRangeAt(0);
+    valeur = valeur
+        .toString()
+        .replace(/[<>]/g, "")
+        .trim()
+        .toLowerCase();
 
-        if (
-            !range.collapsed &&
-            wysiwyg.contains(
-                range.commonAncestorContainer
-            )
-        ) {
+
+    const formatsAutorises = [
+        "p",
+        "h1",
+        "h2",
+        "h3",
+        "h4",
+        "blockquote",
+        "pre"
+    ];
+
+
+    if (!formatsAutorises.includes(valeur)) {
+        valeur = "p";
+    }
+
+
+    try {
+
+        document.execCommand(
+            "formatBlock",
+            false,
+            `<${valeur}>`
+        );
+
+    } catch (error) {
+
+        console.error(
+            "AVANT-GARDE — AUTRES PAGES : erreur formatBlock.",
+            error
+        );
+
+        showMessage(
+            slug,
+            "Impossible d'appliquer ce format.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    synchroniserSourceDepuisWysiwyg(slug);
+}
+
+
+/* =========================================================
+   INSERTION LIEN
+========================================================= */
+
+function insererLien(slug) {
+
+    const config = getConfig(slug);
+    const state = getState(slug);
+
+    if (!config || !state || state.sourceMode) {
+        return;
+    }
+
+
+    const editor = getElement(config.editorId);
+
+    if (!editor) {
+        return;
+    }
+
+
+    editor.focus();
+
+    restaurerSelection(slug);
+
+
+    const selection = window.getSelection();
+
+    let texteSelectionne = "";
+
+    if (selection) {
+        texteSelectionne = selection.toString();
+    }
+
+
+    const url = window.prompt(
+        "Adresse du lien :",
+        "https://"
+    );
+
+
+    if (!url) {
+        return;
+    }
+
+
+    const urlNettoyee = url.trim();
+
+    if (!urlNettoyee) {
+        return;
+    }
+
+
+    try {
+
+        document.execCommand(
+            "createLink",
+            false,
+            urlNettoyee
+        );
+
+    } catch (error) {
+
+        console.error(
+            "AVANT-GARDE — AUTRES PAGES : erreur création lien.",
+            error
+        );
+
+        showMessage(
+            slug,
+            "Impossible d'insérer le lien.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    /*
+       Si aucune sélection n'existait, createLink peut ne rien
+       faire selon le navigateur. On propose alors une insertion
+       HTML simple.
+    */
+
+    if (!texteSelectionne) {
+
+        const html = `
+<a href="${escapeHtml(urlNettoyee)}"
+   target="_blank"
+   rel="noopener noreferrer">${escapeHtml(urlNettoyee)}</a>
+`;
+
+        try {
 
             document.execCommand(
-                "createLink",
+                "insertHTML",
                 false,
-                safeUrl
+                html
             );
 
-            sauvegarderSelection(
-                slug
+        } catch (error) {
+
+            console.error(
+                "AVANT-GARDE — AUTRES PAGES : insertion HTML impossible.",
+                error
             );
-
-            return;
-
         }
-
     }
 
 
-    document.execCommand(
-        "insertHTML",
-        false,
-        `<a href="${echapperAttribut(safeUrl)}" target="_blank" rel="noopener noreferrer">${echapperHtml(texte)}</a>`
-    );
-
-    sauvegarderSelection(
-        slug
-    );
-
+    synchroniserSourceDepuisWysiwyg(slug);
 }
 
 
 /* =========================================================
-   IMAGE
+   INSERTION IMAGE
 ========================================================= */
 
-function insererImage(
-    slug
-) {
+function insererImage(slug) {
 
-    if (
-        !exigerAdministrateur()
-    ) {
+    const config = getConfig(slug);
+    const state = getState(slug);
+
+    if (!config || !state || state.sourceMode) {
         return;
     }
 
-    const config =
-        getConfig(slug);
 
-    const state =
-        getState(slug);
+    const editor = getElement(config.editorId);
 
-    if (
-        !config ||
-        !state
-    ) {
+    if (!editor) {
         return;
     }
 
-    if (state.sourceMode) {
-        return;
-    }
 
-    restaurerSelection(
-        slug
+    editor.focus();
+
+    restaurerSelection(slug);
+
+
+    const url = window.prompt(
+        "URL de l'image :",
+        "https://"
     );
 
 
-    const url =
-        window.prompt(
-            "URL de l'image :"
+    if (!url) {
+        return;
+    }
+
+
+    const urlNettoyee = url.trim();
+
+    if (!urlNettoyee) {
+        return;
+    }
+
+
+    const alt = window.prompt(
+        "Texte alternatif de l'image :",
+        ""
+    );
+
+
+    const html = `
+<img src="${escapeHtml(urlNettoyee)}"
+     alt="${escapeHtml(alt || "")}">
+`;
+
+
+    try {
+
+        document.execCommand(
+            "insertHTML",
+            false,
+            html
         );
 
-    if (
-        url === null ||
-        !url.trim()
-    ) {
-        return;
-    }
+    } catch (error) {
 
-
-    const alt =
-        window.prompt(
-            "Texte alternatif de l'image :",
-            ""
+        console.error(
+            "AVANT-GARDE — AUTRES PAGES : erreur insertion image.",
+            error
         );
 
+        showMessage(
+            slug,
+            "Impossible d'insérer l'image.",
+            "error"
+        );
 
-    const wysiwyg =
-        getElement(config.wysiwygId);
-
-    if (!wysiwyg) {
         return;
     }
 
 
-    wysiwyg.focus();
-
-
-    const html =
-        `<img src="${echapperAttribut(url.trim())}" alt="${echapperAttribut(alt || "")}">`;
-
-
-    document.execCommand(
-        "insertHTML",
-        false,
-        html
-    );
-
-
-    sauvegarderSelection(
-        slug
-    );
-
+    synchroniserSourceDepuisWysiwyg(slug);
 }
 
 
 /* =========================================================
-   VIDEO
+   INSERTION VIDÉO
 ========================================================= */
 
-function insererVideo(
-    slug
-) {
+function insererVideo(slug) {
 
-    if (
-        !exigerAdministrateur()
-    ) {
+    const config = getConfig(slug);
+    const state = getState(slug);
+
+    if (!config || !state || state.sourceMode) {
         return;
     }
 
-    const config =
-        getConfig(slug);
 
-    const state =
-        getState(slug);
+    const editor = getElement(config.editorId);
 
-    if (
-        !config ||
-        !state
-    ) {
+    if (!editor) {
         return;
     }
 
-    if (state.sourceMode) {
-        return;
-    }
 
-    restaurerSelection(
-        slug
+    editor.focus();
+
+    restaurerSelection(slug);
+
+
+    const url = window.prompt(
+        "URL de la vidéo :",
+        "https://"
     );
 
 
-    const url =
-        window.prompt(
-            "URL de la vidéo ou URL d'intégration :"
-        );
-
-    if (
-        url === null ||
-        !url.trim()
-    ) {
+    if (!url) {
         return;
     }
 
 
-    const wysiwyg =
-        getElement(config.wysiwygId);
+    const urlNettoyee = url.trim();
 
-    if (!wysiwyg) {
+    if (!urlNettoyee) {
         return;
     }
 
 
-    wysiwyg.focus();
+    let embedUrl = urlNettoyee;
 
 
-    const cleanUrl =
-        url.trim();
+    /*
+       Conversion simple YouTube :
+       https://www.youtube.com/watch?v=XXXX
+       →
+       https://www.youtube.com/embed/XXXX
+    */
 
+    try {
 
-    let html =
-        "";
+        const parsed = new URL(urlNettoyee);
 
+        if (
+            parsed.hostname.includes("youtube.com") &&
+            parsed.searchParams.get("v")
+        ) {
 
-    if (
-        cleanUrl.includes(
-            "youtube.com"
-        ) ||
-        cleanUrl.includes(
-            "youtu.be"
-        )
-    ) {
-
-        let embedUrl =
-            cleanUrl;
+            embedUrl =
+                "https://www.youtube.com/embed/" +
+                parsed.searchParams.get("v");
+        }
 
 
         if (
-            cleanUrl.includes(
-                "youtu.be/"
-            )
+            parsed.hostname === "youtu.be"
         ) {
 
-            const id =
-                cleanUrl
-                    .split("youtu.be/")[1]
-                    .split(/[?&#]/)[0];
-
             embedUrl =
-                `https://www.youtube.com/embed/${id}`;
-
-        } else if (
-            cleanUrl.includes(
-                "watch?v="
-            )
-        ) {
-
-            const id =
-                cleanUrl
-                    .split("watch?v=")[1]
-                    .split(/[&#]/)[0];
-
-            embedUrl =
-                `https://www.youtube.com/embed/${id}`;
-
+                "https://www.youtube.com/embed" +
+                parsed.pathname;
         }
 
+    } catch (error) {
 
-        html =
-            `<iframe src="${echapperAttribut(embedUrl)}" title="Vidéo" frameborder="0" allowfullscreen></iframe>`;
-
-    } else if (
-        cleanUrl.includes(
-            "vimeo.com"
-        )
-    ) {
-
-        const id =
-            cleanUrl
-                .split("vimeo.com/")[1]
-                .split(/[?&#/]/)[0];
-
-        const embedUrl =
-            `https://player.vimeo.com/video/${id}`;
-
-        html =
-            `<iframe src="${echapperAttribut(embedUrl)}" title="Vidéo" frameborder="0" allowfullscreen></iframe>`;
-
-    } else {
-
-        html =
-            `<video controls src="${echapperAttribut(cleanUrl)}"></video>`;
-
+        console.warn(
+            "AVANT-GARDE — AUTRES PAGES : URL vidéo non analysable.",
+            error
+        );
     }
 
 
-    document.execCommand(
-        "insertHTML",
-        false,
-        html
-    );
+    const html = `
+<div class="video-container">
+    <iframe
+        src="${escapeHtml(embedUrl)}"
+        title="Vidéo"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+    </iframe>
+</div>
+`;
 
 
-    sauvegarderSelection(
-        slug
-    );
+    try {
 
+        document.execCommand(
+            "insertHTML",
+            false,
+            html
+        );
+
+    } catch (error) {
+
+        console.error(
+            "AVANT-GARDE — AUTRES PAGES : erreur insertion vidéo.",
+            error
+        );
+
+        showMessage(
+            slug,
+            "Impossible d'insérer la vidéo.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    synchroniserSourceDepuisWysiwyg(slug);
 }
 
 
 /* =========================================================
-   ECHAPPEMENT HTML
+   ÉCHAPPEMENT HTML
 ========================================================= */
-
-function echapperHtml(value) {
-
-    return String(
-        value ?? ""
-    )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
-
 
 function echapperAttribut(value) {
 
-    return String(
-        value ?? ""
-    )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        );
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+}
 
+
+/*
+   escapeHtml vient normalement de admin-utils.js.
+   Cette fonction de secours évite qu'une absence ponctuelle
+   de cette fonction bloque tout le module.
+*/
+
+function escapeHtmlSafe(value) {
+
+    if (typeof escapeHtml === "function") {
+        return escapeHtml(value);
+    }
+
+    return echapperAttribut(value);
 }
 
 
@@ -1104,26 +953,17 @@ function echapperAttribut(value) {
    CHARGEMENT SUPABASE
 ========================================================= */
 
-async function chargerContenu(
-    slug
-) {
+async function chargerContenu(slug) {
 
-    if (
-        !exigerAdministrateur()
-    ) {
+    const config = getConfig(slug);
+    const state = getState(slug);
+
+    if (!config || !state) {
         return;
     }
 
-    const config =
-        getConfig(slug);
 
-    const state =
-        getState(slug);
-
-    if (
-        !config ||
-        !state
-    ) {
+    if (!exigerAdministrateur()) {
         return;
     }
 
@@ -1133,511 +973,359 @@ async function chargerContenu(
         const {
             data,
             error
-        } =
-            await supabase
-                .from(
-                    "other_contents"
-                )
-                .select(
-                    "id, slug, titre, contenu_html, updated_at"
-                )
-                .eq(
-                    "slug",
-                    config.slug
-                )
-                .maybeSingle();
+        } = await supabase
+            .from("other_contents")
+            .select(
+                "id, slug, titre, contenu_html, updated_at"
+            )
+            .eq("slug", config.slug)
+            .order("id", {
+                ascending: true
+            })
+            .limit(1);
 
 
         if (error) {
 
-            throw error;
+            console.error(
+                "AVANT-GARDE — AUTRES PAGES : erreur chargement.",
+                error
+            );
 
-        }
+            state.row = null;
 
-
-        if (
-            !estAdministrateur()
-        ) {
-            return;
-        }
-
-
-        state.row =
-            data || null;
-
-
-        chargerDansEditeur(
-            slug,
-            data?.contenu_html || ""
-        );
-
-
-    }
-    catch (error) {
-
-        console.error(
-            `Erreur chargement ${slug} :`,
-            error
-        );
-
-
-        if (
-            estAdministrateur()
-        ) {
+            chargerDansEditeur(
+                slug,
+                ""
+            );
 
             showMessage(
                 slug,
-                error?.message
-                    ? `Impossible de charger ${config.titre} : ${error.message}`
-                    : `Impossible de charger ${config.titre}.`,
+                "Erreur lors du chargement : " +
+                (error.message || "erreur Supabase"),
                 "error"
             );
 
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   ENREGISTREMENT
-========================================================= */
-
-async function enregistrerContenu(
-    slug
-) {
-
-    if (
-        !exigerAdministrateur()
-    ) {
-        return;
-    }
-
-    const config =
-        getConfig(slug);
-
-    const state =
-        getState(slug);
-
-    if (
-        !config ||
-        !state
-    ) {
-        return;
-    }
-
-
-    const saveButton =
-        getElement(
-            config.saveButtonId
-        );
-
-
-    const html =
-        getCurrentHtml(
-            slug
-        );
-
-
-    if (saveButton) {
-
-        saveButton.disabled =
-            true;
-
-    }
-
-
-    try {
-
-        if (
-            !estAdministrateur()
-        ) {
             return;
         }
 
 
-        const now =
-            new Date().toISOString();
+        const row = data && data.length
+            ? data[0]
+            : null;
 
 
-        if (
-            state.row &&
-            state.row.id !== undefined &&
-            state.row.id !== null
-        ) {
-
-            const {
-                data,
-                error
-            } =
-                await supabase
-                    .from(
-                        "other_contents"
-                    )
-                    .update({
-
-                        titre:
-                            config.titre,
-
-                        contenu_html:
-                            html,
-
-                        updated_at:
-                            now
-
-                    })
-                    .eq(
-                        "id",
-                        state.row.id
-                    )
-                    .select(
-                        "id, slug, titre, contenu_html, updated_at"
-                    )
-                    .maybeSingle();
-
-
-            if (error) {
-
-                throw error;
-
-            }
-
-
-            if (
-                !estAdministrateur()
-            ) {
-                return;
-            }
-
-
-            if (data) {
-
-                state.row =
-                    data;
-
-            } else {
-
-                state.row = {
-
-                    ...state.row,
-
-                    titre:
-                        config.titre,
-
-                    contenu_html:
-                        html,
-
-                    updated_at:
-                        now
-
-                };
-
-            }
-
-        } else {
-
-            if (
-                !exigerAdministrateur()
-            ) {
-                return;
-            }
-
-
-            const {
-                data,
-                error
-            } =
-                await supabase
-                    .from(
-                        "other_contents"
-                    )
-                    .insert({
-
-                        slug:
-                            config.slug,
-
-                        titre:
-                            config.titre,
-
-                        contenu_html:
-                            html,
-
-                        updated_at:
-                            now
-
-                    })
-                    .select(
-                        "id, slug, titre, contenu_html, updated_at"
-                    )
-                    .maybeSingle();
-
-
-            if (error) {
-
-                throw error;
-
-            }
-
-
-            if (
-                !estAdministrateur()
-            ) {
-                return;
-            }
-
-
-            state.row =
-                data;
-
-        }
+        state.row = row;
 
 
         chargerDansEditeur(
             slug,
-            html
+            row?.contenu_html || ""
         );
 
 
         showMessage(
             slug,
-            `${config.titre} enregistré.`
+            ""
         );
 
-    }
-    catch (error) {
+
+    } catch (error) {
 
         console.error(
-            `Erreur enregistrement ${slug} :`,
+            "AVANT-GARDE — AUTRES PAGES : exception chargement.",
             error
         );
 
-
-        if (
-            estAdministrateur()
-        ) {
-
-            showMessage(
-                slug,
-                error?.message
-                    ? `Impossible d'enregistrer ${config.titre} : ${error.message}`
-                    : `Impossible d'enregistrer ${config.titre}.`,
-                "error"
-            );
-
-        }
-
-    }
-    finally {
-
-        if (saveButton) {
-
-            saveButton.disabled =
-                false;
-
-        }
-
-    }
-
-}
-
-
-/* =========================================================
-   ANNULER
-========================================================= */
-
-async function annulerContenu(
-    slug
-) {
-
-    if (
-        !exigerAdministrateur()
-    ) {
-        return;
-    }
-
-
-    const config =
-        getConfig(slug);
-
-    const state =
-        getState(slug);
-
-    if (
-        !config ||
-        !state
-    ) {
-        return;
-    }
-
-
-    const confirmation =
-        window.confirm(
-            `Annuler les modifications de ${config.titre} ?`
+        showMessage(
+            slug,
+            "Erreur inattendue lors du chargement.",
+            "error"
         );
-
-    if (!confirmation) {
-        return;
     }
-
-
-    const html =
-        state.row?.contenu_html ||
-        "";
-
-
-    chargerDansEditeur(
-        slug,
-        html
-    );
-
-
-    showMessage(
-        slug,
-        "Modifications annulées."
-    );
-
 }
 
 
 /* =========================================================
-   OUTILS BARRE
+   CHARGEMENT DES DEUX PAGES
 ========================================================= */
 
-function initialiserToolbar(
-    slug
-) {
+async function actualiserContenusAutres() {
 
-    const config =
-        getConfig(slug);
+    if (!exigerAdministrateur()) {
+        return;
+    }
+
+
+    await Promise.all([
+        chargerContenu("manifeste"),
+        chargerContenu("inspirations")
+    ]);
+}
+
+
+/* =========================================================
+   ÉDITION — WYSIWYG
+========================================================= */
+
+function initialiserEditeurWysiwyg(slug) {
+
+    const config = getConfig(slug);
 
     if (!config) {
         return;
     }
 
-    const toolbar =
-        getElement(
-            config.toolbarId
-        );
 
-    if (!toolbar) {
+    const editor = getElement(config.editorId);
+
+    if (!editor) {
         return;
     }
 
 
-    if (
-        toolbar.dataset.adminAutresInitialized ===
+    editor.setAttribute(
+        "contenteditable",
         "true"
-    ) {
-
-        return;
-    }
+    );
 
 
-    toolbar.dataset.adminAutresInitialized =
-        "true";
+    /*
+       Sauvegarde de la sélection avant les clics sur la toolbar.
+    */
+
+    const sauvegarder = () => {
+        sauvegarderSelection(slug);
+    };
 
 
-    toolbar
-        .querySelectorAll(
-            "[data-command]"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "mousedown",
-                    event => {
-
-                        event.preventDefault();
-
-                    }
-                );
+    editor.addEventListener(
+        "mouseup",
+        sauvegarder
+    );
 
 
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        if (
-                            !exigerAdministrateur()
-                        ) {
-                            return;
-                        }
+    editor.addEventListener(
+        "keyup",
+        sauvegarder
+    );
 
 
-                        sauvegarderSelection(
-                            slug
-                        );
+    editor.addEventListener(
+        "focus",
+        sauvegarder
+    );
 
-                        executerCommande(
-                            slug,
-                            button.dataset.command
-                        );
 
-                    }
-                );
+    /*
+       Chaque modification du contenu met à jour le HTML source.
+    */
 
+    editor.addEventListener(
+        "input",
+        () => {
+
+            const state = getState(slug);
+
+            if (!state || state.sourceMode) {
+                return;
             }
-        );
 
-
-    toolbar
-        .querySelectorAll(
-            "[data-format]"
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    "mousedown",
-                    event => {
-
-                        event.preventDefault();
-
-                    }
-                );
-
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        if (
-                            !exigerAdministrateur()
-                        ) {
-                            return;
-                        }
-
-
-                        sauvegarderSelection(
-                            slug
-                        );
-
-                        appliquerFormat(
-                            slug,
-                            button.dataset.format
-                        );
-
-                    }
-                );
-
-            }
-        );
-
+            synchroniserSourceDepuisWysiwyg(slug);
+        }
+    );
 }
 
 
 /* =========================================================
-   BOUTONS SPECIAUX
+   TOOLBAR
 ========================================================= */
 
-function initialiserBoutons(
-    slug
-) {
+function initialiserToolbar(slug) {
 
-    const config =
-        getConfig(slug);
+    const config = getConfig(slug);
+
+    if (!config) {
+        return;
+    }
+
+
+    const toolbar = getElement(config.toolbarId);
+
+    if (!toolbar) {
+
+        console.warn(
+            "AVANT-GARDE — AUTRES PAGES : toolbar introuvable pour",
+            slug
+        );
+
+        return;
+    }
+
+
+    /*
+       IMPORTANT :
+
+       Le HTML utilise :
+       data-other-command
+       data-other-format
+
+       et non :
+       data-command
+       data-format
+    */
+
+
+    toolbar
+        .querySelectorAll("[data-other-command]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "mousedown",
+                event => {
+
+                    /*
+                       Empêche le bouton de prendre le focus
+                       et de faire disparaître la sélection
+                       dans le contenteditable.
+                    */
+
+                    event.preventDefault();
+
+                    sauvegarderSelection(slug);
+                }
+            );
+
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+
+                    const command =
+                        button.getAttribute(
+                            "data-other-command"
+                        );
+
+
+                    if (!command) {
+                        return;
+                    }
+
+
+                    executerCommande(
+                        slug,
+                        command
+                    );
+                }
+            );
+        });
+
+
+    toolbar
+        .querySelectorAll("[data-other-format]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "mousedown",
+                event => {
+
+                    event.preventDefault();
+
+                    sauvegarderSelection(slug);
+                }
+            );
+
+
+            button.addEventListener(
+                "click",
+                event => {
+
+                    event.preventDefault();
+
+
+                    const format =
+                        button.getAttribute(
+                            "data-other-format"
+                        );
+
+
+                    if (!format) {
+                        return;
+                    }
+
+
+                    appliquerFormat(
+                        slug,
+                        format
+                    );
+                }
+            );
+        });
+}
+
+
+/* =========================================================
+   MODE SOURCE
+========================================================= */
+
+function basculerModeSource(slug) {
+
+    const config = getConfig(slug);
+    const state = getState(slug);
+
+    if (!config || !state) {
+        return;
+    }
+
+
+    const wysiwyg = getElement(config.wysiwygId);
+    const source = getElement(config.sourceId);
+
+    if (!wysiwyg || !source) {
+        return;
+    }
+
+
+    if (!state.sourceMode) {
+
+        /*
+           Passage WYSIWYG → HTML.
+        */
+
+        source.value =
+            wysiwyg.innerHTML || "";
+
+
+        state.sourceMode = true;
+
+    } else {
+
+        /*
+           Passage HTML → WYSIWYG.
+        */
+
+        wysiwyg.innerHTML =
+            source.value || "";
+
+
+        state.sourceMode = false;
+    }
+
+
+    actualiserModeEditeur(slug);
+}
+
+
+/* =========================================================
+   BOUTONS SPÉCIAUX
+========================================================= */
+
+function initialiserBoutonsSpeciaux(slug) {
+
+    const config = getConfig(slug);
 
     if (!config) {
         return;
@@ -1645,155 +1333,19 @@ function initialiserBoutons(
 
 
     const linkButton =
-        getElement(
-            config.linkButtonId
-        );
+        getElement(config.linkButtonId);
+
 
     const imageButton =
-        getElement(
-            config.imageButtonId
-        );
+        getElement(config.imageButtonId);
+
 
     const videoButton =
-        getElement(
-            config.videoButtonId
-        );
+        getElement(config.videoButtonId);
+
 
     const sourceButton =
-        getElement(
-            config.sourceButtonId
-        );
-
-    const saveButton =
-        getElement(
-            config.saveButtonId
-        );
-
-    const cancelButton =
-        getElement(
-            config.cancelButtonId
-        );
-
-
-    const wysiwyg =
-        getElement(
-            config.wysiwygId
-        );
-
-    const source =
-        getElement(
-            config.sourceId
-        );
-
-
-    const editorAlreadyInitialized =
-        wysiwyg?.dataset.adminAutresInitialized ===
-        "true";
-
-
-    if (
-        editorAlreadyInitialized
-    ) {
-        return;
-    }
-
-
-    if (wysiwyg) {
-
-        wysiwyg.dataset.adminAutresInitialized =
-            "true";
-
-
-        wysiwyg.addEventListener(
-            "mouseup",
-            () => {
-
-                if (
-                    !exigerAdministrateur()
-                ) {
-                    return;
-                }
-
-                sauvegarderSelection(
-                    slug
-                );
-
-            }
-        );
-
-
-        wysiwyg.addEventListener(
-            "keyup",
-            () => {
-
-                if (
-                    !exigerAdministrateur()
-                ) {
-                    return;
-                }
-
-                sauvegarderSelection(
-                    slug
-                );
-
-            }
-        );
-
-
-        wysiwyg.addEventListener(
-            "input",
-            () => {
-
-                if (
-                    !exigerAdministrateur()
-                ) {
-                    return;
-                }
-
-
-                if (
-                    !getState(slug).sourceMode
-                ) {
-
-                    synchroniserSource(
-                        slug
-                    );
-
-                }
-
-            }
-        );
-
-    }
-
-
-    if (source) {
-
-        source.addEventListener(
-            "input",
-            () => {
-
-                if (
-                    !exigerAdministrateur()
-                ) {
-                    return;
-                }
-
-
-                if (
-                    getState(slug).sourceMode
-                ) {
-
-                    synchroniserWysiwyg(
-                        slug
-                    );
-
-                }
-
-            }
-        );
-
-    }
+        getElement(config.sourceButtonId);
 
 
     if (linkButton) {
@@ -1804,38 +1356,20 @@ function initialiserBoutons(
 
                 event.preventDefault();
 
-                if (
-                    !exigerAdministrateur()
-                ) {
-                    return;
-                }
-
-                sauvegarderSelection(
-                    slug
-                );
-
+                sauvegarderSelection(slug);
             }
         );
 
 
         linkButton.addEventListener(
             "click",
-            () => {
+            event => {
 
-                if (
-                    !exigerAdministrateur()
-                ) {
-                    return;
-                }
+                event.preventDefault();
 
-
-                insererLien(
-                    slug
-                );
-
+                insererLien(slug);
             }
         );
-
     }
 
 
@@ -1847,38 +1381,20 @@ function initialiserBoutons(
 
                 event.preventDefault();
 
-                if (
-                    !exigerAdministrateur()
-                ) {
-                    return;
-                }
-
-                sauvegarderSelection(
-                    slug
-                );
-
+                sauvegarderSelection(slug);
             }
         );
 
 
         imageButton.addEventListener(
             "click",
-            () => {
+            event => {
 
-                if (
-                    !exigerAdministrateur()
-                ) {
-                    return;
-                }
+                event.preventDefault();
 
-
-                insererImage(
-                    slug
-                );
-
+                insererImage(slug);
             }
         );
-
     }
 
 
@@ -1890,119 +1406,112 @@ function initialiserBoutons(
 
                 event.preventDefault();
 
-                if (
-                    !exigerAdministrateur()
-                ) {
-                    return;
-                }
-
-                sauvegarderSelection(
-                    slug
-                );
-
+                sauvegarderSelection(slug);
             }
         );
 
 
         videoButton.addEventListener(
             "click",
-            () => {
+            event => {
 
-                if (
-                    !exigerAdministrateur()
-                ) {
-                    return;
-                }
+                event.preventDefault();
 
-
-                insererVideo(
-                    slug
-                );
-
+                insererVideo(slug);
             }
         );
-
     }
 
 
     if (sourceButton) {
 
         sourceButton.addEventListener(
-            "mousedown",
+            "click",
             event => {
 
                 event.preventDefault();
 
+                basculerModeSource(slug);
             }
         );
-
-
-        sourceButton.addEventListener(
-            "click",
-            () => {
-
-                if (
-                    !exigerAdministrateur()
-                ) {
-                    return;
-                }
-
-
-                const state =
-                    getState(slug);
-
-
-                if (!state.sourceMode) {
-
-                    synchroniserSource(
-                        slug
-                    );
-
-                    state.sourceMode =
-                        true;
-
-                } else {
-
-                    synchroniserWysiwyg(
-                        slug
-                    );
-
-                    state.sourceMode =
-                        false;
-
-                }
-
-
-                actualiserModeEditeur(
-                    slug
-                );
-
-            }
-        );
-
     }
+}
+
+
+/* =========================================================
+   SOURCE EDITOR
+========================================================= */
+
+function initialiserSourceEditor(slug) {
+
+    const config = getConfig(slug);
+
+    if (!config) {
+        return;
+    }
+
+
+    const source = getElement(config.sourceId);
+
+    if (!source) {
+        return;
+    }
+
+
+    source.addEventListener(
+        "input",
+        () => {
+
+            const state = getState(slug);
+
+            if (!state || !state.sourceMode) {
+                return;
+            }
+
+
+            /*
+               Mise à jour immédiate du WYSIWYG.
+               Cela permet de voir le résultat même en mode source.
+            */
+
+            synchroniserWysiwygDepuisSource(slug);
+        }
+    );
+}
+
+
+/* =========================================================
+   INITIALISATION DES BOUTONS ENREGISTRER / ANNULER
+========================================================= */
+
+function initialiserActions(slug) {
+
+    const config = getConfig(slug);
+
+    if (!config) {
+        return;
+    }
+
+
+    const saveButton =
+        getElement(config.saveButtonId);
+
+
+    const cancelButton =
+        getElement(config.cancelButtonId);
 
 
     if (saveButton) {
 
         saveButton.addEventListener(
             "click",
-            async () => {
+            event => {
 
-                if (
-                    !exigerAdministrateur()
-                ) {
-                    return;
-                }
+                event.preventDefault();
 
-
-                await enregistrerContenu(
-                    slug
-                );
-
+                enregistrerContenu(slug);
             }
         );
-
     }
 
 
@@ -2010,353 +1519,642 @@ function initialiserBoutons(
 
         cancelButton.addEventListener(
             "click",
-            async () => {
+            event => {
 
-                if (
-                    !exigerAdministrateur()
-                ) {
-                    return;
-                }
+                event.preventDefault();
 
-
-                await annulerContenu(
-                    slug
-                );
-
+                annulerContenu(slug);
             }
         );
-
     }
-
 }
 
 
 /* =========================================================
-   INITIALISATION D'UN EDITEUR
+   INITIALISATION COMPLÈTE D'UN ÉDITEUR
 ========================================================= */
 
-async function initialiserEditeur(
-    slug
-) {
+function initialiserEditeur(slug) {
 
-    if (
-        !exigerAdministrateur()
-    ) {
-        return;
-    }
-
-
-    const config =
-        getConfig(slug);
+    const config = getConfig(slug);
 
     if (!config) {
         return;
     }
 
 
-    /*
-       CORRECTION :
+    if (!exigerAdministrateur()) {
+        return;
+    }
 
-       Il n'existe pas de conteneur
-       "manifestEditor" ou "inspirationsEditor"
-       dans admin.html.
-
-       Les éditeurs réels sont directement :
-       - manifestWysiwyg / manifestSourceEditor
-       - inspirationsWysiwyg / inspirationsSourceEditor
-
-       On vérifie donc directement les éléments
-       réellement utilisés.
-    */
 
     const wysiwyg =
-        getElement(
-            config.wysiwygId
-        );
+        getElement(config.wysiwygId);
 
-    const source =
-        getElement(
-            config.sourceId
-        );
 
-    if (
-        !wysiwyg ||
-        !source
-    ) {
+    if (!wysiwyg) {
 
-        console.error(
-            `AUTRES PAGES : éditeur introuvable pour ${slug}.`,
-            {
-                wysiwygId:
-                    config.wysiwygId,
-
-                sourceId:
-                    config.sourceId
-            }
+        console.warn(
+            "AVANT-GARDE — AUTRES PAGES : éditeur introuvable pour",
+            slug
         );
 
         return;
     }
 
 
-    initialiserToolbar(
-        slug
-    );
+    /*
+       IMPORTANT :
 
-    initialiserBoutons(
-        slug
-    );
+       On ne bloque plus toute l'initialisation si un autre script
+       a déjà posé dataset.adminAutresInitialized.
+
+       Chaque écouteur est désormais protégé individuellement
+       par un marqueur propre.
+    */
 
 
-    await chargerContenu(
-        slug
-    );
+    if (
+        wysiwyg.dataset
+            .adminAutresWysiwygInitialized !== "true"
+    ) {
 
+        initialiserEditeurWysiwyg(slug);
+
+        wysiwyg.dataset
+            .adminAutresWysiwygInitialized = "true";
+    }
+
+
+    const toolbar =
+        getElement(config.toolbarId);
+
+
+    if (
+        toolbar &&
+        toolbar.dataset
+            .adminAutresToolbarInitialized !== "true"
+    ) {
+
+        initialiserToolbar(slug);
+
+        toolbar.dataset
+            .adminAutresToolbarInitialized = "true";
+    }
+
+
+    const source =
+        getElement(config.sourceId);
+
+
+    if (
+        source &&
+        source.dataset
+            .adminAutresSourceInitialized !== "true"
+    ) {
+
+        initialiserSourceEditor(slug);
+
+        source.dataset
+            .adminAutresSourceInitialized = "true";
+    }
+
+
+    const linkButton =
+        getElement(config.linkButtonId);
+
+
+    if (
+        linkButton &&
+        linkButton.dataset
+            .adminAutresActionInitialized !== "true"
+    ) {
+
+        initialiserBoutonsSpeciaux(slug);
+
+        /*
+           Les trois boutons spéciaux et le bouton source
+           sont initialisés dans le même bloc.
+        */
+
+        linkButton.dataset
+            .adminAutresActionInitialized = "true";
+    }
+
+
+    const saveButton =
+        getElement(config.saveButtonId);
+
+
+    if (
+        saveButton &&
+        saveButton.dataset
+            .adminAutresSaveInitialized !== "true"
+    ) {
+
+        initialiserActions(slug);
+
+        saveButton.dataset
+            .adminAutresSaveInitialized = "true";
+    }
+
+
+    actualiserModeEditeur(slug);
+
+
+    /*
+       Chargement depuis Supabase.
+    */
+
+    chargerContenu(slug);
 }
 
 
 /* =========================================================
-   ACTUALISATION AU CHANGEMENT D'ONGLET
+   ENREGISTREMENT
 ========================================================= */
 
-async function actualiserAutresPages() {
+async function enregistrerContenu(slug) {
 
-    if (
-        actualisationAutresEnCours
-    ) {
+    const config = getConfig(slug);
+    const state = getState(slug);
+
+    if (!config || !state) {
         return;
     }
 
 
-    if (
-        !exigerAdministrateur()
-    ) {
-        return;
-    }
+    /*
+       Vérification d'accès AVANT toute opération.
+    */
 
+    if (!exigerAdministrateur()) {
 
-    const contentOtherTab =
-        getElement(
-            "contentOtherTab"
+        showMessage(
+            slug,
+            "Enregistrement refusé : accès administrateur requis.",
+            "error"
         );
 
-    if (
-        !contentOtherTab
-    ) {
         return;
     }
 
 
-    actualisationAutresEnCours =
-        true;
+    /*
+       Si nous sommes en mode source, le contenu est déjà
+       dans le textarea.
+
+       Sinon, on synchronise d'abord le WYSIWYG.
+    */
+
+    if (!state.sourceMode) {
+        synchroniserSourceDepuisWysiwyg(slug);
+    }
+
+
+    const html = getCurrentHtml(slug);
+
+
+    if (!html.trim()) {
+
+        const continuer =
+            window.confirm(
+                "Le contenu est vide. Voulez-vous vraiment enregistrer une page vide ?"
+            );
+
+
+        if (!continuer) {
+            return;
+        }
+    }
+
+
+    const saveButton =
+        getElement(config.saveButtonId);
+
+
+    if (saveButton) {
+        saveButton.disabled = true;
+    }
+
+
+    showMessage(
+        slug,
+        "Enregistrement en cours...",
+        "info"
+    );
 
 
     try {
 
-        await Promise.all([
+        const now =
+            new Date().toISOString();
 
-            chargerContenu(
-                "manifeste"
-            ),
 
-            chargerContenu(
-                "inspirations"
-            )
+        let result;
 
-        ]);
 
+        /*
+           EXISTANT → UPDATE
+        */
+
+        if (state.row?.id) {
+
+            result =
+                await supabase
+                    .from("other_contents")
+                    .update({
+
+                        titre: config.titre,
+
+                        contenu_html: html,
+
+                        updated_at: now
+                    })
+                    .eq(
+                        "id",
+                        state.row.id
+                    )
+                    .select(
+                        "id, slug, titre, contenu_html, updated_at"
+                    )
+                    .maybeSingle();
+        }
+
+
+        /*
+           ABSENT → INSERT
+        */
+
+        else {
+
+            result =
+                await supabase
+                    .from("other_contents")
+                    .insert({
+
+                        slug: config.slug,
+
+                        titre: config.titre,
+
+                        contenu_html: html,
+
+                        updated_at: now
+                    })
+                    .select(
+                        "id, slug, titre, contenu_html, updated_at"
+                    )
+                    .maybeSingle();
+        }
+
+
+        const {
+            data,
+            error
+        } = result;
+
+
+        if (error) {
+
+            console.error(
+                "AVANT-GARDE — AUTRES PAGES : erreur Supabase lors de l'enregistrement.",
+                error
+            );
+
+
+            showMessage(
+                slug,
+                "Erreur lors de l'enregistrement : " +
+                (
+                    error.message ||
+                    error.details ||
+                    "erreur Supabase inconnue"
+                ),
+                "error"
+            );
+
+
+            return;
+        }
+
+
+        /*
+           Si Supabase ne renvoie aucune ligne après UPDATE/INSERT,
+           on considère que quelque chose est anormal.
+        */
+
+        if (!data) {
+
+            console.error(
+                "AVANT-GARDE — AUTRES PAGES : aucune ligne retournée après enregistrement."
+            );
+
+
+            showMessage(
+                slug,
+                "L'enregistrement n'a pas confirmé la modification.",
+                "error"
+            );
+
+
+            return;
+        }
+
+
+        /*
+           Mise à jour de l'état local.
+        */
+
+        state.row = data;
+
+
+        chargerDansEditeur(
+            slug,
+            data.contenu_html || html
+        );
+
+
+        showMessage(
+            slug,
+            "Contenu enregistré avec succès.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "AVANT-GARDE — AUTRES PAGES : exception lors de l'enregistrement.",
+            error
+        );
+
+
+        showMessage(
+            slug,
+            "Erreur inattendue lors de l'enregistrement.",
+            "error"
+        );
+
+
+    } finally {
+
+        if (saveButton) {
+            saveButton.disabled = false;
+        }
     }
-    finally {
-
-        actualisationAutresEnCours =
-            false;
-
-    }
-
 }
 
 
 /* =========================================================
-   ECOUTEUR CHANGEMENT ONGLET
+   ANNULATION
 ========================================================= */
 
-function initialiserEcouteurOnglet() {
+async function annulerContenu(slug) {
 
-    if (
-        adminAutresTabListenerInitialized
-    ) {
+    const config = getConfig(slug);
+    const state = getState(slug);
+
+    if (!config || !state) {
         return;
     }
 
 
-    adminAutresTabListenerInitialized =
-        true;
+    if (!exigerAdministrateur()) {
+
+        showMessage(
+            slug,
+            "Accès administrateur requis.",
+            "error"
+        );
+
+        return;
+    }
 
 
-    document.addEventListener(
-        "click",
+    const confirmer =
+        window.confirm(
+            "Annuler les modifications et recharger le contenu enregistré ?"
+        );
+
+
+    if (!confirmer) {
+        return;
+    }
+
+
+    state.sourceMode = false;
+
+
+    await chargerContenu(slug);
+
+
+    showMessage(
+        slug,
+        "Modifications annulées.",
+        "info"
+    );
+}
+
+
+/* =========================================================
+   RAFRAÎCHISSEMENT AU CHANGEMENT D'ONGLET
+========================================================= */
+
+function initialiserEcouteOnglets() {
+
+    if (tabListenerInitialized) {
+        return;
+    }
+
+
+    tabListenerInitialized = true;
+
+
+    window.addEventListener(
+        "avantgarde:admin-tab-changed",
         event => {
 
-            const button =
-                event.target.closest(
-                    "[data-tab], .tab-button, .admin-tab"
-                );
-
-            if (!button) {
-                return;
-            }
+            const detail =
+                event?.detail || {};
 
 
             const tab =
-                button.dataset.tab ||
-                button.getAttribute(
-                    "data-tab"
-                );
+                detail.tab;
 
 
             if (
-                tab !==
-                "contentOtherTab"
+                tab === "contentOtherTab" ||
+                tab === "otherPagesTab" ||
+                tab === "contentOther"
             ) {
-                return;
+
+                /*
+                   Petit délai pour laisser le DOM et l'onglet
+                   terminer leur activation.
+                */
+
+                setTimeout(
+                    () => {
+
+                        if (!exigerAdministrateur()) {
+                            return;
+                        }
+
+
+                        initialiserEditeur(
+                            "manifeste"
+                        );
+
+
+                        initialiserEditeur(
+                            "inspirations"
+                        );
+
+                    },
+                    0
+                );
+            }
+        }
+    );
+}
+
+
+/* =========================================================
+   ÉVÉNEMENT AUTHENTIFICATION ADMIN
+========================================================= */
+
+function initialiserEcouteAuth() {
+
+    if (authListenerInitialized) {
+        return;
+    }
+
+
+    authListenerInitialized = true;
+
+
+    window.addEventListener(
+        "avantgarde:admin-connected",
+        event => {
+
+            const detail =
+                event?.detail || {};
+
+
+            if (detail.user) {
+                window.currentUser =
+                    detail.user;
             }
 
+
+            if (detail.profile) {
+                window.currentProfile =
+                    detail.profile;
+            }
+
+
+            /*
+               L'authentification vient d'être finalisée.
+               On attend un tour de boucle pour laisser les autres
+               modules mettre à jour leur état global.
+            */
 
             setTimeout(
                 () => {
 
-                    actualiserAutresPages();
+                    initialiser();
 
                 },
                 0
             );
-
         }
     );
-
 }
 
 
 /* =========================================================
-   INITIALISATION GENERALE
+   INITIALISATION PRINCIPALE
 ========================================================= */
 
-async function initialiser() {
+function initialiser() {
 
-    initialiserEcouteurOnglet();
-
-
-    if (
-        !window.adminAuthReady
-    ) {
-        return;
-    }
+    initialiserEcouteOnglets();
+    initialiserEcouteAuth();
 
 
-    if (
-        !estAdministrateur()
-    ) {
-        return;
-    }
+    /*
+       L'authentification n'est pas encore prête.
+       L'événement avantgarde:admin-connected prendra le relais.
+    */
 
+    if (!window.adminAuthReady) {
 
-    if (
-        adminAutresModuleInitialized
-    ) {
-        return;
-    }
-
-
-    const contentOtherTab =
-        getElement(
-            "contentOtherTab"
+        console.info(
+            "AVANT-GARDE — AUTRES PAGES : attente de l'authentification administrateur."
         );
 
-    if (!contentOtherTab) {
         return;
     }
 
 
-    adminAutresModuleInitialized =
-        true;
+    /*
+       L'authentification est prête mais le profil n'est pas
+       administrateur.
+    */
+
+    if (!estAdministrateur()) {
+
+        console.warn(
+            "AVANT-GARDE — AUTRES PAGES : utilisateur non administrateur."
+        );
+
+        return;
+    }
 
 
-    await Promise.all([
+    if (moduleInitialized) {
 
-        initialiserEditeur(
-            "manifeste"
-        ),
+        /*
+           Même si le module est déjà initialisé, on recharge les
+           données lorsque initialiser() est rappelé après
+           l'authentification.
+        */
 
-        initialiserEditeur(
-            "inspirations"
-        )
+        actualiserContenusAutres();
 
-    ]);
+        return;
+    }
 
+
+    moduleInitialized = true;
+
+
+    /*
+       Initialisation des deux éditeurs.
+    */
+
+    initialiserEditeur(
+        "manifeste"
+    );
+
+
+    initialiserEditeur(
+        "inspirations"
+    );
 }
 
 
 /* =========================================================
-   AUTHENTIFICATION
-========================================================= */
-
-window.addEventListener(
-    "avantgarde:admin-connected",
-    event => {
-
-        const detail =
-            event?.detail || {};
-
-
-        if (
-            detail.user
-        ) {
-
-            window.currentUser =
-                detail.user;
-
-        }
-
-
-        if (
-            detail.profile
-        ) {
-
-            window.currentProfile =
-                detail.profile;
-
-        }
-
-
-        setTimeout(
-            () => {
-
-                initialiser();
-
-            },
-            0
-        );
-
-    }
-);
-
-
-/* =========================================================
-   INITIALISATION DOM
+   DOM READY
 ========================================================= */
 
 if (
-    document.readyState ===
-    "loading"
+    document.readyState === "loading"
 ) {
 
     document.addEventListener(
         "DOMContentLoaded",
-        () => {
-
-            initialiser();
-
-        },
+        initialiser,
         {
             once: true
         }
@@ -2365,5 +2163,17 @@ if (
 } else {
 
     initialiser();
-
 }
+
+
+/* =========================================================
+   EXPOSITION OPTIONNELLE
+========================================================= */
+
+/*
+   Permet éventuellement à d'autres modules de forcer
+   un rafraîchissement de l'onglet Autres Pages.
+*/
+
+window.actualiserContenusAutres =
+    actualiserContenusAutres;
