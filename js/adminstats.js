@@ -41,6 +41,13 @@ let mesures = [];
 let editionId = null;
 
 
+/*
+ * Empêche l'installation plusieurs fois du même
+ * écouteur de changement d'onglet.
+ */
+let adminStatsTabListenerInitialized = false;
+
+
 /* =========================================================
    ELEMENTS
 ========================================================= */
@@ -1668,10 +1675,98 @@ if (statsCancelButton) {
 
 
 /* =========================================================
+   ACTUALISATION AU CHANGEMENT D'ONGLET
+========================================================= */
+
+/*
+ * admin-tabs.js déclenche l'événement :
+ *
+ * avantgarde:admin-tab-changed
+ *
+ * à chaque changement d'onglet.
+ *
+ * Lorsque l'onglet statsTab devient actif,
+ * on recharge les statistiques ET les mesures
+ * depuis Supabase, puis on reconstruit l'affichage.
+ *
+ * Aucun rechargement de la page n'est effectué.
+ */
+
+function initialiserEcouteurOnglet() {
+
+    if (
+        adminStatsTabListenerInitialized
+    ) {
+        return;
+    }
+
+
+    adminStatsTabListenerInitialized =
+        true;
+
+
+    window.addEventListener(
+        "avantgarde:admin-tab-changed",
+        async event => {
+
+            if (
+                event.detail?.tab !==
+                "statsTab"
+            ) {
+                return;
+            }
+
+
+            try {
+
+                await Promise.all([
+
+                    chargerStatistiques(),
+
+                    chargerMesures()
+
+                ]);
+
+
+                renderStats();
+
+            }
+            catch (error) {
+
+                console.error(
+                    "STATISTIQUES — ACTUALISATION ONGLET :",
+                    error
+                );
+
+
+                afficherMessage(
+                    "Impossible d'actualiser les statistiques.",
+                    "error"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
    INITIALISATION
 ========================================================= */
 
 async function initialiser() {
+
+    /*
+     * Installation de l'écouteur AVANT le chargement
+     * initial des données.
+     *
+     * Cela permet ensuite à admin-tabs.js de demander
+     * une actualisation à chaque entrée dans statsTab.
+     */
+    initialiserEcouteurOnglet();
+
 
     try {
 
