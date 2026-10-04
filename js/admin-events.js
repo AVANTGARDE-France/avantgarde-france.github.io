@@ -7,6 +7,29 @@
 
 
 /* =========================================================
+   ETAT ACTUALISATION ONGLET
+========================================================= */
+
+/*
+ * L'onglet RDV est piloté par admin-tabs.js.
+ *
+ * admin-tabs.js déclenche :
+ *
+ *     avantgarde:admin-tab-changed
+ *
+ * lorsque l'utilisateur change d'onglet.
+ *
+ * On écoute cet événement afin de relire les rendez-vous
+ * depuis Supabase lorsque l'utilisateur revient sur
+ * l'onglet RDV, sans rechargement de la page.
+ */
+
+let adminEventsTabListenerInitialized = false;
+
+let actualisationEvenementsEnCours = false;
+
+
+/* =========================================================
    CHARGER LES EVENEMENTS
    Classement automatique par date
 ========================================================= */
@@ -200,6 +223,108 @@ async function chargerRendezVous(){
     );
 
   });
+
+}
+
+
+/* =========================================================
+   ACTUALISATION DYNAMIQUE DE L'ONGLET
+========================================================= */
+
+/*
+ * Lorsque l'utilisateur revient sur rdvTab,
+ * on recharge la liste depuis Supabase.
+ *
+ * Cela permet de voir immédiatement :
+ *
+ * - les nouveaux évènements ;
+ * - les évènements modifiés ;
+ * - les évènements supprimés ;
+ * - les changements effectués ailleurs ;
+ *
+ * sans Ctrl + R et sans rechargement de admin.html.
+ */
+
+function initialiserEcouteurOnglet(){
+
+  if(
+    adminEventsTabListenerInitialized
+  ){
+    return;
+  }
+
+
+  adminEventsTabListenerInitialized =
+    true;
+
+
+  window.addEventListener(
+    "avantgarde:admin-tab-changed",
+    async event => {
+
+      const onglet =
+        event?.detail?.tab;
+
+
+      if(
+        onglet !==
+        "rdvTab"
+      ){
+        return;
+      }
+
+
+      /*
+       * Protection contre plusieurs clics rapides
+       * provoquant plusieurs requêtes simultanées.
+       */
+
+      if(
+        actualisationEvenementsEnCours
+      ){
+        return;
+      }
+
+
+      actualisationEvenementsEnCours =
+        true;
+
+
+      try{
+
+        await chargerRendezVous();
+
+      }
+      catch(error){
+
+        console.error(
+          "RDV — actualisation de l'onglet :",
+          error
+        );
+
+        const eventList =
+          document.getElementById(
+            "eventList"
+          );
+
+
+        if(eventList){
+
+          eventList.innerHTML =
+            "<div class='message error' style='display:block'>Impossible d'actualiser les évènements.</div>";
+
+        }
+
+      }
+      finally{
+
+        actualisationEvenementsEnCours =
+          false;
+
+      }
+
+    }
+  );
 
 }
 
@@ -628,6 +753,14 @@ async function supprimerEvenement(id){
 ========================================================= */
 
 function initialiserEvenements(){
+
+  /*
+   * IMPORTANT :
+   * Installe l'écouteur avant le premier chargement.
+   */
+
+  initialiserEcouteurOnglet();
+
 
   /*
    * Initialise le formulaire.
