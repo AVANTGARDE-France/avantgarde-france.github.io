@@ -5,6 +5,9 @@
    Bibliothèque des icônes animées utilisées
    par les cartes de mesures.
 
+   ACCÈS :
+   - Administrateurs uniquement.
+
    Champs statistiques :
    - id
    - nom
@@ -46,6 +49,18 @@ let editionId = null;
  * écouteur de changement d'onglet.
  */
 let adminStatsTabListenerInitialized = false;
+
+
+/*
+ * Empêche plusieurs initialisations du module.
+ */
+let moduleInitialise = false;
+
+
+/*
+ * Indique que l'authentification est connue.
+ */
+let authVerifiee = false;
 
 
 /* =========================================================
@@ -153,9 +168,38 @@ function afficherMessage(
 
 
 /* =========================================================
-   ADMIN
+   VERIFICATION ADMIN LOCALE
 ========================================================= */
 
+/*
+ * Vérification rapide à partir du profil déjà chargé
+ * par admin-core.js.
+ *
+ * IMPORTANT :
+ * Cette fonction ne considère PAS l'absence de profil
+ * comme une autorisation.
+ */
+function estAdministrateur() {
+
+    return (
+        window.currentProfile?.grade ===
+        "admin"
+    );
+
+}
+
+
+/* =========================================================
+   VERIFICATION ADMIN SUPABASE
+========================================================= */
+
+/*
+ * Vérification renforcée utilisée avant les opérations
+ * sensibles.
+ *
+ * Cela évite de se fier uniquement à l'état visuel
+ * de l'interface.
+ */
 async function verifierAdmin() {
 
     const {
@@ -179,6 +223,44 @@ async function verifierAdmin() {
     }
 
 
+    /*
+     * Si admin-core possède déjà le profil correspondant
+     * à l'utilisateur connecté, on l'utilise.
+     *
+     * Cela évite une requête inutile dans le cas normal.
+     */
+    if (
+        window.currentProfile &&
+        String(
+            window.currentProfile.id
+        ) ===
+        String(
+            user.id
+        )
+    ) {
+
+        if (
+            window.currentProfile.grade !==
+            "admin"
+        ) {
+
+            throw new Error(
+                "Accès réservé aux administrateurs."
+            );
+
+        }
+
+        authVerifiee = true;
+
+        return true;
+
+    }
+
+
+    /*
+     * Fallback :
+     * récupération directe du profil.
+     */
     const {
         data: profile,
         error
@@ -219,7 +301,55 @@ async function verifierAdmin() {
     }
 
 
+    authVerifiee = true;
+
     return true;
+
+}
+
+
+/* =========================================================
+   GARDE MODULE
+========================================================= */
+
+async function exigerAdmin() {
+
+    /*
+     * Premier niveau :
+     * profil déjà chargé.
+     */
+    if (
+        estAdministrateur()
+    ) {
+
+        authVerifiee = true;
+
+        return true;
+
+    }
+
+
+    /*
+     * Si l'authentification n'est pas encore prête,
+     * on vérifie directement auprès de Supabase.
+     */
+    try {
+
+        await verifierAdmin();
+
+        return true;
+
+    }
+    catch (error) {
+
+        console.warn(
+            "STATISTIQUES — ACCÈS REFUSÉ :",
+            error.message
+        );
+
+        return false;
+
+    }
 
 }
 
@@ -229,6 +359,15 @@ async function verifierAdmin() {
 ========================================================= */
 
 async function chargerStatistiques() {
+
+    if (
+        !await exigerAdmin()
+    ) {
+
+        return;
+
+    }
+
 
     const {
         data,
@@ -276,6 +415,15 @@ async function chargerStatistiques() {
 ========================================================= */
 
 async function chargerMesures() {
+
+    if (
+        !await exigerAdmin()
+    ) {
+
+        return;
+
+    }
+
 
     const {
         data,
@@ -408,6 +556,23 @@ async function retirerRattachement(
     mesureId
 ) {
 
+    /*
+     * GARDE ADMIN
+     */
+    if (
+        !await exigerAdmin()
+    ) {
+
+        afficherMessage(
+            "Accès réservé aux administrateurs.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
     const mesure =
         mesures.find(
             item =>
@@ -442,10 +607,7 @@ async function retirerRattachement(
             "error"
         );
 
-        /*
-         * On recharge tout de même les données
-         * afin de rester synchronisé avec Supabase.
-         */
+
         try {
 
             await chargerMesures();
@@ -511,6 +673,12 @@ async function retirerRattachement(
 
     try {
 
+        /*
+         * Nouvelle vérification juste avant écriture.
+         */
+        await verifierAdmin();
+
+
         const {
             error
         } =
@@ -532,9 +700,6 @@ async function retirerRattachement(
         }
 
 
-        /*
-         * Mise à jour locale immédiate.
-         */
         mesure[champ] =
             null;
 
@@ -566,10 +731,42 @@ async function retirerRattachement(
 
 
 /* =========================================================
+   ESCAPE
+========================================================= */
+
+function escapeHtml(value) {
+
+    return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+}
+
+
+/* =========================================================
    RENDU
 ========================================================= */
 
 function renderStats() {
+
+    /*
+     * GARDE UI
+     */
+    if (
+        !estAdministrateur()
+    ) {
+
+        if (statsList) {
+            statsList.innerHTML = "";
+        }
+
+        return;
+
+    }
+
 
     if (!statsList) {
         return;
@@ -623,11 +820,6 @@ function renderStats() {
                 "";
 
 
-            /*
-             * Toutes les mesures qui utilisent
-             * cette statistique dans stat_1,
-             * stat_2 ou stat_3.
-             */
             const mesuresStat =
                 obtenirMesuresPourStatistique(
                     stat.id
@@ -644,10 +836,6 @@ function renderStats() {
                     gap:18px;
                   "
                 >
-
-                    <!-- =================================================
-                         INFORMATIONS STATISTIQUE
-                    ================================================== -->
 
                     <div
                       style="
@@ -717,10 +905,6 @@ function renderStats() {
                         </div>
 
 
-                        <!-- =============================================
-                             EFFET STATISTIQUE
-                        ============================================== -->
-
                         <div
                           style="
                             margin-top:18px;
@@ -749,19 +933,9 @@ function renderStats() {
                                 margin-bottom:8px;
                               "
                             >
-                                ${
-                                    mesuresStat.length
-                                }
-                                mesure${
-                                    mesuresStat.length > 1
-                                        ? "s"
-                                        : ""
-                                }
-                                concernée${
-                                    mesuresStat.length > 1
-                                        ? "s"
-                                        : ""
-                                }
+                                ${mesuresStat.length}
+                                mesure${mesuresStat.length > 1 ? "s" : ""}
+                                concernée${mesuresStat.length > 1 ? "s" : ""}
                             </div>
 
 
@@ -870,10 +1044,6 @@ function renderStats() {
                     </div>
 
 
-                    <!-- =================================================
-                         APERÇU
-                    ================================================== -->
-
                     <div
                       style="
                         width:110px;
@@ -932,10 +1102,6 @@ function renderStats() {
                     </div>
 
 
-                    <!-- =================================================
-                         ACTIONS
-                    ================================================== -->
-
                     <div
                       style="
                         display:flex;
@@ -983,26 +1149,24 @@ function renderStats() {
 
 
 /* =========================================================
-   ESCAPE
-========================================================= */
-
-function escapeHtml(value) {
-
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-}
-
-
-/* =========================================================
    OUVERTURE FORMULAIRE
 ========================================================= */
 
 function ouvrirFormulaire() {
+
+    if (
+        !estAdministrateur()
+    ) {
+
+        afficherMessage(
+            "Accès réservé aux administrateurs.",
+            "error"
+        );
+
+        return;
+
+    }
+
 
     if (!statsEditor) {
         return;
@@ -1014,26 +1178,17 @@ function ouvrirFormulaire() {
 
 
     if (statsId) {
-
-        statsId.value =
-            "";
-
+        statsId.value = "";
     }
 
 
     if (statsNom) {
-
-        statsNom.value =
-            "";
-
+        statsNom.value = "";
     }
 
 
     if (statsLien) {
-
-        statsLien.value =
-            "";
-
+        statsLien.value = "";
     }
 
 
@@ -1073,26 +1228,17 @@ function reinitialiserFormulaire() {
 
 
     if (statsId) {
-
-        statsId.value =
-            "";
-
+        statsId.value = "";
     }
 
 
     if (statsNom) {
-
-        statsNom.value =
-            "";
-
+        statsNom.value = "";
     }
 
 
     if (statsLien) {
-
-        statsLien.value =
-            "";
-
+        statsLien.value = "";
     }
 
 
@@ -1133,6 +1279,23 @@ if (statsForm) {
         async event => {
 
             event.preventDefault();
+
+
+            /*
+             * GARDE IMMEDIATE
+             */
+            if (
+                !await exigerAdmin()
+            ) {
+
+                afficherMessage(
+                    "Accès réservé aux administrateurs.",
+                    "error"
+                );
+
+                return;
+
+            }
 
 
             const nom =
@@ -1181,6 +1344,12 @@ if (statsForm) {
 
             try {
 
+                /*
+                 * Vérification juste avant écriture.
+                 */
+                await verifierAdmin();
+
+
                 if (editionId) {
 
                     const {
@@ -1210,7 +1379,8 @@ if (statsForm) {
                         "Icône modifiée."
                     );
 
-                } else {
+                }
+                else {
 
                     const {
                         error
@@ -1256,7 +1426,10 @@ if (statsForm) {
 
 
                 afficherMessage(
-                    "Impossible d'enregistrer l'icône.",
+                    error.message ===
+                        "Accès réservé aux administrateurs."
+                        ? error.message
+                        : "Impossible d'enregistrer l'icône.",
                     "error"
                 );
 
@@ -1286,6 +1459,20 @@ function modifierStatistique(
     id
 ) {
 
+    if (
+        !estAdministrateur()
+    ) {
+
+        afficherMessage(
+            "Accès réservé aux administrateurs.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
     const stat =
         statistiques.find(
             item =>
@@ -1304,34 +1491,22 @@ function modifierStatistique(
 
 
     if (statsId) {
-
-        statsId.value =
-            stat.id;
-
+        statsId.value = stat.id;
     }
 
 
     if (statsNom) {
-
-        statsNom.value =
-            stat.nom || "";
-
+        statsNom.value = stat.nom || "";
     }
 
 
     if (statsLien) {
-
-        statsLien.value =
-            stat.lien || "";
-
+        statsLien.value = stat.lien || "";
     }
 
 
     if (statsEditor) {
-
-        statsEditor.style.display =
-            "block";
-
+        statsEditor.style.display = "block";
     }
 
 
@@ -1363,6 +1538,17 @@ function modifierStatistique(
 async function verifierUtilisation(
     id
 ) {
+
+    if (
+        !await exigerAdmin()
+    ) {
+
+        throw new Error(
+            "Accès réservé aux administrateurs."
+        );
+
+    }
+
 
     const {
         count,
@@ -1414,6 +1600,20 @@ async function verifierUtilisation(
 async function supprimerStatistique(
     id
 ) {
+
+    if (
+        !await exigerAdmin()
+    ) {
+
+        afficherMessage(
+            "Accès réservé aux administrateurs.",
+            "error"
+        );
+
+        return;
+
+    }
+
 
     const stat =
         statistiques.find(
@@ -1486,19 +1686,82 @@ async function supprimerStatistique(
     }
 
 
-    const {
-        error
-    } =
-        await supabase
-            .from("stats")
-            .delete()
-            .eq(
-                "id",
-                id
+    try {
+
+        /*
+         * Vérification finale avant suppression.
+         */
+        await verifierAdmin();
+
+
+        const {
+            error
+        } =
+            await supabase
+                .from("stats")
+                .delete()
+                .eq(
+                    "id",
+                    id
+                );
+
+
+        if (error) {
+
+            console.error(
+                "SUPPRESSION STAT :",
+                error
             );
 
 
-    if (error) {
+            if (
+                error.code ===
+                "23503"
+            ) {
+
+                afficherMessage(
+                    "Impossible de supprimer cette statistique : elle est utilisée par un contenu.",
+                    "error"
+                );
+
+            }
+            else {
+
+                afficherMessage(
+                    "Impossible de supprimer l’icône.",
+                    "error"
+                );
+
+            }
+
+
+            return;
+
+        }
+
+
+        if (
+            String(editionId) ===
+            String(id)
+        ) {
+
+            reinitialiserFormulaire();
+
+        }
+
+
+        await chargerStatistiques();
+
+
+        renderStats();
+
+
+        afficherMessage(
+            "Icône supprimée."
+        );
+
+    }
+    catch (error) {
 
         console.error(
             "SUPPRESSION STAT :",
@@ -1506,50 +1769,15 @@ async function supprimerStatistique(
         );
 
 
-        if (
-            error.code ===
-            "23503"
-        ) {
-
-            afficherMessage(
-                "Impossible de supprimer cette statistique : elle est utilisée par un contenu.",
-                "error"
-            );
-
-        } else {
-
-            afficherMessage(
-                "Impossible de supprimer l’icône.",
-                "error"
-            );
-
-        }
-
-
-        return;
+        afficherMessage(
+            error.message ===
+                "Accès réservé aux administrateurs."
+                ? error.message
+                : "Impossible de supprimer l’icône.",
+            "error"
+        );
 
     }
-
-
-    if (
-        String(editionId) ===
-        String(id)
-    ) {
-
-        reinitialiserFormulaire();
-
-    }
-
-
-    await chargerStatistiques();
-
-
-    renderStats();
-
-
-    afficherMessage(
-        "Icône supprimée."
-    );
 
 }
 
@@ -1563,6 +1791,13 @@ if (statsList) {
     statsList.addEventListener(
         "click",
         event => {
+
+            if (
+                !estAdministrateur()
+            ) {
+                return;
+            }
+
 
             const button =
                 event.target.closest(
@@ -1583,10 +1818,6 @@ if (statsList) {
                 button.dataset.id;
 
 
-            /* =====================================================
-               MODIFIER STATISTIQUE
-            ===================================================== */
-
             if (
                 action ===
                 "edit"
@@ -1601,10 +1832,6 @@ if (statsList) {
             }
 
 
-            /* =====================================================
-               SUPPRIMER STATISTIQUE
-            ===================================================== */
-
             if (
                 action ===
                 "delete"
@@ -1618,10 +1845,6 @@ if (statsList) {
 
             }
 
-
-            /* =====================================================
-               RETIRER STATISTIQUE D'UNE MESURE
-            ===================================================== */
 
             if (
                 action ===
@@ -1678,20 +1901,6 @@ if (statsCancelButton) {
    ACTUALISATION AU CHANGEMENT D'ONGLET
 ========================================================= */
 
-/*
- * admin-tabs.js déclenche l'événement :
- *
- * avantgarde:admin-tab-changed
- *
- * à chaque changement d'onglet.
- *
- * Lorsque l'onglet statsTab devient actif,
- * on recharge les statistiques ET les mesures
- * depuis Supabase, puis on reconstruit l'affichage.
- *
- * Aucun rechargement de la page n'est effectué.
- */
-
 function initialiserEcouteurOnglet() {
 
     if (
@@ -1714,6 +1923,19 @@ function initialiserEcouteurOnglet() {
                 "statsTab"
             ) {
                 return;
+            }
+
+
+            /*
+             * Un non-admin ne doit jamais déclencher
+             * le chargement des données.
+             */
+            if (
+                !estAdministrateur()
+            ) {
+
+                return;
+
             }
 
 
@@ -1753,41 +1975,71 @@ function initialiserEcouteurOnglet() {
 
 
 /* =========================================================
-   INITIALISATION
+   INITIALISATION MODULE
 ========================================================= */
 
-async function initialiser() {
+async function initialiserModule() {
 
-    /*
-     * Installation de l'écouteur AVANT le chargement
-     * initial des données.
-     *
-     * Cela permet ensuite à admin-tabs.js de demander
-     * une actualisation à chaque entrée dans statsTab.
-     */
-    initialiserEcouteurOnglet();
+    if (moduleInitialise) {
+        return;
+    }
 
 
-    try {
+    if (
+        !await exigerAdmin()
+    ) {
 
-        await verifierAdmin();
-
-
+        /*
+         * Non-admin :
+         * aucun chargement de données,
+         * aucun éditeur.
+         */
         if (statsTabButton) {
 
             statsTabButton.style.display =
-                "block";
+                "none";
 
         }
 
 
-        reinitialiserFormulaire();
+        if (statsEditor) {
+
+            statsEditor.style.display =
+                "none";
+
+        }
 
 
-        /*
-         * On charge les statistiques et les mesures
-         * avant le premier rendu.
-         */
+        if (statsList) {
+
+            statsList.innerHTML =
+                "";
+
+        }
+
+
+        return;
+
+    }
+
+
+    moduleInitialise =
+        true;
+
+
+    if (statsTabButton) {
+
+        statsTabButton.style.display =
+            "block";
+
+    }
+
+
+    reinitialiserFormulaire();
+
+
+    try {
+
         await Promise.all([
             chargerStatistiques(),
             chargerMesures()
@@ -1825,7 +2077,54 @@ async function initialiser() {
 
 
 /* =========================================================
+   AUTHENTIFICATION ADMIN
+========================================================= */
+
+/*
+ * admin-core.js déclenche normalement cet événement
+ * après avoir chargé currentProfile.
+ */
+window.addEventListener(
+    "avantgarde:admin-connected",
+    event => {
+
+        const profile =
+            event.detail?.profile ||
+            window.currentProfile;
+
+
+        if (
+            profile?.grade !==
+            "admin"
+        ) {
+
+            return;
+
+        }
+
+
+        initialiserModule();
+
+    }
+);
+
+
+/* =========================================================
    LANCEMENT
 ========================================================= */
 
-initialiser();
+initialiserEcouteurOnglet();
+
+
+/*
+ * Cas où admin-core est déjà initialisé avant
+ * le chargement de ce module.
+ */
+if (
+    window.adminAuthReady &&
+    window.currentProfile
+) {
+
+    initialiserModule();
+
+}
