@@ -16,6 +16,7 @@
    - synergies liées par UUID
    - synergies obligatoirement bidirectionnelles
    - verso HTML
+   - actualisation dynamique lors du changement d'onglet
 ========================================================= */
 
 import { supabase } from "./supabase.js";
@@ -52,6 +53,29 @@ let messageTimer = null;
 
 let selectedSynergyIds = [];
 let currentSynergyContentId = null;
+
+
+/* =========================================================
+   ETAT ACTUALISATION ONGLET
+========================================================= */
+
+/*
+ * L'onglet Page PROJET est piloté par admin-tabs.js.
+ *
+ * admin-tabs.js déclenche :
+ *
+ *     avantgarde:admin-tab-changed
+ *
+ * lorsque l'utilisateur change d'onglet.
+ *
+ * On écoute cet événement afin de relire les données
+ * depuis Supabase lorsque l'utilisateur revient sur
+ * Page PROJET, sans aucun rechargement de la page.
+ */
+
+let adminContenusTabListenerInitialized = false;
+
+let actualisationContenusEnCours = false;
 
 
 /* =========================================================
@@ -697,6 +721,126 @@ async function chargerDonnees() {
         rendreSynergies();
 
     }
+
+}
+
+
+/* =========================================================
+   ACTUALISATION DYNAMIQUE DE L'ONGLET
+========================================================= */
+
+/*
+ * Cette fonction est la correction principale.
+ *
+ * admin-tabs.js ne recharge plus admin.html.
+ *
+ * Il déclenche simplement :
+ *
+ *     avantgarde:admin-tab-changed
+ *
+ * Lorsque l'utilisateur revient sur :
+ *
+ *     contentProjectTab
+ *
+ * nous relisons les données depuis Supabase.
+ *
+ * Résultat :
+ *
+ * - aucun Ctrl + R ;
+ * - aucun rechargement de admin.html ;
+ * - aucun flash de reconnexion ;
+ * - l'arbre Page PROJET est remis à jour ;
+ * - les statistiques sont relues ;
+ * - les synergies sont relues ;
+ * - les données supprimées ou modifiées ailleurs
+ *   apparaissent lors du retour sur l'onglet.
+ */
+
+function initialiserEcouteurOnglet() {
+
+    if (
+        adminContenusTabListenerInitialized
+    ) {
+        return;
+    }
+
+    adminContenusTabListenerInitialized =
+        true;
+
+
+    window.addEventListener(
+        "avantgarde:admin-tab-changed",
+        async event => {
+
+            const onglet =
+                event?.detail?.tab;
+
+            if (
+                onglet !==
+                "contentProjectTab"
+            ) {
+                return;
+            }
+
+
+            /*
+             * Si le module n'est pas encore complètement
+             * authentifié, l'initialisation normale prendra
+             * en charge le premier chargement.
+             */
+
+            if (!currentProfile) {
+                return;
+            }
+
+
+            /*
+             * Protection contre deux actualisations
+             * simultanées provoquées par plusieurs clics.
+             */
+
+            if (
+                actualisationContenusEnCours
+            ) {
+                return;
+            }
+
+
+            actualisationContenusEnCours =
+                true;
+
+
+            try {
+
+                await chargerDonnees();
+
+            }
+            catch (error) {
+
+                console.error(
+                    "CONTENUS — actualisation de l'onglet :",
+                    error
+                );
+
+                showMessage(
+                    "Impossible d'actualiser les contenus : " +
+                    (
+                        error?.message ||
+                        "erreur inconnue"
+                    ),
+                    "error"
+                );
+
+            }
+            finally {
+
+                actualisationContenusEnCours =
+                    false;
+
+            }
+
+        }
+    );
 
 }
 
@@ -5407,6 +5551,18 @@ function verifierStructureDOM() {
 async function initialiser() {
 
     verifierStructureDOM();
+
+
+    /*
+     * IMPORTANT :
+     * On installe l'écouteur du changement d'onglet
+     * dès le début de l'initialisation.
+     *
+     * Ainsi, le module est prêt à recevoir les événements
+     * envoyés par admin-tabs.js dès que possible.
+     */
+
+    initialiserEcouteurOnglet();
 
 
     /*
