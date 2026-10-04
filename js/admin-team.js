@@ -34,6 +34,10 @@ let tousLesMembres = [];
 
 let regionEquipeActive = null;
 
+let adminTeamTabListenerInitialized = false;
+
+let actualisationEquipeEnCours = false;
+
 
 /* =========================================================
 REGIONS
@@ -388,6 +392,118 @@ async function rafraichirAffichageApresChangementGrade2(){
     afficherSelectionDirection();
 
     afficherRegionsEquipe();
+
+}
+
+
+/* =========================================================
+ACTUALISATION DYNAMIQUE DE L'ONGLET
+========================================================= */
+
+/*
+ * admin-tabs.js déclenche l'évènement :
+ *
+ *     avantgarde:admin-tab-changed
+ *
+ * à chaque changement d'onglet.
+ *
+ * Lorsque teamTab devient actif, on recharge entièrement
+ * les membres depuis Supabase puis on reconstruit
+ * l'affichage de l'équipe.
+ *
+ * Aucun rechargement de la page n'est nécessaire.
+ */
+
+function initialiserEcouteurOnglet(){
+
+    if(
+        adminTeamTabListenerInitialized
+    ){
+
+        return;
+
+    }
+
+
+    adminTeamTabListenerInitialized =
+        true;
+
+
+    window.addEventListener(
+        "avantgarde:admin-tab-changed",
+        async event => {
+
+            const onglet =
+                event?.detail?.tab;
+
+
+            if(
+                onglet !==
+                "teamTab"
+            ){
+
+                return;
+
+            }
+
+
+            /*
+             * Evite plusieurs requêtes simultanées
+             * lors de changements d'onglet très rapides.
+             */
+
+            if(
+                actualisationEquipeEnCours
+            ){
+
+                return;
+
+            }
+
+
+            actualisationEquipeEnCours =
+                true;
+
+
+            try{
+
+                await chargerGestionEquipes();
+
+            }
+            catch(error){
+
+                console.error(
+                    "EQUIPES — actualisation de l'onglet :",
+                    error
+                );
+
+
+                const message =
+                    document.getElementById(
+                        "teamMessage"
+                    );
+
+
+                if(message){
+
+                    afficherMessage(
+                        message,
+                        "error",
+                        "Impossible d'actualiser les équipes."
+                    );
+
+                }
+
+            }
+            finally{
+
+                actualisationEquipeEnCours =
+                    false;
+
+            }
+
+        }
+    );
 
 }
 
@@ -2333,6 +2449,13 @@ function mettreAJourMembreLocal(
     }
 
 }
+
+
+/* =========================================================
+INITIALISATION ONGLET
+========================================================= */
+
+initialiserEcouteurOnglet();
 
 
 /* =========================================================
