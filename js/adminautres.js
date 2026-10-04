@@ -37,6 +37,7 @@
    - Ecriture réservée aux profils grade = "admin".
 ========================================================= */
 
+
 import { supabase } from "./supabase.js";
 
 
@@ -47,10 +48,10 @@ import { supabase } from "./supabase.js";
 const CONTENTS = {
 
     manifeste: {
+
         slug: "manifeste",
         titre: "Manifeste",
 
-        editorId: "manifestEditor",
         wysiwygId: "manifestWysiwyg",
         sourceId: "manifestSourceEditor",
 
@@ -68,10 +69,10 @@ const CONTENTS = {
 
 
     inspirations: {
+
         slug: "inspirations",
         titre: "Inspirations",
 
-        editorId: "inspirationsEditor",
         wysiwygId: "inspirationsWysiwyg",
         sourceId: "inspirationsSourceEditor",
 
@@ -109,18 +110,8 @@ const states = {
 };
 
 
-/*
-   Protection contre plusieurs actualisations simultanées
-   lors de changements d'onglet rapprochés.
-*/
-
 let adminAutresTabListenerInitialized = false;
 let actualisationAutresEnCours = false;
-
-
-/*
-   Protection contre plusieurs initialisations du module.
-*/
 
 let adminAutresModuleInitialized = false;
 
@@ -128,18 +119,6 @@ let adminAutresModuleInitialized = false;
 /* =========================================================
    VERIFICATION ADMINISTRATEUR
 ========================================================= */
-
-/*
-   AUTRES PAGES est une zone strictement réservée
-   aux administrateurs.
-
-   Le contrôle repose sur le grade principal du profil.
-
-   Important :
-   cette vérification est faite ici également et ne dépend
-   donc pas uniquement du masquage du bouton dans admin-core.js
-   ou du contrôle de navigation dans admin-tabs.js.
-*/
 
 function estAdministrateur() {
 
@@ -150,13 +129,6 @@ function estAdministrateur() {
 
 }
 
-
-/*
-   Exige les droits administrateur.
-
-   Retourne true si l'opération est autorisée.
-   Retourne false sinon.
-*/
 
 function exigerAdministrateur() {
 
@@ -984,21 +956,12 @@ function insererVideo(
         "";
 
 
-    /*
-       YouTube / Vimeo / URL vidéo :
-       on insère un iframe pour les plateformes
-       et un élément video pour les fichiers directs.
-    */
-
     if (
         cleanUrl.includes(
             "youtube.com"
         ) ||
         cleanUrl.includes(
             "youtu.be"
-        ) ||
-        cleanUrl.includes(
-            "vimeo.com"
         )
     ) {
 
@@ -1015,81 +978,47 @@ function insererVideo(
             const id =
                 cleanUrl
                     .split("youtu.be/")[1]
-                    ?.split(/[?&#]/)[0];
+                    .split(/[?&#]/)[0];
 
-            if (id) {
+            embedUrl =
+                `https://www.youtube.com/embed/${id}`;
 
-                embedUrl =
-                    `https://www.youtube.com/embed/${id}`;
-
-            }
-
-        }
-
-
-        if (
+        } else if (
             cleanUrl.includes(
-                "youtube.com/watch"
-            )
-        ) {
-
-            try {
-
-                const parsed =
-                    new URL(
-                        cleanUrl
-                    );
-
-                const id =
-                    parsed.searchParams.get(
-                        "v"
-                    );
-
-                if (id) {
-
-                    embedUrl =
-                        `https://www.youtube.com/embed/${id}`;
-
-                }
-
-            }
-            catch (error) {
-
-                console.warn(
-                    error
-                );
-
-            }
-
-        }
-
-
-        if (
-            cleanUrl.includes(
-                "vimeo.com/"
-            ) &&
-            !cleanUrl.includes(
-                "player.vimeo.com"
+                "watch?v="
             )
         ) {
 
             const id =
                 cleanUrl
-                    .split("vimeo.com/")[1]
-                    ?.split(/[?&#]/)[0];
+                    .split("watch?v=")[1]
+                    .split(/[&#]/)[0];
 
-            if (id) {
-
-                embedUrl =
-                    `https://player.vimeo.com/video/${id}`;
-
-            }
+            embedUrl =
+                `https://www.youtube.com/embed/${id}`;
 
         }
 
 
         html =
-            `<div class="video-container"><iframe src="${echapperAttribut(embedUrl)}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+            `<iframe src="${echapperAttribut(embedUrl)}" title="Vidéo" frameborder="0" allowfullscreen></iframe>`;
+
+    } else if (
+        cleanUrl.includes(
+            "vimeo.com"
+        )
+    ) {
+
+        const id =
+            cleanUrl
+                .split("vimeo.com/")[1]
+                .split(/[?&#/]/)[0];
+
+        const embedUrl =
+            `https://player.vimeo.com/video/${id}`;
+
+        html =
+            `<iframe src="${echapperAttribut(embedUrl)}" title="Vidéo" frameborder="0" allowfullscreen></iframe>`;
 
     } else {
 
@@ -1114,63 +1043,70 @@ function insererVideo(
 
 
 /* =========================================================
-   ECHAPPEMENT
+   ECHAPPEMENT HTML
 ========================================================= */
 
-function echapperHtml(
-    value
-) {
+function echapperHtml(value) {
 
     return String(
         value ?? ""
     )
-        .replaceAll(
-            "&",
+        .replace(
+            /&/g,
             "&amp;"
         )
-        .replaceAll(
-            "<",
+        .replace(
+            /</g,
             "&lt;"
         )
-        .replaceAll(
-            ">",
+        .replace(
+            />/g,
             "&gt;"
         )
-        .replaceAll(
-            '"',
+        .replace(
+            /"/g,
             "&quot;"
         )
-        .replaceAll(
-            "'",
+        .replace(
+            /'/g,
             "&#039;"
         );
 
 }
 
 
-function echapperAttribut(
-    value
-) {
+function echapperAttribut(value) {
 
-    return echapperHtml(
-        value
-    );
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        );
 
 }
 
 
 /* =========================================================
-   CHARGER UNE LIGNE
+   CHARGEMENT SUPABASE
 ========================================================= */
 
 async function chargerContenu(
     slug
 ) {
-
-    /*
-       SECURITE :
-       aucune lecture de other_contents pour un non-admin.
-    */
 
     if (
         !exigerAdministrateur()
@@ -1178,11 +1114,16 @@ async function chargerContenu(
         return;
     }
 
-
     const config =
         getConfig(slug);
 
-    if (!config) {
+    const state =
+        getState(slug);
+
+    if (
+        !config ||
+        !state
+    ) {
         return;
     }
 
@@ -1204,13 +1145,7 @@ async function chargerContenu(
                     "slug",
                     config.slug
                 )
-                .order(
-                    "id",
-                    {
-                        ascending:true
-                    }
-                )
-                .limit(1);
+                .maybeSingle();
 
 
         if (error) {
@@ -1220,39 +1155,22 @@ async function chargerContenu(
         }
 
 
-        /*
-           Vérification supplémentaire :
-           le profil peut théoriquement changer pendant
-           une requête asynchrone.
-        */
-
         if (
-            !exigerAdministrateur()
+            !estAdministrateur()
         ) {
             return;
         }
 
 
-        const row =
-            Array.isArray(data) &&
-            data.length
-                ? data[0]
-                : null;
-
-
-        states[slug].row =
-            row;
-
-
-        const html =
-            row?.contenu_html ||
-            "";
+        state.row =
+            data || null;
 
 
         chargerDansEditeur(
             slug,
-            html
+            data?.contenu_html || ""
         );
+
 
     }
     catch (error) {
@@ -1263,24 +1181,15 @@ async function chargerContenu(
         );
 
 
-        /*
-           On ne réinjecte pas de contenu en cas
-           de perte des droits pendant le chargement.
-        */
-
         if (
             estAdministrateur()
         ) {
 
-            chargerDansEditeur(
-                slug,
-                ""
-            );
-
-
             showMessage(
                 slug,
-                "Impossible de charger le contenu.",
+                error?.message
+                    ? `Impossible de charger ${config.titre} : ${error.message}`
+                    : `Impossible de charger ${config.titre}.`,
                 "error"
             );
 
@@ -1292,132 +1201,18 @@ async function chargerContenu(
 
 
 /* =========================================================
-   ACTUALISATION DYNAMIQUE ONGLET AUTRES
-========================================================= */
-
-async function actualiserContenusAutres(){
-
-    /*
-       SECURITE :
-       aucune actualisation pour un non-admin.
-    */
-
-    if (
-        !exigerAdministrateur()
-    ) {
-        return;
-    }
-
-
-    if(actualisationAutresEnCours){
-        return;
-    }
-
-
-    actualisationAutresEnCours =
-        true;
-
-
-    try{
-
-        await Promise.all([
-
-            chargerContenu(
-                "manifeste"
-            ),
-
-            chargerContenu(
-                "inspirations"
-            )
-
-        ]);
-
-    }
-    catch(error){
-
-        console.error(
-            "AUTRES — ACTUALISATION ONGLET :",
-            error
-        );
-
-    }
-    finally{
-
-        actualisationAutresEnCours =
-            false;
-
-    }
-
-}
-
-
-/*
-   Initialisation unique de l'écouteur de changement d'onglet.
-*/
-
-function initialiserEcouteurOnglet(){
-
-    if(adminAutresTabListenerInitialized){
-        return;
-    }
-
-
-    adminAutresTabListenerInitialized =
-        true;
-
-
-    window.addEventListener(
-        "avantgarde:admin-tab-changed",
-        async event => {
-
-            const onglet =
-                event?.detail?.tab;
-
-
-            if(onglet !== "contentOtherTab"){
-                return;
-            }
-
-
-            /*
-               Même si quelqu'un déclenche manuellement
-               l'événement, le module reste protégé.
-            */
-
-            if (
-                !exigerAdministrateur()
-            ) {
-                return;
-            }
-
-
-            await actualiserContenusAutres();
-
-        }
-    );
-
-}
-
-
-/* =========================================================
-   ENREGISTRER
+   ENREGISTREMENT
 ========================================================= */
 
 async function enregistrerContenu(
     slug
 ) {
 
-    /*
-       SECURITE :
-       aucune écriture Supabase pour un non-admin.
-    */
-
     if (
         !exigerAdministrateur()
     ) {
         return;
     }
-
 
     const config =
         getConfig(slug);
@@ -1432,6 +1227,7 @@ async function enregistrerContenu(
         return;
     }
 
+
     const saveButton =
         getElement(
             config.saveButtonId
@@ -1444,22 +1240,6 @@ async function enregistrerContenu(
         );
 
 
-    if (
-        !html.trim()
-    ) {
-
-        const confirmation =
-            window.confirm(
-                `Le contenu de ${config.titre} est vide. Voulez-vous vraiment enregistrer ?`
-            );
-
-        if (!confirmation) {
-            return;
-        }
-
-    }
-
-
     if (saveButton) {
 
         saveButton.disabled =
@@ -1470,34 +1250,16 @@ async function enregistrerContenu(
 
     try {
 
-        /*
-           Vérification juste avant l'opération
-           Supabase.
-        */
-
         if (
-            !exigerAdministrateur()
+            !estAdministrateur()
         ) {
             return;
         }
 
 
         const now =
-            new Date()
-                .toISOString();
+            new Date().toISOString();
 
-
-        /*
-           Si la ligne existe déjà :
-           UPDATE par son ID.
-
-           Sinon :
-           INSERT avec le slug et le titre.
-
-           On ne fait volontairement pas d'upsert :
-           cela évite d'exiger une contrainte UNIQUE
-           sur slug.
-        */
 
         if (
             state.row &&
@@ -1542,12 +1304,6 @@ async function enregistrerContenu(
             }
 
 
-            /*
-               Vérification des droits après écriture.
-               On ne modifie pas l'état local si le profil
-               n'est plus administrateur.
-            */
-
             if (
                 !estAdministrateur()
             ) {
@@ -1580,10 +1336,6 @@ async function enregistrerContenu(
             }
 
         } else {
-
-            /*
-               Nouvelle vérification avant INSERT.
-            */
 
             if (
                 !exigerAdministrateur()
@@ -1641,11 +1393,6 @@ async function enregistrerContenu(
         }
 
 
-        /*
-           On resynchronise les deux modes
-           après l'enregistrement.
-        */
-
         chargerDansEditeur(
             slug,
             html
@@ -1702,12 +1449,6 @@ async function enregistrerContenu(
 async function annulerContenu(
     slug
 ) {
-
-    /*
-       L'annulation recharge également les données
-       depuis l'état déjà chargé : elle reste donc
-       réservée à l'administrateur.
-    */
 
     if (
         !exigerAdministrateur()
@@ -1783,11 +1524,6 @@ function initialiserToolbar(
         return;
     }
 
-
-    /*
-       Evite les doubles listeners si le module
-       est réinitialisé après authentification.
-    */
 
     if (
         toolbar.dataset.adminAutresInitialized ===
@@ -1949,10 +1685,6 @@ function initialiserBoutons(
             config.sourceId
         );
 
-
-    /*
-       Protection contre les doubles listeners.
-    */
 
     const editorAlreadyInitialized =
         wysiwyg?.dataset.adminAutresInitialized ===
@@ -2307,11 +2039,6 @@ async function initialiserEditeur(
     slug
 ) {
 
-    /*
-       Aucun éditeur AUTRES PAGES n'est initialisé
-       pour un non-admin.
-    */
-
     if (
         !exigerAdministrateur()
     ) {
@@ -2327,12 +2054,47 @@ async function initialiserEditeur(
     }
 
 
-    const editor =
+    /*
+       CORRECTION :
+
+       Il n'existe pas de conteneur
+       "manifestEditor" ou "inspirationsEditor"
+       dans admin.html.
+
+       Les éditeurs réels sont directement :
+       - manifestWysiwyg / manifestSourceEditor
+       - inspirationsWysiwyg / inspirationsSourceEditor
+
+       On vérifie donc directement les éléments
+       réellement utilisés.
+    */
+
+    const wysiwyg =
         getElement(
-            config.editorId
+            config.wysiwygId
         );
 
-    if (!editor) {
+    const source =
+        getElement(
+            config.sourceId
+        );
+
+    if (
+        !wysiwyg ||
+        !source
+    ) {
+
+        console.error(
+            `AUTRES PAGES : éditeur introuvable pour ${slug}.`,
+            {
+                wysiwygId:
+                    config.wysiwygId,
+
+                sourceId:
+                    config.sourceId
+            }
+        );
+
         return;
     }
 
@@ -2354,23 +2116,135 @@ async function initialiserEditeur(
 
 
 /* =========================================================
+   ACTUALISATION AU CHANGEMENT D'ONGLET
+========================================================= */
+
+async function actualiserAutresPages() {
+
+    if (
+        actualisationAutresEnCours
+    ) {
+        return;
+    }
+
+
+    if (
+        !exigerAdministrateur()
+    ) {
+        return;
+    }
+
+
+    const contentOtherTab =
+        getElement(
+            "contentOtherTab"
+        );
+
+    if (
+        !contentOtherTab
+    ) {
+        return;
+    }
+
+
+    actualisationAutresEnCours =
+        true;
+
+
+    try {
+
+        await Promise.all([
+
+            chargerContenu(
+                "manifeste"
+            ),
+
+            chargerContenu(
+                "inspirations"
+            )
+
+        ]);
+
+    }
+    finally {
+
+        actualisationAutresEnCours =
+            false;
+
+    }
+
+}
+
+
+/* =========================================================
+   ECOUTEUR CHANGEMENT ONGLET
+========================================================= */
+
+function initialiserEcouteurOnglet() {
+
+    if (
+        adminAutresTabListenerInitialized
+    ) {
+        return;
+    }
+
+
+    adminAutresTabListenerInitialized =
+        true;
+
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            const button =
+                event.target.closest(
+                    "[data-tab], .tab-button, .admin-tab"
+                );
+
+            if (!button) {
+                return;
+            }
+
+
+            const tab =
+                button.dataset.tab ||
+                button.getAttribute(
+                    "data-tab"
+                );
+
+
+            if (
+                tab !==
+                "contentOtherTab"
+            ) {
+                return;
+            }
+
+
+            setTimeout(
+                () => {
+
+                    actualiserAutresPages();
+
+                },
+                0
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
    INITIALISATION GENERALE
 ========================================================= */
 
 async function initialiser() {
 
-    /*
-       L'écouteur doit être installé même si le profil
-       n'est pas encore disponible.
-    */
-
     initialiserEcouteurOnglet();
 
-
-    /*
-       Si l'authentification n'est pas terminée,
-       on attend l'événement admin-connected.
-    */
 
     if (
         !window.adminAuthReady
@@ -2379,21 +2253,12 @@ async function initialiser() {
     }
 
 
-    /*
-       Le module ne doit jamais être initialisé
-       pour un profil non-admin.
-    */
-
     if (
         !estAdministrateur()
     ) {
         return;
     }
 
-
-    /*
-       Protection contre les doubles initialisations.
-    */
 
     if (
         adminAutresModuleInitialized
@@ -2435,15 +2300,6 @@ async function initialiser() {
    AUTHENTIFICATION
 ========================================================= */
 
-/*
-   adminautres.js peut être chargé avant admin-auth.js.
-
-   On attend donc l'événement officiel de connexion.
-
-   Le profil transmis par l'événement est également
-   recopié dans currentProfile si nécessaire.
-*/
-
 window.addEventListener(
     "avantgarde:admin-connected",
     event => {
@@ -2472,14 +2328,6 @@ window.addEventListener(
         }
 
 
-        /*
-           admin-auth.js doit normalement avoir placé
-           adminAuthReady à true avant cet événement.
-           Le setTimeout garantit que les autres modules
-           ayant le même événement ont pu terminer leur
-           synchronisation.
-        */
-
         setTimeout(
             () => {
 
@@ -2506,19 +2354,11 @@ if (
         "DOMContentLoaded",
         () => {
 
-            /*
-               Installation de l'écouteur dès que possible.
-               Si l'authentification est déjà prête,
-               initialiser() démarre immédiatement.
-               Sinon l'événement admin-connected prendra
-               le relais.
-            */
-
             initialiser();
 
         },
         {
-            once:true
+            once: true
         }
     );
 
