@@ -98,11 +98,22 @@
    ONGLETS TOUJOURS VISIBLES
 ======================================================= */
 
+/*
+   RDV et ROLE sont gérés par leurs propres
+   fonctions de permissions dans admin-core.js.
+
+   Page PROJET, Autres Pages et Effets Mesures
+   sont strictement réservés aux administrateurs
+   et doivent rester contrôlés par JavaScript.
+
+   IMPORTANT :
+   Ne pas remettre !important sur ces trois onglets,
+   car cela écraserait le display:none appliqué
+   aux utilisateurs non-admin.
+*/
+
 #rdvTabButton,
-#roleTabButton,
-#contentProjectTabButton,
-#contentOtherTabButton,
-#statsTabButton {
+#roleTabButton {
     display:block !important;
 }
 
@@ -1383,12 +1394,6 @@
         <div
             id="nationalResults"
             class="team-search-results"
-        ></div>
-
-
-        <div
-            id="nationalSelected"
-            class="team-selected"
         ></div>
 
 
