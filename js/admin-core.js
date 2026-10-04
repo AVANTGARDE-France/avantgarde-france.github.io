@@ -1093,6 +1093,89 @@ function actualiserAccesContenuProjet() {
 
 
 /* =========================================================
+ACCES ONGLET AUTRES PAGES
+========================================================= */
+
+/*
+   AUTRES PAGES est réservé aux administrateurs.
+
+   Cet onglet contient notamment :
+
+   - MANIFESTE
+   - INSPIRATIONS
+
+   Il ne doit être accessible ni en lecture
+   ni en modification par les profils non-admin.
+*/
+
+function actualiserAccesContenuAutres() {
+
+    const button =
+        document.getElementById(
+            "contentOtherTabButton"
+        );
+
+
+    if (!button) {
+
+        return;
+
+    }
+
+
+    const autorise =
+        window.currentProfile?.grade ===
+        "admin";
+
+
+    button.style.display =
+        autorise
+            ? ""
+            : "none";
+
+}
+
+
+/* =========================================================
+ACCES ONGLET EFFETS MESURES
+========================================================= */
+
+/*
+   EFFETS MESURES est réservé aux administrateurs.
+
+   Cet onglet correspond à la bibliothèque des
+   statistiques / icônes utilisées par les mesures.
+*/
+
+function actualiserAccesEffetsMesures() {
+
+    const button =
+        document.getElementById(
+            "statsTabButton"
+        );
+
+
+    if (!button) {
+
+        return;
+
+    }
+
+
+    const autorise =
+        window.currentProfile?.grade ===
+        "admin";
+
+
+    button.style.display =
+        autorise
+            ? ""
+            : "none";
+
+}
+
+
+/* =========================================================
 ACTUALISER LES ACCES
 ========================================================= */
 
@@ -1105,6 +1188,10 @@ function actualiserAccesAdmin() {
     actualiserAccesEquipes();
 
     actualiserAccesContenuProjet();
+
+    actualiserAccesContenuAutres();
+
+    actualiserAccesEffetsMesures();
 
 }
 
@@ -1124,6 +1211,12 @@ window.actualiserAccesEquipes =
 
 window.actualiserAccesContenuProjet =
     actualiserAccesContenuProjet;
+
+window.actualiserAccesContenuAutres =
+    actualiserAccesContenuAutres;
+
+window.actualiserAccesEffetsMesures =
+    actualiserAccesEffetsMesures;
 
 window.actualiserAccesAdmin =
     actualiserAccesAdmin;
@@ -1244,7 +1337,10 @@ export {
 
     actualiserAccesContenuProjet,
 
+    actualiserAccesContenuAutres,
+
+    actualiserAccesEffetsMesures,
+
     actualiserAccesAdmin
 
 };
-
