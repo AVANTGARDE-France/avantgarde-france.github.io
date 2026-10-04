@@ -63,6 +63,13 @@ let moduleInitialise = false;
 let authVerifiee = false;
 
 
+/*
+ * Indique qu'une initialisation est en attente
+ * de la fin du chargement de l'authentification.
+ */
+let initialisationEnAttente = false;
+
+
 /* =========================================================
    ELEMENTS
 ========================================================= */
@@ -179,10 +186,12 @@ function afficherMessage(
  * Cette fonction ne considère PAS l'absence de profil
  * comme une autorisation.
  */
-function estAdministrateur() {
+function estAdministrateur(
+    profile = window.currentProfile
+) {
 
     return (
-        window.currentProfile?.grade ===
+        profile?.grade ===
         "admin"
     );
 
@@ -312,14 +321,43 @@ async function verifierAdmin() {
    GARDE MODULE
 ========================================================= */
 
+/*
+ * Garde locale stricte.
+ *
+ * IMPORTANT :
+ * L'absence de profil ne vaut JAMAIS autorisation.
+ *
+ * Si l'authentification n'est pas encore prête,
+ * cette fonction refuse l'accès au lieu de lancer
+ * prématurément une requête métier.
+ */
+function accesAdminLocalDisponible() {
+
+    if (
+        !window.adminAuthReady
+    ) {
+
+        return false;
+
+    }
+
+
+    return estAdministrateur();
+
+}
+
+
+/*
+ * Vérification utilisée pour les opérations sensibles.
+ */
 async function exigerAdmin() {
 
     /*
      * Premier niveau :
-     * profil déjà chargé.
+     * profil déjà chargé et authentification prête.
      */
     if (
-        estAdministrateur()
+        accesAdminLocalDisponible()
     ) {
 
         authVerifiee = true;
@@ -331,7 +369,24 @@ async function exigerAdmin() {
 
     /*
      * Si l'authentification n'est pas encore prête,
-     * on vérifie directement auprès de Supabase.
+     * on ne doit pas lancer les opérations métier.
+     *
+     * L'initialisation attendra l'événement
+     * avantgarde:admin-connected.
+     */
+    if (
+        !window.adminAuthReady
+    ) {
+
+        return false;
+
+    }
+
+
+    /*
+     * Si l'authentification est prête mais que le profil
+     * local n'autorise pas l'accès, on effectue une
+     * vérification renforcée.
      */
     try {
 
@@ -1941,6 +1996,18 @@ function initialiserEcouteurOnglet() {
 
             try {
 
+                /*
+                 * Vérification avant actualisation.
+                 */
+                if (
+                    !await exigerAdmin()
+                ) {
+
+                    return;
+
+                }
+
+
                 await Promise.all([
 
                     chargerStatistiques(),
@@ -1975,6 +2042,53 @@ function initialiserEcouteurOnglet() {
 
 
 /* =========================================================
+   MASQUAGE NON-ADMIN
+========================================================= */
+
+function appliquerProtectionNonAdmin() {
+
+    /*
+     * Le module ne doit rien laisser apparaître
+     * pour un profil non administrateur.
+     */
+
+    if (statsTabButton) {
+
+        statsTabButton.style.display =
+            "none";
+
+    }
+
+
+    if (statsEditor) {
+
+        statsEditor.style.display =
+            "none";
+
+    }
+
+
+    if (statsList) {
+
+        statsList.innerHTML =
+            "";
+
+    }
+
+
+    statistiques =
+        [];
+
+    mesures =
+        [];
+
+    editionId =
+        null;
+
+}
+
+
+/* =========================================================
    INITIALISATION MODULE
 ========================================================= */
 
@@ -1985,38 +2099,52 @@ async function initialiserModule() {
     }
 
 
+    /*
+     * Tant que l'authentification n'est pas prête,
+     * on ne fait aucune requête métier.
+     */
+    if (
+        !window.adminAuthReady
+    ) {
+
+        initialisationEnAttente =
+            true;
+
+        return;
+
+    }
+
+
+    /*
+     * Le profil est maintenant connu.
+     *
+     * Un non-admin est définitivement refusé.
+     */
+    if (
+        !estAdministrateur()
+    ) {
+
+        initialisationEnAttente =
+            false;
+
+        appliquerProtectionNonAdmin();
+
+        return;
+
+    }
+
+
+    /*
+     * Double vérification avant initialisation.
+     */
     if (
         !await exigerAdmin()
     ) {
 
-        /*
-         * Non-admin :
-         * aucun chargement de données,
-         * aucun éditeur.
-         */
-        if (statsTabButton) {
+        initialisationEnAttente =
+            false;
 
-            statsTabButton.style.display =
-                "none";
-
-        }
-
-
-        if (statsEditor) {
-
-            statsEditor.style.display =
-                "none";
-
-        }
-
-
-        if (statsList) {
-
-            statsList.innerHTML =
-                "";
-
-        }
-
+        appliquerProtectionNonAdmin();
 
         return;
 
@@ -2025,6 +2153,9 @@ async function initialiserModule() {
 
     moduleInitialise =
         true;
+
+    initialisationEnAttente =
+        false;
 
 
     if (statsTabButton) {
@@ -2083,6 +2214,8 @@ async function initialiserModule() {
 /*
  * admin-core.js déclenche normalement cet événement
  * après avoir chargé currentProfile.
+ *
+ * Le module ne se lance qu'après réception du profil.
  */
 window.addEventListener(
     "avantgarde:admin-connected",
@@ -2093,14 +2226,33 @@ window.addEventListener(
             window.currentProfile;
 
 
+        /*
+         * Mise à jour de l'état partagé si nécessaire.
+         *
+         * On ne remplace pas currentProfile :
+         * admin-core.js en reste la source officielle.
+         */
         if (
             profile?.grade !==
             "admin"
         ) {
 
+            initialisationEnAttente =
+                false;
+
+            appliquerProtectionNonAdmin();
+
             return;
 
         }
+
+
+        /*
+         * L'événement confirme que le profil admin
+         * est maintenant disponible.
+         */
+        authVerifiee =
+            true;
 
 
         initialiserModule();
@@ -2119,10 +2271,13 @@ initialiserEcouteurOnglet();
 /*
  * Cas où admin-core est déjà initialisé avant
  * le chargement de ce module.
+ *
+ * IMPORTANT :
+ * Aucun appel à initialiserModule() n'est effectué
+ * avant que adminAuthReady soit vrai.
  */
 if (
-    window.adminAuthReady &&
-    window.currentProfile
+    window.adminAuthReady
 ) {
 
     initialiserModule();
