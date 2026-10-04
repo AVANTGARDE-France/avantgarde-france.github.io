@@ -15,6 +15,159 @@
 
 
 /* =========================================================
+   ACTUALISATION DYNAMIQUE DE L'ONGLET PROFIL
+========================================================= */
+
+let adminProfileTabListenerInitialized = false;
+let actualisationProfilEnCours = false;
+
+
+/*
+   Recharge le profil courant directement depuis Supabase.
+
+   Cette fonction permet de récupérer les éventuelles
+   modifications effectuées depuis le dernier chargement
+   de l'espace membre, sans recharger la page.
+*/
+
+async function actualiserProfilDepuisSupabase(){
+
+  if(!currentUser?.id){
+    return;
+  }
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from("profiles")
+      .select("*")
+      .eq(
+        "id",
+        currentUser.id
+      )
+      .single();
+
+
+  if(error){
+
+    console.error(
+      "PROFIL — ACTUALISATION SUPABASE :",
+      error
+    );
+
+    return;
+
+  }
+
+
+  if(!data){
+    return;
+  }
+
+
+  /*
+    Mise à jour du profil global.
+
+    On conserve également la référence window.currentProfile
+    afin que les autres modules de l'espace membre utilisent
+    immédiatement les nouvelles données.
+  */
+
+  currentProfile =
+    data;
+
+  window.currentProfile =
+    data;
+
+
+  /*
+    Reconstruction complète de l'affichage du profil.
+  */
+
+  remplirProfil(
+    data
+  );
+
+}
+
+
+/*
+   Initialisation unique de l'écouteur de changement d'onglet.
+*/
+
+function initialiserEcouteurOngletProfil(){
+
+  if(adminProfileTabListenerInitialized){
+    return;
+  }
+
+
+  adminProfileTabListenerInitialized =
+    true;
+
+
+  window.addEventListener(
+    "avantgarde:admin-tab-changed",
+    async event => {
+
+      const onglet =
+        event?.detail?.tab;
+
+
+      if(onglet !== "profileTab"){
+        return;
+      }
+
+
+      if(!currentUser?.id){
+        return;
+      }
+
+
+      /*
+        Évite plusieurs requêtes simultanées si plusieurs
+        événements sont déclenchés très rapidement.
+      */
+
+      if(actualisationProfilEnCours){
+        return;
+      }
+
+
+      actualisationProfilEnCours =
+        true;
+
+
+      try{
+
+        await actualiserProfilDepuisSupabase();
+
+      }
+      catch(error){
+
+        console.error(
+          "PROFIL — ACTUALISATION ONGLET :",
+          error
+        );
+
+      }
+      finally{
+
+        actualisationProfilEnCours =
+          false;
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
    COMPTEUR DESCRIPTION
 ========================================================= */
 
@@ -895,6 +1048,9 @@ profileForm.addEventListener(
     currentProfile =
       data;
 
+    window.currentProfile =
+      data;
+
 
     /*
       Si le poste régional vient d'être supprimé,
@@ -1116,3 +1272,10 @@ profileForm.addEventListener(
 
 window.remplirProfil =
   remplirProfil;
+
+
+/* =========================================================
+   INITIALISATION ÉCOUTEUR ONGLET PROFIL
+========================================================= */
+
+initialiserEcouteurOngletProfil();
