@@ -401,6 +401,232 @@ function initialiserCompteurDescription() {
 
 
 /* =========================================================
+   ACTUALISATION DU PROFIL POUR L'ONGLET ROLE
+========================================================= */
+
+/*
+ * Le panneau ROLE utilise window.currentProfile.
+ *
+ * Lorsque le profil a été modifié ailleurs dans l'espace
+ * membre, cette variable peut ne plus correspondre aux
+ * données actuellement présentes dans Supabase.
+ *
+ * A chaque entrée dans roleTab, on relit donc le profil
+ * courant puis on resynchronise l'affichage.
+ */
+
+async function actualiserProfilRole() {
+
+    const currentUser =
+        obtenirCurrentUser();
+
+
+    if (
+        !currentUser
+    ) {
+
+        return;
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+
+            .from("profiles")
+
+            .select("*")
+
+            .eq(
+                "id",
+                currentUser.id
+            )
+
+            .single();
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "ROLE — erreur actualisation profil :",
+            error
+        );
+
+
+        return;
+
+    }
+
+
+    if (
+        !data
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+     * Mise à jour du profil global.
+     */
+
+    window.currentProfile =
+        data;
+
+
+    /*
+     * Resynchronisation des compétences
+     * et des rôles affichés.
+     */
+
+    synchroniserCompetencesEtRoles(
+        data.competences
+    );
+
+
+    /*
+     * Mise à jour éventuelle de la médaille VIP.
+     *
+     * Plusieurs noms de colonnes ont pu être utilisés
+     * dans les différentes parties de l'espace membre.
+     * On conserve donc une lecture souple.
+     */
+
+    mettreAJourMedailleVIP(
+        data.audience_max ??
+        data.audienceMax ??
+        data.audience ??
+        0
+    );
+
+
+    /*
+     * Le compteur de description dépend lui aussi
+     * de la valeur éventuellement actualisée.
+     */
+
+    const descriptionField =
+        document.getElementById(
+            "profileDescription"
+        );
+
+
+    if (
+        descriptionField &&
+        typeof data.description === "string"
+    ) {
+
+        descriptionField.value =
+            data.description;
+
+    }
+
+
+    initialiserCompteurDescription();
+
+}
+
+
+/* =========================================================
+   ACTUALISATION DYNAMIQUE DE L'ONGLET
+========================================================= */
+
+let adminRoleTabListenerInitialized =
+    false;
+
+let actualisationRoleEnCours =
+    false;
+
+
+/*
+ * admin-tabs.js déclenche :
+ *
+ *     avantgarde:admin-tab-changed
+ *
+ * lorsqu'un onglet devient actif.
+ *
+ * ROLE doit donc relire le profil courant chaque fois
+ * que roleTab devient actif.
+ */
+
+function initialiserEcouteurOnglet() {
+
+    if (
+        adminRoleTabListenerInitialized
+    ) {
+
+        return;
+    }
+
+
+    adminRoleTabListenerInitialized =
+        true;
+
+
+    window.addEventListener(
+        "avantgarde:admin-tab-changed",
+        async event => {
+
+            const onglet =
+                event?.detail?.tab;
+
+
+            if (
+                onglet !==
+                "roleTab"
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                actualisationRoleEnCours
+            ) {
+
+                return;
+
+            }
+
+
+            actualisationRoleEnCours =
+                true;
+
+
+            try {
+
+                await actualiserProfilRole();
+
+            }
+            catch (error) {
+
+                console.error(
+                    "ROLE — actualisation de l'onglet :",
+                    error
+                );
+
+            }
+            finally {
+
+                actualisationRoleEnCours =
+                    false;
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =========================================================
    SAUVEGARDE DES ROLES
 ========================================================= */
 
@@ -668,6 +894,7 @@ async function sauvegarderRoles() {
     /*
      * Resynchronisation immédiate
      * de l'affichage.
+
      */
 
     synchroniserCompetencesEtRoles(
@@ -743,6 +970,14 @@ window.sauvegarderRoles =
 ========================================================= */
 
 function initialiserRole() {
+
+    /*
+     * Installe l'écouteur avant toute interaction
+     * avec l'onglet ROLE.
+     */
+
+    initialiserEcouteurOnglet();
+
 
     const saveRolesButton =
         document.getElementById(
