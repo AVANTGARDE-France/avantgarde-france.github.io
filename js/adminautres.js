@@ -19,6 +19,7 @@
    - vidéo
    - enregistrement Supabase
    - annulation / rechargement
+   - actualisation dynamique lors du changement d'onglet
 
    Table :
    other_contents
@@ -101,6 +102,15 @@ const states = {
     }
 
 };
+
+
+/*
+   Protection contre plusieurs actualisations simultanées
+   lors de changements d'onglet rapprochés.
+*/
+
+let adminAutresTabListenerInitialized = false;
+let actualisationAutresEnCours = false;
 
 
 /* =========================================================
@@ -1068,6 +1078,90 @@ async function chargerContenu(
 
 
 /* =========================================================
+   ACTUALISATION DYNAMIQUE ONGLET AUTRES
+========================================================= */
+
+async function actualiserContenusAutres(){
+
+    if(actualisationAutresEnCours){
+        return;
+    }
+
+
+    actualisationAutresEnCours =
+        true;
+
+
+    try{
+
+        await Promise.all([
+
+            chargerContenu(
+                "manifeste"
+            ),
+
+            chargerContenu(
+                "inspirations"
+            )
+
+        ]);
+
+    }
+    catch(error){
+
+        console.error(
+            "AUTRES — ACTUALISATION ONGLET :",
+            error
+        );
+
+    }
+    finally{
+
+        actualisationAutresEnCours =
+            false;
+
+    }
+
+}
+
+
+/*
+   Initialisation unique de l'écouteur de changement d'onglet.
+*/
+
+function initialiserEcouteurOnglet(){
+
+    if(adminAutresTabListenerInitialized){
+        return;
+    }
+
+
+    adminAutresTabListenerInitialized =
+        true;
+
+
+    window.addEventListener(
+        "avantgarde:admin-tab-changed",
+        async event => {
+
+            const onglet =
+                event?.detail?.tab;
+
+
+            if(onglet !== "contentOtherTab"){
+                return;
+            }
+
+
+            await actualiserContenusAutres();
+
+        }
+    );
+
+}
+
+
+/* =========================================================
    ENREGISTRER
 ========================================================= */
 
@@ -1774,6 +1868,14 @@ async function initialiserEditeur(
 ========================================================= */
 
 async function initialiser() {
+
+    /*
+       Initialisation de l'écouteur AVANT le chargement
+       initial des contenus.
+    */
+
+    initialiserEcouteurOnglet();
+
 
     /*
        Le module est chargé après le HTML.
