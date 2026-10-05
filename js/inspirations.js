@@ -3,33 +3,19 @@
 
    js/inspirations.js
 
-   Gestion de la page publique INSPIRATIONS.
+   Les inspirations sont normalement pré-rendues
+   directement dans inspirations.html.
 
-   Source :
-   - Table Supabase : other_contents
-   - slug : inspirations
-
-   Le contenu HTML est rédigé dans le back-office
-   AUTRES PAGES puis affiché publiquement ici.
-
-   Aucune fonction d'administration.
+   Le JavaScript sert uniquement de fallback.
 ========================================================= */
 
 
 import { supabase } from "./supabase.js";
 
 
-/* =========================================================
-   CONFIGURATION
-========================================================= */
-
 const SLUG =
     "inspirations";
 
-
-/* =========================================================
-   ELEMENTS
-========================================================= */
 
 const titleElement =
     document.getElementById(
@@ -44,13 +30,60 @@ const contentElement =
 
 
 /* =========================================================
-   CHARGEMENT DU CONTENU
+   VERIFICATION DU PRE-RENDU
+========================================================= */
+
+function contenuPreRenduDisponible() {
+
+    if (!contentElement) {
+        return false;
+    }
+
+
+    const html =
+        contentElement.innerHTML
+            ?.trim();
+
+
+    if (!html) {
+        return false;
+    }
+
+
+    return (
+        !contentElement.querySelector(
+            ".editorial-loading"
+        )
+    );
+
+}
+
+
+/* =========================================================
+   FALLBACK SUPABASE
 ========================================================= */
 
 async function chargerInspirations() {
 
     if (!contentElement) {
         return;
+    }
+
+
+    /*
+       Fonctionnement normal :
+
+       le HTML contient déjà le contenu.
+
+       Aucun appel Supabase n'est donc effectué.
+    */
+
+    if (
+        contenuPreRenduDisponible()
+    ) {
+
+        return;
+
     }
 
 
@@ -61,7 +94,9 @@ async function chargerInspirations() {
             error
         } =
             await supabase
-                .from("other_contents")
+                .from(
+                    "other_contents"
+                )
                 .select(
                     "id, slug, titre, contenu_html, updated_at"
                 )
@@ -79,9 +114,7 @@ async function chargerInspirations() {
 
 
         if (error) {
-
             throw error;
-
         }
 
 
@@ -103,11 +136,6 @@ async function chargerInspirations() {
         }
 
 
-        /*
-           Le titre enregistré dans Supabase
-           devient le titre de la page.
-        */
-
         if (
             titleElement &&
             contenu.titre
@@ -119,22 +147,9 @@ async function chargerInspirations() {
         }
 
 
-        /*
-           Le HTML provenant du back-office
-           est volontairement rendu comme HTML.
-
-           Le contenu est administré depuis
-           l'espace membre.
-        */
-
         contentElement.innerHTML =
             contenu.contenu_html || "";
 
-
-        /*
-           Si la ligne existe mais ne contient
-           aucun contenu.
-        */
 
         if (
             !contenu.contenu_html ||
@@ -178,7 +193,8 @@ function afficherErreur(
     }
 
 
-    contentElement.innerHTML = "";
+    contentElement.innerHTML =
+        "";
 
 
     const element =
@@ -219,7 +235,8 @@ if (
         }
     );
 
-} else {
+}
+else {
 
     chargerInspirations();
 
