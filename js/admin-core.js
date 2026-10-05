@@ -955,6 +955,19 @@ function actualiserAccesRDV() {
         window.peutGererRendezVous();
 
 
+    /*
+       IMPORTANT :
+
+       On utilise hidden EN PLUS de display:none.
+
+       Cela garantit que l'onglet reste réellement masqué
+       même si une autre règle CSS tente de lui appliquer
+       un display:block ou un autre display.
+    */
+
+    button.hidden =
+        !autorise;
+
     button.style.display =
         autorise
             ? ""
@@ -990,6 +1003,9 @@ function actualiserAccesRole() {
 
         window.peutGererRole();
 
+
+    button.hidden =
+        !autorise;
 
     button.style.display =
         autorise
@@ -1045,6 +1061,9 @@ function actualiserAccesEquipes() {
     );
 
 
+    button.hidden =
+        !autorise;
+
     button.style.display =
         autorise
             ? ""
@@ -1083,6 +1102,9 @@ function actualiserAccesContenuProjet() {
         window.currentProfile?.grade ===
         "admin";
 
+
+    button.hidden =
+        !autorise;
 
     button.style.display =
         autorise
@@ -1128,6 +1150,9 @@ function actualiserAccesContenuAutres() {
         "admin";
 
 
+    button.hidden =
+        !autorise;
+
     button.style.display =
         autorise
             ? ""
@@ -1166,6 +1191,9 @@ function actualiserAccesEffetsMesures() {
         window.currentProfile?.grade ===
         "admin";
 
+
+    button.hidden =
+        !autorise;
 
     button.style.display =
         autorise
@@ -1221,6 +1249,9 @@ function appliquerMasquageOngletsAdmin() {
 
             }
 
+
+            button.hidden =
+                !admin;
 
             button.style.display =
                 admin
