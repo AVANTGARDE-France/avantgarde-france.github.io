@@ -9,17 +9,19 @@
    - normalisation des compétences
    - affichage des rôles
    - sauvegarde des rôles
+   - nettoyage automatique des rôles
    - médaille VIP
    - compteur de description
 
-   IMPORTANT :
-   Le panneau ROLE est un espace personnel.
-   Il est donc accessible à tout membre connecté,
-   quel que soit son grade ou grade2.
+   REGLES :
 
-   Les fonctions utilisées par les autres modules sont
-   exposées sur window afin de conserver le comportement
-   du monolithe après séparation en modules ES.
+   - Un membre sans grade2 n'a PAS accès à ROLE.
+   - Un membre sans grade2 ne peut PAS modifier ses rôles.
+   - Lorsqu'un grade2 est supprimé, les anciens rôles sont
+     automatiquement retirés de profiles.competences.
+   - Les compétences métier sont conservées.
+   - Tout membre possédant un grade2 possède automatiquement
+     le rôle "Militants".
 ========================================================= */
 
 import { supabase } from "./supabase.js";
@@ -68,7 +70,14 @@ function normaliserCompetences(value) {
 
     if (Array.isArray(value)) {
 
-        return value;
+        return value
+            .map(
+                competence =>
+                    typeof competence === "string"
+                        ? competence.trim()
+                        : competence
+            )
+            .filter(Boolean);
     }
 
 
@@ -96,36 +105,246 @@ function normaliserCompetences(value) {
 
 
 /* =========================================================
+   TEST GRADE2
+========================================================= */
+
+function possedeGrade2(profile = obtenirCurrentProfile()) {
+
+    if (!profile) {
+
+        return false;
+    }
+
+
+    return !!(
+        profile.grade2 !== null &&
+        profile.grade2 !== undefined &&
+        String(profile.grade2).trim() !== ""
+    );
+}
+
+
+/* =========================================================
    ACCES ROLE
 ========================================================= */
 
 /*
- * IMPORTANT :
+ * ROLE n'est PAS accessible à tous les membres connectés.
  *
- * ROLE est un espace personnel.
+ * Un grade2 est nécessaire.
  *
- * Tous les membres connectés peuvent sélectionner
- * et modifier leurs propres rôles.
+ * Exemples :
  *
- * Il ne faut donc PAS tester grade ou grade2 ici.
- *
- * Ainsi :
- *
- * - ADMIN                    → accès
+ * - ADMIN                    → accès si grade2 présent
  * - ARCHITECTE DU PROJET     → accès
  * - DELEGUE NATIONAL         → accès
  * - DELEGUE REGIONAL         → accès
- * - MEMBRE / EQUIPE MILITANTE→ accès
+ * - MILITANT                 → accès
+ * - MEMBRE SANS GRADE2       → PAS d'accès
  *
- * grade2 peut donc parfaitement être null.
+ * Le grade2 est volontairement le critère d'accès.
  */
 
 function peutGererRole() {
 
-    return !!(
-        obtenirCurrentUser() &&
-        obtenirCurrentProfile()
+    const currentUser =
+        obtenirCurrentUser();
+
+
+    const currentProfile =
+        obtenirCurrentProfile();
+
+
+    if (
+        !currentUser ||
+        !currentProfile
+    ) {
+
+        return false;
+    }
+
+
+    return possedeGrade2(
+        currentProfile
     );
+}
+
+
+/* =========================================================
+   NETTOYAGE DES ROLES
+========================================================= */
+
+/*
+ * Supprime uniquement les valeurs correspondant aux rôles.
+ *
+ * IMPORTANT :
+ *
+ * Les compétences métier sont conservées.
+ *
+ * Exemple :
+ *
+ * [
+ *     "Maîtrise de doctrine",
+ *     "Tactique",
+ *     "Militants"
+ * ]
+ *
+ * devient :
+ *
+ * [
+ *     "Maîtrise de doctrine",
+ *     "Tactique"
+ * ]
+ */
+
+function retirerRolesDesCompetences(
+    competences
+) {
+
+    const liste =
+        normaliserCompetences(
+            competences
+        );
+
+
+    return liste.filter(
+        competence =>
+            !ROLES.includes(
+                competence
+            )
+    );
+}
+
+
+/* =========================================================
+   NETTOYAGE AUTOMATIQUE EN BASE
+========================================================= */
+
+/*
+ * Si grade2 est vide :
+ *
+ * - aucun rôle ne doit rester dans profiles.competences ;
+ * - les compétences métier sont conservées.
+ *
+ * Cette fonction est appelée lorsque le profil courant
+ * est relu par le module ROLE.
+ */
+
+async function nettoyerRolesSiNecessaire(
+    profile
+) {
+
+    if (!profile) {
+
+        return profile;
+    }
+
+
+    /*
+     * Si grade2 existe, aucun nettoyage n'est nécessaire.
+     */
+
+    if (
+        possedeGrade2(
+            profile
+        )
+    ) {
+
+        return profile;
+    }
+
+
+    const anciennesCompetences =
+        normaliserCompetences(
+            profile.competences
+        );
+
+
+    const nouvellesCompetences =
+        retirerRolesDesCompetences(
+            anciennesCompetences
+        );
+
+
+    /*
+     * Rien à modifier.
+     */
+
+    if (
+        nouvellesCompetences.length ===
+        anciennesCompetences.length
+    ) {
+
+        return profile;
+    }
+
+
+    const currentUser =
+        obtenirCurrentUser();
+
+
+    if (!currentUser) {
+
+        return profile;
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabase
+
+            .from("profiles")
+
+            .update({
+
+                competences:
+                    nouvellesCompetences
+
+            })
+
+            .eq(
+                "id",
+                currentUser.id
+            )
+
+            .select()
+            .single();
+
+
+    if (error) {
+
+        console.error(
+            "ROLE — erreur nettoyage automatique des rôles :",
+            error
+        );
+
+
+        /*
+         * Même si le nettoyage en base échoue,
+         * on nettoie l'état local pour empêcher
+         * l'affichage des anciens rôles.
+         */
+
+        profile.competences =
+            nouvellesCompetences;
+
+
+        return profile;
+    }
+
+
+    if (data) {
+
+        window.currentProfile =
+            data;
+
+        return data;
+    }
+
+
+    return profile;
 }
 
 
@@ -148,11 +367,8 @@ function remplirRoles(
 
 
     const grade2Existe =
-        !!(
-            profil &&
-            profil.grade2 !== null &&
-            profil.grade2 !== undefined &&
-            String(profil.grade2).trim() !== ""
+        possedeGrade2(
+            profil
         );
 
 
@@ -175,12 +391,8 @@ function remplirRoles(
                  * REGLE AUTOMATIQUE :
                  *
                  * Tout membre ayant un grade2
-                 * est automatiquement considéré
-                 * comme militant.
-                 *
-                 * Le rôle "Militants" est donc
-                 * coché par défaut dès que grade2
-                 * n'est pas null.
+                 * possède automatiquement le rôle
+                 * "Militants".
                  */
 
                 if (
@@ -189,7 +401,21 @@ function remplirRoles(
                 ) {
 
                     coche = true;
+                }
 
+
+                /*
+                 * Sans grade2 :
+                 *
+                 * aucun rôle ne doit être affiché
+                 * comme sélectionné.
+                 */
+
+                if (
+                    !grade2Existe
+                ) {
+
+                    coche = false;
                 }
 
 
@@ -216,7 +442,7 @@ function synchroniserCompetencesEtRoles(
 
 
     /*
-     * Compétences métier
+     * Compétences métier.
      */
 
     document
@@ -238,12 +464,101 @@ function synchroniserCompetencesEtRoles(
 
 
     /*
-     * Rôles
+     * Rôles.
      */
 
     remplirRoles(
         liste
     );
+}
+
+
+/* =========================================================
+   VERROUILLAGE VISUEL DU PANNEAU ROLE
+========================================================= */
+
+function actualiserInterfaceRole() {
+
+    const autorise =
+        peutGererRole();
+
+
+    const roleTabButton =
+        document.getElementById(
+            "roleTabButton"
+        );
+
+
+    const roleTab =
+        document.getElementById(
+            "roleTab"
+        );
+
+
+    const saveRolesButton =
+        document.getElementById(
+            "saveRolesButton"
+        );
+
+
+    /*
+     * Bouton de navigation.
+     *
+     * IMPORTANT :
+     * on utilise style.display sans !important.
+     */
+
+    if (roleTabButton) {
+
+        roleTabButton.style.display =
+            autorise
+                ? ""
+                : "none";
+    }
+
+
+    /*
+     * Panneau ROLE.
+     */
+
+    if (roleTab) {
+
+        if (!autorise) {
+
+            roleTab.style.display =
+                "none";
+        }
+    }
+
+
+    /*
+     * Sauvegarde.
+     */
+
+    if (saveRolesButton) {
+
+        saveRolesButton.disabled =
+            !autorise;
+    }
+
+
+    /*
+     * Cases de rôles.
+     */
+
+    document
+
+        .querySelectorAll(
+            'input[name="roles"]'
+        )
+
+        .forEach(
+            input => {
+
+                input.disabled =
+                    !autorise;
+            }
+        );
 }
 
 
@@ -376,8 +691,7 @@ function initialiserCompteurDescription() {
 
 
     /*
-     * Evite de créer plusieurs écouteurs
-     * si le module est initialisé plusieurs fois.
+     * Evite de créer plusieurs écouteurs.
      */
 
     if (
@@ -404,17 +718,6 @@ function initialiserCompteurDescription() {
    ACTUALISATION DU PROFIL POUR L'ONGLET ROLE
 ========================================================= */
 
-/*
- * Le panneau ROLE utilise window.currentProfile.
- *
- * Lorsque le profil a été modifié ailleurs dans l'espace
- * membre, cette variable peut ne plus correspondre aux
- * données actuellement présentes dans Supabase.
- *
- * A chaque entrée dans roleTab, on relit donc le profil
- * courant puis on resynchronise l'affichage.
- */
-
 async function actualiserProfilRole() {
 
     const currentUser =
@@ -425,8 +728,9 @@ async function actualiserProfilRole() {
         !currentUser
     ) {
 
-        return;
+        actualiserInterfaceRole();
 
+        return;
     }
 
 
@@ -458,8 +762,9 @@ async function actualiserProfilRole() {
         );
 
 
-        return;
+        actualiserInterfaceRole();
 
+        return;
     }
 
 
@@ -467,8 +772,9 @@ async function actualiserProfilRole() {
         !data
     ) {
 
-        return;
+        actualiserInterfaceRole();
 
+        return;
     }
 
 
@@ -481,34 +787,61 @@ async function actualiserProfilRole() {
 
 
     /*
-     * Resynchronisation des compétences
-     * et des rôles affichés.
+     * Si grade2 est vide, les anciens rôles
+     * sont supprimés automatiquement.
+     */
+
+    const profilNettoye =
+        await nettoyerRolesSiNecessaire(
+            data
+        );
+
+
+    const profilFinal =
+        profilNettoye ||
+        window.currentProfile ||
+        data;
+
+
+    /*
+     * Après nettoyage, on recalcule le droit.
+     */
+
+    window.currentProfile =
+        profilFinal;
+
+
+    actualiserInterfaceRole();
+
+
+    /*
+     * Si aucun grade2 :
+     *
+     * on ne synchronise pas les rôles
+     * comme des rôles actifs.
      */
 
     synchroniserCompetencesEtRoles(
-        data.competences
+        profilFinal.competences
     );
 
 
     /*
-     * Mise à jour éventuelle de la médaille VIP.
-     *
-     * Plusieurs noms de colonnes ont pu être utilisés
-     * dans les différentes parties de l'espace membre.
-     * On conserve donc une lecture souple.
+     * Mise à jour de la médaille VIP.
      */
 
     mettreAJourMedailleVIP(
-        data.audience_max ??
-        data.audienceMax ??
-        data.audience ??
+
+        profilFinal.audience_max ??
+        profilFinal.audienceMax ??
+        profilFinal.audience ??
         0
+
     );
 
 
     /*
-     * Le compteur de description dépend lui aussi
-     * de la valeur éventuellement actualisée.
+     * Mise à jour éventuelle de la description.
      */
 
     const descriptionField =
@@ -519,17 +852,15 @@ async function actualiserProfilRole() {
 
     if (
         descriptionField &&
-        typeof data.description === "string"
+        typeof profilFinal.description === "string"
     ) {
 
         descriptionField.value =
-            data.description;
-
+            profilFinal.description;
     }
 
 
     initialiserCompteurDescription();
-
 }
 
 
@@ -540,20 +871,10 @@ async function actualiserProfilRole() {
 let adminRoleTabListenerInitialized =
     false;
 
+
 let actualisationRoleEnCours =
     false;
 
-
-/*
- * admin-tabs.js déclenche :
- *
- *     avantgarde:admin-tab-changed
- *
- * lorsqu'un onglet devient actif.
- *
- * ROLE doit donc relire le profil courant chaque fois
- * que roleTab devient actif.
- */
 
 function initialiserEcouteurOnglet() {
 
@@ -582,8 +903,15 @@ function initialiserEcouteurOnglet() {
                 "roleTab"
             ) {
 
-                return;
+                /*
+                 * Même hors ROLE, on peut vérifier
+                 * si grade2 a changé depuis un autre
+                 * module.
+                 */
 
+                actualiserInterfaceRole();
+
+                return;
             }
 
 
@@ -592,7 +920,6 @@ function initialiserEcouteurOnglet() {
             ) {
 
                 return;
-
             }
 
 
@@ -622,7 +949,58 @@ function initialiserEcouteurOnglet() {
 
         }
     );
+}
 
+
+/* =========================================================
+   BLOCAGE D'ACCES DIRECT AU ROLE
+========================================================= */
+
+/*
+ * Si un utilisateur tente d'ouvrir directement :
+ *
+ * ?tab=roleTab
+ *
+ * sans grade2, on empêche l'affichage du panneau.
+ *
+ * Le module admin-tabs doit également appliquer
+ * ses propres contrôles de navigation.
+ */
+
+function bloquerAccesRoleSiNecessaire() {
+
+    if (
+        peutGererRole()
+    ) {
+
+        return;
+    }
+
+
+    const roleTab =
+        document.getElementById(
+            "roleTab"
+        );
+
+
+    const roleTabButton =
+        document.getElementById(
+            "roleTabButton"
+        );
+
+
+    if (roleTab) {
+
+        roleTab.style.display =
+            "none";
+    }
+
+
+    if (roleTabButton) {
+
+        roleTabButton.style.display =
+            "none";
+    }
 }
 
 
@@ -685,12 +1063,34 @@ async function sauvegarderRoles() {
     /*
      * Vérification du droit.
      *
-     * Tous les membres connectés sont autorisés.
+     * IMPORTANT :
+     * le contrôle est effectué au moment exact
+     * de la sauvegarde.
      */
 
     if (
         !peutGererRole()
     ) {
+
+        actualiserInterfaceRole();
+
+
+        if (
+            typeof window.afficherMessage ===
+            "function"
+        ) {
+
+            window.afficherMessage(
+
+                roleMessage,
+
+                "error",
+
+                "Vous n'avez pas de grade vous permettant de modifier les rôles."
+
+            );
+        }
+
 
         return;
     }
@@ -732,11 +1132,8 @@ async function sauvegarderRoles() {
 
 
     const competencesExistantes =
-        anciennesCompetences.filter(
-            competence =>
-                !ROLES.includes(
-                    competence
-                )
+        retirerRolesDesCompetences(
+            anciennesCompetences
         );
 
 
@@ -763,22 +1160,13 @@ async function sauvegarderRoles() {
      * REGLE AUTOMATIQUE :
      *
      * Si le membre possède un grade2,
-     * le rôle "Militants" doit obligatoirement
-     * être présent dans ses rôles.
-     *
-     * Cela garantit que le rôle ne disparaît
-     * pas simplement parce que la case a été
-     * décochée manuellement.
+     * "Militants" est obligatoire.
      */
 
-    const grade2Existe =
-        currentProfile.grade2 !== null &&
-        currentProfile.grade2 !== undefined &&
-        String(currentProfile.grade2).trim() !== "";
-
-
     if (
-        grade2Existe &&
+        possedeGrade2(
+            currentProfile
+        ) &&
         !rolesSelectionnes.includes(
             "Militants"
         )
@@ -787,8 +1175,23 @@ async function sauvegarderRoles() {
         rolesSelectionnes.push(
             "Militants"
         );
-
     }
+
+
+    /*
+     * Sécurité supplémentaire :
+     *
+     * on ne sauvegarde que des valeurs
+     * appartenant à la liste officielle des rôles.
+     */
+
+    rolesSelectionnes =
+        rolesSelectionnes.filter(
+            role =>
+                ROLES.includes(
+                    role
+                )
+        );
 
 
     /*
@@ -894,12 +1297,14 @@ async function sauvegarderRoles() {
     /*
      * Resynchronisation immédiate
      * de l'affichage.
-
      */
 
     synchroniserCompetencesEtRoles(
         data.competences
     );
+
+
+    actualiserInterfaceRole();
 
 
     if (
@@ -965,6 +1370,14 @@ window.sauvegarderRoles =
     sauvegarderRoles;
 
 
+window.actualiserProfilRole =
+    actualiserProfilRole;
+
+
+window.actualiserInterfaceRole =
+    actualiserInterfaceRole;
+
+
 /* =========================================================
    INITIALISATION
 ========================================================= */
@@ -977,6 +1390,16 @@ function initialiserRole() {
      */
 
     initialiserEcouteurOnglet();
+
+
+    /*
+     * Contrôle immédiat de l'accès.
+     */
+
+    actualiserInterfaceRole();
+
+
+    bloquerAccesRoleSiNecessaire();
 
 
     const saveRolesButton =
