@@ -10,6 +10,16 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="description"
+        content="Le Manifeste d'Avant-gardE — La France libre."
+    >
+
+    <meta
+        name="robots"
+        content="index, follow"
+    >
+
     <title>Manifeste — Avant-gardE</title>
 
     <link
@@ -23,16 +33,8 @@
 <body>
 
 
-    <!-- =====================================================
-         HEADER
-    ====================================================== -->
-
     <div id="site-header"></div>
 
-
-    <!-- =====================================================
-         CONTENU
-    ====================================================== -->
 
     <main class="editorial-page">
 
@@ -51,44 +53,46 @@
         </header>
 
 
+        <!--
+            IMPORTANT :
+
+            Le contenu réel est maintenant injecté
+            directement dans ce fichier HTML par le
+            système de publication.
+
+            Les robots, moteurs de recherche et IA
+            peuvent donc lire le contenu sans JavaScript.
+        -->
+
         <article
             id="editorialContent"
             class="editorial-content"
+            data-content-source="supabase"
         >
 
-            <div class="editorial-loading">
-                Chargement…
-            </div>
+            <!--
+                CONTENU SUPABASE — GÉNÉRÉ AUTOMATIQUEMENT
+
+                NE PAS MODIFIER MANUELLEMENT.
+
+                Le contenu provient de :
+                other_contents
+                slug = manifeste
+            -->
 
         </article>
 
     </main>
 
 
-    <!-- =====================================================
-         FOOTER
-    ====================================================== -->
-
     <div id="site-footer"></div>
-
-
-    <!-- =====================================================
-         MODAL RDV
-    ====================================================== -->
 
     <div id="site-rdv-modal"></div>
 
 
-    <!-- =====================================================
-         SUPABASE
-    ====================================================== -->
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
-    <!-- =====================================================
-         SCRIPTS COMMUNS
-    ====================================================== -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
 
     <script
         type="module"
@@ -99,11 +103,6 @@
         type="module"
         src="js/components.js"
     ></script>
-
-
-    <!-- =====================================================
-         SCRIPT PAGE
-    ====================================================== -->
 
     <script
         type="module"
