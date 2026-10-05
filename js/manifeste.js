@@ -3,33 +3,26 @@
 
    js/manifeste.js
 
-   Gestion de la page publique MANIFESTE.
+   Le manifeste est désormais pré-rendu directement
+   dans manifeste.html.
 
-   Source :
-   - Table Supabase : other_contents
-   - slug : manifeste
+   Le HTML public est donc lisible par :
+   - moteurs de recherche
+   - robots
+   - crawlers
+   - systèmes d'IA
 
-   Le contenu HTML est rédigé dans le back-office
-   AUTRES PAGES puis affiché publiquement ici.
-
-   Aucune fonction d'administration.
+   Ce script ne remplace le contenu que si le HTML
+   pré-rendu est absent.
 ========================================================= */
 
 
 import { supabase } from "./supabase.js";
 
 
-/* =========================================================
-   CONFIGURATION
-========================================================= */
-
 const SLUG =
     "manifeste";
 
-
-/* =========================================================
-   ELEMENTS
-========================================================= */
 
 const titleElement =
     document.getElementById(
@@ -44,7 +37,37 @@ const contentElement =
 
 
 /* =========================================================
-   CHARGEMENT DU CONTENU
+   VERIFICATION DU PRE-RENDU
+========================================================= */
+
+function contenuPreRenduDisponible() {
+
+    if (!contentElement) {
+        return false;
+    }
+
+
+    const html =
+        contentElement.innerHTML
+            ?.trim();
+
+
+    if (!html) {
+        return false;
+    }
+
+
+    return (
+        !contentElement.querySelector(
+            ".editorial-loading"
+        )
+    );
+
+}
+
+
+/* =========================================================
+   CHARGEMENT DE SECOURS
 ========================================================= */
 
 async function chargerManifeste() {
@@ -54,6 +77,27 @@ async function chargerManifeste() {
     }
 
 
+    /*
+       Si le contenu est déjà présent dans le HTML,
+       on ne fait absolument rien.
+
+       C'est le fonctionnement normal.
+    */
+
+    if (
+        contenuPreRenduDisponible()
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+       Fallback uniquement si le fichier HTML
+       a été ouvert sans contenu pré-rendu.
+    */
+
     try {
 
         const {
@@ -61,7 +105,9 @@ async function chargerManifeste() {
             error
         } =
             await supabase
-                .from("other_contents")
+                .from(
+                    "other_contents"
+                )
                 .select(
                     "id, slug, titre, contenu_html, updated_at"
                 )
@@ -79,9 +125,7 @@ async function chargerManifeste() {
 
 
         if (error) {
-
             throw error;
-
         }
 
 
@@ -103,11 +147,6 @@ async function chargerManifeste() {
         }
 
 
-        /*
-           Le titre enregistré dans Supabase
-           devient le titre de la page.
-        */
-
         if (
             titleElement &&
             contenu.titre
@@ -119,22 +158,9 @@ async function chargerManifeste() {
         }
 
 
-        /*
-           Le HTML provenant du back-office
-           est volontairement rendu comme HTML.
-
-           Le contenu est administré depuis
-           l'espace membre.
-        */
-
         contentElement.innerHTML =
             contenu.contenu_html || "";
 
-
-        /*
-           Si la ligne existe mais ne contient
-           aucun contenu.
-        */
 
         if (
             !contenu.contenu_html ||
@@ -178,7 +204,8 @@ function afficherErreur(
     }
 
 
-    contentElement.innerHTML = "";
+    contentElement.innerHTML =
+        "";
 
 
     const element =
@@ -219,7 +246,8 @@ if (
         }
     );
 
-} else {
+}
+else {
 
     chargerManifeste();
 
