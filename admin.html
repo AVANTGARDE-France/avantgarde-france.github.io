@@ -95,27 +95,25 @@
 
 
 /* =======================================================
-   ONGLETS TOUJOURS VISIBLES
+   IMPORTANT — PERMISSIONS DES ONGLETS
 ======================================================= */
 
 /*
-   RDV et ROLE sont gérés par leurs propres
-   fonctions de permissions dans admin-core.js.
+   NE PAS FORCER L'AFFICHAGE DES ONGLETS AVEC !important.
 
-   Page PROJET, Autres Pages et Effets Mesures
-   sont strictement réservés aux administrateurs
-   et doivent rester contrôlés par JavaScript.
+   Les permissions sont gérées par JavaScript :
 
-   IMPORTANT :
-   Ne pas remettre !important sur ces trois onglets,
-   car cela écraserait le display:none appliqué
-   aux utilisateurs non-admin.
+   - PROFIL : accessible aux membres
+   - RDV : selon les permissions définies dans admin-core.js
+   - GRADES : selon les permissions définies dans admin-core.js
+   - ROLE : selon les permissions définies dans admin-core.js
+   - Page PROJET : administrateurs
+   - Autres Pages : administrateurs
+   - Effets Mesures : administrateurs
+
+   Le CSS ne doit donc jamais écraser le
+   display:none appliqué par JavaScript.
 */
-
-#rdvTabButton,
-#roleTabButton {
-    display:block !important;
-}
 
 
 /* =======================================================
