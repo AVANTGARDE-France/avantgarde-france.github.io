@@ -10,6 +10,16 @@
         content="width=device-width, initial-scale=1.0"
     >
 
+    <meta
+        name="description"
+        content="Les inspirations d'Avant-gardE — La France libre."
+    >
+
+    <meta
+        name="robots"
+        content="index, follow"
+    >
+
     <title>Inspirations — Avant-gardE</title>
 
     <link
@@ -23,16 +33,8 @@
 <body>
 
 
-    <!-- =====================================================
-         HEADER
-    ====================================================== -->
-
     <div id="site-header"></div>
 
-
-    <!-- =====================================================
-         CONTENU
-    ====================================================== -->
 
     <main class="editorial-page">
 
@@ -54,41 +56,32 @@
         <article
             id="editorialContent"
             class="editorial-content"
+            data-content-source="supabase"
         >
 
-            <div class="editorial-loading">
-                Chargement…
-            </div>
+            <!--
+                CONTENU SUPABASE — GÉNÉRÉ AUTOMATIQUEMENT
+
+                NE PAS MODIFIER MANUELLEMENT.
+
+                Source :
+                other_contents
+                slug = inspirations
+            -->
 
         </article>
 
     </main>
 
 
-    <!-- =====================================================
-         FOOTER
-    ====================================================== -->
-
     <div id="site-footer"></div>
-
-
-    <!-- =====================================================
-         MODAL RDV
-    ====================================================== -->
 
     <div id="site-rdv-modal"></div>
 
 
-    <!-- =====================================================
-         SUPABASE
-    ====================================================== -->
-
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
-    <!-- =====================================================
-         SCRIPTS COMMUNS
-    ====================================================== -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    ></script>
 
     <script
         type="module"
@@ -99,11 +92,6 @@
         type="module"
         src="js/components.js"
     ></script>
-
-
-    <!-- =====================================================
-         SCRIPT PAGE
-    ====================================================== -->
 
     <script
         type="module"
