@@ -541,7 +541,15 @@ async function basculerLecture() {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
         setStatus("Démarrage de la lecture…");
-        await audioContext.resume();
+
+        /* Safari / iOS peut laisser AudioContext.resume() en attente.
+           Ne jamais attendre cette promesse avant de lancer Kokoro. */
+        if (audioContext.state === "suspended") {
+            audioContext.resume().catch(function (error) {
+                console.warn("AVANT-GARDE — activation audio :", error);
+            });
+        }
+
         setStatus("Préparation de la voix française…");
         await lireMorceau(currentGeneration);
     } catch (error) {
