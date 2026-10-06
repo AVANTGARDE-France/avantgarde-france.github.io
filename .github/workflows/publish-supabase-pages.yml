@@ -67,4 +67,8 @@ jobs:
 
           git commit -m "chore: synchronisation Supabase"
 
+          # Un push concurrent peut arriver pendant la génération.
+          # On resynchronise avant de publier pour éviter "fetch first".
+          git pull --rebase origin main
+
           git push
