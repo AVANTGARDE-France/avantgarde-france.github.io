@@ -304,6 +304,12 @@ async function chargerPiper() {
                     "AVANT-GARDE — Piper :",
                     message
                 );
+
+                if (iosDevice) {
+                    setStatus(
+                        "iPhone — Piper : " + String(message)
+                    );
+                }
             }
         };
 
@@ -318,12 +324,59 @@ async function chargerPiper() {
             console.log("AVANT-GARDE — iOS : Piper CDN-only, sans modèle local.");
         }
 
-        const session = new piper.TtsSession(sessionOptions);
+        let session;
 
-        setStatus(
-            "Initialisation de la voix Tom…"
-        );
-            await session.waitReady;
+            try {
+                setStatus(
+                    iosDevice
+                        ? "iPhone — création de la session Piper…"
+                        : "Initialisation de la voix Tom…"
+                );
+
+                session = new piper.TtsSession(sessionOptions);
+            } catch (sessionError) {
+                console.error(
+                    "AVANT-GARDE — ERREUR CONSTRUCTEUR TTS SESSION :",
+                    sessionError
+                );
+
+                const detail =
+                    sessionError && sessionError.message
+                        ? sessionError.message
+                        : String(sessionError);
+
+                setStatus(
+                    "iPhone — TTS session : " + detail
+                );
+
+                throw sessionError;
+            }
+
+            try {
+                setStatus(
+                    iosDevice
+                        ? "iPhone — session créée, chargement du modèle…"
+                        : "Initialisation de la voix Tom…"
+                );
+
+                await session.waitReady;
+            } catch (readyError) {
+                console.error(
+                    "AVANT-GARDE — ERREUR WAITREADY TTS :",
+                    readyError
+                );
+
+                const detail =
+                    readyError && readyError.message
+                        ? readyError.message
+                        : String(readyError);
+
+                setStatus(
+                    "iPhone — TTS waitReady : " + detail
+                );
+
+                throw readyError;
+            }
 
             piperEngine = {
                 predict: function (texte) {
