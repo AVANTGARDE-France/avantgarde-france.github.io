@@ -193,7 +193,8 @@ function replaceEditorialContent(
 
     return html.replace(
         pattern,
-        `$1\n\n${content}\n\n$2`
+        (_match, openingTag, closingTag) =>
+            `${openingTag}\n\n${content}\n\n${closingTag}`
     );
 }
 
