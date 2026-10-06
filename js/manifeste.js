@@ -39,6 +39,7 @@ let loading = false;
 let initialisationFaite = false;
 
 let ephonePromise = null;
+let lecteurEvenementsInstalles = false;
 
 function avecTimeout(promise, delai, message) {
     return Promise.race([
@@ -259,21 +260,61 @@ function initialiserLecteurManifeste() {
         return;
     }
 
-    playButton.addEventListener(
-        "click",
-        basculerLecture
-    );
-
-    stopButton.addEventListener(
-        "click",
-        arreterLecture
-    );
+    /*
+       Le lecteur est désormais piloté par délégation d'évènement sur
+       document. Cela évite qu'une initialisation tardive ou un élément
+       recréé par le HTML empêche le bouton d'être actif sur Safari/iOS.
+    */
+    installerEvenementsLecteur();
 
     initialisationFaite = true;
 
     mettreAJourInterface();
     setStatus("Prêt");
     console.log("AVANT-GARDE — lecteur initialisé");
+}
+
+function installerEvenementsLecteur() {
+
+    if (lecteurEvenementsInstalles) return;
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            const bouton =
+                event.target &&
+                event.target.closest
+                    ? event.target.closest("#manifesteReaderPlay, #manifesteReaderStop")
+                    : null;
+
+            if (!bouton) return;
+
+            console.log(
+                "AVANT-GARDE — clic lecteur détecté :",
+                bouton.id
+            );
+
+            if (bouton.id === "manifesteReaderPlay") {
+                setStatus("Clic détecté…");
+                basculerLecture().catch(function (error) {
+                    console.error(
+                        "AVANT-GARDE — clic lecture :",
+                        error
+                    );
+                });
+            } else {
+                arreterLecture();
+            }
+        },
+        true
+    );
+
+    lecteurEvenementsInstalles = true;
+
+    console.log(
+        "AVANT-GARDE — événements lecteur installés"
+    );
 }
 
 function extraireTexte() {
