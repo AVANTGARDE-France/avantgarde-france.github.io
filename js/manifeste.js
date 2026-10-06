@@ -943,22 +943,43 @@ async function basculerLecture() {
             });
         }
 
+        /*
+           IMPORTANT :
+           Sur iOS, nous n'utilisons plus speechSynthesis.
+
+           La voix native Safari donne une diction de type TTS classique
+           (mot à mot, intonation pauvre, ponctuation parfois mal rendue).
+           Le lecteur utilise donc désormais EXACTEMENT le même moteur
+           neuronal Kokoro + ff_siwis sur iPhone/iPad et sur ordinateur.
+
+           Le français est phonémisé localement par ephone/eSpeak NG,
+           puis envoyé au modèle Kokoro.
+        */
         if (appareilIOSOuSafariMobile()) {
-            setStatus("Voix française iOS…");
-            console.log("AVANT-GARDE — iOS : speechSynthesis", "speechSynthesis" in window, typeof SpeechSynthesisUtterance);
-            await lectureNativeFrancaise(currentGeneration);
-            if (generationCouranteValide()) {
-                playing = false;
-                paused = false;
-                mettreAJourInterface();
-                setStatus("Lecture terminée");
-            }
-            return;
+            setStatus("Préparation de la voix Kokoro…");
+            console.log("AVANT-GARDE — iOS : Kokoro français local");
         }
 
         await chargerKokoro();
 
         setStatus("Préparation de la voix française…");
+
+        /*
+           Après un chargement asynchrone, Safari peut avoir resuspendu
+           l'AudioContext. On tente donc explicitement de le réveiller
+           juste avant la première sortie audio.
+        */
+        if (audioContext && audioContext.state === "suspended") {
+            try {
+                await audioContext.resume();
+            } catch (error) {
+                console.warn(
+                    "AVANT-GARDE — reprise AudioContext après chargement :",
+                    error
+                );
+            }
+        }
+
         await lireMorceau(currentGeneration);
     } catch (error) {
         playing = false;
@@ -1097,12 +1118,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1010");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1011");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.1010";
+    diagnostic.textContent = "LECTEUR V.1011";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
