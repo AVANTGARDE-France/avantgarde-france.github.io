@@ -40,6 +40,15 @@ let initialisationFaite = false;
 
 let espeakPromise = null;
 
+function contenuPreRenduDisponible() {
+    if (!contentElement) return false;
+
+    const source = contentElement.dataset.contentSource;
+    const texte = (contentElement.textContent || "").trim();
+
+    return source === "supabase" && texte.length > 0;
+}
+
 async function phonemiserFrancais(texte) {
     if (!espeakPromise) {
         espeakPromise = import("https://cdn.jsdelivr.net/npm/espeak-ng@1.0.2/+esm")
