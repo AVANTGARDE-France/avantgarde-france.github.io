@@ -28,6 +28,7 @@ const contentElement =
 let kokoro = null;
 let audioContext = null;
 let activeSource = null;
+let audioUnlocked = false;
 
 let currentGeneration = 0;
 let chunks = [];
@@ -518,6 +519,42 @@ function generationCouranteValide() {
     return playing && !paused;
 }
 
+/*
+   Déverrouillage audio iOS/Safari.
+   Il doit être exécuté SYNCHRONIQUEMENT dans le geste utilisateur.
+   On crée un micro-buffer silencieux et on le joue immédiatement.
+   Le contexte reste ensuite ouvert pendant toute la lecture.
+*/
+function deverrouillerAudioDansLeGeste() {
+    try {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        const maintenant = audioContext.currentTime;
+        const buffer = audioContext.createBuffer(1, 1, audioContext.sampleRate);
+        const source = audioContext.createBufferSource();
+
+        source.buffer = buffer;
+        source.connect(audioContext.destination);
+        source.start(maintenant);
+
+        audioUnlocked = true;
+
+        if (audioContext.state === "suspended") {
+            audioContext.resume().catch(function (error) {
+                console.warn("AVANT-GARDE — AudioContext resume :", error);
+            });
+        }
+
+        return true;
+    } catch (error) {
+        audioUnlocked = false;
+        console.error("AVANT-GARDE — déverrouillage audio :", error);
+        return false;
+    }
+}
+
 function attendreVoixIOS() {
     return new Promise(function (resolve) {
         if (!("speechSynthesis" in window)) {
@@ -742,17 +779,15 @@ async function basculerLecture() {
            de le créer, le navigateur peut considérer que le geste
            utilisateur est terminé et laisser resume() bloqué.
         */
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        /*
+           IMPORTANT : cette fonction est appelée avant toute opération
+           asynchrone et déverrouille WebAudio dans le clic/tap utilisateur.
+        */
+        if (!deverrouillerAudioDansLeGeste()) {
+            throw new Error("Le navigateur n'a pas autorisé la sortie audio.");
         }
 
         setStatus("Démarrage de la lecture…");
-
-        if (audioContext.state === "suspended") {
-            audioContext.resume().catch(function (error) {
-                console.warn("AVANT-GARDE — activation audio :", error);
-            });
-        }
 
         /*
            IMPORTANT :
@@ -864,9 +899,11 @@ function pauseLecture() {
         try { activeSource.stop(); } catch (_) {}
         activeSource = null;
     }
-    if (audioContext && audioContext.state === "running") {
-        audioContext.suspend().catch(function () {});
-    }
+    /*
+       Ne pas suspendre AudioContext sur iOS.
+       Une suspension volontaire peut recréer une barrière d'activation
+       lorsque l'utilisateur appuie ensuite sur « Reprendre ».
+    */
     setStatus("En pause");
     mettreAJourInterface();
 }
@@ -874,7 +911,7 @@ function pauseLecture() {
 function reprendreLecture() {
     if (!playing || !paused) return;
     paused = false;
-    if (audioContext) {
+    if (audioContext && audioContext.state === "suspended") {
         audioContext.resume().catch(function (error) {
             console.error("AVANT-GARDE — reprise audio :", error);
         });
@@ -898,9 +935,6 @@ function arreterLecture() {
     if (activeSource) {
         try { activeSource.stop(); } catch (_) {}
         activeSource = null;
-    }
-    if (audioContext && audioContext.state === "running") {
-        audioContext.suspend().catch(function () {});
     }
     setStatus("Arrêté");
     mettreAJourInterface();
@@ -934,7 +968,7 @@ function demarrerPageManifeste() {
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.1023";
+    diagnostic.textContent = "LECTEUR";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
