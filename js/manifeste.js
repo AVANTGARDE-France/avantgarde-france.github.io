@@ -535,20 +535,26 @@ async function basculerLecture() {
         paused = false;
         mettreAJourInterface();
 
-        await chargerKokoro();
-        setStatus("Initialisation audio…");
+        /*
+           IMPORTANT iOS / Safari :
+           AudioContext doit être créé et réveillé directement dans
+           le geste utilisateur. Si on attend chargerKokoro() avant
+           de le créer, le navigateur peut considérer que le geste
+           utilisateur est terminé et laisser resume() bloqué.
+        */
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
+
         setStatus("Démarrage de la lecture…");
 
-        /* Safari / iOS peut laisser AudioContext.resume() en attente.
-           Ne jamais attendre cette promesse avant de lancer Kokoro. */
         if (audioContext.state === "suspended") {
             audioContext.resume().catch(function (error) {
                 console.warn("AVANT-GARDE — activation audio :", error);
             });
         }
+
+        await chargerKokoro();
 
         setStatus("Préparation de la voix française…");
         await lireMorceau(currentGeneration);
