@@ -536,10 +536,13 @@ async function basculerLecture() {
         mettreAJourInterface();
 
         await chargerKokoro();
+        setStatus("Initialisation audio…");
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
         }
+        setStatus("Démarrage de la lecture…");
         await audioContext.resume();
+        setStatus("Préparation de la voix française…");
         await lireMorceau(currentGeneration);
     } catch (error) {
         playing = false;
@@ -561,7 +564,8 @@ async function lireMorceau(generation) {
         return;
     }
 
-    setStatus("Lecture " + (chunkIndex + 1) + " / " + chunks.length + "…");
+    setStatus("Phonémisation française…");
+    console.log("AVANT-GARDE — génération du morceau", chunkIndex + 1, "/", chunks.length);
     const audio = await kokoro.generate(chunks[chunkIndex], { voice: KOKORO_VOICE, speed: 1 });
 
     if (!playing || paused || generation !== currentGeneration) return;
