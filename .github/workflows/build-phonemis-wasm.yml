@@ -1,0 +1,137 @@
+name: Construire Phonemis WASM français
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "scripts/phonemis-web/**"
+      - ".github/workflows/build-phonemis-wasm.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-phonemis-wasm
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Compiler Phonemis français en WebAssembly
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer Avant-gardE
+        uses: actions/checkout@v5
+
+      - name: Installer Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.47
+          actions-cache-folder: "emsdk-cache"
+
+      - name: Récupérer Phonemis
+        run: |
+          git clone --depth 1 https://github.com/IgorSwat/Phonemis.git /tmp/phonemis
+          cd /tmp/phonemis
+          git fetch --depth 1 origin 71eb1ce33bd586d38cbac037843b8539d7829c3b
+          git checkout 71eb1ce33bd586d38cbac037843b8539d7829c3b
+
+      - name: Désactiver les threads natifs pour le build Web
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path("/tmp/phonemis/src/phonemis/protophone/protophone.cpp")
+          s = p.read_text()
+
+          start = s.index("template <typename Fn>\ninline void parallel_for")
+          end = s.index("\n} // namespace", start)
+
+          replacement = r'''#ifdef PHONEMIS_WEB_SERIAL
+
+template <typename Fn>
+inline void parallel_for(size_t n, size_t, Fn&& fn) {
+  if (n == 0) return;
+  fn(size_t(0), n);
+}
+
+#else
+
+template <typename Fn>
+inline void parallel_for(size_t n, size_t min_per_worker, Fn&& fn) {
+  if (n == 0) return;
+  const size_t affordable = n / std::max<size_t>(min_per_worker, 1);
+  const size_t nthreads = std::min(worker_budget(), affordable);
+  if (nthreads <= 1) {
+    fn(size_t(0), n);
+    return;
+  }
+
+  const size_t chunk = (n + nthreads - 1) / nthreads;
+  std::vector<std::thread> workers;
+  workers.reserve(nthreads - 1);
+  for (size_t begin = chunk; begin < n; begin += chunk) {
+    const size_t end = std::min(n, begin + chunk);
+    workers.emplace_back([&fn, begin, end] { fn(begin, end); });
+  }
+  fn(size_t(0), std::min(n, chunk));
+  for (std::thread& wkr : workers) wkr.join();
+}
+
+#endif
+'''
+          s = s[:start] + replacement + s[end:]
+          p.write_text(s)
+          PY
+
+      - name: Télécharger le modèle français
+        run: |
+          mkdir -p /tmp/phonemis/data/fr
+          curl -L --fail --retry 3             "https://huggingface.co/Shusek00/kokoro-kmp-models/resolve/main/phonemizers/fr/phonemizer_fr.bin?download=true"             -o /tmp/phonemis/data/fr/phonemizer_fr.bin
+          test "$(stat -c%s /tmp/phonemis/data/fr/phonemizer_fr.bin)" -eq 7094120
+
+      - name: Compiler le bridge WASM
+        run: |
+          mkdir -p scripts/phonemis-web/dist
+          cd /tmp/phonemis
+
+          SOURCES=$(find src/phonemis -name "*.cpp" ! -name "main.cpp" -print)
+
+          em++ -O3 -std=c++20             -DPHONEMIS_WEB_SERIAL             -msimd128             -fexceptions             -I/tmp/phonemis/src             -I/tmp/phonemis/src/third-party             $SOURCES             $GITHUB_WORKSPACE/scripts/phonemis-web/bridge.cpp             -lembind             -sMODULARIZE=1             -sEXPORT_ES6=1             -sEXPORT_NAME=createPhonemis             -sALLOW_MEMORY_GROWTH=1             -sENVIRONMENT=web             -sEXPORTED_RUNTIME_METHODS=FS             -o $GITHUB_WORKSPACE/scripts/phonemis-web/dist/phonemis.js
+
+      - name: Tester le module
+        run: |
+          cat > /tmp/test-phonemis.mjs <<'EOF'
+          import createPhonemis from "/workspace/scripts/phonemis-web/dist/phonemis.js";
+          EOF
+
+          node --input-type=module <<'EOF'
+          import createPhonemis from "./scripts/phonemis-web/dist/phonemis.js";
+          const m = await createPhonemis();
+          m.FS.writeFile(
+            "/phonemizer_fr.bin",
+            new Uint8Array(
+              await (await fetch(
+                "https://huggingface.co/Shusek00/kokoro-kmp-models/resolve/main/phonemizers/fr/phonemizer_fr.bin?download=true"
+              )).arrayBuffer()
+            )
+          );
+          m.initPhonemis("/phonemizer_fr.bin");
+          const p = m.phonemizeFrench("La France libre protège sa souveraineté.");
+          if (!p || !p.trim()) throw new Error("Phonémisation vide");
+          console.log(p);
+          EOF
+
+      - name: Installer les artefacts dans le site
+        run: |
+          mkdir -p js/phonemis
+          cp scripts/phonemis-web/dist/phonemis.js js/phonemis/phonemis.js
+          cp scripts/phonemis-web/dist/phonemis.wasm js/phonemis/phonemis.wasm
+          git add scripts/phonemis-web js/phonemis
+          git diff --cached --quiet && exit 0
+          git config user.name "avant-garde-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build: compiler Phonemis français en WASM"
+          git push
