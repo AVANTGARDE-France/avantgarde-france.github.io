@@ -1,10 +1,10 @@
 /* =========================================================
    AVANT-GARDE — PAGE MANIFESTE
    Lecteur vocal gratuit — Piper TTS Web
-   Voix unique : fr_FR-mls-medium
+   Voix unique : fr_FR-upmc-medium
 ========================================================= */
 
-const PIPER_WEB_VOICE = "fr_FR-mls-medium";
+const PIPER_WEB_VOICE = "fr_FR-upmc-medium";
 const PIPER_WEB_PACKAGE =
     "https://cdn.jsdelivr.net/npm/@jtsage/piper-tts-web@1.2.0/+esm";
 
@@ -211,7 +211,7 @@ async function chargerPiper() {
             PIPER_WEB_VOICE
         );
 
-        setStatus("Piper MLS — moteur prêt.");
+        setStatus("Piper UPMC Pierre — moteur prêt.");
 
         return piperTTS;
     } catch (error) {
@@ -269,14 +269,14 @@ async function genererEtLireMorceau(id) {
     const numero = chunkIndex + 1;
 
     setStatus(
-        "Piper MLS — génération " +
+        "Piper UPMC Pierre — génération " +
         numero +
         "/" +
         chunks.length
     );
 
     console.log(
-        "AVANT-GARDE — Piper MLS — génération",
+        "AVANT-GARDE — Piper UPMC Pierre — génération",
         numero,
         "/",
         chunks.length
@@ -307,7 +307,7 @@ async function genererEtLireMorceau(id) {
                         progress.total > 0
                     ) {
                         setStatus(
-                            "Piper MLS — téléchargement " +
+                            "Piper UPMC Pierre — téléchargement " +
                             Math.round(
                                 progress.loaded /
                                 progress.total *
@@ -371,7 +371,7 @@ async function genererEtLireMorceau(id) {
             };
 
         setStatus(
-            "Piper MLS — lecture " +
+            "Piper UPMC Pierre — lecture " +
             numero +
             "/" +
             chunks.length
@@ -458,7 +458,7 @@ async function basculerLecture() {
         mettreAJourInterface();
 
         setStatus(
-            "Piper MLS — préparation…"
+            "Piper UPMC Pierre — préparation…"
         );
 
         await genererEtLireMorceau(
@@ -505,7 +505,7 @@ function reprendreLecture() {
         });
 
         setStatus(
-            "Piper MLS — lecture " +
+            "Piper UPMC Pierre — lecture " +
             (chunkIndex + 1) +
             "/" +
             chunks.length
@@ -578,7 +578,7 @@ function installerInteractionsLecteur() {
 
 function demarrerPageManifeste() {
     console.log(
-        "AVANT-GARDE — manifeste.js chargé — Piper MLS."
+        "AVANT-GARDE — manifeste.js chargé — Piper UPMC Pierre."
     );
 
     installerInteractionsLecteur();
