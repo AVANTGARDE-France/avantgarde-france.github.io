@@ -5,6 +5,7 @@
 ========================================================= */
 
 const PIPER_WEB_VOICE = "fr_FR-upmc-medium";
+const PIPER_WEB_SPEAKER_ID = 1;
 const PIPER_WEB_PACKAGE =
     "https://cdn.jsdelivr.net/npm/@jtsage/piper-tts-web@1.2.0/+esm";
 
