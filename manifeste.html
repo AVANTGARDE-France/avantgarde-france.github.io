@@ -5176,6 +5176,110 @@
         </div>
     </section>
 
+<style>
+/* =========================================================
+   AVANT-GARDE — LECTEUR AUDIO
+   Petit lecteur flottant, toujours en haut à droite
+========================================================= */
+
+#manifesteReader {
+    position: fixed !important;
+    top: 88px !important;
+    right: 16px !important;
+    left: auto !important;
+    bottom: auto !important;
+
+    z-index: 2147483647 !important;
+
+    width: auto !important;
+    max-width: calc(100vw - 32px) !important;
+    margin: 0 !important;
+    padding: 4px !important;
+
+    display: block !important;
+    box-sizing: border-box !important;
+
+    border: 1px solid rgba(7,21,45,.16) !important;
+    border-radius: 4px !important;
+
+    background: rgba(245,243,237,.90) !important;
+    box-shadow: 0 4px 14px rgba(7,21,45,.12) !important;
+
+    color: #07152d !important;
+
+    backdrop-filter: blur(7px);
+    -webkit-backdrop-filter: blur(7px);
+}
+
+#manifesteReader .manifeste-reader-main {
+    display: flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+}
+
+#manifesteReader .manifeste-reader-heading {
+    display: none !important;
+}
+
+#manifesteReader .manifeste-reader-controls {
+    display: flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+}
+
+#manifesteReader .manifeste-reader-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 25px !important;
+
+    margin: 0 !important;
+    padding: 3px 6px !important;
+
+    border: 1px solid rgba(7,21,45,.14) !important;
+    border-radius: 3px !important;
+
+    background: transparent !important;
+    color: #07152d !important;
+
+    font: 700 11px/1 Arial, sans-serif !important;
+    cursor: pointer !important;
+
+    transition: background .15s ease, color .15s ease, border-color .15s ease !important;
+}
+
+#manifesteReader .manifeste-reader-button-primary {
+    border-color: #07152d !important;
+    background: #07152d !important;
+    color: #fff !important;
+}
+
+#manifesteReader .manifeste-reader-button:hover {
+    border-color: #d6ad55 !important;
+}
+
+#manifesteReader .manifeste-reader-button:disabled {
+    opacity: .45 !important;
+    cursor: default !important;
+}
+
+@media (max-width: 800px) {
+    #manifesteReader {
+        top: 68px !important;
+        right: 8px !important;
+        max-width: calc(100vw - 16px) !important;
+    }
+
+    #manifesteReader .manifeste-reader-button {
+        min-height: 24px !important;
+        padding: 3px 5px !important;
+        font-size: 10px !important;
+    }
+}
+</style>
     <div id="site-footer"></div>
 
     <div id="site-rdv-modal"></div>
