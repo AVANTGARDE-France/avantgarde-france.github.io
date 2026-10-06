@@ -205,7 +205,7 @@ async function chargerPiper() {
          * son moteur phonemizer depuis @diffusionstudio.
          *
          * Le bundle impose speaker 0. On corrige cette seule
-         * valeur en mémoire afin de sélectionner Pierre (1).
+         * valeur en mémoire afin de sélectionner le locuteur MLS 40.
          */
         const response = await fetch(PIPER_WEB_BUNDLE);
 
@@ -234,7 +234,7 @@ async function chargerPiper() {
             'const speakerId = 40;'
         );
 
-        if (!source.includes("const speakerId = 1;")) {
+        if (!source.includes("const speakerId = 40;")) {
             throw new Error(
                 "Impossible de sélectionner la voix MLS 40 dans Piper."
             );
