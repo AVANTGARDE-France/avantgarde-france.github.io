@@ -136,6 +136,26 @@ export class PocketTTS {
         return result.ref;
     }
 
+    async cloneVoice(audioData, ref = "cloned-voice") {
+        if (!audioData || !audioData.length) {
+            throw new Error("Aucun audio de référence fourni.");
+        }
+
+        const pcm = audioData instanceof Float32Array
+            ? audioData
+            : new Float32Array(audioData);
+
+        const result = await this._request(
+            "cloneVoice",
+            {
+                audio: pcm,
+                ref
+            }
+        );
+
+        return result.ref;
+    }
+
     async generate(text, options = {}) {
         if (!options.voice) {
             throw new Error("generate() nécessite une voix préparée.");
