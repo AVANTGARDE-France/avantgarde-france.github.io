@@ -52,8 +52,8 @@ const PIPER_DATA =
 const PIPER_WORKER =
     "https://cdn.jsdelivr.net/npm/piper-wasm@0.1.4/build/worker/piper_worker.js";
 
-const PIPER_FR_CONFIG =
-    "https://huggingface.co/rhasspy/piper-voices/resolve/main/fr/fr_FR/siwis/medium/fr_FR-siwis-medium.onnx.json";
+const PIPER_FR_MODEL =
+    "https://huggingface.co/rhasspy/piper-voices/resolve/main/fr/fr_FR/siwis/medium/fr_FR-siwis-medium.onnx";
 
 async function chargerPiperPhonemizer() {
     if (piperPhonemizerPromise) {
@@ -106,7 +106,7 @@ async function phonemiserFrancais(texte) {
                 PIPER_WASM,
                 PIPER_DATA,
                 PIPER_WORKER,
-                PIPER_FR_CONFIG,
+                PIPER_FR_MODEL,
                 String(texte).trim(),
                 function (progress) {
                     if (
@@ -820,12 +820,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1021");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1022");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.1021";
+    diagnostic.textContent = "LECTEUR V.1022";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
