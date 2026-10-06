@@ -277,7 +277,22 @@ async function chargerPiper() {
                     }
                 });
 
-            const session =
+            /* iOS Safari : force ONNX Runtime Web en WASM CPU mono-thread. */
+        if (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)) {
+            try {
+                const ort = await import(PIPER_ONNX);
+                if (ort && ort.env && ort.env.wasm) {
+                    ort.env.wasm.numThreads = 1;
+                    ort.env.wasm.proxy = false;
+                }
+                console.log("AVANT-GARDE — iOS : ONNX Runtime en WASM mono-thread.");
+            } catch (iosError) {
+                console.warn("AVANT-GARDE — configuration ONNX iOS non appliquée :", iosError);
+            }
+        }
+
+        const session =
                 new piper.TtsSession({
                     voiceId: PIPER_WEB_VOICE,
                     fileReader: fileReader,
