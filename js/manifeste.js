@@ -6,14 +6,14 @@
 const KOKORO_MODEL = "onnx-community/Kokoro-82M-v1.0-ONNX";
 const KOKORO_VOICE = "ff_siwis";
 const KOKORO_CDN = "https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/+esm";
-const FRENCH_G2P_CDN = "https://cdn.jsdelivr.net/npm/@piper-plus/g2p@0.7.0/+esm";
+const FRENCH_PHONEMIZER_CDN = "https://cdn.jsdelivr.net/npm/phonemizer@1.2.1/+esm";
 const KOKORO_SAMPLE_RATE = 24000;
 const KOKORO_STYLE_DIM = 256;
 
 const contentElement = document.getElementById("editorialContent");
 
 let kokoro = null;
-let frenchG2P = null;
+let phonemizeFrancais = null;
 let audioContext = null;
 let activeSource = null;
 let currentGeneration = 0;
@@ -157,15 +157,15 @@ function construireMorceaux(texte) {
 }
 
 async function chargerKokoro() {
-    if (kokoro && frenchG2P) return kokoro;
+    if (kokoro && phonemizeFrancais) return kokoro;
 
     if (loading) {
-        while (loading && (!kokoro || !frenchG2P)) {
+        while (loading && (!kokoro || !phonemizeFrancais)) {
             await new Promise(function (resolve) {
                 setTimeout(resolve, 100);
             });
         }
-        if (kokoro && frenchG2P) return kokoro;
+        if (kokoro && phonemizeFrancais) return kokoro;
     }
 
     loading = true;
@@ -175,18 +175,18 @@ async function chargerKokoro() {
 
         const modules = await Promise.all([
             import(KOKORO_CDN),
-            import(FRENCH_G2P_CDN)
+            import(FRENCH_PHONEMIZER_CDN)
         ]);
 
         const KokoroTTS = modules[0].KokoroTTS;
-        const G2P = modules[1].G2P;
+        const phonemize = modules[1].phonemize;
 
         if (!KokoroTTS) {
             throw new Error("KokoroTTS introuvable.");
         }
 
-        if (typeof G2P !== "function") {
-            throw new Error("Phonémiseur français introuvable.");
+        if (typeof phonemize !== "function") {
+            throw new Error("Phonémiseur eSpeak français introuvable.");
         }
 
         const webGpuDisponible =
@@ -209,13 +209,7 @@ async function chargerKokoro() {
             }
         });
 
-        frenchG2P = await G2P.create({
-            languages: ["fr"]
-        });
-
-        if (!frenchG2P || typeof frenchG2P.phonemize !== "function") {
-            throw new Error("Initialisation du phonémiseur français impossible.");
-        }
+        phonemizeFrancais = phonemize;
 
         if (typeof kokoro.list_voices === "function") {
             const voices = kokoro.list_voices();
@@ -228,42 +222,35 @@ async function chargerKokoro() {
     } catch (error) {
         loading = false;
         kokoro = null;
-        frenchG2P = null;
+        phonemizeFrancais = null;
         console.error("AVANT-GARDE — initialisation Kokoro :", error);
         throw error;
     }
 }
 
 async function genererAudioFrancais(texte) {
-    if (!kokoro || !frenchG2P) {
+    if (!kokoro || typeof phonemizeFrancais !== "function") {
         throw new Error("Moteur vocal non initialisé.");
     }
 
     setStatus("Préparation du français…");
 
     /*
-       @piper-plus/g2p 0.4.x retourne un objet :
-       { tokens, language }.
-       Le second argument de phonemize() est le code langue.
+       Kokoro.js utilise le phonémiseur eSpeak NG.
+       Pour la voix française ff_siwis, le code langue attendu
+       est fr-fr. Nous utilisons donc exactement le même moteur
+       de phonémisation que Kokoro.js, et non @piper-plus/g2p.
     */
-    const resultatG2P = frenchG2P.phonemize(texte, { language: "fr" });
-    const phonemes = resultatG2P && Array.isArray(resultatG2P.tokens)
-        ? resultatG2P.tokens
-        : Array.isArray(resultatG2P)
-            ? resultatG2P
-            : null;
+    const resultatPhonemique = await phonemizeFrancais(texte, "fr-fr");
+    const textePhonemique = Array.isArray(resultatPhonemique)
+        ? resultatPhonemique.join(" ")
+        : String(resultatPhonemique || "").trim();
 
-    if (!phonemes || !phonemes.length) {
-        console.error(
-            "AVANT-GARDE — résultat G2P français inattendu :",
-            resultatG2P
-        );
+    if (!textePhonemique) {
         throw new Error("Le phonémiseur français n'a retourné aucun phonème.");
     }
 
-    const textePhonemique = phonemes.join("");
-
-    console.log("AVANT-GARDE — phonèmes français :", textePhonemique);
+    console.log("AVANT-GARDE — phonèmes français Kokoro :", textePhonemique);
 
     const tokenized = kokoro.tokenizer(textePhonemique, {
         truncation: true
@@ -274,10 +261,9 @@ async function genererAudioFrancais(texte) {
     }
 
     /*
-       kokoro-js 1.2.1 limite malheureusement sa validation de voix
-       aux préfixes anglais "a" et "b". Nous contournons UNIQUEMENT
-       cette validation et utilisons son API publique generate_from_ids()
-       avec la vraie voix française ff_siwis.
+       generate_from_ids() permet d'utiliser directement ff_siwis,
+       même si la validation de generate() de kokoro-js 1.2.1
+       ne reconnaît que les préfixes a/b.
     */
     return kokoro.generate_from_ids(tokenized.input_ids, {
         voice: KOKORO_VOICE,
