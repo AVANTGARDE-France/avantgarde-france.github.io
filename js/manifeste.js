@@ -6,7 +6,7 @@
 const KOKORO_MODEL = "onnx-community/Kokoro-82M-v1.0-ONNX";
 const KOKORO_VOICE = "ff_siwis";
 const KOKORO_CDN = "https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/+esm";
-const FRENCH_G2P_CDN = "https://cdn.jsdelivr.net/npm/@piper-plus/g2p@0.4.2/+esm";
+const FRENCH_G2P_CDN = "https://cdn.jsdelivr.net/npm/@piper-plus/g2p@0.7.0/+esm";
 const KOKORO_SAMPLE_RATE = 24000;
 const KOKORO_STYLE_DIM = 256;
 
@@ -246,7 +246,7 @@ async function genererAudioFrancais(texte) {
        { tokens, language }.
        Le second argument de phonemize() est le code langue.
     */
-    const resultatG2P = frenchG2P.phonemize(texte, "fr");
+    const resultatG2P = frenchG2P.phonemize(texte, { language: "fr" });
     const phonemes = resultatG2P && Array.isArray(resultatG2P.tokens)
         ? resultatG2P.tokens
         : Array.isArray(resultatG2P)
