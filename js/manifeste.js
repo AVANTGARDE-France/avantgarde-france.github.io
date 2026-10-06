@@ -20,6 +20,75 @@ const PIPER_ONNX =
 const contentElement =
     document.getElementById("editorialContent");
 
+
+import { supabase } from "./supabase.js";
+
+
+/* =========================================================
+   SYNCHRONISATION DU CONTENU PUBLIC
+
+   Le HTML est pré-rendu dans manifeste.html pour le SEO,
+   mais la version enregistrée dans le back-office reste
+   la source de vérité. On la recharge donc depuis Supabase
+   à chaque ouverture de la page.
+
+   Si Supabase est momentanément indisponible, on conserve
+   le contenu pré-rendu au lieu de vider la page.
+========================================================= */
+
+async function synchroniserContenuManifeste() {
+
+    if (!contentElement) {
+        return;
+    }
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabase
+            .from("other_contents")
+            .select("id, slug, titre, contenu_html, updated_at")
+            .eq("slug", "manifeste")
+            .order("id", { ascending: true })
+            .limit(1);
+
+        if (error) {
+            throw error;
+        }
+
+        const contenu =
+            Array.isArray(data) && data.length
+                ? data[0]
+                : null;
+
+        if (
+            !contenu ||
+            !contenu.contenu_html ||
+            !contenu.contenu_html.trim()
+        ) {
+            return;
+        }
+
+        contentElement.innerHTML =
+            contenu.contenu_html;
+
+        console.log(
+            "AVANT-GARDE — manifeste synchronisé depuis Supabase.",
+            contenu.updated_at
+        );
+
+    }
+    catch (error) {
+
+        console.warn(
+            "AVANT-GARDE — synchronisation Supabase du manifeste impossible ; conservation du pré-rendu.",
+            error
+        );
+    }
+}
+
 let piperEngine = null;
 let piperLoading = false;
 
@@ -728,10 +797,17 @@ function installerInteractionsLecteur() {
     }
 }
 
-function demarrerPageManifeste() {
+async function demarrerPageManifeste() {
     console.log(
         "AVANT-GARDE — manifeste.js chargé — Piper Tom."
     );
+
+    /*
+       Le contenu public est d'abord synchronisé avec Supabase.
+       Le lecteur est ensuite initialisé sur la version réellement
+       affichée, y compris après une modification depuis le back-office.
+    */
+    await synchroniserContenuManifeste();
 
     installerInteractionsLecteur();
 }
