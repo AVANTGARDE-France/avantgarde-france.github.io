@@ -5,7 +5,10 @@
 
 const POCKET_TTS_MODULE = "./pocket-tts/index.js";
 const POCKET_TTS_LANGUAGE = "french_24l";
-const POCKET_TTS_VOICE = "cosette";
+const POCKET_TTS_VOICE = "estelle-fr";
+const POCKET_TTS_VOICE_REFERENCE =
+    "https://huggingface.co/kyutai/tts-voices/resolve/main/unmute-prod-website/developpeuse-3.wav";
+const POCKET_TTS_VOICE_REFERENCE_CACHE = "avantgarde-pocket-tts-estelle-v1";
 const POCKET_TTS_CACHE = "avantgarde-pocket-tts-v1";
 const POCKET_TTS_SAMPLE_RATE = 24000;
 
@@ -199,6 +202,108 @@ function construireMorceaux(texte) {
     });
 }
 
+async function chargerReferenceEstelle() {
+    let arrayBuffer = null;
+
+    if (typeof caches !== "undefined") {
+        try {
+            const cache = await caches.open(
+                POCKET_TTS_VOICE_REFERENCE_CACHE
+            );
+            const cached = await cache.match(
+                POCKET_TTS_VOICE_REFERENCE
+            );
+
+            if (cached) {
+                arrayBuffer = await cached.arrayBuffer();
+            } else {
+                const response = await fetch(
+                    POCKET_TTS_VOICE_REFERENCE,
+                    { mode: "cors", cache: "force-cache" }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Téléchargement de la référence Estelle impossible (" +
+                        response.status +
+                        ")."
+                    );
+                }
+
+                const copy = response.clone();
+                arrayBuffer = await response.arrayBuffer();
+
+                try {
+                    await cache.put(
+                        POCKET_TTS_VOICE_REFERENCE,
+                        copy
+                    );
+                } catch (_) {}
+            }
+        } catch (error) {
+            console.warn(
+                "AVANT-GARDE — cache référence Estelle :",
+                error
+            );
+        }
+    }
+
+    if (!arrayBuffer) {
+        const response = await fetch(
+            POCKET_TTS_VOICE_REFERENCE,
+            { mode: "cors" }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                "Référence vocale Estelle inaccessible (" +
+                response.status +
+                ")."
+            );
+        }
+
+        arrayBuffer = await response.arrayBuffer();
+    }
+
+    if (!audioContext) {
+        throw new Error(
+            "AudioContext indisponible pour préparer la voix Estelle."
+        );
+    }
+
+    const decoded = await audioContext.decodeAudioData(
+        arrayBuffer.slice(0)
+    );
+
+    if (!decoded || !decoded.length) {
+        throw new Error(
+            "La référence vocale Estelle est vide."
+        );
+    }
+
+    const targetRate = POCKET_TTS_SAMPLE_RATE;
+    const targetLength = Math.max(
+        1,
+        Math.ceil(decoded.duration * targetRate)
+    );
+
+    const offline = new OfflineAudioContext(
+        1,
+        targetLength,
+        targetRate
+    );
+
+    const source = offline.createBufferSource();
+    source.buffer = decoded;
+    source.connect(offline.destination);
+    source.start(0);
+
+    const rendered = await offline.startRendering();
+    return new Float32Array(
+        rendered.getChannelData(0)
+    );
+}
+
 async function chargerPocketTTS() {
     if (pocketTTS && pocketVoice) {
         return pocketTTS;
@@ -235,7 +340,7 @@ async function chargerPocketTTS() {
         pocketTTS = new module.PocketTTS({
             language: POCKET_TTS_LANGUAGE,
             quantized: true,
-            voiceCloning: false,
+            voiceCloning: true,
             cache: true,
             cacheName: POCKET_TTS_CACHE
         });
@@ -269,35 +374,33 @@ async function chargerPocketTTS() {
         });
 
         console.log(
-            "AVANT-GARDE — Pocket TTS langues :",
+            "AVANT-GARDE — Pocket TTS langue :",
             POCKET_TTS_LANGUAGE
         );
 
         console.log(
-            "AVANT-GARDE — voix Pocket TTS disponibles :",
-            pocketTTS.predefinedVoices
+            "AVANT-GARDE — voix française : Estelle (référence Kyutai)"
         );
 
-        if (
-            !Array.isArray(pocketTTS.predefinedVoices) ||
-            !pocketTTS.predefinedVoices.includes(
-                POCKET_TTS_VOICE
-            )
-        ) {
-            throw new Error(
-                'La voix française "' +
-                POCKET_TTS_VOICE +
-                '" est indisponible dans le modèle.'
-            );
-        }
+        setStatus(
+            "Chargement de la voix française Estelle…"
+        );
 
-        setStatus("Préparation de la voix française…");
+        const referenceAudio =
+            await chargerReferenceEstelle();
 
-        pocketVoice = await pocketTTS.loadVoice(
+        setStatus(
+            "Préparation de la voix française Estelle…"
+        );
+
+        pocketVoice = await pocketTTS.cloneVoice(
+            referenceAudio,
             POCKET_TTS_VOICE
         );
 
-        setStatus("Moteur vocal français prêt.");
+        setStatus(
+            "Moteur vocal français prêt."
+        );
 
         loading = false;
 
