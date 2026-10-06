@@ -38,422 +38,124 @@ let paused = false;
 let loading = false;
 let initialisationFaite = false;
 
-let ephonePromise = null;
-let lectureNativeActive = false;
-let lecteurEvenementsInstalles = false;
-let lecteurInteractionsInstallees = false;
+let piperPhonemizerPromise = null;
 
-function avecTimeout(promise, delai, message) {
-    return Promise.race([
-        promise,
-        new Promise(function (_, reject) {
-            window.setTimeout(function () {
-                reject(new Error(message));
-            }, delai);
-        })
-    ]);
+const PIPER_WASM_JS =
+    "https://cdn.jsdelivr.net/npm/piper-wasm@0.1.4/build/piper_phonemize.js";
+
+const PIPER_WASM =
+    "https://cdn.jsdelivr.net/npm/piper-wasm@0.1.4/build/piper_phonemize.wasm";
+
+const PIPER_DATA =
+    "https://cdn.jsdelivr.net/npm/piper-wasm@0.1.4/build/piper_phonemize.data";
+
+const PIPER_WORKER =
+    "https://cdn.jsdelivr.net/npm/piper-wasm@0.1.4/build/worker/piper_worker.js";
+
+const PIPER_FR_CONFIG =
+    "https://huggingface.co/rhasspy/piper-voices/resolve/main/fr/fr_FR/siwis/medium/fr_FR-siwis-medium.onnx.json";
+
+async function chargerPiperPhonemizer() {
+    if (piperPhonemizerPromise) {
+        return piperPhonemizerPromise;
+    }
+
+    piperPhonemizerPromise =
+        import("https://cdn.jsdelivr.net/npm/piper-wasm@0.1.4/+esm")
+            .then(function (module) {
+                if (
+                    typeof module.piperPhonemize !==
+                    "function"
+                ) {
+                    throw new Error(
+                        "Piper : fonction piperPhonemize introuvable."
+                    );
+                }
+
+                return module.piperPhonemize;
+            });
+
+    try {
+        return await avecTimeout(
+            piperPhonemizerPromise,
+            30000,
+            "Piper : chargement du phonémiseur trop long."
+        );
+    } catch (error) {
+        piperPhonemizerPromise = null;
+        throw error;
+    }
 }
 
 async function phonemiserFrancais(texte) {
-    /*
-       eSpeak NG direct pouvait rester bloqué dans Safari/iOS.
-
-       ephone est un port WASM spécialisé dans la génération de
-       phonèmes eSpeak NG pour le navigateur. Le pack "roa"
-       contient notamment le français.
-    */
-
-    if (!ephonePromise) {
-        setStatus("Chargement du phonémiseur…");
-        console.log("AVANT-GARDE — ephone : import du module");
-
-        ephonePromise = avecTimeout(
-            import("https://cdn.jsdelivr.net/npm/ephone/+esm"),
-            20000,
-            "ephone : chargement du module trop long."
-        )
-        .then(async function (module) {
-            setStatus("Initialisation du français (WASM)…");
-            console.log(
-                "AVANT-GARDE — ephone : module chargé",
-                Object.keys(module || {})
-            );
-
-            const createEphone =
-                module.default || module;
-
-            const roa =
-                module.roa ||
-                (module.default && module.default.roa);
-
-            if (!createEphone || typeof createEphone !== "function") {
-                throw new Error(
-                    "ephone : fonction d'initialisation introuvable."
-                );
-            }
-
-            if (!roa) {
-                throw new Error(
-                    "ephone : pack linguistique français (roa) introuvable."
-                );
-            }
-
-            setStatus("Initialisation WASM du français… (max. 8 s)");
-
-            const moteur =
-                await avecTimeout(
-                    createEphone(roa),
-                    8000,
-                    "ephone : initialisation WASM trop longue (Safari/iOS)."
-                );
-
-            console.log("AVANT-GARDE — ephone : WASM initialisé");
-            setStatus("Activation de la voix française…");
-
-            if (
-                !moteur ||
-                typeof moteur.setVoice !== "function" ||
-                typeof moteur.textToIpa !== "function"
-            ) {
-                throw new Error(
-                    "ephone : moteur français incomplet."
-                );
-            }
-
-            moteur.setVoice("fr");
-
-            console.log("AVANT-GARDE — ephone : voix fr activée");
-
-            console.log(
-                "AVANT-GARDE — ephone : moteur français prêt",
-                typeof moteur.textToIpa
-            );
-
-            return moteur;
-        })
-        .catch(function (error) {
-            ephonePromise = null;
-            throw error;
-        });
-    }
-
-    const moteur = await ephonePromise;
-
-    setStatus("Conversion en phonèmes…");
-    console.log(
-        "AVANT-GARDE — ephone : conversion",
-        String(texte).slice(0, 120)
+    setStatus(
+        "Initialisation du phonémiseur français…"
     );
 
-    /*
-       textToIpa() est synchrone dans ephone.
-       On ne met volontairement PAS de await ici.
-    */
-    const debut =
-        performance.now();
+    const piperPhonemize =
+        await chargerPiperPhonemizer();
+
+    setStatus(
+        "Phonémisation française…"
+    );
 
     const resultat =
-        moteur.textToIpa(texte);
-
-    const duree =
-        Math.round(performance.now() - debut);
-
-    console.log(
-        "AVANT-GARDE — ephone : conversion terminée en",
-        duree,
-        "ms"
-    );
-
-    if (
-        !resultat ||
-        !String(resultat).trim()
-    ) {
-        throw new Error(
-            "ephone : aucun phonème français généré."
-        );
-    }
-
-    console.log(
-        "AVANT-GARDE — phonèmes français :",
-        String(resultat).slice(0, 200)
-    );
-
-    setStatus("Phonèmes prêts…");
-
-    return String(resultat).trim();
-}
-
-async function chargerManifeste() {
-
-    if (!contentElement) return;
-
-    if (contenuPreRenduDisponible()) {
-        initialiserLecteurManifeste();
-        return;
-    }
-
-    try {
-
-        const { supabase } = await import("./supabase.js");
-
-        const { data, error } =
-            await supabase
-                .from("other_contents")
-                .select("id, slug, titre, contenu_html, updated_at")
-                .eq("slug", SLUG)
-                .order("id", { ascending: true })
-                .limit(1);
-
-        if (error) throw error;
-
-        const contenu =
-            Array.isArray(data) && data.length
-                ? data[0]
-                : null;
-
-        if (!contenu) {
-            afficherErreur("Le manifeste n'est pas encore disponible.");
-            return;
-        }
-
-        if (titleElement && contenu.titre) {
-            titleElement.textContent = contenu.titre;
-        }
-
-        contentElement.innerHTML =
-            contenu.contenu_html || "";
-
-        initialiserLecteurManifeste();
-
-        if (!contenu.contenu_html?.trim()) {
-            afficherErreur("Le manifeste n'est pas encore disponible.");
-        }
-
-    } catch (error) {
-
-        console.error("AVANT-GARDE — MANIFESTE :", error);
-        afficherErreur("Impossible de charger le manifeste.");
-
-    }
-}
-
-function afficherErreur(message) {
-
-    if (!contentElement) return;
-
-    contentElement.innerHTML = "";
-
-    const element =
-        document.createElement("p");
-
-    element.className = "editorial-error";
-    element.textContent = message;
-
-    contentElement.appendChild(element);
-}
-
-function initialiserLecteurManifeste() {
-
-    if (initialisationFaite) return;
-
-    const reader =
-        document.getElementById("manifesteReader");
-
-    const playButton =
-        document.getElementById("manifesteReaderPlay");
-
-    const stopButton =
-        document.getElementById("manifesteReaderStop");
-
-    if (!reader || !playButton || !stopButton || !contentElement) {
-        return;
-    }
-
-    /*
-       Le lecteur est désormais piloté par délégation d'évènement sur
-       document. Cela évite qu'une initialisation tardive ou un élément
-       recréé par le HTML empêche le bouton d'être actif sur Safari/iOS.
-    */
-    installerEvenementsLecteur();
-
-    initialisationFaite = true;
-
-    mettreAJourInterface();
-    setStatus("Prêt");
-    console.log("AVANT-GARDE — lecteur initialisé");
-}
-
-function installerEvenementsLecteur() {
-
-    if (lecteurEvenementsInstalles) return;
-
-    function traiterBouton(bouton, source) {
-        if (!bouton) return;
-
-        console.log(
-            "AVANT-GARDE — interaction lecteur :",
-            source,
-            bouton.id
-        );
-
-        if (bouton.id === "manifesteReaderPlay") {
-            setStatus("Clic détecté…");
-            basculerLecture().catch(function (error) {
-                console.error("AVANT-GARDE — clic lecture :", error);
-            });
-        } else if (bouton.id === "manifesteReaderStop") {
-            arreterLecture();
-        }
-    }
-
-    function trouverBouton(event) {
-        const cible = event && event.target;
-        if (!cible) return null;
-
-        if (cible.closest) {
-            return cible.closest("#manifesteReaderPlay, #manifesteReaderStop");
-        }
-
-        return null;
-    }
-
-    document.addEventListener("click", function (event) {
-        traiterBouton(trouverBouton(event), "click");
-    }, true);
-
-    document.addEventListener("pointerup", function (event) {
-        traiterBouton(trouverBouton(event), "pointerup");
-    }, true);
-
-    document.addEventListener("touchend", function (event) {
-        traiterBouton(trouverBouton(event), "touchend");
-    }, true);
-
-    lecteurEvenementsInstalles = true;
-
-    console.log("AVANT-GARDE — événements lecteur installés");
-}
-
-function installerInteractionsDirectesLecteur() {
-    if (lecteurInteractionsInstallees) return;
-
-    window.__avantGardeLecture = function () {
-        setStatus("Activation…");
-        return basculerLecture();
-    };
-
-    window.__avantGardeArretLecture = function () {
-        arreterLecture();
-    };
-
-    const playButton = document.getElementById("manifesteReaderPlay");
-    const stopButton = document.getElementById("manifesteReaderStop");
-
-    if (playButton) {
-        playButton.onclick = function (event) {
-            if (event) event.preventDefault();
-            console.log("AVANT-GARDE — activation directe PLAY");
-            window.__avantGardeLecture();
-        };
-    }
-
-    if (stopButton) {
-        stopButton.onclick = function (event) {
-            if (event) event.preventDefault();
-            console.log("AVANT-GARDE — activation directe STOP");
-            window.__avantGardeArretLecture();
-        };
-    }
-
-    lecteurInteractionsInstallees = true;
-    console.log("AVANT-GARDE — interactions directes installées");
-}
-
-function extraireTexte() {
-
-    const clone =
-        contentElement.cloneNode(true);
-
-    clone.querySelectorAll(
-        "script, style, button, .manifeste-reader"
-    ).forEach(function (element) {
-        element.remove();
-    });
-
-    return (clone.textContent || "")
-        .replace(/\s+/g, " ")
-        .trim();
-}
-
-function construireMorceaux(texte) {
-
-    if (!texte) return [];
-
-    const phrases =
-        texte
-            .split(/(?<=[.!?…])\s+/)
-            .map(function (phrase) {
-                return phrase.trim();
-            })
-            .filter(Boolean);
-
-    const resultat = [];
-    let courant = "";
-
-    phrases.forEach(function (phrase) {
-
-        /*
-           Kokoro fonctionne mieux avec des segments modestes.
-           On évite les très longs blocs qui peuvent provoquer
-           des erreurs de génération ou des délais excessifs.
-        */
-        if (
-            courant &&
-            courant.length + phrase.length + 1 > 420
-        ) {
-            resultat.push(courant);
-            courant = "";
-        }
-
-        /*
-           Une phrase exceptionnellement longue est découpée
-           proprement plutôt que de dépasser la limite.
-        */
-        if (phrase.length > 420) {
-
-            const mots =
-                phrase.split(/\s+/);
-
-            mots.forEach(function (mot) {
-
-                if (
-                    courant &&
-                    courant.length + mot.length + 1 > 420
-                ) {
-                    resultat.push(courant);
-                    courant = "";
+        await avecTimeout(
+            piperPhonemize(
+                PIPER_WASM_JS,
+                PIPER_WASM,
+                PIPER_DATA,
+                PIPER_WORKER,
+                PIPER_FR_CONFIG,
+                String(texte).trim(),
+                function (progress) {
+                    if (
+                        progress &&
+                        progress.loaded &&
+                        progress.total
+                    ) {
+                        const pourcentage =
+                            Math.round(
+                                progress.loaded /
+                                progress.total *
+                                100
+                            );
+
+                        setStatus(
+                            "Phonémiseur français " +
+                            pourcentage +
+                            "%…"
+                        );
+                    }
                 }
+            ),
+            45000,
+            "Piper : phonémisation française trop longue."
+        );
 
-                courant =
-                    courant
-                        ? courant + " " + mot
-                        : mot;
-            });
+    const phonemes =
+        resultat &&
+        Array.isArray(resultat.phonemes)
+            ? resultat.phonemes
+            : [];
 
-            return;
-        }
+    const textePhonetique =
+        phonemes
+            .map(function (phrase) {
+                return Array.isArray(phrase)
+                    ? phrase.join("")
+                    : String(phrase);
+            })
+            .join(" ")
+            .trim();
 
-        courant =
-            courant
-                ? courant + " " + phrase
-                : phrase;
-    });
-
-    if (courant) {
-        resultat.push(courant);
+    if (!textePhonetique) {
+        throw new Error(
+            "Piper : aucun phonème français retourné."
+        );
     }
 
-    return resultat;
+    return textePhonetique;
 }
 
 async function chargerKokoro() {
@@ -1118,12 +820,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1011");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1021");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.1011";
+    diagnostic.textContent = "LECTEUR V.1021";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
