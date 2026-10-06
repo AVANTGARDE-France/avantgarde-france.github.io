@@ -169,6 +169,196 @@ async function fetchContent(slug) {
 }
 
 
+
+/* ============================================================
+   NORMALISATION DU CONTENU ÉDITORIAL
+============================================================ */
+
+/*
+ * Le contenu historique de Supabase peut contenir plusieurs
+ * copies identiques des mêmes blocs <style>. On les conserve
+ * une seule fois dans le HTML publié afin d'éviter de gonfler
+ * inutilement la page et de rendre son contenu difficile à
+ * traiter par les robots et les systèmes d'IA.
+ *
+ * Les blocs <style> différents sont tous conservés.
+ */
+
+function deduplicateStyleBlocks(html) {
+
+    const seen =
+        new Set();
+
+    return html.replace(
+        /<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi,
+        (block) => {
+
+            const normalized =
+                block.trim();
+
+            if (seen.has(normalized)) {
+
+                return "";
+
+            }
+
+            seen.add(normalized);
+
+            return block;
+
+        }
+    );
+}
+
+
+/* ============================================================
+   RESSOURCES D'ACCÈS AUX ROBOTS ET AUX IA
+============================================================ */
+
+function generateRobotsTxt() {
+
+    return [
+        "User-agent: *",
+        "Allow: /",
+        "",
+        "User-agent: GPTBot",
+        "Allow: /",
+        "",
+        "User-agent: ClaudeBot",
+        "Allow: /",
+        "",
+        "User-agent: Google-Extended",
+        "Allow: /",
+        "",
+        "User-agent: PerplexityBot",
+        "Allow: /",
+        "",
+        "User-agent: Applebot-Extended",
+        "Allow: /",
+        "",
+        "Sitemap: https://avantgarde-france.github.io/sitemap.xml",
+        ""
+    ].join("\n");
+}
+
+
+function generateSitemapXml() {
+
+    return [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+        '  <url><loc>https://avantgarde-france.github.io/</loc></url>',
+        '  <url><loc>https://avantgarde-france.github.io/manifeste.html</loc></url>',
+        '  <url><loc>https://avantgarde-france.github.io/projet.html</loc></url>',
+        '  <url><loc>https://avantgarde-france.github.io/inspirations.html</loc></url>',
+        '  <url><loc>https://avantgarde-france.github.io/equipe.html</loc></url>',
+        '</urlset>',
+        ""
+    ].join("\n");
+}
+
+
+/*
+ * llms.txt fournit une porte d'entrée explicite aux agents IA.
+ * Il ne remplace pas le HTML : le manifeste reste entièrement
+ * présent dans manifeste.html.
+ */
+
+function generateLlmsTxt() {
+
+    return [
+        "# Avant-gardE",
+        "",
+        "> La France libre.",
+        "",
+        "## Pages principales",
+        "",
+        "- [Accueil](https://avantgarde-france.github.io/): Présentation d'Avant-gardE.",
+        "- [Manifeste](https://avantgarde-france.github.io/manifeste.html): Texte intégral du Manifeste d'Avant-gardE, disponible directement dans le HTML.",
+        "- [Projet](https://avantgarde-france.github.io/projet.html): Présentation du projet.",
+        "- [Inspirations](https://avantgarde-france.github.io/inspirations.html): Inspirations revendiquées par Avant-gardE.",
+        "- [Équipe](https://avantgarde-france.github.io/equipe.html): Présentation de l'équipe.",
+        "",
+        "## Principe d'accès",
+        "",
+        "Les pages éditoriales sont publiées en HTML statique afin que leur contenu puisse être lu directement par les moteurs de recherche, robots et systèmes d'IA, sans dépendre d'une exécution JavaScript.",
+        ""
+    ].join("\n");
+}
+
+
+function generateLlmsFullTxt(manifestHtml) {
+
+    const withoutScripts =
+        manifestHtml.replace(
+            /<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi,
+            ""
+        );
+
+    const withoutStyles =
+        withoutScripts.replace(
+            /<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi,
+            ""
+        );
+
+    const text =
+        withoutStyles
+            .replace(/<br\\s*\\/?\\s*>/gi, "\n")
+            .replace(/<\\/p>/gi, "\n\n")
+            .replace(/<\\/h[1-6]>/gi, "\n\n")
+            .replace(/<li\\b[^>]*>/gi, "- ")
+            .replace(/<\\/li>/gi, "\n")
+            .replace(/<[^>]+>/g, "")
+            .replace(/&nbsp;/gi, " ")
+            .replace(/&amp;/gi, "&")
+            .replace(/&lt;/gi, "<")
+            .replace(/&gt;/gi, ">")
+            .replace(/&quot;/gi, '"')
+            .replace(/&#039;/gi, "'")
+            .replace(/\\n[ \\t]+/g, "\n")
+            .replace(/[ \\t]{2,}/g, " ")
+            .replace(/\\n{3,}/g, "\n\n")
+            .trim();
+
+    return [
+        "# Manifeste — Avant-gardE",
+        "",
+        "Source HTML : https://avantgarde-france.github.io/manifeste.html",
+        "",
+        text,
+        ""
+    ].join("\n");
+}
+
+
+async function writeDiscoveryFiles(manifestHtml) {
+
+    await fs.writeFile(
+        path.resolve(process.cwd(), "robots.txt"),
+        generateRobotsTxt(),
+        "utf8"
+    );
+
+    await fs.writeFile(
+        path.resolve(process.cwd(), "sitemap.xml"),
+        generateSitemapXml(),
+        "utf8"
+    );
+
+    await fs.writeFile(
+        path.resolve(process.cwd(), "llms.txt"),
+        generateLlmsTxt(),
+        "utf8"
+    );
+
+    await fs.writeFile(
+        path.resolve(process.cwd(), "llms-full.txt"),
+        generateLlmsFullTxt(manifestHtml),
+        "utf8"
+    );
+}
+
+
 /* ============================================================
    REMPLACEMENT DU CONTENU DE L'ARTICLE
 ============================================================ */
@@ -328,10 +518,12 @@ async function publishPage(page) {
 
 
     const content =
-        String(
-            data.contenu_html ||
-            ""
-        ).trim();
+        deduplicateStyleBlocks(
+            String(
+                data.contenu_html ||
+                ""
+            ).trim()
+        );
 
 
     if (!content) {
@@ -491,6 +683,23 @@ async function main() {
             changed = true;
         }
     }
+
+
+    const manifestPath =
+        path.resolve(
+            process.cwd(),
+            "manifeste.html"
+        );
+
+    const manifestHtml =
+        await fs.readFile(
+            manifestPath,
+            "utf8"
+        );
+
+    await writeDiscoveryFiles(
+        manifestHtml
+    );
 
 
     console.log("");
