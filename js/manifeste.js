@@ -292,22 +292,37 @@ async function chargerPiper() {
             }
         }
 
-        const session =
-                new piper.TtsSession({
-                    voiceId: PIPER_WEB_VOICE,
-                    fileReader: fileReader,
-                    logger: function (message) {
-                        console.log(
-                            "AVANT-GARDE — Piper :",
-                            message
-                        );
-                    }
-                });
+        const iosDevice =
+            /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+            (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-            setStatus(
-                "Initialisation de la voix Tom…"
-            );
+        const sessionOptions = {
+            voiceId: PIPER_WEB_VOICE,
+            fileReader: fileReader,
+            logger: function (message) {
+                console.log(
+                    "AVANT-GARDE — Piper :",
+                    message
+                );
+            }
+        };
 
+        if (iosDevice) {
+            sessionOptions.allowLocalModels = false;
+            sessionOptions.fallbackStrategy = "cdn";
+            sessionOptions.wasmPaths = {
+                onnxWasm: "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/",
+                piperData: "https://cdn.jsdelivr.net/npm/@diffusionstudio/piper-wasm@1.0.0/build/piper_phonemize.data",
+                piperWasm: "https://cdn.jsdelivr.net/npm/@diffusionstudio/piper-wasm@1.0.0/build/piper_phonemize.wasm"
+            };
+            console.log("AVANT-GARDE — iOS : Piper CDN-only, sans modèle local.");
+        }
+
+        const session = new piper.TtsSession(sessionOptions);
+
+        setStatus(
+            "Initialisation de la voix Tom…"
+        );
             await session.waitReady;
 
             piperEngine = {
