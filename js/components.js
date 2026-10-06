@@ -474,7 +474,7 @@ function injecterFooter() {
             </div>
 
             <div>
-                Souveraineté · Liberté · Responsabilité
+                PATRIE · SOUVERAINETÉ · JUSTICE · LIBERTÉ
             </div>
 
         </footer>
