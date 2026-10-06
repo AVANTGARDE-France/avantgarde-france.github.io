@@ -863,9 +863,24 @@ function supprimerChoixMoteur() {
 
     if (conteneur) {
         conteneur.remove();
-    } else {
-        select.remove();
+        return;
     }
+
+    const parent =
+        select.parentElement;
+
+    if (
+        parent &&
+        !parent.querySelector(
+            "#manifesteReaderPlay, #manifesteReaderStop, #manifesteReaderStatus, button"
+        ) &&
+        parent.children.length <= 3
+    ) {
+        parent.remove();
+        return;
+    }
+
+    select.remove();
 }
 
 function installerInteractionsDirectesLecteur() {
