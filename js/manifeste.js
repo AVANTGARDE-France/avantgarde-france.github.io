@@ -15,7 +15,11 @@ import { supabase } from "./supabase.js";
 const SLUG = "manifeste";
 const KOKORO_MODEL = "onnx-community/Kokoro-82M-v1.0-ONNX";
 const KOKORO_VOICE = "ff_siwis";
-const KOKORO_CDN = "https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/+esm";
+const TRANSFORMERS_CDN = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1/+esm";
+const PHONEMIZER_CDN = "https://cdn.jsdelivr.net/npm/phonemizer@1.2.1/+esm";
+const KOKORO_VOICE_URL = "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/main/voices/ff_siwis.bin";
+const KOKORO_STYLE_DIM = 256;
+const KOKORO_SAMPLE_RATE = 24000;
 
 const titleElement =
     document.getElementById("editorialTitle");
@@ -248,20 +252,41 @@ async function chargerKokoro() {
     }
 
     loading = true;
-
     setStatus("Chargement du moteur…");
 
     try {
 
-        const module =
-            await import(KOKORO_CDN);
+        /*
+           IMPORTANT :
+           kokoro-js 1.2.1 expose officiellement les voix anglaises
+           dans sa liste VOICES et refuse ff_siwis avant même la génération.
+           Le fichier ff_siwis.bin existe pourtant bien dans le modèle
+           Kokoro-82M-ONNX.
 
-        const KokoroTTS =
-            module.KokoroTTS;
+           On contourne donc uniquement cette limitation de l'enveloppe
+           kokoro-js et on utilise directement les mêmes briques
+           Transformers.js + phonemizer que Kokoro.
+        */
+        const transformers = await import(TRANSFORMERS_CDN);
+        const phonemizer = await import(PHONEMIZER_CDN);
 
-        if (!KokoroTTS) {
+        const StyleTextToSpeech2Model =
+            transformers.StyleTextToSpeech2Model;
+
+        const AutoTokenizer =
+            transformers.AutoTokenizer;
+
+        const Tensor =
+            transformers.Tensor;
+
+        if (
+            !StyleTextToSpeech2Model ||
+            !AutoTokenizer ||
+            !Tensor ||
+            !phonemizer?.phonemize
+        ) {
             throw new Error(
-                "KokoroTTS introuvable dans kokoro-js."
+                "Les composants Kokoro nécessaires sont introuvables."
             );
         }
 
@@ -274,11 +299,6 @@ async function chargerKokoro() {
                 ? "webgpu"
                 : "wasm";
 
-        /*
-           La documentation officielle recommande fp32
-           pour WebGPU. On garde q8 pour WASM afin de
-           limiter la mémoire nécessaire.
-        */
         const dtype =
             device === "webgpu"
                 ? "fp32"
@@ -286,32 +306,176 @@ async function chargerKokoro() {
 
         setStatus(
             device === "webgpu"
-                ? "Préparation de la voix…"
-                : "Préparation de la voix…"
+                ? "Chargement du modèle GPU…"
+                : "Chargement du modèle…"
         );
 
-        kokoro =
-            await KokoroTTS.from_pretrained(
-                KOKORO_MODEL,
-                {
-                    dtype,
-                    device,
-                    progress_callback: function (progress) {
+        const [model, tokenizer] =
+            await Promise.all([
+                StyleTextToSpeech2Model.from_pretrained(
+                    KOKORO_MODEL,
+                    {
+                        dtype,
+                        device,
+                        progress_callback: function (progress) {
 
-                        if (
-                            progress &&
-                            typeof progress.progress === "number"
-                        ) {
-
-                            setStatus(
-                                "Chargement " +
-                                Math.round(progress.progress) +
-                                "%"
-                            );
+                            if (
+                                progress &&
+                                typeof progress.progress === "number"
+                            ) {
+                                setStatus(
+                                    "Chargement " +
+                                    Math.round(progress.progress) +
+                                    "%"
+                                );
+                            }
                         }
                     }
-                }
+                ),
+                AutoTokenizer.from_pretrained(
+                    KOKORO_MODEL,
+                    {
+                        progress_callback: function (progress) {
+
+                            if (
+                                progress &&
+                                typeof progress.progress === "number"
+                            ) {
+                                setStatus(
+                                    "Chargement " +
+                                    Math.round(progress.progress) +
+                                    "%"
+                                );
+                            }
+                        }
+                    }
+                )
+            ]);
+
+        setStatus("Chargement de la voix française…");
+
+        const response =
+            await fetch(KOKORO_VOICE_URL);
+
+        if (!response.ok) {
+            throw new Error(
+                "Impossible de charger ff_siwis.bin (" +
+                response.status +
+                ")."
             );
+        }
+
+        const voiceBuffer =
+            await response.arrayBuffer();
+
+        const voiceData =
+            new Float32Array(voiceBuffer);
+
+        if (!voiceData.length) {
+            throw new Error(
+                "Le fichier de voix française est vide."
+            );
+        }
+
+        /*
+           On garde une petite API interne compatible avec le reste
+           du lecteur actuel : moteur.generate(texte, options).
+        */
+        kokoro = {
+            async generate(text, options) {
+
+                const speed =
+                    Number.isFinite(options?.speed)
+                        ? options.speed
+                        : 1;
+
+                const phonemeArray =
+                    await phonemizer.phonemize(
+                        text,
+                        "fr-fr"
+                    );
+
+                const phonemes =
+                    Array.isArray(phonemeArray)
+                        ? phonemeArray.join(" ")
+                        : String(phonemeArray || "");
+
+                if (!phonemes.trim()) {
+                    throw new Error(
+                        "La phonémisation française a retourné un texte vide."
+                    );
+                }
+
+                const tokenized =
+                    tokenizer(
+                        phonemes,
+                        {
+                            truncation: true
+                        }
+                    );
+
+                const input_ids =
+                    tokenized.input_ids;
+
+                const nombreTokens =
+                    Math.min(
+                        Math.max(
+                            input_ids.dims.at(-1) - 2,
+                            0
+                        ),
+                        509
+                    );
+
+                const offset =
+                    nombreTokens *
+                    KOKORO_STYLE_DIM;
+
+                const style =
+                    voiceData.slice(
+                        offset,
+                        offset + KOKORO_STYLE_DIM
+                    );
+
+                if (
+                    style.length !==
+                    KOKORO_STYLE_DIM
+                ) {
+                    throw new Error(
+                        "Le vecteur de style ff_siwis est incomplet."
+                    );
+                }
+
+                const outputs =
+                    await model({
+                        input_ids,
+                        style: new Tensor(
+                            "float32",
+                            style,
+                            [1, KOKORO_STYLE_DIM]
+                        ),
+                        speed: new Tensor(
+                            "float32",
+                            [speed],
+                            [1]
+                        )
+                    });
+
+                if (
+                    !outputs ||
+                    !outputs.waveform ||
+                    !outputs.waveform.data
+                ) {
+                    throw new Error(
+                        "Kokoro n'a pas retourné de forme d'onde."
+                    );
+                }
+
+                return {
+                    data: outputs.waveform.data,
+                    sample_rate: KOKORO_SAMPLE_RATE
+                };
+            }
+        };
 
         loading = false;
 
@@ -335,467 +499,3 @@ async function chargerKokoro() {
     }
 }
 
-function obtenirAudioContext() {
-
-    if (!audioContext) {
-
-        const AudioContextClass =
-            window.AudioContext ||
-            window.webkitAudioContext;
-
-        if (!AudioContextClass) {
-            throw new Error(
-                "Web Audio API indisponible."
-            );
-        }
-
-        audioContext =
-            new AudioContextClass();
-    }
-
-    return audioContext;
-}
-
-function convertirEnBuffer(audio) {
-
-    if (
-        !audio ||
-        !audio.data ||
-        !audio.sample_rate
-    ) {
-        throw new Error(
-            "Kokoro n'a pas retourné de données audio valides."
-        );
-    }
-
-    const context =
-        obtenirAudioContext();
-
-    const source =
-        audio.data instanceof Float32Array
-            ? audio.data
-            : Float32Array.from(audio.data);
-
-    if (!source.length) {
-        throw new Error(
-            "Kokoro a retourné une piste audio vide."
-        );
-    }
-
-    /*
-       Sécurité supplémentaire :
-       certains couples navigateur/WebGPU peuvent produire
-       ponctuellement NaN ou Infinity dans le PCM. Une seule
-       valeur invalide peut rendre toute la piste inutilisable.
-    */
-    const donnees =
-        new Float32Array(source.length);
-
-    let valeurValide = false;
-
-    for (let i = 0; i < source.length; i++) {
-
-        let valeur = source[i];
-
-        if (!Number.isFinite(valeur)) {
-            valeur = 0;
-        }
-
-        if (valeur > 1) valeur = 1;
-        if (valeur < -1) valeur = -1;
-
-        if (valeur !== 0) {
-            valeurValide = true;
-        }
-
-        donnees[i] = valeur;
-    }
-
-    if (!valeurValide) {
-        throw new Error(
-            "Kokoro a retourné une piste audio silencieuse."
-        );
-    }
-
-    const audioBuffer =
-        context.createBuffer(
-            1,
-            donnees.length,
-            audio.sample_rate
-        );
-
-    audioBuffer
-        .getChannelData(0)
-        .set(donnees);
-
-    return audioBuffer;
-}
-
-function jouerBuffer(audioBuffer, generation) {
-
-    return new Promise(function (resolve) {
-
-        if (
-            generation !== currentGeneration ||
-            !playing
-        ) {
-            resolve(false);
-            return;
-        }
-
-        const context =
-            obtenirAudioContext();
-
-        const source =
-            context.createBufferSource();
-
-        source.buffer =
-            audioBuffer;
-
-        source.connect(
-            context.destination
-        );
-
-        activeSource =
-            source;
-
-        source.onended =
-            function () {
-
-                if (
-                    activeSource === source
-                ) {
-                    activeSource = null;
-                }
-
-                resolve(
-                    generation === currentGeneration
-                );
-            };
-
-        source.start(0);
-    });
-}
-
-async function lireAvecKokoro() {
-
-    const generation =
-        ++currentGeneration;
-
-    const texte =
-        extraireTexte();
-
-    chunks =
-        construireMorceaux(texte);
-
-    chunkIndex = 0;
-
-    if (!chunks.length) {
-        terminerLecture();
-        setStatus("Aucun texte à lire.");
-        return;
-    }
-
-    try {
-
-        const moteur =
-            await chargerKokoro();
-
-        if (
-            generation !== currentGeneration ||
-            !playing
-        ) {
-            return;
-        }
-
-        const context =
-            obtenirAudioContext();
-
-        if (context.state === "suspended") {
-            await context.resume();
-        }
-
-        /*
-           IMPORTANT :
-           on utilise generate() morceau par morceau plutôt
-           que tts.stream(). C'est plus robuste dans le navigateur
-           et conforme à l'API officielle de kokoro-js.
-        */
-        for (
-            let index = 0;
-            index < chunks.length;
-            index++
-        ) {
-
-            if (
-                generation !== currentGeneration ||
-                !playing
-            ) {
-                return;
-            }
-
-            chunkIndex =
-                index + 1;
-
-            setStatus(
-                "Préparation " +
-                chunkIndex +
-                "/" +
-                chunks.length
-            );
-
-            const audio =
-                await moteur.generate(
-                    chunks[index],
-                    {
-                        voice: KOKORO_VOICE,
-                        speed: 0.94
-                    }
-                );
-
-            if (
-                generation !== currentGeneration ||
-                !playing
-            ) {
-                return;
-            }
-
-            const audioBuffer =
-                convertirEnBuffer(audio);
-
-            setStatus(
-                "Lecture " +
-                chunkIndex +
-                "/" +
-                chunks.length
-            );
-
-            const continuer =
-                await jouerBuffer(
-                    audioBuffer,
-                    generation
-                );
-
-            if (!continuer) {
-                return;
-            }
-        }
-
-        if (
-            generation === currentGeneration &&
-            playing
-        ) {
-            terminerLecture();
-        }
-
-    } catch (error) {
-
-        if (
-            generation !== currentGeneration
-        ) {
-            return;
-        }
-
-        console.error(
-            "AVANT-GARDE — Lecture Kokoro :",
-            error
-        );
-
-        terminerLecture();
-
-        setStatus(
-            "Erreur de lecture."
-        );
-    }
-}
-
-async function basculerLecture() {
-
-    if (playing && !paused) {
-
-        paused = true;
-
-        if (audioContext) {
-            await audioContext.suspend();
-        }
-
-        mettreAJourInterface();
-        setStatus("Pause");
-        return;
-    }
-
-    if (playing && paused) {
-
-        paused = false;
-
-        if (audioContext) {
-            await audioContext.resume();
-        }
-
-        mettreAJourInterface();
-        setStatus("Lecture");
-
-        return;
-    }
-
-    playing = true;
-    paused = false;
-
-    mettreAJourInterface();
-
-    try {
-
-        /*
-           Le contexte audio est créé ET repris immédiatement
-           dans le gestionnaire du clic utilisateur.
-           C'est important : attendre le chargement du modèle
-           avant de créer/reprendre AudioContext peut déclencher
-           le blocage autoplay de Chrome/Edge.
-        */
-        const context =
-            obtenirAudioContext();
-
-        if (context.state === "suspended") {
-            await context.resume();
-        }
-
-        if (context.state !== "running") {
-            throw new Error(
-                "Le navigateur n'autorise pas la lecture audio."
-            );
-        }
-
-        await lireAvecKokoro();
-
-    } catch (error) {
-
-        console.error(
-            "AVANT-GARDE — Lecteur :",
-            error
-        );
-
-        terminerLecture();
-
-        setStatus(
-            "Lecture indisponible."
-        );
-    }
-}
-
-function arreterLecture() {
-
-    currentGeneration++;
-
-    playing = false;
-    paused = false;
-    chunkIndex = 0;
-
-    if (activeSource) {
-
-        try {
-            activeSource.stop();
-        } catch (_) {}
-
-        activeSource = null;
-    }
-
-    if (audioContext) {
-
-        try {
-            audioContext.suspend();
-        } catch (_) {}
-    }
-
-    mettreAJourInterface();
-    setStatus("Prêt");
-}
-
-function terminerLecture() {
-
-    playing = false;
-    paused = false;
-    chunkIndex = 0;
-
-    activeSource = null;
-
-    mettreAJourInterface();
-    setStatus("Terminé");
-}
-
-function setStatus(message) {
-
-    const element =
-        document.getElementById(
-            "manifesteReaderStatus"
-        );
-
-    if (element) {
-        element.textContent = message;
-    }
-}
-
-function mettreAJourInterface() {
-
-    const playButton =
-        document.getElementById(
-            "manifesteReaderPlay"
-        );
-
-    const playLabel =
-        document.getElementById(
-            "manifesteReaderPlayLabel"
-        );
-
-    if (!playButton) return;
-
-    if (playing && !paused) {
-
-        playButton.setAttribute(
-            "aria-label",
-            "Mettre en pause"
-        );
-
-        if (playLabel) {
-            playLabel.textContent = "Pause";
-        }
-
-        return;
-    }
-
-    if (playing && paused) {
-
-        playButton.setAttribute(
-            "aria-label",
-            "Reprendre la lecture"
-        );
-
-        if (playLabel) {
-            playLabel.textContent = "Reprendre";
-        }
-
-        return;
-    }
-
-    playButton.setAttribute(
-        "aria-label",
-        "Écouter le manifeste"
-    );
-
-    if (playLabel) {
-        playLabel.textContent = "Écouter";
-    }
-}
-
-if (document.readyState === "loading") {
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        chargerManifeste,
-        { once: true }
-    );
-
-} else {
-
-    chargerManifeste();
-
-}
