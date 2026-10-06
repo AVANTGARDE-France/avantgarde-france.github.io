@@ -748,11 +748,13 @@ function attendreVoixIOS() {
 
 function lectureNativeFrancaise(generation) {
     return new Promise(function (resolve, reject) {
+        const SpeechUtterance = window.SpeechSynthesisUtterance;
+
         if (
-            !("speechSynthesis" in window) ||
-            typeof SpeechSynthesisUtterance === "undefined"
+            !window.speechSynthesis ||
+            typeof SpeechUtterance !== "function"
         ) {
-            reject(new Error("Synthèse vocale native indisponible."));
+            reject(new Error("iOS : variable SpeechSynthesisUtterance indisponible."));
             return;
         }
 
@@ -806,7 +808,7 @@ function lectureNativeFrancaise(generation) {
 
                lang=fr-FR suffit à demander à iOS une synthèse française.
             */
-            const utterance = new SpeechSynthesisUtterance(texte);
+            const utterance = new SpeechUtterance(texte);
 
             utterance.lang = "fr-FR";
             utterance.rate = 0.92;
@@ -1095,12 +1097,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1006");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1010");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.1006";
+    diagnostic.textContent = "LECTEUR V.1010";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
