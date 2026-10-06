@@ -40,6 +40,7 @@ let initialisationFaite = false;
 
 let ephonePromise = null;
 let lecteurEvenementsInstalles = false;
+let lecteurInteractionsInstallees = false;
 
 function avecTimeout(promise, delai, message) {
     return Promise.race([
@@ -278,43 +279,86 @@ function installerEvenementsLecteur() {
 
     if (lecteurEvenementsInstalles) return;
 
-    document.addEventListener(
-        "click",
-        function (event) {
+    function traiterBouton(bouton, source) {
+        if (!bouton) return;
 
-            const bouton =
-                event.target &&
-                event.target.closest
-                    ? event.target.closest("#manifesteReaderPlay, #manifesteReaderStop")
-                    : null;
+        console.log(
+            "AVANT-GARDE — interaction lecteur :",
+            source,
+            bouton.id
+        );
 
-            if (!bouton) return;
+        if (bouton.id === "manifesteReaderPlay") {
+            setStatus("Clic détecté…");
+            basculerLecture().catch(function (error) {
+                console.error("AVANT-GARDE — clic lecture :", error);
+            });
+        } else if (bouton.id === "manifesteReaderStop") {
+            arreterLecture();
+        }
+    }
 
-            console.log(
-                "AVANT-GARDE — clic lecteur détecté :",
-                bouton.id
-            );
+    function trouverBouton(event) {
+        const cible = event && event.target;
+        if (!cible) return null;
 
-            if (bouton.id === "manifesteReaderPlay") {
-                setStatus("Clic détecté…");
-                basculerLecture().catch(function (error) {
-                    console.error(
-                        "AVANT-GARDE — clic lecture :",
-                        error
-                    );
-                });
-            } else {
-                arreterLecture();
-            }
-        },
-        true
-    );
+        if (cible.closest) {
+            return cible.closest("#manifesteReaderPlay, #manifesteReaderStop");
+        }
+
+        return null;
+    }
+
+    document.addEventListener("click", function (event) {
+        traiterBouton(trouverBouton(event), "click");
+    }, true);
+
+    document.addEventListener("pointerup", function (event) {
+        traiterBouton(trouverBouton(event), "pointerup");
+    }, true);
+
+    document.addEventListener("touchend", function (event) {
+        traiterBouton(trouverBouton(event), "touchend");
+    }, true);
 
     lecteurEvenementsInstalles = true;
 
-    console.log(
-        "AVANT-GARDE — événements lecteur installés"
-    );
+    console.log("AVANT-GARDE — événements lecteur installés");
+}
+
+function installerInteractionsDirectesLecteur() {
+    if (lecteurInteractionsInstallees) return;
+
+    window.__avantGardeLecture = function () {
+        setStatus("Activation…");
+        return basculerLecture();
+    };
+
+    window.__avantGardeArretLecture = function () {
+        arreterLecture();
+    };
+
+    const playButton = document.getElementById("manifesteReaderPlay");
+    const stopButton = document.getElementById("manifesteReaderStop");
+
+    if (playButton) {
+        playButton.onclick = function (event) {
+            if (event) event.preventDefault();
+            console.log("AVANT-GARDE — activation directe PLAY");
+            window.__avantGardeLecture();
+        };
+    }
+
+    if (stopButton) {
+        stopButton.onclick = function (event) {
+            if (event) event.preventDefault();
+            console.log("AVANT-GARDE — activation directe STOP");
+            window.__avantGardeArretLecture();
+        };
+    }
+
+    lecteurInteractionsInstallees = true;
+    console.log("AVANT-GARDE — interactions directes installées");
 }
 
 function extraireTexte() {
@@ -824,12 +868,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0933");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0934");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.0933";
+    diagnostic.textContent = "LECTEUR V.0934";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
@@ -843,6 +887,7 @@ function demarrerPageManifeste() {
         pointerEvents: "none"
     });
     document.body.appendChild(diagnostic);
+    installerInteractionsDirectesLecteur();
     chargerManifeste().catch(function (error) {
         console.error("AVANT-GARDE — initialisation manifeste :", error);
     });
