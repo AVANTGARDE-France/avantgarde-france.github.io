@@ -212,6 +212,209 @@ function deduplicateStyleBlocks(html) {
 
 
 /* ============================================================
+   NETTOYAGE DU CONTENU ÉDITORIAL
+============================================================ */
+
+/*
+ * Le back-office doit enregistrer le contenu éditorial, pas une
+ * copie complète de manifeste.html.
+ *
+ * Si un ancien enregistrement Supabase contient déjà une page
+ * complète (article, section, styles, scripts, etc.), on extrait
+ * uniquement le premier bloc éditorial utile avant publication.
+ *
+ * IMPORTANT :
+ * Le lecteur audio n'est PAS dans ce contenu. Il appartient au
+ * squelette statique de manifeste.html et reste donc totalement
+ * indépendant de cette normalisation.
+ */
+
+const VOID_ELEMENTS = new Set([
+    "area", "base", "br", "col", "embed", "hr", "img", "input",
+    "link", "meta", "param", "source", "track", "wbr"
+]);
+
+function trouverOuverture(html, tagName, className) {
+    const pattern = new RegExp(
+        "<" + tagName + "\\b[^>]*\\bclass=[\\\"']([^\\\"']*)[\\\"'][^>]*>",
+        "ig"
+    );
+
+    let match;
+
+    while ((match = pattern.exec(html)) !== null) {
+        const classes = match[1]
+            .split(/\\s+/)
+            .filter(Boolean);
+
+        if (classes.includes(className)) {
+            return {
+                index: match.index,
+                end: pattern.lastIndex
+            };
+        }
+    }
+
+    return null;
+}
+
+function extraireElementEquilibre(html, ouverture) {
+    if (!ouverture) return null;
+
+    const ouvertureMatch = html
+        .slice(ouverture.index, ouverture.end)
+        .match(/^<([a-z0-9]+)/i);
+
+    if (!ouvertureMatch) return null;
+
+    const tagName = ouvertureMatch[1].toLowerCase();
+
+    const tokenPattern =
+        /<\\/?([a-z0-9]+)\\b[^>]*>/gi;
+
+    tokenPattern.lastIndex = ouverture.end;
+
+    let depth = 1;
+    let match;
+
+    while ((match = tokenPattern.exec(html)) !== null) {
+        const token = match[0];
+        const tokenTag = match[1].toLowerCase();
+
+        if (tokenTag !== tagName || token.startsWith("<!")) {
+            continue;
+        }
+
+        if (/^<\\//.test(token)) {
+            depth--;
+
+            if (depth === 0) {
+                return html.slice(
+                    ouverture.index,
+                    tokenPattern.lastIndex
+                );
+            }
+        } else if (
+            !token.endsWith("/>") &&
+            !VOID_ELEMENTS.has(tokenTag)
+        ) {
+            depth++;
+        }
+    }
+
+    return null;
+}
+
+function extraireInterieurElement(html, id) {
+    const pattern = new RegExp(
+        "<article\\b[^>]*\\bid=[\\\"']" +
+        id +
+        "[\\\"'][^>]*>([\\s\\S]*?)<\\/article>",
+        "i"
+    );
+
+    const match = html.match(pattern);
+
+    return match ? match[1].trim() : null;
+}
+
+function extrairePremierStyleApres(html, position) {
+    const suite = html.slice(position);
+
+    const match = suite.match(
+        /<style\\b[^>]*>[\\s\\S]*?<\\/style>/i
+    );
+
+    return match ? match[0].trim() : "";
+}
+
+function nettoyerContenuEditorial(html, slug) {
+    let source = String(html || "").trim();
+
+    if (!source) return "";
+
+    /*
+     * Cas 1 : Supabase contient une ancienne copie complète de
+     * l'article. On récupère uniquement son contenu intérieur.
+     */
+    const articleContent =
+        extraireInterieurElement(source, "editorialContent");
+
+    if (articleContent) {
+        source = articleContent;
+    }
+
+    /*
+     * Cas 2 : Supabase contient encore une page complète ou
+     * plusieurs copies successives du manifeste.
+     *
+     * On conserve le premier <section class="manifeste">,
+     * qui correspond au contenu éditorial réel, puis uniquement
+     * le premier <style> qui le suit.
+     */
+    const ouvertureManifeste =
+        trouverOuverture(
+            source,
+            "section",
+            "manifeste"
+        );
+
+    if (ouvertureManifeste) {
+        const manifeste =
+            extraireElementEquilibre(
+                source,
+                ouvertureManifeste
+            );
+
+        if (manifeste) {
+            const finManifeste =
+                ouvertureManifeste.index +
+                manifeste.length;
+
+            const style =
+                extrairePremierStyleApres(
+                    source,
+                    finManifeste
+                );
+
+            source =
+                style
+                    ? manifeste + "\\n\\n" + style
+                    : manifeste;
+        }
+    }
+
+    /*
+     * Sécurité : le contenu éditorial ne doit jamais embarquer
+     * le lecteur, les scripts de page, le footer ou les wrappers
+     * globaux. Le lecteur reste celui du squelette HTML statique.
+     */
+    source = source
+        .replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi, "")
+        .replace(/<link\\b[^>]*>/gi, "")
+        .replace(/<iframe\\b[^>]*>[\\s\\S]*?<\\/iframe>/gi, "")
+        .replace(/<div\\b[^>]*\\bid=[\\\"']site-header[\\\"'][^>]*>[\\s\\S]*?<\\/div>/gi, "")
+        .replace(/<div\\b[^>]*\\bid=[\\\"']site-footer[\\\"'][^>]*>[\\s\\S]*?<\\/div>/gi, "")
+        .replace(/<div\\b[^>]*\\bid=[\\\"']site-rdv-modal[\\\"'][^>]*>[\\s\\S]*?<\\/div>/gi, "")
+        .trim();
+
+    /*
+     * Les anciennes publications peuvent avoir laissé plusieurs
+     * copies exactes du CSS du manifeste. On n'en conserve qu'une.
+     */
+    source = deduplicateStyleBlocks(source);
+
+    if (slug === "manifeste") {
+        console.log(
+            "✓ Contenu manifeste normalisé : wrappers/scripts/duplications exclus."
+        );
+    }
+
+    return source;
+}
+
+
+/* ============================================================
    RESSOURCES D'ACCÈS AUX ROBOTS ET AUX IA
 ============================================================ */
 
@@ -518,11 +721,12 @@ async function publishPage(page) {
 
 
     const content =
-        deduplicateStyleBlocks(
+        nettoyerContenuEditorial(
             String(
                 data.contenu_html ||
                 ""
-            ).trim()
+            ),
+            page.slug
         );
 
 
