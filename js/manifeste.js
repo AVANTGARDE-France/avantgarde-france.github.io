@@ -742,7 +742,7 @@ async function basculerLecture() {
         if (appareilIOSOuSafariMobile()) {
             setStatus("Voix française iOS…");
             console.log("AVANT-GARDE — iOS : speechSynthesis", "speechSynthesis" in window, typeof SpeechSynthesisUtterance);
-            await lectureNativeFrancaise(texte);
+            await lectureNativeFrancaise(currentGeneration);
             if (generationCouranteValide()) {
                 playing = false;
                 paused = false;
@@ -763,7 +763,7 @@ async function basculerLecture() {
         setStatus(
             error && error.message && error.message.includes("initialisation WASM")
                 ? "ephone bloqué : WASM français non initialisé."
-                : "Erreur de lecture."
+                : "Erreur : " + (error && error.message ? error.message : "lecture impossible.")
         );
         console.error("AVANT-GARDE — lecture :", error);
     }
@@ -893,12 +893,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0938");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0939");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.0938";
+    diagnostic.textContent = "LECTEUR V.0939";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
