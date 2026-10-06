@@ -470,7 +470,7 @@ function replaceDescription(
 
 
     const pattern =
-        /(<meta\b[^>]*name=["']description["'][^>]*content=["'])[^"']*(["'][^>]*>)/i;
+        /(<meta\b[^>]*name=["']description["'][^>]*content=["'])[^"]*(["'][^>]*>)/i;
 
 
     if (!pattern.test(html)) {
