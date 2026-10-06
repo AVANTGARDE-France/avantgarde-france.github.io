@@ -459,6 +459,32 @@ async function genererAudioFrancais(texte, generation) {
         await pocketTTS.generate(texte, {
             voice: pocketVoice,
 
+            onProgress: function (progress) {
+                if (
+                    generation !== currentGeneration ||
+                    !playing ||
+                    paused
+                ) {
+                    return;
+                }
+
+                if (
+                    progress &&
+                    progress.status === "generating"
+                ) {
+                    setStatus(
+                        "Génération " +
+                        progress.chunk +
+                        "/" +
+                        progress.totalChunks +
+                        " — " +
+                        progress.frame +
+                        "/" +
+                        progress.maxFrames
+                    );
+                }
+            },
+
             onChunk: function (audio) {
                 if (
                     generation !== currentGeneration ||
