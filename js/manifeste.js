@@ -368,135 +368,24 @@ async function chargerKokoro() {
                 }
             );
 
-        setStatus("Chargement de la voix française…");
-
-        const transformers =
-            await import(TRANSFORMERS_CDN);
-
-        const Tensor =
-            transformers.Tensor;
-
-        if (!Tensor) {
-            throw new Error(
-                "Tensor introuvable dans Transformers.js."
-            );
-        }
-
-        const response =
-            await fetch(KOKORO_VOICE_URL);
-
-        if (!response.ok) {
-            throw new Error(
-                "Impossible de charger ff_siwis.bin (" +
-                response.status +
-                ")."
-            );
-        }
-
-        const voiceBuffer =
-            await response.arrayBuffer();
-
-        const voiceData =
-            new Float32Array(voiceBuffer);
-
-        if (!voiceData.length) {
-            throw new Error(
-                "Le fichier ff_siwis.bin est vide."
-            );
-        }
+        setStatus("Préparation de la voix française…");
 
         /*
-           Le tokenizer est celui réellement chargé par kokoro-js.
-           Le modèle est également celui réellement chargé par kokoro-js.
-           On ne recrée donc pas une seconde instance lourde.
+           Kokoro-js 1.2.1 gère directement les voix françaises,
+           dont ff_siwis. On utilise donc son pipeline officiel de
+           génération au lieu de reconstruire manuellement le tokenizer,
+           les phonèmes et le vecteur de style.
+
+           Cela supprime une dépendance WASM Piper supplémentaire et
+           évite les erreurs de compatibilité qui pouvaient interrompre
+           la lecture avant même la génération audio.
         */
-        moteur.generate =
-            async function (text, options) {
-
-                const speed =
-                    Number.isFinite(options?.speed)
-                        ? options.speed
-                        : 1;
-
-                setStatus("Phonémisation française…");
-
-                const phonemes = await phonemiserFrancais(text);
-
-                if (!phonemes || !String(phonemes).trim()) {
-                    throw new Error("eSpeak NG n'a retourné aucun phonème français.");
-                }
-
-                console.log("AVANT-GARDE — phonèmes français :", phonemes);
-
-                const tokenized =
-                    moteur.tokenizer(
-                        String(phonemes),
-                        {
-                            truncation: true
-                        }
-                    );
-
-                const input_ids =
-                    tokenized.input_ids;
-
-                const numTokens =
-                    Math.min(
-                        Math.max(
-                            input_ids.dims.at(-1) - 2,
-                            0
-                        ),
-                        509
-                    );
-
-                const offset =
-                    numTokens *
-                    KOKORO_STYLE_DIM;
-
-                const style =
-                    voiceData.slice(
-                        offset,
-                        offset + KOKORO_STYLE_DIM
-                    );
-
-                if (
-                    style.length !==
-                    KOKORO_STYLE_DIM
-                ) {
-                    throw new Error(
-                        "Le style vocal ff_siwis est incomplet pour ce segment."
-                    );
-                }
-
-                const result =
-                    await moteur.model({
-                        input_ids,
-                        style: new Tensor(
-                            "float32",
-                            style,
-                            [1, KOKORO_STYLE_DIM]
-                        ),
-                        speed: new Tensor(
-                            "float32",
-                            [speed],
-                            [1]
-                        )
-                    });
-
-                if (
-                    !result ||
-                    !result.waveform ||
-                    !result.waveform.data
-                ) {
-                    throw new Error(
-                        "Le modèle Kokoro n'a pas retourné de piste audio."
-                    );
-                }
-
-                return {
-                    data: result.waveform.data,
-                    sample_rate: KOKORO_SAMPLE_RATE
-                };
-            };
+        if (typeof moteur.list_voices === "function") {
+            const voixDisponibles = moteur.list_voices();
+            if (Array.isArray(voixDisponibles) && !voixDisponibles.includes(KOKORO_VOICE)) {
+                throw new Error("La voix française " + KOKORO_VOICE + " n'est pas disponible dans Kokoro.");
+            }
+        }
 
         /*
            Marque le moteur comme prêt uniquement après avoir chargé
