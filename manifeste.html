@@ -11527,7 +11527,23 @@
     </main>
 
 
-    <section id="manifesteReader" class="manifeste-reader" aria-label="Lecteur vocal du Manifeste">
+    <script>
+(function () {
+    const bouton = document.getElementById("manifesteReaderPlay");
+    const statut = document.getElementById("manifesteReaderStatus");
+
+    if (bouton) {
+        bouton.addEventListener("click", function () {
+            console.log("AVANT-GARDE — TEST CLIC LECTEUR");
+            if (statut) statut.textContent = "Clic détecté";
+        }, { capture: true });
+    } else {
+        console.error("AVANT-GARDE — bouton lecteur introuvable");
+    }
+})();
+</script>
+
+<section id="manifesteReader" class="manifeste-reader" aria-label="Lecteur vocal du Manifeste">
     <div class="manifeste-reader-main">
         <div class="manifeste-reader-heading">
             <span class="manifeste-reader-kicker">LECTEUR</span>
