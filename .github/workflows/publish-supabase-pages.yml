@@ -55,7 +55,7 @@ jobs:
 
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add manifeste.html inspirations.html
+          git add manifeste.html inspirations.html robots.txt sitemap.xml llms.txt llms-full.txt
 
           if git diff --cached --quiet; then
 
