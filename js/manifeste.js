@@ -415,10 +415,17 @@ async function genererEtLireMorceau(id) {
             return;
         }
 
-        if (
-            !response ||
-            !(response.file instanceof Blob)
-        ) {
+        const audioBlob =
+            response instanceof Blob
+                ? response
+                : (
+                    response &&
+                    response.file instanceof Blob
+                        ? response.file
+                        : null
+                );
+
+        if (!audioBlob) {
             throw new Error(
                 "Piper n'a pas renvoyé un fichier audio valide."
             );
@@ -427,7 +434,7 @@ async function genererEtLireMorceau(id) {
         libererAudio();
 
         activeObjectUrl =
-            URL.createObjectURL(response.file);
+            URL.createObjectURL(audioBlob);
 
         audioElement =
             new Audio(activeObjectUrl);
