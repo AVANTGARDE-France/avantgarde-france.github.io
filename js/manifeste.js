@@ -347,139 +347,114 @@ function libererAudio() {
     }
 }
 
-async function genererEtLireMorceau(id) {
-    if (
-        !playing ||
-        paused ||
-        id !== generationId
-    ) {
-        return;
+const buffers = new Map();
+let generationPromises = new Map();
+
+async function genererMorceau(index, id) {
+    if (index >= chunks.length || id !== generationId) return null;
+
+    if (buffers.has(index)) return buffers.get(index);
+    if (generationPromises.has(index)) return generationPromises.get(index);
+
+    const promise = (async function () {
+        const engine = await chargerPiper();
+        if (id !== generationId) return null;
+
+        const response = await engine.predict(chunks[index]);
+        if (id !== generationId) return null;
+
+        const audioBlob = response instanceof Blob
+            ? response
+            : (response && response.file instanceof Blob ? response.file : null);
+
+        if (!audioBlob) {
+            throw new Error("Piper n'a pas renvoyé un fichier audio valide.");
+        }
+
+        const url = URL.createObjectURL(audioBlob);
+        buffers.set(index, { blob: audioBlob, url: url });
+        return buffers.get(index);
+    })();
+
+    generationPromises.set(index, promise);
+
+    try {
+        return await promise;
+    } finally {
+        generationPromises.delete(index);
     }
+}
+
+async function prechargerMorceauSuivant(index, id) {
+    if (index >= chunks.length || id !== generationId) return;
+
+    try {
+        await genererMorceau(index, id);
+    } catch (error) {
+        console.error("AVANT-GARDE — préchargement Piper :", error);
+    }
+}
+
+async function genererEtLireMorceau(id) {
+    if (!playing || paused || id !== generationId) return;
 
     if (chunkIndex >= chunks.length) {
         playing = false;
         paused = false;
         chunkIndex = 0;
-
         libererAudio();
+        buffers.forEach(function (buffer) {
+            URL.revokeObjectURL(buffer.url);
+        });
+        buffers.clear();
+        generationPromises.clear();
         mettreAJourInterface();
         setStatus("Lecture terminée.");
-
         return;
     }
 
     const numero = chunkIndex + 1;
-
-    setStatus(
-        "Piper Tom — génération " +
-        numero +
-        "/" +
-        chunks.length
-    );
-
-    console.log(
-        "AVANT-GARDE — Piper Tom — génération",
-        numero,
-        "/",
-        chunks.length
-    );
+    setStatus("Piper Tom — génération " + numero + "/" + chunks.length);
+    console.log("AVANT-GARDE — Piper Tom — génération", numero, "/", chunks.length);
 
     try {
-        const engine =
-            await chargerPiper();
+        const buffer = await genererMorceau(chunkIndex, id);
 
-        if (
-            !playing ||
-            paused ||
-            id !== generationId
-        ) {
-            return;
-        }
+        if (!buffer || !playing || paused || id !== generationId) return;
 
-        const response =
-            await engine.predict(
-                chunks[chunkIndex]
-            );
-
-        if (
-            !playing ||
-            paused ||
-            id !== generationId
-        ) {
-            return;
-        }
-
-        const audioBlob =
-            response instanceof Blob
-                ? response
-                : (
-                    response &&
-                    response.file instanceof Blob
-                        ? response.file
-                        : null
-                );
-
-        if (!audioBlob) {
-            throw new Error(
-                "Piper n'a pas renvoyé un fichier audio valide."
-            );
-        }
-
+        const indexLu = chunkIndex;
         libererAudio();
 
-        activeObjectUrl =
-            URL.createObjectURL(audioBlob);
-
-        audioElement =
-            new Audio(activeObjectUrl);
-
+        activeObjectUrl = buffer.url;
+        audioElement = new Audio(activeObjectUrl);
         audioElement.preload = "auto";
         audioElement.playbackRate = PIPER_PLAYBACK_RATE;
 
-        audioElement.onended =
-            function () {
-                if (
-                    id !== generationId ||
-                    !playing ||
-                    paused
-                ) {
-                    return;
-                }
+        audioElement.onended = function () {
+            if (id !== generationId || !playing || paused) return;
 
-                chunkIndex++;
+            URL.revokeObjectURL(buffer.url);
+            buffers.delete(indexLu);
+            chunkIndex = indexLu + 1;
 
-                genererEtLireMorceau(id)
-                    .catch(function (error) {
-                        afficherErreurLecture(error);
-                    });
-            };
+            genererEtLireMorceau(id).catch(function (error) {
+                afficherErreurLecture(error);
+            });
+        };
 
-        audioElement.onerror =
-            function () {
-                afficherErreurLecture(
-                    new Error(
-                        "Le navigateur n'a pas pu lire l'audio Piper."
-                    )
-                );
-            };
+        audioElement.onerror = function () {
+            afficherErreurLecture(new Error("Le navigateur n'a pas pu lire l'audio Piper."));
+        };
 
-        setStatus(
-            "Piper Tom — lecture " +
-            numero +
-            "/" +
-            chunks.length
-        );
+        setStatus("Piper Tom — lecture " + numero + "/" + chunks.length);
+
+        // Double buffer : le morceau suivant est généré pendant la lecture.
+        prechargerMorceauSuivant(indexLu + 1, id);
 
         await audioElement.play();
 
     } catch (error) {
-        if (
-            id !== generationId ||
-            !playing
-        ) {
-            return;
-        }
-
+        if (id !== generationId || !playing) return;
         afficherErreurLecture(error);
     }
 }
