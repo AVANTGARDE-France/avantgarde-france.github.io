@@ -44,7 +44,8 @@ jobs:
         run: node scripts/publish-supabase-pages.mjs
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          # Accepte le nouveau nom publishable ou l'ancien nom anon.
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY || secrets.SUPABASE_ANON_KEY }}
 
 
       - name: Publier les modifications
