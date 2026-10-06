@@ -308,12 +308,70 @@ async function chargerPiperPlus() {
                 "piper-plus"
             );
 
-        const ort =
+        const ortModule =
             await import(
                 "onnxruntime-web"
             );
 
+        /*
+           Piper Plus 0.7.0 construit le masque speaker_embedding_mask
+           en [1]. Le modèle Tsukuyomi-chan issu de PR #320 attend
+           explicitement [1,1]. On corrige uniquement ce tenseur avant
+           de le remettre à Piper Plus, sans modifier les autres tenseurs.
+        */
+        const OriginalTensor =
+            ortModule.Tensor;
+
+        const ort =
+            new Proxy(
+                ortModule,
+                {
+                    get: function (target, property) {
+                        if (
+                            property === "Tensor"
+                        ) {
+                            return function (
+                                type,
+                                data,
+                                dims
+                            ) {
+                                if (
+                                    type === "int64" &&
+                                    data instanceof BigInt64Array &&
+                                    dims &&
+                                    dims.length === 1 &&
+                                    dims[0] === 1 &&
+                                    data.length === 1 &&
+                                    (
+                                        data[0] === 0n ||
+                                        data[0] === 1n
+                                    )
+                                ) {
+                                    return new OriginalTensor(
+                                        type,
+                                        data,
+                                        [1, 1]
+                                    );
+                                }
+
+                                return new OriginalTensor(
+                                    type,
+                                    data,
+                                    dims
+                                );
+                            };
+                        }
+
+                        return Reflect.get(
+                            target,
+                            property
+                        );
+                    }
+                }
+            );
+
         if (
+            !ortModule ||
             !piperModule ||
             !piperModule.PiperPlus
         ) {
@@ -430,9 +488,9 @@ async function genererAudioFrancais(
                 texte,
                 {
                     language: "fr",
-                    noiseScale: 0.4,
+                    noiseScale: 0.667,
                     lengthScale: 1.5,
-                    noiseW: 0.667,
+                    noiseW: 0.8,
                     speakerEmbedding: speakerEmbedding
                 }
             );
@@ -844,44 +902,65 @@ function arreterLecture() {
 }
 
 function supprimerChoixMoteur() {
-    const select =
-        document.getElementById("manifesteReaderEngine");
+    const selecteurs = [
+        "#manifesteReaderEngine",
+        "#manifesteReaderVoice",
+        ".manifeste-reader-engine",
+        ".manifeste-reader-choice",
+        ".manifeste-reader-options",
+        ".manifeste-reader-select",
+        "[data-reader-engine]",
+        "[data-tts-engine]"
+    ];
 
-    if (!select) return;
+    selecteurs.forEach(function (selecteur) {
+        document
+            .querySelectorAll(selecteur)
+            .forEach(function (element) {
+                if (
+                    element.id === "manifesteReaderPlay" ||
+                    element.id === "manifesteReaderStop" ||
+                    element.id === "manifesteReaderStatus"
+                ) {
+                    return;
+                }
 
-    const label =
-        select.closest("label");
+                const parent =
+                    element.closest("label") ||
+                    element.closest(
+                        ".manifeste-reader-engine, .manifeste-reader-choice, .manifeste-reader-options, .manifeste-reader-select"
+                    );
 
-    if (label) {
-        label.remove();
-        return;
-    }
+                if (parent) {
+                    parent.remove();
+                } else {
+                    element.remove();
+                }
+            });
+    });
 
-    const conteneur =
-        select.closest(
-            ".manifeste-reader-engine, .manifeste-reader-choice, .manifeste-reader-options"
-        );
+    /*
+       Dernier filet de sécurité : si un ancien lecteur injecte
+       simplement un <select> dans la zone du lecteur, on retire
+       le select et son libellé sans toucher aux boutons.
+    */
+    document
+        .querySelectorAll(
+            "#manifesteReader select, .manifeste-reader select"
+        )
+        .forEach(function (select) {
+            const parent =
+                select.closest("label") ||
+                select.closest(
+                    ".manifeste-reader-engine, .manifeste-reader-choice, .manifeste-reader-options, .manifeste-reader-select"
+                );
 
-    if (conteneur) {
-        conteneur.remove();
-        return;
-    }
-
-    const parent =
-        select.parentElement;
-
-    if (
-        parent &&
-        !parent.querySelector(
-            "#manifesteReaderPlay, #manifesteReaderStop, #manifesteReaderStatus, button"
-        ) &&
-        parent.children.length <= 3
-    ) {
-        parent.remove();
-        return;
-    }
-
-    select.remove();
+            if (parent) {
+                parent.remove();
+            } else {
+                select.remove();
+            }
+        });
 }
 
 function installerInteractionsDirectesLecteur() {
