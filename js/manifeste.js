@@ -741,6 +741,7 @@ async function basculerLecture() {
 
         if (appareilIOSOuSafariMobile()) {
             setStatus("Voix française iOS…");
+            console.log("AVANT-GARDE — iOS : speechSynthesis", "speechSynthesis" in window, typeof SpeechSynthesisUtterance);
             await lectureNativeFrancaise(texte);
             if (generationCouranteValide()) {
                 playing = false;
@@ -892,12 +893,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0937");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0938");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.0937";
+    diagnostic.textContent = "LECTEUR V.0938";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
