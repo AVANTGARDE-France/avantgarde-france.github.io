@@ -52,6 +52,53 @@
 
         </header>
 
+        <!-- =====================================================
+             LECTEUR DU MANIFESTE
+        ====================================================== -->
+
+        <section id="manifesteReader" class="manifeste-reader" aria-label="Lecteur du Manifeste">
+
+            <div class="manifeste-reader-main">
+
+                <div class="manifeste-reader-heading">
+                    <span class="manifeste-reader-kicker">LECTEUR DU MANIFESTE</span>
+                    <strong id="manifesteReaderTitle">Écouter le manifeste</strong>
+                </div>
+
+                <div class="manifeste-reader-controls">
+
+                    <button type="button" id="manifesteReaderPlay" class="manifeste-reader-button manifeste-reader-button-primary" aria-label="Lire le manifeste">
+                        <span aria-hidden="true">▶</span>
+                        <span id="manifesteReaderPlayLabel">Lire</span>
+                    </button>
+
+                    <button type="button" id="manifesteReaderStop" class="manifeste-reader-button" aria-label="Arrêter la lecture">
+                        <span aria-hidden="true">■</span>
+                        <span>Arrêter</span>
+                    </button>
+
+                    <button type="button" id="manifesteReaderPrevious" class="manifeste-reader-button" aria-label="Chapitre précédent">
+                        <span aria-hidden="true">‹</span>
+                        <span>Précédent</span>
+                    </button>
+
+                    <button type="button" id="manifesteReaderNext" class="manifeste-reader-button" aria-label="Chapitre suivant">
+                        <span>Suivant</span>
+                        <span aria-hidden="true">›</span>
+                    </button>
+
+                </div>
+
+                <div class="manifeste-reader-status">
+                    <span id="manifesteReaderStatus">Prêt à lire</span>
+                    <span class="manifeste-reader-separator" aria-hidden="true">·</span>
+                    <span id="manifesteReaderVoice">Voix française naturelle</span>
+                </div>
+
+            </div>
+
+        </section>
+
 
         <!--
             IMPORTANT :
@@ -1427,6 +1474,155 @@
     letter-spacing: -.06em;
 }
 
+
+/* =========================================================
+   LECTEUR DU MANIFESTE
+========================================================= */
+
+.manifeste-reader {
+    position: relative;
+    z-index: 5;
+    width: min(1100px, 90%);
+    margin: 35px auto 0;
+    padding: 22px 24px;
+    box-sizing: border-box;
+    border: 1px solid rgba(7,21,45,.12);
+    border-radius: 2px;
+    background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(245,243,237,.96));
+    box-shadow: 0 14px 35px rgba(7,21,45,.10);
+    color: var(--navy);
+}
+
+.manifeste-reader-main {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) auto;
+    align-items: center;
+    gap: 20px 30px;
+}
+
+.manifeste-reader-heading { min-width: 0; }
+
+.manifeste-reader-kicker {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--gold);
+    font-size: .68rem;
+    font-weight: 900;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+}
+
+.manifeste-reader-heading strong {
+    display: block;
+    font-size: 1.15rem;
+    line-height: 1.2;
+}
+
+.manifeste-reader-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.manifeste-reader-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 8px 13px;
+    border: 1px solid rgba(7,21,45,.16);
+    border-radius: 2px;
+    background: white;
+    color: var(--navy);
+    font: inherit;
+    font-size: .82rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+.manifeste-reader-button:hover {
+    border-color: var(--gold);
+    transform: translateY(-1px);
+}
+
+.manifeste-reader-button-primary {
+    border-color: var(--navy);
+    background: var(--navy);
+    color: white;
+}
+
+.manifeste-reader-button-primary:hover {
+    border-color: var(--navy-2);
+    background: var(--navy-2);
+}
+
+.manifeste-reader-button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.manifeste-reader-status {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(7,21,45,.09);
+    color: var(--muted);
+    font-size: .78rem;
+    font-weight: 700;
+}
+
+.manifeste-reader-separator { color: var(--gold); }
+
+.manifeste-reader-active {
+    position: relative;
+}
+
+.manifeste-reader-active::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--gold);
+}
+
+.manifeste-reader-active .manifeste-number {
+    color: var(--gold);
+}
+
+@media (max-width: 800px) {
+
+    .manifeste-reader {
+        width: 92%;
+        margin-top: 20px;
+        padding: 18px;
+    }
+
+    .manifeste-reader-main {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .manifeste-reader-controls {
+        justify-content: flex-start;
+    }
+
+    .manifeste-reader-button {
+        flex: 1 1 auto;
+    }
+
+    .manifeste-reader-status {
+        grid-column: auto;
+    }
+
+}
 
 /* =========================================================
    RESPONSIVE
