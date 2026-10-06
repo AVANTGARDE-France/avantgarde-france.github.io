@@ -148,6 +148,7 @@ function initialiserLecteurManifeste() {
 
     mettreAJourInterface();
     setStatus("Prêt");
+    console.log("AVANT-GARDE — lecteur initialisé");
 }
 
 function extraireTexte() {
