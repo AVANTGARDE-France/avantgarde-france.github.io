@@ -893,12 +893,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0940");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0941");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.0940";
+    diagnostic.textContent = "LECTEUR V.0941";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
