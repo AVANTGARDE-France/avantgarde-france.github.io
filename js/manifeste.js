@@ -1,18 +1,22 @@
 /* =========================================================
    AVANT-GARDE — PAGE MANIFESTE
    Lecteur vocal gratuit — Piper TTS Web
-   Voix unique : fr_FR-upmc-medium
+   Voix unique : UPMC Pierre
 ========================================================= */
 
 const PIPER_WEB_VOICE = "fr_FR-upmc-medium";
 const PIPER_WEB_SPEAKER_ID = 1;
+
 const PIPER_WEB_PACKAGE =
-    "https://cdn.jsdelivr.net/npm/@jtsage/piper-tts-web@1.2.0/+esm";
+    "https://cdn.jsdelivr.net/npm/piper-tts-web@1.1.2/dist/piper-tts-web.js";
+
+const PIPER_WEB_ASSETS =
+    "https://cdn.jsdelivr.net/npm/piper-tts-web@1.1.2/dist/";
 
 const contentElement =
     document.getElementById("editorialContent");
 
-let piperTTS = null;
+let piperEngine = null;
 let piperLoading = false;
 
 let audioElement = null;
@@ -172,51 +176,71 @@ function construireMorceaux(texte) {
 }
 
 async function chargerPiper() {
-    if (piperTTS) {
-        return piperTTS;
+    if (piperEngine) {
+        return piperEngine;
     }
 
     if (piperLoading) {
-        while (piperLoading && !piperTTS) {
+        while (piperLoading && !piperEngine) {
             await new Promise(function (resolve) {
                 setTimeout(resolve, 100);
             });
         }
 
-        if (piperTTS) {
-            return piperTTS;
+        if (piperEngine) {
+            return piperEngine;
         }
     }
 
     piperLoading = true;
 
     try {
-        setStatus("Chargement de Piper…");
+        setStatus("Chargement du moteur vocal…");
 
-        const tts =
+        const piper =
             await import(PIPER_WEB_PACKAGE);
 
         if (
-            !tts ||
-            typeof tts.predict !== "function"
+            !piper ||
+            typeof piper.PiperWebEngine !== "function" ||
+            typeof piper.OnnxWebRuntime !== "function" ||
+            typeof piper.PhonemizeWebRuntime !== "function"
         ) {
             throw new Error(
                 "Le moteur Piper Web n'a pas pu être chargé."
             );
         }
 
-        piperTTS = tts;
+        const onnxRuntime =
+            new piper.OnnxWebRuntime({
+                basePath:
+                    PIPER_WEB_ASSETS + "onnx/"
+            });
+
+        const phonemizeRuntime =
+            new piper.PhonemizeWebRuntime({
+                basePath:
+                    PIPER_WEB_ASSETS + "piper/"
+            });
+
+        piperEngine =
+            new piper.PiperWebEngine({
+                onnxRuntime,
+                phonemizeRuntime
+            });
 
         console.log(
-            "AVANT-GARDE — Piper Web prêt :",
-            PIPER_WEB_VOICE
+            "AVANT-GARDE — Piper Web prêt : UPMC Pierre (speaker 1)"
         );
 
-        setStatus("Piper UPMC Pierre — moteur prêt.");
+        setStatus(
+            "Piper UPMC Pierre — moteur prêt."
+        );
 
-        return piperTTS;
+        return piperEngine;
+
     } catch (error) {
-        piperTTS = null;
+        piperEngine = null;
 
         console.error(
             "AVANT-GARDE — chargement Piper :",
@@ -224,6 +248,7 @@ async function chargerPiper() {
         );
 
         throw error;
+
     } finally {
         piperLoading = false;
     }
@@ -284,7 +309,8 @@ async function genererEtLireMorceau(id) {
     );
 
     try {
-        const tts = await chargerPiper();
+        const engine =
+            await chargerPiper();
 
         if (
             !playing ||
@@ -294,30 +320,11 @@ async function genererEtLireMorceau(id) {
             return;
         }
 
-        const wav =
-            await tts.predict(
-                {
-                    text: chunks[chunkIndex],
-                    voiceId: PIPER_WEB_VOICE
-                },
-                function (progress) {
-                    if (
-                        progress &&
-                        Number.isFinite(progress.loaded) &&
-                        Number.isFinite(progress.total) &&
-                        progress.total > 0
-                    ) {
-                        setStatus(
-                            "Piper UPMC Pierre — téléchargement " +
-                            Math.round(
-                                progress.loaded /
-                                progress.total *
-                                100
-                            ) +
-                            "%"
-                        );
-                    }
-                }
+        const response =
+            await engine.generate(
+                chunks[chunkIndex],
+                PIPER_WEB_VOICE,
+                PIPER_WEB_SPEAKER_ID
             );
 
         if (
@@ -328,7 +335,10 @@ async function genererEtLireMorceau(id) {
             return;
         }
 
-        if (!(wav instanceof Blob)) {
+        if (
+            !response ||
+            !(response.file instanceof Blob)
+        ) {
             throw new Error(
                 "Piper n'a pas renvoyé un fichier audio valide."
             );
@@ -337,7 +347,7 @@ async function genererEtLireMorceau(id) {
         libererAudio();
 
         activeObjectUrl =
-            URL.createObjectURL(wav);
+            URL.createObjectURL(response.file);
 
         audioElement =
             new Audio(activeObjectUrl);
