@@ -286,6 +286,13 @@ function initialiserLecteurManifeste() {
 
     syntheseVocale = window.speechSynthesis;
 
+    /*
+       Certains navigateurs, notamment Chromium/Edge, ne fournissent
+       les voix qu'après le chargement de la page. On prépare donc la
+       liste immédiatement puis à nouveau avec voiceschanged.
+    */
+    preparerVoix();
+
     chapitres = Array.from(
         contentElement.querySelectorAll(
             ".manifeste-content > .manifeste-section, .manifeste-content > .manifeste-conclusion"
@@ -432,7 +439,18 @@ function preparerVoix() {
 
 function basculerLecture() {
 
-    if (!syntheseVocale) return;
+    if (!syntheseVocale) {
+        return;
+    }
+
+    /*
+       Si aucune voix n'a encore été fournie par le navigateur,
+       on demande explicitement le chargement puis on lit quand même
+       avec la voix française par défaut du moteur.
+    */
+    if (!voixSelectionnee) {
+        preparerVoix();
+    }
 
     if (enLecture) {
 
@@ -502,6 +520,11 @@ function lireMorceau() {
         ? voixSelectionnee.lang
         : "fr-FR";
 
+    /*
+       On n'impose la voix que lorsqu'elle est réellement disponible.
+       Sinon le moteur choisit automatiquement la meilleure voix pour
+       fr-FR, ce qui évite les erreurs "voice-unavailable".
+    */
     if (voixSelectionnee) {
         utterance.voice = voixSelectionnee;
     }
@@ -532,17 +555,71 @@ function lireMorceau() {
         terminerLecture();
     };
 
+    utterance.onstart = function () {
+        enLecture = true;
+        enPause = false;
+        mettreAJourInterface();
+    };
+
     utterance.onerror = function (event) {
 
-        console.warn("AVANT-GARDE — LECTEUR :", event);
+        console.warn(
+            "AVANT-GARDE — LECTEUR vocal :",
+            event.error
+        );
 
-        if (event.error === "canceled") return;
+        if (
+            event.error === "canceled" ||
+            event.error === "interrupted"
+        ) {
+            return;
+        }
+
+        /*
+           Si le navigateur refuse la voix sélectionnée, on retente
+           immédiatement sans imposer de voice. Le moteur utilise alors
+           sa voix française par défaut.
+        */
+        if (
+            voixSelectionnee &&
+            (
+                event.error === "voice-unavailable" ||
+                event.error === "synthesis-failed" ||
+                event.error === "language-unavailable"
+            )
+        ) {
+
+            voixSelectionnee = null;
+
+            const voiceStatus =
+                document.getElementById("manifesteReaderVoice");
+
+            if (voiceStatus) {
+                voiceStatus.textContent =
+                    "Voix française automatique";
+            }
+
+            syntheseVocale.cancel();
+
+            window.setTimeout(function () {
+                if (enLecture) {
+                    lireMorceau();
+                }
+            }, 80);
+
+            return;
+        }
 
         enLecture = false;
         enPause = false;
         mettreAJourInterface();
     };
 
+    /*
+       Important sur Chromium/Edge : cancel() peut laisser le moteur
+       dans un état intermédiaire. On laisse le thread audio respirer
+       avant le speak(), surtout lors d'un changement de chapitre.
+    */
     syntheseVocale.speak(utterance);
     mettreAJourInterface();
 }
