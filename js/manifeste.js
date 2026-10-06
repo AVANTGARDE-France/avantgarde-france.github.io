@@ -40,53 +40,135 @@ let initialisationFaite = false;
 
 let ephonePromise = null;
 
-function contenuPreRenduDisponible() {
-    if (!contentElement) return false;
-
-    const source = contentElement.dataset.contentSource;
-    const texte = (contentElement.textContent || "").trim();
-
-    return source === "supabase" && texte.length > 0;
+function avecTimeout(promise, delai, message) {
+    return Promise.race([
+        promise,
+        new Promise(function (_, reject) {
+            window.setTimeout(function () {
+                reject(new Error(message));
+            }, delai);
+        })
+    ]);
 }
 
 async function phonemiserFrancais(texte) {
     /*
-       eSpeak NG direct (espeak-ng@1.0.2) pouvait rester bloqué dans
-       Safari/iOS lors de son initialisation WASM.
+       eSpeak NG direct pouvait rester bloqué dans Safari/iOS.
 
        ephone est un port WASM spécialisé dans la génération de
-       phonèmes eSpeak NG pour le navigateur. Le pack "roa" contient
-       notamment le français.
+       phonèmes eSpeak NG pour le navigateur. Le pack "roa"
+       contient notamment le français.
     */
+
     if (!ephonePromise) {
-        ephonePromise = import("https://cdn.jsdelivr.net/npm/ephone/+esm")
-            .then(async function (module) {
-                const createEphone = module.default || module;
-                const roa = module.roa;
+        setStatus("Chargement du phonémiseur…");
+        console.log("AVANT-GARDE — ephone : import du module");
 
-                if (!createEphone || !roa) {
-                    throw new Error("ephone : module français introuvable.");
-                }
+        ephonePromise = avecTimeout(
+            import("https://cdn.jsdelivr.net/npm/ephone/+esm"),
+            20000,
+            "ephone : chargement du module trop long."
+        )
+        .then(async function (module) {
+            setStatus("Initialisation du français…");
+            console.log(
+                "AVANT-GARDE — ephone : module chargé",
+                Object.keys(module || {})
+            );
 
-                const moteur = await createEphone(roa);
-                moteur.setVoice("fr");
+            const createEphone =
+                module.default || module;
 
-                return moteur;
-            });
+            const roa =
+                module.roa ||
+                (module.default && module.default.roa);
+
+            if (!createEphone || typeof createEphone !== "function") {
+                throw new Error(
+                    "ephone : fonction d'initialisation introuvable."
+                );
+            }
+
+            if (!roa) {
+                throw new Error(
+                    "ephone : pack linguistique français (roa) introuvable."
+                );
+            }
+
+            const moteur =
+                await avecTimeout(
+                    createEphone(roa),
+                    20000,
+                    "ephone : initialisation WASM trop longue."
+                );
+
+            if (
+                !moteur ||
+                typeof moteur.setVoice !== "function" ||
+                typeof moteur.textToIpa !== "function"
+            ) {
+                throw new Error(
+                    "ephone : moteur français incomplet."
+                );
+            }
+
+            moteur.setVoice("fr");
+
+            console.log(
+                "AVANT-GARDE — ephone : moteur français prêt",
+                typeof moteur.textToIpa
+            );
+
+            return moteur;
+        })
+        .catch(function (error) {
+            ephonePromise = null;
+            throw error;
+        });
     }
 
     const moteur = await ephonePromise;
 
-    const resultat = moteur.textToIpa(texte);
+    setStatus("Conversion en phonèmes…");
+    console.log(
+        "AVANT-GARDE — ephone : conversion",
+        String(texte).slice(0, 120)
+    );
 
-    if (!resultat || !String(resultat).trim()) {
-        throw new Error("ephone : aucun phonème français généré.");
+    /*
+       textToIpa() est synchrone dans ephone.
+       On ne met volontairement PAS de await ici.
+    */
+    const debut =
+        performance.now();
+
+    const resultat =
+        moteur.textToIpa(texte);
+
+    const duree =
+        Math.round(performance.now() - debut);
+
+    console.log(
+        "AVANT-GARDE — ephone : conversion terminée en",
+        duree,
+        "ms"
+    );
+
+    if (
+        !resultat ||
+        !String(resultat).trim()
+    ) {
+        throw new Error(
+            "ephone : aucun phonème français généré."
+        );
     }
 
     console.log(
         "AVANT-GARDE — phonèmes français :",
         String(resultat).slice(0, 200)
     );
+
+    setStatus("Phonèmes prêts…");
 
     return String(resultat).trim();
 }
