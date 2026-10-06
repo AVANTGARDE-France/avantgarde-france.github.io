@@ -190,7 +190,7 @@ function deduplicateStyleBlocks(html) {
         new Set();
 
     return html.replace(
-        /<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi,
+        /<style\b[^>]*>[\s\\S]*?<\/style>/gi,
         (block) => {
 
             const normalized =
@@ -291,23 +291,23 @@ function generateLlmsFullTxt(manifestHtml) {
 
     const withoutScripts =
         manifestHtml.replace(
-            /<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi,
+            /<script\b[^>]*>[\s\\S]*?<\/script>/gi,
             ""
         );
 
     const withoutStyles =
         withoutScripts.replace(
-            /<style\\b[^>]*>[\\s\\S]*?<\\/style>/gi,
+            /<style\b[^>]*>[\s\\S]*?<\/style>/gi,
             ""
         );
 
     const text =
         withoutStyles
-            .replace(/<br\\s*\\/?\\s*>/gi, "\n")
-            .replace(/<\\/p>/gi, "\n\n")
-            .replace(/<\\/h[1-6]>/gi, "\n\n")
-            .replace(/<li\\b[^>]*>/gi, "- ")
-            .replace(/<\\/li>/gi, "\n")
+            .replace(/<br\s*\/?\s*>/gi, "\n")
+            .replace(/<\/p>/gi, "\n\n")
+            .replace(/<\/h[1-6]>/gi, "\n\n")
+            .replace(/<li\b[^>]*>/gi, "- ")
+            .replace(/<\/li>/gi, "\n")
             .replace(/<[^>]+>/g, "")
             .replace(/&nbsp;/gi, " ")
             .replace(/&amp;/gi, "&")
