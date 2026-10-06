@@ -10,8 +10,6 @@
    - génération par morceaux pour commencer la lecture rapidement
 ========================================================= */
 
-import { supabase } from "./supabase.js";
-
 const SLUG = "manifeste";
 const KOKORO_MODEL = "onnx-community/Kokoro-82M-v1.0-ONNX";
 const KOKORO_VOICE = "ff_siwis";
@@ -60,6 +58,8 @@ async function chargerManifeste() {
     }
 
     try {
+
+        const { supabase } = await import("./supabase.js");
 
         const { data, error } =
             await supabase
