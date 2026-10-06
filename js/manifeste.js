@@ -5,7 +5,7 @@
 
 const POCKET_TTS_MODULE = "./pocket-tts/index.js";
 const POCKET_TTS_LANGUAGE = "french_24l";
-const POCKET_TTS_VOICE = "estelle";
+const POCKET_TTS_VOICE = "cosette";
 const POCKET_TTS_CACHE = "avantgarde-pocket-tts-v1";
 const POCKET_TTS_SAMPLE_RATE = 24000;
 
