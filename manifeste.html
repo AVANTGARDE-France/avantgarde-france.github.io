@@ -15817,31 +15817,6 @@
     </div>
 </section>
 
-<script>
-(function () {
-    const bouton = document.getElementById("manifesteReaderPlay");
-    const statut = document.getElementById("manifesteReaderStatus");
-
-    if (!bouton) {
-        console.error("AVANT-GARDE — bouton lecteur introuvable");
-        return;
-    }
-
-    bouton.addEventListener("click", async function () {
-        console.log("AVANT-GARDE — TEST CLIC LECTEUR");
-        if (statut) statut.textContent = "Chargement du lecteur…";
-
-        try {
-            await import("./js/manifeste.js?v=20261006-0800");
-            console.log("AVANT-GARDE — manifeste.js importé par le test");
-        } catch (error) {
-            console.error("AVANT-GARDE — ERREUR IMPORT manifeste.js :", error);
-            if (statut) statut.textContent = "Erreur JavaScript";
-        }
-    }, { capture: true, once: true });
-})();
-</script>
-
 <style>
 /* =========================================================
    AVANT-GARDE — LECTEUR AUDIO
@@ -15983,7 +15958,7 @@
 
     <script
         type="module"
-        src="js/manifeste.js?v=20261006-0800"
+        src="js/manifeste.js?v=20261006-0810"
     ></script>
 
 
