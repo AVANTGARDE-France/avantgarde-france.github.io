@@ -38,7 +38,7 @@ let paused = false;
 let loading = false;
 let initialisationFaite = false;
 
-let espeakPromise = null;
+let ephonePromise = null;
 
 function contenuPreRenduDisponible() {
     if (!contentElement) return false;
@@ -50,35 +50,45 @@ function contenuPreRenduDisponible() {
 }
 
 async function phonemiserFrancais(texte) {
-    if (!espeakPromise) {
-        espeakPromise = import("https://cdn.jsdelivr.net/npm/espeak-ng@1.0.2/+esm")
-            .then(function (module) {
-                return module.default || module;
+    /*
+       eSpeak NG direct (espeak-ng@1.0.2) pouvait rester bloqué dans
+       Safari/iOS lors de son initialisation WASM.
+
+       ephone est un port WASM spécialisé dans la génération de
+       phonèmes eSpeak NG pour le navigateur. Le pack "roa" contient
+       notamment le français.
+    */
+    if (!ephonePromise) {
+        ephonePromise = import("https://cdn.jsdelivr.net/npm/ephone/+esm")
+            .then(async function (module) {
+                const createEphone = module.default || module;
+                const roa = module.roa;
+
+                if (!createEphone || !roa) {
+                    throw new Error("ephone : module français introuvable.");
+                }
+
+                const moteur = await createEphone(roa);
+                moteur.setVoice("fr");
+
+                return moteur;
             });
     }
 
-    const ESpeakNg = await espeakPromise;
+    const moteur = await ephonePromise;
 
-    const moteur = await ESpeakNg({
-        arguments: [
-            "--phonout",
-            "generated",
-            '--sep=""',
-            "-q",
-            "-b=1",
-            "--ipa=3",
-            "-v",
-            "fr-fr",
-            JSON.stringify(texte)
-        ]
-    });
+    const resultat = moteur.textToIpa(texte);
 
-    const phonemes = moteur.FS.readFile(
-        "generated",
-        { encoding: "utf8" }
+    if (!resultat || !String(resultat).trim()) {
+        throw new Error("ephone : aucun phonème français généré.");
+    }
+
+    console.log(
+        "AVANT-GARDE — phonèmes français :",
+        String(resultat).slice(0, 200)
     );
 
-    return String(phonemes || "").trim();
+    return String(resultat).trim();
 }
 
 async function chargerManifeste() {
