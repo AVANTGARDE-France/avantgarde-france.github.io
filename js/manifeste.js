@@ -783,7 +783,25 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0933");
+
+    /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
+    const diagnostic = document.createElement("div");
+    diagnostic.id = "manifesteReaderDiagnostic";
+    diagnostic.textContent = "LECTEUR V.0933";
+    Object.assign(diagnostic.style, {
+        position: "fixed",
+        top: "8px",
+        right: "8px",
+        zIndex: "2147483647",
+        padding: "3px 6px",
+        background: "#07152d",
+        color: "#f0d58a",
+        font: "600 9px Arial, sans-serif",
+        borderRadius: "3px",
+        pointerEvents: "none"
+    });
+    document.body.appendChild(diagnostic);
     chargerManifeste().catch(function (error) {
         console.error("AVANT-GARDE — initialisation manifeste :", error);
     });
