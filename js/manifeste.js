@@ -6,6 +6,7 @@
 
 const PIPER_WEB_VOICE = "fr_FR-tom-medium";
 const PIPER_WEB_SPEAKER_ID = 0;
+const PIPER_PLAYBACK_RATE = 1.2;
 
 const PIPER_WEB_BUNDLE =
     "https://cdn.jsdelivr.net/npm/@jtsage/piper-tts-web@1.2.0/dist/piper-tts-web.js";
@@ -204,8 +205,7 @@ async function chargerPiper() {
          * @jtsage/piper-tts-web 1.2.0 charge correctement
          * son moteur phonemizer depuis @diffusionstudio.
          *
-         * Le bundle impose speaker 0. On corrige cette seule
-         * valeur en mémoire afin de sélectionner le locuteur MLS 40.
+         * Tom est une voix mono-locuteur : speaker 0 est conservé.
          */
         const response = await fetch(PIPER_WEB_BUNDLE);
 
@@ -231,14 +231,8 @@ async function chargerPiper() {
 
         source = source.replace(
             'const speakerId = 0;',
-            'const speakerId = 40;'
+            'const speakerId = 0;'
         );
-
-        if (!source.includes("const speakerId = 40;")) {
-            throw new Error(
-                "Impossible de sélectionner la voix MLS 40 dans Piper."
-            );
-        }
 
         const moduleUrl = URL.createObjectURL(
             new Blob(
@@ -275,7 +269,7 @@ async function chargerPiper() {
                                 );
 
                             setStatus(
-                                "Chargement de la voix MLS 40… " +
+                                "Chargement de la voix Tom… " +
                                 pourcentage +
                                 "%"
                             );
@@ -296,7 +290,7 @@ async function chargerPiper() {
                 });
 
             setStatus(
-                "Initialisation de la voix MLS 40…"
+                "Initialisation de la voix Tom…"
             );
 
             await session.waitReady;
@@ -440,6 +434,7 @@ async function genererEtLireMorceau(id) {
             new Audio(activeObjectUrl);
 
         audioElement.preload = "auto";
+        audioElement.playbackRate = PIPER_PLAYBACK_RATE;
 
         audioElement.onended =
             function () {
