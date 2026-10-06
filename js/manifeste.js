@@ -7,11 +7,14 @@
 const PIPER_WEB_VOICE = "fr_FR-upmc-medium";
 const PIPER_WEB_SPEAKER_ID = 1;
 
-const PIPER_WEB_PACKAGE =
-    "https://esm.sh/piper-tts-web@1.1.2";
+const PIPER_WEB_BUNDLE =
+    "https://cdn.jsdelivr.net/npm/@jtsage/piper-tts-web@1.2.0/dist/piper-tts-web.js";
 
-const PIPER_WEB_ASSETS =
-    "https://cdn.jsdelivr.net/npm/piper-tts-web@1.1.2/dist/";
+const PIPER_WEB_CHUNK =
+    "https://cdn.jsdelivr.net/npm/@jtsage/piper-tts-web@1.2.0/dist/piper-CLXk3wTk.js";
+
+const PIPER_ONNX =
+    "https://esm.sh/onnxruntime-web@1.22.0";
 
 const contentElement =
     document.getElementById("editorialContent");
@@ -197,47 +200,126 @@ async function chargerPiper() {
     try {
         setStatus("Chargement du moteur vocal…");
 
-        const piper =
-            await import(PIPER_WEB_PACKAGE);
+        /*
+         * @jtsage/piper-tts-web 1.2.0 charge correctement
+         * son moteur phonemizer depuis @diffusionstudio.
+         *
+         * Le bundle impose speaker 0. On corrige cette seule
+         * valeur en mémoire afin de sélectionner Pierre (1).
+         */
+        const response = await fetch(PIPER_WEB_BUNDLE);
 
-        if (
-            !piper ||
-            typeof piper.PiperWebEngine !== "function" ||
-            typeof piper.OnnxWebRuntime !== "function" ||
-            typeof piper.PhonemizeWebRuntime !== "function"
-        ) {
+        if (!response.ok) {
             throw new Error(
-                "Le moteur Piper Web n'a pas pu être chargé."
+                "Impossible de charger le moteur Piper (" +
+                response.status +
+                ")."
             );
         }
 
-        const onnxRuntime =
-            new piper.OnnxWebRuntime({
-                basePath:
-                    PIPER_WEB_ASSETS + "onnx/"
-            });
+        let source = await response.text();
 
-        const phonemizeRuntime =
-            new piper.PhonemizeWebRuntime({
-                basePath:
-                    PIPER_WEB_ASSETS + "piper/"
-            });
-
-        piperEngine =
-            new piper.PiperWebEngine({
-                onnxRuntime,
-                phonemizeRuntime
-            });
-
-        console.log(
-            "AVANT-GARDE — Piper Web prêt : UPMC Pierre (speaker 1)"
+        source = source.replace(
+            'import("./piper-CLXk3wTk.js")',
+            'import("' + PIPER_WEB_CHUNK + '")'
         );
 
-        setStatus(
-            "Piper UPMC Pierre — moteur prêt."
+        source = source.replace(
+            'import("onnxruntime-web")',
+            'import("' + PIPER_ONNX + '")'
         );
 
-        return piperEngine;
+        source = source.replace(
+            'const speakerId = 0;',
+            'const speakerId = 1;'
+        );
+
+        if (!source.includes("const speakerId = 1;")) {
+            throw new Error(
+                "Impossible de sélectionner la voix Pierre dans Piper."
+            );
+        }
+
+        const moduleUrl = URL.createObjectURL(
+            new Blob(
+                [source],
+                { type: "text/javascript" }
+            )
+        );
+
+        try {
+            const piper = await import(moduleUrl);
+
+            if (
+                !piper ||
+                typeof piper.TtsSession !== "function" ||
+                typeof piper.CachedFileReader !== "function"
+            ) {
+                throw new Error(
+                    "Le moteur Piper Web n'a pas pu être initialisé."
+                );
+            }
+
+            const fileReader =
+                new piper.CachedFileReader({
+                    progress: function (progress) {
+                        if (
+                            progress &&
+                            progress.total
+                        ) {
+                            const pourcentage =
+                                Math.round(
+                                    progress.loaded *
+                                    100 /
+                                    progress.total
+                                );
+
+                            setStatus(
+                                "Chargement de la voix Pierre… " +
+                                pourcentage +
+                                "%"
+                            );
+                        }
+                    }
+                });
+
+            const session =
+                new piper.TtsSession({
+                    voiceId: PIPER_WEB_VOICE,
+                    fileReader: fileReader,
+                    logger: function (message) {
+                        console.log(
+                            "AVANT-GARDE — Piper :",
+                            message
+                        );
+                    }
+                });
+
+            setStatus(
+                "Initialisation de la voix Pierre…"
+            );
+
+            await session.waitReady;
+
+            piperEngine = {
+                predict: function (texte) {
+                    return session.predict(texte);
+                }
+            };
+
+            console.log(
+                "AVANT-GARDE — Piper Web prêt : UPMC Pierre (speaker 1)"
+            );
+
+            setStatus(
+                "Piper UPMC Pierre — moteur prêt."
+            );
+
+            return piperEngine;
+
+        } finally {
+            URL.revokeObjectURL(moduleUrl);
+        }
 
     } catch (error) {
         piperEngine = null;
@@ -321,10 +403,8 @@ async function genererEtLireMorceau(id) {
         }
 
         const response =
-            await engine.generate(
-                chunks[chunkIndex],
-                PIPER_WEB_VOICE,
-                PIPER_WEB_SPEAKER_ID
+            await engine.predict(
+                chunks[chunkIndex]
             );
 
         if (
