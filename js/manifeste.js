@@ -8,7 +8,7 @@ const PIPER_WEB_VOICE = "fr_FR-upmc-medium";
 const PIPER_WEB_SPEAKER_ID = 1;
 
 const PIPER_WEB_PACKAGE =
-    "https://cdn.jsdelivr.net/npm/piper-tts-web@1.1.2/dist/piper-tts-web.js";
+    "https://esm.sh/piper-tts-web@1.1.2";
 
 const PIPER_WEB_ASSETS =
     "https://cdn.jsdelivr.net/npm/piper-tts-web@1.1.2/dist/";
