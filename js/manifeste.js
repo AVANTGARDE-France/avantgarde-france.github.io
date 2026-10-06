@@ -679,16 +679,7 @@ async function lireMorceau(
         return;
     }
 
-    const data =
-        audio.data;
-
-    const sampleRate =
-        audio.sampleRate;
-
-    if (
-        !data ||
-        !data.length
-    ) {
+    if (!audio) {
         throw new Error(
             "Audio vide."
         );
@@ -704,42 +695,13 @@ async function lireMorceau(
         );
     }
 
-    const clean =
-        new Float32Array(
-            data.length
-        );
-
-    for (
-        let i = 0;
-        i < data.length;
-        i++
-    ) {
-        const value =
-            Number(data[i]);
-
-        clean[i] =
-            Number.isFinite(value)
-                ? Math.max(
-                    -1,
-                    Math.min(
-                        1,
-                        value
-                    )
-                )
-                : 0;
-    }
+    const arrayBuffer =
+        await audio.arrayBuffer();
 
     const buffer =
-        audioContext.createBuffer(
-            1,
-            clean.length,
-            sampleRate
+        await audioContext.decodeAudioData(
+            arrayBuffer
         );
-
-    buffer.copyToChannel(
-        clean,
-        0
-    );
 
     const source =
         audioContext.createBufferSource();
