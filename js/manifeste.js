@@ -38,158 +38,233 @@ let paused = false;
 let loading = false;
 let initialisationFaite = false;
 
-let phonemisPromise = null;
-let phonemisModule = null;
+let piperPhonemizerPromise = null;
 
-const PHONEMIS_JS_URL =
-    "./phonemis/phonemis.js?v=20261006-1030";
+const PIPER_PHONEMIZER_JS =
+    "https://cdn.jsdelivr.net/npm/@diffusionstudio/piper-wasm@1.0.0/build/piper_phonemize.js";
 
-const PHONEMIS_MODEL_URL =
-    "https://huggingface.co/Shusek00/kokoro-kmp-models/resolve/main/phonemizers/fr/phonemizer_fr.bin?download=true";
+const PIPER_PHONEMIZER_BASE =
+    "https://cdn.jsdelivr.net/npm/@diffusionstudio/piper-wasm@1.0.0/build/piper_phonemize";
 
-async function chargerPhonemis() {
+async function chargerPiperPhonemizer() {
 
-    if (phonemisModule) {
-        return phonemisModule;
+    if (piperPhonemizerPromise) {
+        return piperPhonemizerPromise;
     }
 
-    if (phonemisPromise) {
-        return phonemisPromise;
-    }
+    piperPhonemizerPromise = new Promise(function (resolve, reject) {
 
-    phonemisPromise = (async function () {
-
-        setStatus(
-            "Chargement du phonémiseur français…"
-        );
-
-        const module =
-            await import(PHONEMIS_JS_URL);
-
-        const factory =
-            module.default || module;
-
-        if (typeof factory !== "function") {
-            throw new Error(
-                "Phonemis WASM : factory introuvable."
-            );
+        if (
+            window.createPiperPhonemize &&
+            typeof window.createPiperPhonemize === "function"
+        ) {
+            resolve(window.createPiperPhonemize);
+            return;
         }
 
-        const moteur =
-            await avecTimeout(
-                factory(),
-                30000,
-                "Phonemis WASM : initialisation trop longue."
+        const script = document.createElement("script");
+
+        script.src = PIPER_PHONEMIZER_JS;
+        script.async = true;
+
+        script.onload = function () {
+
+            if (
+                window.createPiperPhonemize &&
+                typeof window.createPiperPhonemize === "function"
+            ) {
+                resolve(window.createPiperPhonemize);
+            } else {
+                reject(
+                    new Error(
+                        "Piper : factory WASM introuvable après chargement."
+                    )
+                );
+            }
+        };
+
+        script.onerror = function () {
+            reject(
+                new Error(
+                    "Piper : impossible de charger le phonémiseur WASM."
+                )
             );
+        };
 
-        setStatus(
-            "Téléchargement du modèle français…"
-        );
-
-        const reponse =
-            await fetch(PHONEMIS_MODEL_URL, {
-                mode: "cors",
-                cache: "force-cache"
-            });
-
-        if (!reponse.ok) {
-            throw new Error(
-                "Modèle Phonemis français inaccessible (" +
-                reponse.status +
-                ")."
-            );
-        }
-
-        const buffer =
-            new Uint8Array(
-                await reponse.arrayBuffer()
-            );
-
-        if (buffer.byteLength < 1000000) {
-            throw new Error(
-                "Modèle Phonemis français incomplet."
-            );
-        }
-
-        moteur.FS.writeFile(
-            "/phonemizer_fr.bin",
-            buffer
-        );
-
-        setStatus(
-            "Initialisation du moteur français…"
-        );
-
-        moteur.initPhonemis(
-            "/phonemizer_fr.bin"
-        );
-
-        if (!moteur.ready()) {
-            throw new Error(
-                "Phonemis français n'est pas prêt."
-            );
-        }
-
-        phonemisModule = moteur;
-
-        setStatus(
-            "Phonémiseur français prêt"
-        );
-
-        return moteur;
-
-    })();
+        document.head.appendChild(script);
+    });
 
     try {
-        return await phonemisPromise;
+        return await avecTimeout(
+            piperPhonemizerPromise,
+            30000,
+            "Piper : chargement WASM trop long."
+        );
     } catch (error) {
-        phonemisPromise = null;
-        phonemisModule = null;
+        piperPhonemizerPromise = null;
         throw error;
     }
 }
 
 async function phonemiserFrancais(texte) {
 
-    const moteur =
-        await chargerPhonemis();
+    setStatus(
+        "Initialisation du phonémiseur français…"
+    );
 
-    const source =
-        String(texte || "")
-            .replace(/\\s+/g, " ")
-            .trim();
-
-    if (!source) {
-        throw new Error(
-            "Phonemis : texte français vide."
-        );
-    }
+    const factory =
+        await chargerPiperPhonemizer();
 
     setStatus(
         "Phonémisation française…"
     );
 
-    const phonemes =
+    const texteSource =
+        String(texte || "")
+            .replace(/\\s+/g, " ")
+            .trim();
+
+    if (!texteSource) {
+        throw new Error(
+            "Piper : texte français vide."
+        );
+    }
+
+    const resultat =
         await avecTimeout(
-            Promise.resolve(
-                moteur.phonemizeFrench(source)
-            ),
-            30000,
-            "Phonemis : phonémisation trop longue."
+            new Promise(function (resolve, reject) {
+
+                let termine = false;
+
+                function terminerAvecErreur(error) {
+                    if (termine) return;
+                    termine = true;
+                    reject(error);
+                }
+
+                function terminerAvecResultat(value) {
+                    if (termine) return;
+                    termine = true;
+                    resolve(value);
+                }
+
+                factory({
+
+                    print: function (ligne) {
+
+                        try {
+
+                            const objet =
+                                JSON.parse(String(ligne));
+
+                            if (
+                                objet &&
+                                Array.isArray(objet.phonemes)
+                            ) {
+                                terminerAvecResultat(objet);
+                            }
+
+                        } catch (error) {
+
+                            terminerAvecErreur(
+                                new Error(
+                                    "Piper : sortie WASM invalide."
+                                )
+                            );
+                        }
+                    },
+
+                    printErr: function (ligne) {
+
+                        const message =
+                            String(ligne || "").trim();
+
+                        if (message) {
+                            console.warn(
+                                "AVANT-GARDE — Piper :",
+                                message
+                            );
+                        }
+                    },
+
+                    locateFile: function (fichier) {
+
+                        if (
+                            String(fichier).endsWith(".wasm")
+                        ) {
+                            return (
+                                PIPER_PHONEMIZER_BASE +
+                                ".wasm"
+                            );
+                        }
+
+                        if (
+                            String(fichier).endsWith(".data")
+                        ) {
+                            return (
+                                PIPER_PHONEMIZER_BASE +
+                                ".data"
+                            );
+                        }
+
+                        return fichier;
+                    }
+
+                }).then(function (module) {
+
+                    try {
+
+                        module.callMain([
+                            "-l",
+                            "fr-fr",
+                            "--input",
+                            JSON.stringify([
+                                {
+                                    text: texteSource
+                                }
+                            ]),
+                            "--espeak_data",
+                            "/espeak-ng-data"
+                        ]);
+
+                    } catch (error) {
+
+                        terminerAvecErreur(error);
+                    }
+
+                }).catch(function (error) {
+
+                    terminerAvecErreur(error);
+                });
+            }),
+            45000,
+            "Piper : phonémisation française trop longue."
         );
 
-    if (!phonemes || !String(phonemes).trim()) {
+    const phonemes =
+        resultat.phonemes
+            .map(function (element) {
+
+                return Array.isArray(element)
+                    ? element.join("")
+                    : String(element);
+
+            })
+            .join(" ")
+            .trim();
+
+    if (!phonemes) {
         throw new Error(
-            "Phonemis : aucun phonème français retourné."
+            "Piper : aucun phonème français retourné."
         );
     }
 
     console.log(
-        "AVANT-GARDE — phonèmes Phonemis :",
+        "AVANT-GARDE — phonèmes Piper :",
         phonemes
     );
 
-    return String(phonemes);
+    return phonemes;
 }
 
 async function chargerKokoro() {
@@ -443,6 +518,200 @@ function generationCouranteValide() {
     return playing && !paused;
 }
 
+function attendreVoixIOS() {
+    return new Promise(function (resolve) {
+        if (!("speechSynthesis" in window)) {
+            resolve([]);
+            return;
+        }
+
+        const synth = window.speechSynthesis;
+        const deja = synth.getVoices() || [];
+
+        /*
+           Sur Safari/iOS, getVoices() peut être vide au premier appel.
+           On attend voiceschanged, mais on ne dépend PAS d'un objet Voice
+           pour lancer la lecture : l'utterance utilise simplement lang=fr-FR.
+        */
+        if (deja.length) {
+            resolve(deja);
+            return;
+        }
+
+        let termine = false;
+
+        function finir() {
+            if (termine) return;
+            termine = true;
+            if (synth.removeEventListener) {
+                synth.removeEventListener("voiceschanged", finir);
+            }
+            resolve(synth.getVoices() || []);
+        }
+
+        if (synth.addEventListener) {
+            synth.addEventListener("voiceschanged", finir, { once: true });
+        }
+
+        window.setTimeout(finir, 1200);
+    });
+}
+
+function lectureNativeFrancaise(generation) {
+    return new Promise(function (resolve, reject) {
+        const SpeechUtterance = window.SpeechSynthesisUtterance;
+
+        if (
+            !window.speechSynthesis ||
+            typeof SpeechUtterance !== "function"
+        ) {
+            reject(new Error("iOS : variable SpeechSynthesisUtterance indisponible."));
+            return;
+        }
+
+        const synth = window.speechSynthesis;
+
+        try {
+            synth.cancel();
+            synth.resume();
+        } catch (_) {}
+
+        let index = 0;
+        let termine = false;
+
+        function terminer() {
+            if (termine) return;
+            termine = true;
+            lectureNativeActive = false;
+            resolve();
+        }
+
+        function suivant() {
+            if (termine) return;
+
+            if (
+                !playing ||
+                paused ||
+                generation !== currentGeneration ||
+                index >= chunks.length
+            ) {
+                terminer();
+                return;
+            }
+
+            const texte = String(chunks[index] || "").trim();
+
+            if (!texte) {
+                index++;
+                suivant();
+                return;
+            }
+
+            index++;
+
+            /*
+               POINT IMPORTANT :
+               Nous ne définissons volontairement PAS utterance.voice.
+
+               Safari/iOS peut conserver une référence de voix devenue
+               invalide entre getVoices() et speak(), ce qui provoque
+               précisément les erreurs du type "Can't find voice".
+
+               lang=fr-FR suffit à demander à iOS une synthèse française.
+            */
+            const utterance = new SpeechUtterance(texte);
+
+            utterance.lang = "fr-FR";
+            utterance.rate = 0.92;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            utterance.onstart = function () {
+                lectureNativeActive = true;
+                setStatus(
+                    "Lecture française… " +
+                    index +
+                    "/" +
+                    chunks.length
+                );
+            };
+
+            utterance.onend = function () {
+                if (
+                    !playing ||
+                    paused ||
+                    generation !== currentGeneration
+                ) {
+                    terminer();
+                    return;
+                }
+
+                window.setTimeout(suivant, 40);
+            };
+
+            utterance.onerror = function (event) {
+                const code =
+                    event && event.error
+                        ? String(event.error)
+                        : "erreur inconnue";
+
+                console.error(
+                    "AVANT-GARDE — speechSynthesis iOS :",
+                    code
+                );
+
+                /*
+                   "interrupted" / "canceled" sont normaux lorsqu'un
+                   utilisateur arrête ou met en pause la lecture.
+                */
+                if (
+                    code === "interrupted" ||
+                    code === "canceled" ||
+                    !playing ||
+                    paused ||
+                    generation !== currentGeneration
+                ) {
+                    terminer();
+                    return;
+                }
+
+                reject(
+                    new Error(
+                        "iOS speechSynthesis : " + code
+                    )
+                );
+            };
+
+            console.log(
+                "AVANT-GARDE — iOS : speak morceau",
+                index,
+                "/",
+                chunks.length,
+                "lang=fr-FR"
+            );
+
+            /*
+               speak() est appelé directement sans attendre le chargement
+               d'une voix ni lui affecter un objet SpeechSynthesisVoice.
+            */
+            try {
+                synth.speak(utterance);
+            } catch (error) {
+                reject(error);
+            }
+        }
+
+        /* Précharge éventuellement la liste des voix, sans l'utiliser. */
+        attendreVoixIOS()
+            .catch(function () { return []; })
+            .finally(function () {
+                if (!termine) suivant();
+            });
+    });
+}
+
+
+
 async function basculerLecture() {
     console.log("AVANT-GARDE — lecture demandée");
     if (playing && !paused) {
@@ -494,7 +763,7 @@ async function basculerLecture() {
            Le lecteur utilise donc désormais EXACTEMENT le même moteur
            neuronal Kokoro + ff_siwis sur iPhone/iPad et sur ordinateur.
 
-           Le français est phonémisé localement par Phonemis/Protophone,
+           Le français est phonémisé localement par ephone/eSpeak NG,
            puis envoyé au modèle Kokoro.
         */
         if (appareilIOSOuSafariMobile()) {
@@ -529,7 +798,7 @@ async function basculerLecture() {
         mettreAJourInterface();
         setStatus(
             error && error.message && error.message.includes("initialisation WASM")
-                ? "Phonemis WASM français non initialisé."
+                ? "ephone bloqué : WASM français non initialisé."
                 : "Erreur : " + (error && error.message ? error.message : "lecture impossible.")
         );
         console.error("AVANT-GARDE — lecture :", error);
@@ -660,12 +929,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1030");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1023");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.1030";
+    diagnostic.textContent = "LECTEUR V.1023";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
