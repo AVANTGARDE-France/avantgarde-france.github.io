@@ -697,6 +697,208 @@ async function chargerKokoro() {
 
 
 
+function appareilIOSOuSafariMobile() {
+    const ua = navigator.userAgent || "";
+    return /iPhone|iPad|iPod/i.test(ua) ||
+        (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
+}
+
+function generationCouranteValide() {
+    return playing && !paused;
+}
+
+function attendreVoixIOS() {
+    return new Promise(function (resolve) {
+        if (!("speechSynthesis" in window)) {
+            resolve([]);
+            return;
+        }
+
+        const synth = window.speechSynthesis;
+        const deja = synth.getVoices() || [];
+
+        /*
+           Sur Safari/iOS, getVoices() peut être vide au premier appel.
+           On attend voiceschanged, mais on ne dépend PAS d'un objet Voice
+           pour lancer la lecture : l'utterance utilise simplement lang=fr-FR.
+        */
+        if (deja.length) {
+            resolve(deja);
+            return;
+        }
+
+        let termine = false;
+
+        function finir() {
+            if (termine) return;
+            termine = true;
+            if (synth.removeEventListener) {
+                synth.removeEventListener("voiceschanged", finir);
+            }
+            resolve(synth.getVoices() || []);
+        }
+
+        if (synth.addEventListener) {
+            synth.addEventListener("voiceschanged", finir, { once: true });
+        }
+
+        window.setTimeout(finir, 1200);
+    });
+}
+
+function lectureNativeFrancaise(generation) {
+    return new Promise(function (resolve, reject) {
+        if (
+            !("speechSynthesis" in window) ||
+            typeof SpeechSynthesisUtterance === "undefined"
+        ) {
+            reject(new Error("Synthèse vocale native indisponible."));
+            return;
+        }
+
+        const synth = window.speechSynthesis;
+
+        try {
+            synth.cancel();
+            synth.resume();
+        } catch (_) {}
+
+        let index = 0;
+        let termine = false;
+
+        function terminer() {
+            if (termine) return;
+            termine = true;
+            lectureNativeActive = false;
+            resolve();
+        }
+
+        function suivant() {
+            if (termine) return;
+
+            if (
+                !playing ||
+                paused ||
+                generation !== currentGeneration ||
+                index >= chunks.length
+            ) {
+                terminer();
+                return;
+            }
+
+            const texte = String(chunks[index] || "").trim();
+
+            if (!texte) {
+                index++;
+                suivant();
+                return;
+            }
+
+            index++;
+
+            /*
+               POINT IMPORTANT :
+               Nous ne définissons volontairement PAS utterance.voice.
+
+               Safari/iOS peut conserver une référence de voix devenue
+               invalide entre getVoices() et speak(), ce qui provoque
+               précisément les erreurs du type "Can't find voice".
+
+               lang=fr-FR suffit à demander à iOS une synthèse française.
+            */
+            const utterance = new SpeechSynthesisUtterance(texte);
+
+            utterance.lang = "fr-FR";
+            utterance.rate = 0.92;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            utterance.onstart = function () {
+                lectureNativeActive = true;
+                setStatus(
+                    "Lecture française… " +
+                    index +
+                    "/" +
+                    chunks.length
+                );
+            };
+
+            utterance.onend = function () {
+                if (
+                    !playing ||
+                    paused ||
+                    generation !== currentGeneration
+                ) {
+                    terminer();
+                    return;
+                }
+
+                window.setTimeout(suivant, 40);
+            };
+
+            utterance.onerror = function (event) {
+                const code =
+                    event && event.error
+                        ? String(event.error)
+                        : "erreur inconnue";
+
+                console.error(
+                    "AVANT-GARDE — speechSynthesis iOS :",
+                    code
+                );
+
+                /*
+                   "interrupted" / "canceled" sont normaux lorsqu'un
+                   utilisateur arrête ou met en pause la lecture.
+                */
+                if (
+                    code === "interrupted" ||
+                    code === "canceled" ||
+                    !playing ||
+                    paused ||
+                    generation !== currentGeneration
+                ) {
+                    terminer();
+                    return;
+                }
+
+                reject(
+                    new Error(
+                        "iOS speechSynthesis : " + code
+                    )
+                );
+            };
+
+            console.log(
+                "AVANT-GARDE — iOS : speak morceau",
+                index,
+                "/",
+                chunks.length,
+                "lang=fr-FR"
+            );
+
+            /*
+               speak() est appelé directement sans attendre le chargement
+               d'une voix ni lui affecter un objet SpeechSynthesisVoice.
+            */
+            try {
+                synth.speak(utterance);
+            } catch (error) {
+                reject(error);
+            }
+        }
+
+        /* Précharge éventuellement la liste des voix, sans l'utiliser. */
+        attendreVoixIOS()
+            .catch(function () { return []; })
+            .finally(function () {
+                if (!termine) suivant();
+            });
+    });
+}
+
+
+
 async function basculerLecture() {
     console.log("AVANT-GARDE — lecture demandée");
     if (playing && !paused) {
@@ -893,12 +1095,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0941");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1006");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.0941";
+    diagnostic.textContent = "LECTEUR V.1006";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
