@@ -15,7 +15,6 @@ const KOKORO_MODEL = "onnx-community/Kokoro-82M-v1.0-ONNX";
 const KOKORO_VOICE = "ff_siwis";
 const KOKORO_CDN = "https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/+esm";
 const TRANSFORMERS_CDN = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1/+esm";
-const PHONEMIZER_CDN = "https://cdn.jsdelivr.net/npm/phonemizer@1.2.1/+esm";
 const KOKORO_VOICE_URL = "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/main/voices/ff_siwis.bin";
 const KOKORO_STYLE_DIM = 256;
 const KOKORO_SAMPLE_RATE = 24000;
@@ -332,18 +331,6 @@ async function chargerKokoro() {
             );
         }
 
-        const phonemizer =
-            await import(PHONEMIZER_CDN);
-
-        if (
-            !phonemizer ||
-            typeof phonemizer.phonemize !== "function"
-        ) {
-            throw new Error(
-                "Le phonémiseur français est indisponible."
-            );
-        }
-
         const response =
             await fetch(KOKORO_VOICE_URL);
 
@@ -380,26 +367,9 @@ async function chargerKokoro() {
                         ? options.speed
                         : 1;
 
-                setStatus("Phonémisation française…");
+                setStatus("Préparation de la voix française…");
 
-                const phonemesResult =
-                    await phonemizer.phonemize(
-                        text,
-                        "fr-fr"
-                    );
-
-                const phonemes =
-                    Array.isArray(phonemesResult)
-                        ? phonemesResult.join(" ")
-                        : String(
-                            phonemesResult || ""
-                        );
-
-                if (!phonemes.trim()) {
-                    throw new Error(
-                        "La phonémisation française a retourné un texte vide."
-                    );
-                }
+                const phonemes = text;
 
                 const tokenized =
                     moteur.tokenizer(
