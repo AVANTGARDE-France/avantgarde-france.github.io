@@ -6,14 +6,14 @@
 const KOKORO_MODEL = "onnx-community/Kokoro-82M-v1.0-ONNX";
 const KOKORO_VOICE = "ff_siwis";
 const KOKORO_CDN = "https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/+esm";
-const PHONEMIZER_CDN = "https://cdn.jsdelivr.net/npm/phonemizer@1.2.1/+esm";
+const FRENCH_G2P_CDN = "https://cdn.jsdelivr.net/npm/@piper-plus/g2p@0.4.2/+esm";
 const KOKORO_SAMPLE_RATE = 24000;
 const KOKORO_STYLE_DIM = 256;
 
 const contentElement = document.getElementById("editorialContent");
 
 let kokoro = null;
-let phonemize = null;
+let frenchG2P = null;
 let audioContext = null;
 let activeSource = null;
 let currentGeneration = 0;
@@ -157,15 +157,15 @@ function construireMorceaux(texte) {
 }
 
 async function chargerKokoro() {
-    if (kokoro && phonemize) return kokoro;
+    if (kokoro && frenchG2P) return kokoro;
 
     if (loading) {
-        while (loading && (!kokoro || !phonemize)) {
+        while (loading && (!kokoro || !frenchG2P)) {
             await new Promise(function (resolve) {
                 setTimeout(resolve, 100);
             });
         }
-        if (kokoro && phonemize) return kokoro;
+        if (kokoro && frenchG2P) return kokoro;
     }
 
     loading = true;
@@ -175,17 +175,17 @@ async function chargerKokoro() {
 
         const modules = await Promise.all([
             import(KOKORO_CDN),
-            import(PHONEMIZER_CDN)
+            import(FRENCH_G2P_CDN)
         ]);
 
         const KokoroTTS = modules[0].KokoroTTS;
-        phonemize = modules[1].phonemize;
+        const G2P = modules[1].G2P;
 
         if (!KokoroTTS) {
             throw new Error("KokoroTTS introuvable.");
         }
 
-        if (typeof phonemize !== "function") {
+        if (typeof G2P !== "function") {
             throw new Error("Phonémiseur français introuvable.");
         }
 
@@ -209,6 +209,14 @@ async function chargerKokoro() {
             }
         });
 
+        frenchG2P = await G2P.create({
+            languages: ["fr"]
+        });
+
+        if (!frenchG2P || typeof frenchG2P.phonemize !== "function") {
+            throw new Error("Initialisation du phonémiseur français impossible.");
+        }
+
         if (typeof kokoro.list_voices === "function") {
             const voices = kokoro.list_voices();
             console.log("AVANT-GARDE — voix Kokoro disponibles :", voices);
@@ -220,27 +228,27 @@ async function chargerKokoro() {
     } catch (error) {
         loading = false;
         kokoro = null;
-        phonemize = null;
+        frenchG2P = null;
         console.error("AVANT-GARDE — initialisation Kokoro :", error);
         throw error;
     }
 }
 
 async function genererAudioFrancais(texte) {
-    if (!kokoro || typeof phonemize !== "function") {
+    if (!kokoro || !frenchG2P) {
         throw new Error("Moteur vocal non initialisé.");
     }
 
     setStatus("Préparation du français…");
 
-    const phonemes = await phonemize(texte, "fr");
+    const phonemes = frenchG2P.phonemize(texte);
 
-    if (!phonemes) {
+    if (!phonemes || !phonemes.length) {
         throw new Error("Le phonémiseur français n'a retourné aucun phonème.");
     }
 
     const textePhonemique = Array.isArray(phonemes)
-        ? phonemes.join(" ")
+        ? phonemes.join("")
         : String(phonemes);
 
     console.log("AVANT-GARDE — phonèmes français :", textePhonemique);
