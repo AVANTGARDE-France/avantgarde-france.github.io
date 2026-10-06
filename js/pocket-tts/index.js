@@ -162,6 +162,7 @@ export class PocketTTS {
         }
 
         this._onChunk = options.onChunk || null;
+        this._onProgress = options.onProgress || null;
 
         try {
             const result = await this._request(
@@ -175,6 +176,7 @@ export class PocketTTS {
             return result.metrics;
         } finally {
             this._onChunk = null;
+            this._onProgress = null;
         }
     }
 
