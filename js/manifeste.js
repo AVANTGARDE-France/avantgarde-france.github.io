@@ -371,10 +371,51 @@ function convertirEnBuffer(audio) {
     const context =
         obtenirAudioContext();
 
-    const donnees =
+    const source =
         audio.data instanceof Float32Array
             ? audio.data
             : Float32Array.from(audio.data);
+
+    if (!source.length) {
+        throw new Error(
+            "Kokoro a retourné une piste audio vide."
+        );
+    }
+
+    /*
+       Sécurité supplémentaire :
+       certains couples navigateur/WebGPU peuvent produire
+       ponctuellement NaN ou Infinity dans le PCM. Une seule
+       valeur invalide peut rendre toute la piste inutilisable.
+    */
+    const donnees =
+        new Float32Array(source.length);
+
+    let valeurValide = false;
+
+    for (let i = 0; i < source.length; i++) {
+
+        let valeur = source[i];
+
+        if (!Number.isFinite(valeur)) {
+            valeur = 0;
+        }
+
+        if (valeur > 1) valeur = 1;
+        if (valeur < -1) valeur = -1;
+
+        if (valeur !== 0) {
+            valeurValide = true;
+        }
+
+        donnees[i] = valeur;
+    }
+
+    if (!valeurValide) {
+        throw new Error(
+            "Kokoro a retourné une piste audio silencieuse."
+        );
+    }
 
     const audioBuffer =
         context.createBuffer(
@@ -603,6 +644,26 @@ async function basculerLecture() {
     mettreAJourInterface();
 
     try {
+
+        /*
+           Le contexte audio est créé ET repris immédiatement
+           dans le gestionnaire du clic utilisateur.
+           C'est important : attendre le chargement du modèle
+           avant de créer/reprendre AudioContext peut déclencher
+           le blocage autoplay de Chrome/Edge.
+        */
+        const context =
+            obtenirAudioContext();
+
+        if (context.state === "suspended") {
+            await context.resume();
+        }
+
+        if (context.state !== "running") {
+            throw new Error(
+                "Le navigateur n'autorise pas la lecture audio."
+            );
+        }
 
         await lireAvecKokoro();
 
