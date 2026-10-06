@@ -15,8 +15,6 @@ const KOKORO_MODEL = "onnx-community/Kokoro-82M-v1.0-ONNX";
 const KOKORO_VOICE = "ff_siwis";
 const KOKORO_CDN = "https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/+esm";
 const TRANSFORMERS_CDN = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1/+esm";
-const ESPEAK_JS_URL = "https://cdn.jsdelivr.net/espeakng.js/1.49.0/espeakng.min.js";
-const ESPEAK_WORKER_URL = "https://cdn.jsdelivr.net/espeakng.js/1.49.0/espeakng.worker.js";
 const KOKORO_VOICE_URL = "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/main/voices/ff_siwis.bin";
 const KOKORO_STYLE_DIM = 256;
 const KOKORO_SAMPLE_RATE = 24000;
@@ -40,90 +38,38 @@ let paused = false;
 let loading = false;
 let initialisationFaite = false;
 
-let espeak = null;
 let espeakPromise = null;
 
-function chargerEspeak() {
-    if (espeak) return Promise.resolve(espeak);
-    if (espeakPromise) return espeakPromise;
-
-    espeakPromise = new Promise(function (resolve, reject) {
-        if (window.eSpeakNG) {
-            espeak = new window.eSpeakNG(ESPEAK_WORKER_URL, function () {
-                espeak.set_voice("fr-fr");
-                resolve(espeak);
-            });
-            return;
-        }
-
-        const script = document.createElement("script");
-        script.src = ESPEAK_JS_URL;
-        script.async = true;
-        script.onload = function () {
-            try {
-                if (!window.eSpeakNG) {
-                    throw new Error("eSpeak NG n'a pas exposé eSpeakNG.");
-                }
-                espeak = new window.eSpeakNG(ESPEAK_WORKER_URL, function () {
-                    espeak.set_voice("fr-fr");
-                    resolve(espeak);
-                });
-            } catch (error) {
-                reject(error);
-            }
-        };
-        script.onerror = function () {
-            reject(new Error("Impossible de charger eSpeak NG."));
-        };
-        document.head.appendChild(script);
-    });
-
-    return espeakPromise;
-}
-
 async function phonemiserFrancais(texte) {
-    const moteur = await chargerEspeak();
-
-    return new Promise(function (resolve, reject) {
-        try {
-            moteur.synthesize(texte, function (samples, events) {
-                /*
-                 * La version navigateur d'eSpeak NG utilisée ici expose
-                 * principalement la synthèse audio. Pour Kokoro, nous
-                 * demandons donc directement sa sortie phonémique via
-                 * l'API CLI Emscripten si elle est disponible.
-                 */
-                if (typeof moteur.run === "function") {
-                    resolve(moteur.run([
-                        "--phonout",
-                        "generated",
-                        '--sep=""',
-                        "-q",
-                        "-b=1",
-                        "--ipa=3",
-                        "-v",
-                        "fr-fr",
-                        JSON.stringify(texte)
-                    ]));
-                    return;
-                }
-
-                reject(new Error("Cette version d'eSpeak NG ne permet pas d'obtenir les phonèmes IPA dans le navigateur."));
+    if (!espeakPromise) {
+        espeakPromise = import("https://cdn.jsdelivr.net/npm/espeak-ng@1.0.2/+esm")
+            .then(function (module) {
+                return module.default || module;
             });
-        } catch (error) {
-            reject(error);
-        }
+    }
+
+    const ESpeakNg = await espeakPromise;
+
+    const moteur = await ESpeakNg({
+        arguments: [
+            "--phonout",
+            "generated",
+            '--sep=""',
+            "-q",
+            "-b=1",
+            "--ipa=3",
+            "-v",
+            "fr-fr",
+            JSON.stringify(texte)
+        ]
     });
-}
 
+    const phonemes = moteur.FS.readFile(
+        "generated",
+        { encoding: "utf8" }
+    );
 
-function contenuPreRenduDisponible() {
-    if (!contentElement) return false;
-
-    const html = contentElement.innerHTML?.trim();
-
-    return !!html &&
-        !contentElement.querySelector(".editorial-loading");
+    return String(phonemes || "").trim();
 }
 
 async function chargerManifeste() {
