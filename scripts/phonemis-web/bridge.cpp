@@ -29,7 +29,7 @@ std::string phonemizeFrench(const std::string& text) {
     return phonemis::utils::conversions::u32_to_utf8(phonemes);
 }
 
-bool ready() {
+void resetPhonemis() {\n    g_pipeline.reset();\n}\n\nbool ready() {
     return static_cast<bool>(g_pipeline);
 }
 
