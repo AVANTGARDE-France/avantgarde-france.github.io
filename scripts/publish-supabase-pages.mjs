@@ -190,7 +190,7 @@ function deduplicateStyleBlocks(html) {
         new Set();
 
     return html.replace(
-        /<style\b[^>]*>[\s\\S]*?<\/style>/gi,
+        /<style\b[^>]*>[\s\S]*?<\/style>/gi,
         (block) => {
 
             const normalized =
@@ -291,13 +291,13 @@ function generateLlmsFullTxt(manifestHtml) {
 
     const withoutScripts =
         manifestHtml.replace(
-            /<script\b[^>]*>[\s\\S]*?<\/script>/gi,
+            /<script\b[^>]*>[\s\S]*?<\/script>/gi,
             ""
         );
 
     const withoutStyles =
         withoutScripts.replace(
-            /<style\b[^>]*>[\s\\S]*?<\/style>/gi,
+            /<style\b[^>]*>[\s\S]*?<\/style>/gi,
             ""
         );
 
