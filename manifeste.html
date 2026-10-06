@@ -58305,6 +58305,15 @@
         </div>
 
         <div class="manifeste-reader-controls">
+            <select
+                id="manifesteReaderEngine"
+                class="manifeste-reader-engine"
+                aria-label="Moteur vocal"
+            >
+                <option value="piper">Piper Plus — test</option>
+                <option value="pocket">Pocket TTS — Estelle</option>
+            </select>
+
             <button
                 type="button"
                 id="manifesteReaderPlay"
@@ -58383,6 +58392,19 @@
     display: flex !important;
     align-items: center !important;
     gap: 3px !important;
+}
+
+#manifesteReader .manifeste-reader-engine {
+    min-height: 25px !important;
+    max-width: 142px !important;
+    margin: 0 !important;
+    padding: 3px 5px !important;
+    border: 1px solid rgba(7,21,45,.14) !important;
+    border-radius: 3px !important;
+    background: rgba(255,255,255,.72) !important;
+    color: #07152d !important;
+    font: 700 10px/1 Arial, sans-serif !important;
+    cursor: pointer !important;
 }
 
 #manifesteReader .manifeste-reader-button {
@@ -58473,9 +58495,19 @@
         src="js/components.js"
     ></script>
 
+    <script type="importmap">
+{
+  "imports": {
+    "piper-plus": "https://cdn.jsdelivr.net/npm/piper-plus@0.8.0/src/index.js",
+    "@piper-plus/g2p": "https://cdn.jsdelivr.net/npm/@piper-plus/g2p@0.4.2/src/index.js",
+    "onnxruntime-web": "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/ort.min.mjs"
+  }
+}
+</script>
+
     <script
         type="module"
-        src="js/manifeste.js?v=20261006-1830-estellefr-liveprogress"
+        src="js/manifeste.js?v=20261006-1845-piperplus-test"
     ></script>
 
 
