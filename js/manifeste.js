@@ -233,7 +233,7 @@ async function genererAudioFrancais(texte) {
 
     setStatus("Préparation du français…");
 
-    const phonemes = await phonemize(texte, "fr-fr");
+    const phonemes = await phonemize(texte, "fr");
 
     if (!phonemes) {
         throw new Error("Le phonémiseur français n'a retourné aucun phonème.");
