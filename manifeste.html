@@ -1497,8 +1497,7 @@
 
     font-family:
         Inter,
-        system-ui,
-        -apple-system,
+        system-ui,        -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
         sans-serif;
@@ -2997,7 +2996,6 @@
 
     font-size:
         clamp(4rem, 12vw, 9rem);
-
     line-height: .84;
     letter-spacing: -.055em;
     font-weight: 300;
@@ -4438,6 +4436,36 @@
 
     </main>
 
+
+    <section id="manifesteReader" class="manifeste-reader" aria-label="Lecteur audio du Manifeste">
+        <div class="manifeste-reader-main">
+            <div class="manifeste-reader-heading">
+                <span class="manifeste-reader-kicker">LECTEUR</span>
+            </div>
+
+            <div class="manifeste-reader-controls">
+                <button
+                    type="button"
+                    id="manifesteReaderPlay"
+                    class="manifeste-reader-button manifeste-reader-button-primary"
+                    aria-label="Lire le manifeste"
+                >
+                    <span aria-hidden="true">▶</span>
+                    <span id="manifesteReaderPlayLabel">Lire</span>
+                </button>
+
+                <button
+                    type="button"
+                    id="manifesteReaderStop"
+                    class="manifeste-reader-button"
+                    aria-label="Arrêter la lecture"
+                >
+                    <span aria-hidden="true">■</span>
+                    <span>Arrêter</span>
+                </button>
+            </div>
+        </div>
+    </section>
 
     <div id="site-footer"></div>
 
