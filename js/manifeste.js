@@ -419,14 +419,20 @@ async function genererAudioFrancais(
             "Piper — génération…"
         );
 
+        const speakerEmbedding =
+            new Float32Array(
+                PIPER_PLUS_SPEAKER_EMBEDDING_DIM
+            );
+
         const result =
             await tts.synthesize(
                 texte,
                 {
                     language: "fr",
                     noiseScale: 0.4,
-                    lengthScale: 1.0,
-                    noiseW: 0.5
+                    lengthScale: 1.5,
+                    noiseW: 0.667,
+                    speakerEmbedding: speakerEmbedding
                 }
             );
 
@@ -836,7 +842,35 @@ function arreterLecture() {
     mettreAJourInterface();
 }
 
+function supprimerChoixMoteur() {
+    const select =
+        document.getElementById("manifesteReaderEngine");
+
+    if (!select) return;
+
+    const label =
+        select.closest("label");
+
+    if (label) {
+        label.remove();
+        return;
+    }
+
+    const conteneur =
+        select.closest(
+            ".manifeste-reader-engine, .manifeste-reader-choice, .manifeste-reader-options"
+        );
+
+    if (conteneur) {
+        conteneur.remove();
+    } else {
+        select.remove();
+    }
+}
+
 function installerInteractionsDirectesLecteur() {
+    supprimerChoixMoteur();
+
     const play =
         document.getElementById(
             "manifesteReaderPlay"
@@ -878,6 +912,26 @@ function demarrerPageManifeste() {
     );
 
     installerInteractionsDirectesLecteur();
+
+    /*
+       Le lecteur peut être injecté après le chargement du script.
+       On surveille donc brièvement le DOM pour supprimer tout ancien
+       sélecteur de moteur sans toucher aux boutons ni au statut.
+    */
+    const observer =
+        new MutationObserver(function () {
+            supprimerChoixMoteur();
+        });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
+    setTimeout(function () {
+        observer.disconnect();
+        supprimerChoixMoteur();
+    }, 5000);
 
     if (!extraireTexte()) {
         setStatus(
