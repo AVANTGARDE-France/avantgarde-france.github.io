@@ -72,7 +72,7 @@ async function phonemiserFrancais(texte) {
             "ephone : chargement du module trop long."
         )
         .then(async function (module) {
-            setStatus("Initialisation du français…");
+            setStatus("Initialisation du français (WASM)…");
             console.log(
                 "AVANT-GARDE — ephone : module chargé",
                 Object.keys(module || {})
@@ -97,12 +97,17 @@ async function phonemiserFrancais(texte) {
                 );
             }
 
+            setStatus("Initialisation WASM du français…");
+
             const moteur =
                 await avecTimeout(
                     createEphone(roa),
                     20000,
                     "ephone : initialisation WASM trop longue."
                 );
+
+            console.log("AVANT-GARDE — ephone : WASM initialisé");
+            setStatus("Activation de la voix française…");
 
             if (
                 !moteur ||
@@ -115,6 +120,8 @@ async function phonemiserFrancais(texte) {
             }
 
             moteur.setVoice("fr");
+
+            console.log("AVANT-GARDE — ephone : voix fr activée");
 
             console.log(
                 "AVANT-GARDE — ephone : moteur français prêt",
@@ -868,12 +875,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0934");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0935");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.0934";
+    diagnostic.textContent = "LECTEUR V.0935";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
