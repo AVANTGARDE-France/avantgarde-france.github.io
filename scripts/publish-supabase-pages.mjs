@@ -220,13 +220,11 @@ function deduplicateStyleBlocks(html) {
  * copie complète de manifeste.html.
  *
  * Si un ancien enregistrement Supabase contient déjà une page
- * complète (article, section, styles, scripts, etc.), on extrait
- * uniquement le premier bloc éditorial utile avant publication.
+ * complète, on extrait uniquement le premier bloc éditorial utile.
  *
  * IMPORTANT :
- * Le lecteur audio n'est PAS dans ce contenu. Il appartient au
- * squelette statique de manifeste.html et reste donc totalement
- * indépendant de cette normalisation.
+ * Le lecteur audio reste dans le squelette statique de
+ * manifeste.html. Cette normalisation ne le supprime jamais.
  */
 
 const VOID_ELEMENTS = new Set([
@@ -244,7 +242,7 @@ function trouverOuverture(html, tagName, className) {
 
     while ((match = pattern.exec(html)) !== null) {
         const classes = match[1]
-            .split(/\\s+/)
+            .split(/\s+/)
             .filter(Boolean);
 
         if (classes.includes(className)) {
@@ -270,7 +268,7 @@ function extraireElementEquilibre(html, ouverture) {
     const tagName = ouvertureMatch[1].toLowerCase();
 
     const tokenPattern =
-        /<\\/?([a-z0-9]+)\\b[^>]*>/gi;
+        /<\/?([a-z0-9]+)\b[^>]*>/gi;
 
     tokenPattern.lastIndex = ouverture.end;
 
@@ -281,11 +279,11 @@ function extraireElementEquilibre(html, ouverture) {
         const token = match[0];
         const tokenTag = match[1].toLowerCase();
 
-        if (tokenTag !== tagName || token.startsWith("<!")) {
+        if (tokenTag !== tagName) {
             continue;
         }
 
-        if (/^<\\//.test(token)) {
+        if (/^<\//.test(token)) {
             depth--;
 
             if (depth === 0) {
@@ -322,7 +320,7 @@ function extrairePremierStyleApres(html, position) {
     const suite = html.slice(position);
 
     const match = suite.match(
-        /<style\\b[^>]*>[\\s\\S]*?<\\/style>/i
+        /<style\b[^>]*>[\s\S]*?<\/style>/i
     );
 
     return match ? match[0].trim() : "";
@@ -334,23 +332,23 @@ function nettoyerContenuEditorial(html, slug) {
     if (!source) return "";
 
     /*
-     * Cas 1 : Supabase contient une ancienne copie complète de
-     * l'article. On récupère uniquement son contenu intérieur.
+     * Si une ancienne version a enregistré l'article complet,
+     * on retire d'abord son wrapper editorialContent.
      */
     const articleContent =
-        extraireInterieurElement(source, "editorialContent");
+        extraireInterieurElement(
+            source,
+            "editorialContent"
+        );
 
     if (articleContent) {
         source = articleContent;
     }
 
     /*
-     * Cas 2 : Supabase contient encore une page complète ou
-     * plusieurs copies successives du manifeste.
-     *
-     * On conserve le premier <section class="manifeste">,
-     * qui correspond au contenu éditorial réel, puis uniquement
-     * le premier <style> qui le suit.
+     * Pour le manifeste, on conserve le premier bloc éditorial
+     * <section class="manifeste"> et le premier CSS qui le suit.
+     * Cela élimine les copies successives et les balises orphelines.
      */
     const ouvertureManifeste =
         trouverOuverture(
@@ -379,29 +377,24 @@ function nettoyerContenuEditorial(html, slug) {
 
             source =
                 style
-                    ? manifeste + "\\n\\n" + style
+                    ? manifeste + "\n\n" + style
                     : manifeste;
         }
     }
 
     /*
-     * Sécurité : le contenu éditorial ne doit jamais embarquer
-     * le lecteur, les scripts de page, le footer ou les wrappers
-     * globaux. Le lecteur reste celui du squelette HTML statique.
+     * Sécurité : jamais de scripts, liens de page ou wrappers
+     * globaux dans le contenu éditorial.
      */
     source = source
-        .replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi, "")
-        .replace(/<link\\b[^>]*>/gi, "")
-        .replace(/<iframe\\b[^>]*>[\\s\\S]*?<\\/iframe>/gi, "")
-        .replace(/<div\\b[^>]*\\bid=[\\\"']site-header[\\\"'][^>]*>[\\s\\S]*?<\\/div>/gi, "")
-        .replace(/<div\\b[^>]*\\bid=[\\\"']site-footer[\\\"'][^>]*>[\\s\\S]*?<\\/div>/gi, "")
-        .replace(/<div\\b[^>]*\\bid=[\\\"']site-rdv-modal[\\\"'][^>]*>[\\s\\S]*?<\\/div>/gi, "")
+        .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
+        .replace(/<link\b[^>]*>/gi, "")
+        .replace(/<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi, "")
+        .replace(/<div\b[^>]*\bid=["']site-header["'][^>]*>[\s\S]*?<\/div>/gi, "")
+        .replace(/<div\b[^>]*\bid=["']site-footer["'][^>]*>[\s\S]*?<\/div>/gi, "")
+        .replace(/<div\b[^>]*\bid=["']site-rdv-modal["'][^>]*>[\s\S]*?<\/div>/gi, "")
         .trim();
 
-    /*
-     * Les anciennes publications peuvent avoir laissé plusieurs
-     * copies exactes du CSS du manifeste. On n'en conserve qu'une.
-     */
     source = deduplicateStyleBlocks(source);
 
     if (slug === "manifeste") {
