@@ -2,14 +2,21 @@
    AVANT-GARDE — PAGE MANIFESTE
    js/manifeste.js
 
-   Le manifeste est pré-rendu dans manifeste.html.
-   Ce script conserve le chargement Supabase de secours et
-   assure le fonctionnement du lecteur vocal.
+   Lecteur vocal :
+   - Kokoro-82M directement dans le navigateur
+   - aucune API payante
+   - aucun MP3 permanent
+   - aucune voix native Chrome/Edge
+   - WebGPU si disponible, WASM sinon
+   - le modèle est téléchargé une seule fois puis mis en cache
 ========================================================= */
 
 import { supabase } from "./supabase.js";
 
 const SLUG = "manifeste";
+const KOKORO_MODEL = "onnx-community/Kokoro-82M-v1.0-ONNX";
+const KOKORO_VOICE = "ff_siwis";
+const KOKORO_CDN = "https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/+esm";
 
 const titleElement =
     document.getElementById("editorialTitle");
@@ -17,13 +24,16 @@ const titleElement =
 const contentElement =
     document.getElementById("editorialContent");
 
-let syntheseVocale = null;
-let morceaux = [];
-let morceauActuel = 0;
-let enLecture = false;
-let enPause = false;
+let kokoro = null;
+let audioContext = null;
+let activeSource = null;
+let currentGeneration = 0;
+let chunks = [];
+let chunkIndex = 0;
+let playing = false;
+let paused = false;
+let loading = false;
 let initialisationFaite = false;
-let tentativeVoix = null;
 
 function contenuPreRenduDisponible() {
     if (!contentElement) return false;
@@ -118,26 +128,6 @@ function initialiserLecteurManifeste() {
         return;
     }
 
-    if (
-        !("speechSynthesis" in window) ||
-        !("SpeechSynthesisUtterance" in window)
-    ) {
-        reader.hidden = true;
-        console.warn(
-            "AVANT-GARDE — Lecture vocale non disponible dans ce navigateur."
-        );
-        return;
-    }
-
-    syntheseVocale = window.speechSynthesis;
-
-    morceaux = construireMorceaux();
-
-    if (!morceaux.length) {
-        reader.hidden = true;
-        return;
-    }
-
     playButton.addEventListener(
         "click",
         basculerLecture
@@ -151,20 +141,15 @@ function initialiserLecteurManifeste() {
     initialisationFaite = true;
 
     mettreAJourInterface();
+    setStatus("Prêt");
 
-    preparerVoix();
-
-    if (
-        typeof syntheseVocale.addEventListener === "function"
-    ) {
-        syntheseVocale.addEventListener(
-            "voiceschanged",
-            preparerVoix
-        );
-    }
+    /*
+       Le moteur Kokoro n'est volontairement PAS chargé ici.
+       Il ne sera téléchargé que lorsque le visiteur demande une lecture.
+    */
 }
 
-function construireMorceaux() {
+function extraireTexte() {
 
     const clone =
         contentElement.cloneNode(true);
@@ -175,17 +160,15 @@ function construireMorceaux() {
         element.remove();
     });
 
-    const texte =
-        (clone.textContent || "")
-            .replace(/\s+/g, " ")
-            .trim();
+    return (clone.textContent || "")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function construireMorceaux(texte) {
 
     if (!texte) return [];
 
-    /*
-       Morceaux courts pour éviter les échecs de SpeechSynthesis
-       rencontrés sur Chromium/Edge avec les longs textes.
-    */
     const phrases =
         texte
             .split(/(?<=[.!?…])\s+/)
@@ -220,216 +203,444 @@ function construireMorceaux() {
     return resultat;
 }
 
-function preparerVoix() {
+async function chargerKokoro() {
 
-    if (!syntheseVocale) return;
+    if (kokoro) return kokoro;
 
-    const voix =
-        syntheseVocale.getVoices();
-
-    const francaises =
-        voix.filter(function (voice) {
-            return /^fr(?:-|_|$)/i.test(
-                voice.lang || ""
-            );
-        });
-
-    if (francaises.length) {
-
-        tentativeVoix =
-            francaises.find(function (voice) {
-                return /^fr-fr$/i.test(
-                    voice.lang || ""
-                );
-            }) ||
-            francaises.find(function (voice) {
-                return /natural|neural|online/i.test(
-                    voice.name || ""
-                );
-            }) ||
-            francaises[0];
-
-    } else {
-
-        tentativeVoix = null;
-
-    }
-}
-
-function basculerLecture() {
-
-    if (!syntheseVocale || !morceaux.length) {
-        return;
-    }
-
-    if (enLecture) {
-
-        if (enPause) {
-            syntheseVocale.resume();
-            enPause = false;
-        } else {
-            syntheseVocale.pause();
-            enPause = true;
+    if (loading) {
+        while (loading && !kokoro) {
+            await new Promise(function (resolve) {
+                window.setTimeout(resolve, 100);
+            });
         }
 
-        mettreAJourInterface();
-        return;
+        if (kokoro) return kokoro;
     }
 
-    /*
-       Un clic utilisateur déclenche directement speak().
-       On n'attend pas voiceschanged : le navigateur peut parfaitement
-       utiliser sa voix par défaut même si getVoices() est encore vide.
-    */
-    enLecture = true;
-    enPause = false;
+    loading = true;
+    setStatus("Chargement du moteur…");
 
-    if (morceauActuel >= morceaux.length) {
-        morceauActuel = 0;
+    try {
+
+        const module =
+            await import(KOKORO_CDN);
+
+        const KokoroTTS =
+            module.KokoroTTS;
+
+        if (!KokoroTTS) {
+            throw new Error(
+                "KokoroTTS introuvable dans kokoro-js."
+            );
+        }
+
+        const device =
+            "gpu" in navigator && navigator.gpu
+                ? "webgpu"
+                : "wasm";
+
+        setStatus(
+            device === "webgpu"
+                ? "Préparation de la voix…"
+                : "Préparation de la voix (mode compatible)…"
+        );
+
+        kokoro =
+            await KokoroTTS.from_pretrained(
+                KOKORO_MODEL,
+                {
+                    dtype: device === "webgpu"
+                        ? "fp16"
+                        : "q8",
+                    device,
+                    progress_callback: function (progress) {
+
+                        if (
+                            progress &&
+                            typeof progress.progress === "number"
+                        ) {
+                            const value =
+                                Math.round(
+                                    progress.progress
+                                );
+
+                            setStatus(
+                                "Chargement " +
+                                value +
+                                "%"
+                            );
+                        }
+                    }
+                }
+            );
+
+        loading = false;
+
+        return kokoro;
+
+    } catch (error) {
+
+        loading = false;
+        kokoro = null;
+
+        console.error(
+            "AVANT-GARDE — Kokoro :",
+            error
+        );
+
+        setStatus(
+            "Impossible de charger la voix."
+        );
+
+        throw error;
     }
-
-    mettreAJourInterface();
-
-    syntheseVocale.cancel();
-
-    window.setTimeout(
-        lireMorceau,
-        80
-    );
 }
 
-function lireMorceau() {
+function obtenirAudioContext() {
 
-    if (!enLecture || !syntheseVocale) {
-        return;
+    if (!audioContext) {
+
+        const AudioContextClass =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        if (!AudioContextClass) {
+            throw new Error(
+                "Web Audio API indisponible."
+            );
+        }
+
+        audioContext =
+            new AudioContextClass();
     }
 
-    if (morceauActuel >= morceaux.length) {
+    return audioContext;
+}
+
+function convertirEnBuffer(audio) {
+
+    const context =
+        obtenirAudioContext();
+
+    const audioBuffer =
+        context.createBuffer(
+            1,
+            audio.data.length,
+            audio.sample_rate
+        );
+
+    audioBuffer
+        .getChannelData(0)
+        .set(audio.data);
+
+    return audioBuffer;
+}
+
+function jouerBuffer(audioBuffer, generation) {
+
+    return new Promise(function (resolve) {
+
+        if (
+            generation !== currentGeneration ||
+            !playing
+        ) {
+            resolve(false);
+            return;
+        }
+
+        const context =
+            obtenirAudioContext();
+
+        const source =
+            context.createBufferSource();
+
+        source.buffer =
+            audioBuffer;
+
+        source.connect(
+            context.destination
+        );
+
+        activeSource = source;
+
+        source.onended =
+            function () {
+
+                if (
+                    activeSource === source
+                ) {
+                    activeSource = null;
+                }
+
+                resolve(
+                    generation === currentGeneration
+                );
+            };
+
+        source.start(0);
+    });
+}
+
+async function lireAvecKokoro() {
+
+    const generation =
+        ++currentGeneration;
+
+    const texte =
+        extraireTexte();
+
+    chunks =
+        construireMorceaux(texte);
+
+    chunkIndex = 0;
+
+    if (!chunks.length) {
+        setStatus("Aucun texte à lire.");
         terminerLecture();
         return;
     }
 
-    const texte =
-        morceaux[morceauActuel];
+    try {
 
-    if (!texte) {
-        morceauActuel++;
-        lireMorceau();
+        const moteur =
+            await chargerKokoro();
+
+        if (
+            generation !== currentGeneration ||
+            !playing
+        ) {
+            return;
+        }
+
+        const context =
+            obtenirAudioContext();
+
+        if (context.state === "suspended") {
+            await context.resume();
+        }
+
+        /*
+           Kokoro produit les morceaux progressivement.
+           Le navigateur commence donc à parler avant que
+           tout le manifeste ait été synthétisé.
+        */
+        const splitterModule =
+            await import(KOKORO_CDN);
+
+        const TextSplitterStream =
+            splitterModule.TextSplitterStream;
+
+        if (!TextSplitterStream) {
+            throw new Error(
+                "TextSplitterStream introuvable."
+            );
+        }
+
+        const splitter =
+            new TextSplitterStream();
+
+        const stream =
+            moteur.stream(
+                splitter,
+                {
+                    voice: KOKORO_VOICE,
+                    speed: 0.94
+                }
+            );
+
+        const alimentation =
+            (async function () {
+
+                for (
+                    let i = 0;
+                    i < chunks.length;
+                    i++
+                ) {
+
+                    if (
+                        generation !== currentGeneration ||
+                        !playing
+                    ) {
+                        return;
+                    }
+
+                    splitter.push(
+                        chunks[i]
+                    );
+                }
+
+                splitter.close();
+            })();
+
+        for await (
+            const resultat of stream
+        ) {
+
+            if (
+                generation !== currentGeneration ||
+                !playing
+            ) {
+                return;
+            }
+
+            chunkIndex++;
+
+            setStatus(
+                "Lecture " +
+                chunkIndex +
+                "/" +
+                chunks.length
+            );
+
+            const audioBuffer =
+                convertirEnBuffer(
+                    resultat.audio
+                );
+
+            const continueLecture =
+                await jouerBuffer(
+                    audioBuffer,
+                    generation
+                );
+
+            if (!continueLecture) {
+                return;
+            }
+        }
+
+        await alimentation;
+
+        if (
+            generation === currentGeneration &&
+            playing
+        ) {
+            terminerLecture();
+        }
+
+    } catch (error) {
+
+        if (
+            generation !== currentGeneration
+        ) {
+            return;
+        }
+
+        console.error(
+            "AVANT-GARDE — Lecture Kokoro :",
+            error
+        );
+
+        terminerLecture();
+        setStatus(
+            "Erreur de lecture."
+        );
+    }
+}
+
+async function basculerLecture() {
+
+    if (playing && !paused) {
+
+        paused = true;
+
+        if (audioContext) {
+            await audioContext.suspend();
+        }
+
+        mettreAJourInterface();
+        setStatus("Pause");
         return;
     }
 
-    const utterance =
-        new SpeechSynthesisUtterance(texte);
+    if (playing && paused) {
 
-    utterance.lang = "fr-FR";
-    utterance.rate = 0.94;
-    utterance.pitch = 1;
-    utterance.volume = 1;
+        paused = false;
 
-    if (
-        tentativeVoix &&
-        syntheseVocale
-            .getVoices()
-            .includes(tentativeVoix)
-    ) {
-        utterance.voice =
-            tentativeVoix;
+        if (audioContext) {
+            await audioContext.resume();
+        }
+
+        mettreAJourInterface();
+        setStatus("Lecture");
+
+        return;
     }
 
-    utterance.onstart =
-        function () {
-            enLecture = true;
-            enPause = false;
-            mettreAJourInterface();
-        };
+    playing = true;
+    paused = false;
 
-    utterance.onend =
-        function () {
+    mettreAJourInterface();
 
-            if (!enLecture) return;
+    try {
 
-            morceauActuel++;
+        await lireAvecKokoro();
 
-            if (
-                morceauActuel <
-                morceaux.length
-            ) {
-                window.setTimeout(
-                    lireMorceau,
-                    40
-                );
-            } else {
-                terminerLecture();
-            }
-        };
+    } catch (error) {
 
-    utterance.onerror =
-        function (event) {
+        console.error(
+            "AVANT-GARDE — Lecteur :",
+            error
+        );
 
-            console.warn(
-                "AVANT-GARDE — Lecteur vocal :",
-                event.error
-            );
-
-            if (
-                event.error === "canceled" ||
-                event.error === "interrupted"
-            ) {
-                return;
-            }
-
-            /*
-               Si une voix précise pose problème, on la retire
-               et on retente une seule fois avec la voix automatique
-               du navigateur.
-            */
-            if (tentativeVoix) {
-
-                tentativeVoix = null;
-
-                syntheseVocale.cancel();
-
-                window.setTimeout(
-                    lireMorceau,
-                    100
-                );
-
-                return;
-            }
-
-            enLecture = false;
-            enPause = false;
-
-            mettreAJourInterface();
-        };
-
-    syntheseVocale.speak(utterance);
+        terminerLecture();
+        setStatus(
+            "Lecture indisponible."
+        );
+    }
 }
 
 function arreterLecture() {
 
-    if (syntheseVocale) {
-        syntheseVocale.cancel();
+    currentGeneration++;
+
+    playing = false;
+    paused = false;
+    chunkIndex = 0;
+
+    if (activeSource) {
+
+        try {
+            activeSource.stop();
+        } catch (_) {}
+
+        activeSource = null;
     }
 
-    enLecture = false;
-    enPause = false;
-    morceauActuel = 0;
+    if (audioContext) {
+
+        try {
+            audioContext.suspend();
+        } catch (_) {}
+    }
 
     mettreAJourInterface();
+    setStatus("Prêt");
 }
 
 function terminerLecture() {
 
-    if (syntheseVocale) {
-        syntheseVocale.cancel();
+    playing = false;
+    paused = false;
+    chunkIndex = 0;
+
+    if (activeSource) {
+        activeSource = null;
     }
 
-    enLecture = false;
-    enPause = false;
-    morceauActuel = 0;
-
     mettreAJourInterface();
+    setStatus("Terminé");
+}
+
+function setStatus(message) {
+
+    const element =
+        document.getElementById(
+            "manifesteReaderStatus"
+        );
+
+    if (element) {
+        element.textContent = message;
+    }
 }
 
 function mettreAJourInterface() {
@@ -446,23 +657,41 @@ function mettreAJourInterface() {
 
     if (!playButton) return;
 
+    if (playing && !paused) {
+
+        playButton.setAttribute(
+            "aria-label",
+            "Mettre en pause"
+        );
+
+        if (playLabel) {
+            playLabel.textContent = "Pause";
+        }
+
+        return;
+    }
+
+    if (playing && paused) {
+
+        playButton.setAttribute(
+            "aria-label",
+            "Reprendre la lecture"
+        );
+
+        if (playLabel) {
+            playLabel.textContent = "Reprendre";
+        }
+
+        return;
+    }
+
     playButton.setAttribute(
         "aria-label",
-        enLecture && !enPause
-            ? "Mettre en pause"
-            : enPause
-                ? "Reprendre la lecture"
-                : "Écouter le manifeste"
+        "Écouter le manifeste"
     );
 
     if (playLabel) {
-
-        playLabel.textContent =
-            enLecture && !enPause
-                ? "Pause"
-                : enPause
-                    ? "Reprendre"
-                    : "Écouter";
+        playLabel.textContent = "Écouter";
     }
 }
 
