@@ -97,13 +97,13 @@ async function phonemiserFrancais(texte) {
                 );
             }
 
-            setStatus("Initialisation WASM du français…");
+            setStatus("Initialisation WASM du français… (max. 8 s)");
 
             const moteur =
                 await avecTimeout(
                     createEphone(roa),
-                    20000,
-                    "ephone : initialisation WASM trop longue."
+                    8000,
+                    "ephone : initialisation WASM trop longue (Safari/iOS)."
                 );
 
             console.log("AVANT-GARDE — ephone : WASM initialisé");
@@ -746,7 +746,11 @@ async function basculerLecture() {
         playing = false;
         paused = false;
         mettreAJourInterface();
-        setStatus("Erreur de lecture.");
+        setStatus(
+            error && error.message && error.message.includes("initialisation WASM")
+                ? "ephone bloqué : WASM français non initialisé."
+                : "Erreur de lecture."
+        );
         console.error("AVANT-GARDE — lecture :", error);
     }
 }
@@ -875,12 +879,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0935");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0936");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.0935";
+    diagnostic.textContent = "LECTEUR V.0936";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
