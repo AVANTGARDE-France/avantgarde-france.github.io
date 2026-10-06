@@ -962,30 +962,120 @@ function mettreAJourInterface() {
     }
 }
 
-function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1023");
+function extraireTexte() {
+    if (!contentElement) return "";
 
-    /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
-    const diagnostic = document.createElement("div");
-    diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR";
-    Object.assign(diagnostic.style, {
-        position: "fixed",
-        top: "8px",
-        right: "8px",
-        zIndex: "2147483647",
-        padding: "3px 6px",
-        background: "#07152d",
-        color: "#f0d58a",
-        font: "600 9px Arial, sans-serif",
-        borderRadius: "3px",
-        pointerEvents: "none"
+    const clone = contentElement.cloneNode(true);
+
+    clone.querySelectorAll(
+        "script, style, noscript, #manifesteReader, .manifeste-reader, button"
+    ).forEach(function (element) {
+        element.remove();
     });
-    document.body.appendChild(diagnostic);
+
+    return String(clone.innerText || clone.textContent || "")
+        .replace(/\\u00a0/g, " ")
+        .replace(/[ \\t]+/g, " ")
+        .replace(/\\n{3,}/g, "\\n\\n")
+        .trim();
+}
+
+function construireMorceaux(texte) {
+    const limite = 850;
+    const paragraphes = String(texte || "")
+        .split(/\\n{2,}/)
+        .map(function (p) {
+            return p.replace(/\\s+/g, " ").trim();
+        })
+        .filter(Boolean);
+
+    const resultat = [];
+    let courant = "";
+
+    paragraphes.forEach(function (paragraphe) {
+        const candidat = courant
+            ? courant + " " + paragraphe
+            : paragraphe;
+
+        if (candidat.length <= limite) {
+            courant = candidat;
+            return;
+        }
+
+        if (courant) {
+            resultat.push(courant);
+            courant = "";
+        }
+
+        if (paragraphe.length <= limite) {
+            courant = paragraphe;
+            return;
+        }
+
+        const phrases = paragraphe.match(/[^.!?…]+[.!?…]+(?:["»”']+)?|[^.!?…]+$/g) || [paragraphe];
+
+        phrases.forEach(function (phrase) {
+            const propre = phrase.trim();
+            if (!propre) return;
+
+            const test = courant
+                ? courant + " " + propre
+                : propre;
+
+            if (test.length <= limite) {
+                courant = test;
+            } else {
+                if (courant) resultat.push(courant);
+
+                if (propre.length <= limite) {
+                    courant = propre;
+                } else {
+                    for (let i = 0; i < propre.length; i += limite) {
+                        resultat.push(propre.slice(i, i + limite).trim());
+                    }
+                    courant = "";
+                }
+            }
+        });
+    });
+
+    if (courant) resultat.push(courant);
+
+    return resultat.filter(function (morceau) {
+        return morceau && morceau.length > 2;
+    });
+}
+
+function installerInteractionsDirectesLecteur() {
+    const play = document.getElementById("manifesteReaderPlay");
+    const stop = document.getElementById("manifesteReaderStop");
+
+    if (!play || !stop) {
+        console.error("AVANT-GARDE — boutons du lecteur introuvables.");
+        return;
+    }
+
+    play.addEventListener("click", function () {
+        basculerLecture();
+    });
+
+    stop.addEventListener("click", function () {
+        arreterLecture();
+    });
+
+    mettreAJourInterface();
+}
+
+function demarrerPageManifeste() {
+    console.log("AVANT-GARDE — manifeste.js chargé.");
+
     installerInteractionsDirectesLecteur();
-    chargerManifeste().catch(function (error) {
-        console.error("AVANT-GARDE — initialisation manifeste :", error);
-    });
+
+    const texte = extraireTexte();
+    if (!texte) {
+        setStatus("Texte du manifeste introuvable.");
+        console.error("AVANT-GARDE — aucun texte du manifeste trouvé.");
+    }
 }
 
 if (document.readyState === "loading") {
