@@ -40,46 +40,65 @@ let initialisationFaite = false;
 
 let piperPhonemizerPromise = null;
 
-const PIPER_WASM_JS =
-    "https://cdn.jsdelivr.net/npm/piper-wasm@0.1.4/build/piper_phonemize.js";
+const PIPER_PHONEMIZER_JS =
+    "https://cdn.jsdelivr.net/npm/@diffusionstudio/piper-wasm@1.0.0/build/piper_phonemize.js";
 
-const PIPER_WASM =
-    "https://cdn.jsdelivr.net/npm/piper-wasm@0.1.4/build/piper_phonemize.wasm";
-
-const PIPER_DATA =
-    "https://cdn.jsdelivr.net/npm/piper-wasm@0.1.4/build/piper_phonemize.data";
-
-const PIPER_WORKER =
-    "https://cdn.jsdelivr.net/npm/piper-wasm@0.1.4/build/worker/piper_worker.js";
-
-const PIPER_FR_MODEL =
-    "https://huggingface.co/rhasspy/piper-voices/resolve/main/fr/fr_FR/siwis/medium/fr_FR-siwis-medium.onnx";
+const PIPER_PHONEMIZER_BASE =
+    "https://cdn.jsdelivr.net/npm/@diffusionstudio/piper-wasm@1.0.0/build/piper_phonemize";
 
 async function chargerPiperPhonemizer() {
+
     if (piperPhonemizerPromise) {
         return piperPhonemizerPromise;
     }
 
-    piperPhonemizerPromise =
-        import("https://cdn.jsdelivr.net/npm/piper-wasm@0.1.4/+esm")
-            .then(function (module) {
-                if (
-                    typeof module.piperPhonemize !==
-                    "function"
-                ) {
-                    throw new Error(
-                        "Piper : fonction piperPhonemize introuvable."
-                    );
-                }
+    piperPhonemizerPromise = new Promise(function (resolve, reject) {
 
-                return module.piperPhonemize;
-            });
+        if (
+            window.createPiperPhonemize &&
+            typeof window.createPiperPhonemize === "function"
+        ) {
+            resolve(window.createPiperPhonemize);
+            return;
+        }
+
+        const script = document.createElement("script");
+
+        script.src = PIPER_PHONEMIZER_JS;
+        script.async = true;
+
+        script.onload = function () {
+
+            if (
+                window.createPiperPhonemize &&
+                typeof window.createPiperPhonemize === "function"
+            ) {
+                resolve(window.createPiperPhonemize);
+            } else {
+                reject(
+                    new Error(
+                        "Piper : factory WASM introuvable après chargement."
+                    )
+                );
+            }
+        };
+
+        script.onerror = function () {
+            reject(
+                new Error(
+                    "Piper : impossible de charger le phonémiseur WASM."
+                )
+            );
+        };
+
+        document.head.appendChild(script);
+    });
 
     try {
         return await avecTimeout(
             piperPhonemizerPromise,
             30000,
-            "Piper : chargement du phonémiseur trop long."
+            "Piper : chargement WASM trop long."
         );
     } catch (error) {
         piperPhonemizerPromise = null;
@@ -88,74 +107,164 @@ async function chargerPiperPhonemizer() {
 }
 
 async function phonemiserFrancais(texte) {
+
     setStatus(
         "Initialisation du phonémiseur français…"
     );
 
-    const piperPhonemize =
+    const factory =
         await chargerPiperPhonemizer();
 
     setStatus(
         "Phonémisation française…"
     );
 
+    const texteSource =
+        String(texte || "")
+            .replace(/\\s+/g, " ")
+            .trim();
+
+    if (!texteSource) {
+        throw new Error(
+            "Piper : texte français vide."
+        );
+    }
+
     const resultat =
         await avecTimeout(
-            piperPhonemize(
-                PIPER_WASM_JS,
-                PIPER_WASM,
-                PIPER_DATA,
-                PIPER_WORKER,
-                PIPER_FR_MODEL,
-                String(texte).trim(),
-                function (progress) {
-                    if (
-                        progress &&
-                        progress.loaded &&
-                        progress.total
-                    ) {
-                        const pourcentage =
-                            Math.round(
-                                progress.loaded /
-                                progress.total *
-                                100
-                            );
+            new Promise(function (resolve, reject) {
 
-                        setStatus(
-                            "Phonémiseur français " +
-                            pourcentage +
-                            "%…"
-                        );
-                    }
+                let termine = false;
+
+                function terminerAvecErreur(error) {
+                    if (termine) return;
+                    termine = true;
+                    reject(error);
                 }
-            ),
+
+                function terminerAvecResultat(value) {
+                    if (termine) return;
+                    termine = true;
+                    resolve(value);
+                }
+
+                factory({
+
+                    print: function (ligne) {
+
+                        try {
+
+                            const objet =
+                                JSON.parse(String(ligne));
+
+                            if (
+                                objet &&
+                                Array.isArray(objet.phonemes)
+                            ) {
+                                terminerAvecResultat(objet);
+                            }
+
+                        } catch (error) {
+
+                            terminerAvecErreur(
+                                new Error(
+                                    "Piper : sortie WASM invalide."
+                                )
+                            );
+                        }
+                    },
+
+                    printErr: function (ligne) {
+
+                        const message =
+                            String(ligne || "").trim();
+
+                        if (message) {
+                            console.warn(
+                                "AVANT-GARDE — Piper :",
+                                message
+                            );
+                        }
+                    },
+
+                    locateFile: function (fichier) {
+
+                        if (
+                            String(fichier).endsWith(".wasm")
+                        ) {
+                            return (
+                                PIPER_PHONEMIZER_BASE +
+                                ".wasm"
+                            );
+                        }
+
+                        if (
+                            String(fichier).endsWith(".data")
+                        ) {
+                            return (
+                                PIPER_PHONEMIZER_BASE +
+                                ".data"
+                            );
+                        }
+
+                        return fichier;
+                    }
+
+                }).then(function (module) {
+
+                    try {
+
+                        module.callMain([
+                            "-l",
+                            "fr-fr",
+                            "--input",
+                            JSON.stringify([
+                                {
+                                    text: texteSource
+                                }
+                            ]),
+                            "--espeak_data",
+                            "/espeak-ng-data"
+                        ]);
+
+                    } catch (error) {
+
+                        terminerAvecErreur(error);
+                    }
+
+                }).catch(function (error) {
+
+                    terminerAvecErreur(error);
+                });
+            }),
             45000,
             "Piper : phonémisation française trop longue."
         );
 
     const phonemes =
-        resultat &&
-        Array.isArray(resultat.phonemes)
-            ? resultat.phonemes
-            : [];
+        resultat.phonemes
+            .map(function (element) {
 
-    const textePhonetique =
-        phonemes
-            .map(function (phrase) {
-                return Array.isArray(phrase)
-                    ? phrase.join("")
-                    : String(phrase);
+                return Array.isArray(element)
+                    ? element.join("")
+                    : String(element);
+
             })
             .join(" ")
             .trim();
 
-    if (!textePhonetique) {
+    if (!phonemes) {
         throw new Error(
             "Piper : aucun phonème français retourné."
         );
     }
 
-    return textePhonetique;
+    console.log(
+        "AVANT-GARDE — phonèmes Piper :",
+        phonemes
+    );
+
+    return phonemes;
 }
 
 async function chargerKokoro() {
@@ -820,12 +929,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1022");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-1023");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.1022";
+    diagnostic.textContent = "LECTEUR V.1023";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
