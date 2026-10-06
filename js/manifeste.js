@@ -15,6 +15,7 @@ import { supabase } from "./supabase.js";
 const SLUG = "manifeste";
 const KOKORO_MODEL = "onnx-community/Kokoro-82M-v1.0-ONNX";
 const KOKORO_VOICE = "ff_siwis";
+const KOKORO_CDN = "https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/+esm";
 const TRANSFORMERS_CDN = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.5.1/+esm";
 const PHONEMIZER_CDN = "https://cdn.jsdelivr.net/npm/phonemizer@1.2.1/+esm";
 const KOKORO_VOICE_URL = "https://huggingface.co/onnx-community/Kokoro-82M-v1.0-ONNX/resolve/main/voices/ff_siwis.bin";
@@ -241,13 +242,11 @@ async function chargerKokoro() {
     if (kokoro) return kokoro;
 
     if (loading) {
-
         while (loading && !kokoro) {
             await new Promise(function (resolve) {
                 window.setTimeout(resolve, 100);
             });
         }
-
         if (kokoro) return kokoro;
     }
 
@@ -257,36 +256,28 @@ async function chargerKokoro() {
     try {
 
         /*
-           IMPORTANT :
-           kokoro-js 1.2.1 expose officiellement les voix anglaises
-           dans sa liste VOICES et refuse ff_siwis avant même la génération.
-           Le fichier ff_siwis.bin existe pourtant bien dans le modèle
-           Kokoro-82M-ONNX.
+           On laisse kokoro-js charger le modèle et le tokenizer,
+           car cette partie fonctionne déjà correctement dans le navigateur.
 
-           On contourne donc uniquement cette limitation de l'enveloppe
-           kokoro-js et on utilise directement les mêmes briques
-           Transformers.js + phonemizer que Kokoro.
+           Le problème de ff_siwis vient uniquement de sa whitelist de voix :
+           generate() refuse la voix française avant l'inférence.
+
+           Nous conservons donc le moteur chargé par kokoro-js et remplaçons
+           uniquement sa méthode generate() par l'équivalent direct qui :
+           1. phonémise en français ;
+           2. tokenise ;
+           3. charge ff_siwis.bin ;
+           4. appelle directement le modèle Kokoro.
         */
-        const transformers = await import(TRANSFORMERS_CDN);
-        const phonemizer = await import(PHONEMIZER_CDN);
+        const kokoroModule =
+            await import(KOKORO_CDN);
 
-        const StyleTextToSpeech2Model =
-            transformers.StyleTextToSpeech2Model;
+        const KokoroTTS =
+            kokoroModule.KokoroTTS;
 
-        const AutoTokenizer =
-            transformers.AutoTokenizer;
-
-        const Tensor =
-            transformers.Tensor;
-
-        if (
-            !StyleTextToSpeech2Model ||
-            !AutoTokenizer ||
-            !Tensor ||
-            !phonemizer?.phonemize
-        ) {
+        if (!KokoroTTS) {
             throw new Error(
-                "Les composants Kokoro nécessaires sont introuvables."
+                "KokoroTTS introuvable dans kokoro-js."
             );
         }
 
@@ -304,55 +295,53 @@ async function chargerKokoro() {
                 ? "fp32"
                 : "q8";
 
-        setStatus(
-            device === "webgpu"
-                ? "Chargement du modèle GPU…"
-                : "Chargement du modèle…"
-        );
+        const moteur =
+            await KokoroTTS.from_pretrained(
+                KOKORO_MODEL,
+                {
+                    dtype,
+                    device,
+                    progress_callback: function (progress) {
 
-        const [model, tokenizer] =
-            await Promise.all([
-                StyleTextToSpeech2Model.from_pretrained(
-                    KOKORO_MODEL,
-                    {
-                        dtype,
-                        device,
-                        progress_callback: function (progress) {
-
-                            if (
-                                progress &&
-                                typeof progress.progress === "number"
-                            ) {
-                                setStatus(
-                                    "Chargement " +
-                                    Math.round(progress.progress) +
-                                    "%"
-                                );
-                            }
+                        if (
+                            progress &&
+                            typeof progress.progress === "number"
+                        ) {
+                            setStatus(
+                                "Chargement " +
+                                Math.round(progress.progress) +
+                                "%"
+                            );
                         }
                     }
-                ),
-                AutoTokenizer.from_pretrained(
-                    KOKORO_MODEL,
-                    {
-                        progress_callback: function (progress) {
-
-                            if (
-                                progress &&
-                                typeof progress.progress === "number"
-                            ) {
-                                setStatus(
-                                    "Chargement " +
-                                    Math.round(progress.progress) +
-                                    "%"
-                                );
-                            }
-                        }
-                    }
-                )
-            ]);
+                }
+            );
 
         setStatus("Chargement de la voix française…");
+
+        const transformers =
+            await import(TRANSFORMERS_CDN);
+
+        const Tensor =
+            transformers.Tensor;
+
+        if (!Tensor) {
+            throw new Error(
+                "Tensor introuvable dans Transformers.js."
+            );
+        }
+
+        const phonemizer =
+            await import(PHONEMIZER_CDN);
+
+        if (
+            !phonemizer ||
+            typeof phonemizer.phonemize !== "function"
+        ) {
+            throw new Error(
+                "Le phonémiseur français est indisponible."
+            );
+        }
 
         const response =
             await fetch(KOKORO_VOICE_URL);
@@ -373,32 +362,37 @@ async function chargerKokoro() {
 
         if (!voiceData.length) {
             throw new Error(
-                "Le fichier de voix française est vide."
+                "Le fichier ff_siwis.bin est vide."
             );
         }
 
         /*
-           On garde une petite API interne compatible avec le reste
-           du lecteur actuel : moteur.generate(texte, options).
+           Le tokenizer est celui réellement chargé par kokoro-js.
+           Le modèle est également celui réellement chargé par kokoro-js.
+           On ne recrée donc pas une seconde instance lourde.
         */
-        kokoro = {
-            async generate(text, options) {
+        moteur.generate =
+            async function (text, options) {
 
                 const speed =
                     Number.isFinite(options?.speed)
                         ? options.speed
                         : 1;
 
-                const phonemeArray =
+                setStatus("Phonémisation française…");
+
+                const phonemesResult =
                     await phonemizer.phonemize(
                         text,
                         "fr-fr"
                     );
 
                 const phonemes =
-                    Array.isArray(phonemeArray)
-                        ? phonemeArray.join(" ")
-                        : String(phonemeArray || "");
+                    Array.isArray(phonemesResult)
+                        ? phonemesResult.join(" ")
+                        : String(
+                            phonemesResult || ""
+                        );
 
                 if (!phonemes.trim()) {
                     throw new Error(
@@ -407,7 +401,7 @@ async function chargerKokoro() {
                 }
 
                 const tokenized =
-                    tokenizer(
+                    moteur.tokenizer(
                         phonemes,
                         {
                             truncation: true
@@ -417,7 +411,7 @@ async function chargerKokoro() {
                 const input_ids =
                     tokenized.input_ids;
 
-                const nombreTokens =
+                const numTokens =
                     Math.min(
                         Math.max(
                             input_ids.dims.at(-1) - 2,
@@ -427,7 +421,7 @@ async function chargerKokoro() {
                     );
 
                 const offset =
-                    nombreTokens *
+                    numTokens *
                     KOKORO_STYLE_DIM;
 
                 const style =
@@ -441,12 +435,12 @@ async function chargerKokoro() {
                     KOKORO_STYLE_DIM
                 ) {
                     throw new Error(
-                        "Le vecteur de style ff_siwis est incomplet."
+                        "Le style vocal ff_siwis est incomplet pour ce segment."
                     );
                 }
 
-                const outputs =
-                    await model({
+                const result =
+                    await moteur.model({
                         input_ids,
                         style: new Tensor(
                             "float32",
@@ -461,23 +455,29 @@ async function chargerKokoro() {
                     });
 
                 if (
-                    !outputs ||
-                    !outputs.waveform ||
-                    !outputs.waveform.data
+                    !result ||
+                    !result.waveform ||
+                    !result.waveform.data
                 ) {
                     throw new Error(
-                        "Kokoro n'a pas retourné de forme d'onde."
+                        "Le modèle Kokoro n'a pas retourné de piste audio."
                     );
                 }
 
                 return {
-                    data: outputs.waveform.data,
+                    data: result.waveform.data,
                     sample_rate: KOKORO_SAMPLE_RATE
                 };
-            }
-        };
+            };
 
+        /*
+           Marque le moteur comme prêt uniquement après avoir chargé
+           explicitement la voix française.
+        */
+        kokoro = moteur;
         loading = false;
+
+        setStatus("Moteur prêt");
 
         return kokoro;
 
@@ -492,7 +492,7 @@ async function chargerKokoro() {
         );
 
         setStatus(
-            "Impossible de charger la voix."
+            "Erreur de chargement."
         );
 
         throw error;
