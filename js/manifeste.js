@@ -253,8 +253,6 @@ else {
 
     chargerManifeste();
 
-    initialiserLecteurManifeste();
-
 }
 
 /* =========================================================
@@ -295,7 +293,7 @@ function initialiserLecteurManifeste() {
 
     chapitres = Array.from(
         contentElement.querySelectorAll(
-            ".manifeste-content > .manifeste-section, .manifeste-content > .manifeste-conclusion"
+            ".manifeste > .manifeste-content > .manifeste-section, .manifeste > .manifeste-content > .manifeste-conclusion"
         )
     )
     .map(function (element, index) {
