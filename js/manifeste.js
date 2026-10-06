@@ -370,6 +370,20 @@ async function chargerPocketTTS() {
                 progress.status === "loading-bundle"
             ) {
                 setStatus("Chargement du modèle français…");
+            } else if (
+                progress &&
+                progress.status === "generating"
+            ) {
+                setStatus(
+                    "Génération " +
+                    progress.chunk +
+                    "/" +
+                    progress.totalChunks +
+                    " — " +
+                    progress.frame +
+                    "/" +
+                    progress.maxFrames
+                );
             }
         });
 
