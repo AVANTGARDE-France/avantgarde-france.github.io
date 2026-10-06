@@ -5855,35 +5855,41 @@
     </main>
 
 
-    <section id="manifesteReader" class="manifeste-reader" aria-label="Lecteur audio du Manifeste">
-        <div class="manifeste-reader-main">
-            <div class="manifeste-reader-heading">
-                <span class="manifeste-reader-kicker">LECTEUR</span>
-            </div>
-
-            <div class="manifeste-reader-controls">
-                <button
-                    type="button"
-                    id="manifesteReaderPlay"
-                    class="manifeste-reader-button manifeste-reader-button-primary"
-                    aria-label="Lire le manifeste"
-                >
-                    <span aria-hidden="true">▶</span>
-                    <span id="manifesteReaderPlayLabel">Lire</span>
-                </button>
-
-                <button
-                    type="button"
-                    id="manifesteReaderStop"
-                    class="manifeste-reader-button"
-                    aria-label="Arrêter la lecture"
-                >
-                    <span aria-hidden="true">■</span>
-                    <span>Arrêter</span>
-                </button>
-            </div>
+    <section id="manifesteReader" class="manifeste-reader" aria-label="Lecteur vocal du Manifeste">
+    <div class="manifeste-reader-main">
+        <div class="manifeste-reader-heading">
+            <span class="manifeste-reader-kicker">LECTEUR</span>
         </div>
-    </section>
+
+        <div class="manifeste-reader-controls">
+            <button
+                type="button"
+                id="manifesteReaderPlay"
+                class="manifeste-reader-button manifeste-reader-button-primary"
+                aria-label="Écouter le manifeste"
+            >
+                <span aria-hidden="true">▶</span>
+                <span id="manifesteReaderPlayLabel">Écouter</span>
+            </button>
+
+            <button
+                type="button"
+                id="manifesteReaderStop"
+                class="manifeste-reader-button"
+                aria-label="Arrêter la lecture"
+            >
+                <span aria-hidden="true">■</span>
+                <span>Arrêter</span>
+            </button>
+
+            <span
+                id="manifesteReaderStatus"
+                class="manifeste-reader-status"
+                aria-live="polite"
+            ></span>
+        </div>
+    </div>
+</section>
 
 <style>
 /* =========================================================
@@ -5973,6 +5979,22 @@
 #manifesteReader .manifeste-reader-button:disabled {
     opacity: .45 !important;
     cursor: default !important;
+}
+
+#manifesteReader .manifeste-reader-status {
+    display: inline-block !important;
+    max-width: 180px !important;
+    color: rgba(7,21,45,.62) !important;
+    font: 600 10px/1.2 Arial, sans-serif !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+@media (max-width: 800px) {
+    #manifesteReader .manifeste-reader-status {
+        max-width: 110px !important;
+    }
 }
 
 @media (max-width: 800px) {
