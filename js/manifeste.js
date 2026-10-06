@@ -426,9 +426,10 @@ async function genererEtLireMorceau(id) {
         libererAudio();
 
         activeObjectUrl = buffer.url;
-        audioElement = new Audio(activeObjectUrl);
+        audioElement = new Audio();
         audioElement.preload = "auto";
         audioElement.playbackRate = PIPER_PLAYBACK_RATE;
+        audioElement.src = activeObjectUrl;
 
         audioElement.onended = function () {
             if (id !== generationId || !playing || paused) return;
