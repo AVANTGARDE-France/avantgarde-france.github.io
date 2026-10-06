@@ -500,3 +500,177 @@ async function chargerKokoro() {
     }
 }
 
+
+
+async function basculerLecture() {
+    console.log("AVANT-GARDE — lecture demandée");
+    if (playing && !paused) {
+        pauseLecture();
+        return;
+    }
+    if (paused) {
+        reprendreLecture();
+        return;
+    }
+
+    try {
+        const texte = extraireTexte();
+        if (!texte) throw new Error("Aucun texte à lire.");
+        chunks = construireMorceaux(texte);
+        if (!chunks.length) throw new Error("Aucun morceau à lire.");
+
+        currentGeneration++;
+        chunkIndex = 0;
+        playing = true;
+        paused = false;
+        mettreAJourInterface();
+
+        await chargerKokoro();
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        await audioContext.resume();
+        await lireMorceau(currentGeneration);
+    } catch (error) {
+        playing = false;
+        paused = false;
+        mettreAJourInterface();
+        setStatus("Erreur de lecture.");
+        console.error("AVANT-GARDE — lecture :", error);
+    }
+}
+
+async function lireMorceau(generation) {
+    if (!playing || paused || generation !== currentGeneration) return;
+    if (chunkIndex >= chunks.length) {
+        playing = false;
+        paused = false;
+        chunkIndex = 0;
+        mettreAJourInterface();
+        setStatus("Lecture terminée");
+        return;
+    }
+
+    setStatus("Lecture " + (chunkIndex + 1) + " / " + chunks.length + "…");
+    const audio = await kokoro.generate(chunks[chunkIndex], { voice: KOKORO_VOICE, speed: 1 });
+
+    if (!playing || paused || generation !== currentGeneration) return;
+
+    const data = audio.data || audio.waveform;
+    const sampleRate = audio.sample_rate || KOKORO_SAMPLE_RATE;
+    if (!data || !data.length) throw new Error("Audio Kokoro vide.");
+
+    const clean = new Float32Array(data.length);
+    for (let i = 0; i < data.length; i++) {
+        const value = Number(data[i]);
+        clean[i] = Number.isFinite(value) ? Math.max(-1, Math.min(1, value)) : 0;
+    }
+
+    const buffer = audioContext.createBuffer(1, clean.length, sampleRate);
+    buffer.copyToChannel(clean, 0);
+
+    const source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(audioContext.destination);
+    activeSource = source;
+
+    source.onended = function () {
+        if (activeSource !== source) return;
+        activeSource = null;
+        if (playing && !paused && generation === currentGeneration) {
+            chunkIndex++;
+            lireMorceau(generation).catch(function (error) {
+                playing = false;
+                setStatus("Erreur de lecture.");
+                console.error("AVANT-GARDE — morceau suivant :", error);
+                mettreAJourInterface();
+            });
+        }
+    };
+
+    source.start(0);
+}
+
+function pauseLecture() {
+    if (!playing) return;
+    paused = true;
+    if (activeSource) {
+        try { activeSource.stop(); } catch (_) {}
+        activeSource = null;
+    }
+    if (audioContext && audioContext.state === "running") {
+        audioContext.suspend().catch(function () {});
+    }
+    setStatus("En pause");
+    mettreAJourInterface();
+}
+
+function reprendreLecture() {
+    if (!playing || !paused) return;
+    paused = false;
+    if (audioContext) {
+        audioContext.resume().catch(function (error) {
+            console.error("AVANT-GARDE — reprise audio :", error);
+        });
+    }
+    setStatus("Reprise…");
+    mettreAJourInterface();
+    lireMorceau(currentGeneration).catch(function (error) {
+        playing = false;
+        paused = false;
+        setStatus("Erreur de lecture.");
+        console.error("AVANT-GARDE — reprise :", error);
+        mettreAJourInterface();
+    });
+}
+
+function arreterLecture() {
+    currentGeneration++;
+    playing = false;
+    paused = false;
+    chunkIndex = 0;
+    if (activeSource) {
+        try { activeSource.stop(); } catch (_) {}
+        activeSource = null;
+    }
+    if (audioContext && audioContext.state === "running") {
+        audioContext.suspend().catch(function () {});
+    }
+    setStatus("Arrêté");
+    mettreAJourInterface();
+}
+
+function setStatus(message) {
+    const status = document.getElementById("manifesteReaderStatus");
+    if (status) status.textContent = message;
+}
+
+function mettreAJourInterface() {
+    const button = document.getElementById("manifesteReaderPlay");
+    const label = document.getElementById("manifesteReaderPlayLabel");
+    if (!button) return;
+
+    if (playing && !paused) {
+        if (label) label.textContent = "Pause";
+        button.setAttribute("aria-label", "Mettre en pause");
+    } else if (paused) {
+        if (label) label.textContent = "Reprendre";
+        button.setAttribute("aria-label", "Reprendre la lecture");
+    } else {
+        if (label) label.textContent = "Écouter";
+        button.setAttribute("aria-label", "Écouter le manifeste");
+    }
+}
+
+function demarrerPageManifeste() {
+    console.log("AVANT-GARDE — manifeste.js chargé");
+    chargerManifeste().catch(function (error) {
+        console.error("AVANT-GARDE — initialisation manifeste :", error);
+    });
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", demarrerPageManifeste, { once: true });
+} else {
+    demarrerPageManifeste();
+}
