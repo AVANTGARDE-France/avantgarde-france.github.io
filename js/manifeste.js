@@ -41,6 +41,26 @@ let initialisationFaite = false;
 
 let piperPhonemizerPromise = null;
 
+/* =========================================================
+   Utilitaire de sécurité pour les chargements WASM / réseau.
+   Évite qu'une promesse de dépendance reste bloquée indéfiniment.
+========================================================= */
+function avecTimeout(promesse, delai, message) {
+    let timer = null;
+
+    const timeout = new Promise(function (_, reject) {
+        timer = setTimeout(function () {
+            reject(new Error(message || "Opération trop longue."));
+        }, delai);
+    });
+
+    return Promise.race([promesse, timeout]).finally(function () {
+        if (timer !== null) {
+            clearTimeout(timer);
+        }
+    });
+}
+
 const PIPER_PHONEMIZER_JS =
     "https://cdn.jsdelivr.net/npm/@diffusionstudio/piper-wasm@1.0.0/build/piper_phonemize.js";
 
