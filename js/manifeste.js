@@ -6,6 +6,7 @@
 const PIPER_PLUS_MODEL =
     "ayousanz/piper-plus-tsukuyomi-chan";
 const PIPER_PLUS_SAMPLE_RATE = 22050;
+const PIPER_PLUS_SPEAKER_EMBEDDING_DIM = 256;
 
 const contentElement =
     document.getElementById("editorialContent");
