@@ -767,8 +767,8 @@ async function lireMorceau(generation) {
     if (!playing || paused || generation !== currentGeneration) return;
 
     const data = audio.data || audio.waveform;
-    const sampleRate = audio.sample_rate || KOKORO_SAMPLE_RATE;
-    if (!data || !data.length) throw new Error("Audio Kokoro vide.");
+    const sampleRate = audio.sampling_rate || audio.sample_rate || KOKORO_SAMPLE_RATE;
+    console.log("AVANT-GARDE — audio Kokoro reçu :", {\n        type: audio && audio.constructor ? audio.constructor.name : typeof audio,\n        samples: data && data.length,\n        sampleRate: sampleRate,\n        audioContextState: audioContext && audioContext.state\n    });\n\n    if (!data || !data.length) throw new Error("Audio Kokoro vide.");\n    if (!audioContext) throw new Error("AudioContext non initialisé.");\n    if (audioContext.state === "closed") throw new Error("AudioContext fermé.");
 
     const clean = new Float32Array(data.length);
     for (let i = 0; i < data.length; i++) {
