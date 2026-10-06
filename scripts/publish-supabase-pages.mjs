@@ -250,15 +250,18 @@ function replaceEditorialTitle(
 
     if (!pattern.test(html)) {
 
-        throw new Error(
-            'Balise <h1 id="editorialTitle"> introuvable.'
+        console.log(
+            'ℹ Aucun <h1 id="editorialTitle"> à mettre à jour sur cette page.'
         );
+
+        return html;
     }
 
 
     return html.replace(
         pattern,
-        `$1\n                ${safeTitle}\n            $2`
+        (_match, openingTag, closingTag) =>
+            `${openingTag}\n                ${safeTitle}\n            ${closingTag}`
     );
 }
 
