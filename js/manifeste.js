@@ -39,6 +39,7 @@ let loading = false;
 let initialisationFaite = false;
 
 let ephonePromise = null;
+let lectureNativeActive = false;
 let lecteurEvenementsInstalles = false;
 let lecteurInteractionsInstallees = false;
 
@@ -738,6 +739,18 @@ async function basculerLecture() {
             });
         }
 
+        if (appareilIOSOuSafariMobile()) {
+            setStatus("Voix française iOS…");
+            await lectureNativeFrancaise(texte);
+            if (generationCouranteValide()) {
+                playing = false;
+                paused = false;
+                mettreAJourInterface();
+                setStatus("Lecture terminée");
+            }
+            return;
+        }
+
         await chargerKokoro();
 
         setStatus("Préparation de la voix française…");
@@ -879,12 +892,12 @@ function mettreAJourInterface() {
 }
 
 function demarrerPageManifeste() {
-    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0936");
+    console.log("AVANT-GARDE — manifeste.js chargé — TEST 20261006-0937");
 
     /* DIAGNOSTIC TEMPORAIRE : confirme visuellement que le JS courant est chargé. */
     const diagnostic = document.createElement("div");
     diagnostic.id = "manifesteReaderDiagnostic";
-    diagnostic.textContent = "LECTEUR V.0936";
+    diagnostic.textContent = "LECTEUR V.0937";
     Object.assign(diagnostic.style, {
         position: "fixed",
         top: "8px",
