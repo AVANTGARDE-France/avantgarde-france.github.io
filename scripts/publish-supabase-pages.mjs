@@ -333,10 +333,12 @@ async function publishPage(page) {
 
     if (!content) {
 
-        throw new Error(
-            `Le contenu HTML de "${page.slug}" ` +
-            `est vide dans Supabase.`
+        console.warn(
+            `⚠ Le contenu HTML de "${page.slug}" est vide dans Supabase. ` +
+            `La page existante est conservée et la publication continue.`
         );
+
+        return false;
     }
 
 
