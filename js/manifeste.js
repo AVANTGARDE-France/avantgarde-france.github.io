@@ -241,15 +241,27 @@ async function genererAudioFrancais(texte) {
 
     setStatus("Préparation du français…");
 
-    const phonemes = frenchG2P.phonemize(texte, { language: "fr" });
+    /*
+       @piper-plus/g2p 0.4.x retourne un objet :
+       { tokens, language }.
+       Le second argument de phonemize() est le code langue.
+    */
+    const resultatG2P = frenchG2P.phonemize(texte, "fr");
+    const phonemes = resultatG2P && Array.isArray(resultatG2P.tokens)
+        ? resultatG2P.tokens
+        : Array.isArray(resultatG2P)
+            ? resultatG2P
+            : null;
 
     if (!phonemes || !phonemes.length) {
+        console.error(
+            "AVANT-GARDE — résultat G2P français inattendu :",
+            resultatG2P
+        );
         throw new Error("Le phonémiseur français n'a retourné aucun phonème.");
     }
 
-    const textePhonemique = Array.isArray(phonemes)
-        ? phonemes.join("")
-        : String(phonemes);
+    const textePhonemique = phonemes.join("");
 
     console.log("AVANT-GARDE — phonèmes français :", textePhonemique);
 
