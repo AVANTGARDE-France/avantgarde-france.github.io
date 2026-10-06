@@ -1,11 +1,11 @@
 /* =========================================================
    AVANT-GARDE — PAGE MANIFESTE
    Lecteur vocal gratuit — Piper TTS Web
-   Voix unique : MLS — voix 40
+   Voix unique : Tom
 ========================================================= */
 
-const PIPER_WEB_VOICE = "fr_FR-mls-medium";
-const PIPER_WEB_SPEAKER_ID = 40;
+const PIPER_WEB_VOICE = "fr_FR-tom-medium";
+const PIPER_WEB_SPEAKER_ID = 0;
 
 const PIPER_WEB_BUNDLE =
     "https://cdn.jsdelivr.net/npm/@jtsage/piper-tts-web@1.2.0/dist/piper-tts-web.js";
@@ -308,11 +308,11 @@ async function chargerPiper() {
             };
 
             console.log(
-                "AVANT-GARDE — Piper Web prêt : MLS — voix 40 (speaker 40)"
+                "AVANT-GARDE — Piper Web prêt : Tom (Tom)"
             );
 
             setStatus(
-                "Piper MLS — voix 40 — moteur prêt."
+                "Piper Tom — moteur prêt."
             );
 
             return piperEngine;
@@ -377,14 +377,14 @@ async function genererEtLireMorceau(id) {
     const numero = chunkIndex + 1;
 
     setStatus(
-        "Piper MLS — voix 40 — génération " +
+        "Piper Tom — génération " +
         numero +
         "/" +
         chunks.length
     );
 
     console.log(
-        "AVANT-GARDE — Piper MLS — voix 40 — génération",
+        "AVANT-GARDE — Piper Tom — génération",
         numero,
         "/",
         chunks.length
@@ -469,7 +469,7 @@ async function genererEtLireMorceau(id) {
             };
 
         setStatus(
-            "Piper MLS — voix 40 — lecture " +
+            "Piper Tom — lecture " +
             numero +
             "/" +
             chunks.length
@@ -556,7 +556,7 @@ async function basculerLecture() {
         mettreAJourInterface();
 
         setStatus(
-            "Piper MLS — voix 40 — préparation…"
+            "Piper Tom — préparation…"
         );
 
         await genererEtLireMorceau(
@@ -603,7 +603,7 @@ function reprendreLecture() {
         });
 
         setStatus(
-            "Piper MLS — voix 40 — lecture " +
+            "Piper Tom — lecture " +
             (chunkIndex + 1) +
             "/" +
             chunks.length
@@ -676,7 +676,7 @@ function installerInteractionsLecteur() {
 
 function demarrerPageManifeste() {
     console.log(
-        "AVANT-GARDE — manifeste.js chargé — Piper MLS — voix 40."
+        "AVANT-GARDE — manifeste.js chargé — Piper Tom."
     );
 
     installerInteractionsLecteur();
