@@ -16,7 +16,7 @@ const MODEL_STEMS = ["mimi_encoder", "text_conditioner", "flow_lm_main", "flow_l
 const CACHE_NAME = "pocket-tts-js-v1";
 
 const CHUNK_GAP_SEC = 0.25;
-const MAX_FRAMES = 500;
+const MAX_FRAMES = 220;
 const LSD_STEPS = 1;
 const TEMPERATURE = 0.7;
 const EOS_THRESHOLD = -4.0;
@@ -561,6 +561,17 @@ async function generate(text, voiceRef) {
 
         for (let step = 0; step < MAX_FRAMES; step++) {
             if (!isGenerating) break;
+
+            if (step === 0 || step % 10 === 0) {
+                post({
+                    type: "status",
+                    status: "generating",
+                    chunk: chunkIdx + 1,
+                    totalChunks: chunks.length,
+                    frame: step + 1,
+                    maxFrames: MAX_FRAMES
+                });
+            }
             if (step > 0 && step % 4 === 0) await new Promise((r) => setTimeout(r, 0));
 
             const stepStart = performance.now();
