@@ -236,7 +236,7 @@ async function chargerPiper() {
 
         if (!source.includes("const speakerId = 1;")) {
             throw new Error(
-                "Impossible de sélectionner la voix Pierre dans Piper."
+                "Impossible de sélectionner la voix MLS 40 dans Piper."
             );
         }
 
@@ -275,7 +275,7 @@ async function chargerPiper() {
                                 );
 
                             setStatus(
-                                "Chargement de la voix Pierre… " +
+                                "Chargement de la voix MLS 40… " +
                                 pourcentage +
                                 "%"
                             );
@@ -296,7 +296,7 @@ async function chargerPiper() {
                 });
 
             setStatus(
-                "Initialisation de la voix Pierre…"
+                "Initialisation de la voix MLS 40…"
             );
 
             await session.waitReady;
