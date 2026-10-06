@@ -88,6 +88,8 @@ async function chargerManifeste() {
         contenuPreRenduDisponible()
     ) {
 
+        initialiserLecteurManifeste();
+
         return;
 
     }
