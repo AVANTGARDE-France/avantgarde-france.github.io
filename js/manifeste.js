@@ -2,13 +2,12 @@
    AVANT-GARDE — PAGE MANIFESTE
    js/manifeste.js
 
-   Lecteur vocal :
-   - Kokoro-82M directement dans le navigateur
-   - aucune API payante
+   Lecteur vocal Kokoro :
+   - 100 % local dans le navigateur
    - aucun MP3 permanent
-   - aucune voix native Chrome/Edge
+   - aucune API payante
    - WebGPU si disponible, WASM sinon
-   - le modèle est téléchargé une seule fois puis mis en cache
+   - génération par morceaux pour commencer la lecture rapidement
 ========================================================= */
 
 import { supabase } from "./supabase.js";
@@ -27,9 +26,11 @@ const contentElement =
 let kokoro = null;
 let audioContext = null;
 let activeSource = null;
+
 let currentGeneration = 0;
 let chunks = [];
 let chunkIndex = 0;
+
 let playing = false;
 let paused = false;
 let loading = false;
@@ -142,11 +143,6 @@ function initialiserLecteurManifeste() {
 
     mettreAJourInterface();
     setStatus("Prêt");
-
-    /*
-       Le moteur Kokoro n'est volontairement PAS chargé ici.
-       Il ne sera téléchargé que lorsque le visiteur demande une lecture.
-    */
 }
 
 function extraireTexte() {
@@ -182,12 +178,45 @@ function construireMorceaux(texte) {
 
     phrases.forEach(function (phrase) {
 
+        /*
+           Kokoro fonctionne mieux avec des segments modestes.
+           On évite les très longs blocs qui peuvent provoquer
+           des erreurs de génération ou des délais excessifs.
+        */
         if (
             courant &&
-            courant.length + phrase.length + 1 > 650
+            courant.length + phrase.length + 1 > 420
         ) {
             resultat.push(courant);
             courant = "";
+        }
+
+        /*
+           Une phrase exceptionnellement longue est découpée
+           proprement plutôt que de dépasser la limite.
+        */
+        if (phrase.length > 420) {
+
+            const mots =
+                phrase.split(/\s+/);
+
+            mots.forEach(function (mot) {
+
+                if (
+                    courant &&
+                    courant.length + mot.length + 1 > 420
+                ) {
+                    resultat.push(courant);
+                    courant = "";
+                }
+
+                courant =
+                    courant
+                        ? courant + " " + mot
+                        : mot;
+            });
+
+            return;
         }
 
         courant =
@@ -208,6 +237,7 @@ async function chargerKokoro() {
     if (kokoro) return kokoro;
 
     if (loading) {
+
         while (loading && !kokoro) {
             await new Promise(function (resolve) {
                 window.setTimeout(resolve, 100);
@@ -218,6 +248,7 @@ async function chargerKokoro() {
     }
 
     loading = true;
+
     setStatus("Chargement du moteur…");
 
     try {
@@ -234,24 +265,36 @@ async function chargerKokoro() {
             );
         }
 
+        const webGpuDisponible =
+            "gpu" in navigator &&
+            !!navigator.gpu;
+
         const device =
-            "gpu" in navigator && navigator.gpu
+            webGpuDisponible
                 ? "webgpu"
                 : "wasm";
+
+        /*
+           La documentation officielle recommande fp32
+           pour WebGPU. On garde q8 pour WASM afin de
+           limiter la mémoire nécessaire.
+        */
+        const dtype =
+            device === "webgpu"
+                ? "fp32"
+                : "q8";
 
         setStatus(
             device === "webgpu"
                 ? "Préparation de la voix…"
-                : "Préparation de la voix (mode compatible)…"
+                : "Préparation de la voix…"
         );
 
         kokoro =
             await KokoroTTS.from_pretrained(
                 KOKORO_MODEL,
                 {
-                    dtype: device === "webgpu"
-                        ? "fp16"
-                        : "q8",
+                    dtype,
                     device,
                     progress_callback: function (progress) {
 
@@ -259,14 +302,10 @@ async function chargerKokoro() {
                             progress &&
                             typeof progress.progress === "number"
                         ) {
-                            const value =
-                                Math.round(
-                                    progress.progress
-                                );
 
                             setStatus(
                                 "Chargement " +
-                                value +
+                                Math.round(progress.progress) +
                                 "%"
                             );
                         }
@@ -319,19 +358,34 @@ function obtenirAudioContext() {
 
 function convertirEnBuffer(audio) {
 
+    if (
+        !audio ||
+        !audio.data ||
+        !audio.sample_rate
+    ) {
+        throw new Error(
+            "Kokoro n'a pas retourné de données audio valides."
+        );
+    }
+
     const context =
         obtenirAudioContext();
+
+    const donnees =
+        audio.data instanceof Float32Array
+            ? audio.data
+            : Float32Array.from(audio.data);
 
     const audioBuffer =
         context.createBuffer(
             1,
-            audio.data.length,
+            donnees.length,
             audio.sample_rate
         );
 
     audioBuffer
         .getChannelData(0)
-        .set(audio.data);
+        .set(donnees);
 
     return audioBuffer;
 }
@@ -361,7 +415,8 @@ function jouerBuffer(audioBuffer, generation) {
             context.destination
         );
 
-        activeSource = source;
+        activeSource =
+            source;
 
         source.onended =
             function () {
@@ -395,8 +450,8 @@ async function lireAvecKokoro() {
     chunkIndex = 0;
 
     if (!chunks.length) {
-        setStatus("Aucun texte à lire.");
         terminerLecture();
+        setStatus("Aucun texte à lire.");
         return;
     }
 
@@ -420,60 +475,15 @@ async function lireAvecKokoro() {
         }
 
         /*
-           Kokoro produit les morceaux progressivement.
-           Le navigateur commence donc à parler avant que
-           tout le manifeste ait été synthétisé.
+           IMPORTANT :
+           on utilise generate() morceau par morceau plutôt
+           que tts.stream(). C'est plus robuste dans le navigateur
+           et conforme à l'API officielle de kokoro-js.
         */
-        const splitterModule =
-            await import(KOKORO_CDN);
-
-        const TextSplitterStream =
-            splitterModule.TextSplitterStream;
-
-        if (!TextSplitterStream) {
-            throw new Error(
-                "TextSplitterStream introuvable."
-            );
-        }
-
-        const splitter =
-            new TextSplitterStream();
-
-        const stream =
-            moteur.stream(
-                splitter,
-                {
-                    voice: KOKORO_VOICE,
-                    speed: 0.94
-                }
-            );
-
-        const alimentation =
-            (async function () {
-
-                for (
-                    let i = 0;
-                    i < chunks.length;
-                    i++
-                ) {
-
-                    if (
-                        generation !== currentGeneration ||
-                        !playing
-                    ) {
-                        return;
-                    }
-
-                    splitter.push(
-                        chunks[i]
-                    );
-                }
-
-                splitter.close();
-            })();
-
-        for await (
-            const resultat of stream
+        for (
+            let index = 0;
+            index < chunks.length;
+            index++
         ) {
 
             if (
@@ -483,7 +493,34 @@ async function lireAvecKokoro() {
                 return;
             }
 
-            chunkIndex++;
+            chunkIndex =
+                index + 1;
+
+            setStatus(
+                "Préparation " +
+                chunkIndex +
+                "/" +
+                chunks.length
+            );
+
+            const audio =
+                await moteur.generate(
+                    chunks[index],
+                    {
+                        voice: KOKORO_VOICE,
+                        speed: 0.94
+                    }
+                );
+
+            if (
+                generation !== currentGeneration ||
+                !playing
+            ) {
+                return;
+            }
+
+            const audioBuffer =
+                convertirEnBuffer(audio);
 
             setStatus(
                 "Lecture " +
@@ -492,23 +529,16 @@ async function lireAvecKokoro() {
                 chunks.length
             );
 
-            const audioBuffer =
-                convertirEnBuffer(
-                    resultat.audio
-                );
-
-            const continueLecture =
+            const continuer =
                 await jouerBuffer(
                     audioBuffer,
                     generation
                 );
 
-            if (!continueLecture) {
+            if (!continuer) {
                 return;
             }
         }
-
-        await alimentation;
 
         if (
             generation === currentGeneration &&
@@ -531,6 +561,7 @@ async function lireAvecKokoro() {
         );
 
         terminerLecture();
+
         setStatus(
             "Erreur de lecture."
         );
@@ -583,6 +614,7 @@ async function basculerLecture() {
         );
 
         terminerLecture();
+
         setStatus(
             "Lecture indisponible."
         );
@@ -623,9 +655,7 @@ function terminerLecture() {
     paused = false;
     chunkIndex = 0;
 
-    if (activeSource) {
-        activeSource = null;
-    }
+    activeSource = null;
 
     mettreAJourInterface();
     setStatus("Terminé");
@@ -695,9 +725,7 @@ function mettreAJourInterface() {
     }
 }
 
-if (
-    document.readyState === "loading"
-) {
+if (document.readyState === "loading") {
 
     document.addEventListener(
         "DOMContentLoaded",
