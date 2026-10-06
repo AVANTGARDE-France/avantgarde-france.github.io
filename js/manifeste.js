@@ -241,7 +241,7 @@ async function genererAudioFrancais(texte) {
 
     setStatus("Préparation du français…");
 
-    const phonemes = frenchG2P.phonemize(texte);
+    const phonemes = frenchG2P.phonemize(texte, { language: "fr" });
 
     if (!phonemes || !phonemes.length) {
         throw new Error("Le phonémiseur français n'a retourné aucun phonème.");
