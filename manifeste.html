@@ -13454,6 +13454,714 @@ Seules la santé gratuite et de nouvelles formes de majoration par enfant seront
 
 </article>
 
+</section>
+
+<style>
+
+/* =========================================================
+   AVANT-GARDE — MANIFESTE
+   Présentation éditoriale
+========================================================= */
+
+.manifeste {
+    --navy: #07152d;
+    --navy-2: #0d2344;
+    --gold: #d6ad55;
+    --gold-light: #f0d58a;
+    --cream: #f5f3ed;
+    --blue: #0055a4;
+    --red: #ef4135;
+    --text: #172033;
+    --muted: #687184;
+
+    width: 100%;
+    overflow: hidden;
+    background: var(--cream);
+    color: var(--text);
+
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+
+/* =========================================================
+   HERO
+========================================================= */
+
+.manifeste-hero {
+    position: relative;
+    min-height: 82vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(7,21,45,.98),
+            rgba(13,35,68,.92)
+        );
+
+    color: white;
+    text-align: center;
+}
+
+.manifeste-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 7px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--blue) 0 33.333%,
+            white 33.333% 66.666%,
+            var(--red) 66.666% 100%
+        );
+}
+
+.manifeste-hero-overlay {
+    position: absolute;
+    inset: 0;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(214,173,85,.12),
+            transparent 55%
+        );
+}
+
+.manifeste-hero-content {
+    position: relative;
+    z-index: 2;
+
+    width: min(900px, 90%);
+}
+
+.manifeste-kicker,
+.manifeste-label {
+    display: block;
+
+    color: var(--gold-light);
+
+    font-size: .78rem;
+    font-weight: 800;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+}
+
+.manifeste-hero h1 {
+    margin: 28px 0;
+
+    font-size:
+        clamp(4rem, 12vw, 9rem);
+
+    line-height: .84;
+    letter-spacing: -.055em;
+    font-weight: 300;
+}
+
+.manifeste-hero h1 strong {
+    font-weight: 900;
+}
+
+.manifeste-line {
+    width: 100px;
+    height: 3px;
+
+    margin: 36px auto;
+
+    background: var(--gold);
+}
+
+.manifeste-intro {
+    margin: 12px 0;
+
+    font-size:
+        clamp(1.25rem, 3vw, 2rem);
+
+    font-weight: 400;
+}
+
+.manifeste-intro-strong {
+    color: var(--gold-light);
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   SECTIONS
+========================================================= */
+
+.manifeste-section {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: 100px minmax(0, 850px);
+
+    gap: 40px;
+
+    width: min(1100px, 90%);
+    margin: auto;
+
+    padding: 130px 0;
+}
+
+.manifeste-section-body {
+    min-width: 0;
+}
+
+.manifeste-number {
+    color: rgba(7,21,45,.16);
+
+    font-size: 5rem;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.manifeste-section h2 {
+    margin: 15px 0 35px;
+
+    font-size:
+        clamp(2.5rem, 6vw, 5rem);
+
+    line-height: .95;
+    letter-spacing: -.045em;
+}
+
+.manifeste-section p {
+    max-width: 760px;
+
+    font-size: 1.15rem;
+    line-height: 1.75;
+}
+
+.manifeste-lead {
+    font-size:
+        clamp(1.35rem, 3vw, 1.8rem) !important;
+
+    font-weight: 500;
+}
+
+.manifeste-claim {
+    margin: 40px 0;
+
+    color: var(--navy);
+
+    font-size:
+        clamp(1.6rem, 4vw, 2.6rem) !important;
+
+    font-weight: 900;
+    line-height: 1.15 !important;
+}
+
+.manifeste-claim-small {
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   LISTES
+========================================================= */
+
+.manifeste-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    margin: 35px 0;
+}
+
+.manifeste-list span {
+    padding: 10px 15px;
+
+    border: 1px solid rgba(7,21,45,.14);
+
+    font-weight: 700;
+}
+
+.manifeste-list-negative span {
+    color: #8c2020;
+}
+
+.manifeste-list-positive span {
+    color: var(--navy);
+}
+
+.manifeste-final {
+    font-size: 2.5rem !important;
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   DARK
+========================================================= */
+
+.manifeste-section-dark {
+    width: 100%;
+    padding-left: max(5%, calc((100% - 1100px) / 2));
+    padding-right: max(5%, calc((100% - 1100px) / 2));
+
+    box-sizing: border-box;
+
+    background: var(--navy);
+    color: white;
+}
+
+.manifeste-section-dark .manifeste-number {
+    color: rgba(255,255,255,.12);
+}
+
+.manifeste-section-dark h2 {
+    color: white;
+}
+
+.manifeste-section-dark p {
+    color: rgba(255,255,255,.82);
+}
+
+.manifeste-section-dark .manifeste-claim {
+    color: var(--gold-light);
+}
+
+
+/* =========================================================
+   SURIGNAGE — PEINE DE MORT
+========================================================= */
+
+.manifeste-highlight {
+    display: inline-block;
+
+    padding: 2px 6px;
+
+    background:
+        linear-gradient(
+            180deg,
+            transparent 15%,
+            rgba(214,173,85,.45) 15%,
+            rgba(214,173,85,.45) 90%,
+            transparent 90%
+        );
+
+    color: inherit;
+    font-weight: 900;
+}
+
+
+/* =========================================================
+   QUOTES
+========================================================= */
+
+.manifeste blockquote {
+    position: relative;
+
+    margin: 55px 0;
+    padding-left: 30px;
+
+    border-left: 4px solid var(--gold);
+
+    color: var(--navy);
+
+    font-size:
+        clamp(1.5rem, 4vw, 2.5rem);
+
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.manifeste-section-dark blockquote {
+    color: var(--gold-light);
+}
+
+.manifeste-big-quote {
+    margin: 60px 0;
+
+    font-size:
+        clamp(2rem, 5vw, 4rem);
+
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -.04em;
+}
+
+
+/* =========================================================
+   TILES
+========================================================= */
+
+.manifeste-tiles {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    margin-top: 50px;
+
+    border-top: 1px solid rgba(7,21,45,.15);
+    border-left: 1px solid rgba(7,21,45,.15);
+}
+
+.manifeste-tiles div {
+    display: flex;
+    flex-direction: column;
+
+    padding: 30px;
+
+    border-right: 1px solid rgba(7,21,45,.15);
+    border-bottom: 1px solid rgba(7,21,45,.15);
+}
+
+.manifeste-tiles strong {
+    font-size: 2rem;
+}
+
+.manifeste-tiles span {
+    margin-top: 8px;
+    color: var(--muted);
+}
+
+
+/* =========================================================
+   ECONOMIE
+========================================================= */
+
+.manifeste-words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+
+    margin: 50px 0;
+}
+
+.manifeste-words span {
+    padding: 12px 18px;
+
+    border: 1px solid rgba(255,255,255,.22);
+
+    color: white;
+    font-weight: 700;
+}
+
+.manifeste-equation {
+    display: grid;
+    grid-template-columns: auto auto 45px auto auto;
+    align-items: center;
+    gap: 15px;
+
+    margin-top: 60px;
+
+    font-size: 1.1rem;
+}
+
+.manifeste-equation b {
+    color: var(--gold-light);
+}
+
+.manifeste-equation i {
+    color: var(--gold);
+    font-size: 1.8rem;
+}
+
+
+/* =========================================================
+   SOUVERAINETÉ / EUROPE
+========================================================= */
+
+.manifeste-europe {
+    width: 100%;
+    max-width: none;
+
+    padding-left: max(5%, calc((100% - 1100px) / 2));
+    padding-right: max(5%, calc((100% - 1100px) / 2));
+
+    box-sizing: border-box;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f5f3ed,
+            #e9e6dd
+        );
+}
+
+.manifeste-sovereignty {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    margin: 50px 0;
+
+    border-top: 1px solid rgba(7,21,45,.15);
+    border-left: 1px solid rgba(7,21,45,.15);
+}
+
+.manifeste-sovereignty span {
+    padding: 22px;
+
+    border-right: 1px solid rgba(7,21,45,.15);
+    border-bottom: 1px solid rgba(7,21,45,.15);
+
+    font-weight: 800;
+}
+
+.manifeste-dual {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    margin-top: 50px;
+}
+
+.manifeste-dual div {
+    padding: 25px;
+
+    border-left: 2px solid var(--gold);
+}
+
+.manifeste-dual strong,
+.manifeste-dual span {
+    display: block;
+}
+
+.manifeste-dual strong {
+    font-size: 1.3rem;
+}
+
+.manifeste-dual span {
+    margin-top: 6px;
+    color: var(--muted);
+}
+
+
+/* =========================================================
+   JUSTICE
+========================================================= */
+
+.manifeste-triad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    margin-top: 60px;
+
+    border-top: 1px solid rgba(255,255,255,.18);
+}
+
+.manifeste-triad span {
+    padding: 25px 15px;
+
+    border-right: 1px solid rgba(255,255,255,.18);
+
+    color: var(--gold-light);
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   COMPARAISON
+========================================================= */
+
+.manifeste-comparison {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+
+    margin-top: 60px;
+}
+
+.comparison-column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    padding: 35px;
+
+    border: 1px solid rgba(7,21,45,.15);
+}
+
+.comparison-column span {
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.comparison-title {
+    margin-bottom: 15px;
+
+    color: var(--gold);
+
+    font-size: .75rem !important;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    font-weight: 900 !important;
+}
+
+.manifeste-state-role {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    margin-top: 40px;
+    padding: 35px;
+
+    background: var(--navy);
+    color: white;
+}
+
+.manifeste-state-role strong {
+    color: var(--gold-light);
+    font-size: 1.8rem;
+}
+
+
+/* =========================================================
+   CONCLUSION
+========================================================= */
+
+.manifeste-conclusion {
+    position: relative;
+
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 150px 20px;
+
+    background: var(--navy);
+    color: white;
+
+    text-align: center;
+}
+
+.manifeste-conclusion::before {
+    content: "";
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 6px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--blue) 0 33.333%,
+            white 33.333% 66.666%,
+            var(--red) 66.666% 100%
+        );
+}
+
+.manifeste-conclusion-inner {
+    width: min(900px, 100%);
+    margin: auto;
+}
+
+.manifeste-conclusion p {
+    color: rgba(255,255,255,.78);
+
+    font-size: 1.2rem;
+    line-height: 1.6;
+}
+
+.manifeste-conclusion .manifeste-claim {
+    margin: 70px 0;
+
+    color: var(--gold-light);
+
+    font-size:
+        clamp(1.4rem, 4vw, 2.4rem) !important;
+
+    line-height: 1.3 !important;
+}
+
+.manifeste-ending {
+    padding-top: 70px;
+
+    border-top: 1px solid rgba(255,255,255,.15);
+}
+
+.manifeste-ending strong {
+    display: block;
+
+    margin: 25px 0 70px;
+
+    color: white;
+
+    font-size:
+        clamp(1.7rem, 4vw, 3rem);
+}
+
+.manifeste-ending h3 {
+    margin: 0;
+
+    color: var(--gold-light);
+
+    font-size:
+        clamp(3rem, 10vw, 7rem);
+
+    line-height: .85;
+    letter-spacing: -.06em;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 800px) {
+
+    .manifeste-section {
+        grid-template-columns: 1fr;
+        gap: 15px;
+
+        padding: 85px 0;
+    }
+
+    .manifeste-number {
+        font-size: 2.5rem;
+    }
+
+    .manifeste-tiles,
+    .manifeste-sovereignty,
+    .manifeste-comparison {
+        grid-template-columns: 1fr;
+    }
+
+    .manifeste-dual,
+    .manifeste-triad {
+        grid-template-columns: 1fr;
+    }
+
+    .manifeste-dual div,
+    .manifeste-triad span {
+        border-right: none;
+        border-bottom: 1px solid rgba(7,21,45,.15);
+    }
+
+    .manifeste-equation {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .manifeste-equation i {
+        transform: rotate(90deg);
+    }
+
+    .manifeste-hero {
+        min-height: 75vh;
+    }
+
+    .manifeste-hero h1 {
+        font-size: 19vw;
+    }
+
+}
+</style>
+
+</article>
+
     </main>
 
 
