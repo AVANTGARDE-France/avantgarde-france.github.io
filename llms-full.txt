@@ -448,7 +448,7 @@ Vous voulez une comparaison que ça marche? La Suisse.
  Suppression de la TVA, remplacée par une Taxe Automatique sur les Flux Financiers pour éradiquer l'évasion fiscale : notre douane numérique.
  Refonte de l'I R : un barème plus progressif avec plus de ranches.
  Suppression de la Fla Tax, intégrée à l'I R
- Suppression de l'I S confiscatoire : l'Éta perçoi uniquemen les intérêts de l'épargne d'entreprise, préservan ainsi 100 % du capital e des bénéfices.
+ Suppression de l'I S confiscatoire : l'Éta perçoi uniquemen les intérêts de l'épargne d'entreprise
  De 438 axes à l'essentiel : peu à peu, vers la fin de l'abus fiscal. 
  
  
@@ -859,6 +859,12 @@ Le libertarianisme comme boussole.
  
 
  
+
+
+
+
+
+
 
 
 
