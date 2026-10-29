@@ -1,165 +1,248 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>Avant-gardE — Dialogue</title>
-
-  <link
-    rel="stylesheet"
-    href="css/style.css"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07152d">
+  <title>Avant-gardE — La France libre</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    #home-experience{--q-gold:#e2bd69;--q-cream:#f6f4ef;--q-muted:#aab8c9;background:#050d19;color:var(--q-cream);font-family:Arial,Helvetica,sans-serif;overflow:hidden}
+    #home-experience *{box-sizing:border-box}
+    #home-experience button,#home-experience textarea,#home-experience input{font:inherit}
+    #home-experience .quiz-hero{position:relative;isolation:isolate;min-height:calc(100svh - 118px);padding:clamp(28px,5vw,72px) clamp(18px,6vw,96px) 54px;overflow:hidden;background:#06101e}
+    #home-experience .quiz-photo{position:absolute;inset:0;z-index:-3;background-image:url('https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=2200&q=85');background-position:center 46%;background-size:cover;transform:scale(1.02)}
+    #home-experience .quiz-shade{position:absolute;inset:0;z-index:-2;background:linear-gradient(90deg,rgba(3,10,20,.93),rgba(3,10,20,.82) 48%,rgba(3,10,20,.72)),linear-gradient(0deg,#050d19 0%,transparent 50%,rgba(4,11,22,.28) 100%)}
+    #home-experience .quiz-top{max-width:1080px;margin:0 auto 30px;display:flex;justify-content:space-between;align-items:center;gap:12px;color:#d4dce7;font-size:10px;font-weight:700;letter-spacing:.16em}
+    #home-experience .quiz-kicker{color:var(--q-gold)}
+    #home-experience .quiz-status{color:#b7c7d7;font-size:10px;letter-spacing:.12em}
+    #home-experience .quiz-status i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--q-gold);margin-right:8px;box-shadow:0 0 12px #e2bd69}
+    #home-experience .quiz-layout{max-width:1080px;margin:auto;display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr);gap:clamp(26px,6vw,80px);align-items:center}
+    #home-experience .quiz-intro h1{margin:18px 0 20px;font-family:Georgia,'Times New Roman',serif;font-size:clamp(48px,7vw,90px);line-height:.92;letter-spacing:-.065em;font-weight:500;color:white}
+    #home-experience .quiz-intro h1 em{color:var(--q-gold);font-style:normal}
+    #home-experience .quiz-intro p{max-width:390px;color:#d0d8e2;font-size:15px;line-height:1.75}
+    #home-experience .quiz-values{display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:28px;color:#e2bd69;font-size:9px;letter-spacing:.13em}
+    #home-experience .quiz-values span+span:before{content:'·';margin-right:12px;color:#77899c}
+    #home-experience .quiz-card{border:1px solid #e2bd6959;background:linear-gradient(145deg,rgba(9,23,41,.96),rgba(4,12,23,.97));box-shadow:0 28px 90px #0007;backdrop-filter:blur(12px);padding:clamp(20px,3vw,34px);min-width:0}
+    #home-experience .quiz-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:20px;border-bottom:1px solid #ffffff1c}
+    #home-experience .quiz-step-label{color:var(--q-gold);font-size:10px;font-weight:700;letter-spacing:.17em}
+    #home-experience .quiz-progress{display:flex;gap:5px}
+    #home-experience .quiz-progress span{display:block;width:22px;height:3px;background:#ffffff2b;transition:background .2s}
+    #home-experience .quiz-progress span.active{background:var(--q-gold)}
+    #home-experience .quiz-question{margin:25px 0 8px;font-family:Georgia,'Times New Roman',serif;font-size:clamp(25px,3vw,34px);line-height:1.15;font-weight:400;letter-spacing:-.025em}
+    #home-experience .quiz-hint{margin:0 0 22px;color:#9aabbd;font-size:12px;line-height:1.6}
+    #home-experience .quiz-options{display:grid;gap:9px}
+    #home-experience .quiz-option{width:100%;display:flex;align-items:flex-start;gap:13px;padding:15px 14px;border:1px solid #ffffff25;background:#ffffff05;color:#edf0f4;text-align:left;cursor:pointer;transition:border-color .2s,background .2s,transform .2s}
+    #home-experience .quiz-option:hover{border-color:#e2bd6980;transform:translateY(-1px)}
+    #home-experience .quiz-option[aria-pressed="true"]{border-color:var(--q-gold);background:#e2bd6914}
+    #home-experience .quiz-option-mark{flex:0 0 29px;height:29px;display:grid;place-items:center;border:1px solid #ffffff30;color:var(--q-gold);font-size:11px}
+    #home-experience .quiz-option[aria-pressed="true"] .quiz-option-mark{background:var(--q-gold);color:#081321;border-color:var(--q-gold)}
+    #home-experience .quiz-option-copy{display:block;min-width:0}
+    #home-experience .quiz-option-copy strong{display:block;margin-bottom:5px;color:#f5f2e9;font-size:12px;letter-spacing:.06em}
+    #home-experience .quiz-option-copy span{display:block;color:#b7c3d1;font-size:12px;line-height:1.55}
+    #home-experience .quiz-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:24px;padding-top:19px;border-top:1px solid #ffffff1b}
+    #home-experience .quiz-nav button{min-height:43px;padding:11px 16px;border:1px solid #e2bd6970;background:transparent;color:#f2d58a;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+    #home-experience .quiz-nav button.primary{background:var(--q-gold);color:#071321;border-color:var(--q-gold)}
+    #home-experience .quiz-nav button:disabled{opacity:.32;cursor:not-allowed}
+    #home-experience .quiz-foot{max-width:1080px;margin:28px auto 0;display:flex;align-items:center;gap:15px;color:#9aaabd;font-size:9px;letter-spacing:.13em}
+    #home-experience .quiz-foot-line{height:1px;flex:1;background:#e2bd6940}
+    #home-experience .quiz-range{width:100%;accent-color:var(--q-gold);margin:12px 0}
+    #home-experience .quiz-range-labels{display:flex;justify-content:space-between;gap:10px;color:#9aabbd;font-size:10px}
+    #home-experience .quiz-range-current{margin:20px 0 0;padding:16px;border-left:2px solid var(--q-gold);background:#e2bd690d}
+    #home-experience .quiz-range-current strong{display:block;color:var(--q-gold);font-size:11px;letter-spacing:.1em;margin-bottom:8px}
+    #home-experience .quiz-range-current p{margin:0;color:#dce2e8;font-size:12px;line-height:1.6}
+    #home-experience .quiz-parties{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    #home-experience .quiz-parties .quiz-option{height:100%;padding:13px 11px}
+    #home-experience .quiz-parties .quiz-option-copy strong{margin:2px 0 0}
+    #home-experience .quiz-free{padding:55px 20px 64px;background:#050d19;border-top:1px solid #e2bd692e}
+    #home-experience .quiz-free-inner{max-width:850px;margin:auto}
+    #home-experience .quiz-free h2{margin:12px 0;font-family:Georgia,'Times New Roman',serif;font-size:clamp(30px,4vw,44px);font-weight:400}
+    #home-experience .quiz-free p{color:#aab8c9;font-size:13px;line-height:1.7}
+    #home-experience .quiz-free .ai-suggestion-list{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0}
+    #home-experience .quiz-free .ai-suggestion-list button{padding:11px 13px;border:1px solid #ffffff24;background:#ffffff05;color:#e7edf4;text-align:left;cursor:pointer;font-size:11px}
+    #home-experience .quiz-free .ai-suggestion-list button:hover{border-color:#e2bd69;color:#f2d58a}
+    #home-experience .quiz-free .ai-composer{display:flex;gap:8px;border:1px solid #e2bd6970;background:#020a13}
+    #home-experience .quiz-free .ai-question{width:100%;min-width:0;min-height:64px;resize:vertical;padding:17px;border:0;outline:0;background:transparent;color:#fff;font-size:13px;line-height:1.6}
+    #home-experience .quiz-free .ai-send{flex:0 0 58px;border:0;background:var(--q-gold);color:#071321;font-size:25px;cursor:pointer}
+    #home-experience .quiz-free .ai-composer-bottom{display:flex;justify-content:space-between;gap:10px;margin-top:10px;color:#8595a8;font-size:10px}
+    #home-experience .quiz-free .ai-prompt-indicator i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--q-gold);margin-right:7px}
+    #home-experience .ai-status{min-height:18px;margin-top:8px;color:#f2d58a;font-size:11px}
+    @media(max-width:800px){#home-experience .quiz-layout{grid-template-columns:1fr;gap:28px}#home-experience .quiz-intro h1{font-size:clamp(49px,12vw,78px)}#home-experience .quiz-intro p{max-width:560px}#home-experience .quiz-hero{padding-top:28px}#home-experience .quiz-card{padding:21px}}
+    @media(max-width:480px){#home-experience .quiz-top{align-items:flex-start;font-size:8px}#home-experience .quiz-status{font-size:8px}#home-experience .quiz-card{padding:17px}#home-experience .quiz-question{font-size:27px}#home-experience .quiz-option{padding:12px 10px;gap:9px}#home-experience .quiz-option-mark{flex-basis:25px;height:25px}#home-experience .quiz-parties{grid-template-columns:1fr}#home-experience .quiz-nav button{padding:10px 11px;font-size:9px}#home-experience .quiz-free .ai-composer-bottom{flex-direction:column}}
+    @media(prefers-reduced-motion:reduce){#home-experience *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+  </style>
 </head>
-
 <body>
-
-  <!-- =====================================================
-       COMPOSANTS COMMUNS
-  ====================================================== -->
-
   <div id="site-header"></div>
 
-
-  <!-- =====================================================
-       CONTENU PRINCIPAL
-  ====================================================== -->
-
   <main id="home-experience">
-    <section class="ai-hero" aria-labelledby="home-title">
-      <div class="ai-hero-photo" aria-hidden="true"></div>
-      <div class="ai-hero-vignette" aria-hidden="true"></div>
-      <div class="ai-hero-grid" aria-hidden="true"></div>
-
-      <div class="ai-hero-heading">
-        <p class="ai-overline">LA PAROLE EST À VOUS</p>
-        <h1 id="home-title">La politique.<br><em>Parlons-en.</em></h1>
-        <p class="ai-subtitle">Une question, un débat, une idée à éprouver.</p>
+    <section class="quiz-hero" aria-labelledby="home-title">
+      <div class="quiz-photo" aria-hidden="true"></div>
+      <div class="quiz-shade" aria-hidden="true"></div>
+      <div class="quiz-top">
+        <span class="quiz-kicker">AVANT-GARDE · LA FRANCE LIBRE</span>
+        <span class="quiz-status"><i></i>VOTRE BILAN POLITIQUE</span>
       </div>
 
-      <section class="ai-console" aria-label="Dialogue avec l'intelligence artificielle">
-        <div class="ai-console-head">
-          <div class="ai-orb" aria-hidden="true"><span></span><i></i></div>
-          <div class="ai-console-title"><strong>Le dialogue Avant-gardE</strong><span>Posez votre question librement</span></div>
-          <div class="ai-online"><i></i> EN LIGNE</div>
+      <div class="quiz-layout">
+        <div class="quiz-intro">
+          <p class="quiz-kicker">PATRIE · SOUVERAINETÉ · JUSTICE · LIBERTÉ</p>
+          <h1 id="home-title">Vos idées.<br><em>Vos choix.</em></h1>
+          <p>Cinq étapes pour exprimer vos convictions, choisir le parti que vous soutenez et examiner avec l’IA la cohérence entre vos idées et son programme.</p>
+          <div class="quiz-values"><span>PATRIE</span><span>SOUVERAINETÉ</span><span>JUSTICE</span><span>LIBERTÉ</span></div>
         </div>
 
-        <div class="ai-suggestions">
-          <span class="ai-small-label">POUR COMMENCER</span>
-          <div class="ai-suggestion-list">
-            <button type="button" data-question="Qu'est-ce qui distingue vraiment Avant-gardE des autres partis ?">Ce qui nous distingue <span>↗</span></button>
-            <button type="button" data-question="Pourquoi Avant-gardE défend-il le FREXIT ?">Pourquoi le FREXIT ? <span>↗</span></button>
-            <button type="button" data-question="Comment concilier liberté individuelle et souveraineté nationale ?">Liberté et souveraineté <span>↗</span></button>
+        <section class="quiz-card" aria-label="Questionnaire politique">
+          <div class="quiz-card-head">
+            <span class="quiz-step-label" id="quiz-step-label">ÉTAPE 01 / 05</span>
+            <div class="quiz-progress" id="quiz-progress" aria-hidden="true">
+              <span class="active"></span><span></span><span></span><span></span><span></span>
+            </div>
           </div>
-        </div>
+          <div id="quiz-content" aria-live="polite"></div>
+          <div class="quiz-nav">
+            <button type="button" id="quiz-back" disabled>← Retour</button>
+            <button type="button" class="primary" id="quiz-next" disabled>Continuer →</button>
+          </div>
+        </section>
+      </div>
 
-        <label class="ai-small-label ai-question-label" for="aiQuestion">VOTRE QUESTION</label>
+      <div class="quiz-foot"><span>UNE DÉMARCHE PERSONNELLE</span><span class="quiz-foot-line"></span><span>LIBRE · DIRECTE · SANS INSCRIPTION</span></div>
+    </section>
+
+    <section class="quiz-free" aria-labelledby="free-ai-title">
+      <div class="quiz-free-inner">
+        <p class="quiz-kicker">LE DIALOGUE AVANT-GARDE</p>
+        <h2 id="free-ai-title">Une question à poser ?</h2>
+        <p>Le questionnaire n’est qu’un point de départ. Interrogez librement l’IA sur le projet, ses propositions ou les différences entre les programmes.</p>
+        <div class="ai-suggestion-list">
+          <button type="button" data-question="Qu'est-ce qui distingue vraiment Avant-gardE des autres partis ?">Ce qui nous distingue ↗</button>
+          <button type="button" data-question="Pourquoi Avant-gardE défend-il le FREXIT ?">Pourquoi le FREXIT ? ↗</button>
+          <button type="button" data-question="Comment concilier liberté individuelle et souveraineté nationale ?">Liberté et souveraineté ↗</button>
+        </div>
+        <label class="quiz-kicker" for="aiQuestion">VOTRE QUESTION</label>
         <div class="ai-composer">
           <textarea id="aiQuestion" class="ai-question" rows="2" maxlength="1800" placeholder="Qu’aimeriez-vous comprendre, contester ou approfondir ?" aria-label="Votre question"></textarea>
-          <button type="button" class="ai-send" onclick="envoyerVersIA('chatgpt')" aria-label="Envoyer la question"><span>↗</span></button>
+          <button type="button" class="ai-send" onclick="envoyerVersIA('chatgpt')" aria-label="Envoyer la question">↗</button>
         </div>
-        <div class="ai-composer-bottom">
-          <span class="ai-prompt-indicator"><i></i> Prompt Avant-gardE généré automatiquement</span>
-          <span class="ai-enter-hint">Votre question reste libre</span>
-        </div>
+        <div class="ai-composer-bottom"><span class="ai-prompt-indicator"><i></i>Prompt Avant-gardE généré automatiquement</span><span>Votre question reste libre</span></div>
         <div id="aiStatus" class="ai-status" aria-live="polite"></div>
-      </section>
-
-      <div class="ai-hero-footer">
-        <span>UNE CONVERSATION. AUCUNE QUESTION INTERDITE.</span>
-        <span class="ai-footer-line"></span>
-        <span>01 — PATRIE · SOUVERAINETÉ · JUSTICE · LIBERTÉ</span>
       </div>
-      <div class="ai-hero-stamp" aria-hidden="true">AE<span>·</span></div>
     </section>
   </main>
+
+  <div id="site-footer"></div>
+  <div id="site-rdv-modal"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="js/supabase.js"></script>
+  <script type="module" src="js/components.js"></script>
+  <script type="module" src="js/ai.js"></script>
+
   <script>
   (() => {
     const root = document.getElementById("home-experience");
     if (!root) return;
+    const content = document.getElementById("quiz-content");
+    const label = document.getElementById("quiz-step-label");
+    const progress = [...document.querySelectorAll("#quiz-progress span")];
+    const back = document.getElementById("quiz-back");
+    const next = document.getElementById("quiz-next");
     const field = document.getElementById("aiQuestion");
-    const suggestions = root.querySelectorAll("[data-question]");
-    suggestions.forEach((button) => {
-      button.addEventListener("click", () => {
-        field.value = button.dataset.question || "";
-        field.focus();
-        field.dispatchEvent(new Event("input", { bubbles: true }));
-        root.querySelectorAll("[data-question]").forEach((item) => item.classList.toggle("is-selected", item === button));
-      });
-    });
-    field.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        window.envoyerVersIA?.("chatgpt");
+    const answers = {patrie:null, souverainete:null, justice:null, liberte:2, parti:null};
+    let step = 0;
+
+    const questions = [
+      {key:"patrie", title:"Quelle vision de la France voulez-vous défendre ?", hint:"Choisissez la conception qui se rapproche le plus de la vôtre.", options:[
+        ["UNIVERSELLE","Une terre d’accueil, de liberté et de diversité."],
+        ["EUROPÉENNE","Une identité française inscrite dans un projet européen commun."],
+        ["CONSERVATRICE","Préserver une identité nationale commune, l’État fixant les normes de la société selon un modèle civilisationnel conservateur."],
+        ["RÉGIONALE","Garantir aux régions la liberté de faire vivre leur diversité, leurs coutumes et leur patrimoine. Les sociétés locales s’auto-norm ent et s’auto-régulent ; la République est garante de cette liberté."]
+      ]},
+      {key:"souverainete", title:"Quel avenir pour la souveraineté française ?", hint:"Deux visions du pouvoir de décision de la France.", options:[
+        ["CONTINUER","Participer collectivement aux décisions de l’Union européenne pour les orienter en alliance avec d’autres nations."],
+        ["REPRENDRE","Reprendre immédiatement notre souveraineté et notre pouvoir de décision."]
+      ]},
+      {key:"justice", title:"Votre opinion sur le rétablissement de la peine de mort", hint:"Choisissez la position qui correspond le mieux à votre opinion.", options:[
+        ["POUR","Elle doit absolument être rétablie."],
+        ["TOLÉRABLE","Elle est à envisager pour les crimes les plus monstrueux."],
+        ["CONTRE","Personne ne doit être privé de sa vie : la société doit porter ce fardeau."]
+      ]},
+      {key:"liberte", title:"Vous êtes plutôt…", hint:"Placez le curseur entre dirigisme économique et libéralisme radical.", slider:true},
+      {key:"parti", title:"Qui soutenez-vous ?", hint:"Choisissez le parti dont vous vous sentez le plus proche aujourd’hui.", parties:true, options:[
+        ["Rassemblement national","RN"],["La France insoumise","LFI"],["Les Républicains","LR"],["Renaissance / Ensemble","RE"],["Parti socialiste","PS"],["Les Écologistes","Écologistes"],["Reconquête !","Reconquête"],["Debout la France","DLF"],["Union populaire républicaine","UPR"],["Nouvelle Énergie","Nouvelle Énergie"],["Avant-gardE","Avant-gardE"],["Aucun / autre","Aucun / autre"]
+      ]}
+    ];
+    const liberty = [
+      ["ANTICAPITALISTE","Dirigisme économique, fiscalité confiscatoire et redistribution intégrale."],
+      ["SOCIAL-UNIVERSALISTE","Interventionnisme économique, forte fiscalité et redistribution renforcée."],
+      ["SOCIAL-NATIONALISTE","Interventionnisme économique, forte fiscalité et redistribution renforcée réservée aux détenteurs de la nationalité française."],
+      ["LIBÉRAL TEMPÉRÉ","Interventionnisme économique plus limité, fiscalité et redistribution maintenues, économies recherchées par l’optimisation de la gestion."],
+      ["LIBÉRAL RADICAL","Fin de l’interventionnisme économique, réduction drastique de la pression fiscale et disparition du modèle de redistribution compensatoire fondé sur l’équité, remplacé par un socle fondamental."]
+    ];
+
+    function escapeHtml(value){return String(value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+    function render(){
+      const q = questions[step];
+      label.textContent = "ÉTAPE " + String(step+1).padStart(2,"0") + " / 05";
+      progress.forEach((el,i)=>el.classList.toggle("active",i<=step));
+      back.disabled = step===0;
+      next.textContent = step===4 ? "Analyser mes choix ↗" : "Continuer →";
+      next.disabled = q.slider ? false : !answers[q.key];
+      let html = '<h2 class="quiz-question">'+q.title+'</h2><p class="quiz-hint">'+q.hint+'</p>';
+      if(q.slider){
+        const val = answers.liberte;
+        html += '<label class="quiz-kicker" for="liberte-range">VOTRE POSITION SUR LE SPECTRE</label><input class="quiz-range" id="liberte-range" type="range" min="0" max="4" step="1" value="'+val+'" aria-label="Position entre anticapitalisme et libéralisme radical"><div class="quiz-range-labels"><span>Dirigisme</span><span>Libéralisme radical</span></div><div class="quiz-range-current"><strong>'+liberty[val][0]+'</strong><p>'+liberty[val][1]+'</p></div>';
+      } else {
+        html += '<div class="'+(q.parties?'quiz-parties':'quiz-options')+'">';
+        q.options.forEach((option,i)=>{
+          const value = q.parties ? option[1] : option[0];
+          const title = q.parties ? option[0] : option[0];
+          const description = q.parties ? "" : option[1];
+          const selected = answers[q.key]===value;
+          html += '<button type="button" class="quiz-option" data-answer="'+escapeHtml(value)+'" aria-pressed="'+selected+'"><span class="quiz-option-mark">'+(selected?'✓':(q.parties?'↗':String.fromCharCode(65+i)))+'</span><span class="quiz-option-copy"><strong>'+escapeHtml(title)+'</strong>'+(description?'<span>'+escapeHtml(description)+'</span>':'')+'</span></button>';
+        });
+        html += '</div>';
       }
+      content.innerHTML = html;
+      content.querySelectorAll("[data-answer]").forEach(button=>button.addEventListener("click",()=>{
+        answers[q.key]=button.dataset.answer;
+        render();
+      }));
+      const range = content.querySelector("#liberte-range");
+      if(range) range.addEventListener("input",()=>{
+        answers.liberte=Number(range.value);
+        const current=content.querySelector(".quiz-range-current");
+        current.innerHTML='<strong>'+liberty[answers.liberte][0]+'</strong><p>'+liberty[answers.liberte][1]+'</p>';
+      });
+      next.disabled = q.slider ? false : !answers[q.key];
+    }
+    function buildAnalysisPrompt(){
+      const p = questions[0].options.find(o=>o[0]===answers.patrie);
+      const s = questions[1].options.find(o=>o[0]===answers.souverainete);
+      const j = questions[2].options.find(o=>o[0]===answers.justice);
+      const l = liberty[answers.liberte];
+      const party = questions[4].options.find(o=>o[1]===answers.parti);
+      return "Réalise une analyse concise de cohérence politique à partir des réponses ci-dessous. Ne présume pas que le visiteur est incohérent : identifie les convergences, les tensions réelles et les points impossibles à conclure. Pour le parti choisi, vérifie ses positions dans son programme officiel et des sources fiables récentes, cite les sources et distingue faits établis, interprétation et incertitude. Ne lui attribue aucune position sans preuve. Termine par ce qu’Avant-gardE propose de différent, uniquement à partir de son site officiel. Ton direct, clair et accessible.\n\nRÉPONSES DU VISITEUR\nPatrie : "+p[0]+" — "+p[1]+"\nSouveraineté : "+s[0]+" — "+s[1]+"\nJustice : "+j[0]+" — "+j[1]+"\nLiberté économique : "+l[0]+" — "+l[1]+"\nParti soutenu : "+party[0]+"\n\nCommence par une synthèse de ses convictions, puis analyse la cohérence avec le parti choisi, en présentant les points d’accord et les éventuels écarts documentés. Ne transforme pas une différence de valeurs en contradiction automatique.";
+    }
+    back.addEventListener("click",()=>{if(step>0){step--;render();}});
+    next.addEventListener("click",()=>{
+      if(step<4){step++;render();return;}
+      field.value=buildAnalysisPrompt();
+      field.dispatchEvent(new Event("input",{bubbles:true}));
+      document.querySelector(".quiz-free").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+      const status=document.getElementById("aiStatus");
+      status.textContent="Votre analyse est prête. ChatGPT va s’ouvrir avec vos réponses et les consignes d’analyse.";
+      window.envoyerVersIA?.("chatgpt");
     });
-    field.addEventListener("input", () => {
-      field.style.height = "auto";
-      field.style.height = Math.min(field.scrollHeight, 180) + "px";
-    });
+    root.querySelectorAll("[data-question]").forEach(button=>button.addEventListener("click",()=>{
+      field.value=button.dataset.question||"";
+      field.focus();
+      field.dispatchEvent(new Event("input",{bubbles:true}));
+    }));
+    field.addEventListener("keydown",event=>{if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();window.envoyerVersIA?.("chatgpt");}});
+    field.addEventListener("input",()=>{field.style.height="auto";field.style.height=Math.min(field.scrollHeight,180)+"px";});
+    render();
   })();
   </script>
-
-  <!-- =====================================================
-       FOOTER
-  ====================================================== -->
-
-  <div id="site-footer"></div>
-
-
-  <!-- =====================================================
-       MODALE RENDEZ-VOUS
-  ====================================================== -->
-
-  <div id="site-rdv-modal"></div>
-
-
-  <!-- =====================================================
-       SUPABASE CDN
-  ====================================================== -->
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-  ></script>
-
-
-  <!-- =====================================================
-       SUPABASE
-  ====================================================== -->
-
-  <script
-    type="module"
-    src="js/supabase.js"
-  ></script>
-
-
-  <!-- =====================================================
-       COMPOSANTS COMMUNS
-  ====================================================== -->
-
-  <script
-    type="module"
-    src="js/components.js"
-  ></script>
-
-
-  <!-- =====================================================
-       IA D'AVANT-GARDE
-  ====================================================== -->
-
-  <script
-    type="module"
-    src="js/ai.js"
-  ></script>
-
 </body>
-
 </html>
-
