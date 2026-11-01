@@ -210,6 +210,21 @@ function initialiserInterfaceAutresPages() {
     publishButton.className = "primary-button";
     publishButton.textContent = "PUBLIER LES PAGES";
     publishButton.title = "Générer les pages HTML statiques à partir de Supabase";
+    publishButton.hidden = window.currentProfile?.grade !== "admin";
+
+    function actualiserVisibilitePublication() {
+        publishButton.hidden = window.currentProfile?.grade !== "admin";
+    }
+
+    window.addEventListener(
+        "avantgarde:admin-connected",
+        actualiserVisibilitePublication
+    );
+
+    window.addEventListener(
+        "avantgarde:admin-disconnected",
+        actualiserVisibilitePublication
+    );
 
     publishButton.addEventListener("click", async () => {
         if (publishButton.disabled) return;
