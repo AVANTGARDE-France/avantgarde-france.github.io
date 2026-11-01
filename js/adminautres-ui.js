@@ -267,13 +267,13 @@ function initialiserInterfaceAutresPages() {
             message.textContent =
                 "Publication déclenchée. Les pages seront actualisées dans quelques instants.";
             message.className =
-                "other-editor-control-message success";
+                "other-editor-control-message message visible success";
         } catch (error) {
             console.error("Publication HTML statique :", error);
             message.textContent =
                 error?.message || "Impossible de lancer la publication.";
             message.className =
-                "other-editor-control-message error";
+                "other-editor-control-message message visible error";
         } finally {
             publishButton.disabled = false;
             publishButton.textContent = previousText;
