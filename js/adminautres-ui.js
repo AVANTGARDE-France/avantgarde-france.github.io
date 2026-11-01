@@ -1,3 +1,5 @@
+import { supabase } from "./supabase.js";
+
 /* =========================================================
    AVANT-GARDE — AUTRES PAGES
    Interface éditeur unique
@@ -201,6 +203,68 @@ function initialiserInterfaceAutresPages() {
     actions.appendChild(manifestCancel);
     actions.appendChild(inspirationsSave);
     actions.appendChild(inspirationsCancel);
+
+    const publishButton = document.createElement("button");
+    publishButton.type = "button";
+    publishButton.id = "publishSupabasePagesButton";
+    publishButton.className = "primary-button";
+    publishButton.textContent = "PUBLIER LES PAGES";
+    publishButton.title = "Générer les pages HTML statiques à partir de Supabase";
+
+    publishButton.addEventListener("click", async () => {
+        if (publishButton.disabled) return;
+
+        const previousText = publishButton.textContent;
+        publishButton.disabled = true;
+        publishButton.textContent = "PUBLICATION…";
+        message.textContent = "Demande de publication en cours…";
+        message.className = "other-editor-control-message";
+
+        try {
+            const { data: sessionData, error: sessionError } =
+                await supabase.auth.getSession();
+
+            if (sessionError) throw sessionError;
+
+            const accessToken = sessionData?.session?.access_token;
+            if (!accessToken) {
+                throw new Error("Session expirée. Reconnectez-vous.");
+            }
+
+            const response = await fetch(
+                "https://wlhtegrciehmtxqecopv.supabase.co/functions/v1/publish-supabase-pages-manual",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "apikey": "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs",
+                        "Authorization": "Bearer " + accessToken
+                    },
+                    body: JSON.stringify({})
+                }
+            );
+
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(result.error || "La demande de publication a échoué.");
+            }
+
+            message.textContent =
+                "Publication déclenchée. Les pages seront actualisées dans quelques instants.";
+            message.className =
+                "other-editor-control-message success";
+        } catch (error) {
+            console.error("Publication HTML statique :", error);
+            message.textContent =
+                error?.message || "Impossible de lancer la publication.";
+            message.className =
+                "other-editor-control-message error";
+        } finally {
+            publishButton.disabled = false;
+            publishButton.textContent = previousText;
+        }
+    });
+    actions.appendChild(publishButton);
     bar.appendChild(label);
     bar.appendChild(select);
     bar.appendChild(actions);
