@@ -109,14 +109,18 @@
     #home-experience .quiz-parties .quiz-option{height:100%;padding:13px 11px}
     #home-experience .quiz-parties .quiz-option-copy strong{margin:2px 0 0}
     #home-experience .quiz-free{padding:55px 20px 64px;background:#050d19;border-top:1px solid #e2bd692e}
-    #home-experience .quiz-stats-placeholder{min-height:76px;margin:0;padding:14px 20px;background:linear-gradient(90deg,rgba(13,35,68,.42),rgba(5,13,25,.78));border:1px solid #e2bd6959;border-left:3px solid #e2bd69;}
-    #home-experience .debt-counter{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:48px;color:#f5f3ed}
-    #home-experience .stats-slide[hidden]{display:none}
-    #home-experience .stats-description{font-size:clamp(15px,2vw,22px);white-space:normal;line-height:1.25;max-width:600px}
+    #home-experience .quiz-stats-placeholder{min-height:76px;margin:0;padding:0;overflow:hidden;background:linear-gradient(90deg,rgba(13,35,68,.42),rgba(5,13,25,.78));border:1px solid #e2bd6959;border-left:3px solid #e2bd69}
+    #home-experience .stats-marquee{display:flex;width:max-content;align-items:center;animation:stats-marquee-scroll 34s linear infinite;will-change:transform}
+    #home-experience .stats-marquee:hover{animation-play-state:paused}
+    #home-experience .stats-marquee-group{display:flex;flex:0 0 auto;align-items:center;gap:64px;padding:14px 32px}
+    #home-experience .debt-counter{display:flex;flex:0 0 auto;align-items:center;gap:18px;min-height:48px;color:#f5f3ed;white-space:nowrap}
+    #home-experience .stats-description{font-size:clamp(15px,2vw,22px);line-height:1.25}
     #home-experience .debt-counter-label{flex:0 0 auto;color:#e2bd69;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
     #home-experience .debt-counter-value{font-variant-numeric:tabular-nums;font-size:clamp(19px,2.5vw,29px);font-weight:600;letter-spacing:.015em;white-space:nowrap}
-    #home-experience .debt-counter-note{margin-left:auto;color:#91a2b6;font-size:9px;line-height:1.4;text-align:right}
-    @media(max-width:620px){#home-experience .quiz-stats-placeholder{padding:11px 13px}#home-experience .debt-counter{align-items:flex-start;flex-direction:column;gap:5px}#home-experience .debt-counter-value{font-size:clamp(19px,5.6vw,27px)}#home-experience .debt-counter-note{margin-left:0;text-align:left;font-size:8px}}
+    #home-experience .debt-counter-note{flex:0 0 auto;color:#91a2b6;font-size:9px;line-height:1.4;text-align:left}
+    @keyframes stats-marquee-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    @media(prefers-reduced-motion:reduce){#home-experience .stats-marquee{animation:none}}
+    @media(max-width:620px){#home-experience .stats-marquee-group{gap:38px;padding:11px 20px}#home-experience .debt-counter{gap:10px}#home-experience .debt-counter-value{font-size:clamp(17px,4.5vw,23px)}#home-experience .stats-description{font-size:15px;max-width:240px;white-space:normal}#home-experience .debt-counter-note{font-size:8px;max-width:130px;white-space:normal}}
     #home-experience .quiz-free-inner{max-width:850px;margin:auto}
     #home-experience .quiz-free h2{margin:12px 0;font-family:Georgia,'Times New Roman',serif;font-size:clamp(30px,4vw,44px);font-weight:400}
     #home-experience .quiz-free p{color:#aab8c9;font-size:13px;line-height:1.7}
@@ -187,15 +191,31 @@
     </section>
 
     <section class="quiz-stats-placeholder" aria-label="Quelques chiffres sur la France">
-      <div class="debt-counter stats-slide" id="stats-debt" aria-live="polite">
-        <span class="debt-counter-label">Dette publique</span>
-        <strong class="debt-counter-value" id="public-debt-value">3 595 500 000 000 €</strong>
-        <span class="debt-counter-note">Projection 2026<br>Méthode Horloge de la dette publique</span>
-      </div>
-      <div class="debt-counter stats-slide" id="stats-taxes" aria-live="polite" hidden>
-        <span class="debt-counter-label">438</span>
-        <strong class="debt-counter-value stats-description">Impôts, taxes, cotisations et contributions en France</strong>
-        <span class="debt-counter-note">Recensement Fondation IFRAP · 2026</span>
+      <div class="stats-marquee">
+        <div class="stats-marquee-group">
+          <div class="debt-counter">
+            <span class="debt-counter-label">Dette publique</span>
+            <strong class="debt-counter-value" id="public-debt-value">3 595 500 000 000 €</strong>
+            <span class="debt-counter-note">Projection 2026<br>Méthode Horloge de la dette publique</span>
+          </div>
+          <div class="debt-counter">
+            <span class="debt-counter-label">438</span>
+            <strong class="debt-counter-value stats-description">Impôts, taxes, cotisations et contributions en France</strong>
+            <span class="debt-counter-note">Recensement Fondation IFRAP · 2026</span>
+          </div>
+        </div>
+        <div class="stats-marquee-group" aria-hidden="true">
+          <div class="debt-counter">
+            <span class="debt-counter-label">Dette publique</span>
+            <strong class="debt-counter-value debt-value-copy">3 595 500 000 000 €</strong>
+            <span class="debt-counter-note">Projection 2026<br>Méthode Horloge de la dette publique</span>
+          </div>
+          <div class="debt-counter">
+            <span class="debt-counter-label">438</span>
+            <strong class="debt-counter-value stats-description">Impôts, taxes, cotisations et contributions en France</strong>
+            <span class="debt-counter-note">Recensement Fondation IFRAP · 2026</span>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -241,16 +261,6 @@
     closeQuiz.addEventListener("click",()=>root.classList.add("quiz-is-closed"));
     reopenQuiz.addEventListener("click",()=>root.classList.remove("quiz-is-closed"));
     setTimeout(()=>root.classList.remove("quiz-logo-first"),5000);
-    // Les chiffres alternent dans le même bandeau.
-    const statsSlides = [...document.querySelectorAll("#home-experience .stats-slide")];
-    if (statsSlides.length > 1) {
-      let activeStats = 0;
-      window.setInterval(() => {
-        statsSlides[activeStats].hidden = true;
-        activeStats = (activeStats + 1) % statsSlides.length;
-        statsSlides[activeStats].hidden = false;
-      }, 7000);
-    }
     // Reproduction de la formule du compteur Horloge de la dette publique (projection 2026).
     const debtDisplay = document.getElementById("public-debt-value");
     if (debtDisplay) {
@@ -264,7 +274,9 @@
         let elapsedSeconds = (now - startDate) / 1000;
         elapsedSeconds = Math.max(0, Math.min(elapsedSeconds, totalSeconds));
         const counterValue = startValue + ((endValue - startValue) * (elapsedSeconds / totalSeconds));
-        debtDisplay.textContent = new Intl.NumberFormat("fr-FR", {maximumFractionDigits:0}).format(Math.round(counterValue)) + " €";
+        const formattedDebt = new Intl.NumberFormat("fr-FR", {maximumFractionDigits:0}).format(Math.round(counterValue)) + " €";
+        debtDisplay.textContent = formattedDebt;
+        document.querySelectorAll("#home-experience .debt-value-copy").forEach(node => node.textContent = formattedDebt);
       };
       updateDebt();
       window.setInterval(updateDebt, 100);
