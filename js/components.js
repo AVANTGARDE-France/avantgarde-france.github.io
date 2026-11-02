@@ -388,7 +388,7 @@ function injecterHeader() {
                 <a
                     href="index.html"
                     class="logo"
-                    aria-label="Avant-gardE — La France libre"
+                    aria-label="Avant-gardE"
                 >
 
                     <span class="logo-a">A</span>vant-gard<span class="logo-e">E</span>
