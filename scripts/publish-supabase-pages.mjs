@@ -572,28 +572,82 @@ async function writeDiscoveryFiles(manifestHtml) {
    REMPLACEMENT DU CONTENU DE L'ARTICLE
 ============================================================ */
 
-function replaceEditorialContent(
-    html,
-    content
-) {
+function trouverOuvertureParId(html, tagName, id) {
+    const pattern = new RegExp(
+        "<" + tagName + "\\b(?=[^>]*\\bid=[\\\"']" +
+        id +
+        "[\\\"'])[^>]*>",
+        "i"
+    );
 
-    const pattern =
-        /(<article\b[^>]*\bid=["']editorialContent["'][^>]*>)[\s\S]*?(<\/article>)/i;
+    const match = pattern.exec(html);
+
+    return match
+        ? {
+            index: match.index,
+            end: pattern.lastIndex
+        }
+        : null;
+}
 
 
-    if (!pattern.test(html)) {
+function replaceEditorialContent(html, content) {
+    /*
+     * editorialContent contient lui-même un <article> imbriqué
+     * (manifeste-content). Une regex non-gourmande s'arrêtait au
+     * premier </article>, laissant le reste de l'ancien document
+     * derrière elle. À chaque publication, les fermetures
+     * </article> et </section> s'accumulaient.
+     *
+     * On repère donc la fermeture équilibrée du wrapper externe.
+     */
+    const ouverture = trouverOuvertureParId(
+        html,
+        "article",
+        "editorialContent"
+    );
 
+    const wrapper = extraireElementEquilibre(html, ouverture);
+
+    if (!ouverture || !wrapper) {
         throw new Error(
-            "Impossible de trouver " +
-            '<article id="editorialContent">.'
+            'Impossible de trouver un wrapper équilibré <article id="editorialContent">.'
         );
     }
 
+    const openingTag = html.slice(
+        ouverture.index,
+        ouverture.end
+    );
 
-    return html.replace(
-        pattern,
-        (_match, openingTag, closingTag) =>
-            `${openingTag}\n\n${content}\n\n${closingTag}`
+    const wrapperEnd = ouverture.index + wrapper.length;
+    const suffix = html.slice(wrapperEnd);
+
+    /*
+     * Le wrapper éditorial est le seul contenu de <main>.
+     * Les anciennes publications ont laissé des fermetures
+     * orphelines entre le wrapper et </main> : on les retire.
+     */
+    const mainCloseIndex = suffix.search(/<\/main\s*>/i);
+
+    if (mainCloseIndex === -1) {
+        throw new Error(
+            "Balise </main> introuvable après editorialContent."
+        );
+    }
+
+    const cleanSuffix =
+        suffix.slice(0, mainCloseIndex)
+            .replace(/<\/(?:article|section)\s*>/gi, "") +
+        suffix.slice(mainCloseIndex);
+
+    return (
+        html.slice(0, ouverture.index) +
+        openingTag +
+        "\n\n" +
+        content +
+        "\n\n</article>" +
+        cleanSuffix
     );
 }
 
