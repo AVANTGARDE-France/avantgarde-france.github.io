@@ -585,7 +585,7 @@ function trouverOuvertureParId(html, tagName, id) {
     return match
         ? {
             index: match.index,
-            end: pattern.lastIndex
+            end: match.index + match[0].length
         }
         : null;
 }
