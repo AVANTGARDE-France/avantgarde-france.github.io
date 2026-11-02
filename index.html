@@ -18,7 +18,7 @@
     #home-experience{--q-gold:#e2bd69;--q-cream:#f6f4ef;--q-muted:#aab8c9;background:#050d19;color:var(--q-cream);font-family:Arial,Helvetica,sans-serif;overflow:hidden}
     #home-experience *{box-sizing:border-box}
     #home-experience button,#home-experience textarea,#home-experience input{font:inherit}
-    #home-experience .quiz-hero{position:relative;isolation:isolate;min-height:calc(100svh - 118px);padding:clamp(28px,5vw,72px) clamp(18px,6vw,96px) 54px;overflow:hidden;background-color:#06101e;background-image:linear-gradient(90deg,rgba(3,10,20,.72),rgba(3,10,20,.58) 48%,rgba(3,10,20,.46)),linear-gradient(0deg,#050d19 0%,transparent 50%,rgba(4,11,22,.18) 100%),url('https://static.wixstatic.com/media/d0ac27_16c32250792d4bc38fdcea341e5e88ff~mv2.png/v1/fill/w_1536,h_491,al_c,q_90,enc_avif,quality_auto/d0ac27_16c32250792d4bc38fdcea341e5e88ff~mv2.png');background-position:center,center,center 46%;background-size:100% 100%,100% 100%,auto 100svh;background-repeat:no-repeat}
+    #home-experience .quiz-hero{position:relative;isolation:isolate;height:calc(100svh - 118px);min-height:0;padding:clamp(18px,3.5vh,48px) clamp(18px,6vw,96px) clamp(18px,3vh,36px);display:flex;flex-direction:column;overflow:hidden;background-color:#06101e;background-image:linear-gradient(90deg,rgba(3,10,20,.72),rgba(3,10,20,.58) 48%,rgba(3,10,20,.46)),linear-gradient(0deg,#050d19 0%,transparent 50%,rgba(4,11,22,.18) 100%),url('https://static.wixstatic.com/media/d0ac27_16c32250792d4bc38fdcea341e5e88ff~mv2.png/v1/fill/w_1536,h_491,al_c,q_90,enc_avif,quality_auto/d0ac27_16c32250792d4bc38fdcea341e5e88ff~mv2.png');background-position:center,center,center 46%;background-size:100% 100%,100% 100%,auto 100svh;background-repeat:no-repeat}
     #home-experience .quiz-photo{display:none}
     #home-experience .quiz-shade{display:none}
     #home-experience .quiz-top,#home-experience .quiz-layout,#home-experience .quiz-foot{position:relative;z-index:2}
@@ -26,24 +26,24 @@
     #home-experience .quiz-kicker{color:var(--q-gold)}
     #home-experience .quiz-status{color:#b7c7d7;font-size:10px;letter-spacing:.12em}
     #home-experience .quiz-status i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--q-gold);margin-right:8px;box-shadow:0 0 12px #e2bd69}
-    #home-experience .quiz-layout{max-width:1080px;margin:auto;display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr);gap:clamp(26px,6vw,80px);align-items:center}
+    #home-experience .quiz-layout{width:100%;max-width:1080px;flex:1;min-height:0;margin:auto;display:grid;grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr);gap:clamp(20px,4vw,60px);align-items:stretch}
     #home-experience .quiz-intro h1{margin:18px 0 20px;font-family:Georgia,'Times New Roman',serif;font-size:clamp(48px,7vw,90px);line-height:.92;letter-spacing:-.065em;font-weight:500;color:white}
     #home-experience .quiz-intro h1 em{color:var(--q-gold);font-style:normal}
     #home-experience .quiz-intro p{max-width:390px;color:#d0d8e2;font-size:15px;line-height:1.75}
     #home-experience .quiz-values{display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:28px;color:#e2bd69;font-size:9px;letter-spacing:.13em}
     #home-experience .quiz-values span+span:before{content:'·';margin-right:12px;color:#77899c}
     #home-experience .quiz-card{border:1px solid #e2bd6959;background:linear-gradient(145deg,rgba(9,23,41,.30),rgba(4,12,23,.30));box-shadow:0 28px 90px #0007;backdrop-filter:blur(3px);padding:clamp(20px,3vw,34px);min-width:0}
-    #home-experience .quiz-card{position:relative;padding-top:clamp(20px,3vw,34px)}
+    #home-experience .quiz-card{position:relative;align-self:center;width:100%;max-height:100%;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#e2bd6980 transparent;padding-top:clamp(14px,2vh,26px)}
     #home-experience .quiz-close{position:absolute;top:10px;right:12px;z-index:3;width:34px;height:34px;display:grid;place-items:center;border:1px solid #e2bd6970;background:#07152d;color:#f2d58a;font-size:25px;line-height:1;cursor:pointer}
     #home-experience .quiz-close:hover{background:#e2bd69;color:#071321}
     #home-experience .quiz-card-head{padding-right:38px}
-    #home-experience .quiz-reopen{display:none;min-height:340px;width:100%;padding:24px;border:1px solid #e2bd6959;background:rgba(5,13,25,.24);color:#f2d58a;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:20px;letter-spacing:.16em;font-size:10px;font-weight:700;transition:background .2s,border-color .2s}
-    #home-experience .quiz-reopen img{display:block;width:min(100%,330px);max-height:330px;object-fit:contain;filter:drop-shadow(0 12px 28px #0008)}
+    #home-experience .quiz-reopen{display:none;min-height:0;height:100%;width:100%;padding:24px;border:1px solid #e2bd6959;background:rgba(5,13,25,.24);color:#f2d58a;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:20px;letter-spacing:.16em;font-size:10px;font-weight:700;transition:background .2s,border-color .2s}
+    #home-experience .quiz-reopen img{display:block;width:min(100%,330px);max-height:100%;object-fit:contain;filter:drop-shadow(0 12px 28px #0008)}
     #home-experience .quiz-reopen:hover{background:rgba(5,13,25,.42);border-color:#e2bd69}
     #home-experience.quiz-is-closed .quiz-card{display:none}
     #home-experience.quiz-is-closed .quiz-reopen{display:flex}
     #home-experience.quiz-logo-first .quiz-card{display:none}
-    #home-experience.quiz-logo-first .quiz-reopen{display:flex;min-height:420px;border:0;background:transparent}
+    #home-experience.quiz-logo-first .quiz-reopen{display:flex;min-height:0;height:100%;border:0;background:transparent}
     #home-experience.quiz-logo-first .quiz-reopen img{width:min(100%,390px);max-height:390px}
     #home-experience.quiz-logo-first .quiz-reopen span{display:none}
     #home-experience .quiz-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:20px;border-bottom:1px solid #ffffff1c}
@@ -90,8 +90,8 @@
     #home-experience .quiz-free .ai-composer-bottom{display:flex;justify-content:space-between;gap:10px;margin-top:10px;color:#8595a8;font-size:10px}
     #home-experience .quiz-free .ai-prompt-indicator i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--q-gold);margin-right:7px}
     #home-experience .ai-status{min-height:18px;margin-top:8px;color:#f2d58a;font-size:11px}
-    @media(max-width:800px){#home-experience .quiz-layout{grid-template-columns:1fr;gap:28px}#home-experience .quiz-intro h1{font-size:clamp(49px,12vw,78px)}#home-experience .quiz-intro p{max-width:560px}#home-experience .quiz-hero{padding-top:28px}#home-experience .quiz-card{padding:21px}}
-    @media(max-width:480px){#home-experience .quiz-top{align-items:flex-start;font-size:8px}#home-experience .quiz-status{font-size:8px}#home-experience .quiz-card{padding:17px}#home-experience .quiz-question{font-size:27px}#home-experience .quiz-option{padding:12px 10px;gap:9px}#home-experience .quiz-option-mark{flex-basis:25px;height:25px}#home-experience .quiz-parties{grid-template-columns:1fr}#home-experience .quiz-nav button{padding:10px 11px;font-size:9px}#home-experience .quiz-free .ai-composer-bottom{flex-direction:column}}
+    @media(max-width:800px){#home-experience .quiz-hero{height:auto;min-height:calc(100svh - 118px);padding-top:28px}#home-experience .quiz-layout{flex:1;min-height:0;grid-template-columns:1fr;gap:clamp(16px,3vh,28px)}#home-experience .quiz-card{max-height:min(62svh,680px);align-self:stretch}#home-experience .quiz-reopen{height:clamp(240px,42svh,390px)}#home-experience .quiz-intro h1{font-size:clamp(49px,12vw,78px)}#home-experience .quiz-intro p{max-width:560px}#home-experience .quiz-hero{padding-top:28px}#home-experience .quiz-card{padding:21px}}
+    @media(max-width:480px){#home-experience .quiz-hero{min-height:calc(100svh - 118px)}#home-experience .quiz-card{max-height:62svh}#home-experience .quiz-top{align-items:flex-start;font-size:8px}#home-experience .quiz-status{font-size:8px}#home-experience .quiz-card{padding:17px}#home-experience .quiz-question{font-size:27px}#home-experience .quiz-option{padding:12px 10px;gap:9px}#home-experience .quiz-option-mark{flex-basis:25px;height:25px}#home-experience .quiz-parties{grid-template-columns:1fr}#home-experience .quiz-nav button{padding:10px 11px;font-size:9px}#home-experience .quiz-free .ai-composer-bottom{flex-direction:column}}
     @media(prefers-reduced-motion:reduce){#home-experience *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
   </style>
   <link rel="canonical" href="https://avantgarde-france.github.io/">
