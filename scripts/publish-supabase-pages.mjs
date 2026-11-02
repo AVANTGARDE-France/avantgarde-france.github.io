@@ -813,6 +813,14 @@ async function publishPage(page) {
         );
 
 
+    /*
+     * Déduplication finale sur toute la page, y compris le
+     * squelette HTML. Le CSS du manifeste peut déjà exister dans
+     * le modèle statique et être réinjecté avec le contenu Supabase.
+     */
+    html = deduplicateStyleBlocks(html);
+
+
     /* --------------------------------------------------------
        ÉCRITURE UNIQUEMENT SI NÉCESSAIRE
     -------------------------------------------------------- */
