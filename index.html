@@ -33,6 +33,15 @@
     #home-experience .quiz-values{display:flex;flex-wrap:wrap;gap:8px 12px;margin-top:28px;color:#e2bd69;font-size:9px;letter-spacing:.13em}
     #home-experience .quiz-values span+span:before{content:'·';margin-right:12px;color:#77899c}
     #home-experience .quiz-card{border:1px solid #e2bd6959;background:linear-gradient(145deg,rgba(9,23,41,.30),rgba(4,12,23,.30));box-shadow:0 28px 90px #0007;backdrop-filter:blur(3px);padding:clamp(20px,3vw,34px);min-width:0}
+    #home-experience .quiz-card{position:relative;padding-top:clamp(20px,3vw,34px)}
+    #home-experience .quiz-close{position:absolute;top:10px;right:12px;z-index:3;width:34px;height:34px;display:grid;place-items:center;border:1px solid #e2bd6970;background:#07152d;color:#f2d58a;font-size:25px;line-height:1;cursor:pointer}
+    #home-experience .quiz-close:hover{background:#e2bd69;color:#071321}
+    #home-experience .quiz-card-head{padding-right:38px}
+    #home-experience .quiz-reopen{display:none;min-height:340px;width:100%;padding:24px;border:1px solid #e2bd6959;background:rgba(5,13,25,.24);color:#f2d58a;cursor:pointer;flex-direction:column;align-items:center;justify-content:center;gap:20px;letter-spacing:.16em;font-size:10px;font-weight:700;transition:background .2s,border-color .2s}
+    #home-experience .quiz-reopen img{display:block;width:min(100%,330px);max-height:330px;object-fit:contain;filter:drop-shadow(0 12px 28px #0008)}
+    #home-experience .quiz-reopen:hover{background:rgba(5,13,25,.42);border-color:#e2bd69}
+    #home-experience.quiz-is-closed .quiz-card{display:none}
+    #home-experience.quiz-is-closed .quiz-reopen{display:flex}
     #home-experience .quiz-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:20px;border-bottom:1px solid #ffffff1c}
     #home-experience .quiz-step-label{color:var(--q-gold);font-size:10px;font-weight:700;letter-spacing:.17em}
     #home-experience .quiz-progress{display:flex;gap:5px}
@@ -110,7 +119,8 @@
           <div class="quiz-values"><span>PATRIE</span><span>SOUVERAINETÉ</span><span>JUSTICE</span><span>LIBERTÉ</span></div>
         </div>
 
-        <section class="quiz-card" aria-label="Questionnaire politique">
+        <section class="quiz-card" id="quiz-card" aria-label="Questionnaire politique">
+          <button type="button" class="quiz-close" id="quiz-close" aria-label="Fermer le questionnaire" title="Fermer le questionnaire">×</button>
           <div class="quiz-card-head">
             <span class="quiz-step-label" id="quiz-step-label">ÉTAPE 01 / 05</span>
             <div class="quiz-progress" id="quiz-progress" aria-hidden="true">
@@ -123,6 +133,10 @@
             <button type="button" class="primary" id="quiz-next" disabled>Continuer →</button>
           </div>
         </section>
+        <button type="button" class="quiz-reopen" id="quiz-reopen" aria-label="Ouvrir le questionnaire" title="Ouvrir le questionnaire">
+          <img src="/image/Emblem%20with%20hexagona2.png" alt="Emblème Avant-gardE">
+          <span>OUVRIR LE QUESTIONNAIRE</span>
+        </button>
       </div>
 
     </section>
@@ -163,7 +177,11 @@
     const progress = [...document.querySelectorAll("#quiz-progress span")];
     const back = document.getElementById("quiz-back");
     const next = document.getElementById("quiz-next");
+    const closeQuiz = document.getElementById("quiz-close");
+    const reopenQuiz = document.getElementById("quiz-reopen");
     const field = document.getElementById("aiQuestion");
+    closeQuiz.addEventListener("click",()=>root.classList.add("quiz-is-closed"));
+    reopenQuiz.addEventListener("click",()=>root.classList.remove("quiz-is-closed"));
     const answers = {patrie:null, souverainete:null, justice:null, liberte:2, parti:null};
     let step = 0;
 
