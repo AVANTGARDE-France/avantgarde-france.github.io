@@ -491,45 +491,52 @@ function generateLlmsTxt() {
 
 function generateLlmsFullTxt(manifestHtml) {
 
-    const withoutScripts =
-        manifestHtml.replace(
-            /<script\b[^>]*>[\s\S]*?<\/script>/gi,
-            ""
-        );
+    /*
+     * On extrait uniquement le contenu éditorial du manifeste.
+     * Cela évite de transformer le squelette de page, les styles,
+     * les scripts ou les composants techniques en texte destiné
+     * aux moteurs et agents IA.
+     */
 
-    const withoutStyles =
-        withoutScripts.replace(
-            /<style\b[^>]*>[\s\S]*?<\/style>/gi,
-            ""
-        );
+    const match = manifestHtml.match(
+        /<article\\b[^>]*class=["'][^"']*\\bmanifeste-content\\b[^"']*["'][^>]*>([\\s\\S]*?)<\\/article>/i
+    );
 
-    const text =
-        withoutStyles
-            .replace(/<br\s*\/?\s*>/gi, "\n")
-            .replace(/<\/p>/gi, "\n\n")
-            .replace(/<\/h[1-6]>/gi, "\n\n")
-            .replace(/<li\b[^>]*>/gi, "- ")
-            .replace(/<\/li>/gi, "\n")
-            .replace(/<[^>]+>/g, "")
-            .replace(/&nbsp;/gi, " ")
-            .replace(/&amp;/gi, "&")
-            .replace(/&lt;/gi, "<")
-            .replace(/&gt;/gi, ">")
-            .replace(/&quot;/gi, '"')
-            .replace(/&#039;/gi, "'")
-            .replace(/\\n[ \\t]+/g, "\n")
-            .replace(/[ \\t]{2,}/g, " ")
-            .replace(/\\n{3,}/g, "\n\n")
-            .trim();
+    const source = match ? match[1] : manifestHtml;
+
+    const text = source
+        .replace(/<!--[\\s\\S]*?-->/g, " ")
+        .replace(/<(script|style|noscript)\\b[^>]*>[\\s\\S]*?<\\/\\1>/gi, " ")
+        .replace(/<br\\s*\\/?\\s*>/gi, "\\n")
+        .replace(/<\\/(p|div|section|h[1-6]|li|header|footer|span)>/gi, "\\n")
+        .replace(/<li\\b[^>]*>/gi, "- ")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/&nbsp;|&#160;/gi, " ")
+        .replace(/&amp;/gi, "&")
+        .replace(/&lt;/gi, "<")
+        .replace(/&gt;/gi, ">")
+        .replace(/&quot;|&#34;/gi, '"')
+        .replace(/&#39;|&apos;|&#039;/gi, "'")
+        .replace(/&#(\\d+);/g, (_m, n) => String.fromCharCode(Number(n)))
+        .replace(/&#x([0-9a-f]+);/gi, (_m, n) => String.fromCharCode(parseInt(n, 16)))
+        .replace(/[ \\t]+\\n/g, "\\n")
+        .replace(/\\n[ \\t]+/g, "\\n")
+        .replace(/[ \\t]{2,}/g, " ")
+        .replace(/\\n{3,}/g, "\\n\\n")
+        .trim();
 
     return [
         "# Manifeste — Avant-gardE",
         "",
-        "Source HTML : https://avantgarde-france.github.io/manifeste.html",
+        "Source officielle : https://avantgarde-france.github.io/manifeste.html",
+        "",
+        "Titre de présentation : LE GRAND DÉSOSSEMENT — Les bouchers de Bercy",
+        "",
+        "Texte extrait du HTML statique de la page officielle. En cas de divergence, la page HTML fait foi.",
         "",
         text,
         ""
-    ].join("\n");
+    ].join("\\n");
 }
 
 
