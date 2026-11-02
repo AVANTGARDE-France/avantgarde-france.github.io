@@ -638,10 +638,10 @@ function replaceEditorialContent(html, content) {
 
     const cleanBetween = suffix
         .slice(0, mainCloseIndex)
-        .replace(/<\\/(?:article|section)\\s*>/gi, "");
+        .replace(/<\/(?:article|section)\s*>/gi, "");
 
     const cleanSuffix =
-        (cleanBetween.trim() ? cleanBetween : "\\n\\n") +
+        (cleanBetween.trim() ? cleanBetween : "\n\n") +
         suffix.slice(mainCloseIndex);
 
     return (
