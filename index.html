@@ -19,7 +19,7 @@
     #home-experience *{box-sizing:border-box}
     #home-experience button,#home-experience textarea,#home-experience input{font:inherit}
     #home-experience .quiz-hero{position:relative;isolation:isolate;height:calc(100svh - 118px);min-height:0;padding:clamp(18px,3.5vh,48px) clamp(18px,6vw,96px) clamp(18px,3vh,36px);display:flex;flex-direction:column;overflow:hidden;background:#06101e}
-    #home-experience .quiz-hero:before{content:"";position:absolute;inset:0;z-index:0;background-image:url('https://static.wixstatic.com/media/d0ac27_16c32250792d4bc38fdcea341e5e88ff~mv2.png/v1/fill/w_1536,h_491,al_c,q_90,enc_avif,quality_auto/d0ac27_16c32250792d4bc38fdcea341e5e88ff~mv2.png');background-position:center 46%;background-size:auto 100svh;background-repeat:no-repeat;transform:scale(.48);clip-path:inset(34% 0 34%);opacity:0;transform-origin:center center;animation:quiz-background-grow 4s cubic-bezier(.2,.72,.25,1) both}
+    #home-experience .quiz-hero:before{content:"";position:absolute;inset:0;z-index:0;background-image:url('https://static.wixstatic.com/media/d0ac27_16c32250792d4bc38fdcea341e5e88ff~mv2.png/v1/fill/w_1536,h_491,al_c,q_90,enc_avif,quality_auto/d0ac27_16c32250792d4bc38fdcea341e5e88ff~mv2.png');background-position:center 46%;background-size:auto 100svh;background-repeat:no-repeat;transform:scale(.48);clip-path:inset(34% 0 34%);opacity:0;transform-origin:center center;animation:quiz-background-grow 10s cubic-bezier(.2,.72,.25,1) both}
     #home-experience .quiz-hero:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(3,10,20,.72),rgba(3,10,20,.58) 48%,rgba(3,10,20,.46)),linear-gradient(0deg,#050d19 0%,transparent 50%,rgba(4,11,22,.18) 100%)}
     @keyframes quiz-background-grow{0%{transform:scale(.48);clip-path:inset(34% 0 34%);opacity:0}18%{opacity:1}100%{transform:scale(1);clip-path:inset(0);opacity:1}}
     @media(prefers-reduced-motion:reduce){#home-experience .quiz-hero:before{animation:none;transform:none;opacity:1}}
@@ -218,7 +218,7 @@
     const field = document.getElementById("aiQuestion");
     closeQuiz.addEventListener("click",()=>root.classList.add("quiz-is-closed"));
     reopenQuiz.addEventListener("click",()=>root.classList.remove("quiz-is-closed"));
-    setTimeout(()=>root.classList.remove("quiz-logo-first"),4000);
+    setTimeout(()=>root.classList.remove("quiz-logo-first"),5000);
     const answers = {patrie:null, souverainete:null, justice:null, liberte:2, parti:null};
     let step = 0;
 
