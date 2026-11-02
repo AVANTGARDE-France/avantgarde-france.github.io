@@ -190,7 +190,7 @@
       <div class="debt-counter">
         <span class="debt-counter-label">Dette publique</span>
         <strong class="debt-counter-value" id="public-debt-value">3 595 500 000 000 €</strong>
-        <span class="debt-counter-note">Estimation actualisée en continu<br>Base INSEE · T2 2026</span>
+        <span class="debt-counter-note">Projection 2026<br>Méthode Horloge de la dette publique</span>
       </div>
     </section>
 
@@ -236,19 +236,23 @@
     closeQuiz.addEventListener("click",()=>root.classList.add("quiz-is-closed"));
     reopenQuiz.addEventListener("click",()=>root.classList.remove("quiz-is-closed"));
     setTimeout(()=>root.classList.remove("quiz-logo-first"),5000);
-    // Compteur indicatif : dette officielle INSEE au 30/06/2026 + déficit 2025 lissé sur un an.
+    // Reproduction de la formule du compteur Horloge de la dette publique (projection 2026).
     const debtDisplay = document.getElementById("public-debt-value");
     if (debtDisplay) {
-      const debtBase = 3595500000000;
-      const debtBaseTime = new Date("2026-06-30T00:00:00+02:00").getTime();
-      const debtRatePerSecond = 152500000000 / (365 * 24 * 60 * 60);
-      const debtFormat = new Intl.NumberFormat("fr-FR", {maximumFractionDigits:0});
+      const startDate = new Date("2026-01-01").getTime();
+      const endDate = new Date("2026-12-31").getTime();
+      const startValue = 3460500000000;
+      const endValue = 3650500000000;
       const updateDebt = () => {
-        const elapsed = Math.max(0, (Date.now() - debtBaseTime) / 1000);
-        debtDisplay.textContent = debtFormat.format(Math.round(debtBase + elapsed * debtRatePerSecond)) + " €";
+        const now = Date.now();
+        const totalSeconds = (endDate - startDate) / 1000;
+        let elapsedSeconds = (now - startDate) / 1000;
+        elapsedSeconds = Math.max(0, Math.min(elapsedSeconds, totalSeconds));
+        const counterValue = startValue + ((endValue - startValue) * (elapsedSeconds / totalSeconds));
+        debtDisplay.textContent = new Intl.NumberFormat("fr-FR", {maximumFractionDigits:0}).format(Math.round(counterValue)) + " €";
       };
       updateDebt();
-      window.setInterval(updateDebt, 250);
+      window.setInterval(updateDebt, 100);
     }
     const answers = {patrie:null, souverainete:null, justice:null, liberte:2, parti:null};
     let step = 0;
