@@ -44,7 +44,7 @@
     #home-experience.quiz-is-closed .quiz-reopen{display:flex}
     #home-experience.quiz-logo-first .quiz-card{display:none}
     #home-experience.quiz-logo-first .quiz-reopen{display:flex;min-height:0;height:100%;border:0;background:transparent}
-    #home-experience.quiz-logo-first .quiz-reopen img{width:min(100%,390px);max-height:390px}
+    #home-experience.quiz-logo-first .quiz-reopen img{width:min(100%,390px);max-height:390px;animation:quiz-logo-grow 2.5s cubic-bezier(.2,.72,.25,1) both;transform-origin:center center}\n    @keyframes quiz-logo-grow{0%{transform:scale(.18);opacity:.35}70%{opacity:1}100%{transform:scale(1);opacity:1}}\n    @media(prefers-reduced-motion:reduce){#home-experience.quiz-logo-first .quiz-reopen img{animation:none;transform:none;opacity:1}}
     #home-experience.quiz-logo-first .quiz-reopen span{display:none}
     #home-experience .quiz-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:20px;border-bottom:1px solid #ffffff1c}
     #home-experience .quiz-step-label{color:var(--q-gold);font-size:10px;font-weight:700;letter-spacing:.17em}
