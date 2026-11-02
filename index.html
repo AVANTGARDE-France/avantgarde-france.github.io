@@ -66,6 +66,7 @@
     #home-experience .quiz-foot-line{height:1px;flex:1;background:#e2bd6940}
     #home-experience .quiz-range{width:100%;accent-color:var(--q-gold);margin:12px 0}
     #home-experience .quiz-range-labels{display:flex;justify-content:space-between;gap:10px;color:#9aabbd;font-size:10px}
+    #home-experience .quiz-range-labels b{color:#ef4135;font-size:22px;font-weight:900;line-height:0;vertical-align:-2px;margin-right:2px}
     #home-experience .quiz-range-current{margin:20px 0 0;padding:16px;border-left:2px solid var(--q-gold);background:#e2bd690d}
     #home-experience .quiz-range-current strong{display:block;color:var(--q-gold);font-size:11px;letter-spacing:.1em;margin-bottom:8px}
     #home-experience .quiz-range-current p{margin:0;color:#dce2e8;font-size:12px;line-height:1.6}
@@ -201,7 +202,7 @@
         ["TOLÉRABLE","Elle est à envisager pour les crimes les plus monstrueux."],
         ["CONTRE","Personne ne doit être privé de sa vie : la société doit porter ce fardeau."]
       ]},
-      {key:"liberte", title:"Vous êtes plutôt…", hint:"Placez le curseur entre État et Liberté.", slider:true},
+      {key:"liberte", title:"Votre rapport à l’État : Économie, Fiscalité et Social", hint:"", slider:true},
       {key:"parti", title:"Qui soutenez-vous ?", hint:"Choisissez le parti dont vous vous sentez le plus proche aujourd’hui.", parties:true, options:[
         ["Rassemblement national","RN"],["La France insoumise","LFI"],["Les Républicains","LR"],["Renaissance / Ensemble","RE"],["Parti socialiste","PS"],["Les Écologistes","Écologistes"],["Reconquête !","Reconquête"],["Debout la France","DLF"],["Union populaire républicaine","UPR"],["Nouvelle Énergie","Nouvelle Énergie"],["Avant-gardE","Avant-gardE"],["Aucun / autre","Aucun / autre"]
       ]}
@@ -222,10 +223,10 @@
       back.disabled = step===0;
       next.textContent = step===4 ? "Analyser mes choix ↗" : "Continuer →";
       next.disabled = q.slider ? false : !answers[q.key];
-      let html = '<h2 class="quiz-question">'+q.title+'</h2><p class="quiz-hint">'+q.hint+'</p>';
+      let html = '<h2 class="quiz-question">'+q.title+'</h2>'+(q.hint?'<p class="quiz-hint">'+q.hint+'</p>':'');
       if(q.slider){
         const val = answers.liberte;
-        html += '<label class="quiz-kicker" for="liberte-range">VOTRE POSITION SUR LE SPECTRE</label><input class="quiz-range" id="liberte-range" type="range" min="0" max="4" step="1" value="'+val+'" aria-label="Position entre État et Liberté"><div class="quiz-range-labels"><span>État</span><span>Liberté</span></div><div class="quiz-range-current"><strong>'+liberty[val][0]+'</strong><p>'+liberty[val][1]+'</p></div>';
+        html += '<input class="quiz-range" id="liberte-range" type="range" min="0" max="4" step="1" value="'+val+'" aria-label="Votre rapport à l’État, à l’économie, à la fiscalité et au social"><div class="quiz-range-labels"><span><b>+</b> d’État</span><span><b>+</b> de Liberté</span></div><div class="quiz-range-current"><strong>'+liberty[val][0]+'</strong><p>'+liberty[val][1]+'</p></div>';
       } else {
         html += '<div class="'+(q.parties?'quiz-parties':'quiz-options')+'">';
         q.options.forEach((option,i)=>{
