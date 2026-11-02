@@ -194,8 +194,8 @@
         <div class="stats-marquee-group">
           <div class="debt-counter">
             <span class="debt-counter-label">Dette publique</span>
-            <strong class="debt-counter-value" id="public-debt-value">3 595 500 000 000 €</strong>
-            <span class="debt-counter-note">3,8 % de la dépense publique (60Md€ d'intérêts annuels) · INSEE · 2025</span>
+            <strong class="debt-counter-value" id="public-debt-value">−3 595 500 000 000 €</strong>
+            <span class="debt-counter-note">−3,8 % de la dépense publique (−60Md€ d'intérêts annuels) · INSEE · 2025</span>
           </div>
           <div class="debt-counter">
             <strong class="debt-counter-value">438</strong>
@@ -203,7 +203,7 @@
             <span class="debt-counter-note">Recensement Fondation IFRAP · 2026</span>
           </div>
           <div class="debt-counter">
-            <strong class="debt-counter-value">46 %</strong>
+            <strong class="debt-counter-value">−46 %</strong>
             <span class="debt-counter-label stats-description">LA FRANCE, CHAMPIONNE D’EUROPE DES PRÉLÈVEMENTS OBLIGATOIRES</span>
             <span class="debt-counter-note">Impôts et cotisations sociales · 2025 · Eurostat</span>
           </div>
@@ -214,21 +214,21 @@
           </div>
 
           <div class="debt-counter">
-            <strong class="debt-counter-value">982,2 Md€</strong>
+            <strong class="debt-counter-value">−982,2 Md€</strong>
             <span class="debt-counter-label stats-description">Protection sociale et santé</span>
-            <span class="debt-counter-note">57 % de la dépense publique · INSEE · 2024</span>
+            <span class="debt-counter-note">−57 % de la dépense publique · INSEE · 2024</span>
           </div>
           <div class="debt-counter">
-            <strong class="debt-counter-value">166 Md€</strong>
+            <strong class="debt-counter-value">−166 Md€</strong>
             <span class="debt-counter-label stats-description">Interventionnisme économique</span>
-            <span class="debt-counter-note">10 % de la dépense publique · Dont 79 % de subventions, aides et frais de fonctionnement · INSEE · 2024</span>
+            <span class="debt-counter-note">−10 % de la dépense publique · Dont 79 % de subventions, aides et frais de fonctionnement · INSEE · 2024</span>
           </div>
         </div>
         <div class="stats-marquee-group" aria-hidden="true">
           <div class="debt-counter">
             <span class="debt-counter-label">Dette publique</span>
-            <strong class="debt-counter-value debt-value-copy">3 595 500 000 000 €</strong>
-            <span class="debt-counter-note">3,8 % de la dépense publique (60Md€ d'intérêts annuels) · INSEE · 2025</span>
+            <strong class="debt-counter-value debt-value-copy">−3 595 500 000 000 €</strong>
+            <span class="debt-counter-note">−3,8 % de la dépense publique (−60Md€ d'intérêts annuels) · INSEE · 2025</span>
           </div>
           <div class="debt-counter">
             <strong class="debt-counter-value">438</strong>
@@ -241,14 +241,14 @@
             <span class="debt-counter-note">577 députés · 348 sénateurs</span>
           </div>
           <div class="debt-counter">
-            <strong class="debt-counter-value">982,2 Md€</strong>
+            <strong class="debt-counter-value">−982,2 Md€</strong>
             <span class="debt-counter-label stats-description">Protection sociale et santé</span>
-            <span class="debt-counter-note">57 % de la dépense publique · INSEE · 2024</span>
+            <span class="debt-counter-note">−57 % de la dépense publique · INSEE · 2024</span>
           </div>
           <div class="debt-counter">
-            <strong class="debt-counter-value">166 Md€</strong>
+            <strong class="debt-counter-value">−166 Md€</strong>
             <span class="debt-counter-label stats-description">Interventionnisme économique</span>
-            <span class="debt-counter-note">10 % de la dépense publique · Dont 79 % de subventions, aides et frais de fonctionnement · INSEE · 2024</span>
+            <span class="debt-counter-note">−10 % de la dépense publique · Dont 79 % de subventions, aides et frais de fonctionnement · INSEE · 2024</span>
           </div>
         </div>
       </div>
@@ -309,7 +309,7 @@
         let elapsedSeconds = (now - startDate) / 1000;
         elapsedSeconds = Math.max(0, Math.min(elapsedSeconds, totalSeconds));
         const counterValue = startValue + ((endValue - startValue) * (elapsedSeconds / totalSeconds));
-        const formattedDebt = new Intl.NumberFormat("fr-FR", {maximumFractionDigits:0}).format(Math.round(counterValue)) + " €";
+        const formattedDebt = "−" + new Intl.NumberFormat("fr-FR", {maximumFractionDigits:0}).format(Math.round(counterValue)) + " €";
         debtDisplay.textContent = formattedDebt;
         document.querySelectorAll("#home-experience .debt-value-copy").forEach(node => node.textContent = formattedDebt);
       };
