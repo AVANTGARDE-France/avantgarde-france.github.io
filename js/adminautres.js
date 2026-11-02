@@ -276,55 +276,6 @@ function showMessage(
 
 
 /* =========================================================
-   PUBLICATION HTML AUTOMATIQUE
-========================================================= */
-
-async function declencherPublicationHtml() {
-
-    const {
-        data: sessionData,
-        error: sessionError
-    } = await supabase.auth.getSession();
-
-    if (sessionError) {
-        throw sessionError;
-    }
-
-    const accessToken =
-        sessionData?.session?.access_token;
-
-    if (!accessToken) {
-        throw new Error("Session expirée. Reconnectez-vous.");
-    }
-
-    const response = await fetch(
-        "https://wlhtegrciehmtxqecopv.supabase.co/functions/v1/publish-supabase-pages-manual",
-        {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "apikey": "sb_publishable_eBPx2UZFdHbLzxSgoBor-Q_FJobVvjs",
-                "Authorization": "Bearer " + accessToken
-            },
-            body: JSON.stringify({})
-        }
-    );
-
-    const result =
-        await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-        throw new Error(
-            result.error ||
-            "La demande de publication HTML a échoué."
-        );
-    }
-
-    return result;
-}
-
-
-/* =========================================================
    SELECTION EDITEUR
 ========================================================= */
 
@@ -1715,32 +1666,8 @@ async function enregistrerContenu(
 
         showMessage(
             slug,
-            `${config.titre} enregistré dans Supabase. Publication HTML en cours…`
+            `${config.titre} enregistré. La publication HTML est lancée automatiquement.`
         );
-
-        try {
-
-            await declencherPublicationHtml();
-
-            showMessage(
-                slug,
-                `${config.titre} enregistré et publication HTML déclenchée.`
-            );
-
-        } catch (publicationError) {
-
-            console.error(
-                "Erreur publication HTML statique :",
-                publicationError
-            );
-
-            showMessage(
-                slug,
-                `${config.titre} est bien enregistré dans Supabase, mais la publication HTML a échoué : ${publicationError?.message || "erreur inconnue"}`,
-                "error"
-            );
-
-        }
 
     }
     catch (error) {
