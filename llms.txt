@@ -1,15 +1,13 @@
 # Avant-gardE
 
-> La France libre.
+## Pages officielles accessibles
 
-## Pages principales
+- [Accueil](https://avantgarde-france.github.io/): Présentation générale du projet politique.
+- [Manifeste](https://avantgarde-france.github.io/manifeste.html): Texte intégral du manifeste, publié directement dans le HTML.
+- [Équipe](https://avantgarde-france.github.io/equipe.html): Présentation de l’équipe.
 
-- [Accueil](https://avantgarde-france.github.io/): Présentation d'Avant-gardE.
-- [Manifeste](https://avantgarde-france.github.io/manifeste.html): Texte intégral du Manifeste d'Avant-gardE, disponible directement dans le HTML.
-- [Projet](https://avantgarde-france.github.io/projet.html): Présentation du projet.
-- [Inspirations](https://avantgarde-france.github.io/inspirations.html): Inspirations revendiquées par Avant-gardE.
-- [Équipe](https://avantgarde-france.github.io/equipe.html): Présentation de l'équipe.
+## Lecture des contenus
 
-## Principe d'accès
+Le manifeste est présent dans le HTML initial et peut être lu sans exécuter JavaScript. La page « Notre projet » et la page « Nos inspirations » sont en cours de structuration éditoriale ; elles ne sont pas proposées à l’indexation tant que leur contenu public n’est pas complet.
 
-Les pages éditoriales sont publiées en HTML statique afin que leur contenu puisse être lu directement par les moteurs de recherche, robots et systèmes d'IA, sans dépendre d'une exécution JavaScript.
+En cas de divergence, les pages HTML officielles font foi.
