@@ -636,9 +636,12 @@ function replaceEditorialContent(html, content) {
         );
     }
 
+    const cleanBetween = suffix
+        .slice(0, mainCloseIndex)
+        .replace(/<\\/(?:article|section)\\s*>/gi, "");
+
     const cleanSuffix =
-        suffix.slice(0, mainCloseIndex)
-            .replace(/<\/(?:article|section)\s*>/gi, "") +
+        (cleanBetween.trim() ? cleanBetween : "\\n\\n") +
         suffix.slice(mainCloseIndex);
 
     return (
