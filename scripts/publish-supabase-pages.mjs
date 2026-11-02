@@ -499,17 +499,17 @@ function generateLlmsFullTxt(manifestHtml) {
      */
 
     const match = manifestHtml.match(
-        /<article\\b[^>]*class=["'][^"']*\\bmanifeste-content\\b[^"']*["'][^>]*>([\\s\\S]*?)<\\/article>/i
+        /<article\b[^>]*class=["'][^"']*\bmanifeste-content\b[^"']*["'][^>]*>([\s\S]*?)<\/article>/i
     );
 
     const source = match ? match[1] : manifestHtml;
 
     const text = source
-        .replace(/<!--[\\s\\S]*?-->/g, " ")
-        .replace(/<(script|style|noscript)\\b[^>]*>[\\s\\S]*?<\\/\\1>/gi, " ")
-        .replace(/<br\\s*\\/?\\s*>/gi, "\\n")
-        .replace(/<\\/(p|div|section|h[1-6]|li|header|footer|span)>/gi, "\\n")
-        .replace(/<li\\b[^>]*>/gi, "- ")
+        .replace(/<!--[\s\S]*?-->/g, " ")
+        .replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
+        .replace(/<br\s*\/?\s*>/gi, "\n")
+        .replace(/<\/(p|div|section|h[1-6]|li|header|footer|span)>/gi, "\n")
+        .replace(/<li\b[^>]*>/gi, "- ")
         .replace(/<[^>]+>/g, " ")
         .replace(/&nbsp;|&#160;/gi, " ")
         .replace(/&amp;/gi, "&")
@@ -517,12 +517,12 @@ function generateLlmsFullTxt(manifestHtml) {
         .replace(/&gt;/gi, ">")
         .replace(/&quot;|&#34;/gi, '"')
         .replace(/&#39;|&apos;|&#039;/gi, "'")
-        .replace(/&#(\\d+);/g, (_m, n) => String.fromCharCode(Number(n)))
+        .replace(/&#(\d+);/g, (_m, n) => String.fromCharCode(Number(n)))
         .replace(/&#x([0-9a-f]+);/gi, (_m, n) => String.fromCharCode(parseInt(n, 16)))
-        .replace(/[ \\t]+\\n/g, "\\n")
-        .replace(/\\n[ \\t]+/g, "\\n")
-        .replace(/[ \\t]{2,}/g, " ")
-        .replace(/\\n{3,}/g, "\\n\\n")
+        .replace(/[ \t]+\n/g, "\n")
+        .replace(/\n[ \t]+/g, "\n")
+        .replace(/[ \t]{2,}/g, " ")
+        .replace(/\n{3,}/g, "\n\n")
         .trim();
 
     return [
@@ -536,7 +536,7 @@ function generateLlmsFullTxt(manifestHtml) {
         "",
         text,
         ""
-    ].join("\\n");
+    ].join("\n");
 }
 
 
