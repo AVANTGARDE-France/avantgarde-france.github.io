@@ -141,11 +141,16 @@ async function envoyerVersIA(typeIA) {
        Ouverture de ChatGPT
     ----------------------------------------------------- */
 
-    window.open(
+    const fenetreIA = window.open(
         url,
         "_blank",
         "noopener,noreferrer"
     );
+
+    // Le prompt est déjà transmis dans l'URL : on vide le champ
+    // après la tentative d'ouverture pour ne pas laisser le texte affiché.
+    champQuestion.value = "";
+    champQuestion.dispatchEvent(new Event("input", { bubbles: true }));
 
 
     /* -----------------------------------------------------
