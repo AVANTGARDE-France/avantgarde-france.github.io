@@ -42,6 +42,10 @@
     #home-experience .quiz-reopen:hover{background:rgba(5,13,25,.42);border-color:#e2bd69}
     #home-experience.quiz-is-closed .quiz-card{display:none}
     #home-experience.quiz-is-closed .quiz-reopen{display:flex}
+    #home-experience.quiz-logo-first .quiz-card{display:none}
+    #home-experience.quiz-logo-first .quiz-reopen{display:flex;min-height:420px;border:0;background:transparent}
+    #home-experience.quiz-logo-first .quiz-reopen img{width:min(100%,390px);max-height:390px}
+    #home-experience.quiz-logo-first .quiz-reopen span{display:none}
     #home-experience .quiz-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:20px;border-bottom:1px solid #ffffff1c}
     #home-experience .quiz-step-label{color:var(--q-gold);font-size:10px;font-weight:700;letter-spacing:.17em}
     #home-experience .quiz-progress{display:flex;gap:5px}
@@ -107,7 +111,7 @@
 <body>
   <div id="site-header"></div>
 
-  <main id="home-experience">
+  <main id="home-experience" class="quiz-logo-first">
     <section class="quiz-hero" aria-labelledby="home-title">
       <div class="quiz-photo" aria-hidden="true"></div>
       <div class="quiz-shade" aria-hidden="true"></div>
@@ -183,6 +187,7 @@
     const field = document.getElementById("aiQuestion");
     closeQuiz.addEventListener("click",()=>root.classList.add("quiz-is-closed"));
     reopenQuiz.addEventListener("click",()=>root.classList.remove("quiz-is-closed"));
+    setTimeout(()=>root.classList.remove("quiz-logo-first"),2500);
     const answers = {patrie:null, souverainete:null, justice:null, liberte:2, parti:null};
     let step = 0;
 
