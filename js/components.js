@@ -470,7 +470,7 @@ function injecterFooter() {
             </div>
 
             <div>
-                Avant-gardE — La France libre
+                Avant-gardE
             </div>
 
             <div>
