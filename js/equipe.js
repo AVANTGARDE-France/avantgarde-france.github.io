@@ -997,29 +997,6 @@ function creerCarteMembre(
     }
 
 
-    /* DESCRIPTION */
-
-    if (membre.description) {
-
-        const description =
-            document.createElement("div");
-
-
-        description.className =
-            "member-description";
-
-
-        description.textContent =
-            membre.description;
-
-
-        info.appendChild(
-            description
-        );
-
-    }
-
-
     card.appendChild(
         info
     );
@@ -1129,6 +1106,11 @@ function ouvrirProfil(
             "profileModalGrade"
         );
 
+    const points =
+        document.getElementById(
+            "profileModalPoints"
+        );
+
 
     const region =
         document.getElementById(
@@ -1174,6 +1156,13 @@ function ouvrirProfil(
             membre.grade ||
             "user";
 
+    }
+
+    if (points) {
+        const totalPoints = Number(membre.point);
+        points.textContent =
+            (Number.isFinite(totalPoints) ? totalPoints : 0).toLocaleString("fr-FR") +
+            " points";
     }
 
 
