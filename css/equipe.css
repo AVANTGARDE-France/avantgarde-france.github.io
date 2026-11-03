@@ -1193,3 +1193,114 @@ textarea {
     }
 
 }
+
+
+/* =========================================================
+   DIRECTION — PROFILS PRINCIPAUX
+========================================================= */
+
+.leadership-section {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 34px 25px 68px;
+}
+
+.leadership-heading { margin-bottom: 30px; }
+.leadership-heading h2 {
+    font-size: clamp(27px, 4vw, 38px);
+    letter-spacing: -.8px;
+}
+
+.leadership-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.leadership-card {
+    position: relative;
+    min-height: 300px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 38px 28px;
+    text-align: center;
+    border: 1px solid rgba(214, 173, 85, .28);
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(214, 173, 85, .12), transparent 58%),
+        linear-gradient(145deg, rgba(16, 42, 76, .92), rgba(7, 21, 45, .98));
+    transition: border-color .25s, transform .25s, box-shadow .25s;
+}
+
+.leadership-card::before {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border: 1px solid rgba(214, 173, 85, .10);
+    pointer-events: none;
+}
+
+.leadership-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(214, 173, 85, .7);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, .24);
+}
+
+.leadership-monogram {
+    width: 88px;
+    height: 88px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 22px;
+    border: 1px solid rgba(214, 173, 85, .72);
+    border-radius: 50%;
+    color: var(--gold-light);
+    background: rgba(214, 173, 85, .08);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 38px;
+}
+
+.leadership-role {
+    color: var(--gold-light);
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.leadership-card h3 {
+    margin: 10px 0 8px;
+    font-size: clamp(22px, 3vw, 29px);
+    font-weight: 600;
+}
+
+.leadership-placeholder {
+    margin: 0;
+    color: var(--muted);
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
+
+.leadership-card-national {
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(0, 85, 164, .17), transparent 58%),
+        linear-gradient(145deg, rgba(16, 42, 76, .92), rgba(7, 21, 45, .98));
+}
+
+/* TROMBINOSCOPE */
+.team-section { padding-top: 26px; }
+.team-section .section-title { margin-bottom: 38px; }
+.team-grid { align-items: stretch; }
+.member-card { min-height: 305px; border-radius: 2px; }
+.member-photo,
+.member-photo-placeholder { width: 116px; height: 116px; }
+.member-name { font-size: 20px; font-weight: 650; }
+
+@media (max-width: 700px) {
+    .leadership-section { padding: 24px 15px 48px; }
+    .leadership-grid { grid-template-columns: 1fr; gap: 14px; }
+    .leadership-card { min-height: 260px; padding: 30px 22px; }
+    .leadership-monogram { width: 76px; height: 76px; font-size: 33px; }
+}
