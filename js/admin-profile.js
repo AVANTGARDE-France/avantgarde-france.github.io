@@ -997,6 +997,7 @@ function initialiserChampParrain(profile){
 
   if(input.dataset.initialized !== "true"){
     input.addEventListener("input", () => {
+      validationParrainSequence++;
       window.clearTimeout(validationParrainTimer);
       afficherEtatValidationParrain(
         input.value.trim() ? "checking" : "empty",
