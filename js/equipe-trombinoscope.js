@@ -233,6 +233,53 @@ function basculerRegion(region) {
     else regionsSelectionnees.push(region);
     filtreEtranger = REGIONS_ETRANGER.some(item => normaliserRegion(item) === normaliserRegion(region));
     actualiserSelectionCarte();
+    actualiserAlerteFiltres();
+}
+
+function filtresAnnuaireActifs() {
+    const localisationActive = regionsSelectionnees.length > 0 || filtreEtranger;
+    const statuts = ["directoryDelegues", "directoryMilitants", "directoryInscrits"];
+    const statutsTousActifs = statuts.every(id => document.getElementById(id)?.checked ?? true);
+    const attributsActifs = document.querySelector(
+        'input[name="directoryMedals"]:checked, input[name="directorySkills"]:checked, input[name="directoryRoles"]:checked'
+    ) !== null;
+    return localisationActive || !statutsTousActifs || attributsActifs;
+}
+
+function actualiserAlerteFiltres() {
+    const alerte = document.getElementById("directoryFilterAlert");
+    if (alerte) alerte.hidden = !filtresAnnuaireActifs();
+}
+
+function reinitialiserTousFiltresAnnuaire() {
+    regionsSelectionnees = [];
+    filtreEtranger = false;
+
+    ["directoryDelegues", "directoryMilitants", "directoryInscrits"].forEach(id => {
+        const input = document.getElementById(id);
+        if (input) input.checked = true;
+    });
+    document.querySelectorAll(
+        'input[name="directoryMedals"], input[name="directorySkills"], input[name="directoryRoles"]'
+    ).forEach(input => { input.checked = false; });
+
+    filtresAttributsAnnuaire = { medailles: [], competences: [], roles: [] };
+    categoriesAnnuaire = { delegues: true, militants: true, inscrits: true };
+
+    document.querySelectorAll("[data-map-tab]").forEach(tab => {
+        const active = tab.dataset.mapTab === "metropole";
+        tab.classList.toggle("active", active);
+        tab.setAttribute("aria-selected", active ? "true" : "false");
+    });
+    document.querySelectorAll(".directory-map-panel").forEach(panel => {
+        const active = panel.id === "directoryMapMetropole";
+        panel.hidden = !active;
+        panel.classList.toggle("active", active);
+    });
+
+    actualiserSelectionCarte();
+    afficherMembresFiltres(membresVisibles);
+    actualiserAlerteFiltres();
 }
 
 function actualiserSelectionCarte() {
@@ -248,13 +295,8 @@ function actualiserSelectionCarte() {
         button.classList.toggle("selected", selected);
         button.setAttribute("aria-pressed", selected ? "true" : "false");
     });
-    const selection = document.getElementById("directorySelection");
-    if (selection) {
-        const valeurs = [...regionsSelectionnees];
-        if (filtreEtranger) valeurs.push("Étranger");
-        selection.textContent = valeurs.length ? "Sélection : " + valeurs.join(" · ") : "Aucune région sélectionnée — tout afficher";
-    }
     document.getElementById("directoryAll")?.classList.toggle("active", !regionsSelectionnees.length && !filtreEtranger);
+    actualiserAlerteFiltres();
 }
 
 function appliquerFiltreAnnuaire() {
@@ -325,7 +367,7 @@ function appliquerFiltreAnnuaire() {
     }
 
     afficherMembresFiltres(resultat);
-    actualiserResumeFiltre(resultat.length);
+    actualiserAlerteFiltres();
     fermerFiltreAnnuaire();
 }
 
@@ -342,26 +384,6 @@ function afficherMembresFiltres(liste) {
     liste.forEach(membre => grid.appendChild(creerCarteMembre(membre)));
 }
 
-function actualiserResumeFiltre(nombre) {
-    const resume = document.getElementById("directoryFilterSummary");
-    if (!resume) return;
-    const categories = [];
-    if (categoriesAnnuaire.delegues) categories.push("Délégués Régionaux");
-    if (categoriesAnnuaire.militants) categories.push("Équipe Militante");
-    if (categoriesAnnuaire.inscrits) categories.push("Inscrits");
-    const localisation = filtreEtranger
-        ? "Étranger"
-        : (regionsSelectionnees.length ? regionsSelectionnees.join(", ") : "Toutes localisations");
-    const attributs = [
-        ...filtresAttributsAnnuaire.medailles,
-        ...filtresAttributsAnnuaire.competences,
-        ...filtresAttributsAnnuaire.roles
-    ];
-    const resumeAttributs = attributs.length ? " · " + attributs.join(", ") : "";
-    resume.textContent = localisation + " · " +
-        (categories.length ? categories.join(" + ") : "Aucune catégorie") +
-        resumeAttributs + " · " + nombre + " membre(s)";
-}
 
 function initialiserFiltreAnnuaire() {
     document.getElementById("openDirectoryFilter")?.addEventListener("click", ouvrirFiltreAnnuaire);
@@ -377,6 +399,10 @@ function initialiserFiltreAnnuaire() {
         lireFiltresAttributsAnnuaire();
     });
     document.getElementById("directoryApply")?.addEventListener("click", appliquerFiltreAnnuaire);
+    document.getElementById("directoryClearAll")?.addEventListener("click", reinitialiserTousFiltresAnnuaire);
+    document.querySelectorAll("#directoryDelegues, #directoryMilitants, #directoryInscrits, input[name='directoryMedals'], input[name='directorySkills'], input[name='directoryRoles']").forEach(input => {
+        input.addEventListener("change", actualiserAlerteFiltres);
+    });
     document.querySelectorAll("[data-world-zone]").forEach(button => {
         button.addEventListener("click", () => basculerRegion(button.dataset.worldZone));
     });
@@ -406,6 +432,7 @@ function initialiserFiltreAnnuaire() {
     document.addEventListener("keydown", event => {
         if (event.key === "Escape") fermerFiltreAnnuaire();
     });
+    actualiserAlerteFiltres();
 }
 
 initialiserFiltreAnnuaire();
@@ -455,7 +482,7 @@ async function chargerTrombinoscope() {
         regionsSelectionnees = [];
         filtreEtranger = false;
         afficherMembresFiltres(membresVisibles);
-        actualiserResumeFiltre(membresVisibles.length);
+        actualiserAlerteFiltres();
     } catch (error) {
         console.error("Erreur chargement trombinoscope ou direction :", error);
         grid.innerHTML = '<div class="no-members">Impossible de charger le trombinoscope.</div>';
