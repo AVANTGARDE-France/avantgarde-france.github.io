@@ -1445,3 +1445,20 @@ body.directory-filter-open{overflow:hidden}
  .directory-filter-footer button{width:100%}
  .directory-result-count{width:100%}
 }
+
+
+/* CATÉGORIES DU FILTRE DE L'ANNUAIRE */
+.directory-category-filter{margin:22px 0 17px;padding:18px 0 20px;border-top:1px solid rgba(214,173,85,.24);border-bottom:1px solid rgba(214,173,85,.24)}
+.directory-category-filter h3{margin:0 0 5px;color:#f5f3ed;font:700 16px Arial,sans-serif}
+.directory-category-filter>p{margin:0 0 13px;color:#aeb8c7;font:11px/1.5 Arial,sans-serif}
+.directory-category-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.directory-category-option{position:relative;display:flex;align-items:flex-start;gap:10px;min-width:0;padding:13px 11px;border:1px solid rgba(214,173,85,.25);background:rgba(255,255,255,.025);cursor:pointer;transition:.18s}
+.directory-category-option:has(input:checked){border-color:rgba(214,173,85,.8);background:rgba(214,173,85,.09)}
+.directory-category-option input{position:absolute;opacity:0;width:1px;height:1px}
+.directory-category-check{flex:0 0 17px;width:17px;height:17px;margin-top:1px;border:1px solid #8c9aaf;display:grid;place-items:center}
+.directory-category-option input:checked+.directory-category-check{border-color:#d6ad55;background:#d6ad55}
+.directory-category-option input:checked+.directory-category-check:after{content:"✓";color:#07152d;font:800 12px Arial,sans-serif}
+.directory-category-option input:focus-visible+.directory-category-check{outline:2px solid #f0d58a;outline-offset:3px}
+.directory-category-option strong{display:block;color:#f5f3ed;font:700 11px/1.4 Arial,sans-serif}
+.directory-category-option small{display:block;margin-top:4px;color:#9eacbf;font:10px/1.4 Arial,sans-serif}
+@media(max-width:650px){.directory-category-options{grid-template-columns:1fr}.directory-category-option{padding:11px}}
