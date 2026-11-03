@@ -1341,3 +1341,59 @@ textarea {
 @media (max-width: 700px) {
     .leadership-photo-wrap { width: 108px; height: 108px; }
 }
+
+/* =========================================================
+   ALIGNEMENT COMMUN DES TROIS SECTIONS
+   Même axe central et mêmes marges latérales :
+   introduction, direction et trombinoscope.
+========================================================= */
+
+.team-hero,
+.leadership-section,
+.team-section {
+    width: 100%;
+    max-width: 1180px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 25px;
+    padding-right: 25px;
+    box-sizing: border-box;
+}
+
+.team-hero {
+    text-align: center;
+}
+
+.team-hero .hero-content {
+    width: 100%;
+    max-width: 850px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.leadership-heading,
+.team-section > .section-title {
+    width: 100%;
+    max-width: 850px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+.leadership-grid,
+.team-grid {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 800px) {
+    .team-hero,
+    .leadership-section,
+    .team-section {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
+
