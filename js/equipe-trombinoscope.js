@@ -44,6 +44,9 @@ function creerCarteDirection(membre, fonction) {
         photoZone.appendChild(creerMonogrammeDirection(membre.nom));
     }
 
+    const info = document.createElement("div");
+    info.className = "leadership-info";
+
     const role = document.createElement("div");
     role.className = "leadership-role";
     role.textContent = fonction;
@@ -51,19 +54,24 @@ function creerCarteDirection(membre, fonction) {
     const name = document.createElement("h3");
     name.textContent = membre.nom || "Membre";
 
-    const region = document.createElement("p");
-    region.className = "leadership-member-region";
-    region.textContent = membre.region || "";
+    info.append(role, name);
 
-    card.append(photoZone, role, name);
-    if (membre.region) card.appendChild(region);
+    if (membre.region) {
+        const region = document.createElement("p");
+        region.className = "leadership-member-region";
+        region.textContent = membre.region;
+        info.appendChild(region);
+    }
 
     if (membre.description) {
         const description = document.createElement("p");
         description.className = "leadership-member-description";
         description.textContent = membre.description;
-        card.appendChild(description);
+        info.appendChild(description);
     }
+
+    photoZone.appendChild(info);
+    card.appendChild(photoZone);
 
     const ouvrir = () => ouvrirProfil(membre);
     card.addEventListener("click", ouvrir);
