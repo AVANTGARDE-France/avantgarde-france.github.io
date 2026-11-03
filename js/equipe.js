@@ -824,7 +824,7 @@ function creerIconeMedaille(type) {
 
 function obtenirMedailleFonction(membre) {
     const fonction = String(membre?.grade2 || "").trim()
-        .normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase();
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
     if (fonction === "architecte du projet" || fonction === "delegue national") {
         return { key: "fonction-direction", icon: "landmark", label: membre.grade2 };
@@ -853,7 +853,7 @@ function obtenirMedailleDistinctions(membre) {
 
     const competences = normaliserCompetences(membre?.competences)
         .map(valeur => String(valeur).trim().normalize("NFD")
-            .replace(/[\\u0300-\\u036f]/g, "").toLowerCase());
+            .replace(/[\u0300-\u036f]/g, "").toLowerCase());
     if (competences.includes("mecene")) {
         medailles.push({ key: "mecene", icon: "hand-coins", label: "Mécène" });
     }
@@ -1259,7 +1259,7 @@ function ouvrirProfil(
         const competencesBrutes = normaliserCompetences(membre.competences);
         const competencesNormales = competencesBrutes.filter(competence => {
             const valeur = String(competence).trim().normalize("NFD")
-                .replace(/[\\u0300-\\u036f]/g, "").toLowerCase();
+                .replace(/[\u0300-\u036f]/g, "").toLowerCase();
             return valeur !== "vip" && valeur !== "mecene";
         });
         const medaillesProfil = obtenirMedailleDistinctions(membre);
