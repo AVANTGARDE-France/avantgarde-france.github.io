@@ -838,6 +838,186 @@ window.mettreAJourMedailleParrainage = mettreAJourMedailleParrainage;
 
 
 /* =========================================================
+   VALIDATION DU PARRAIN
+========================================================= */
+
+let validationParrainTimer = null;
+let validationParrainSequence = 0;
+let validationParrainEtat = "empty";
+
+function afficherEtatValidationParrain(etat, message){
+
+  const icon = document.getElementById("profileSponsorIcon");
+  const status = document.getElementById("profileSponsorStatus");
+
+  validationParrainEtat = etat;
+
+  if(icon){
+    icon.className = "sponsor-validation-icon " + etat;
+    icon.textContent =
+      etat === "valid" ? "✓" :
+      etat === "invalid" ? "✕" :
+      etat === "checking" ? "…" : "—";
+  }
+
+  if(status){
+    status.className = "help sponsor-validation-status " + etat;
+    status.textContent = message || "";
+  }
+
+}
+
+async function verifierIdentifiantParrain(){
+
+  const input = document.getElementById("profileSponsorId");
+  if(!input) return true;
+
+  const identifiant = input.value.trim();
+  const sequence = ++validationParrainSequence;
+
+  if(!identifiant){
+    afficherEtatValidationParrain(
+      "empty",
+      "Aucun parrain renseigné."
+    );
+    return true;
+  }
+
+  const formatUUID =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  if(!formatUUID.test(identifiant)){
+    afficherEtatValidationParrain(
+      "invalid",
+      "Identifiant invalide : le format attendu est un identifiant membre complet."
+    );
+    return false;
+  }
+
+  if(identifiant.toLowerCase() === String(currentUser?.id || "").toLowerCase()){
+    afficherEtatValidationParrain(
+      "invalid",
+      "Vous ne pouvez pas être votre propre parrain."
+    );
+    return false;
+  }
+
+  afficherEtatValidationParrain(
+    "checking",
+    "Vérification de l’identifiant…"
+  );
+
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("id")
+    .eq("id", identifiant)
+    .maybeSingle();
+
+  if(sequence !== validationParrainSequence) return false;
+
+  if(error){
+    console.error("VALIDATION IDENTIFIANT PARRAIN :", error);
+    afficherEtatValidationParrain(
+      "invalid",
+      "Vérification impossible. Réessayez dans un instant."
+    );
+    return false;
+  }
+
+  if(!data){
+    afficherEtatValidationParrain(
+      "invalid",
+      "Aucun membre ne correspond à cet identifiant."
+    );
+    return false;
+  }
+
+  afficherEtatValidationParrain(
+    "valid",
+    "Identifiant valide : membre trouvé."
+  );
+
+  return true;
+
+}
+
+function initialiserChampParrain(profile){
+
+  const input = document.getElementById("profileSponsorId");
+  if(!input) return;
+
+  if(!document.getElementById("profile-sponsor-styles")){
+    const style = document.createElement("style");
+    style.id = "profile-sponsor-styles";
+    style.textContent = `
+      .sponsor-input-wrap{
+        display:flex;
+        align-items:center;
+        gap:10px;
+      }
+      .sponsor-input-wrap input{
+        flex:1;
+        min-width:0;
+      }
+      .sponsor-validation-icon{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        width:28px;
+        height:28px;
+        flex:0 0 28px;
+        border:1px solid rgba(255,255,255,.16);
+        border-radius:50%;
+        color:rgba(245,243,237,.45);
+        font-family:Arial,sans-serif;
+        font-size:18px;
+        font-weight:800;
+      }
+      .sponsor-validation-icon.valid{
+        color:#35d078;
+        border-color:rgba(53,208,120,.5);
+        background:rgba(53,208,120,.09);
+      }
+      .sponsor-validation-icon.invalid{
+        color:#ef4135;
+        border-color:rgba(239,65,53,.5);
+        background:rgba(239,65,53,.09);
+      }
+      .sponsor-validation-icon.checking{
+        color:var(--gold-light,#f0d58a);
+        border-color:rgba(214,173,85,.4);
+      }
+      .sponsor-validation-status.valid{color:#35d078}
+      .sponsor-validation-status.invalid{color:#ff8178}
+    `;
+    document.head.appendChild(style);
+  }
+
+  input.value = profile?.parrain_id || "";
+
+  if(input.dataset.initialized !== "true"){
+    input.addEventListener("input", () => {
+      window.clearTimeout(validationParrainTimer);
+      afficherEtatValidationParrain(
+        input.value.trim() ? "checking" : "empty",
+        input.value.trim() ? "Vérification de l’identifiant…" : "Aucun parrain renseigné."
+      );
+      validationParrainTimer = window.setTimeout(
+        verifierIdentifiantParrain,
+        350
+      );
+    });
+
+    input.addEventListener("blur", verifierIdentifiantParrain);
+    input.dataset.initialized = "true";
+  }
+
+  verifierIdentifiantParrain();
+
+}
+
+
+/* =========================================================
    REMPLIR PROFIL
 ========================================================= */
 
@@ -845,6 +1025,7 @@ function remplirProfil(profile){
 
   afficherIdentifiantMembre(profile);
   initialiserPopupParrainages();
+  initialiserChampParrain(profile);
 
   // Le facteur dons reste à 1 tant que la table dédiée n'est pas connectée.
   mettreAJourNombrePointsVIP(
@@ -1077,6 +1258,25 @@ profileForm.addEventListener(
         .value
         .trim();
 
+    const parrainIdInput =
+      document.getElementById("profileSponsorId");
+
+    const parrain_id =
+      parrainIdInput?.value.trim() || null;
+
+    const parrainValide =
+      await verifierIdentifiantParrain();
+
+    if(!parrainValide){
+      afficherMessage(
+        profileMessage,
+        "error",
+        "L’identifiant du parrain est invalide. Corrigez-le ou laissez le champ vide."
+      );
+      saveProfileButton.disabled = false;
+      saveProfileButton.textContent = "ENREGISTRER LES MODIFICATIONS";
+      return;
+    }
 
     const anonyme =
       document
@@ -1367,6 +1567,9 @@ profileForm.addEventListener(
 
           tiktok_url:
             tiktok_url || null,
+
+          parrain_id:
+            parrain_id,
 
           ...(perteDroitsRegionaux
             ? { grade2:null }
