@@ -162,11 +162,11 @@
         <p class="directory-filter-intro">Sélectionnez une ou plusieurs régions sur la carte. Les profils étrangers peuvent être affichés séparément.</p>
         <div class="directory-filter-actions">
             <button type="button" class="directory-quick-option" id="directoryAll">TOUT AFFICHER</button>
-            <button type="button" class="directory-quick-option" id="directoryForeign">ÉTRANGER</button>
         </div>
         <div class="directory-map-tabs" role="tablist" aria-label="Choisir une carte">
             <button type="button" class="active" data-map-tab="metropole" role="tab" aria-selected="true">FRANCE MÉTROPOLITAINE</button>
             <button type="button" data-map-tab="outremer" role="tab" aria-selected="false">OUTRE-MER</button>
+            <button type="button" data-map-tab="etranger" role="tab" aria-selected="false">ÉTRANGER</button>
         </div>
         <div class="directory-map-panel active" id="directoryMapMetropole">
             <div class="directory-map-hint">Cliquez sur une région pour l’ajouter ou la retirer de la sélection.</div>
@@ -177,6 +177,12 @@
             <div class="directory-map-hint">Cliquez sur un territoire pour l’ajouter ou le retirer de la sélection.</div>
             <div class="directory-map" id="directoryOutremerMap"><div class="directory-map-loading">Chargement de la carte…</div></div>
             <div class="directory-map-credit">Contours régionaux : IGN — ADMIN EXPRESS COG CARTO PE 2026 · Licence Ouverte 2.0</div>
+        </div>
+        <div class="directory-map-panel" id="directoryMapEtranger" hidden>
+            <div class="directory-map-hint">Cliquez sur un pays pour sélectionner sa zone géographique.</div>
+            <div class="directory-map" id="directoryWorldMap"><div class="directory-map-loading">Chargement de la carte…</div></div>
+            <div class="directory-map-note"><em>sélection hors France Métropolitaine et hors Outre Mer</em></div>
+            <div class="directory-map-credit">Carte : Natural Earth · VectorAtlas / Menelabs · CC BY 4.0</div>
         </div>
 
         <div class="directory-category-filter">
