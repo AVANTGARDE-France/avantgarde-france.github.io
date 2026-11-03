@@ -634,19 +634,20 @@ function mettreAJourNombrePointsVIP(audienceMax, nombreParrainages, donsCumules)
   };
 
   const audience = facteur(audienceMax);
+  const audiencePonderee = audience / 100;
   const parrainages = facteur(nombreParrainages);
 
   // PROVISOIRE : aucun montant de don n'est encore disponible.
   const dons = facteur(donsCumules);
 
   // Même calcul que le déclencheur Supabase ; la colonne point est un integer.
-  const points = Math.min(2147483647, Math.round(audience * parrainages * dons));
+  const points = Math.min(2147483647, Math.round(audiencePonderee * parrainages * dons));
   const element = document.getElementById("vipPoints");
 
   if(element){
     element.textContent = points.toLocaleString("fr-FR");
     element.title =
-      audience.toLocaleString("fr-FR") + " × " +
+      "(" + audience.toLocaleString("fr-FR") + " ÷ 100) × " +
       parrainages.toLocaleString("fr-FR") + " × " +
       dons.toLocaleString("fr-FR") + " (dons provisoires)";
   }
