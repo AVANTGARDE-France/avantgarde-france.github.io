@@ -370,8 +370,11 @@ function initialiserFiltreAnnuaire() {
     document.getElementById("directoryAll")?.addEventListener("click", () => {
         regionsSelectionnees = []; filtreEtranger = false; actualiserSelectionCarte();
     });
-    document.getElementById("directoryReset")?.addEventListener("click", () => {
-        regionsSelectionnees = []; filtreEtranger = false; actualiserSelectionCarte();
+    document.getElementById("directoryAttributesAll")?.addEventListener("click", () => {
+        document.querySelectorAll(
+            'input[name="directoryMedals"], input[name="directorySkills"], input[name="directoryRoles"]'
+        ).forEach(input => { input.checked = false; });
+        lireFiltresAttributsAnnuaire();
     });
     document.getElementById("directoryApply")?.addEventListener("click", appliquerFiltreAnnuaire);
     document.querySelectorAll("[data-world-zone]").forEach(button => {
