@@ -125,6 +125,7 @@ const REGIONS_ETRANGER = [
 let regionsSelectionnees = [];
 let filtreEtranger = false;
 let membresVisibles = [];
+let categoriesAnnuaire = { delegues: true, militants: true, inscrits: true };
 let identifiantsDirection = new Set();
 let cartesChargees = false;
 
@@ -215,12 +216,31 @@ function actualiserSelectionCarte() {
 function appliquerFiltreAnnuaire() {
     const regions = regionsSelectionnees.map(normaliserRegion);
     const etranger = new Set(REGIONS_ETRANGER.map(normaliserRegion));
-    let resultat = membresVisibles;
+    categoriesAnnuaire = {
+        delegues: document.getElementById("directoryDelegues")?.checked ?? true,
+        militants: document.getElementById("directoryMilitants")?.checked ?? true,
+        inscrits: document.getElementById("directoryInscrits")?.checked ?? true
+    };
+
+    let resultat = membresVisibles.filter(membre => {
+        const fonction = normaliserRegion(membre.grade2);
+        const estDelegue = fonction === normaliserRegion("Délégué Régional");
+        const estMilitant = fonction === normaliserRegion("Militant");
+        const estInscrit = !estDelegue && !estMilitant;
+
+        return (
+            (categoriesAnnuaire.delegues && estDelegue) ||
+            (categoriesAnnuaire.militants && estMilitant) ||
+            (categoriesAnnuaire.inscrits && estInscrit)
+        );
+    });
+
     if (filtreEtranger) {
         resultat = resultat.filter(m => etranger.has(normaliserRegion(m.region)));
     } else if (regions.length) {
         resultat = resultat.filter(m => regions.includes(normaliserRegion(m.region)));
     }
+
     afficherMembresFiltres(resultat);
     actualiserResumeFiltre(resultat.length);
     fermerFiltreAnnuaire();
@@ -242,9 +262,14 @@ function afficherMembresFiltres(liste) {
 function actualiserResumeFiltre(nombre) {
     const resume = document.getElementById("directoryFilterSummary");
     if (!resume) return;
-    if (filtreEtranger) resume.textContent = "Localisation : Étranger · " + nombre + " membre(s)";
-    else if (regionsSelectionnees.length) resume.textContent = "Régions : " + regionsSelectionnees.join(", ") + " · " + nombre + " membre(s)";
-    else resume.textContent = "Tous les membres publics · " + nombre + " membre(s)";
+    const categories = [];
+    if (categoriesAnnuaire.delegues) categories.push("Délégués Régionaux");
+    if (categoriesAnnuaire.militants) categories.push("Équipe Militante");
+    if (categoriesAnnuaire.inscrits) categories.push("Inscrits");
+    const localisation = filtreEtranger
+        ? "Étranger"
+        : (regionsSelectionnees.length ? regionsSelectionnees.join(", ") : "Toutes localisations");
+    resume.textContent = localisation + " · " + (categories.length ? categories.join(" + ") : "Aucune catégorie") + " · " + nombre + " membre(s)";
 }
 
 function initialiserFiltreAnnuaire() {
