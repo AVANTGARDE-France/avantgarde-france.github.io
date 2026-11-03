@@ -41,7 +41,7 @@ import "./admin-core.js";
    PROFIL
 ========================================================= */
 
-import "./admin-profile.js";
+import "./admin-profile.js?v=20261103-social-url-unique";
 
 
 /* =========================================================
