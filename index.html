@@ -110,14 +110,14 @@
     #home-experience .quiz-parties .quiz-option-copy strong{margin:2px 0 0}
     #home-experience .quiz-free{padding:55px 20px 64px;background:#050d19;border-top:1px solid #e2bd692e}
     #home-experience .quiz-stats-placeholder{min-height:76px;margin:0;padding:0;overflow:hidden;background:linear-gradient(90deg,rgba(13,35,68,.42),rgba(5,13,25,.78));border:1px solid #e2bd6959;border-left:3px solid #e2bd69}
-    #home-experience .stats-marquee{display:flex;width:max-content;align-items:center;animation:stats-marquee-scroll 34s linear infinite;will-change:transform}
-    #home-experience .stats-marquee:hover{animation-play-state:paused}
+    #home-experience .quiz-stats-placeholder{cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+    #home-experience .quiz-stats-placeholder.is-dragging{cursor:grabbing}
+    #home-experience .stats-marquee{display:flex;width:max-content;align-items:center;will-change:transform}
     #home-experience .stats-marquee-group{display:flex;flex:0 0 auto;align-items:center;gap:64px;padding:14px 32px}
     #home-experience .debt-counter{display:flex;flex:0 0 auto;align-items:center;gap:18px;min-height:48px;color:#f5f3ed;white-space:nowrap}
     #home-experience .debt-counter-label{flex:0 0 auto;color:#e2bd69;font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
     #home-experience .debt-counter-value{font-variant-numeric:tabular-nums;font-size:clamp(19px,2.5vw,29px);font-weight:600;letter-spacing:.015em;white-space:nowrap}
     #home-experience .debt-counter-note{flex:0 0 auto;color:#91a2b6;font-size:9px;line-height:1.4;text-align:left}
-    @keyframes stats-marquee-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
     @media(prefers-reduced-motion:reduce){#home-experience .stats-marquee{animation:none}}
     @media(max-width:620px){#home-experience .stats-marquee-group{gap:38px;padding:11px 20px}#home-experience .debt-counter{gap:10px}#home-experience .debt-counter-value{font-size:clamp(17px,4.5vw,23px)}#home-experience .debt-counter-label.stats-description{font-size:10px;max-width:240px;white-space:normal}#home-experience .debt-counter-note{font-size:8px;max-width:130px;white-space:normal}}
     #home-experience .quiz-free-inner{max-width:850px;margin:auto}
@@ -417,5 +417,66 @@
     render();
   })();
   </script>
+<script>
+(() => {
+  const viewport = document.querySelector('#home-experience .quiz-stats-placeholder');
+  const track = viewport && viewport.querySelector('.stats-marquee');
+  if (!viewport || !track) return;
+
+  let offset = 0, loopWidth = 0, dragging = false, startX = 0, startOffset = 0;
+  let lastTime = 0;
+  const speed = 34; // pixels per second
+
+  const measure = () => {
+    const group = track.querySelector('.stats-marquee-group');
+    if (group) loopWidth = group.getBoundingClientRect().width;
+    if (loopWidth) offset = ((offset % loopWidth) + loopWidth) % loopWidth * -1;
+    track.style.transform = 'translate3d(' + offset + 'px,0,0)';
+  };
+
+  viewport.addEventListener('pointerdown', (event) => {
+    if (event.button !== undefined && event.button !== 0) return;
+    dragging = true;
+    startX = event.clientX;
+    startOffset = offset;
+    lastTime = 0;
+    viewport.classList.add('is-dragging');
+    viewport.setPointerCapture(event.pointerId);
+  });
+
+  viewport.addEventListener('pointermove', (event) => {
+    if (!dragging) return;
+    offset = startOffset + event.clientX - startX;
+    if (loopWidth) offset = -(((-offset % loopWidth) + loopWidth) % loopWidth);
+    track.style.transform = 'translate3d(' + offset + 'px,0,0)';
+  });
+
+  const endDrag = () => {
+    if (!dragging) return;
+    dragging = false;
+    viewport.classList.remove('is-dragging');
+  };
+  viewport.addEventListener('pointerup', endDrag);
+  viewport.addEventListener('pointercancel', endDrag);
+  viewport.addEventListener('lostpointercapture', endDrag);
+
+  const animate = (time) => {
+    if (!lastTime) lastTime = time;
+    const delta = Math.min((time - lastTime) / 1000, 0.05);
+    lastTime = time;
+    if (!dragging && loopWidth) {
+      offset -= speed * delta;
+      if (offset <= -loopWidth) offset += loopWidth;
+      track.style.transform = 'translate3d(' + offset + 'px,0,0)';
+    }
+    requestAnimationFrame(animate);
+  };
+
+  measure();
+  if ('ResizeObserver' in window) new ResizeObserver(measure).observe(viewport);
+  window.addEventListener('resize', measure);
+  requestAnimationFrame(animate);
+})();
+</script>
 </body>
 </html>
