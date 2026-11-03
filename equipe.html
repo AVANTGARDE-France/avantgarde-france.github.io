@@ -141,6 +141,11 @@
                     <span id="directoryLocationName">CLASSEMENT GÉNÉRAL</span>
                     <button type="button" id="directoryLocationClear" class="directory-location-clear" aria-label="Revenir au classement général" title="Revenir au classement général" hidden>×</button>
                 </div>
+                <div class="directory-inline-categories" aria-label="Catégories de membres">
+                    <label class="directory-inline-category" for="directoryDelegues"><input type="checkbox" id="directoryDelegues" checked><span>Délégués Régionaux</span></label>
+                    <label class="directory-inline-category" for="directoryMilitants"><input type="checkbox" id="directoryMilitants" checked><span>L’équipe Militante</span></label>
+                    <label class="directory-inline-category" for="directoryInscrits"><input type="checkbox" id="directoryInscrits" checked><span>Inscrits</span></label>
+                </div>
                 <button type="button" id="openDirectoryFilter" class="directory-filter-icon-button" aria-label="Filtrer les membres" title="Filtrer les membres">
                     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 5h16l-6.2 7.1v5.2l-3.6 1.8v-7L4 5z"/></svg>
                     <span class="directory-filter-alert" id="directoryFilterAlert" hidden aria-label="Nombre de filtres actifs">0</span>
@@ -209,28 +214,6 @@
         <div class="section-kicker">ANNUAIRE DES MEMBRES</div>
         <h2 id="directoryFilterTitle">Affiner le classement</h2>
         <p class="directory-filter-intro">Filtrez les profils par statut, compétences et distinctions.</p>
-        <div class="directory-category-filter">
-            <h3>Afficher les profils</h3>
-            <p>Choisissez les catégories à inclure dans le trombinoscope.</p>
-            <div class="directory-category-options">
-                <label class="directory-category-option">
-                    <input type="checkbox" id="directoryDelegues" checked>
-                    <span class="directory-category-check"></span>
-                    <span><strong>Délégués Régionaux</strong><small>Les membres titulaires d’une délégation régionale</small></span>
-                </label>
-                <label class="directory-category-option">
-                    <input type="checkbox" id="directoryMilitants" checked>
-                    <span class="directory-category-check"></span>
-                    <span><strong>L’équipe Militante</strong><small>Les membres affectés à une équipe militante</small></span>
-                </label>
-                <label class="directory-category-option">
-                    <input type="checkbox" id="directoryInscrits" checked>
-                    <span class="directory-category-check"></span>
-                    <span><strong>Inscrits</strong><small>Les membres inscrits sans fonction régionale ou militante</small></span>
-                </label>
-            </div>
-        </div>
-
         <div class="directory-attributes-filter">
             <h3>Compétences et distinctions</h3>
             <p>Les critères choisis ici s’ajoutent au classement par localisation et au statut du membre.</p>
