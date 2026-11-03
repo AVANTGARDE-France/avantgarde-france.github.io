@@ -2086,3 +2086,180 @@ body.directory-filter-open{overflow:hidden}
         padding: 62px 17px 18px;
     }
 }
+
+
+/* =========================================================
+   FICHE PROFIL — DISPOSITION OPTIMISÉE
+   En-tête portrait/identité, puis contenu en deux colonnes.
+========================================================= */
+#memberModal .modal-box {
+    width: min(900px, 100%);
+    padding: 42px;
+}
+
+#memberModal .profile-points {
+    top: 20px;
+    right: 62px;
+}
+
+#memberModal .profile-modal-content {
+    text-align: left;
+}
+
+#memberModal .profile-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    min-height: 172px;
+    padding: 8px 0 28px;
+    border-bottom: 1px solid rgba(214, 173, 85, .2);
+}
+
+#memberModal .profile-modal-portrait {
+    flex: 0 0 150px;
+    width: 150px;
+    height: 150px;
+}
+
+#memberModal .profile-modal-image,
+#memberModal .profile-placeholder {
+    width: 150px;
+    height: 150px;
+    margin: 0;
+}
+
+#memberModal .profile-modal-identity {
+    min-width: 0;
+    flex: 1;
+    text-align: left;
+}
+
+#memberModal .profile-modal-content h2 {
+    margin: 0 0 10px;
+    font-size: clamp(25px, 4vw, 34px);
+    line-height: 1.08;
+}
+
+#memberModal .profile-grade {
+    margin-top: 8px;
+    line-height: 1.5;
+}
+
+#memberModal .profile-region {
+    margin: 9px 0 0;
+}
+
+#memberModal .profile-modal-details {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(220px, .85fr);
+    gap: 34px;
+    align-items: start;
+    padding-top: 26px;
+}
+
+#memberModal .profile-description {
+    margin: 0 0 24px;
+    text-align: left;
+}
+
+#memberModal .profile-competences {
+    padding-top: 20px;
+}
+
+#memberModal .profile-competences h3 {
+    margin-bottom: 13px;
+}
+
+#memberModal .competence-list {
+    justify-content: flex-start;
+}
+
+#memberModal .profile-social-section {
+    min-width: 0;
+    padding: 18px 20px 8px;
+    border: 1px solid rgba(214, 173, 85, .18);
+    background: rgba(0, 0, 0, .12);
+}
+
+#memberModal .profile-social-title {
+    margin-bottom: 16px;
+}
+
+#memberModal .profile-socials {
+    justify-content: flex-start;
+    margin-bottom: 18px;
+}
+
+@media (max-width: 650px) {
+    #memberModal .modal-box {
+        padding: 46px 22px 26px;
+    }
+
+    #memberModal .profile-modal-header {
+        gap: 18px;
+        min-height: 0;
+        padding-bottom: 22px;
+    }
+
+    #memberModal .profile-modal-portrait,
+    #memberModal .profile-modal-image,
+    #memberModal .profile-placeholder {
+        width: 112px;
+        height: 112px;
+    }
+
+    #memberModal .profile-modal-portrait {
+        flex-basis: 112px;
+    }
+
+    #memberModal .profile-modal-details {
+        grid-template-columns: 1fr;
+        gap: 22px;
+        padding-top: 20px;
+    }
+
+    #memberModal .profile-social-section {
+        padding: 16px;
+    }
+
+    #memberModal .profile-points {
+        top: 15px;
+        right: 54px;
+        font-size: 10px;
+    }
+}
+
+@media (max-width: 420px) {
+    #memberModal .modal-box {
+        padding: 48px 16px 22px;
+    }
+
+    #memberModal .profile-modal-header {
+        align-items: flex-start;
+        gap: 13px;
+    }
+
+    #memberModal .profile-modal-portrait,
+    #memberModal .profile-modal-image,
+    #memberModal .profile-placeholder {
+        width: 88px;
+        height: 88px;
+    }
+
+    #memberModal .profile-modal-portrait {
+        flex-basis: 88px;
+    }
+
+    #memberModal .profile-modal-content h2 {
+        font-size: 22px;
+    }
+
+    #memberModal .profile-grade {
+        font-size: 9px;
+        letter-spacing: 1px;
+    }
+
+    #memberModal .profile-region {
+        font-size: 11px;
+    }
+}
