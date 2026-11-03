@@ -1717,3 +1717,27 @@ body.directory-filter-open{overflow:hidden}
     .member-card-compact .member-rank { flex-basis: 19px; min-width: 19px; height: 19px; font-size: 9px; }
     .member-card-compact .member-name { font-size: 9px; }
 }
+
+/* Description réservée aux cartes de la direction */
+.leadership-member-description {
+    max-width: 310px;
+    margin: 12px auto 0;
+    color: #c8ced8;
+    font: 13px/1.55 Arial, sans-serif;
+}
+
+/* Points du profil dans la fenêtre modale */
+.profile-points {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px auto 0;
+    padding: 7px 13px;
+    border: 1px solid rgba(214, 173, 85, .55);
+    border-radius: 3px;
+    background: rgba(214, 173, 85, .09);
+    color: #f0d58a;
+    font: 800 12px/1 Arial, sans-serif;
+    letter-spacing: 1px;
+    font-variant-numeric: tabular-nums;
+}
