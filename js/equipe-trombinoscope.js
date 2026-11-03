@@ -137,6 +137,80 @@ const REGIONS_METROPOLE = [
     "Pays de la Loire", "Provence-Alpes-Côte d’Azur"
 ];
 const REGIONS_OUTREMER = ["Guadeloupe", "Martinique", "Guyane", "La Réunion", "Mayotte"];
+const REGIONS_CLASSEMENT = [
+    { nom: "Auvergne-Rhône-Alpes", sigle: "ARA", population: 8205557 },
+    { nom: "Bourgogne-Franche-Comté", sigle: "BFC", population: 2802670 },
+    { nom: "Bretagne", sigle: "BRE", population: 3449370 },
+    { nom: "Centre-Val de Loire", sigle: "CVL", population: 2587031 },
+    { nom: "Corse", sigle: "COR", population: 355486 },
+    { nom: "Grand Est", sigle: "GES", population: 5563378 },
+    { nom: "Hauts-de-France", sigle: "HDF", population: 5992194 },
+    { nom: "Île-de-France", sigle: "IDF", population: 12463067 },
+    { nom: "Normandie", sigle: "NOR", population: 3345842 },
+    { nom: "Nouvelle-Aquitaine", sigle: "NAQ", population: 6150451 },
+    { nom: "Occitanie", sigle: "OCC", population: 6124653 },
+    { nom: "Pays de la Loire", sigle: "PDL", population: 3907156 },
+    { nom: "Provence-Alpes-Côte d’Azur", sigle: "PACA", population: 5218960 },
+    { nom: "Guadeloupe", sigle: "GUA", population: 384160 },
+    { nom: "Martinique", sigle: "MAR", population: 360630 },
+    { nom: "Guyane", sigle: "GUY", population: 293996 },
+    { nom: "La Réunion", sigle: "REU", population: 889679 },
+    { nom: "Mayotte", sigle: "MAY", population: 310563 }
+];
+
+function afficherClassementRegions(listeMembres) {
+    const liste = document.getElementById("regionsRankingList");
+    if (!liste) return;
+
+    const classement = REGIONS_CLASSEMENT.map(region => {
+        const membresRegion = (Array.isArray(listeMembres) ? listeMembres : [])
+            .filter(membre => normaliserRegion(membre.region) === normaliserRegion(region.nom));
+        const totalPoints = membresRegion.reduce((total, membre) => {
+            const points = Number(membre.point);
+            return total + (Number.isFinite(points) ? points : 0);
+        }, 0);
+        return {
+            ...region,
+            totalPoints,
+            score: totalPoints / region.population
+        };
+    }).sort((a, b) => b.score - a.score);
+
+    const formatScore = new Intl.NumberFormat("fr-FR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+    liste.replaceChildren();
+    classement.forEach((region, index) => {
+        const item = document.createElement("li");
+        item.className = "regions-ranking-item";
+        item.title = "Total des points : " + region.totalPoints.toLocaleString("fr-FR")
+            + " · Population : " + region.population.toLocaleString("fr-FR") + " habitants";
+
+        const rang = document.createElement("span");
+        rang.className = "regions-ranking-rank";
+        rang.textContent = String(index + 1).padStart(2, "0");
+
+        const logo = document.createElement("span");
+        logo.className = "regions-ranking-logo";
+        logo.setAttribute("aria-hidden", "true");
+        logo.textContent = region.sigle;
+
+        const nom = document.createElement("span");
+        nom.className = "regions-ranking-name";
+        nom.textContent = region.nom;
+
+        const score = document.createElement("strong");
+        score.className = "regions-ranking-score";
+        score.textContent = formatScore.format(region.score);
+        score.setAttribute("aria-label", "Score " + formatScore.format(region.score));
+
+        item.append(rang, logo, nom, score);
+        liste.appendChild(item);
+    });
+}
+
 const REGIONS_ETRANGER = [
     "Europe", "Amérique du Nord", "Amérique centrale et Caraïbes",
     "Amérique du Sud", "Afrique", "Asie", "Océanie", "Autre"
@@ -535,6 +609,7 @@ async function chargerTrombinoscope() {
 
         const tousLesMembres = Array.isArray(data) ? data : [];
         membres = tousLesMembres;
+        afficherClassementRegions(tousLesMembres);
         membresVisibles = tousLesMembres.filter(membre => !identifiantsDirection.has(membre.id));
         afficherMembresFiltres(membresVisibles);
         actualiserAlerteFiltres();
