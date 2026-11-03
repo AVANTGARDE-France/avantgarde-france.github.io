@@ -615,6 +615,41 @@ function mettreAJourMedailleVIP(audience){
 
 }
 
+/*
+ * MÉDAILLE DONS — EN ATTENTE DE CONNEXION.
+ * Ne pas lire ni écrire de montant dans profiles.
+ * À terme, relier cette médaille à une table Supabase dédiée
+ * aux dons (montants cumulés par membre). Aucun lien Supabase
+ * n'existe actuellement : le total reste volontairement inconnu.
+ */
+function mettreAJourMedailleDons(total){
+
+  const medal = document.getElementById("donationMedal");
+  const totalElement = document.getElementById("donationTotal");
+
+  // Sans source de données, ne jamais activer la médaille par défaut.
+  if(medal){
+    medal.classList.remove("active");
+  }
+
+  if(totalElement){
+    const montant = Number(total);
+    totalElement.textContent =
+      Number.isFinite(montant)
+        ? "Dons cumulés : " + montant.toLocaleString("fr-FR", {
+            style:"currency",
+            currency:"EUR",
+            maximumFractionDigits:2
+          }) + " / 100 €"
+        : "Dons cumulés : — / 100 €";
+  }
+
+  if(medal && Number.isFinite(Number(total))){
+    medal.classList.toggle("active", Number(total) >= 100);
+  }
+
+}
+
 function mettreAJourMedailleParrainage(nombre){
 
   const medal = document.getElementById("referralMedal");
