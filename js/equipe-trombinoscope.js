@@ -388,7 +388,23 @@ function afficherMembresFiltres(liste) {
         return pointsB - pointsA;
     });
 
-    listeTriee.forEach(membre => grid.appendChild(creerCarteMembre(membre)));
+    listeTriee.forEach((membre, index) => {
+        const rang = index + 1;
+        const carte = creerCarteMembre(membre);
+        carte.classList.add(
+            rang <= 10 ? "member-card-top10" :
+            rang <= 100 ? "member-card-compact" : "member-card-standard"
+        );
+        carte.dataset.rank = String(rang);
+
+        const numero = document.createElement("span");
+        numero.className = "member-rank";
+        numero.textContent = String(rang);
+        numero.setAttribute("aria-label", "Classement : " + rang);
+        carte.prepend(numero);
+
+        grid.appendChild(carte);
+    });
 }
 
 
