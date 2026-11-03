@@ -255,16 +255,11 @@ function reinitialiserLocalisationAnnuaire() {
 }
 
 function nombreFiltresAnnuaireActifs() {
-    const statuts = ["directoryDelegues", "directoryMilitants", "directoryInscrits"];
-    const statutsTousActifs = statuts.every(id => document.getElementById(id)?.checked ?? true);
-    const attributsActifs = document.querySelectorAll(
+    // Les trois catégories affichées dans la barre de classement ne comptent pas
+    // dans l’alerte du bouton : celle-ci concerne uniquement les filtres avancés.
+    return document.querySelectorAll(
         'input[name="directoryMedals"]:checked, input[name="directorySkills"]:checked, input[name="directoryRoles"]:checked'
     ).length;
-
-    // La localisation ne compte pas dans le compteur des filtres de la modale.
-    // Les statuts constituent un seul groupe de filtrage.
-    return (statutsTousActifs ? 0 : 1) +
-        attributsActifs;
 }
 
 function filtresAnnuaireActifs() {
@@ -458,8 +453,12 @@ function initialiserFiltreAnnuaire() {
         lireFiltresAttributsAnnuaire();
     });
     document.getElementById("directoryApply")?.addEventListener("click", appliquerFiltreAnnuaire);
-    document.getElementById("directoryClearAll")?.addEventListener("click", reinitialiserTousFiltresAnnuaire);
-    document.querySelectorAll("#directoryDelegues, #directoryMilitants, #directoryInscrits, input[name='directoryMedals'], input[name='directorySkills'], input[name='directoryRoles']").forEach(input => {
+    // Les trois catégories visibles dans la barre appliquent le filtre immédiatement.
+    document.querySelectorAll("#directoryDelegues, #directoryMilitants, #directoryInscrits").forEach(input => {
+        input.addEventListener("change", () => appliquerFiltreAnnuaire(false));
+    });
+    // Les filtres avancés conservent leur validation dans la fenêtre dédiée.
+    document.querySelectorAll("input[name='directoryMedals'], input[name='directorySkills'], input[name='directoryRoles']").forEach(input => {
         input.addEventListener("change", actualiserAlerteFiltres);
     });
     document.querySelectorAll("[data-world-zone]").forEach(button => {
