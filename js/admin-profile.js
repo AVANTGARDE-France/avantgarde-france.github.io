@@ -616,6 +616,42 @@ function mettreAJourMedailleVIP(audience){
 }
 
 /*
+ * SCORE VIP — FORMULE PROVISOIRE.
+ * Points = audience maximale × parrainages × dons cumulés depuis l'origine.
+ * Chaque facteur nul ou absent vaut 1.
+ *
+ * NOTE DE FINALISATION :
+ * Les dons ne sont pas encore connectés. Le facteur dons vaut donc 1.
+ * Lors de la future connexion, utiliser le montant TOTAL historique des dons
+ * (sans limite de période), depuis une table Supabase dédiée aux dons.
+ * Ne pas ajouter ce montant à profiles.
+ */
+function mettreAJourNombrePointsVIP(audienceMax, nombreParrainages, donsCumules){
+
+  const facteur = valeur => {
+    const nombre = Number(valeur);
+    return Number.isFinite(nombre) && nombre > 0 ? nombre : 1;
+  };
+
+  const audience = facteur(audienceMax);
+  const parrainages = facteur(nombreParrainages);
+
+  // PROVISOIRE : aucun montant de don n'est encore disponible.
+  const dons = facteur(donsCumules);
+
+  const points = audience * parrainages * dons;
+  const element = document.getElementById("vipPoints");
+
+  if(element){
+    element.textContent = Math.round(points).toLocaleString("fr-FR");
+    element.title =
+      audience.toLocaleString("fr-FR") + " × " +
+      parrainages.toLocaleString("fr-FR") + " × " +
+      dons.toLocaleString("fr-FR") + " (dons provisoires)";
+  }
+}
+
+/*
  * MÉDAILLE MÉCÈNE — EN ATTENTE DE CONNEXION.
  * Ne pas lire ni écrire de montant dans profiles.
  * À terme, relier cette médaille à une table Supabase dédiée
@@ -809,6 +845,13 @@ function remplirProfil(profile){
 
   afficherIdentifiantMembre(profile);
   initialiserPopupParrainages();
+
+  // Le facteur dons reste à 1 tant que la table dédiée n'est pas connectée.
+  mettreAJourNombrePointsVIP(
+    profile.audience_max,
+    profile.parrainage,
+    1
+  );
 
   document
     .getElementById("profileNom")
