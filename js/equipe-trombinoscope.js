@@ -261,10 +261,9 @@ function nombreFiltresAnnuaireActifs() {
         'input[name="directoryMedals"]:checked, input[name="directorySkills"]:checked, input[name="directoryRoles"]:checked'
     ).length;
 
-    // Chaque localisation sélectionnée compte séparément.
+    // La localisation ne compte pas dans le compteur des filtres de la modale.
     // Les statuts constituent un seul groupe de filtrage.
-    return regionsSelectionnees.length +
-        (statutsTousActifs ? 0 : 1) +
+    return (statutsTousActifs ? 0 : 1) +
         attributsActifs;
 }
 
