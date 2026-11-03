@@ -865,141 +865,48 @@ function creerCarteMembre(
 
 
     /* =====================================================
-       PHOTO
+       VISUEL — PHOTO PLEINE CARTE + INFORMATIONS SUPERPOSÉES
     ====================================================== */
 
-    if (
-        imageValide(
-            membre.image_url
-        )
-    ) {
+    const visual = document.createElement("div");
+    visual.className = "member-visual";
 
-        const image =
-            document.createElement("img");
-
-
-        image.className =
-            "member-photo";
-
-
-        image.src =
-            membre.image_url;
-
-
-        image.alt =
-            membre.nom ||
-            "Membre";
-
-
-        image.loading =
-            "lazy";
-
-
-        image.onerror =
-            function () {
-
-                this.replaceWith(
-                    creerPlaceholder(
-                        membre
-                    )
-                );
-
-            };
-
-
-        card.appendChild(
-            image
-        );
-
+    if (imageValide(membre.image_url)) {
+        const image = document.createElement("img");
+        image.className = "member-photo";
+        image.src = membre.image_url;
+        image.alt = membre.nom || "Membre";
+        image.loading = "lazy";
+        image.onerror = function () {
+            this.replaceWith(creerPlaceholder(membre));
+        };
+        visual.appendChild(image);
     } else {
-
-        card.appendChild(
-            creerPlaceholder(
-                membre
-            )
-        );
-
+        visual.appendChild(creerPlaceholder(membre));
     }
 
+    const info = document.createElement("div");
+    info.className = "member-info";
 
-    /* =====================================================
-       INFORMATIONS
-    ====================================================== */
+    const name = document.createElement("h3");
+    name.className = "member-name";
+    name.textContent = membre.nom || "Membre";
+    info.appendChild(name);
 
-    const info =
-        document.createElement("div");
-
-
-    info.className =
-        "member-info";
-
-
-    /* NOM */
-
-    const name =
-        document.createElement("h3");
-
-
-    name.className =
-        "member-name";
-
-
-    name.textContent =
-        membre.nom ||
-        "Membre";
-
-
-    info.appendChild(
-        name
-    );
-
-
-    /* GRADE */
-
-    const grade =
-        document.createElement("div");
-
-
-    grade.className =
-        "member-grade";
-
-
-    grade.textContent =
-        membre.grade ||
-        "user";
-
-
-    info.appendChild(
-        grade
-    );
-
-
-    /* REGION */
+    const grade = document.createElement("div");
+    grade.className = "member-grade";
+    grade.textContent = membre.grade || "user";
+    info.appendChild(grade);
 
     if (membre.region) {
-
-        const region =
-            document.createElement("div");
-
-
-        region.className =
-            "member-region";
-
-
-        region.textContent =
-            membre.region;
-
-
-        info.appendChild(
-            region
-        );
-
+        const region = document.createElement("div");
+        region.className = "member-region";
+        region.textContent = membre.region;
+        info.appendChild(region);
     }
 
-
-    card.appendChild(
-        info
-    );
+    visual.appendChild(info);
+    card.appendChild(visual);
 
 
     /* =====================================================
