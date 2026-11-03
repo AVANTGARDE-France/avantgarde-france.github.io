@@ -241,6 +241,13 @@ function actualiserSelectionCarte() {
         zone.classList.toggle("selected", selected);
         zone.setAttribute("aria-pressed", selected ? "true" : "false");
     });
+    document.querySelectorAll("[data-world-zone]").forEach(button => {
+        const selected = regionsSelectionnees.some(region =>
+            normaliserRegion(region) === normaliserRegion(button.dataset.worldZone)
+        );
+        button.classList.toggle("selected", selected);
+        button.setAttribute("aria-pressed", selected ? "true" : "false");
+    });
     const selection = document.getElementById("directorySelection");
     if (selection) {
         const valeurs = [...regionsSelectionnees];
@@ -367,6 +374,9 @@ function initialiserFiltreAnnuaire() {
         regionsSelectionnees = []; filtreEtranger = false; actualiserSelectionCarte();
     });
     document.getElementById("directoryApply")?.addEventListener("click", appliquerFiltreAnnuaire);
+    document.querySelectorAll("[data-world-zone]").forEach(button => {
+        button.addEventListener("click", () => basculerRegion(button.dataset.worldZone));
+    });
     document.querySelectorAll("[data-map-tab]").forEach(tab => {
         tab.addEventListener("click", () => {
             const cible = tab.dataset.mapTab;
