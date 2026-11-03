@@ -857,7 +857,8 @@ async function verifierUtilisateur() {
                     instagram_url,
                     youtube_url,
                     tiktok_url,
-                    audience_max
+                    audience_max,
+                    parrainage
                 `)
                 .eq(
                     "id",
