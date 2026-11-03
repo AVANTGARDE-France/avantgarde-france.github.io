@@ -2484,10 +2484,10 @@ body.directory-filter-open{overflow:hidden}
     letter-spacing:.2px;
 }
 .regions-ranking-source{
-    margin:16px auto 0;
+    margin:12px auto 0;
     color:rgba(174,184,199,.68);
     text-align:center;
-    font:10px/1.4 Arial,sans-serif;
+    font:italic 10px/1.4 Arial,sans-serif;
 }
 .regions-ranking-loading{
     grid-column:1/-1;
