@@ -405,7 +405,7 @@ function afficherMembresFiltres(liste) {
     grid.innerHTML = "";
     if (compteur) compteur.textContent = liste.length + (liste.length > 1 ? " MEMBRES" : " MEMBRE");
     if (!liste.length) {
-        grid.innerHTML = '<div class="no-members">Aucun membre public ne correspond à cette localisation.</div>';
+        grid.innerHTML = '<div class="no-members">Aucun membre public ne correspond à votre filtre.</div>';
         return;
     }
 
