@@ -804,6 +804,82 @@ function afficherReseauxSociaux(membre) {
    CARTES MEMBRES
 ========================================================= */
 
+const ICONES_MEDAILLES = {
+    "radio-tower": '<path d="M12 13v8M8 21h8M12 13 8 4m4 9 4-9M5 8a10 10 0 0 0 0 8M19 8a10 10 0 0 1 0 8M9 11a4 4 0 0 0 0 4M15 11a4 4 0 0 1 0 4"/>',
+    "handshake": '<path d="m8 12 2.2-2.2a2 2 0 0 1 2.8 0l1 1a2 2 0 0 0 2.8 0L19 10M5 9l3-3 3 1 2-1 6 3 2 3-5 6a2 2 0 0 1-2.8 0L12 17l-1 1a2 2 0 0 1-2.8 0L4 14a2 2 0 0 1 0-2.8zM8 6l-2 2m10-1 2-1"/>',
+    "hand-coins": '<path d="M12 12V4m0 8 4-3m-4 3-4-3M4 14h8a3 3 0 0 1 3 3v1H7a3 3 0 0 1-3-3v-1zM15 14h3a2 2 0 1 1 0 4h-3M7 18v2m11-2v2M17 5c1.7.4 2.5 1.2 2.5 2.3S18.7 9.2 17 9.5"/>',
+    "landmark": '<path d="M3 21h18M5 18V9m4 9V9m6 9V9m4 9V9M2 9l10-6 10 6M4 21v-3h16v3"/>',
+    "swords": '<path d="m14.5 17.5 3 3 3-3-3-3M17.5 14.5l-11-11M9.5 17.5l-3 3-3-3 3-3M6.5 14.5l11-11M4 4l3-1 1 3M20 4l-3-1-1 3"/>'
+};
+
+function creerIconeMedaille(type) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    svg.setAttribute("focusable", "false");
+    svg.classList.add("medal-symbol");
+    svg.innerHTML = ICONES_MEDAILLES[type] || "";
+    return svg;
+}
+
+function obtenirMedailleFonction(membre) {
+    const fonction = String(membre?.grade2 || "").trim()
+        .normalize("NFD").replace(/[\\u0300-\\u036f]/g, "").toLowerCase();
+
+    if (fonction === "architecte du projet" || fonction === "delegue national") {
+        return { key: "fonction-direction", icon: "landmark", label: membre.grade2 };
+    }
+    if (fonction === "delegue regional" || fonction === "militant") {
+        return {
+            key: "fonction-terrain",
+            icon: "swords",
+            label: fonction === "militant" ? "Équipe Militante" : membre.grade2
+        };
+    }
+    return null;
+}
+
+function obtenirMedailleDistinctions(membre) {
+    const medailles = [];
+    const fonction = obtenirMedailleFonction(membre);
+    if (fonction) medailles.push(fonction);
+
+    if (Number(membre?.audience_max || 0) >= 3000) {
+        medailles.push({ key: "vip", icon: "radio-tower", label: "Influenceur VIP" });
+    }
+    if (Number(membre?.parrainage || 0) >= 50) {
+        medailles.push({ key: "parrainage", icon: "handshake", label: "Parrain / Marraine" });
+    }
+
+    const competences = normaliserCompetences(membre?.competences)
+        .map(valeur => String(valeur).trim().normalize("NFD")
+            .replace(/[\\u0300-\\u036f]/g, "").toLowerCase());
+    if (competences.includes("mecene")) {
+        medailles.push({ key: "mecene", icon: "hand-coins", label: "Mécène" });
+    }
+
+    return medailles.slice(0, 4);
+}
+
+function ajouterMedailleCarte(visual, medailles) {
+    if (!medailles.length) return;
+
+    const rail = document.createElement("div");
+    rail.className = "member-medals";
+    rail.setAttribute("aria-label", "Distinctions du membre");
+
+    medailles.forEach(medaille => {
+        const item = document.createElement("span");
+        item.className = "member-medal member-medal-" + medaille.key;
+        item.title = medaille.label;
+        item.setAttribute("aria-label", medaille.label);
+        item.appendChild(creerIconeMedaille(medaille.icon));
+        rail.appendChild(item);
+    });
+
+    visual.appendChild(rail);
+}
+
 function creerPlaceholder(
     membre
 ) {
@@ -884,6 +960,8 @@ function creerCarteMembre(
     } else {
         visual.appendChild(creerPlaceholder(membre));
     }
+
+    ajouterMedailleCarte(visual, obtenirMedailleDistinctions(membre));
 
     const info = document.createElement("div");
     info.className = "member-info";
@@ -1178,99 +1256,17 @@ function ouvrirProfil(
             "";
 
 
-        const competencesBrutes =
-            normaliserCompetences(
-                membre.competences
-            );
-
-
-        /*
-         * VIP et Mécène sont des médailles informatives.
-         * Ils ne sont jamais traités comme des compétences
-         * sélectionnables.
-         */
-
-        const liste =
-            competencesBrutes.filter(
-                competence => {
-
-                    const valeur =
-                        String(
-                            competence
-                        )
-                            .trim()
-                            .toUpperCase();
-
-                    return (
-                        valeur !== "VIP" &&
-                        valeur !== "MÉCÈNE" &&
-                        valeur !== "MECENE"
-                    );
-
-                }
-            );
-
-
-        /* =================================================
-           VIP
-
-           Le statut VIP est déterminé automatiquement
-           par l'audience maximale.
-        ================================================= */
-
-        const audienceMax =
-            Number(
-                membre.audience_max
-            ) || 0;
-
-
-        if (
-            audienceMax >= 3000
-        ) {
-
-            liste.unshift(
-                "VIP"
-            );
-
-        }
-
-
-        /* =================================================
-           MECENE
-
-           Les anciennes données peuvent contenir Mécène
-           dans la colonne competences. On le conserve alors
-           comme médaille informative.
-        ================================================= */
-
-        const estMecene =
-            competencesBrutes.some(
-                competence => {
-
-                    const valeur =
-                        String(
-                            competence
-                        )
-                            .trim()
-                            .toUpperCase();
-
-                    return (
-                        valeur === "MÉCÈNE" ||
-                        valeur === "MECENE"
-                    );
-
-                }
-            );
-
-
-        if (estMecene) {
-
-            liste.push(
-                "Mécène"
-            );
-
-        }
-
+        const competencesBrutes = normaliserCompetences(membre.competences);
+        const competencesNormales = competencesBrutes.filter(competence => {
+            const valeur = String(competence).trim().normalize("NFD")
+                .replace(/[\\u0300-\\u036f]/g, "").toLowerCase();
+            return valeur !== "vip" && valeur !== "mecene";
+        });
+        const medaillesProfil = obtenirMedailleDistinctions(membre);
+        const liste = [
+            ...medaillesProfil.map(medaille => medaille.label),
+            ...competencesNormales
+        ];
 
         if (!liste.length) {
 
@@ -1331,119 +1327,16 @@ function ouvrirProfil(
                         "competence-tag";
 
 
-                    /* =================================================
-                       MEDAILLE VIP
-                    ================================================= */
-
-                    if (
-                        competence ===
-                        "VIP"
-                    ) {
-
-                        const medal =
-                            document.createElement(
-                                "span"
-                            );
-
-
-                        medal.className =
-                            "vip-medal";
-
-
-                        medal.textContent =
-                            "★";
-
-
-                        medal.setAttribute(
-                            "aria-hidden",
-                            "true"
-                        );
-
-
-                        tag.appendChild(
-                            medal
-                        );
-
-
-                        const vipText =
-                            document.createElement(
-                                "span"
-                            );
-
-
-                        vipText.textContent =
-                            "VIP";
-
-
-                        tag.appendChild(
-                            vipText
-                        );
-
+                    const medaille = medaillesProfil.find(item => item.label === competence);
+                    if (medaille) {
+                        tag.classList.add("competence-medal-tag");
+                        const icon = document.createElement("span");
+                        icon.className = "competence-medal-icon";
+                        icon.appendChild(creerIconeMedaille(medaille.icon));
+                        tag.append(icon, document.createTextNode(competence));
+                    } else {
+                        tag.textContent = competence;
                     }
-
-
-                    /* =================================================
-                       MEDAILLE MECENE
-                    ================================================= */
-
-                    else if (
-                        competence ===
-                        "Mécène"
-                    ) {
-
-                        const medal =
-                            document.createElement(
-                                "span"
-                            );
-
-
-                        medal.className =
-                            "vip-medal";
-
-
-                        medal.textContent =
-                            "◆";
-
-
-                        medal.setAttribute(
-                            "aria-hidden",
-                            "true"
-                        );
-
-
-                        tag.appendChild(
-                            medal
-                        );
-
-
-                        const meceneText =
-                            document.createElement(
-                                "span"
-                            );
-
-
-                        meceneText.textContent =
-                            "Mécène";
-
-
-                        tag.appendChild(
-                            meceneText
-                        );
-
-                    }
-
-
-                    /* =================================================
-                       COMPETENCE NORMALE
-                    ================================================= */
-
-                    else {
-
-                        tag.textContent =
-                            competence;
-
-                    }
-
 
                     competencesContainer.appendChild(
                         tag
