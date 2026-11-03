@@ -539,6 +539,17 @@ textarea{
   padding:10px 12px;
 }
 
+.vip-medal-icon svg{
+  width:19px;
+  height:19px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.65;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  display:block;
+}
+
 .vip-medal-icon{
   flex-shrink:0;
   width:34px;
