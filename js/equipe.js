@@ -1068,8 +1068,8 @@ function ouvrirProfil(
     if (points) {
         const totalPoints = Number(membre.point);
         points.textContent =
-            (Number.isFinite(totalPoints) ? totalPoints : 0).toLocaleString("fr-FR") +
-            " points";
+            "Score : " +
+            (Number.isFinite(totalPoints) ? totalPoints : 0).toLocaleString("fr-FR");
     }
 
 
