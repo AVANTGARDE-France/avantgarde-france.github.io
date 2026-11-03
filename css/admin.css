@@ -1849,6 +1849,7 @@ textarea{
 ========================================================= */
 
 .referral-medal {
+  margin-top:10px;
   cursor:pointer;
   width:100%;
   text-align:left;
