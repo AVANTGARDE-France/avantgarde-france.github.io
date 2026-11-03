@@ -158,25 +158,6 @@ const REGIONS_CLASSEMENT = [
     { nom: "Mayotte", sigle: "MAY", population: 310563 }
 ];
 
-function creerEmblemeRegion(sigle) {
-    const [haut, milieu, bas, symbole] = REGION_FLAGS[sigle] || ["#ffffff", "#2455a4", "#d51f2a", "star"];
-    const formes = {
-        cross: '<path d="M20 0h8v40h-8zM4 16h40v8H4z" fill="#fff"/>',
-        quarters: '<path d="M0 0h24v20H0zM24 20h24v20H24z" fill="#2455a4"/>',
-        stripes: '<path d="M0 0h48v5H0zm0 10h48v5H0zm0 10h48v5H0zm0 10h48v5H0z" fill="#111"/>',
-        fleur: '<path d="M24 9c-7-7-12 1-5 7-8-2-11 7-2 9-4 7 4 11 8 4 4 7 12 3 8-4 9-2 6-11-2-9 7-6 2-14-5-7z" fill="#f0d58a" stroke="#7c1f2a" stroke-width="1"/>',
-        moor: '<circle cx="24" cy="19" r="8" fill="#111"/><path d="M15 29h18l-3 5H18z" fill="#111"/><path d="M20 18h2m4 0h2" stroke="#fff" stroke-width="2"/>',
-        lion: '<path d="M16 8l5 3 5-3 6 5-2 7 4 5-5 10-5-3-5 3-5-10 4-5-2-7z" fill="#d5ad45" stroke="#7b2020" stroke-width="1.5"/>',
-        leopards: '<g fill="#d5ad45"><path d="M9 8l5 2 3-2 3 3-2 4-4 1-4-3zM28 8l5 2 3-2 3 3-2 4-4 1-4-3zM18 24l5 2 3-2 3 3-2 4-4 1-4-3z"/></g>',
-        ship: '<path d="M10 24h28l-6 10H17z" fill="#d5ad45"/><path d="M23 7v17h13z" fill="#fff" stroke="#2455a4"/>',
-        sun: '<circle cx="24" cy="20" r="8" fill="#f0c52e"/><g stroke="#f0c52e" stroke-width="2"><path d="M24 5v6m0 18v6M9 20h6m18 0h6M13 9l4 4m14 14 4 4m0-22-4 4M17 27l-4 4"/></g>',
-        snake: '<path d="M14 10c14-8 24 7 10 10s-5 14 9 9" fill="none" stroke="#f0d58a" stroke-width="4" stroke-linecap="round"/><circle cx="14" cy="10" r="3" fill="#f0d58a"/>',
-        star: '<path d="m24 5 4.5 10 11 1.5-8 7.5 2 11-9.5-5.5-9.5 5.5 2-11-8-7.5 11-1.5z" fill="#f0d58a"/>'
-    };
-    return '<svg class="regions-ranking-flag" viewBox="0 0 48 40" role="img" aria-label="Emblème régional ' + sigle + '"><rect width="48" height="40" rx="2" fill="' + haut + '"/><path d="M0 13.33h48v13.34H0z" fill="' + milieu + '"/><path d="M0 26.67h48v13.33H0z" fill="' + bas + '"/>' + (formes[symbole] || formes.star) + '<rect x=".5" y=".5" width="47" height="39" rx="2" fill="none" stroke="rgba(0,0,0,.22)"/></svg>';
-}
-
-const REGION_FLAGS = {"ARA":["#d52b1e","#ffffff","#d52b1e","cross"],"BFC":["#e6c35c","#ffffff","#c51f32","quarters"],"BRE":["#ffffff","#111111","#ffffff","stripes"],"CVL":["#f5d547","#ffffff","#b51f2e","fleur"],"COR":["#ffffff","#111111","#ffffff","moor"],"GES":["#ffffff","#d21f35","#ffffff","cross"],"HDF":["#ffffff","#d3262e","#ffffff","lion"],"IDF":["#ffffff","#2455a4","#ffffff","fleur"],"NOR":["#d51f2a","#f5f5f5","#d51f2a","leopards"],"NAQ":["#ffffff","#d51f2a","#ffffff","lion"],"OCC":["#d51f2a","#f4d04f","#d51f2a","cross"],"PDL":["#ffffff","#2455a4","#d51f2a","ship"],"PACA":["#ffffff","#2455a4","#d51f2a","sun"],"GUA":["#ffffff","#f0c52e","#16834a","sun"],"MAR":["#2455a4","#ffffff","#2455a4","snake"],"GUY":["#16834a","#f0c52e","#16834a","star"],"REU":["#2455a4","#ffffff","#d51f2a","sun"],"MAY":["#ffffff","#d51f2a","#16834a","star"]};
 
 function afficherClassementRegions(listeMembres) {
     const liste = document.getElementById("regionsRankingList");
@@ -212,10 +193,6 @@ function afficherClassementRegions(listeMembres) {
         rang.className = "regions-ranking-rank";
         rang.textContent = String(index + 1).padStart(2, "0");
 
-        const logo = document.createElement("span");
-        logo.className = "regions-ranking-logo";
-        logo.innerHTML = creerEmblemeRegion(region.sigle);
-
         const nom = document.createElement("span");
         nom.className = "regions-ranking-name";
         nom.textContent = region.nom;
@@ -225,7 +202,7 @@ function afficherClassementRegions(listeMembres) {
         score.textContent = formatScore.format(region.score);
         score.setAttribute("aria-label", "Score " + formatScore.format(region.score));
 
-        item.append(rang, logo, nom, score);
+        item.append(rang, nom, score);
         liste.appendChild(item);
     });
 }
