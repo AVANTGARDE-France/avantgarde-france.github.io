@@ -100,43 +100,41 @@
 
 
 
-    <!-- =====================================================
-         MEMBRES
-    ===================================================== -->
+    <!-- DIRECTION DU MOUVEMENT -->
+    <section class="leadership-section">
+        <div class="section-title leadership-heading">
+            <div class="section-kicker">LA DIRECTION</div>
+            <h2>Les profils dirigeants</h2>
+        </div>
 
+        <div class="leadership-grid">
+            <article class="leadership-card leadership-card-founder">
+                <div class="leadership-monogram" aria-hidden="true">A</div>
+                <div class="leadership-role">ARCHITECTE DU PROJET</div>
+                <h3>Architecte du Projet</h3>
+                <p class="leadership-placeholder">Présentation du profil à venir</p>
+            </article>
+
+            <article class="leadership-card leadership-card-national">
+                <div class="leadership-monogram" aria-hidden="true">D</div>
+                <div class="leadership-role">DIRECTION NATIONALE</div>
+                <h3>Délégué National</h3>
+                <p class="leadership-placeholder">Présentation du profil à venir</p>
+            </article>
+        </div>
+    </section>
+
+    <!-- TROMBINOSCOPE -->
     <section class="team-section">
-
         <div class="section-title">
-
-            <div class="section-kicker">
-                NOS MEMBRES
-            </div>
-
-            <h2>
-                Les membres
-            </h2>
-
-            <p>
-                Découvrez celles et ceux qui ont choisi de rendre leur engagement public.
-            </p>
-
+            <div class="section-kicker">LES FORCES VIVES</div>
+            <h2>Le trombinoscope</h2>
+            <p>Découvrez les membres qui ont choisi de rendre leur engagement public.</p>
         </div>
 
-
-        <div
-            class="team-grid"
-            id="teamGrid"
-        >
-
-            <div
-                class="loading"
-                id="loadingMembers"
-            >
-                Chargement des membres…
-            </div>
-
+        <div class="team-grid" id="teamGrid" aria-live="polite">
+            <div class="loading" id="loadingMembers">Chargement des membres…</div>
         </div>
-
     </section>
 
 
@@ -1175,6 +1173,10 @@
 
 <script
     src="js/equipe.js"
+></script>
+
+<script
+    src="js/equipe-trombinoscope.js"
 ></script>
 
 
