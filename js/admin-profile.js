@@ -592,10 +592,175 @@ function afficherIdentifiantMembre(profile){
 
 
 /* =========================================================
+   MÉDAILLES — INFLUENCE ET PARRAINAGE
+========================================================= */
+
+function mettreAJourMedailleVIP(audience){
+
+  const medal = document.getElementById("vipMedal");
+  const audienceElement = document.getElementById("vipAudience");
+  const valeur = Number(audience || 0);
+
+  if(medal){
+    medal.classList.toggle("active", valeur >= 3000);
+  }
+
+  if(audienceElement){
+    audienceElement.textContent =
+      "Audience actuelle : " +
+      (audience === null || audience === undefined
+        ? "—"
+        : valeur.toLocaleString("fr-FR") + " followers");
+  }
+
+}
+
+function mettreAJourMedailleParrainage(nombre){
+
+  const medal = document.getElementById("referralMedal");
+  const countElement = document.getElementById("referralCount");
+  const valeur = Math.max(0, Number(nombre || 0));
+
+  if(medal){
+    medal.classList.toggle("active", valeur >= 50);
+  }
+
+  if(countElement){
+    countElement.textContent =
+      "Parrainages actifs : " +
+      valeur.toLocaleString("fr-FR") +
+      " / 50";
+  }
+
+}
+
+function echapperHtmlParrainage(value){
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+async function ouvrirPopupParrainages(){
+
+  const modal = document.getElementById("referralModal");
+  const list = document.getElementById("referralList");
+
+  if(!modal || !list || !currentUser?.id) return;
+
+  modal.classList.add("active");
+  modal.setAttribute("aria-hidden", "false");
+  list.innerHTML = '<div class="referral-list-empty">Chargement de vos filleuls…</div>';
+
+  const { data, error } = await supabaseClient
+    .from("profiles")
+    .select("id, nom, anonyme, created_at")
+    .eq("parrain_id", currentUser.id)
+    .order("created_at", { ascending:false });
+
+  if(error){
+    console.error("PARRAINAGE — CHARGEMENT DES FILLEULS :", error);
+    list.innerHTML = '<div class="referral-list-error">Impossible de charger la liste pour le moment.</div>';
+    return;
+  }
+
+  const filleuls = data || [];
+  mettreAJourMedailleParrainage(filleuls.length);
+
+  if(!filleuls.length){
+    list.innerHTML = '<div class="referral-list-empty">Aucun profil n’a encore utilisé votre identifiant de parrainage.</div>';
+    return;
+  }
+
+  list.innerHTML = filleuls.map(membre => {
+    const nom = membre.anonyme
+      ? "Membre anonyme"
+      : (membre.nom || "Membre");
+    const date = membre.created_at
+      ? new Date(membre.created_at).toLocaleDateString("fr-FR")
+      : "";
+    return `
+      <div class="referral-list-item">
+        <span class="referral-list-name">${echapperHtmlParrainage(nom)}</span>
+        <span class="referral-list-date">${echapperHtmlParrainage(date)}</span>
+      </div>
+    `;
+  }).join("");
+
+}
+
+function initialiserPopupParrainages(){
+
+  const medal = document.getElementById("referralMedal");
+  if(!medal || medal.dataset.initialized === "true") return;
+
+  const ouvrir = () => ouvrirPopupParrainages();
+
+  medal.addEventListener("click", ouvrir);
+  medal.addEventListener("keydown", event => {
+    if(event.key === "Enter" || event.key === " "){
+      event.preventDefault();
+      ouvrir();
+    }
+  });
+
+  medal.dataset.initialized = "true";
+
+  let modal = document.getElementById("referralModal");
+  if(!modal){
+    modal = document.createElement("div");
+    modal.id = "referralModal";
+    modal.className = "modal";
+    modal.setAttribute("aria-hidden", "true");
+    modal.innerHTML = `
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="referralModalTitle">
+        <button type="button" class="modal-close" id="referralModalClose" aria-label="Fermer">×</button>
+        <div class="page-kicker">PARRAINAGE</div>
+        <h2 id="referralModalTitle">Vos filleuls</h2>
+        <p>Liste des membres ayant utilisé votre identifiant de parrainage et dont le profil est toujours actif.</p>
+        <div id="referralList" class="referral-list"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+  }
+
+  document.getElementById("referralModalClose")?.addEventListener("click", () => {
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+  });
+
+  modal.addEventListener("click", event => {
+    if(event.target === modal){
+      modal.classList.remove("active");
+      modal.setAttribute("aria-hidden", "true");
+    }
+  });
+
+  document.addEventListener("keydown", event => {
+    if(event.key === "Escape" && modal.classList.contains("active")){
+      modal.classList.remove("active");
+      modal.setAttribute("aria-hidden", "true");
+    }
+  });
+
+}
+
+window.mettreAJourMedailleVIP = mettreAJourMedailleVIP;
+window.mettreAJourMedailleParrainage = mettreAJourMedailleParrainage;
+
+
+/* =========================================================
    REMPLIR PROFIL
 ========================================================= */
 
 function remplirProfil(profile){
+
+  afficherIdentifiantMembre(profile);
+  initialiserPopupParrainages();
 
   afficherIdentifiantMembre(profile);
 
@@ -698,6 +863,10 @@ function remplirProfil(profile){
 
   mettreAJourMedailleVIP(
     profile.audience_max
+  );
+
+  mettreAJourMedailleParrainage(
+    profile.parrainage
   );
 
 
@@ -1305,6 +1474,10 @@ profileForm.addEventListener(
 
     mettreAJourMedailleVIP(
       data.audience_max
+    );
+
+    mettreAJourMedailleParrainage(
+      data.parrainage
     );
 
 
