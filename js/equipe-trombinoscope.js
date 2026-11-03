@@ -195,7 +195,8 @@ async function chargerCartesRegions() {
     if (cartesChargees) return;
     const cartes = [
         ["directoryMetropoleMap", "assets/carte-regions-metropole.svg"],
-        ["directoryOutremerMap", "assets/carte-regions-outremer.svg"]
+        ["directoryOutremerMap", "assets/carte-regions-outremer.svg"],
+        ["directoryWorldMap", "assets/carte-monde.svg"]
     ];
     try {
         for (const [id, url] of cartes) {
@@ -230,7 +231,7 @@ function basculerRegion(region) {
     const index = regionsSelectionnees.findIndex(item => normaliserRegion(item) === normaliserRegion(region));
     if (index >= 0) regionsSelectionnees.splice(index, 1);
     else regionsSelectionnees.push(region);
-    filtreEtranger = false;
+    filtreEtranger = REGIONS_ETRANGER.some(item => normaliserRegion(item) === normaliserRegion(region));
     actualiserSelectionCarte();
 }
 
@@ -310,7 +311,9 @@ function appliquerFiltreAnnuaire() {
     });
 
     if (filtreEtranger) {
-        resultat = resultat.filter(m => etranger.has(normaliserRegion(m.region)));
+        resultat = resultat.filter(m => regions.length
+            ? regions.includes(normaliserRegion(m.region)) && etranger.has(normaliserRegion(m.region))
+            : etranger.has(normaliserRegion(m.region)));
     } else if (regions.length) {
         resultat = resultat.filter(m => regions.includes(normaliserRegion(m.region)));
     }
@@ -361,23 +364,31 @@ function initialiserFiltreAnnuaire() {
     document.getElementById("directoryAll")?.addEventListener("click", () => {
         regionsSelectionnees = []; filtreEtranger = false; actualiserSelectionCarte();
     });
-    document.getElementById("directoryForeign")?.addEventListener("click", () => {
-        regionsSelectionnees = []; filtreEtranger = true; actualiserSelectionCarte();
-    });
     document.getElementById("directoryReset")?.addEventListener("click", () => {
         regionsSelectionnees = []; filtreEtranger = false; actualiserSelectionCarte();
     });
     document.getElementById("directoryApply")?.addEventListener("click", appliquerFiltreAnnuaire);
     document.querySelectorAll("[data-map-tab]").forEach(tab => {
         tab.addEventListener("click", () => {
+            const cible = tab.dataset.mapTab;
             document.querySelectorAll("[data-map-tab]").forEach(item => {
                 const active = item === tab;
                 item.classList.toggle("active", active);
                 item.setAttribute("aria-selected", active ? "true" : "false");
             });
-            const metro = tab.dataset.mapTab === "metropole";
-            document.getElementById("directoryMapMetropole").hidden = !metro;
-            document.getElementById("directoryMapOutremer").hidden = metro;
+            document.querySelectorAll(".directory-map-panel").forEach(panel => {
+                const idCible = "directoryMap" + cible.charAt(0).toUpperCase() + cible.slice(1);
+                panel.hidden = panel.id !== idCible;
+                panel.classList.toggle("active", !panel.hidden);
+            });
+            if (cible === "etranger") {
+                filtreEtranger = true;
+                if (regionsSelectionnees.some(region => !REGIONS_ETRANGER.some(item => normaliserRegion(item) === normaliserRegion(region)))) regionsSelectionnees = [];
+            } else {
+                filtreEtranger = false;
+                if (regionsSelectionnees.some(region => REGIONS_ETRANGER.some(item => normaliserRegion(item) === normaliserRegion(region)))) regionsSelectionnees = [];
+            }
+            actualiserSelectionCarte();
         });
     });
     document.addEventListener("keydown", event => {
