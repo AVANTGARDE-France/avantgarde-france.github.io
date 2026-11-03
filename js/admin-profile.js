@@ -616,38 +616,49 @@ function mettreAJourMedailleVIP(audience){
 }
 
 /*
- * MÉDAILLE DONS — EN ATTENTE DE CONNEXION.
+ * MÉDAILLE MÉCÈNE — EN ATTENTE DE CONNEXION.
  * Ne pas lire ni écrire de montant dans profiles.
  * À terme, relier cette médaille à une table Supabase dédiée
- * aux dons (montants cumulés par membre). Aucun lien Supabase
- * n'existe actuellement : le total reste volontairement inconnu.
+ * aux dons, avec leurs dates, afin de calculer le total glissant
+ * des 6 derniers mois. Aucun lien Supabase n'existe actuellement.
+ * La médaille devra perdre son éclairage dès que le total glissant
+ * repasse sous 60 € : elle n'est pas acquise à vie.
  */
-function mettreAJourMedailleDons(total){
+function mettreAJourMedailleDons(totalSixDerniersMois){
 
   const medal = document.getElementById("donationMedal");
   const totalElement = document.getElementById("donationTotal");
 
-  // Sans source de données, ne jamais activer la médaille par défaut.
-  if(medal){
-    medal.classList.remove("active");
+  const montant =
+    totalSixDerniersMois === null ||
+    totalSixDerniersMois === undefined ||
+    totalSixDerniersMois === ""
+      ? NaN
+      : Number(totalSixDerniersMois);
+
+  // Sans source de données, le montant reste inconnu et la médaille éteinte.
+  if(!Number.isFinite(montant)){
+    if(medal) medal.classList.remove("active");
+    if(totalElement){
+      totalElement.textContent =
+        "Dons sur les 6 derniers mois : — / 60 €";
+    }
+    return;
   }
 
   if(totalElement){
-    const montant = total === null || total === undefined || total === ""
-    ? NaN
-    : Number(total);
     totalElement.textContent =
-      Number.isFinite(montant)
-        ? "Dons cumulés : " + montant.toLocaleString("fr-FR", {
-            style:"currency",
-            currency:"EUR",
-            maximumFractionDigits:2
-          }) + " / 100 €"
-        : "Dons cumulés : — / 100 €";
+      "Dons sur les 6 derniers mois : " +
+      montant.toLocaleString("fr-FR", {
+        style:"currency",
+        currency:"EUR",
+        maximumFractionDigits:2
+      }) +
+      " / 60 €";
   }
 
-  if(medal && Number.isFinite(montant)){
-    medal.classList.toggle("active", montant >= 100);
+  if(medal){
+    medal.classList.toggle("active", montant >= 60);
   }
 
 }
