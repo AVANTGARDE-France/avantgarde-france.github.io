@@ -161,7 +161,7 @@
         <h2 id="directoryFilterTitle">Filtrer par localisation</h2>
         <p class="directory-filter-intro">Sélectionnez une ou plusieurs régions sur la carte. Les profils étrangers peuvent être affichés séparément.</p>
         <div class="directory-filter-actions">
-            <button type="button" class="directory-quick-option" id="directoryAll">TOUT AFFICHER</button>
+            <button type="button" class="directory-quick-option" id="directoryAll">TOUT AFFICHER / EFFACER LA SÉLECTION (LOCALISATION)</button>
         </div>
         <div class="directory-map-tabs" role="tablist" aria-label="Choisir une carte">
             <button type="button" class="active" data-map-tab="metropole" role="tab" aria-selected="true">FRANCE MÉTROPOLITAINE</button>
@@ -220,6 +220,9 @@
         <div class="directory-attributes-filter">
             <h3>Compétences et distinctions</h3>
             <p>Les critères choisis ici s’ajoutent à la localisation et au statut du membre.</p>
+            <div class="directory-filter-actions directory-attribute-actions">
+                <button type="button" class="directory-quick-option" id="directoryAttributesAll">TOUT AFFICHER / EFFACER LA SÉLECTION</button>
+            </div>
 
             <div class="directory-attribute-group">
                 <h4>MÉDAILLES</h4>
@@ -256,7 +259,6 @@
 
         <div class="directory-selection" id="directorySelection">Aucune région sélectionnée</div>
         <div class="directory-filter-footer">
-            <button type="button" class="directory-reset" id="directoryReset">EFFACER LA SÉLECTION</button>
             <button type="button" class="directory-apply" id="directoryApply">AFFICHER LES MEMBRES</button>
         </div>
     </section>
