@@ -633,7 +633,9 @@ function mettreAJourMedailleDons(total){
   }
 
   if(totalElement){
-    const montant = Number(total);
+    const montant = total === null || total === undefined || total === ""
+    ? NaN
+    : Number(total);
     totalElement.textContent =
       Number.isFinite(montant)
         ? "Dons cumulés : " + montant.toLocaleString("fr-FR", {
@@ -644,8 +646,8 @@ function mettreAJourMedailleDons(total){
         : "Dons cumulés : — / 100 €";
   }
 
-  if(medal && Number.isFinite(Number(total))){
-    medal.classList.toggle("active", Number(total) >= 100);
+  if(medal && Number.isFinite(montant)){
+    medal.classList.toggle("active", montant >= 100);
   }
 
 }
