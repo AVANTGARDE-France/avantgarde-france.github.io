@@ -364,7 +364,7 @@
       let html = '<h2 class="quiz-question">'+q.title+'</h2>'+(q.hint?'<p class="quiz-hint">'+q.hint+'</p>':'');
       if(q.slider){
         const val = answers.liberte;
-        html += '<input class="quiz-range" id="liberte-range" type="range" min="0" max="4" step="1" value="'+val+'" aria-label="Votre rapport à l’État, à l’économie, à la fiscalité et au social"><div class="quiz-range-labels"><span><b>+</b> d’État</span><span><b>+</b> de Liberté</span></div><div class="quiz-range-current"><strong>'+liberty[val][0]+'</strong><p>'+liberty[val][1]+'</p></div>';
+        html += '<input class="quiz-range" id="liberte-range" type="range" min="0" max="4" step="1" value="'+val+'" aria-label="Votre rapport à l’État, à l’économie, à la fiscalité et au social"><div class="quiz-range-labels"><span><b>+</b> d’État · <b>+</b> d’aides · <b>+</b> de taxes</span><span><b>+</b> de liberté · <b>+</b> de responsabilité · <b>−</b> de taxes</span></div><div class="quiz-range-current"><strong>'+liberty[val][0]+'</strong><p>'+liberty[val][1]+'</p></div>';
       } else {
         html += '<div class="'+(q.parties?'quiz-parties':'quiz-options')+'">';
         q.options.forEach((option,i)=>{
