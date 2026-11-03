@@ -242,11 +242,10 @@ async function chargerCartesRegions() {
 }
 
 function basculerRegion(region) {
-    const index = regionsSelectionnees.findIndex(item => normaliserRegion(item) === normaliserRegion(region));
-    if (index >= 0) regionsSelectionnees.splice(index, 1);
-    else regionsSelectionnees.push(region);
+    const dejaSelectionnee = regionsSelectionnees.some(item => normaliserRegion(item) === normaliserRegion(region));
+    regionsSelectionnees = dejaSelectionnee ? [] : [region];
     actualiserSelectionCarte();
-    actualiserAlerteFiltres();
+    appliquerFiltreAnnuaire(false);
 }
 
 function nombreFiltresAnnuaireActifs() {
@@ -304,6 +303,8 @@ function reinitialiserTousFiltresAnnuaire() {
 
     actualiserSelectionCarte();
     afficherMembresFiltres(membresVisibles);
+    const libelle = document.getElementById("directoryLocationCurrent");
+    if (libelle) libelle.textContent = "CLASSEMENT GÉNÉRAL";
     actualiserAlerteFiltres();
 }
 
@@ -320,11 +321,10 @@ function actualiserSelectionCarte() {
         button.classList.toggle("selected", selected);
         button.setAttribute("aria-pressed", selected ? "true" : "false");
     });
-    document.getElementById("directoryAll")?.classList.toggle("active", !regionsSelectionnees.length);
     actualiserAlerteFiltres();
 }
 
-function appliquerFiltreAnnuaire() {
+function appliquerFiltreAnnuaire(fermer = true) {
     const regions = regionsSelectionnees.map(normaliserRegion);
     categoriesAnnuaire = {
         delegues: document.getElementById("directoryDelegues")?.checked ?? true,
@@ -382,15 +382,16 @@ function appliquerFiltreAnnuaire() {
         return medailleValide && competenceValide && roleValide;
     });
 
-    // Toutes les zones sélectionnées, qu'elles soient en métropole,
-    // en outre-mer ou à l'étranger, sont combinées en OU.
+    // Une seule zone peut être active à la fois : le classement est régional ou général.
     if (regions.length) {
         resultat = resultat.filter(m => regions.includes(normaliserRegion(m.region)));
     }
 
     afficherMembresFiltres(resultat);
     actualiserAlerteFiltres();
-    fermerFiltreAnnuaire();
+    const libelle = document.getElementById("directoryLocationCurrent");
+    if (libelle) libelle.textContent = regionsSelectionnees[0] || "CLASSEMENT GÉNÉRAL";
+    if (fermer) fermerFiltreAnnuaire();
 }
 
 function afficherMembresFiltres(liste) {
@@ -440,9 +441,6 @@ function initialiserFiltreAnnuaire() {
     document.getElementById("openDirectoryFilter")?.addEventListener("click", ouvrirFiltreAnnuaire);
     document.getElementById("closeDirectoryFilter")?.addEventListener("click", fermerFiltreAnnuaire);
     document.querySelector("[data-close-directory-filter]")?.addEventListener("click", fermerFiltreAnnuaire);
-    document.getElementById("directoryAll")?.addEventListener("click", () => {
-        regionsSelectionnees = []; actualiserSelectionCarte();
-    });
     document.getElementById("directoryAttributesAll")?.addEventListener("click", () => {
         document.querySelectorAll(
             'input[name="directoryMedals"], input[name="directorySkills"], input[name="directoryRoles"]'
