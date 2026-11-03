@@ -909,7 +909,7 @@ async function verifierIdentifiantParrain(){
 
   const { data, error } = await supabaseClient
     .from("profiles")
-    .select("id")
+    .select("id, nom, anonyme")
     .eq("id", identifiant)
     .maybeSingle();
 
@@ -932,9 +932,14 @@ async function verifierIdentifiantParrain(){
     return false;
   }
 
+  const nomParrain =
+    data.anonyme
+      ? "Membre anonyme"
+      : (data.nom || "").trim() || "Nom non renseigné";
+
   afficherEtatValidationParrain(
     "valid",
-    "Identifiant valide : membre trouvé."
+    "Identifiant valide : " + nomParrain + "."
   );
 
   return true;
