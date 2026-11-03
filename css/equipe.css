@@ -2292,3 +2292,14 @@ body.directory-filter-open{overflow:hidden}
  .directory-location-section .directory-map{min-height:150px}
  .directory-location-section .directory-map svg{max-height:290px}
 }
+
+
+/* Désignation de la localisation active, accolée au titre */
+.directory-location-heading{display:block;margin-bottom:14px}
+.directory-location-titleline{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:12px}
+.directory-location-titleline>.section-kicker{margin:0}
+.directory-location-current{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid rgba(214,173,85,.65);border-radius:4px;background:rgba(214,173,85,.09);color:#f0d58a;font:800 14px/1.2 Arial,sans-serif;letter-spacing:.65px;text-align:left}
+.directory-location-clear{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;padding:0;border:1px solid rgba(239,65,53,.75);border-radius:3px;background:rgba(239,65,53,.12);color:#ff6257;font:700 18px/1 Arial,sans-serif;cursor:pointer;transition:background .18s,border-color .18s,color .18s}
+.directory-location-clear:hover{border-color:#ef4135;background:#ef4135;color:#fff}
+.directory-location-clear[hidden]{display:none}
+@media(max-width:650px){.directory-location-titleline{gap:9px}.directory-location-current{font-size:12px;padding:6px 9px}.directory-location-clear{width:19px;height:19px}}
