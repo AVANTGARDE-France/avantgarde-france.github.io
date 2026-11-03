@@ -106,24 +106,190 @@ function afficherDirection(membres) {
     });
 }
 
+
+/* =========================================================
+   FILTRE DU TROMBINOSCOPE — LOCALISATION
+========================================================= */
+
+const REGIONS_METROPOLE = [
+    "Auvergne-Rhône-Alpes", "Bourgogne-Franche-Comté", "Bretagne",
+    "Centre-Val de Loire", "Corse", "Grand Est", "Hauts-de-France",
+    "Île-de-France", "Normandie", "Nouvelle-Aquitaine", "Occitanie",
+    "Pays de la Loire", "Provence-Alpes-Côte d’Azur"
+];
+const REGIONS_OUTREMER = ["Guadeloupe", "Martinique", "Guyane", "La Réunion", "Mayotte"];
+const REGIONS_ETRANGER = [
+    "Europe", "Amérique du Nord", "Amérique centrale et Caraïbes",
+    "Amérique du Sud", "Afrique", "Asie", "Océanie", "Autre"
+];
+let regionsSelectionnees = [];
+let filtreEtranger = false;
+let membresVisibles = [];
+let identifiantsDirection = new Set();
+let cartesChargees = false;
+
+function normaliserRegion(valeur) {
+    return String(valeur || "").trim()
+        .replace(/[’']/g, "'")
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+}
+
+function ouvrirFiltreAnnuaire() {
+    const modal = document.getElementById("directoryFilterModal");
+    if (!modal) return;
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("directory-filter-open");
+    chargerCartesRegions();
+    actualiserSelectionCarte();
+}
+
+function fermerFiltreAnnuaire() {
+    const modal = document.getElementById("directoryFilterModal");
+    if (!modal) return;
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("directory-filter-open");
+}
+
+async function chargerCartesRegions() {
+    if (cartesChargees) return;
+    const cartes = [
+        ["directoryMetropoleMap", "assets/carte-regions-metropole.svg"],
+        ["directoryOutremerMap", "assets/carte-regions-outremer.svg"]
+    ];
+    try {
+        for (const [id, url] of cartes) {
+            const cible = document.getElementById(id);
+            const reponse = await fetch(url);
+            if (!reponse.ok) throw new Error("Carte indisponible : " + url);
+            cible.innerHTML = await reponse.text();
+            cible.querySelectorAll(".region-shape").forEach(zone => {
+                zone.setAttribute("tabindex", "0");
+                zone.setAttribute("role", "button");
+                zone.setAttribute("aria-label", "Sélectionner " + zone.dataset.region);
+                zone.addEventListener("click", () => basculerRegion(zone.dataset.region));
+                zone.addEventListener("keydown", event => {
+                    if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        basculerRegion(zone.dataset.region);
+                    }
+                });
+            });
+        }
+        cartesChargees = true;
+        actualiserSelectionCarte();
+    } catch (error) {
+        console.error("Erreur chargement des cartes régionales :", error);
+        document.querySelectorAll(".directory-map-loading").forEach(el => {
+            el.textContent = "La carte n’a pas pu être chargée. Vous pouvez réessayer en rechargeant la page.";
+        });
+    }
+}
+
+function basculerRegion(region) {
+    const index = regionsSelectionnees.findIndex(item => normaliserRegion(item) === normaliserRegion(region));
+    if (index >= 0) regionsSelectionnees.splice(index, 1);
+    else regionsSelectionnees.push(region);
+    filtreEtranger = false;
+    actualiserSelectionCarte();
+}
+
+function actualiserSelectionCarte() {
+    document.querySelectorAll(".region-shape").forEach(zone => {
+        const selected = regionsSelectionnees.some(region => normaliserRegion(region) === normaliserRegion(zone.dataset.region));
+        zone.classList.toggle("selected", selected);
+        zone.setAttribute("aria-pressed", selected ? "true" : "false");
+    });
+    const selection = document.getElementById("directorySelection");
+    if (selection) {
+        const valeurs = [...regionsSelectionnees];
+        if (filtreEtranger) valeurs.push("Étranger");
+        selection.textContent = valeurs.length ? "Sélection : " + valeurs.join(" · ") : "Aucune région sélectionnée — tout afficher";
+    }
+    document.getElementById("directoryForeign")?.classList.toggle("active", filtreEtranger);
+    document.getElementById("directoryAll")?.classList.toggle("active", !regionsSelectionnees.length && !filtreEtranger);
+}
+
+function appliquerFiltreAnnuaire() {
+    const regions = regionsSelectionnees.map(normaliserRegion);
+    const etranger = new Set(REGIONS_ETRANGER.map(normaliserRegion));
+    let resultat = membresVisibles;
+    if (filtreEtranger) {
+        resultat = resultat.filter(m => etranger.has(normaliserRegion(m.region)));
+    } else if (regions.length) {
+        resultat = resultat.filter(m => regions.includes(normaliserRegion(m.region)));
+    }
+    afficherMembresFiltres(resultat);
+    actualiserResumeFiltre(resultat.length);
+    fermerFiltreAnnuaire();
+}
+
+function afficherMembresFiltres(liste) {
+    const grid = document.getElementById("teamGrid");
+    const compteur = document.getElementById("directoryResultCount");
+    if (!grid) return;
+    grid.innerHTML = "";
+    if (compteur) compteur.textContent = liste.length + (liste.length > 1 ? " MEMBRES" : " MEMBRE");
+    if (!liste.length) {
+        grid.innerHTML = '<div class="no-members">Aucun membre public ne correspond à cette localisation.</div>';
+        return;
+    }
+    liste.forEach(membre => grid.appendChild(creerCarteMembre(membre)));
+}
+
+function actualiserResumeFiltre(nombre) {
+    const resume = document.getElementById("directoryFilterSummary");
+    if (!resume) return;
+    if (filtreEtranger) resume.textContent = "Localisation : Étranger · " + nombre + " membre(s)";
+    else if (regionsSelectionnees.length) resume.textContent = "Régions : " + regionsSelectionnees.join(", ") + " · " + nombre + " membre(s)";
+    else resume.textContent = "Tous les membres publics · " + nombre + " membre(s)";
+}
+
+function initialiserFiltreAnnuaire() {
+    document.getElementById("openDirectoryFilter")?.addEventListener("click", ouvrirFiltreAnnuaire);
+    document.getElementById("closeDirectoryFilter")?.addEventListener("click", fermerFiltreAnnuaire);
+    document.querySelector("[data-close-directory-filter]")?.addEventListener("click", fermerFiltreAnnuaire);
+    document.getElementById("directoryAll")?.addEventListener("click", () => {
+        regionsSelectionnees = []; filtreEtranger = false; actualiserSelectionCarte();
+    });
+    document.getElementById("directoryForeign")?.addEventListener("click", () => {
+        regionsSelectionnees = []; filtreEtranger = true; actualiserSelectionCarte();
+    });
+    document.getElementById("directoryReset")?.addEventListener("click", () => {
+        regionsSelectionnees = []; filtreEtranger = false; actualiserSelectionCarte();
+    });
+    document.getElementById("directoryApply")?.addEventListener("click", appliquerFiltreAnnuaire);
+    document.querySelectorAll("[data-map-tab]").forEach(tab => {
+        tab.addEventListener("click", () => {
+            document.querySelectorAll("[data-map-tab]").forEach(item => {
+                const active = item === tab;
+                item.classList.toggle("active", active);
+                item.setAttribute("aria-selected", active ? "true" : "false");
+            });
+            const metro = tab.dataset.mapTab === "metropole";
+            document.getElementById("directoryMapMetropole").hidden = !metro;
+            document.getElementById("directoryMapOutremer").hidden = metro;
+        });
+    });
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") fermerFiltreAnnuaire();
+    });
+}
+
+initialiserFiltreAnnuaire();
+
 async function chargerTrombinoscope() {
     const grid = document.getElementById("teamGrid");
     if (!grid) return;
-
     grid.innerHTML = '<div class="loading">Chargement des membres…</div>';
-
     if (typeof supabaseClient === "undefined" || !supabaseClient) {
         grid.innerHTML = '<div class="no-members">Impossible de contacter la base de données.</div>';
         console.error("supabaseClient est introuvable.");
         return;
     }
-
     try {
-        /*
-         * Lecture dédiée des fonctions dirigeantes.
-         * Cette requête ciblée évite qu'un tri ou un filtrage du
-         * trombinoscope empêche l'affichage d'un profil dirigeant.
-         */
         const { data: directionData, error: directionError } = await supabaseClient
             .from("profiles")
             .select(`
@@ -135,15 +301,11 @@ async function chargerTrombinoscope() {
             `)
             .eq("anonyme", false)
             .in("grade2", FONCTIONS_DIRECTION);
-
         if (directionError) throw directionError;
-
         const dirigeants = Array.isArray(directionData) ? directionData : [];
         afficherDirection(dirigeants);
+        identifiantsDirection = new Set(dirigeants.map(membre => membre.id));
 
-        /*
-         * Chargement séparé des autres membres publics.
-         */
         const { data, error } = await supabaseClient
             .from("profiles")
             .select(`
@@ -155,27 +317,15 @@ async function chargerTrombinoscope() {
             `)
             .eq("anonyme", false)
             .order("created_at", { ascending: true });
-
         if (error) throw error;
 
         const tousLesMembres = Array.isArray(data) ? data : [];
         membres = tousLesMembres;
-
-        const idsDirigeants = new Set(dirigeants.map(membre => membre.id));
-        const membresTrombinoscope = tousLesMembres.filter(membre =>
-            !idsDirigeants.has(membre.id)
-        );
-
-        if (!membresTrombinoscope.length) {
-            grid.innerHTML = '<div class="no-members">Aucun autre membre public pour le moment.</div>';
-            return;
-        }
-
-        grid.innerHTML = "";
-        membresTrombinoscope.forEach(membre => {
-            grid.appendChild(creerCarteMembre(membre));
-        });
-
+        membresVisibles = tousLesMembres.filter(membre => !identifiantsDirection.has(membre.id));
+        regionsSelectionnees = [];
+        filtreEtranger = false;
+        afficherMembresFiltres(membresVisibles);
+        actualiserResumeFiltre(membresVisibles.length);
     } catch (error) {
         console.error("Erreur chargement trombinoscope ou direction :", error);
         grid.innerHTML = '<div class="no-members">Impossible de charger le trombinoscope.</div>';
