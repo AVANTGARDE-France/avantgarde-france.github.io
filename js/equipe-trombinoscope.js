@@ -125,8 +125,6 @@ const REGIONS_ETRANGER = [
 const ROLES_ANNUAIRE = [
     "Organisateurs de terrain",
     "Conférenciers",
-    "Influenceurs Réseaux Sociaux",
-    "Parrains/marraines",
     "Militants"
 ];
 let filtresAttributsAnnuaire = { medailles: [], competences: [], roles: [] };
