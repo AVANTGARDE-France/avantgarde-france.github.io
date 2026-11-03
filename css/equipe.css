@@ -1462,3 +1462,19 @@ body.directory-filter-open{overflow:hidden}
 .directory-category-option strong{display:block;color:#f5f3ed;font:700 11px/1.4 Arial,sans-serif}
 .directory-category-option small{display:block;margin-top:4px;color:#9eacbf;font:10px/1.4 Arial,sans-serif}
 @media(max-width:650px){.directory-category-options{grid-template-columns:1fr}.directory-category-option{padding:11px}}
+
+
+/* =========================================================
+   TROISIÈME FILTRE — MÉDAILLES, COMPÉTENCES ET RÔLES
+========================================================= */
+.directory-attributes-filter{margin:22px 0 18px;padding:19px 0 20px;border-top:1px solid rgba(214,173,85,.24);border-bottom:1px solid rgba(214,173,85,.24)}
+.directory-attributes-filter>h3{margin:0 0 5px;color:#f5f3ed;font:700 16px Arial,sans-serif}
+.directory-attributes-filter>p{margin:0 0 16px;color:#aeb8c7;font:11px/1.5 Arial,sans-serif}
+.directory-attribute-group{margin-top:16px}
+.directory-attribute-group h4{margin:0 0 9px;color:var(--gold-light);font:700 10px Arial,sans-serif;letter-spacing:1.2px}
+.directory-attribute-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.directory-attribute-options label{display:flex;align-items:center;gap:8px;min-width:0;padding:9px 10px;border:1px solid rgba(214,173,85,.2);background:rgba(255,255,255,.025);color:#dce3ed;font:11px/1.35 Arial,sans-serif;cursor:pointer;transition:.18s}
+.directory-attribute-options label:has(input:checked){border-color:rgba(214,173,85,.8);background:rgba(214,173,85,.1);color:var(--gold-light)}
+.directory-attribute-options input{flex:0 0 14px;width:14px;height:14px;margin:0;accent-color:#d6ad55}
+.directory-attribute-options input:focus-visible{outline:2px solid #f0d58a;outline-offset:3px}
+@media(max-width:650px){.directory-attribute-options{grid-template-columns:repeat(2,minmax(0,1fr))}.directory-attribute-options label{font-size:10px;padding:9px 7px}}
