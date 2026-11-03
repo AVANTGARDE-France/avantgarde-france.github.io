@@ -249,19 +249,32 @@ function basculerRegion(region) {
     actualiserAlerteFiltres();
 }
 
-function filtresAnnuaireActifs() {
-    const localisationActive = regionsSelectionnees.length > 0;
+function nombreFiltresAnnuaireActifs() {
     const statuts = ["directoryDelegues", "directoryMilitants", "directoryInscrits"];
     const statutsTousActifs = statuts.every(id => document.getElementById(id)?.checked ?? true);
-    const attributsActifs = document.querySelector(
+    const attributsActifs = document.querySelectorAll(
         'input[name="directoryMedals"]:checked, input[name="directorySkills"]:checked, input[name="directoryRoles"]:checked'
-    ) !== null;
-    return localisationActive || !statutsTousActifs || attributsActifs;
+    ).length;
+
+    // Chaque localisation sélectionnée compte séparément.
+    // Les statuts constituent un seul groupe de filtrage.
+    return regionsSelectionnees.length +
+        (statutsTousActifs ? 0 : 1) +
+        attributsActifs;
+}
+
+function filtresAnnuaireActifs() {
+    return nombreFiltresAnnuaireActifs() > 0;
 }
 
 function actualiserAlerteFiltres() {
     const alerte = document.getElementById("directoryFilterAlert");
-    if (alerte) alerte.hidden = !filtresAnnuaireActifs();
+    if (!alerte) return;
+
+    const nombre = nombreFiltresAnnuaireActifs();
+    alerte.textContent = nombre;
+    alerte.hidden = nombre === 0;
+    alerte.setAttribute("aria-label", nombre + (nombre > 1 ? " filtres actifs" : " filtre actif"));
 }
 
 function reinitialiserTousFiltresAnnuaire() {
