@@ -478,12 +478,48 @@ textarea{
    MEDAILLE VIP
 ========================================================= */
 
-.vip-title{
-  color:var(--gold);
-  font-size:17px;
+.vip-heading{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:18px;
   margin:22px 0 6px;
   padding-bottom:7px;
   border-bottom:1px solid rgba(214,173,85,.2);
+}
+
+.vip-title{
+  color:var(--gold);
+  font-size:17px;
+  margin:0;
+  padding:0;
+  border:0;
+}
+
+.vip-points{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  flex:0 0 auto;
+  line-height:1;
+}
+
+.vip-points-label{
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:7px;
+  font-weight:700;
+  letter-spacing:.12em;
+  margin-bottom:4px;
+}
+
+.vip-points strong{
+  color:var(--gold-light);
+  font-family:Arial,sans-serif;
+  font-size:clamp(25px,5vw,34px);
+  font-weight:800;
+  letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums;
 }
 
 .vip-intro{
@@ -1714,6 +1750,14 @@ textarea{
 ========================================================= */
 
 @media(max-width:800px){
+
+  .vip-heading{
+    align-items:center;
+  }
+
+  .vip-points strong{
+    font-size:28px;
+  }
 
   header{
     padding:16px 20px;
