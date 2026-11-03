@@ -58,6 +58,13 @@ function creerCarteDirection(membre, fonction) {
     card.append(photoZone, role, name);
     if (membre.region) card.appendChild(region);
 
+    if (membre.description) {
+        const description = document.createElement("p");
+        description.className = "leadership-member-description";
+        description.textContent = membre.description;
+        card.appendChild(description);
+    }
+
     const ouvrir = () => ouvrirProfil(membre);
     card.addEventListener("click", ouvrir);
     card.addEventListener("keydown", event => {
