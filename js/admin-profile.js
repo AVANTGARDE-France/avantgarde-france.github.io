@@ -1600,10 +1600,19 @@ profileForm.addEventListener(
       );
 
 
+      const urlSocialDejaUtilisee =
+        error.code === "23505" &&
+        error.message === "URL_SOCIAL_DEJA_UTILISEE";
+
+      const reseauConcerne =
+        error.details || "ce réseau social";
+
       afficherMessage(
         profileMessage,
         "error",
-        "Impossible d'enregistrer les modifications. Vérifiez les droits de la table profiles dans Supabase."
+        urlSocialDejaUtilisee
+          ? `Cette page ${reseauConcerne} est déjà associée à un autre membre. Chaque page ne peut être utilisée que par un seul profil.`
+          : "Impossible d'enregistrer les modifications. Vérifiez les droits de la table profiles dans Supabase."
       );
 
 
