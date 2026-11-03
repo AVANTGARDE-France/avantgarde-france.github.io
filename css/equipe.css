@@ -2403,3 +2403,104 @@ body.directory-filter-open{overflow:hidden}
     .member-medal{width:23px;height:23px}
     .member-medal .medal-symbol{width:14px;height:14px}
 }
+
+
+/* =========================================================
+   CLASSEMENT DES 18 RÉGIONS
+========================================================= */
+.regions-ranking-section{
+    width:min(1180px,calc(100% - 48px));
+    margin:0 auto 34px;
+    padding:28px 26px 24px;
+    border-top:1px solid rgba(214,173,85,.32);
+    border-bottom:1px solid rgba(214,173,85,.2);
+    background:linear-gradient(135deg,rgba(13,35,68,.72),rgba(7,21,45,.38));
+}
+.regions-ranking-heading{text-align:center;margin:0 auto 22px}
+.regions-ranking-heading .section-kicker{margin-bottom:7px}
+.regions-ranking-heading h2{
+    margin:0;
+    color:#f5f3ed;
+    font-size:clamp(23px,3vw,32px);
+    font-weight:850;
+    letter-spacing:1.8px;
+}
+.regions-ranking-heading p{
+    margin:8px 0 0;
+    color:#aeb8c7;
+    font:12px/1.5 Arial,sans-serif;
+}
+.regions-ranking-list{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px 18px;
+    max-width:940px;
+    margin:0 auto;
+    padding:0;
+    list-style:none;
+}
+.regions-ranking-item{
+    display:grid;
+    grid-template-columns:28px 38px minmax(0,1fr) auto;
+    align-items:center;
+    gap:11px;
+    min-height:58px;
+    padding:8px 12px;
+    border:1px solid rgba(214,173,85,.17);
+    background:rgba(255,255,255,.025);
+    transition:background .18s,border-color .18s;
+}
+.regions-ranking-item:hover{
+    border-color:rgba(214,173,85,.58);
+    background:rgba(214,173,85,.07);
+}
+.regions-ranking-rank{
+    color:rgba(240,213,138,.62);
+    font:700 11px/1 Arial,sans-serif;
+    font-variant-numeric:tabular-nums;
+}
+.regions-ranking-logo{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:36px;
+    height:36px;
+    border:1px solid rgba(214,173,85,.62);
+    border-radius:4px;
+    background:linear-gradient(145deg,rgba(214,173,85,.17),rgba(7,21,45,.85));
+    color:#f0d58a;
+    font:800 10px/1 Arial,sans-serif;
+    letter-spacing:.35px;
+}
+.regions-ranking-name{
+    min-width:0;
+    color:#f5f3ed;
+    font:700 12px/1.25 Arial,sans-serif;
+}
+.regions-ranking-score{
+    color:#f0d58a;
+    font:800 16px/1 Arial,sans-serif;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:.2px;
+}
+.regions-ranking-source{
+    margin:16px auto 0;
+    color:rgba(174,184,199,.68);
+    text-align:center;
+    font:10px/1.4 Arial,sans-serif;
+}
+.regions-ranking-loading{
+    grid-column:1/-1;
+    padding:18px;
+    color:#aeb8c7;
+    text-align:center;
+    font:12px Arial,sans-serif;
+}
+@media(max-width:700px){
+    .regions-ranking-section{width:calc(100% - 24px);padding:22px 12px 18px;margin-bottom:26px}
+    .regions-ranking-list{grid-template-columns:1fr;gap:6px}
+    .regions-ranking-item{min-height:52px;grid-template-columns:24px 34px minmax(0,1fr) auto;gap:9px;padding:7px 9px}
+    .regions-ranking-logo{width:32px;height:32px;font-size:9px}
+    .regions-ranking-name{font-size:11px}
+    .regions-ranking-score{font-size:15px}
+}
