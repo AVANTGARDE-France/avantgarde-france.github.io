@@ -2504,3 +2504,47 @@ body.directory-filter-open{overflow:hidden}
     .regions-ranking-score{font-size:10px;letter-spacing:0}
     .regions-ranking-source{margin-top:4px;font-size:9px}
 }
+
+
+/* Direction : deux cartes côte à côte sur iPhone */
+@media (max-width: 600px) {
+    .leadership-section {
+        padding: 18px 8px 28px;
+    }
+    .leadership-heading {
+        margin-bottom: 14px;
+    }
+    .leadership-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+    .leadership-card {
+        min-width: 0;
+        min-height: 205px;
+        padding: 22px 7px;
+    }
+    .leadership-card::before {
+        inset: 5px;
+    }
+    .leadership-monogram {
+        width: 54px;
+        height: 54px;
+        margin-bottom: 13px;
+        font-size: 25px;
+    }
+    .leadership-role {
+        font-size: 8px;
+        letter-spacing: 1px;
+        line-height: 1.25;
+    }
+    .leadership-card h3 {
+        margin: 7px 0 5px;
+        font-size: 15px;
+        line-height: 1.15;
+        overflow-wrap: anywhere;
+    }
+    .leadership-placeholder {
+        font-size: 10px;
+        line-height: 1.25;
+    }
+}
