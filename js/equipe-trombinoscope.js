@@ -479,6 +479,7 @@ function initialiserFiltreAnnuaire() {
 }
 
 initialiserFiltreAnnuaire();
+chargerCartesRegions();
 
 async function chargerTrombinoscope() {
     const grid = document.getElementById("teamGrid");
@@ -522,7 +523,6 @@ async function chargerTrombinoscope() {
         const tousLesMembres = Array.isArray(data) ? data : [];
         membres = tousLesMembres;
         membresVisibles = tousLesMembres.filter(membre => !identifiantsDirection.has(membre.id));
-        regionsSelectionnees = [];
         afficherMembresFiltres(membresVisibles);
         actualiserAlerteFiltres();
     } catch (error) {
