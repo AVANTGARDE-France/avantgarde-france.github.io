@@ -2262,3 +2262,33 @@ body.directory-filter-open{overflow:hidden}
         font-size: 11px;
     }
 }
+
+
+/* CLASSEMENT PAR LOCALISATION — CARTES SOUS LA DIRECTION */
+.directory-location-section{
+    width:min(1180px, calc(100% - 48px));
+    margin:0 auto 52px;
+    padding:22px 26px 24px;
+    border-top:1px solid rgba(214,173,85,.28);
+    border-bottom:1px solid rgba(214,173,85,.18);
+    background:linear-gradient(135deg,rgba(13,35,68,.62),rgba(7,21,45,.28));
+}
+.directory-location-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px}
+.directory-location-heading .section-kicker{margin:0}
+.directory-location-current{color:#f0d58a;font:700 11px/1.3 Arial,sans-serif;letter-spacing:1px;text-align:right}
+.directory-location-section .directory-map-tabs{justify-content:center}
+.directory-location-section .directory-map-tabs button{flex:1;max-width:280px;text-align:center}
+.directory-location-section .directory-map-panel{padding-top:12px}
+.directory-location-section .directory-map{min-height:190px}
+.directory-location-section .directory-map svg{max-height:360px}
+.directory-location-section .directory-world-zones{max-width:850px;margin:12px auto 4px}
+.directory-location-section .directory-map-note{text-align:center;color:#aeb8c7;font-size:10px}
+.directory-location-section .directory-map-credit{margin-top:8px}
+@media(max-width:650px){
+ .directory-location-section{width:calc(100% - 24px);margin-bottom:34px;padding:17px 12px 18px}
+ .directory-location-heading{align-items:flex-start;flex-direction:column;gap:7px}
+ .directory-location-current{text-align:left}
+ .directory-location-section .directory-map-tabs button{padding:11px 4px;font-size:8px;letter-spacing:.1px}
+ .directory-location-section .directory-map{min-height:150px}
+ .directory-location-section .directory-map svg{max-height:290px}
+}
