@@ -126,8 +126,13 @@
     <!-- CLASSEMENT PAR LOCALISATION -->
     <section class="directory-location-section" aria-label="Classement par localisation">
         <div class="directory-location-heading">
-            <div class="section-kicker">CLASSEMENT PAR LOCALISATION</div>
-            <div class="directory-location-current" id="directoryLocationCurrent" aria-live="polite">CLASSEMENT GÉNÉRAL</div>
+            <div class="directory-location-titleline">
+                <div class="section-kicker">CLASSEMENT PAR LOCALISATION</div>
+                <div class="directory-location-current" id="directoryLocationCurrent" aria-live="polite">
+                    <span id="directoryLocationName">CLASSEMENT GÉNÉRAL</span>
+                    <button type="button" id="directoryLocationClear" class="directory-location-clear" aria-label="Revenir au classement général" title="Revenir au classement général" hidden>×</button>
+                </div>
+            </div>
         </div>
     <div class="directory-map-tabs" role="tablist" aria-label="Choisir une carte">
         <button type="button" class="active" data-map-tab="metropole" role="tab" aria-selected="true">FRANCE MÉTROPOLITAINE</button>
