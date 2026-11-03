@@ -1170,6 +1170,7 @@ function ouvrirProfil(
     if (grade) {
 
         grade.textContent =
+            membre.grade2 ||
             membre.grade ||
             "user";
 
