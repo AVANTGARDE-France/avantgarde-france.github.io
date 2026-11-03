@@ -123,6 +123,45 @@
         </div>
     </section>
 
+    <!-- CLASSEMENT PAR LOCALISATION -->
+    <section class="directory-location-section" aria-label="Classement par localisation">
+        <div class="directory-location-heading">
+            <div class="section-kicker">CLASSEMENT PAR LOCALISATION</div>
+            <div class="directory-location-current" id="directoryLocationCurrent" aria-live="polite">CLASSEMENT GÉNÉRAL</div>
+        </div>
+    <div class="directory-map-tabs" role="tablist" aria-label="Choisir une carte">
+        <button type="button" class="active" data-map-tab="metropole" role="tab" aria-selected="true">FRANCE MÉTROPOLITAINE</button>
+        <button type="button" data-map-tab="outremer" role="tab" aria-selected="false">OUTRE-MER</button>
+        <button type="button" data-map-tab="etranger" role="tab" aria-selected="false">ÉTRANGER</button>
+    </div>
+    <div class="directory-map-panel active" id="directoryMapMetropole">
+        <div class="directory-map-hint">Choisissez une seule région pour afficher son classement. Cliquez à nouveau pour revenir au classement général.</div>
+        <div class="directory-map" id="directoryMetropoleMap"><div class="directory-map-loading">Chargement de la carte…</div></div>
+        <div class="directory-map-credit">Contours régionaux : IGN — ADMIN EXPRESS COG CARTO PE 2026 · Licence Ouverte 2.0</div>
+    </div>
+    <div class="directory-map-panel" id="directoryMapOutremer" hidden>
+        <div class="directory-map-hint">Choisissez un seul territoire pour afficher son classement.</div>
+        <div class="directory-map" id="directoryOutremerMap"><div class="directory-map-loading">Chargement de la carte…</div></div>
+        <div class="directory-map-credit">Contours régionaux : IGN — ADMIN EXPRESS COG CARTO PE 2026 · Licence Ouverte 2.0</div>
+    </div>
+    <div class="directory-map-panel" id="directoryMapEtranger" hidden>
+        <div class="directory-map-hint">Choisissez une seule zone géographique pour afficher son classement.</div>
+        <div class="directory-map" id="directoryWorldMap"><div class="directory-map-loading">Chargement de la carte…</div></div>
+        <div class="directory-world-zones" id="directoryWorldZones" aria-label="Sélectionner une zone géographique">
+            <button type="button" data-world-zone="Europe" aria-pressed="false">Europe</button>
+            <button type="button" data-world-zone="Amérique du Nord" aria-pressed="false">Amérique du Nord</button>
+            <button type="button" data-world-zone="Amérique centrale et Caraïbes" aria-pressed="false">Amérique centrale et Caraïbes</button>
+            <button type="button" data-world-zone="Amérique du Sud" aria-pressed="false">Amérique du Sud</button>
+            <button type="button" data-world-zone="Afrique" aria-pressed="false">Afrique</button>
+            <button type="button" data-world-zone="Asie" aria-pressed="false">Asie</button>
+            <button type="button" data-world-zone="Océanie" aria-pressed="false">Océanie</button>
+            <button type="button" data-world-zone="Autre" aria-pressed="false">Autre</button>
+        </div>
+        <div class="directory-map-note"><em>sélection hors France Métropolitaine et hors Outre Mer</em></div>
+        <div class="directory-map-credit">Carte : Natural Earth · VectorAtlas / Menelabs · CC BY 4.0</div>
+    </div>
+    </section>
+
     <!-- TROMBINOSCOPE -->
     <section class="team-section">
         <div class="section-title">
@@ -160,42 +199,12 @@
     <section class="directory-filter-panel" role="dialog" aria-modal="true" aria-labelledby="directoryFilterTitle">
         <button type="button" class="directory-filter-close" id="closeDirectoryFilter" aria-label="Fermer">×</button>
         <div class="section-kicker">ANNUAIRE DES MEMBRES</div>
-        <h2 id="directoryFilterTitle">Filtrer par localisation</h2>
-        <p class="directory-filter-intro">Sélectionnez une ou plusieurs régions sur la carte. Les profils étrangers peuvent être affichés séparément.</p>
+        <h2 id="directoryFilterTitle">Affiner le classement</h2>
+        <p class="directory-filter-intro">Filtrez les profils par statut, compétences et distinctions.</p>
         <div class="directory-filter-actions">
             <button type="button" class="directory-quick-option" id="directoryAll">TOUT AFFICHER / EFFACER LA SÉLECTION (LOCALISATION)</button>
         </div>
-        <div class="directory-map-tabs" role="tablist" aria-label="Choisir une carte">
-            <button type="button" class="active" data-map-tab="metropole" role="tab" aria-selected="true">FRANCE MÉTROPOLITAINE</button>
-            <button type="button" data-map-tab="outremer" role="tab" aria-selected="false">OUTRE-MER</button>
-            <button type="button" data-map-tab="etranger" role="tab" aria-selected="false">ÉTRANGER</button>
-        </div>
-        <div class="directory-map-panel active" id="directoryMapMetropole">
-            <div class="directory-map-hint">Cliquez sur une région pour l’ajouter ou la retirer de la sélection.</div>
-            <div class="directory-map" id="directoryMetropoleMap"><div class="directory-map-loading">Chargement de la carte…</div></div>
-            <div class="directory-map-credit">Contours régionaux : IGN — ADMIN EXPRESS COG CARTO PE 2026 · Licence Ouverte 2.0</div>
-        </div>
-        <div class="directory-map-panel" id="directoryMapOutremer" hidden>
-            <div class="directory-map-hint">Cliquez sur un territoire pour l’ajouter ou le retirer de la sélection.</div>
-            <div class="directory-map" id="directoryOutremerMap"><div class="directory-map-loading">Chargement de la carte…</div></div>
-            <div class="directory-map-credit">Contours régionaux : IGN — ADMIN EXPRESS COG CARTO PE 2026 · Licence Ouverte 2.0</div>
-        </div>
-        <div class="directory-map-panel" id="directoryMapEtranger" hidden>
-            <div class="directory-map-hint">Cliquez sur un pays pour sélectionner sa zone géographique.</div>
-            <div class="directory-map" id="directoryWorldMap"><div class="directory-map-loading">Chargement de la carte…</div></div>
-            <div class="directory-world-zones" id="directoryWorldZones" aria-label="Sélectionner une zone géographique">
-                <button type="button" data-world-zone="Europe" aria-pressed="false">Europe</button>
-                <button type="button" data-world-zone="Amérique du Nord" aria-pressed="false">Amérique du Nord</button>
-                <button type="button" data-world-zone="Amérique centrale et Caraïbes" aria-pressed="false">Amérique centrale et Caraïbes</button>
-                <button type="button" data-world-zone="Amérique du Sud" aria-pressed="false">Amérique du Sud</button>
-                <button type="button" data-world-zone="Afrique" aria-pressed="false">Afrique</button>
-                <button type="button" data-world-zone="Asie" aria-pressed="false">Asie</button>
-                <button type="button" data-world-zone="Océanie" aria-pressed="false">Océanie</button>
-                <button type="button" data-world-zone="Autre" aria-pressed="false">Autre</button>
-            </div>
-            <div class="directory-map-note"><em>sélection hors France Métropolitaine et hors Outre Mer</em></div>
-            <div class="directory-map-credit">Carte : Natural Earth · VectorAtlas / Menelabs · CC BY 4.0</div>
-        </div>
+
 
         <div class="directory-category-filter">
             <h3>Afficher les profils</h3>
