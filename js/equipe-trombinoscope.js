@@ -381,7 +381,20 @@ function afficherMembresFiltres(liste) {
         grid.innerHTML = '<div class="no-members">Aucun membre public ne correspond à cette localisation.</div>';
         return;
     }
-    liste.forEach(membre => grid.appendChild(creerCarteMembre(membre)));
+
+    // Priorité absolue aux Délégués Régionaux, puis tous les autres membres.
+    // Dans chaque groupe : classement décroissant selon le nombre de points.
+    const listeTriee = [...liste].sort((a, b) => {
+        const aDelegue = normaliserValeurAnnuaire(a.grade2) === normaliserValeurAnnuaire("Délégué Régional");
+        const bDelegue = normaliserValeurAnnuaire(b.grade2) === normaliserValeurAnnuaire("Délégué Régional");
+        if (aDelegue !== bDelegue) return aDelegue ? -1 : 1;
+
+        const pointsA = Number.isFinite(Number(a.point)) ? Number(a.point) : 0;
+        const pointsB = Number.isFinite(Number(b.point)) ? Number(b.point) : 0;
+        return pointsB - pointsA;
+    });
+
+    listeTriee.forEach(membre => grid.appendChild(creerCarteMembre(membre)));
 }
 
 
@@ -450,7 +463,7 @@ async function chargerTrombinoscope() {
         const { data: directionData, error: directionError } = await supabaseClient
             .from("profiles")
             .select(`
-                id, created_at, nom, grade, grade2, image_url, description, region,
+                id, created_at, nom, grade, grade2, point, image_url, description, region,
                 competences, anonyme, facebook_url, x_url, instagram_url,
                 youtube_url, tiktok_url, facebook_audience, instagram_audience,
                 x_audience, youtube_audience, tiktok_audience, audience_max,
@@ -466,14 +479,14 @@ async function chargerTrombinoscope() {
         const { data, error } = await supabaseClient
             .from("profiles")
             .select(`
-                id, created_at, nom, grade, grade2, image_url, description, region,
+                id, created_at, nom, grade, grade2, point, image_url, description, region,
                 competences, anonyme, facebook_url, x_url, instagram_url,
                 youtube_url, tiktok_url, facebook_audience, instagram_audience,
                 x_audience, youtube_audience, tiktok_audience, audience_max,
                 audience_reseau, audience_updated_at
             `)
             .eq("anonyme", false)
-            .order("created_at", { ascending: true });
+            .order("point", { ascending: false });
         if (error) throw error;
 
         const tousLesMembres = Array.isArray(data) ? data : [];
