@@ -101,10 +101,6 @@ if (
 
         "Conférenciers",
 
-        "Influenceurs Réseaux Sociaux",
-
-        "Parrains/marraines",
-
         "Militants"
 
     ];
