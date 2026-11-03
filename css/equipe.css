@@ -2548,3 +2548,26 @@ body.directory-filter-open{overflow:hidden}
         line-height: 1.25;
     }
 }
+
+
+/* Hero équipe : réduire les blancs sur mobile */
+@media (max-width: 650px) {
+    .team-hero {
+        padding-top: 12px;
+        padding-bottom: 8px;
+    }
+    .team-hero .section-kicker {
+        margin-bottom: 4px;
+    }
+    .team-hero h1 {
+        line-height: .9;
+    }
+    .team-hero p {
+        margin: 8px auto 10px;
+        font-size: 13px;
+        line-height: 1.4;
+    }
+    .team-hero .join-button {
+        padding: 11px 18px;
+    }
+}
