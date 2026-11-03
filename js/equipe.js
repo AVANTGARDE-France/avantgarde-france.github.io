@@ -1068,154 +1068,23 @@ function creerCarteMembre(
 
 
 /* =========================================================
-   CHARGEMENT DES MEMBRES
+   CHARGEMENT DU TROMBINOSCOPE
+   Le chargement et le rendu sont isolés dans
+   js/equipe-trombinoscope.js.
 ========================================================= */
 
 async function chargerMembres() {
-
-    const grid =
-        document.getElementById(
-            "teamGrid"
-        );
-
-
-    if (!grid) {
-        return;
+    if (typeof chargerTrombinoscope === "function") {
+        await chargerTrombinoscope();
     }
-
-
-    grid.innerHTML = `
-        <div class="loading">
-            Chargement des membres…
-        </div>
-    `;
-
-
-    if (
-        typeof supabaseClient ===
-            "undefined" ||
-        !supabaseClient
-    ) {
-
-        grid.innerHTML = `
-            <div class="no-members">
-                Impossible de contacter la base de données.
-            </div>
-        `;
-
-        console.error(
-            "supabaseClient est introuvable."
-        );
-
-        return;
-
-    }
-
-
-    const {
-        data,
-        error
-    } = await supabaseClient
-
-        .from("profiles")
-
-        .select(`
-            id,
-            created_at,
-            nom,
-            grade,
-            image_url,
-            description,
-            region,
-            competences,
-            anonyme,
-            facebook_url,
-            x_url,
-            instagram_url,
-            youtube_url,
-            tiktok_url,
-            facebook_audience,
-            instagram_audience,
-            x_audience,
-            youtube_audience,
-            tiktok_audience,
-            audience_max,
-            audience_reseau,
-            audience_updated_at
-        `)
-
-        .eq(
-            "anonyme",
-            false
-        )
-
-        .order(
-            "created_at",
-            {
-                ascending: true
-            }
-        );
-
-
-    if (error) {
-
-        console.error(
-            "Erreur chargement membres :",
-            error
-        );
-
-
-        grid.innerHTML = `
-            <div class="no-members">
-                Impossible de charger l’équipe.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    membres =
-        Array.isArray(data)
-            ? data
-            : [];
-
-
-    if (!membres.length) {
-
-        grid.innerHTML = `
-            <div class="no-members">
-                Aucun membre public pour le moment.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    grid.innerHTML = "";
-
-
-    membres.forEach(
-        membre => {
-
-            grid.appendChild(
-                creerCarteMembre(
-                    membre
-                )
-            );
-
-        }
-    );
-
 }
 
 
 /* =========================================================
    OUVERTURE PROFIL
 ========================================================= */
+
+
 
 function ouvrirProfil(
     membre
