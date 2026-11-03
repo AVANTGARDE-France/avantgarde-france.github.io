@@ -858,6 +858,15 @@ if (
 
             }
 
+            if (
+                typeof window.mettreAJourMedailleParrainage ===
+                "function"
+            ) {
+                window.mettreAJourMedailleParrainage(
+                    profile.parrainage
+                );
+            }
+
 
             const compteur =
                 document.getElementById(
