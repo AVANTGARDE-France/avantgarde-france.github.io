@@ -284,12 +284,19 @@ function appliquerFiltreAnnuaire() {
             valeur !== "vip" && valeur !== "mecene"
         );
 
+        // Seuils des médailles identiques à ceux des fiches individuelles.
         const possedeVIP = Number(membre.audience_max || 0) >= 3000;
+        const possedeParrainage = Number(membre.parrainage || 0) >= 50;
+        // La médaille Mécène n'est pas encore reliée à une table de dons.
+        // On ne peut donc détecter que les anciennes valeurs conservées dans competences.
         const possedeMecene = competencesNormalisees.includes("mecene");
         const medailleValide = !filtresAttributsAnnuaire.medailles.length ||
             filtresAttributsAnnuaire.medailles.some(medaille => {
                 const valeur = normaliserValeurAnnuaire(medaille);
-                return valeur === "vip" ? possedeVIP : valeur === "mecene" ? possedeMecene : false;
+                if (valeur === "vip" || valeur === "influenceurs reseaux sociaux") return possedeVIP;
+                if (valeur === "parrain/marraine" || valeur === "parrain" || valeur === "marraine") return possedeParrainage;
+                if (valeur === "mecene") return possedeMecene;
+                return false;
             });
         const competenceValide = !filtresAttributsAnnuaire.competences.length ||
             filtresAttributsAnnuaire.competences.some(competence =>
