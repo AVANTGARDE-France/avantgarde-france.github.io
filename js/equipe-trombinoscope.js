@@ -122,6 +122,14 @@ const REGIONS_ETRANGER = [
     "Europe", "Amérique du Nord", "Amérique centrale et Caraïbes",
     "Amérique du Sud", "Afrique", "Asie", "Océanie", "Autre"
 ];
+const ROLES_ANNUAIRE = [
+    "Organisateurs de terrain",
+    "Conférenciers",
+    "Influenceurs Réseaux Sociaux",
+    "Parrains/marraines",
+    "Militants"
+];
+let filtresAttributsAnnuaire = { medailles: [], competences: [], roles: [] };
 let regionsSelectionnees = [];
 let filtreEtranger = false;
 let membresVisibles = [];
@@ -134,6 +142,37 @@ function normaliserRegion(valeur) {
         .replace(/[’']/g, "'")
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
         .toLowerCase();
+}
+
+function normaliserValeurAnnuaire(valeur) {
+    return String(valeur || "").trim()
+        .replace(/[’']/g, "'")
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+}
+
+function normaliserCompetencesAnnuaire(valeur) {
+    if (Array.isArray(valeur)) return valeur.map(item => String(item).trim()).filter(Boolean);
+    if (typeof valeur !== "string" || !valeur.trim()) return [];
+    try {
+        const parsed = JSON.parse(valeur);
+        if (Array.isArray(parsed)) return parsed.map(item => String(item).trim()).filter(Boolean);
+    } catch (error) {
+        // Les anciennes données peuvent être stockées sous forme de liste textuelle.
+    }
+    return valeur.trim().replace(/^\[|\]$/g, "").split(",")
+        .map(item => item.trim().replace(/^"|"$/g, "")).filter(Boolean);
+}
+
+function lireFiltresAttributsAnnuaire() {
+    const lire = nom => Array.from(document.querySelectorAll(
+        'input[name="' + nom + '"]:checked'
+    )).map(input => input.value);
+    filtresAttributsAnnuaire = {
+        medailles: lire("directoryMedals"),
+        competences: lire("directorySkills"),
+        roles: lire("directoryRoles")
+    };
 }
 
 function ouvrirFiltreAnnuaire() {
@@ -221,6 +260,7 @@ function appliquerFiltreAnnuaire() {
         militants: document.getElementById("directoryMilitants")?.checked ?? true,
         inscrits: document.getElementById("directoryInscrits")?.checked ?? true
     };
+    lireFiltresAttributsAnnuaire();
 
     let resultat = membresVisibles.filter(membre => {
         const fonction = normaliserRegion(membre.grade2);
@@ -228,11 +268,40 @@ function appliquerFiltreAnnuaire() {
         const estMilitant = fonction === normaliserRegion("Militant");
         const estInscrit = !estDelegue && !estMilitant;
 
-        return (
+        // Les statuts sélectionnés sont combinés en OU au sein de ce filtre.
+        const statutValide = (
             (categoriesAnnuaire.delegues && estDelegue) ||
             (categoriesAnnuaire.militants && estMilitant) ||
             (categoriesAnnuaire.inscrits && estInscrit)
         );
+        if (!statutValide) return false;
+
+        const competences = normaliserCompetencesAnnuaire(membre.competences);
+        const competencesNormalisees = competences.map(normaliserValeurAnnuaire);
+        const rolesNormalises = ROLES_ANNUAIRE.map(normaliserValeurAnnuaire);
+        const competencesMetier = competencesNormalisees.filter(valeur =>
+            !rolesNormalises.includes(valeur) &&
+            valeur !== "vip" && valeur !== "mecene"
+        );
+
+        const possedeVIP = Number(membre.audience_max || 0) >= 3000;
+        const possedeMecene = competencesNormalisees.includes("mecene");
+        const medailleValide = !filtresAttributsAnnuaire.medailles.length ||
+            filtresAttributsAnnuaire.medailles.some(medaille => {
+                const valeur = normaliserValeurAnnuaire(medaille);
+                return valeur === "vip" ? possedeVIP : valeur === "mecene" ? possedeMecene : false;
+            });
+        const competenceValide = !filtresAttributsAnnuaire.competences.length ||
+            filtresAttributsAnnuaire.competences.some(competence =>
+                competencesMetier.includes(normaliserValeurAnnuaire(competence))
+            );
+        const roleValide = !filtresAttributsAnnuaire.roles.length ||
+            filtresAttributsAnnuaire.roles.some(role =>
+                competencesNormalisees.includes(normaliserValeurAnnuaire(role))
+            );
+
+        // Les trois dimensions (localisation, statut, attributs) se cumulent en ET.
+        return medailleValide && competenceValide && roleValide;
     });
 
     if (filtreEtranger) {
@@ -269,7 +338,15 @@ function actualiserResumeFiltre(nombre) {
     const localisation = filtreEtranger
         ? "Étranger"
         : (regionsSelectionnees.length ? regionsSelectionnees.join(", ") : "Toutes localisations");
-    resume.textContent = localisation + " · " + (categories.length ? categories.join(" + ") : "Aucune catégorie") + " · " + nombre + " membre(s)";
+    const attributs = [
+        ...filtresAttributsAnnuaire.medailles,
+        ...filtresAttributsAnnuaire.competences,
+        ...filtresAttributsAnnuaire.roles
+    ];
+    const resumeAttributs = attributs.length ? " · " + attributs.join(", ") : "";
+    resume.textContent = localisation + " · " +
+        (categories.length ? categories.join(" + ") : "Aucune catégorie") +
+        resumeAttributs + " · " + nombre + " membre(s)";
 }
 
 function initialiserFiltreAnnuaire() {
