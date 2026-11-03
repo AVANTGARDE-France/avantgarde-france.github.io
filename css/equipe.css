@@ -2303,3 +2303,17 @@ body.directory-filter-open{overflow:hidden}
 .directory-location-clear:hover{border-color:#ef4135;background:#ef4135;color:#fff}
 .directory-location-clear[hidden]{display:none}
 @media(max-width:650px){.directory-location-titleline{gap:9px}.directory-location-current{font-size:12px;padding:6px 9px}.directory-location-clear{width:19px;height:19px}}
+
+
+/* Titre trombinoscope placé entre la direction et les cartes de localisation */
+.team-intro-section{padding-top:12px;padding-bottom:8px}
+.team-intro-section .section-title{margin-bottom:0}
+.directory-location-heading{display:flex;align-items:center;justify-content:flex-start;margin-bottom:14px}
+.directory-location-titleline{width:100%;display:flex;align-items:center;justify-content:flex-start;gap:12px}
+.directory-location-current{display:inline-flex;align-items:center;gap:8px}
+.directory-filter-icon-button{position:relative;display:inline-flex;align-items:center;justify-content:center;flex:0 0 38px;width:38px;height:38px;margin-left:auto;padding:8px;border:1px solid rgba(214,173,85,.58);border-radius:4px;background:rgba(214,173,85,.08);color:#f0d58a;cursor:pointer;transition:background .18s,border-color .18s,color .18s}
+.directory-filter-icon-button:hover{border-color:#f0d58a;background:rgba(214,173,85,.18);color:#fff}
+.directory-filter-icon-button svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.directory-filter-icon-button .directory-filter-alert{position:absolute;top:-7px;right:-7px;width:17px;height:17px;min-width:17px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#ef4135;border:1px solid #07152d;color:#fff;font-size:9px;line-height:1}
+.directory-filter-icon-button .directory-filter-alert[hidden]{display:none}
+@media(max-width:650px){.team-intro-section{padding-top:8px;padding-bottom:4px}.directory-filter-icon-button{width:35px;height:35px;flex-basis:35px}}
