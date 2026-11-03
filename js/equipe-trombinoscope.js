@@ -129,7 +129,6 @@ const ROLES_ANNUAIRE = [
 ];
 let filtresAttributsAnnuaire = { medailles: [], competences: [], roles: [] };
 let regionsSelectionnees = [];
-let filtreEtranger = false;
 let membresVisibles = [];
 let categoriesAnnuaire = { delegues: true, militants: true, inscrits: true };
 let identifiantsDirection = new Set();
@@ -231,13 +230,12 @@ function basculerRegion(region) {
     const index = regionsSelectionnees.findIndex(item => normaliserRegion(item) === normaliserRegion(region));
     if (index >= 0) regionsSelectionnees.splice(index, 1);
     else regionsSelectionnees.push(region);
-    filtreEtranger = REGIONS_ETRANGER.some(item => normaliserRegion(item) === normaliserRegion(region));
     actualiserSelectionCarte();
     actualiserAlerteFiltres();
 }
 
 function filtresAnnuaireActifs() {
-    const localisationActive = regionsSelectionnees.length > 0 || filtreEtranger;
+    const localisationActive = regionsSelectionnees.length > 0;
     const statuts = ["directoryDelegues", "directoryMilitants", "directoryInscrits"];
     const statutsTousActifs = statuts.every(id => document.getElementById(id)?.checked ?? true);
     const attributsActifs = document.querySelector(
@@ -253,7 +251,6 @@ function actualiserAlerteFiltres() {
 
 function reinitialiserTousFiltresAnnuaire() {
     regionsSelectionnees = [];
-    filtreEtranger = false;
 
     ["directoryDelegues", "directoryMilitants", "directoryInscrits"].forEach(id => {
         const input = document.getElementById(id);
@@ -295,13 +292,12 @@ function actualiserSelectionCarte() {
         button.classList.toggle("selected", selected);
         button.setAttribute("aria-pressed", selected ? "true" : "false");
     });
-    document.getElementById("directoryAll")?.classList.toggle("active", !regionsSelectionnees.length && !filtreEtranger);
+    document.getElementById("directoryAll")?.classList.toggle("active", !regionsSelectionnees.length);
     actualiserAlerteFiltres();
 }
 
 function appliquerFiltreAnnuaire() {
     const regions = regionsSelectionnees.map(normaliserRegion);
-    const etranger = new Set(REGIONS_ETRANGER.map(normaliserRegion));
     categoriesAnnuaire = {
         delegues: document.getElementById("directoryDelegues")?.checked ?? true,
         militants: document.getElementById("directoryMilitants")?.checked ?? true,
@@ -358,11 +354,9 @@ function appliquerFiltreAnnuaire() {
         return medailleValide && competenceValide && roleValide;
     });
 
-    if (filtreEtranger) {
-        resultat = resultat.filter(m => regions.length
-            ? regions.includes(normaliserRegion(m.region)) && etranger.has(normaliserRegion(m.region))
-            : etranger.has(normaliserRegion(m.region)));
-    } else if (regions.length) {
+    // Toutes les zones sélectionnées, qu'elles soient en métropole,
+    // en outre-mer ou à l'étranger, sont combinées en OU.
+    if (regions.length) {
         resultat = resultat.filter(m => regions.includes(normaliserRegion(m.region)));
     }
 
@@ -403,7 +397,7 @@ function initialiserFiltreAnnuaire() {
     document.getElementById("closeDirectoryFilter")?.addEventListener("click", fermerFiltreAnnuaire);
     document.querySelector("[data-close-directory-filter]")?.addEventListener("click", fermerFiltreAnnuaire);
     document.getElementById("directoryAll")?.addEventListener("click", () => {
-        regionsSelectionnees = []; filtreEtranger = false; actualiserSelectionCarte();
+        regionsSelectionnees = []; actualiserSelectionCarte();
     });
     document.getElementById("directoryAttributesAll")?.addEventListener("click", () => {
         document.querySelectorAll(
@@ -432,13 +426,7 @@ function initialiserFiltreAnnuaire() {
                 panel.hidden = panel.id !== idCible;
                 panel.classList.toggle("active", !panel.hidden);
             });
-            if (cible === "etranger") {
-                filtreEtranger = true;
-                if (regionsSelectionnees.some(region => !REGIONS_ETRANGER.some(item => normaliserRegion(item) === normaliserRegion(region)))) regionsSelectionnees = [];
-            } else {
-                filtreEtranger = false;
-                if (regionsSelectionnees.some(region => REGIONS_ETRANGER.some(item => normaliserRegion(item) === normaliserRegion(region)))) regionsSelectionnees = [];
-            }
+            // Changer d'onglet ne modifie jamais les sélections des autres cartes.
             actualiserSelectionCarte();
         });
     });
@@ -493,7 +481,6 @@ async function chargerTrombinoscope() {
         membres = tousLesMembres;
         membresVisibles = tousLesMembres.filter(membre => !identifiantsDirection.has(membre.id));
         regionsSelectionnees = [];
-        filtreEtranger = false;
         afficherMembresFiltres(membresVisibles);
         actualiserAlerteFiltres();
     } catch (error) {
