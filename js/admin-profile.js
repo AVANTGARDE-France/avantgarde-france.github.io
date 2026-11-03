@@ -762,8 +762,6 @@ function remplirProfil(profile){
   afficherIdentifiantMembre(profile);
   initialiserPopupParrainages();
 
-  afficherIdentifiantMembre(profile);
-
   document
     .getElementById("profileNom")
     .value =
