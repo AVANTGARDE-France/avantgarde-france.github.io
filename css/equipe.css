@@ -2328,3 +2328,77 @@ body.directory-filter-open{overflow:hidden}
 .directory-inline-category:focus-within{outline:2px solid #f0d58a;outline-offset:2px}
 @media(max-width:900px){.directory-location-titleline{flex-wrap:wrap}.directory-inline-categories{order:3;flex:1 1 100%;justify-content:flex-start}.directory-filter-icon-button{margin-left:auto}}
 @media(max-width:520px){.directory-inline-categories{gap:5px}.directory-inline-category{padding:6px 7px;font-size:9px;letter-spacing:0;white-space:normal}.directory-inline-category span{line-height:1.15}}
+
+
+/* =========================================================
+   MÉDAILLES VECTORIELLES — TROMBINOSCOPE ET FICHE PROFIL
+   Les pictogrammes SVG utilisent currentColor et restent recolorables.
+========================================================= */
+.member-medals{
+    position:absolute;
+    z-index:4;
+    top:10px;
+    right:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:5px;
+    pointer-events:none;
+}
+.member-medal{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:27px;
+    height:27px;
+    border:1px solid rgba(240,213,138,.78);
+    border-radius:50%;
+    color:#f0d58a;
+    background:rgba(7,21,45,.88);
+    box-shadow:0 2px 9px rgba(0,0,0,.35), inset 0 0 0 1px rgba(214,173,85,.12);
+    backdrop-filter:blur(5px);
+}
+.member-medal .medal-symbol{
+    width:16px;
+    height:16px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.65;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+.member-medal-fonction-direction{color:#f0d58a;border-color:#f0d58a}
+.member-medal-fonction-terrain{color:#d6ad55}
+.member-medal-vip{color:#f0d58a}
+.member-medal-parrainage{color:#d6ad55}
+.member-medal-mecene{color:#e8c36d}
+
+.competence-medal-tag{
+    border-color:rgba(214,173,85,.62);
+    background:rgba(214,173,85,.07);
+    color:#f0d58a;
+}
+.competence-medal-icon{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:18px;
+    height:18px;
+    flex:0 0 18px;
+    color:#f0d58a;
+}
+.competence-medal-icon .medal-symbol{
+    display:block;
+    width:17px;
+    height:17px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.7;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+@media(max-width:520px){
+    .member-medals{top:7px;right:7px;gap:4px}
+    .member-medal{width:23px;height:23px}
+    .member-medal .medal-symbol{width:14px;height:14px}
+}
