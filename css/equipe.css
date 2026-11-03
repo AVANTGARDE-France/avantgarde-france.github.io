@@ -2281,7 +2281,14 @@ body.directory-filter-open{overflow:hidden}
 .directory-location-section .directory-map-tabs button{flex:1;max-width:280px;text-align:center}
 .directory-location-section .directory-map-panel{padding-top:12px}
 .directory-location-section .directory-map{min-height:190px}
-.directory-location-section .directory-map svg{max-height:360px}
+.directory-location-section .directory-map svg{
+    width:auto;
+    height:auto;
+    max-width:100%;
+    max-height:360px;
+    flex:0 1 auto;
+    object-fit:contain;
+}
 .directory-location-section .directory-world-zones{max-width:850px;margin:12px auto 4px}
 .directory-location-section .directory-map-note{text-align:center;color:#aeb8c7;font-size:10px}
 .directory-location-section .directory-map-credit{margin-top:8px}
@@ -2291,7 +2298,10 @@ body.directory-filter-open{overflow:hidden}
  .directory-location-current{text-align:left}
  .directory-location-section .directory-map-tabs button{padding:11px 4px;font-size:8px;letter-spacing:.1px}
  .directory-location-section .directory-map{min-height:150px}
- .directory-location-section .directory-map svg{max-height:290px}
+ .directory-location-section .directory-map svg{
+    max-width:100%;
+    max-height:290px;
+}
 }
 
 
