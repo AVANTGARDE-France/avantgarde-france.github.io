@@ -248,6 +248,12 @@ function basculerRegion(region) {
     appliquerFiltreAnnuaire(false);
 }
 
+function reinitialiserLocalisationAnnuaire() {
+    regionsSelectionnees = [];
+    actualiserSelectionCarte();
+    appliquerFiltreAnnuaire(false);
+}
+
 function nombreFiltresAnnuaireActifs() {
     const statuts = ["directoryDelegues", "directoryMilitants", "directoryInscrits"];
     const statutsTousActifs = statuts.every(id => document.getElementById(id)?.checked ?? true);
@@ -303,8 +309,10 @@ function reinitialiserTousFiltresAnnuaire() {
 
     actualiserSelectionCarte();
     afficherMembresFiltres(membresVisibles);
-    const libelle = document.getElementById("directoryLocationCurrent");
+    const libelle = document.getElementById("directoryLocationName");
+    const effacer = document.getElementById("directoryLocationClear");
     if (libelle) libelle.textContent = "CLASSEMENT GÉNÉRAL";
+    if (effacer) effacer.hidden = true;
     actualiserAlerteFiltres();
 }
 
@@ -389,8 +397,10 @@ function appliquerFiltreAnnuaire(fermer = true) {
 
     afficherMembresFiltres(resultat);
     actualiserAlerteFiltres();
-    const libelle = document.getElementById("directoryLocationCurrent");
+    const libelle = document.getElementById("directoryLocationName");
+    const effacer = document.getElementById("directoryLocationClear");
     if (libelle) libelle.textContent = regionsSelectionnees[0] || "CLASSEMENT GÉNÉRAL";
+    if (effacer) effacer.hidden = regionsSelectionnees.length === 0;
     if (fermer) fermerFiltreAnnuaire();
 }
 
@@ -441,6 +451,7 @@ function initialiserFiltreAnnuaire() {
     document.getElementById("openDirectoryFilter")?.addEventListener("click", ouvrirFiltreAnnuaire);
     document.getElementById("closeDirectoryFilter")?.addEventListener("click", fermerFiltreAnnuaire);
     document.querySelector("[data-close-directory-filter]")?.addEventListener("click", fermerFiltreAnnuaire);
+    document.getElementById("directoryLocationClear")?.addEventListener("click", reinitialiserLocalisationAnnuaire);
     document.getElementById("directoryAttributesAll")?.addEventListener("click", () => {
         document.querySelectorAll(
             'input[name="directoryMedals"], input[name="directorySkills"], input[name="directoryRoles"]'
