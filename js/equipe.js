@@ -1145,9 +1145,10 @@ function ouvrirProfil(
 
     if (points) {
         const totalPoints = Number(membre.point);
-        points.textContent =
-            "Score : " +
-            (Number.isFinite(totalPoints) ? totalPoints : 0).toLocaleString("fr-FR");
+        const scoreExact = Number.isFinite(totalPoints) ? totalPoints : 0;
+        points.textContent = "Score : " + formaterAudience(scoreExact);
+        points.title = "Score : " + scoreExact.toLocaleString("fr-FR");
+        points.setAttribute("aria-label", "Score exact : " + scoreExact.toLocaleString("fr-FR"));
     }
 
 
