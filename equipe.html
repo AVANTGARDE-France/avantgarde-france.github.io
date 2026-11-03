@@ -123,14 +123,27 @@
         </div>
     </section>
 
+    <!-- INTRODUCTION DU TROMBINOSCOPE -->
+    <section class="team-section team-intro-section">
+        <div class="section-title">
+            <div class="section-kicker">LES FORCES VIVES</div>
+            <h2>Le trombinoscope</h2>
+            <p>Découvrez les membres qui ont choisi de rendre leur engagement public.</p>
+        </div>
+    </section>
+
     <!-- CLASSEMENT PAR LOCALISATION -->
     <section class="directory-location-section" aria-label="Classement par localisation">
         <div class="directory-location-heading">
             <div class="directory-location-titleline">
-                <div class="section-kicker">CLASSEMENT PAR LOCALISATION</div>
+                
                 <div class="directory-location-current" id="directoryLocationCurrent" aria-live="polite">
                     <span id="directoryLocationName">CLASSEMENT GÉNÉRAL</span>
                     <button type="button" id="directoryLocationClear" class="directory-location-clear" aria-label="Revenir au classement général" title="Revenir au classement général" hidden>×</button>
+                    <button type="button" id="openDirectoryFilter" class="directory-filter-icon-button" aria-label="Filtrer les membres" title="Filtrer les membres">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 5h16l-6.2 7.1v5.2l-3.6 1.8v-7L4 5z"/></svg>
+                        <span class="directory-filter-alert" id="directoryFilterAlert" hidden aria-label="Nombre de filtres actifs">0</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -169,19 +182,9 @@
 
     <!-- TROMBINOSCOPE -->
     <section class="team-section">
-        <div class="section-title">
-            <div class="section-kicker">LES FORCES VIVES</div>
-            <h2>Le trombinoscope</h2>
-            <p>Découvrez les membres qui ont choisi de rendre leur engagement public.</p>
-        </div>
 
-        
         <div class="directory-toolbar">
             <div class="directory-toolbar-actions">
-                <button type="button" class="directory-filter-button" id="openDirectoryFilter">
-                    <span aria-hidden="true">☷</span> FILTRER LES MEMBRES
-                    <span class="directory-filter-alert" id="directoryFilterAlert" hidden aria-label="Nombre de filtres actifs">0</span>
-                </button>
                 <button type="button" class="directory-clear-button" id="directoryClearAll">CLASSEMENT GÉNÉRAL</button>
             </div>
             <span class="directory-result-count" id="directoryResultCount" aria-live="polite"></span>
