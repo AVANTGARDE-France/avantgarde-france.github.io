@@ -516,9 +516,9 @@ textarea{
 .vip-points strong{
   color:var(--gold-light);
   font-family:Arial,sans-serif;
-  font-size:clamp(25px,5vw,34px);
+  font-size:15px;
   font-weight:800;
-  letter-spacing:-.04em;
+  letter-spacing:-.02em;
   font-variant-numeric:tabular-nums;
 }
 
@@ -1767,7 +1767,7 @@ textarea{
   }
 
   .vip-points strong{
-    font-size:28px;
+    font-size:14px;
   }
 
   header{
