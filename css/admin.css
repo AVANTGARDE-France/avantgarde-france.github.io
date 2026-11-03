@@ -1841,3 +1841,64 @@ textarea{
   }
 
 }
+
+
+
+/* =========================================================
+   MEDAILLE PARRAINAGE — FENETRE FILLEULS
+========================================================= */
+
+.referral-medal {
+  cursor:pointer;
+  width:100%;
+  text-align:left;
+  font:inherit;
+}
+
+.referral-medal:focus-visible {
+  outline:2px solid var(--gold-light);
+  outline-offset:3px;
+}
+
+.referral-list {
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  max-height:min(55vh,460px);
+  overflow-y:auto;
+  margin-top:18px;
+  border-top:1px solid rgba(214,173,85,.18);
+}
+
+.referral-list-item {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:12px 2px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.referral-list-name {
+  color:var(--white);
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  font-weight:700;
+}
+
+.referral-list-date {
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:10px;
+  white-space:nowrap;
+}
+
+.referral-list-empty,
+.referral-list-error {
+  padding:18px 0;
+  color:var(--muted);
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  line-height:1.5;
+}
+
