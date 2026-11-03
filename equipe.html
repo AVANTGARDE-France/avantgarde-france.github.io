@@ -134,12 +134,15 @@
 
         
         <div class="directory-toolbar">
-            <button type="button" class="directory-filter-button" id="openDirectoryFilter">
-                <span aria-hidden="true">☷</span> FILTRER LES MEMBRES
-            </button>
+            <div class="directory-toolbar-actions">
+                <button type="button" class="directory-filter-button" id="openDirectoryFilter">
+                    <span aria-hidden="true">☷</span> FILTRER LES MEMBRES
+                    <span class="directory-filter-alert" id="directoryFilterAlert" hidden>FILTRES ACTIFS</span>
+                </button>
+                <button type="button" class="directory-clear-button" id="directoryClearAll">SUPPRIMER TOUS LES FILTRES</button>
+            </div>
             <span class="directory-result-count" id="directoryResultCount" aria-live="polite"></span>
         </div>
-        <div class="directory-filter-summary" id="directoryFilterSummary">Tous les membres publics</div>
 
         <div class="team-grid" id="teamGrid" aria-live="polite">
             <div class="loading" id="loadingMembers">Chargement des membres…</div>
