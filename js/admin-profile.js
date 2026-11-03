@@ -639,11 +639,12 @@ function mettreAJourNombrePointsVIP(audienceMax, nombreParrainages, donsCumules)
   // PROVISOIRE : aucun montant de don n'est encore disponible.
   const dons = facteur(donsCumules);
 
-  const points = audience * parrainages * dons;
+  // Même calcul que le déclencheur Supabase ; la colonne point est un integer.
+  const points = Math.min(2147483647, Math.round(audience * parrainages * dons));
   const element = document.getElementById("vipPoints");
 
   if(element){
-    element.textContent = Math.round(points).toLocaleString("fr-FR");
+    element.textContent = points.toLocaleString("fr-FR");
     element.title =
       audience.toLocaleString("fr-FR") + " × " +
       parrainages.toLocaleString("fr-FR") + " × " +
