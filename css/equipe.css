@@ -1542,3 +1542,18 @@ body.directory-filter-open{overflow:hidden}
  .directory-toolbar-actions button{width:100%;justify-content:center}
  .directory-filter-button{flex-wrap:wrap}
 }
+
+
+/* INTRODUCTION ÉQUIPE — VERSION COMPACTE */
+.team-hero{padding-top:32px;padding-bottom:18px}
+.team-hero .hero-content{max-width:780px}
+.team-hero .section-kicker{margin-bottom:8px}
+.team-hero h1{margin:0}
+.team-hero p{max-width:700px;margin:14px auto 18px;font-size:15px;line-height:1.5}
+.leadership-section{padding-top:14px;padding-bottom:42px}
+.leadership-heading{margin-bottom:18px}
+@media(max-width:800px){
+ .team-hero{padding-top:24px;padding-bottom:12px}
+ .team-hero p{margin:12px auto 16px;font-size:14px;line-height:1.5}
+ .leadership-section{padding-top:10px;padding-bottom:30px}
+}
