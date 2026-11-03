@@ -1524,3 +1524,5 @@ body.directory-filter-open{overflow:hidden}
     .directory-world-zones{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
     .directory-world-zones button{min-height:40px;font-size:10px}
 }
+
+.directory-attribute-actions{margin:0 0 12px}
