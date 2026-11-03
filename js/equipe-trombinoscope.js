@@ -247,7 +247,6 @@ function actualiserSelectionCarte() {
         if (filtreEtranger) valeurs.push("Étranger");
         selection.textContent = valeurs.length ? "Sélection : " + valeurs.join(" · ") : "Aucune région sélectionnée — tout afficher";
     }
-    document.getElementById("directoryForeign")?.classList.toggle("active", filtreEtranger);
     document.getElementById("directoryAll")?.classList.toggle("active", !regionsSelectionnees.length && !filtreEtranger);
 }
 
