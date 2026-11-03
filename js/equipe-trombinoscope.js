@@ -119,6 +119,31 @@ async function chargerTrombinoscope() {
     }
 
     try {
+        /*
+         * Lecture dédiée des fonctions dirigeantes.
+         * Cette requête ciblée évite qu'un tri ou un filtrage du
+         * trombinoscope empêche l'affichage d'un profil dirigeant.
+         */
+        const { data: directionData, error: directionError } = await supabaseClient
+            .from("profiles")
+            .select(`
+                id, created_at, nom, grade, grade2, image_url, description, region,
+                competences, anonyme, facebook_url, x_url, instagram_url,
+                youtube_url, tiktok_url, facebook_audience, instagram_audience,
+                x_audience, youtube_audience, tiktok_audience, audience_max,
+                audience_reseau, audience_updated_at
+            `)
+            .eq("anonyme", false)
+            .in("grade2", FONCTIONS_DIRECTION);
+
+        if (directionError) throw directionError;
+
+        const dirigeants = Array.isArray(directionData) ? directionData : [];
+        afficherDirection(dirigeants);
+
+        /*
+         * Chargement séparé des autres membres publics.
+         */
         const { data, error } = await supabaseClient
             .from("profiles")
             .select(`
@@ -136,11 +161,9 @@ async function chargerTrombinoscope() {
         const tousLesMembres = Array.isArray(data) ? data : [];
         membres = tousLesMembres;
 
-        afficherDirection(tousLesMembres);
-
-        const fonctionsDirection = FONCTIONS_DIRECTION.map(normaliserFonctionDirection);
+        const idsDirigeants = new Set(dirigeants.map(membre => membre.id));
         const membresTrombinoscope = tousLesMembres.filter(membre =>
-            !fonctionsDirection.includes(normaliserFonctionDirection(membre.grade2))
+            !idsDirigeants.has(membre.id)
         );
 
         if (!membresTrombinoscope.length) {
@@ -154,7 +177,7 @@ async function chargerTrombinoscope() {
         });
 
     } catch (error) {
-        console.error("Erreur chargement trombinoscope :", error);
+        console.error("Erreur chargement trombinoscope ou direction :", error);
         grid.innerHTML = '<div class="no-members">Impossible de charger le trombinoscope.</div>';
     }
 }
