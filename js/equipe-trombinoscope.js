@@ -504,7 +504,7 @@ async function chargerTrombinoscope() {
             .from("profiles")
             .select(`
                 id, created_at, nom, grade, grade2, point, image_url, description, region,
-                competences, anonyme, facebook_url, x_url, instagram_url,
+                competences, parrainage, anonyme, facebook_url, x_url, instagram_url,
                 youtube_url, tiktok_url, facebook_audience, instagram_audience,
                 x_audience, youtube_audience, tiktok_audience, audience_max,
                 audience_reseau, audience_updated_at
@@ -520,7 +520,7 @@ async function chargerTrombinoscope() {
             .from("profiles")
             .select(`
                 id, created_at, nom, grade, grade2, point, image_url, description, region,
-                competences, anonyme, facebook_url, x_url, instagram_url,
+                competences, parrainage, anonyme, facebook_url, x_url, instagram_url,
                 youtube_url, tiktok_url, facebook_audience, instagram_audience,
                 x_audience, youtube_audience, tiktok_audience, audience_max,
                 audience_reseau, audience_updated_at
