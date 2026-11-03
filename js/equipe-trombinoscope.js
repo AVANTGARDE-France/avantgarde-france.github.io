@@ -70,6 +70,10 @@ function creerCarteDirection(membre, fonction) {
         info.appendChild(description);
     }
 
+    if (typeof obtenirMedailleDistinctions === "function" && typeof ajouterMedailleCarte === "function") {
+        ajouterMedailleCarte(photoZone, obtenirMedailleDistinctions(membre));
+    }
+
     photoZone.appendChild(info);
     card.appendChild(photoZone);
 
