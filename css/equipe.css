@@ -1397,3 +1397,51 @@ textarea {
     }
 }
 
+
+
+/* =========================================================
+   FILTRE DU TROMBINOSCOPE — POPUP ET CARTES
+========================================================= */
+.directory-toolbar{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin:0 auto 12px}
+.directory-filter-button{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border:1px solid rgba(214,173,85,.65);background:rgba(214,173,85,.08);color:var(--gold-light);font:700 11px Arial,sans-serif;letter-spacing:1.2px;cursor:pointer;transition:.2s}
+.directory-filter-button:hover{background:rgba(214,173,85,.17);border-color:var(--gold-light)}
+.directory-filter-button span{font-size:18px}
+.directory-result-count,.directory-filter-summary{color:var(--muted);font:11px Arial,sans-serif;letter-spacing:.6px;text-align:center}
+.directory-filter-summary{margin:0 auto 24px}
+.directory-filter-modal{position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;padding:20px}
+.directory-filter-modal.open{display:flex}
+.directory-filter-backdrop{position:absolute;inset:0;background:rgba(1,8,20,.86);backdrop-filter:blur(8px)}
+.directory-filter-panel{position:relative;z-index:1;width:min(920px,100%);max-height:92vh;overflow:auto;padding:34px 38px;background:#091a34;border:1px solid rgba(214,173,85,.38);box-shadow:0 25px 90px rgba(0,0,0,.55)}
+.directory-filter-panel h2{margin:7px 0 8px;color:var(--white);font-size:clamp(25px,4vw,36px)}
+.directory-filter-intro{max-width:650px;margin:0 0 22px;color:var(--muted);font:13px/1.6 Arial,sans-serif}
+.directory-filter-close{position:absolute;top:13px;right:17px;border:0;background:none;color:var(--gold-light);font-size:32px;cursor:pointer}
+.directory-filter-actions{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:20px}
+.directory-quick-option,.directory-reset{padding:10px 15px;border:1px solid rgba(214,173,85,.38);background:transparent;color:var(--gold-light);font:700 10px Arial,sans-serif;letter-spacing:.8px;cursor:pointer}
+.directory-quick-option.active,.directory-quick-option:hover{background:rgba(214,173,85,.16);border-color:var(--gold)}
+.directory-map-tabs{display:flex;gap:5px;border-bottom:1px solid rgba(214,173,85,.25)}
+.directory-map-tabs button{padding:12px 15px;border:0;border-bottom:2px solid transparent;background:transparent;color:#9ca9bb;font:700 10px Arial,sans-serif;letter-spacing:.8px;cursor:pointer}
+.directory-map-tabs button.active{border-bottom-color:var(--gold);color:var(--gold-light)}
+.directory-map-panel{padding-top:14px}
+.directory-map-panel[hidden]{display:none}
+.directory-map-hint{margin-bottom:8px;color:#aeb8c7;font:11px Arial,sans-serif}
+.directory-map{width:100%;min-height:210px;display:flex;align-items:center;justify-content:center}
+.directory-map svg{display:block;width:100%;max-height:460px;overflow:visible}
+.directory-map-loading{padding:60px 10px;color:var(--muted);font:12px Arial,sans-serif}
+.directory-map-credit{margin-top:5px;color:#7e8ba0;font:9px Arial,sans-serif;text-align:right}
+.directory-selection{margin:15px 0 18px;padding:12px 14px;border:1px solid rgba(214,173,85,.2);background:rgba(255,255,255,.025);color:var(--gold-light);font:11px/1.6 Arial,sans-serif}
+.directory-filter-footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.directory-apply{padding:13px 20px;border:1px solid var(--gold);background:var(--gold);color:#07152d;font:800 10px Arial,sans-serif;letter-spacing:1px;cursor:pointer}
+.directory-apply:hover{background:var(--gold-light)}
+body.directory-filter-open{overflow:hidden}
+.directory-map .region-shape:focus{outline:none}
+.directory-map .region-shape:focus path{stroke:#fff;stroke-width:3}
+@media(max-width:650px){
+ .directory-filter-modal{padding:8px}
+ .directory-filter-panel{max-height:96vh;padding:28px 16px 20px}
+ .directory-map{min-height:170px}
+ .directory-map svg{max-height:330px}
+ .directory-map-tabs button{flex:1;padding:11px 5px;font-size:9px;letter-spacing:.3px}
+ .directory-filter-footer{flex-direction:column-reverse}
+ .directory-filter-footer button{width:100%}
+ .directory-result-count{width:100%}
+}
