@@ -110,7 +110,11 @@
     #home-experience .quiz-parties .quiz-option-copy strong{margin:2px 0 0}
     #home-experience .quiz-free{padding:55px 20px 64px;background:#050d19;border-top:1px solid #e2bd692e}
     #home-experience .quiz-stats-placeholder{min-height:76px;margin:0;padding:0;overflow:hidden;background:linear-gradient(90deg,rgba(13,35,68,.42),rgba(5,13,25,.78));border:1px solid #e2bd6959;border-left:3px solid #e2bd69}
-    #home-experience .quiz-stats-placeholder{cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+#home-experience .quiz-stats-placeholder{cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+    #home-experience .quiz-stats-placeholder+.quiz-stats-placeholder{margin-top:10px}
+    #home-experience .debt-line{min-height:76px;margin-top:10px;padding:12px 24px;display:flex;align-items:center;overflow:hidden;background:linear-gradient(90deg,rgba(13,35,68,.42),rgba(5,13,25,.78));border:1px solid #e2bd6959;border-left:3px solid #e2bd69}
+    #home-experience .debt-line .debt-counter{width:100%;justify-content:center;gap:18px}
+    @media(max-width:620px){#home-experience .debt-line{padding:10px 14px}#home-experience .debt-line .debt-counter{justify-content:flex-start;flex-wrap:wrap;gap:5px 10px}#home-experience .debt-line .debt-counter-label{font-size:9px}#home-experience .debt-line .debt-counter-value{font-size:clamp(17px,4.5vw,23px)}#home-experience .debt-line .debt-counter-note{width:100%;max-width:none;font-size:8px}}
     #home-experience .quiz-stats-placeholder.is-dragging{cursor:grabbing}
     #home-experience .stats-marquee{display:flex;width:max-content;align-items:center;will-change:transform}
     #home-experience .stats-marquee-group{display:flex;flex:0 0 auto;align-items:center;gap:64px;padding:14px 32px}
@@ -194,52 +198,35 @@
 
     </section>
 
-    <section class="quiz-stats-placeholder" aria-label="Quelques chiffres sur la France">
+    <section class="quiz-stats-placeholder" aria-label="Fiscalité et prélèvements obligatoires">
       <div class="stats-marquee">
         <div class="stats-marquee-group">
           <div class="debt-counter">
-            <span class="debt-counter-label">Dette publique</span>
-            <strong class="debt-counter-value" id="public-debt-value">−3 595 500 000 000 €</strong>
-            <span class="debt-counter-note">3,8 % de la dépense publique (−60Md€ d'intérêts annuels) · INSEE · 2025</span>
-          </div>
-          <div class="debt-counter">
             <strong class="debt-counter-value">438</strong>
             <span class="debt-counter-label stats-description">Impôts, taxes, cotisations et contributions</span>
-            <span class="debt-counter-note">· constituant 92,6 % des recettes brutes du budget général de l’État · Recensement Fondation IFRAP · 2026</span>
+            <span class="debt-counter-note">92,6 % des recettes brutes du budget général de l’État · Fondation IFRAP · 2026</span>
           </div>
           <div class="debt-counter">
             <strong class="debt-counter-value">46 %</strong>
-            <span class="debt-counter-label stats-description">LA FRANCE, CHAMPIONNE D’EUROPE DES PRÉLÈVEMENTS OBLIGATOIRES</span>
+            <span class="debt-counter-label stats-description">Prélèvements obligatoires</span>
             <span class="debt-counter-note">Impôts et cotisations sociales · 2025 · Eurostat</span>
-          </div>
-          <div class="debt-counter">
-            <strong class="debt-counter-value">925</strong>
-            <span class="debt-counter-label stats-description">Députés et sénateurs</span>
-            <span class="debt-counter-note">+ 5 500 emplois · Soit −1 Md€/an</span>
-          </div>
-
-          <div class="debt-counter">
-            <strong class="debt-counter-value">−982,2 Md€</strong>
-            <span class="debt-counter-label stats-description">Protection sociale et santé</span>
-            <span class="debt-counter-note">57 % de la dépense publique · INSEE · 2024</span>
-          </div>
-          <div class="debt-counter">
-            <strong class="debt-counter-value">−166 Md€</strong>
-            <span class="debt-counter-label stats-description">Interventionnisme économique</span>
-            <span class="debt-counter-note">10 % de la dépense publique · Dont 79 % de subventions, aides et frais de fonctionnement · INSEE · 2024</span>
-          </div>
-        </div>
+          </div></div>
         <div class="stats-marquee-group" aria-hidden="true">
-          <div class="debt-counter">
-            <span class="debt-counter-label">Dette publique</span>
-            <strong class="debt-counter-value debt-value-copy">−3 595 500 000 000 €</strong>
-            <span class="debt-counter-note">3,8 % de la dépense publique (−60Md€ d'intérêts annuels) · INSEE · 2025</span>
-          </div>
           <div class="debt-counter">
             <strong class="debt-counter-value">438</strong>
             <span class="debt-counter-label stats-description">Impôts, taxes, cotisations et contributions</span>
-            <span class="debt-counter-note">· constituant 92,6 % des recettes brutes du budget général de l’État · Recensement Fondation IFRAP · 2026</span>
+            <span class="debt-counter-note">92,6 % des recettes brutes du budget général de l’État · Fondation IFRAP · 2026</span>
           </div>
+          <div class="debt-counter">
+            <strong class="debt-counter-value">46 %</strong>
+            <span class="debt-counter-label stats-description">Prélèvements obligatoires</span>
+            <span class="debt-counter-note">Impôts et cotisations sociales · 2025 · Eurostat</span>
+          </div></div>
+      </div>
+    </section>
+    <section class="quiz-stats-placeholder" aria-label="Indicateurs économiques">
+      <div class="stats-marquee">
+        <div class="stats-marquee-group">
           <div class="debt-counter">
             <strong class="debt-counter-value">925</strong>
             <span class="debt-counter-label stats-description">Députés et sénateurs</span>
@@ -254,8 +241,30 @@
             <strong class="debt-counter-value">−166 Md€</strong>
             <span class="debt-counter-label stats-description">Interventionnisme économique</span>
             <span class="debt-counter-note">10 % de la dépense publique · Dont 79 % de subventions, aides et frais de fonctionnement · INSEE · 2024</span>
+          </div></div>
+        <div class="stats-marquee-group" aria-hidden="true">
+          <div class="debt-counter">
+            <strong class="debt-counter-value">925</strong>
+            <span class="debt-counter-label stats-description">Députés et sénateurs</span>
+            <span class="debt-counter-note">+ 5 500 emplois · Soit −1 Md€/an</span>
           </div>
-        </div>
+          <div class="debt-counter">
+            <strong class="debt-counter-value">−982,2 Md€</strong>
+            <span class="debt-counter-label stats-description">Protection sociale et santé</span>
+            <span class="debt-counter-note">57 % de la dépense publique · INSEE · 2024</span>
+          </div>
+          <div class="debt-counter">
+            <strong class="debt-counter-value">−166 Md€</strong>
+            <span class="debt-counter-label stats-description">Interventionnisme économique</span>
+            <span class="debt-counter-note">10 % de la dépense publique · Dont 79 % de subventions, aides et frais de fonctionnement · INSEE · 2024</span>
+          </div></div>
+      </div>
+    </section>
+    <section class="debt-line" aria-label="Compteur évolutif de la dette publique">
+      <div class="debt-counter">
+        <span class="debt-counter-label">Dette publique</span>
+        <strong class="debt-counter-value" id="public-debt-value">−3 595 500 000 000 €</strong>
+        <span class="debt-counter-note">Projection 2026 · intérêts annuels : environ 60 Md€</span>
       </div>
     </section>
 
@@ -419,63 +428,65 @@
   </script>
 <script>
 (() => {
-  const viewport = document.querySelector('#home-experience .quiz-stats-placeholder');
-  const track = viewport && viewport.querySelector('.stats-marquee');
-  if (!viewport || !track) return;
+  const viewports = document.querySelectorAll('#home-experience .quiz-stats-placeholder');
+  viewports.forEach((viewport) => {
+    const track = viewport.querySelector('.stats-marquee');
+    if (!track) return;
 
-  let offset = 0, loopWidth = 0, dragging = false, startX = 0, startOffset = 0;
-  let lastTime = 0;
-  const speed = 72; // pixels per second
+    let offset = 0, loopWidth = 0, dragging = false, startX = 0, startOffset = 0;
+    let lastTime = 0;
+    const speed = 72; // pixels per second — identique pour les deux lignes
 
-  const measure = () => {
-    const group = track.querySelector('.stats-marquee-group');
-    if (group) loopWidth = group.getBoundingClientRect().width;
-    if (loopWidth) offset = ((offset % loopWidth) + loopWidth) % loopWidth * -1;
-    track.style.transform = 'translate3d(' + offset + 'px,0,0)';
-  };
-
-  viewport.addEventListener('pointerdown', (event) => {
-    if (event.button !== undefined && event.button !== 0) return;
-    dragging = true;
-    startX = event.clientX;
-    startOffset = offset;
-    lastTime = 0;
-    viewport.classList.add('is-dragging');
-    viewport.setPointerCapture(event.pointerId);
-  });
-
-  viewport.addEventListener('pointermove', (event) => {
-    if (!dragging) return;
-    offset = startOffset + event.clientX - startX;
-    if (loopWidth) offset = -(((-offset % loopWidth) + loopWidth) % loopWidth);
-    track.style.transform = 'translate3d(' + offset + 'px,0,0)';
-  });
-
-  const endDrag = () => {
-    if (!dragging) return;
-    dragging = false;
-    viewport.classList.remove('is-dragging');
-  };
-  viewport.addEventListener('pointerup', endDrag);
-  viewport.addEventListener('pointercancel', endDrag);
-  viewport.addEventListener('lostpointercapture', endDrag);
-
-  const animate = (time) => {
-    if (!lastTime) lastTime = time;
-    const delta = Math.min((time - lastTime) / 1000, 0.05);
-    lastTime = time;
-    if (!dragging && loopWidth) {
-      offset -= speed * delta;
-      if (offset <= -loopWidth) offset += loopWidth;
+    const measure = () => {
+      const group = track.querySelector('.stats-marquee-group');
+      if (group) loopWidth = group.getBoundingClientRect().width;
+      if (loopWidth) offset = -(((-offset % loopWidth) + loopWidth) % loopWidth);
       track.style.transform = 'translate3d(' + offset + 'px,0,0)';
-    }
-    requestAnimationFrame(animate);
-  };
+    };
 
-  measure();
-  if ('ResizeObserver' in window) new ResizeObserver(measure).observe(viewport);
-  window.addEventListener('resize', measure);
-  requestAnimationFrame(animate);
+    viewport.addEventListener('pointerdown', (event) => {
+      if (event.button !== undefined && event.button !== 0) return;
+      dragging = true;
+      startX = event.clientX;
+      startOffset = offset;
+      lastTime = 0;
+      viewport.classList.add('is-dragging');
+      viewport.setPointerCapture(event.pointerId);
+    });
+
+    viewport.addEventListener('pointermove', (event) => {
+      if (!dragging) return;
+      offset = startOffset + event.clientX - startX;
+      if (loopWidth) offset = -(((-offset % loopWidth) + loopWidth) % loopWidth);
+      track.style.transform = 'translate3d(' + offset + 'px,0,0)';
+    });
+
+    const endDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      viewport.classList.remove('is-dragging');
+    };
+    viewport.addEventListener('pointerup', endDrag);
+    viewport.addEventListener('pointercancel', endDrag);
+    viewport.addEventListener('lostpointercapture', endDrag);
+
+    const animate = (time) => {
+      if (!lastTime) lastTime = time;
+      const delta = Math.min((time - lastTime) / 1000, 0.05);
+      lastTime = time;
+      if (!dragging && loopWidth) {
+        offset -= speed * delta;
+        if (offset <= -loopWidth) offset += loopWidth;
+        track.style.transform = 'translate3d(' + offset + 'px,0,0)';
+      }
+      requestAnimationFrame(animate);
+    };
+
+    measure();
+    if ('ResizeObserver' in window) new ResizeObserver(measure).observe(viewport);
+    window.addEventListener('resize', measure);
+    requestAnimationFrame(animate);
+  });
 })();
 </script>
 </body>
