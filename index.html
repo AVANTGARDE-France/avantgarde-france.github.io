@@ -350,7 +350,7 @@
     const field = document.getElementById("aiQuestion");
     closeQuiz.addEventListener("click",()=>root.classList.add("quiz-is-closed"));
     reopenQuiz.addEventListener("click",()=>root.classList.remove("quiz-is-closed"));
-    setTimeout(()=>{root.classList.remove("quiz-logo-first");root.classList.add("quiz-is-closed");},10000);
+    setTimeout(()=>{root.classList.remove("quiz-logo-first");root.classList.add("quiz-is-closed");},5000);
     // Reproduction de la formule du compteur Horloge de la dette publique (projection 2026).
     const debtDisplay = document.getElementById("public-debt-value");
     if (debtDisplay) {
