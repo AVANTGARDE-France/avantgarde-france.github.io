@@ -144,7 +144,29 @@
     @media(max-width:800px){#home-experience .quiz-hero{height:auto;min-height:calc(100svh - 118px);padding-top:28px}#home-experience .quiz-layout{flex:1;min-height:0;grid-template-columns:1fr;gap:clamp(16px,3vh,28px)}#home-experience .quiz-card{max-height:none;align-self:center}#home-experience .quiz-reopen{height:clamp(240px,42svh,390px)}#home-experience .quiz-intro h1{font-size:clamp(49px,12vw,78px)}#home-experience .quiz-intro p{max-width:560px}#home-experience .quiz-hero{padding-top:28px}#home-experience .quiz-card{padding:21px}}
     @media(max-width:480px){#home-experience .quiz-hero{min-height:calc(100svh - 118px)}#home-experience .quiz-card{max-height:none}#home-experience .quiz-top{align-items:flex-start;font-size:8px}#home-experience .quiz-status{font-size:8px}#home-experience .quiz-card{padding:17px}#home-experience .quiz-question{font-size:27px}#home-experience .quiz-option{padding:12px 10px;gap:9px}#home-experience .quiz-option-mark{flex-basis:25px;height:25px}#home-experience .quiz-parties{grid-template-columns:1fr}#home-experience .quiz-nav button{padding:10px 11px;font-size:9px}#home-experience .quiz-free .ai-composer-bottom{flex-direction:column}}
     @media(prefers-reduced-motion:reduce){#home-experience *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
-  </style>
+  
+    /* Correctif de largeur : chaque indicateur conserve sa propre grille */
+    #home-experience .quiz-stats-placeholder .stats-marquee-group > .debt-counter{
+      display:grid;
+      flex:0 0 auto;
+      width:max-content;
+      grid-template-columns:max-content 340px;
+      grid-template-rows:auto auto;
+      column-gap:18px;
+      row-gap:3px;
+      align-items:center;
+    }
+    #home-experience .quiz-stats-placeholder .stats-marquee-group > .debt-counter .debt-counter-value{grid-column:1;grid-row:1}
+    #home-experience .quiz-stats-placeholder .stats-marquee-group > .debt-counter .debt-counter-label{grid-column:2;grid-row:1}
+    #home-experience .quiz-stats-placeholder .stats-marquee-group > .debt-counter .debt-counter-note{grid-column:2;grid-row:2;max-width:340px;white-space:normal}
+    @media(max-width:620px){
+      #home-experience .quiz-stats-placeholder .stats-marquee-group > .debt-counter{
+        grid-template-columns:max-content 220px;
+        column-gap:10px;
+      }
+      #home-experience .quiz-stats-placeholder .stats-marquee-group > .debt-counter .debt-counter-note{max-width:220px}
+    }
+</style>
   <link rel="canonical" href="https://avantgarde-france.github.io/">
   <script type="application/ld+json">
   {
