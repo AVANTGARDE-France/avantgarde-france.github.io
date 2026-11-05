@@ -41,7 +41,7 @@ import "./admin-core.js";
    PROFIL
 ========================================================= */
 
-import "./admin-profile.js?v=20261105-compact-password-link-2";
+import "./admin-profile.js?v=20261105-profile-layout-3";
 
 
 /* =========================================================
