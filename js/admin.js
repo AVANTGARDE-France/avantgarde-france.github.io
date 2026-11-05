@@ -41,7 +41,7 @@ import "./admin-core.js";
    PROFIL
 ========================================================= */
 
-import "./admin-profile.js?v=20261105-single-google-email-1";
+import "./admin-profile.js?v=20261105-compact-password-link-2";
 
 
 /* =========================================================
