@@ -2594,3 +2594,58 @@ body.directory-filter-open{overflow:hidden}
     stroke-linecap: round;
     stroke-linejoin: round;
 }
+
+
+/* Tunnel d'inscription avec authentification Google */
+.signup-step[hidden] { display: none !important; }
+.signup-step { display: block; }
+.signup-navigation { display: flex; gap: 10px; margin-top: 22px; }
+.signup-navigation-dual { justify-content: space-between; }
+.signup-navigation button,
+.google-signup-button {
+    min-height: 46px;
+    border: 1px solid var(--gold);
+    padding: 13px 18px;
+    font: 700 11px/1.3 Arial, sans-serif;
+    letter-spacing: 1px;
+    cursor: pointer;
+}
+.signup-navigation .signup-next-button {
+    flex: 1;
+    background: var(--gold);
+    color: var(--navy);
+}
+.signup-navigation .signup-back-button {
+    min-width: 120px;
+    background: transparent;
+    color: var(--gold-light);
+}
+.signup-conditions-placeholder { min-height: 190px; }
+.signup-google-intro {
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: var(--muted);
+    font: 13px/1.6 Arial, sans-serif;
+}
+.google-signup-button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: #fff;
+    border-color: #fff;
+    color: #202124;
+}
+.google-signup-button:disabled { opacity: .65; cursor: wait; }
+.google-g {
+    font: 800 20px/1 Arial, sans-serif;
+    color: #4285f4;
+    text-transform: none;
+}
+@media(max-width:520px) {
+    .signup-navigation { gap: 7px; }
+    .signup-navigation .signup-back-button { min-width: 95px; }
+}
