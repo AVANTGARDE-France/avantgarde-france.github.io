@@ -231,6 +231,13 @@
 }
 
 
+.profile-page-title {
+    font-size:17px;
+    color:var(--gold);
+    margin:0 0 6px;
+    padding-bottom:7px;
+    border-bottom:1px solid rgba(214,173,85,.2);
+}
 .profile-visibility-row {
     display:flex;
     align-items:center;
@@ -254,12 +261,17 @@
     display:flex; align-items:center; gap:18px;
     padding:10px 0; border-bottom:1px solid rgba(214,173,85,.16);
 }
-.profile-row-label {
-    color:var(--gold-light);
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:.07em;
-    white-space:nowrap;
+/* Les intitulés reprennent exactement la typographie des champs du formulaire. */
+.profile-row-label,
+.profile-security-label {
+    display:block;
+    color:inherit;
+    font-family:Arial,sans-serif;
+    font-size:10px;
+    font-weight:bold;
+    letter-spacing:.5px;
+    line-height:1.35;
+    white-space:normal;
 }
 .profile-visibility-toggle {
     display:inline-flex;
@@ -303,9 +315,9 @@
 .profile-security-heading { display:flex; align-items:center; flex-wrap:wrap; gap:12px; min-height:42px; }
 .profile-security-label {
     display:inline-flex; align-items:center;
-    color:var(--gold-light,#f0d58a);
-    font-family:inherit; font-size:16px; font-weight:700;
-    letter-spacing:.04em; line-height:1.35;
+    color:inherit;
+    font-family:Arial,sans-serif; font-size:10px; font-weight:bold;
+    letter-spacing:.5px; line-height:1.35;
     white-space:normal; cursor:help;
 }
 .profile-email-value {
@@ -315,7 +327,7 @@
 }
 .profile-lock-icon { width:15px; height:15px; flex:none; color:var(--gold-light,#f0d58a); }
 .profile-security-password { display:flex; align-items:center; gap:10px; min-height:54px; }
-.profile-security-password .profile-security-label { font-size:16px; }
+.profile-security-password .profile-security-label { font-size:10px; }
 .profile-password-inline {
     display:flex; align-items:center; flex-wrap:nowrap; gap:8px;
     color:var(--muted); font-size:11px;
@@ -333,7 +345,7 @@
 .password-method-link:hover { background:rgba(214,173,85,.09); }
 
 @media(max-width:900px){.profile-main-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
-@media(max-width:600px){.profile-security-label{font-size:13px}.profile-email-value{font-size:13px}.profile-security-heading{gap:8px}.profile-visibility-row,.profile-security-row{align-items:flex-start;flex-direction:column;gap:8px}.profile-visibility-left{flex-wrap:wrap}.profile-id-copy{margin-left:0}.profile-main-grid{grid-template-columns:1fr 1fr}.profile-security-password{min-height:0;flex-wrap:wrap}.profile-main-grid .full-width{grid-column:1/-1}}
+@media(max-width:600px){.profile-security-label{font-size:10px}.profile-email-value{font-size:13px}.profile-security-heading{gap:8px}.profile-visibility-row,.profile-security-row{align-items:flex-start;flex-direction:column;gap:8px}.profile-visibility-left{flex-wrap:wrap}.profile-id-copy{margin-left:0}.profile-main-grid{grid-template-columns:1fr 1fr}.profile-security-password{min-height:0;flex-wrap:wrap}.profile-main-grid .full-width{grid-column:1/-1}}
 @media(max-width:380px){.profile-main-grid{grid-template-columns:1fr}.profile-main-grid .full-width{grid-column:auto}}
 .password-method-modal .modal-box {
     max-width:460px;
@@ -604,9 +616,9 @@
 
 <div class="panel">
 
-    <h2 class="panel-title">
+    <div class="social-title profile-page-title">
         Mon profil
-    </h2>
+    </div>
 
     <p class="panel-intro">
         Modifiez les informations qui apparaissent sur votre profil.
