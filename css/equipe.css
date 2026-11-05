@@ -2671,3 +2671,20 @@ body.directory-filter-open{overflow:hidden}
     font-weight: 400;
     letter-spacing: .04em;
 }
+
+
+/* Conditions d'inscription — étape 2 */
+.signup-conditions-content { color: #d8dce3; font: 13px/1.7 Arial, sans-serif; }
+.signup-conditions-content p { margin: 0 0 15px; }
+.signup-conditions-content strong { color: #f5f3ed; }
+.signup-conditions-lead { color: var(--gold-light); font: 700 17px/1.4 Georgia,serif; margin-bottom: 18px !important; }
+.signup-conditions-note { padding: 11px 13px; border-left: 2px solid rgba(214,173,85,.65); background: rgba(214,173,85,.06); color: #aeb8c7; font-size: 11px; }
+.signup-conditions-content h3 { color: var(--gold-light); font: 700 18px/1.3 Georgia,serif; margin: 25px 0 10px; }
+.signup-conditions-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 18px 0; }
+.signup-conditions-columns article { padding: 15px; border: 1px solid rgba(214,173,85,.25); background: rgba(0,0,0,.13); }
+.signup-conditions-columns h4 { color: var(--gold-light); font: 700 13px Arial,sans-serif; margin: 0 0 8px; }
+.signup-conditions-columns p { color: #bfc7d3; font-size: 12px; margin: 0; }
+.signup-conditions-conclusion { color: #f0d58a; font-weight: 700; }
+.signup-conditions-quote { margin: 24px 0 5px; padding: 18px 16px; border-left: 3px solid var(--gold); background: rgba(214,173,85,.07); color: #f5f3ed; font: italic 17px/1.5 Georgia,serif; }
+.signup-conditions-quote cite { display: block; margin-top: 9px; color: var(--gold-light); font: 700 10px Arial,sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+@media (max-width: 520px) { .signup-conditions-columns { grid-template-columns: 1fr; } .signup-conditions-quote { font-size: 15px; } }
