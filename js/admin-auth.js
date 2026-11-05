@@ -1405,6 +1405,29 @@ function initialiserAuthentification() {
 
     initialiserFormulaireConnexion();
 
+    const googleLoginButton = document.getElementById("googleLoginButton");
+    if (googleLoginButton && googleLoginButton.dataset.initialized !== "true") {
+        googleLoginButton.dataset.initialized = "true";
+        googleLoginButton.addEventListener("click", async () => {
+            googleLoginButton.disabled = true;
+            googleLoginButton.textContent = "REDIRECTION VERS GOOGLE…";
+
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: "google",
+                options: {
+                    redirectTo: window.location.origin + window.location.pathname + window.location.search
+                }
+            });
+
+            if (error) {
+                console.error("Erreur connexion Google :", error);
+                afficherMessage(loginMessage, "error", "La connexion Google n’est pas disponible. Vérifiez la configuration du fournisseur.");
+                googleLoginButton.disabled = false;
+                googleLoginButton.textContent = "CONTINUER AVEC GOOGLE";
+            }
+        });
+    }
+
 
     /*
      * Vérification de la session existante.
