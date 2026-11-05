@@ -919,6 +919,29 @@ async function verifierUtilisateur() {
         }
 
 
+        /*
+         * L'adresse du profil ne constitue plus une donnée
+         * indépendante : elle reprend celle du compte Auth.
+         * On répare ainsi automatiquement les anciens profils
+         * dont l'adresse aurait divergé.
+         */
+        const emailCompte = (user.email || "").trim().toLowerCase();
+
+        if (emailCompte && (profile.email || "").trim().toLowerCase() !== emailCompte) {
+            const { data: profilSynchronise, error: syncEmailError } = await supabase
+                .from("profiles")
+                .update({ email: emailCompte })
+                .eq("id", user.id)
+                .select()
+                .single();
+
+            if (syncEmailError) {
+                console.error("AUTH — SYNCHRONISATION DE L'ADRESSE DU PROFIL :", syncEmailError);
+            } else if (profilSynchronise) {
+                Object.assign(profile, profilSynchronise);
+            }
+        }
+
         /* =================================================
            ETAT UTILISATEUR
         ================================================= */
