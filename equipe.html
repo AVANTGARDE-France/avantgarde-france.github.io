@@ -27,7 +27,7 @@
 
     <link
         rel="stylesheet"
-        href="css/equipe.css?v=signup-20261105-1"
+        href="css/equipe.css?v=signup-google-20261105-1"
     >
 
   <link rel="canonical" href="https://avantgarde-france.github.io/equipe.html">
@@ -432,6 +432,7 @@
         >
 
 
+            <section class="signup-step active" id="signupStep1" aria-label="Vos informations">
             <!-- ================================================
                  TYPE D'INSCRIPTION
             ================================================= -->
@@ -541,42 +542,6 @@
                     autocomplete="name"
                     required
                 >
-
-            </div>
-
-
-
-            <!-- ================================================
-                 EMAIL
-            ================================================= -->
-
-            <div class="form-group">
-
-                <label
-                    class="main-label"
-                    for="email"
-                >
-
-                    Email
-
-                    <span class="required">
-                        *
-                    </span>
-
-                </label>
-
-
-                <input
-                    type="email"
-                    id="email"
-                    autocomplete="email"
-                    required
-                >
-
-
-                <div class="help">
-                    Une seule inscription est autorisée par adresse e-mail.
-                </div>
 
             </div>
 
@@ -753,27 +718,35 @@
                 </div></div>
             </div>
 
-            <!-- ================================================
-                 ENVOI
-            ================================================= -->
 
-            <button
-                type="submit"
-                class="submit-button"
-                id="submitButton"
-            >
-                CRÉER MON PROFIL
-            </button>
+                <div class="signup-navigation">
+                    <button type="button" class="signup-next-button" id="signupStep1Next">SUIVANT</button>
+                </div>
+            </section>
 
+            <section class="signup-step" id="signupStep2" aria-label="Conditions d'inscription" hidden>
+                <div class="signup-conditions-placeholder" aria-label="Espace réservé aux conditions d'inscription"></div>
+                <div class="signup-navigation signup-navigation-dual">
+                    <button type="button" class="signup-back-button" id="signupStep2Back">RETOUR</button>
+                    <button type="button" class="signup-next-button" id="signupStep2Next">SUIVANT</button>
+                </div>
+            </section>
 
-            <div
-                id="formMessage"
-                class="form-message"
-                role="status"
-                aria-live="polite"
-            ></div>
+            <section class="signup-step" id="signupStep3" aria-label="Authentification Google" hidden>
+                <div class="signup-google-intro">
+                    <p>Pour sécuriser votre inscription, connectez-vous avec votre compte Google.</p>
+                    <p>Votre adresse e-mail sera vérifiée par Google. Aucun mot de passe Avant-gardE ne sera créé.</p>
+                </div>
+                <button type="button" class="google-signup-button" id="googleSignupButton">
+                    <span class="google-g" aria-hidden="true">G</span>
+                    CONTINUER AVEC GOOGLE
+                </button>
+                <div class="signup-navigation">
+                    <button type="button" class="signup-back-button" id="signupStep3Back">RETOUR</button>
+                </div>
+            </section>
 
-
+            <div id="formMessage" class="form-message" role="status" aria-live="polite"></div>
         </form>
 
     </div>
@@ -835,11 +808,11 @@
 ========================================================= -->
 
 <script
-    src="js/equipe.js?v=signup-20261105-1"
+    src="js/equipe.js?v=signup-google-20261105-1"
 ></script>
 
 <script
-    src="js/equipe-trombinoscope.js?v=signup-20261105-1"
+    src="js/equipe-trombinoscope.js?v=signup-google-20261105-1"
 ></script>
 
 
