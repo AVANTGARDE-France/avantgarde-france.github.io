@@ -168,6 +168,232 @@ function initialiserEcouteurOngletProfil(){
 
 
 /* =========================================================
+   MÉTHODE DE CONNEXION E-MAIL + MOT DE PASSE
+========================================================= */
+
+let passwordMethodModalInitialized = false;
+
+function obtenirEtatMethodeMotDePasse(user, identities = []) {
+  const metadata = user?.user_metadata || {};
+  if (metadata.avantgarde_email_password_enabled === false) return false;
+  if (metadata.avantgarde_email_password_enabled === true) return true;
+  return identities.some(identity => identity.provider === "email");
+}
+
+async function actualiserMethodeMotDePasse() {
+  const actions = document.getElementById("profilePasswordMethodActions");
+  const status = document.getElementById("profilePasswordMethodStatus");
+  if (!actions || !status || !window.supabaseClient) return;
+
+  actions.innerHTML = "";
+  status.textContent = "Vérification des méthodes de connexion…";
+
+  const { data: userData, error: userError } = await window.supabaseClient.auth.getUser();
+  if (userError || !userData?.user) {
+    status.textContent = "Impossible de lire les paramètres de connexion.";
+    return;
+  }
+
+  const user = userData.user;
+  const { data: identityData, error: identityError } = await window.supabaseClient.auth.getUserIdentities();
+  if (identityError) {
+    console.error("AUTH — LECTURE DES IDENTITÉS :", identityError);
+    status.textContent = "Impossible de vérifier les méthodes de connexion.";
+    return;
+  }
+
+  const identities = identityData?.identities || [];
+  const passwordEnabled = obtenirEtatMethodeMotDePasse(user, identities);
+  const googleEnabled = identities.some(identity => identity.provider === "google");
+
+  status.textContent = passwordEnabled
+    ? "La connexion par e-mail et mot de passe est activée."
+    : "Aucun mot de passe de connexion secondaire n’est actuellement configuré.";
+
+  const createOrChange = document.createElement("button");
+  createOrChange.type = "button";
+  createOrChange.className = "secondary-button";
+  createOrChange.textContent = passwordEnabled ? "MODIFIER" : "CRÉER";
+  createOrChange.addEventListener("click", () => ouvrirModalMotDePasse(passwordEnabled ? "change" : "create"));
+  actions.appendChild(createOrChange);
+
+  if (passwordEnabled) {
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "delete-button";
+    remove.textContent = "SUPPRIMER";
+    remove.addEventListener("click", () => {
+      if (!googleEnabled) {
+        afficherMessageMotDePasse("Vous devez d’abord disposer d’une autre méthode de connexion, par exemple Google, pour ne pas perdre l’accès à votre compte.", "error");
+        return;
+      }
+      ouvrirModalMotDePasse("delete");
+    });
+    actions.appendChild(remove);
+    if (!googleEnabled) {
+      const warning = document.createElement("div");
+      warning.className = "help";
+      warning.textContent = "Pour éviter de vous verrouiller hors de votre compte, la suppression sera possible uniquement après avoir configuré une autre méthode de connexion.";
+      actions.appendChild(warning);
+    }
+  }
+}
+
+function afficherMessageMotDePasse(texte, type = "") {
+  const message = document.getElementById("passwordMethodMessage");
+  if (!message) return;
+  message.className = "password-method-message " + type;
+  message.textContent = texte;
+}
+
+function fermerModalMotDePasse() {
+  const modal = document.getElementById("passwordMethodModal");
+  if (modal) {
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+  }
+}
+
+function ouvrirModalMotDePasse(mode) {
+  let modal = document.getElementById("passwordMethodModal");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "passwordMethodModal";
+    modal.className = "modal password-method-modal";
+    modal.setAttribute("aria-hidden", "true");
+    modal.innerHTML = `
+      <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="passwordMethodModalTitle">
+        <button type="button" class="modal-close" id="passwordMethodModalClose" aria-label="Fermer">×</button>
+        <div class="page-kicker">PARAMÈTRES DE CONNEXION</div>
+        <h2 id="passwordMethodModalTitle"></h2>
+        <p id="passwordMethodModalIntro"></p>
+        <form id="passwordMethodForm" novalidate>
+          <div id="passwordMethodFields"></div>
+          <div id="passwordMethodMessage" class="password-method-message" aria-live="polite"></div>
+          <div class="password-method-modal-actions">
+            <button type="submit" class="primary-button" id="passwordMethodSubmit">VALIDER</button>
+            <button type="button" class="secondary-button" id="passwordMethodCancel">FERMER</button>
+          </div>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener("click", event => {
+      if (event.target === modal) fermerModalMotDePasse();
+    });
+    document.getElementById("passwordMethodModalClose").addEventListener("click", fermerModalMotDePasse);
+    document.getElementById("passwordMethodCancel").addEventListener("click", fermerModalMotDePasse);
+    document.getElementById("passwordMethodForm").addEventListener("submit", traiterFormulaireMotDePasse);
+    passwordMethodModalInitialized = true;
+  }
+
+  const title = document.getElementById("passwordMethodModalTitle");
+  const intro = document.getElementById("passwordMethodModalIntro");
+  const fields = document.getElementById("passwordMethodFields");
+  const submit = document.getElementById("passwordMethodSubmit");
+  const form = document.getElementById("passwordMethodForm");
+
+  form.dataset.mode = mode;
+  fields.innerHTML = "";
+  document.getElementById("passwordMethodMessage").textContent = "";
+
+  if (mode === "create" || mode === "change") {
+    title.textContent = mode === "create" ? "Créer votre mot de passe" : "Modifier votre mot de passe";
+    intro.textContent = "Choisissez un nouveau mot de passe pour vous connecter avec votre adresse e-mail. Cette méthode reste indépendante de Google.";
+    fields.innerHTML = `
+      <div class="form-group">
+        <label for="passwordMethodNew">NOUVEAU CODE</label>
+        <input type="password" id="passwordMethodNew" autocomplete="new-password" minlength="8" required>
+      </div>
+      <div class="form-group">
+        <label for="passwordMethodConfirm">NOUVEAU CODE — VÉRIFICATION</label>
+        <input type="password" id="passwordMethodConfirm" autocomplete="new-password" minlength="8" required>
+      </div>
+    `;
+    submit.textContent = mode === "create" ? "CRÉER" : "VALIDER";
+  } else {
+    title.textContent = "Supprimer la connexion e-mail + mot de passe";
+    intro.textContent = "Cela ne supprime pas votre compte. Cela supprime seulement l’identification par e-mail + mot de passe. Votre connexion Google reste disponible.";
+    fields.innerHTML = `
+      <div class="form-group">
+        <label for="passwordMethodDeleteConfirm">TAPEZ « SUPPRIMER » POUR CONFIRMER</label>
+        <input type="text" id="passwordMethodDeleteConfirm" autocomplete="off" required>
+      </div>
+    `;
+    submit.textContent = "SUPPRIMER";
+  }
+
+  modal.classList.add("active");
+  modal.setAttribute("aria-hidden", "false");
+  fields.querySelector("input")?.focus();
+}
+
+function genererMotDePasseInconnu() {
+  const bytes = new Uint8Array(48);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, value => value.toString(16).padStart(2, "0")).join("") + "Aa9!";
+}
+
+async function traiterFormulaireMotDePasse(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const mode = form.dataset.mode;
+  const submit = document.getElementById("passwordMethodSubmit");
+  submit.disabled = true;
+  afficherMessageMotDePasse("");
+
+  try {
+    const { data: userData, error: userError } = await window.supabaseClient.auth.getUser();
+    if (userError || !userData?.user) throw userError || new Error("Session membre introuvable.");
+    const user = userData.user;
+    const metadata = { ...(user.user_metadata || {}) };
+
+    if (mode === "create" || mode === "change") {
+      const password = document.getElementById("passwordMethodNew").value;
+      const confirmation = document.getElementById("passwordMethodConfirm").value;
+      if (password.length < 8) throw new Error("Le nouveau code doit contenir au moins 8 caractères.");
+      if (password !== confirmation) throw new Error("Les deux codes ne correspondent pas.");
+      const { error } = await window.supabaseClient.auth.updateUser({
+        password,
+        data: { ...metadata, avantgarde_email_password_enabled: true }
+      });
+      if (error) throw error;
+      fermerModalMotDePasse();
+      await actualiserMethodeMotDePasse();
+      const status = document.getElementById("profilePasswordMethodStatus");
+      if (status) status.textContent = "Votre mot de passe de connexion a bien été enregistré.";
+      return;
+    }
+
+    if (document.getElementById("passwordMethodDeleteConfirm").value.trim().toUpperCase() !== "SUPPRIMER") {
+      throw new Error("Saisissez SUPPRIMER pour confirmer.");
+    }
+
+    const { data: identityData, error: identityError } = await window.supabaseClient.auth.getUserIdentities();
+    if (identityError) throw identityError;
+    const googleEnabled = (identityData?.identities || []).some(identity => identity.provider === "google");
+    if (!googleEnabled) throw new Error("Ajoutez d’abord une autre méthode de connexion, par exemple Google.");
+
+    const { error } = await window.supabaseClient.auth.updateUser({
+      password: genererMotDePasseInconnu(),
+      data: { ...metadata, avantgarde_email_password_enabled: false }
+    });
+    if (error) throw error;
+
+    fermerModalMotDePasse();
+    await actualiserMethodeMotDePasse();
+    const status = document.getElementById("profilePasswordMethodStatus");
+    if (status) status.textContent = "La connexion par e-mail + mot de passe a été désactivée. Votre compte et votre connexion Google sont conservés.";
+  } catch (error) {
+    console.error("AUTH — GESTION DU MOT DE PASSE :", error);
+    afficherMessageMotDePasse(error?.message || "Impossible d’enregistrer cette modification.", "error");
+  } finally {
+    submit.disabled = false;
+  }
+}
+
+
+/* =========================================================
    COMPTEUR DESCRIPTION
 ========================================================= */
 
@@ -1034,6 +1260,7 @@ function remplirProfil(profile){
   afficherIdentifiantMembre(profile);
   initialiserPopupParrainages();
   initialiserChampParrain(profile);
+  actualiserMethodeMotDePasse();
 
   // Le facteur dons reste à 1 tant que la table dédiée n'est pas connectée.
   mettreAJourNombrePointsVIP(
