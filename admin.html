@@ -231,24 +231,72 @@
 }
 
 
-#profilePasswordMethod {
-    margin-top:4px;
-    padding:0;
-    border:0;
-    background:transparent;
+.profile-visibility-row,
+.profile-security-row {
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:10px 0;
+    border-bottom:1px solid rgba(214,173,85,.16);
+}
+.profile-row-label {
+    color:var(--gold-light);
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:.07em;
+    white-space:nowrap;
+}
+.profile-visibility-toggle {
+    display:inline-flex;
+    align-items:center;
+    border:1px solid rgba(214,173,85,.38);
+    border-radius:5px;
+    overflow:hidden;
+}
+.profile-visibility-toggle input {
+    position:absolute;
+    opacity:0;
+    pointer-events:none;
+}
+.profile-visibility-toggle label {
+    margin:0;
+    padding:7px 16px;
+    color:var(--muted);
+    font-size:10px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.18s;
+}
+.profile-visibility-toggle input:checked + label {
+    color:#07152d;
+    background:var(--gold-light,#f0d58a);
+}
+.profile-main-grid {
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:10px 14px;
+    margin-top:12px;
+}
+.profile-main-grid .form-group { min-width:0; margin-bottom:4px; }
+.profile-main-grid input,
+.profile-main-grid select { min-width:0; width:100%; }
+.profile-main-grid .sponsor-input-wrap { gap:5px; }
+.profile-main-grid .sponsor-validation-icon { width:22px; height:22px; flex-basis:22px; }
+.profile-main-grid .help { font-size:9px; margin-top:4px; }
+.profile-security-row { align-items:flex-start; margin-top:18px; }
+.profile-security-email,
+.profile-security-password { flex:1; min-width:0; }
+.profile-security-email input { width:100%; }
+.profile-security-password { display:flex; align-items:center; gap:12px; min-height:68px; }
+.profile-password-inline {
     display:flex;
     align-items:center;
     flex-wrap:wrap;
     gap:8px;
+    color:var(--muted);
+    font-size:11px;
 }
-#profilePasswordMethodStatus {
-    display:inline;
-    margin:0;
-}
-.password-method-actions {
-    display:inline-flex;
-    margin:0;
-}
+#profilePasswordMethodStatus { display:inline; margin:0; }
+.password-method-actions { display:inline-flex; margin:0; }
 .password-method-link {
     appearance:none;
     border:0;
@@ -265,6 +313,9 @@
     cursor:pointer;
 }
 .password-method-link:hover { color:#f0d58a; }
+@media(max-width:900px){.profile-main-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:600px){.profile-visibility-row,.profile-security-row{align-items:flex-start;flex-direction:column;gap:8px}.profile-main-grid{grid-template-columns:1fr 1fr}.profile-security-password{min-height:0;flex-wrap:wrap}.profile-main-grid .full-width{grid-column:1/-1}}
+@media(max-width:380px){.profile-main-grid{grid-template-columns:1fr}.profile-main-grid .full-width{grid-column:auto}}
 .password-method-modal .modal-box {
     max-width:460px;
 }
@@ -547,251 +598,72 @@
 <form id="profileForm">
 
 
-    <div class="form-group">
-
-        <label>
-            VISIBILITÉ DU PROFIL
-        </label>
-
-        <div class="registration-choice">
-
-
-            <div class="choice-option">
-
-                <input
-                    type="radio"
-                    id="profileAffiche"
-                    name="profileVisibility"
-                    value="affiche"
-                >
-
-                <label
-                    for="profileAffiche"
-                    class="choice-label"
-                >
-
-                    <strong>
-                        Affiché
-                    </strong>
-
-                    <span>
-                        Votre profil apparaît dans la liste publique des membres.
-                    </span>
-
-                </label>
-
-            </div>
-
-
-            <div class="choice-option">
-
-                <input
-                    type="radio"
-                    id="profileAnonyme"
-                    name="profileVisibility"
-                    value="anonyme"
-                >
-
-                <label
-                    for="profileAnonyme"
-                    class="choice-label"
-                >
-
-                    <strong>
-                        Anonyme
-                    </strong>
-
-                    <span>
-                        Votre profil est enregistré mais caché de la liste publique.
-                    </span>
-
-                </label>
-
-            </div>
-
-
+    <div class="profile-visibility-row">
+        <span class="profile-row-label">VISIBILITÉ DU PROFIL</span>
+        <div class="profile-visibility-toggle" role="group" aria-label="Visibilité du profil">
+            <input type="radio" id="profileAffiche" name="profileVisibility" value="affiche">
+            <label for="profileAffiche" title="Votre profil apparaît dans la liste publique des membres.">AFFICHÉ</label>
+            <input type="radio" id="profileAnonyme" name="profileVisibility" value="anonyme">
+            <label for="profileAnonyme" title="Votre profil est enregistré mais caché de la liste publique.">CACHÉ</label>
         </div>
-
     </div>
 
-
-
-    <div class="profile-grid">
-
+    <div class="profile-grid profile-main-grid">
 
         <div class="form-group">
-
-            <label for="profileNom">
-                PSEUDO OU NOM PRÉNOM
-            </label>
-
-            <input
-                type="text"
-                id="profileNom"
-                maxlength="100"
-                required
-            >
-
+            <label for="profileNom">PSEUDO OU NOM PRÉNOM</label>
+            <input type="text" id="profileNom" maxlength="100" required>
         </div>
-
 
         <div class="form-group">
-
-            <label for="profileEmail">
-                EMAIL
-            </label>
-
-            <input
-                type="email"
-                id="profileEmail"
-                required
-                autocomplete="email"
-                readonly
-                aria-readonly="true"
-            >
-
-            <div class="help">
-                Cette adresse est celle de votre compte Google. Elle est identique à votre adresse de connexion et ne peut pas être modifiée ici. Pour la changer, modifiez l’adresse de votre compte Google puis reconnectez-vous à Avant-gardE.
-            </div>
+            <label for="profileImage">IMAGE</label>
+            <input type="url" id="profileImage" placeholder="https://...">
+            <div class="help">URL d’une image déjà hébergée en ligne.</div>
         </div>
-
-        <div id="profilePasswordMethod" class="help" aria-live="polite">
-            <span id="profilePasswordMethodStatus">Connexion secondaire : vérification…</span>
-            <span id="profilePasswordMethodActions" class="password-method-actions"></span>
-        </div>
-
 
         <div class="form-group">
-
-            <label for="profileImage">
-                IMAGE
-            </label>
-
-            <input
-                type="url"
-                id="profileImage"
-                placeholder="https://..."
-            >
-
-            <div class="help">
-                Indiquez l’URL d’une image déjà hébergée en ligne.
-            </div>
-
-        </div>
-
-
-        <div class="form-group">
-
-            <label for="profileRegion">
-                RÉGION
-            </label>
-
-            <select
-                id="profileRegion"
-                required
-            >
-
-                <option value="">
-                    Sélectionnez votre région
-                </option>
-
+            <label for="profileRegion">RÉGION</label>
+            <select id="profileRegion" required>
+                <option value="">Sélectionnez votre région</option>
                 <optgroup label="France métropolitaine">
-                    <option>Auvergne-Rhône-Alpes</option>
-                    <option>Bourgogne-Franche-Comté</option>
-                    <option>Bretagne</option>
-                    <option>Centre-Val de Loire</option>
-                    <option>Corse</option>
-                    <option>Grand Est</option>
-                    <option>Hauts-de-France</option>
-                    <option>Île-de-France</option>
-                    <option>Normandie</option>
-                    <option>Nouvelle-Aquitaine</option>
-                    <option>Occitanie</option>
-                    <option>Pays de la Loire</option>
-                    <option>Provence-Alpes-Côte d’Azur</option>
+                    <option>Auvergne-Rhône-Alpes</option><option>Bourgogne-Franche-Comté</option><option>Bretagne</option><option>Centre-Val de Loire</option><option>Corse</option><option>Grand Est</option><option>Hauts-de-France</option><option>Île-de-France</option><option>Normandie</option><option>Nouvelle-Aquitaine</option><option>Occitanie</option><option>Pays de la Loire</option><option>Provence-Alpes-Côte d’Azur</option>
                 </optgroup>
-
-                <optgroup label="Outre-mer">
-                    <option>Guadeloupe</option>
-                    <option>Martinique</option>
-                    <option>Guyane</option>
-                    <option>La Réunion</option>
-                    <option>Mayotte</option>
-                </optgroup>
-
-                <optgroup label="Étranger">
-                    <option>Europe</option>
-                    <option>Amérique du Nord</option>
-                    <option>Amérique centrale et Caraïbes</option>
-                    <option>Amérique du Sud</option>
-                    <option>Afrique</option>
-                    <option>Asie</option>
-                    <option>Océanie</option>
-                    <option>Autre</option>
-                </optgroup>
-
+                <optgroup label="Outre-mer"><option>Guadeloupe</option><option>Martinique</option><option>Guyane</option><option>La Réunion</option><option>Mayotte</option></optgroup>
+                <optgroup label="Étranger"><option>Europe</option><option>Amérique du Nord</option><option>Amérique centrale et Caraïbes</option><option>Amérique du Sud</option><option>Afrique</option><option>Asie</option><option>Océanie</option><option>Autre</option></optgroup>
             </select>
-
         </div>
 
+        <div class="form-group sponsor-field">
+            <label for="profileSponsorId">PARRAIN</label>
+            <div class="sponsor-input-wrap">
+                <input type="text" id="profileSponsorId" placeholder="Identifiant membre" autocomplete="off" spellcheck="false" aria-describedby="profileSponsorStatus">
+                <span id="profileSponsorIcon" class="sponsor-validation-icon" aria-hidden="true">—</span>
+            </div>
+            <div id="profileSponsorStatus" class="help sponsor-validation-status" aria-live="polite">Aucun parrain renseigné.</div>
+        </div>
 
         <div class="form-group full-width">
-
-            <label for="profileDescription">
-                DESCRIPTION
-            </label>
-
-            <textarea
-                id="profileDescription"
-                maxlength="300"
-                placeholder="Présentez-vous en quelques mots..."
-            ></textarea>
-
-            <div
-                id="descriptionCounter"
-                class="description-counter"
-            >
-                0 / 300
-            </div>
-
+            <label for="profileDescription">DESCRIPTION</label>
+            <textarea id="profileDescription" maxlength="300" placeholder="Présentez-vous en quelques mots..."></textarea>
+            <div id="descriptionCounter" class="description-counter">0 / 300</div>
         </div>
-
-        <div class="form-group full-width sponsor-field">
-
-            <label for="profileSponsorId">
-                QUI EST MON PARRAIN ?
-            </label>
-
-            <div class="sponsor-input-wrap">
-                <input
-                    type="text"
-                    id="profileSponsorId"
-                    placeholder="Identifiant membre de votre parrain"
-                    autocomplete="off"
-                    spellcheck="false"
-                    aria-describedby="profileSponsorStatus"
-                >
-                <span
-                    id="profileSponsorIcon"
-                    class="sponsor-validation-icon"
-                    aria-hidden="true"
-                >—</span>
-            </div>
-
-            <div
-                id="profileSponsorStatus"
-                class="help sponsor-validation-status"
-                aria-live="polite"
-            >
-                Saisissez l’identifiant membre de la personne qui vous a parrainé.
-            </div>
-
-        </div>
-
 
     </div>
 
-
+    <div class="profile-security-row">
+        <div class="profile-security-email">
+            <label for="profileEmail">EMAIL</label>
+            <input type="email" id="profileEmail" required autocomplete="email" readonly aria-readonly="true">
+            <div class="help">Adresse vérifiée de votre compte Google.</div>
+        </div>
+        <div class="profile-security-password">
+            <span class="profile-row-label">MOT DE PASSE (AUTRE MÉTHODE)</span>
+            <div id="profilePasswordMethod" class="profile-password-inline" aria-live="polite">
+                <span id="profilePasswordMethodStatus">Vérification…</span>
+                <span id="profilePasswordMethodActions" class="password-method-actions"></span>
+            </div>
+        </div>
+    </div>
 
     <div class="social-title">
         Réseaux sociaux
