@@ -41,7 +41,7 @@ import "./admin-core.js";
    PROFIL
 ========================================================= */
 
-import "./admin-profile.js?v=20261105-password-method-2";
+import "./admin-profile.js?v=20261105-single-google-email-1";
 
 
 /* =========================================================
@@ -90,5 +90,5 @@ import "./admin-delete-profile.js";
  * Les autres modules doivent donc être chargés avant lui.
  */
 
-import "./admin-auth.js?v=google-first-20261105-2";
+import "./admin-auth.js?v=google-first-single-email-20261105-1";
 
