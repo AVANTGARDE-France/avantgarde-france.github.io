@@ -1710,11 +1710,56 @@ function afficherEtapeInscription(numero) {
     if (intro) intro.hidden = numero !== 1;
 }
 
+async function verifierCodeParrainage(identifiant, nouvelUtilisateurId = null) {
+    const code = String(identifiant || "").trim();
+    if (!code) return { valide: true, parrainId: null };
+
+    const formatUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const status = document.getElementById("signupSponsorStatus");
+
+    if (!formatUUID.test(code)) {
+        if (status) status.textContent = "Format invalide : saisissez l’identifiant membre complet.";
+        return { valide: false, parrainId: null };
+    }
+
+    if (nouvelUtilisateurId && code.toLowerCase() === nouvelUtilisateurId.toLowerCase()) {
+        if (status) status.textContent = "Vous ne pouvez pas être votre propre parrain.";
+        return { valide: false, parrainId: null };
+    }
+
+    if (status) status.textContent = "Vérification de l’identifiant…";
+
+    const { data, error } = await window.supabaseClient
+        .from("profiles")
+        .select("id, nom, anonyme")
+        .eq("id", code)
+        .maybeSingle();
+
+    if (error) {
+        console.error("Vérification du parrain :", error);
+        if (status) status.textContent = "Vérification impossible. Réessayez.";
+        return { valide: false, parrainId: null };
+    }
+
+    if (!data) {
+        if (status) status.textContent = "Aucun membre ne correspond à cet identifiant.";
+        return { valide: false, parrainId: null };
+    }
+
+    if (status) {
+        const nom = data.anonyme ? "Membre anonyme" : (data.nom || "Membre");
+        status.textContent = "Identifiant valide : " + nom + ".";
+    }
+
+    return { valide: true, parrainId: data.id };
+}
+
 async function finaliserInscriptionGoogle() {
     const message = document.getElementById("formMessage");
     const button = document.getElementById("googleSignupButton");
     const nom = document.getElementById("nom")?.value.trim() || "";
     const region = document.getElementById("region")?.value.trim() || "";
+    const parrainId = document.getElementById("signupSponsorId")?.value.trim() || "";
     const choix = document.querySelector('input[name="type_inscription"]:checked');
     const anonyme = choix ? choix.value === "anonyme" : false;
 
@@ -1730,10 +1775,19 @@ async function finaliserInscriptionGoogle() {
     }
 
     try {
+        const validationParrain = await verifierCodeParrainage(parrainId);
+        if (!validationParrain.valide) {
+            afficherEtapeInscription(1);
+            afficherErreurFormulaire(message, "Le code de parrainage est invalide. Corrigez-le ou laissez le champ vide.");
+            document.getElementById("signupSponsorId")?.focus();
+            return;
+        }
+
         sessionStorage.setItem("avantgarde_pending_google_signup", JSON.stringify({
             nom,
             region,
             anonyme,
+            parrainId: validationParrain.parrainId,
             createdAt: Date.now()
         }));
 
@@ -1835,13 +1889,21 @@ async function traiterRetourInscriptionGoogle() {
             throw new Error("Cette adresse e-mail est déjà associée à un autre profil. Aucun doublon n’a été créé. Contactez l’équipe pour régulariser l’accès.");
         }
 
+        const validationParrain = await verifierCodeParrainage(pending.parrainId, user.id);
+        if (!validationParrain.valide) {
+            await window.supabaseClient.auth.signOut();
+            sessionStorage.removeItem("avantgarde_pending_google_signup");
+            throw new Error("Le code de parrainage n’est plus valide. Aucun profil n’a été créé.");
+        }
+
         const profil = {
             id: user.id,
             nom: pending.nom,
             grade: "user",
             email: user.email.toLowerCase(),
             region: pending.region,
-            anonyme: Boolean(pending.anonyme)
+            anonyme: Boolean(pending.anonyme),
+            parrain_id: validationParrain.parrainId
         };
 
         const { error: insertError } = await window.supabaseClient
@@ -1877,7 +1939,7 @@ function initialiserFormulaireInscription() {
 
     form.addEventListener("submit", event => event.preventDefault());
 
-    document.getElementById("signupStep1Next")?.addEventListener("click", () => {
+    document.getElementById("signupStep1Next")?.addEventListener("click", async () => {
         const nom = document.getElementById("nom");
         const region = document.getElementById("region");
         const message = document.getElementById("formMessage");
@@ -1891,6 +1953,18 @@ function initialiserFormulaireInscription() {
             afficherErreurFormulaire(message, "Merci de sélectionner votre région.");
             region?.focus();
             return;
+        }
+
+        const parrainId = document.getElementById("signupSponsorId")?.value.trim() || "";
+        if (parrainId) {
+            const validation = await verifierCodeParrainage(parrainId);
+            if (!validation.valide) {
+                document.getElementById("signupSponsorId")?.focus();
+                return;
+            }
+        } else {
+            const status = document.getElementById("signupSponsorStatus");
+            if (status) status.textContent = "Aucun parrain renseigné.";
         }
 
         if (message) {
