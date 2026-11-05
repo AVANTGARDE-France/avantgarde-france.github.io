@@ -220,12 +220,7 @@ async function actualiserMethodeMotDePasse() {
 
   // La suppression reste accessible depuis la fenêtre de modification,
   // sans ajouter un second bouton permanent au profil.
-  if (passwordEnabled && googleEnabled) {
-    manage.addEventListener("contextmenu", event => {
-      event.preventDefault();
-      ouvrirModalMotDePasse("delete");
-    });
-  }
+  
 }
 
 function afficherMessageMotDePasse(texte, type = "") {
@@ -281,6 +276,18 @@ function ouvrirModalMotDePasse(mode) {
   const fields = document.getElementById("passwordMethodFields");
   const submit = document.getElementById("passwordMethodSubmit");
   const form = document.getElementById("passwordMethodForm");
+  const modalActions = form.querySelector(".password-method-modal-actions");
+  const oldDelete = document.getElementById("passwordMethodDeleteAction");
+  if (oldDelete) oldDelete.remove();
+  if (mode === "change") {
+    const deleteAction = document.createElement("button");
+    deleteAction.type = "button";
+    deleteAction.id = "passwordMethodDeleteAction";
+    deleteAction.className = "password-method-link";
+    deleteAction.textContent = "Supprimer cette méthode";
+    deleteAction.addEventListener("click", () => ouvrirModalMotDePasse("delete"));
+    modalActions.insertBefore(deleteAction, submit);
+  }
 
   form.dataset.mode = mode;
   fields.innerHTML = "";
