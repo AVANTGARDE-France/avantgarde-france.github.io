@@ -1768,6 +1768,16 @@ async function traiterRetourInscriptionGoogle() {
     const joinModal = document.getElementById("joinModal");
     const message = document.getElementById("formMessage");
 
+    const callbackParams = new URLSearchParams(window.location.search);
+    const oauthError = callbackParams.get("error_description") || callbackParams.get("error");
+    if (oauthError) {
+        sessionStorage.removeItem("avantgarde_pending_google_signup");
+        ouvrirModalEquipe(joinModal);
+        afficherEtapeInscription(3);
+        afficherErreurFormulaire(message, "La connexion Google a été interrompue ou refusée. Vous pouvez réessayer.");
+        return;
+    }
+
     try {
         const pending = JSON.parse(raw);
         if (!pending || Date.now() - Number(pending.createdAt || 0) > 30 * 60 * 1000) {
