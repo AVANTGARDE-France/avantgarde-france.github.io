@@ -1689,517 +1689,125 @@ function afficherErreurFormulaire(
 ========================================================= */
 
 function initialiserFormulaireInscription() {
+    const form = document.getElementById("joinForm");
+    if (!form) return;
 
-    const form =
-        document.getElementById(
-            "joinForm"
-        );
+    form.addEventListener("submit", async event => {
+        event.preventDefault();
 
+        const nomField = document.getElementById("nom");
+        const emailField = document.getElementById("email");
+        const regionField = document.getElementById("region");
+        const submitButton = document.getElementById("submitButton");
+        const message = document.getElementById("formMessage");
+        const typeInscription = document.querySelector('input[name="type_inscription"]:checked');
 
-    if (!form) {
-        return;
-    }
+        if (!nomField || !emailField || !regionField) return;
 
+        const nom = nomField.value.trim();
+        const email = emailField.value.trim().toLowerCase();
+        const region = regionField.value.trim();
+        const anonyme = typeInscription ? typeInscription.value === "anonyme" : false;
 
-    form.addEventListener(
-        "submit",
-        async event => {
+        if (message) {
+            message.textContent = "";
+            message.className = "form-message";
+        }
 
-            event.preventDefault();
+        if (!nom) {
+            afficherErreurFormulaire(message, "Merci d’indiquer votre nom.");
+            nomField.focus();
+            return;
+        }
+        if (!email) {
+            afficherErreurFormulaire(message, "Merci d’indiquer votre adresse email.");
+            emailField.focus();
+            return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            afficherErreurFormulaire(message, "L’adresse email semble invalide.");
+            emailField.focus();
+            return;
+        }
+        if (!region) {
+            afficherErreurFormulaire(message, "Merci d’indiquer votre région.");
+            regionField.focus();
+            return;
+        }
+        if (typeof supabaseClient === "undefined" || !supabaseClient) {
+            afficherErreurFormulaire(message, "La connexion à la base de données est indisponible.");
+            return;
+        }
 
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = "VÉRIFICATION EN COURS…";
+        }
 
-            const nomField =
-                document.getElementById(
-                    "nom"
-                );
+        try {
+            const { data: emailExistant, error: emailCheckError } = await supabaseClient
+                .from("profiles")
+                .select("id")
+                .ilike("email", email)
+                .limit(1);
 
+            if (emailCheckError) throw emailCheckError;
 
-            const emailField =
-                document.getElementById(
-                    "email"
-                );
-
-
-            const regionField =
-                document.getElementById(
-                    "region"
-                );
-
-
-            const imageField =
-                document.getElementById(
-                    "image_url"
-                );
-
-
-            const descriptionField =
-                document.getElementById(
-                    "description"
-                );
-
-
-            const submitButton =
-                document.getElementById(
-                    "submitButton"
-                );
-
-
-            const message =
-                document.getElementById(
-                    "formMessage"
-                );
-
-
-            const typeInscription =
-                document.querySelector(
-                    'input[name="type_inscription"]:checked'
-                );
-
-
-            if (
-                !nomField ||
-                !emailField ||
-                !regionField ||
-                !descriptionField
-            ) {
-
+            if (Array.isArray(emailExistant) && emailExistant.length > 0) {
+                afficherErreurFormulaire(message, "Cette adresse e-mail est déjà utilisée. Un seul profil peut être créé avec cette adresse.");
                 return;
-
             }
 
+            const profil = {
+                id: crypto.randomUUID(),
+                nom,
+                grade: "user",
+                email,
+                region,
+                anonyme
+            };
 
-            const nom =
-                nomField.value.trim();
+            if (submitButton) submitButton.textContent = "CRÉATION DU PROFIL…";
 
-
-            const email =
-                emailField.value
-                    .trim()
-                    .toLowerCase();
-
-
-            const region =
-                regionField.value.trim();
-
-
-            const image_url =
-                imageField
-                    ? imageField.value.trim()
-                    : "";
-
-
-            const description =
-                descriptionField.value.trim();
-
-
-            const anonyme =
-                typeInscription
-                    ? typeInscription.value ===
-                      "anonyme"
-                    : false;
-
-
-            const competences =
-                Array.from(
-                    document.querySelectorAll(
-                        'input[name="competences"]:checked'
-                    )
-                )
-                .map(
-                    input =>
-                        input.value
-                )
-                .filter(
-                    value =>
-                        value !== "VIP" &&
-                        value !== "Mécène"
-                )
-                .filter(Boolean);
-
+            const { error } = await supabaseClient.from("profiles").insert(profil);
+            if (error) {
+                console.error("Erreur création profil :", error);
+                if (error.code === "23505") {
+                    afficherErreurFormulaire(message, "Cette adresse e-mail est déjà utilisée. Un seul profil peut être créé avec cette adresse.");
+                } else {
+                    afficherErreurFormulaire(message, "Impossible de créer le profil pour le moment. Veuillez réessayer.");
+                }
+                return;
+            }
 
             if (message) {
-
-                message.textContent =
-                    "";
-
-                message.className =
-                    "form-message";
-
+                message.className = "form-message success";
+                message.textContent = anonyme
+                    ? "Votre profil a bien été créé. Il restera caché de la liste publique des membres."
+                    : "Votre profil a bien été créé. Il apparaît désormais dans la liste des membres.";
             }
 
+            form.reset();
+            const radioSympathisant = document.querySelector('input[name="type_inscription"][value="sympathisant"]');
+            if (radioSympathisant) radioSympathisant.checked = true;
 
-            /* =================================================
-               VALIDATION
-            ================================================= */
+            setTimeout(() => {
+                const joinModal = document.getElementById("joinModal");
+                fermerModalEquipe(joinModal);
+                chargerMembres();
+            }, 1800);
 
-            if (!nom) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "Merci d’indiquer votre nom."
-                );
-
-                nomField.focus();
-
-                return;
-
-            }
-
-
-            if (!email) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "Merci d’indiquer votre adresse email."
-                );
-
-                emailField.focus();
-
-                return;
-
-            }
-
-
-            const emailValide =
-                /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-                    .test(email);
-
-
-            if (!emailValide) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "L’adresse email semble invalide."
-                );
-
-                emailField.focus();
-
-                return;
-
-            }
-
-
-            if (!region) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "Merci d’indiquer votre région."
-                );
-
-                regionField.focus();
-
-                return;
-
-            }
-
-
-            if (
-                description.length >
-                300
-            ) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "La présentation ne doit pas dépasser 300 caractères."
-                );
-
-                descriptionField.focus();
-
-                return;
-
-            }
-
-
-            if (
-                image_url &&
-                !imageValide(
-                    image_url
-                )
-            ) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "L’URL de la photo semble invalide."
-                );
-
-                imageField.focus();
-
-                return;
-
-            }
-
-
-            if (
-                typeof supabaseClient ===
-                    "undefined" ||
-                !supabaseClient
-            ) {
-
-                afficherErreurFormulaire(
-                    message,
-                    "La connexion à la base de données est indisponible."
-                );
-
-                return;
-
-            }
-
-
-            /* =================================================
-               BOUTON
-            ================================================= */
-
+        } catch (error) {
+            console.error("Erreur inscription :", error);
+            afficherErreurFormulaire(message, "Une erreur est survenue lors de l’inscription. Veuillez réessayer.");
+        } finally {
             if (submitButton) {
-
-                submitButton.disabled =
-                    true;
-
-                submitButton.textContent =
-                    "VÉRIFICATION EN COURS…";
-
+                submitButton.disabled = false;
+                submitButton.textContent = "CRÉER MON PROFIL";
             }
-
-
-            try {
-
-                /* =============================================
-                   VERIFICATION EMAIL
-                ============================================== */
-
-                const {
-                    data: emailExistant,
-                    error: emailCheckError
-                } = await supabaseClient
-
-                    .from("profiles")
-
-                    .select("id")
-
-                    .ilike(
-                        "email",
-                        email
-                    )
-
-                    .limit(1);
-
-
-                if (emailCheckError) {
-
-                    throw emailCheckError;
-
-                }
-
-
-                if (
-                    Array.isArray(
-                        emailExistant
-                    ) &&
-                    emailExistant.length >
-                        0
-                ) {
-
-                    afficherErreurFormulaire(
-                        message,
-                        "Cette adresse e-mail est déjà utilisée. Un seul profil peut être créé avec cette adresse."
-                    );
-
-
-                    return;
-
-                }
-
-
-                /* =============================================
-                   CREATION
-                ============================================== */
-
-                const profil = {
-
-                    id:
-                        crypto.randomUUID(),
-
-                    nom:
-                        nom,
-
-                    grade:
-                        "user",
-
-                    email:
-                        email,
-
-                    image_url:
-                        image_url ||
-                        null,
-
-                    description:
-                        description ||
-                        null,
-
-                    region:
-                        region,
-
-                    competences:
-                        competences,
-
-                    anonyme:
-                        anonyme
-
-                };
-
-
-                if (submitButton) {
-
-                    submitButton.textContent =
-                        "CRÉATION DU PROFIL…";
-
-                }
-
-
-                const {
-                    error
-                } = await supabaseClient
-
-                    .from("profiles")
-
-                    .insert(
-                        profil
-                    );
-
-
-                if (error) {
-
-                    console.error(
-                        "Erreur création profil :",
-                        error
-                    );
-
-
-                    if (
-                        error.code ===
-                        "23505"
-                    ) {
-
-                        afficherErreurFormulaire(
-                            message,
-                            "Cette adresse e-mail est déjà utilisée. Un seul profil peut être créé avec cette adresse."
-                        );
-
-                    } else {
-
-                        afficherErreurFormulaire(
-                            message,
-                            "Impossible de créer le profil pour le moment. Veuillez réessayer."
-                        );
-
-                    }
-
-
-                    return;
-
-                }
-
-
-                /* =============================================
-                   SUCCES
-                ============================================== */
-
-                if (message) {
-
-                    message.className =
-                        "form-message success";
-
-
-                    if (anonyme) {
-
-                        message.textContent =
-                            "Votre profil a bien été créé. Il restera caché de la liste publique des membres.";
-
-                    } else {
-
-                        message.textContent =
-                            "Votre profil a bien été créé. Il apparaît désormais dans la liste des membres.";
-
-                    }
-
-                }
-
-
-                form.reset();
-
-
-                const radioSympathisant =
-                    document.querySelector(
-                        'input[name="type_inscription"][value="sympathisant"]'
-                    );
-
-
-                if (
-                    radioSympathisant
-                ) {
-
-                    radioSympathisant.checked =
-                        true;
-
-                }
-
-
-                mettreAJourCompteurDescription();
-
-
-                setTimeout(
-                    () => {
-
-                        const joinModal =
-                            document.getElementById(
-                                "joinModal"
-                            );
-
-
-                        fermerModalEquipe(
-                            joinModal
-                        );
-
-
-                        chargerMembres();
-
-                    },
-                    1800
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    "Erreur inscription :",
-                    error
-                );
-
-
-                afficherErreurFormulaire(
-                    message,
-                    "Une erreur est survenue lors de l’inscription. Veuillez réessayer."
-                );
-
-
-            } finally {
-
-                if (submitButton) {
-
-                    submitButton.disabled =
-                        false;
-
-                    submitButton.textContent =
-                        "CRÉER MON PROFIL";
-
-                }
-
-            }
-
         }
-    );
-
+    });
 }
-
 
 /* =========================================================
    COMPTEUR
