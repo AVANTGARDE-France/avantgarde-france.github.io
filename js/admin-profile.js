@@ -1278,9 +1278,9 @@ function remplirProfil(profile){
   document
     .getElementById("profileEmail")
     .value =
-      profile.email ||
-      currentUser.email ||
-      "";
+      (currentUser?.email || profile.email || "")
+        .trim()
+        .toLowerCase();
 
 
   document
@@ -1431,10 +1431,10 @@ profileForm.addEventListener(
         .trim();
 
 
+    // L'adresse de référence est celle du compte authentifié.
+    // Le champ du profil est en lecture seule.
     const email =
-      document
-        .getElementById("profileEmail")
-        .value
+      (currentUser?.email || "")
         .trim()
         .toLowerCase();
 
@@ -1712,53 +1712,6 @@ profileForm.addEventListener(
         : currentProfile?.grade2 || null;
 
 
-    const ancienEmailAuth =
-      (currentUser?.email || "")
-        .trim()
-        .toLowerCase();
-
-
-    const changementEmail =
-      email !== ancienEmailAuth;
-
-
-    if(changementEmail){
-
-      const {
-        error:authEmailError
-      } =
-        await supabaseClient.auth.updateUser({
-          email:email
-        });
-
-
-      if(authEmailError){
-
-        console.error(
-          "Erreur changement email Auth :",
-          authEmailError
-        );
-
-
-        afficherMessage(
-          profileMessage,
-          "error",
-          "Impossible de modifier l'adresse e-mail. Vérifiez l'adresse saisie et les paramètres de confirmation de Supabase."
-        );
-
-
-        saveProfileButton.disabled = false;
-
-        saveProfileButton.textContent =
-          "ENREGISTRER LES MODIFICATIONS";
-
-        return;
-
-      }
-
-    }
-
-
     const {
       data,
       error
@@ -1987,25 +1940,13 @@ profileForm.addEventListener(
     }
 
 
-    if(changementEmail){
-
-      afficherMessage(
-        profileMessage,
-        "success",
-        "Votre profil a bien été mis à jour. Un e-mail de confirmation peut vous être envoyé pour valider votre nouvelle adresse."
-      );
-
-    }else{
-
-      afficherMessage(
-        profileMessage,
-        "success",
-        perteDroitsRegionaux
-          ? "Votre profil a bien été mis à jour. Votre fonction régionale et vos rôles ont été supprimés."
-          : "Votre profil a bien été mis à jour."
-      );
-
-    }
+    afficherMessage(
+      profileMessage,
+      "success",
+      perteDroitsRegionaux
+        ? "Votre profil a bien été mis à jour. Votre fonction régionale et vos rôles ont été supprimés."
+        : "Votre profil a bien été mis à jour."
+    );
 
 
     mettreAJourMedailleVIP(
