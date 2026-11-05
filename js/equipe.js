@@ -1484,6 +1484,7 @@ function initialiserOuvertureInscription() {
             }
 
 
+            afficherEtapeInscription(1);
             mettreAJourCompteurDescription();
 
 
@@ -1688,125 +1689,212 @@ function afficherErreurFormulaire(
    FORMULAIRE INSCRIPTION
 ========================================================= */
 
+function afficherEtapeInscription(numero) {
+    [1, 2, 3].forEach(etape => {
+        const panneau = document.getElementById(`signupStep${etape}`);
+        if (!panneau) return;
+        panneau.hidden = etape !== numero;
+        panneau.classList.toggle("active", etape === numero);
+    });
+
+    const titre = document.getElementById("joinModalTitle");
+    if (titre) {
+        titre.textContent = numero === 1
+            ? "Soutenir l’Avant-gardE"
+            : numero === 2
+                ? "Conditions d’inscription"
+                : "Sécuriser votre inscription";
+    }
+
+    const intro = document.querySelector("#joinModal .form-intro");
+    if (intro) intro.hidden = numero !== 1;
+}
+
+async function finaliserInscriptionGoogle() {
+    const message = document.getElementById("formMessage");
+    const button = document.getElementById("googleSignupButton");
+    const nom = document.getElementById("nom")?.value.trim() || "";
+    const region = document.getElementById("region")?.value.trim() || "";
+    const choix = document.querySelector('input[name="type_inscription"]:checked');
+    const anonyme = choix ? choix.value === "anonyme" : false;
+
+    if (!nom || !region) {
+        afficherEtapeInscription(1);
+        afficherErreurFormulaire(message, "Merci de renseigner votre nom et votre région.");
+        return;
+    }
+
+    if (!window.supabaseClient) {
+        afficherErreurFormulaire(message, "Le service d’authentification est indisponible.");
+        return;
+    }
+
+    try {
+        sessionStorage.setItem("avantgarde_pending_google_signup", JSON.stringify({
+            nom,
+            region,
+            anonyme,
+            createdAt: Date.now()
+        }));
+
+        if (button) {
+            button.disabled = true;
+            button.textContent = "REDIRECTION VERS GOOGLE…";
+        }
+
+        const { error } = await window.supabaseClient.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+                redirectTo: window.location.origin + window.location.pathname
+            }
+        });
+
+        if (error) throw error;
+    } catch (error) {
+        console.error("Erreur authentification Google :", error);
+        sessionStorage.removeItem("avantgarde_pending_google_signup");
+        afficherErreurFormulaire(message, "La connexion Google n’a pas pu être lancée. Vérifiez que le service Google est activé puis réessayez.");
+        if (button) {
+            button.disabled = false;
+            button.innerHTML = '<span class="google-g" aria-hidden="true">G</span> CONTINUER AVEC GOOGLE';
+        }
+    }
+}
+
+async function traiterRetourInscriptionGoogle() {
+    const raw = sessionStorage.getItem("avantgarde_pending_google_signup");
+    if (!raw || !window.supabaseClient) return;
+
+    const joinModal = document.getElementById("joinModal");
+    const message = document.getElementById("formMessage");
+
+    try {
+        const pending = JSON.parse(raw);
+        if (!pending || Date.now() - Number(pending.createdAt || 0) > 30 * 60 * 1000) {
+            sessionStorage.removeItem("avantgarde_pending_google_signup");
+            return;
+        }
+
+        const { data: sessionData, error: sessionError } = await window.supabaseClient.auth.getSession();
+        if (sessionError) throw sessionError;
+
+        const user = sessionData?.session?.user;
+        if (!user) return;
+
+        const provider = user.app_metadata?.provider;
+        const providers = user.app_metadata?.providers || [];
+        if (provider !== "google" && !providers.includes("google")) {
+            throw new Error("La session ne provient pas de Google.");
+        }
+
+        if (!user.email || !user.email_confirmed_at) {
+            throw new Error("Google n’a pas confirmé cette adresse e-mail.");
+        }
+
+        const { data: existingById, error: idError } = await window.supabaseClient
+            .from("profiles")
+            .select("id")
+            .eq("id", user.id)
+            .maybeSingle();
+
+        if (idError) throw idError;
+
+        if (existingById) {
+            sessionStorage.removeItem("avantgarde_pending_google_signup");
+            ouvrirModalEquipe(joinModal);
+            afficherEtapeInscription(1);
+            if (message) {
+                message.className = "form-message success";
+                message.textContent = "Un compte existe déjà avec cette adresse Google. Votre compte actuel a été reconnu : connectez-vous depuis l’espace membre.";
+            }
+            return;
+        }
+
+        const { data: existingByEmail, error: emailError } = await window.supabaseClient
+            .from("profiles")
+            .select("id")
+            .ilike("email", user.email)
+            .limit(1);
+
+        if (emailError) throw emailError;
+
+        if (Array.isArray(existingByEmail) && existingByEmail.length) {
+            await window.supabaseClient.auth.signOut();
+            sessionStorage.removeItem("avantgarde_pending_google_signup");
+            throw new Error("Cette adresse e-mail est déjà associée à un autre profil. Aucun doublon n’a été créé. Contactez l’équipe pour régulariser l’accès.");
+        }
+
+        const profil = {
+            id: user.id,
+            nom: pending.nom,
+            grade: "user",
+            email: user.email.toLowerCase(),
+            region: pending.region,
+            anonyme: Boolean(pending.anonyme)
+        };
+
+        const { error: insertError } = await window.supabaseClient
+            .from("profiles")
+            .insert(profil);
+
+        if (insertError) throw insertError;
+
+        sessionStorage.removeItem("avantgarde_pending_google_signup");
+        ouvrirModalEquipe(joinModal);
+        afficherEtapeInscription(1);
+
+        if (message) {
+            message.className = "form-message success";
+            message.textContent = pending.anonyme
+                ? "Votre compte est créé et votre profil restera caché de la liste publique."
+                : "Votre compte est créé. Votre profil apparaît désormais dans la liste des membres.";
+        }
+
+        await chargerMembres();
+    } catch (error) {
+        console.error("Finalisation inscription Google :", error);
+        ouvrirModalEquipe(joinModal);
+        afficherEtapeInscription(1);
+        afficherErreurFormulaire(message, error.message || "Impossible de finaliser votre inscription. Aucun profil n’a été créé.");
+    }
+}
+
 function initialiserFormulaireInscription() {
     const form = document.getElementById("joinForm");
-    if (!form) return;
+    if (!form || form.dataset.initialized === "true") return;
+    form.dataset.initialized = "true";
 
-    form.addEventListener("submit", async event => {
-        event.preventDefault();
+    form.addEventListener("submit", event => event.preventDefault());
 
-        const nomField = document.getElementById("nom");
-        const emailField = document.getElementById("email");
-        const regionField = document.getElementById("region");
-        const submitButton = document.getElementById("submitButton");
+    document.getElementById("signupStep1Next")?.addEventListener("click", () => {
+        const nom = document.getElementById("nom");
+        const region = document.getElementById("region");
         const message = document.getElementById("formMessage");
-        const typeInscription = document.querySelector('input[name="type_inscription"]:checked');
 
-        if (!nomField || !emailField || !regionField) return;
-
-        const nom = nomField.value.trim();
-        const email = emailField.value.trim().toLowerCase();
-        const region = regionField.value.trim();
-        const anonyme = typeInscription ? typeInscription.value === "anonyme" : false;
+        if (!nom?.value.trim()) {
+            afficherErreurFormulaire(message, "Merci d’indiquer votre nom.");
+            nom?.focus();
+            return;
+        }
+        if (!region?.value.trim()) {
+            afficherErreurFormulaire(message, "Merci de sélectionner votre région.");
+            region?.focus();
+            return;
+        }
 
         if (message) {
             message.textContent = "";
             message.className = "form-message";
         }
-
-        if (!nom) {
-            afficherErreurFormulaire(message, "Merci d’indiquer votre nom.");
-            nomField.focus();
-            return;
-        }
-        if (!email) {
-            afficherErreurFormulaire(message, "Merci d’indiquer votre adresse email.");
-            emailField.focus();
-            return;
-        }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            afficherErreurFormulaire(message, "L’adresse email semble invalide.");
-            emailField.focus();
-            return;
-        }
-        if (!region) {
-            afficherErreurFormulaire(message, "Merci d’indiquer votre région.");
-            regionField.focus();
-            return;
-        }
-        if (typeof supabaseClient === "undefined" || !supabaseClient) {
-            afficherErreurFormulaire(message, "La connexion à la base de données est indisponible.");
-            return;
-        }
-
-        if (submitButton) {
-            submitButton.disabled = true;
-            submitButton.textContent = "VÉRIFICATION EN COURS…";
-        }
-
-        try {
-            const { data: emailExistant, error: emailCheckError } = await supabaseClient
-                .from("profiles")
-                .select("id")
-                .ilike("email", email)
-                .limit(1);
-
-            if (emailCheckError) throw emailCheckError;
-
-            if (Array.isArray(emailExistant) && emailExistant.length > 0) {
-                afficherErreurFormulaire(message, "Cette adresse e-mail est déjà utilisée. Un seul profil peut être créé avec cette adresse.");
-                return;
-            }
-
-            const profil = {
-                id: crypto.randomUUID(),
-                nom,
-                grade: "user",
-                email,
-                region,
-                anonyme
-            };
-
-            if (submitButton) submitButton.textContent = "CRÉATION DU PROFIL…";
-
-            const { error } = await supabaseClient.from("profiles").insert(profil);
-            if (error) {
-                console.error("Erreur création profil :", error);
-                if (error.code === "23505") {
-                    afficherErreurFormulaire(message, "Cette adresse e-mail est déjà utilisée. Un seul profil peut être créé avec cette adresse.");
-                } else {
-                    afficherErreurFormulaire(message, "Impossible de créer le profil pour le moment. Veuillez réessayer.");
-                }
-                return;
-            }
-
-            if (message) {
-                message.className = "form-message success";
-                message.textContent = anonyme
-                    ? "Votre profil a bien été créé. Il restera caché de la liste publique des membres."
-                    : "Votre profil a bien été créé. Il apparaît désormais dans la liste des membres.";
-            }
-
-            form.reset();
-            const radioSympathisant = document.querySelector('input[name="type_inscription"][value="sympathisant"]');
-            if (radioSympathisant) radioSympathisant.checked = true;
-
-            setTimeout(() => {
-                const joinModal = document.getElementById("joinModal");
-                fermerModalEquipe(joinModal);
-                chargerMembres();
-            }, 1800);
-
-        } catch (error) {
-            console.error("Erreur inscription :", error);
-            afficherErreurFormulaire(message, "Une erreur est survenue lors de l’inscription. Veuillez réessayer.");
-        } finally {
-            if (submitButton) {
-                submitButton.disabled = false;
-                submitButton.textContent = "CRÉER MON PROFIL";
-            }
-        }
+        afficherEtapeInscription(2);
     });
+
+    document.getElementById("signupStep2Back")?.addEventListener("click", () => afficherEtapeInscription(1));
+    document.getElementById("signupStep2Next")?.addEventListener("click", () => afficherEtapeInscription(3));
+    document.getElementById("signupStep3Back")?.addEventListener("click", () => afficherEtapeInscription(2));
+    document.getElementById("googleSignupButton")?.addEventListener("click", finaliserInscriptionGoogle);
+
+    traiterRetourInscriptionGoogle();
 }
 
 /* =========================================================
