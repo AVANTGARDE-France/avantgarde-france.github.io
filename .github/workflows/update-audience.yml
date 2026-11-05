@@ -122,94 +122,25 @@ jobs:
           ========================================================= */
 
           function parsePulseAudience(data) {
-            if (!data) {
-              return null;
-            }
-
-            const candidates = [
-              data.followers,
-              data.followerCount,
-              data.followersCount,
-              data.subscribers,
-              data.subscriberCount,
-              data.audience,
-              data.count,
-
-              data.data?.followers,
-              data.data?.followerCount,
-              data.data?.followersCount,
-              data.data?.subscribers,
-              data.data?.subscriberCount,
-              data.data?.audience,
-              data.data?.count,
-
-              data.profile?.followers,
-              data.profile?.followerCount,
-              data.profile?.followersCount,
-              data.profile?.subscribers,
-              data.profile?.subscriberCount,
-              data.profile?.audience,
-              data.profile?.count
+            if (!data || typeof data !== "object") return null;
+            // Champs dédiés aux abonnés uniquement : jamais "count" ou "audience".
+            const containers = [
+              data, data.profile, data.data, data.data?.profile,
+              data.result, data.result?.profile
+            ].filter(value => value && typeof value === "object");
+            const keys = [
+              "followers", "follower_count", "followerCount",
+              "followers_count", "followersCount",
+              "subscriber_count", "subscriberCount", "subscribers"
             ];
-
-            for (const candidate of candidates) {
-              const value = numberValue(candidate);
-
-              if (value !== null) {
-                return value;
+            for (const container of containers) {
+              for (const key of keys) {
+                if (!Object.prototype.hasOwnProperty.call(container, key)) continue;
+                const parsed = numberValue(container[key]);
+                if (parsed !== null && parsed >= 0) return parsed;
               }
             }
-
-            /*
-             * Dernier recours :
-             * recherche récursive de champs connus dans la réponse.
-             */
-
-            function recursiveSearch(obj, depth = 0) {
-              if (!obj || depth > 4) {
-                return null;
-              }
-
-              if (typeof obj !== "object") {
-                return null;
-              }
-
-              for (const [key, value] of Object.entries(obj)) {
-                const normalizedKey = key
-                  .toLowerCase()
-                  .replace(/[^a-z]/g, "");
-
-                if (
-                  normalizedKey === "followers" ||
-                  normalizedKey === "followercount" ||
-                  normalizedKey === "followerscount" ||
-                  normalizedKey === "subscribers" ||
-                  normalizedKey === "subscribercount" ||
-                  normalizedKey === "audience"
-                ) {
-                  const parsed = numberValue(value);
-
-                  if (parsed !== null) {
-                    return parsed;
-                  }
-                }
-
-                if (value && typeof value === "object") {
-                  const nested = recursiveSearch(
-                    value,
-                    depth + 1
-                  );
-
-                  if (nested !== null) {
-                    return nested;
-                  }
-                }
-              }
-
-              return null;
-            }
-
-            return recursiveSearch(data);
+            return null;
           }
 
           /* =========================================================
@@ -837,20 +768,13 @@ jobs:
               );
 
               const updates = {
-                facebook_audience:
-                  profile.facebook_audience,
-
-                instagram_audience:
-                  profile.instagram_audience,
-
-                x_audience:
-                  profile.x_audience,
-
-                youtube_audience:
-                  profile.youtube_audience,
-
-                tiktok_audience:
-                  profile.tiktok_audience
+                // Sans URL : effacer l'ancienne audience.
+                // Avec URL mais erreur Pulse : conserver la dernière valeur fiable.
+                facebook_audience: profile.facebook_url ? profile.facebook_audience : null,
+                instagram_audience: profile.instagram_url ? profile.instagram_audience : null,
+                x_audience: profile.x_url ? profile.x_audience : null,
+                youtube_audience: profile.youtube_url ? profile.youtube_audience : null,
+                tiktok_audience: profile.tiktok_url ? profile.tiktok_audience : null
               };
 
               const profileEntries =
