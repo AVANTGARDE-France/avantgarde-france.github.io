@@ -1405,6 +1405,20 @@ function initialiserAuthentification() {
 
     initialiserFormulaireConnexion();
 
+    const showEmailLoginButton = document.getElementById("showEmailLoginButton");
+    const emailLoginFields = document.getElementById("emailLoginFields");
+    if (showEmailLoginButton && emailLoginFields && showEmailLoginButton.dataset.initialized !== "true") {
+        showEmailLoginButton.dataset.initialized = "true";
+        showEmailLoginButton.addEventListener("click", () => {
+            const isExpanded = showEmailLoginButton.getAttribute("aria-expanded") === "true";
+            emailLoginFields.hidden = isExpanded;
+            showEmailLoginButton.setAttribute("aria-expanded", String(!isExpanded));
+            showEmailLoginButton.textContent = isExpanded
+                ? "AUTRES MÉTHODES DE CONNEXION"
+                : "MASQUER LA CONNEXION PAR E-MAIL";
+        });
+    }
+
     const googleLoginButton = document.getElementById("googleLoginButton");
     if (googleLoginButton && googleLoginButton.dataset.initialized !== "true") {
         googleLoginButton.dataset.initialized = "true";
