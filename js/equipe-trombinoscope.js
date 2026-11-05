@@ -219,6 +219,7 @@ const ROLES_ANNUAIRE = [
 let filtresAttributsAnnuaire = { medailles: [], competences: [], roles: [] };
 let regionsSelectionnees = [];
 let membresVisibles = [];
+let membresPourComptage = [];
 let categoriesAnnuaire = { delegues: true, militants: true, inscrits: true };
 let identifiantsDirection = new Set();
 let cartesChargees = false;
@@ -376,7 +377,7 @@ function reinitialiserTousFiltresAnnuaire() {
     });
 
     actualiserSelectionCarte();
-    afficherMembresFiltres(membresVisibles);
+    appliquerFiltreAnnuaire(false);
     const libelle = document.getElementById("directoryLocationName");
     const effacer = document.getElementById("directoryLocationClear");
     if (libelle) libelle.textContent = "CLASSEMENT GÉNÉRAL";
@@ -400,22 +401,13 @@ function actualiserSelectionCarte() {
     actualiserAlerteFiltres();
 }
 
-function appliquerFiltreAnnuaire(fermer = true) {
+function filtrerMembresAnnuaire(liste) {
     const regions = regionsSelectionnees.map(normaliserRegion);
-    categoriesAnnuaire = {
-        delegues: document.getElementById("directoryDelegues")?.checked ?? true,
-        militants: document.getElementById("directoryMilitants")?.checked ?? true,
-        inscrits: document.getElementById("directoryInscrits")?.checked ?? true
-    };
-    lireFiltresAttributsAnnuaire();
-
-    let resultat = membresVisibles.filter(membre => {
+    let resultat = (Array.isArray(liste) ? liste : []).filter(membre => {
         const fonction = normaliserRegion(membre.grade2);
         const estDelegue = fonction === normaliserRegion("Délégué Régional");
         const estMilitant = fonction === normaliserRegion("Militant");
         const estInscrit = !estDelegue && !estMilitant;
-
-        // Les statuts sélectionnés sont combinés en OU au sein de ce filtre.
         const statutValide = (
             (categoriesAnnuaire.delegues && estDelegue) ||
             (categoriesAnnuaire.militants && estMilitant) ||
@@ -427,15 +419,10 @@ function appliquerFiltreAnnuaire(fermer = true) {
         const competencesNormalisees = competences.map(normaliserValeurAnnuaire);
         const rolesNormalises = ROLES_ANNUAIRE.map(normaliserValeurAnnuaire);
         const competencesMetier = competencesNormalisees.filter(valeur =>
-            !rolesNormalises.includes(valeur) &&
-            valeur !== "vip" && valeur !== "mecene"
+            !rolesNormalises.includes(valeur) && valeur !== "vip" && valeur !== "mecene"
         );
-
-        // Seuils des médailles identiques à ceux des fiches individuelles.
         const possedeVIP = Number(membre.audience_max || 0) >= 3000;
         const possedeParrainage = Number(membre.parrainage || 0) >= 50;
-        // La médaille Mécène n'est pas encore reliée à une table de dons.
-        // On ne peut donc détecter que les anciennes valeurs conservées dans competences.
         const possedeMecene = competencesNormalisees.includes("mecene");
         const medailleValide = !filtresAttributsAnnuaire.medailles.length ||
             filtresAttributsAnnuaire.medailles.some(medaille => {
@@ -453,17 +440,34 @@ function appliquerFiltreAnnuaire(fermer = true) {
             filtresAttributsAnnuaire.roles.some(role =>
                 competencesNormalisees.includes(normaliserValeurAnnuaire(role))
             );
-
-        // Les trois dimensions (localisation, statut, attributs) se cumulent en ET.
         return medailleValide && competenceValide && roleValide;
     });
 
-    // Une seule zone peut être active à la fois : le classement est régional ou général.
     if (regions.length) {
-        resultat = resultat.filter(m => regions.includes(normaliserRegion(m.region)));
+        resultat = resultat.filter(membre => regions.includes(normaliserRegion(membre.region)));
     }
+    return resultat;
+}
 
-    afficherMembresFiltres(resultat);
+function appliquerFiltreAnnuaire(fermer = true) {
+    categoriesAnnuaire = {
+        delegues: document.getElementById("directoryDelegues")?.checked ?? true,
+        militants: document.getElementById("directoryMilitants")?.checked ?? true,
+        inscrits: document.getElementById("directoryInscrits")?.checked ?? true
+    };
+    lireFiltresAttributsAnnuaire();
+
+    const membresPublicsFiltres = filtrerMembresAnnuaire(membresVisibles);
+    const profilsAnonymesFiltres = filtrerMembresAnnuaire(
+        membresPourComptage.filter(membre => membre.anonyme === true)
+    );
+    const statistiques = {
+        sympathisants: membresPublicsFiltres.length,
+        anonymes: profilsAnonymesFiltres.length
+    };
+    statistiques.total = statistiques.sympathisants + statistiques.anonymes;
+
+    afficherMembresFiltres(membresPublicsFiltres, statistiques);
     actualiserAlerteFiltres();
     const libelle = document.getElementById("directoryLocationName");
     const effacer = document.getElementById("directoryLocationClear");
@@ -472,30 +476,50 @@ function appliquerFiltreAnnuaire(fermer = true) {
     if (fermer) fermerFiltreAnnuaire();
 }
 
-function afficherMembresFiltres(liste) {
+function afficherMembresFiltres(liste, statistiques = null) {
     const grid = document.getElementById("teamGrid");
     const compteur = document.getElementById("directoryResultCount");
     if (!grid) return;
+
+    const stats = statistiques || {
+        sympathisants: Array.isArray(liste) ? liste.length : 0,
+        anonymes: 0,
+        total: Array.isArray(liste) ? liste.length : 0
+    };
+    const total = Number(stats.total) || 0;
+    const detail = stats.sympathisants.toLocaleString("fr-FR") +
+        " sympathisants publics · " +
+        stats.anonymes.toLocaleString("fr-FR") +
+        " inscrits anonymes · 300 fiches maximum affichées";
+
     grid.innerHTML = "";
-    if (compteur) compteur.textContent = liste.length + (liste.length > 1 ? " MEMBRES" : " MEMBRE");
+    if (compteur) {
+        compteur.textContent = total.toLocaleString("fr-FR") +
+            (total > 1 ? " MEMBRES" : " MEMBRE");
+        compteur.title = detail;
+        compteur.setAttribute("aria-label",
+            total.toLocaleString("fr-FR") + " membres au total. " + detail
+        );
+    }
+
     if (!liste.length) {
-        grid.innerHTML = '<div class="no-members">Aucun membre public ne correspond à votre filtre.</div>';
+        grid.innerHTML = stats.anonymes > 0
+            ? '<div class="no-members">Aucun profil public à afficher pour ce filtre.</div>'
+            : '<div class="no-members">Aucun membre public ne correspond à votre filtre.</div>';
         return;
     }
 
-    // Priorité absolue aux Délégués Régionaux, puis tous les autres membres.
-    // Dans chaque groupe : classement décroissant selon le nombre de points.
     const listeTriee = [...liste].sort((a, b) => {
         const aDelegue = normaliserValeurAnnuaire(a.grade2) === normaliserValeurAnnuaire("Délégué Régional");
         const bDelegue = normaliserValeurAnnuaire(b.grade2) === normaliserValeurAnnuaire("Délégué Régional");
         if (aDelegue !== bDelegue) return aDelegue ? -1 : 1;
-
         const pointsA = Number.isFinite(Number(a.point)) ? Number(a.point) : 0;
         const pointsB = Number.isFinite(Number(b.point)) ? Number(b.point) : 0;
         return pointsB - pointsA;
     });
 
-    listeTriee.forEach((membre, index) => {
+    // Le compteur reste exhaustif ; seule la génération des cartes est plafonnée.
+    listeTriee.slice(0, 300).forEach((membre, index) => {
         const rang = index + 1;
         const carte = creerCarteMembre(membre);
         carte.classList.add(
@@ -503,17 +527,14 @@ function afficherMembresFiltres(liste) {
             rang <= 100 ? "member-card-compact" : "member-card-standard"
         );
         carte.dataset.rank = String(rang);
-
         const numero = document.createElement("span");
         numero.className = "member-rank";
         numero.textContent = String(rang);
         numero.setAttribute("aria-label", "Classement : " + rang);
         carte.prepend(numero);
-
         grid.appendChild(carte);
     });
 }
-
 
 function initialiserFiltreAnnuaire() {
     document.getElementById("openDirectoryFilter")?.addEventListener("click", ouvrirFiltreAnnuaire);
@@ -564,50 +585,72 @@ function initialiserFiltreAnnuaire() {
 initialiserFiltreAnnuaire();
 chargerCartesRegions();
 
+async function chargerProfilsPaginees(selection, anonymes = null) {
+    const taillePage = 1000;
+    let debut = 0;
+    const resultats = [];
+
+    while (true) {
+        let requete = supabaseClient
+            .from("profiles")
+            .select(selection)
+            .order("id", { ascending: true })
+            .range(debut, debut + taillePage - 1);
+        if (typeof anonymes === "boolean") {
+            requete = requete.eq("anonyme", anonymes);
+        }
+
+        const { data, error } = await requete;
+        if (error) throw error;
+        const page = Array.isArray(data) ? data : [];
+        resultats.push(...page);
+        if (page.length < taillePage) break;
+        debut += taillePage;
+    }
+    return resultats;
+}
+
 async function chargerTrombinoscope() {
     const grid = document.getElementById("teamGrid");
     if (!grid) return;
     grid.innerHTML = '<div class="loading">Chargement des membres…</div>';
+
     if (typeof supabaseClient === "undefined" || !supabaseClient) {
         grid.innerHTML = '<div class="no-members">Impossible de contacter la base de données.</div>';
         console.error("supabaseClient est introuvable.");
         return;
     }
+
     try {
-        const { data: directionData, error: directionError } = await supabaseClient
-            .from("profiles")
-            .select(`
-                id, created_at, nom, grade, grade2, point, image_url, description, region,
-                competences, parrainage, anonyme, facebook_url, x_url, instagram_url,
-                youtube_url, tiktok_url, facebook_audience, instagram_audience,
-                x_audience, youtube_audience, tiktok_audience, audience_max,
-                audience_reseau, audience_updated_at
-            `)
-            .eq("anonyme", false)
-            .in("grade2", FONCTIONS_DIRECTION);
-        if (directionError) throw directionError;
-        const dirigeants = Array.isArray(directionData) ? directionData : [];
-        afficherDirection(dirigeants);
-        identifiantsDirection = new Set(dirigeants.map(membre => membre.id));
+        const colonnesAnnuaire = "id, anonyme, grade2, competences, parrainage, audience_max, region";
+        const colonnesPubliques = `
+            id, created_at, nom, grade, grade2, point, image_url, description, region,
+            competences, parrainage, anonyme, facebook_url, x_url, instagram_url,
+            youtube_url, tiktok_url, facebook_audience, instagram_audience,
+            x_audience, youtube_audience, tiktok_audience, audience_max,
+            audience_reseau, audience_updated_at
+        `;
 
-        const { data, error } = await supabaseClient
-            .from("profiles")
-            .select(`
-                id, created_at, nom, grade, grade2, point, image_url, description, region,
-                competences, parrainage, anonyme, facebook_url, x_url, instagram_url,
-                youtube_url, tiktok_url, facebook_audience, instagram_audience,
-                x_audience, youtube_audience, tiktok_audience, audience_max,
-                audience_reseau, audience_updated_at
-            `)
-            .eq("anonyme", false)
-            .order("point", { ascending: false });
-        if (error) throw error;
+        // Chargement paginé : le compteur n'est pas limité aux 1 000 lignes par défaut.
+        const [profilsComptage, tousLesMembres] = await Promise.all([
+            chargerProfilsPaginees(colonnesAnnuaire),
+            chargerProfilsPaginees(colonnesPubliques, false)
+        ]);
 
-        const tousLesMembres = Array.isArray(data) ? data : [];
+        membresPourComptage = profilsComptage;
         membres = tousLesMembres;
         afficherClassementRegions(tousLesMembres);
+
+        const dirigeants = tousLesMembres.filter(membre =>
+            FONCTIONS_DIRECTION.some(fonction =>
+                normaliserFonctionDirection(membre.grade2) === normaliserFonctionDirection(fonction)
+            )
+        );
+        afficherDirection(dirigeants);
+        identifiantsDirection = new Set(dirigeants.map(membre => membre.id));
         membresVisibles = tousLesMembres.filter(membre => !identifiantsDirection.has(membre.id));
-        afficherMembresFiltres(membresVisibles);
+
+        appliquerFiltreAnnuaire(false);
         actualiserAlerteFiltres();
     } catch (error) {
         console.error("Erreur chargement trombinoscope ou direction :", error);
