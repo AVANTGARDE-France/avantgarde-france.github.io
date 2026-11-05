@@ -180,25 +180,29 @@ function obtenirEtatMethodeMotDePasse(user, identities = []) {
   return identities.some(identity => identity.provider === "email");
 }
 
+let passwordMethodRenderSequence = 0;
+
 async function actualiserMethodeMotDePasse() {
   const actions = document.getElementById("profilePasswordMethodActions");
   const status = document.getElementById("profilePasswordMethodStatus");
   if (!actions || !status || !window.supabaseClient) return;
 
-  actions.innerHTML = "";
-  status.textContent = "Vérification des méthodes de connexion…";
+  // Empêche les appels concurrents de laisser plusieurs boutons.
+  const renderSequence = ++passwordMethodRenderSequence;
+  actions.replaceChildren();
+  status.textContent = "";
 
   const { data: userData, error: userError } = await window.supabaseClient.auth.getUser();
+  if (renderSequence !== passwordMethodRenderSequence) return;
   if (userError || !userData?.user) {
-    status.textContent = "Impossible de lire les paramètres de connexion.";
     return;
   }
 
   const user = userData.user;
   const { data: identityData, error: identityError } = await window.supabaseClient.auth.getUserIdentities();
+  if (renderSequence !== passwordMethodRenderSequence) return;
   if (identityError) {
     console.error("AUTH — LECTURE DES IDENTITÉS :", identityError);
-    status.textContent = "Impossible de vérifier les méthodes de connexion.";
     return;
   }
 
@@ -206,15 +210,13 @@ async function actualiserMethodeMotDePasse() {
   const passwordEnabled = obtenirEtatMethodeMotDePasse(user, identities);
   const googleEnabled = identities.some(identity => identity.provider === "google");
 
-  status.textContent = passwordEnabled
-    ? "Mot de passe secondaire actif."
-    : "Mot de passe secondaire non configuré.";
+  status.textContent = "";
 
   // Un seul lien discret sous l’adresse e-mail.
   const manage = document.createElement("button");
   manage.type = "button";
   manage.className = "password-method-link";
-  manage.textContent = passwordEnabled ? "MODIFIER" : "CRÉER";
+  manage.textContent = passwordEnabled ? "Modifier" : "Créer";
   manage.addEventListener("click", () => ouvrirModalMotDePasse(passwordEnabled ? "change" : "create"));
   actions.appendChild(manage);
 
@@ -713,103 +715,49 @@ function initialiserPhotoProfil(){
 ========================================================= */
 
 function afficherIdentifiantMembre(profile){
-
-  const form = document.getElementById("profileForm");
-  if(!form) return;
-
-  let bloc = document.getElementById("profileMemberIdBlock");
-
-  if(!bloc){
-    bloc = document.createElement("div");
-    bloc.id = "profileMemberIdBlock";
-    bloc.className = "profile-member-id";
-    bloc.innerHTML = `
-      <div class="profile-member-id-copy">
-        <span class="profile-member-id-label">IDENTIFIANT MEMBRE</span>
-        <span class="profile-member-id-help">À communiquer pour le parrainage</span>
-      </div>
-      <code id="profileMemberIdValue"></code>
-      <button type="button" id="profileMemberIdCopy" class="profile-member-id-button" aria-label="Copier l'identifiant" title="Copier l'identifiant">
-        <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="8" y="8" width="12" height="12" rx="2"></rect>
-          <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path>
-        </svg>
-        <span>Copier</span>
-      </button>
-      <span id="profileMemberIdStatus" class="profile-member-id-status" aria-live="polite"></span>
-    `;
-
-    const style = document.createElement("style");
-    style.id = "profile-member-id-styles";
-    style.textContent = `
-      .profile-member-id {
-        display:grid; grid-template-columns:minmax(0,1fr) auto auto;
-        align-items:center; gap:12px; padding:16px 18px; margin:0 0 24px;
-        border:1px solid var(--border, rgba(214,173,85,.28));
-        background:rgba(255,255,255,.025);
-      }
-      .profile-member-id-copy { display:flex; flex-direction:column; gap:5px; min-width:0; }
-      .profile-member-id-label { color:var(--gold,#d6ad55); font-size:10px; font-weight:800; letter-spacing:.13em; }
-      .profile-member-id-help { color:rgba(245,243,237,.58); font-size:12px; }
-      .profile-member-id code { color:var(--text,#f5f3ed); font-size:12px; overflow-wrap:anywhere; user-select:all; }
-      .profile-member-id-button {
-        display:inline-flex; align-items:center; justify-content:center; gap:7px;
-        min-height:38px; padding:0 11px; border:1px solid rgba(214,173,85,.4);
-        background:transparent; color:var(--gold,#d6ad55); cursor:pointer;
-        font:inherit; font-size:11px; font-weight:700; letter-spacing:.04em;
-      }
-      .profile-member-id-button:hover { background:rgba(214,173,85,.1); }
-      .profile-member-id-button svg { width:15px; height:15px; flex:none; }
-      .profile-member-id-status { grid-column:1 / -1; min-height:0; color:var(--gold,#d6ad55); font-size:11px; }
-      .profile-member-id-status:empty { display:none; }
-      @media(max-width:520px) {
-        .profile-member-id { grid-template-columns:minmax(0,1fr) auto; gap:9px; padding:14px; }
-        .profile-member-id-copy { grid-column:1 / -1; }
-        .profile-member-id code { font-size:11px; }
-      }
-    `;
-    document.head.appendChild(style);
-    form.insertBefore(bloc, form.firstElementChild);
-
-    const copyButton = document.getElementById("profileMemberIdCopy");
-    copyButton.addEventListener("click", async () => {
-      const value = document.getElementById("profileMemberIdValue")?.textContent?.trim();
-      const status = document.getElementById("profileMemberIdStatus");
-      if(!value) return;
-
-      try {
-        if(navigator.clipboard && window.isSecureContext){
-          await navigator.clipboard.writeText(value);
-        }else{
-          const temporary = document.createElement("textarea");
-          temporary.value = value;
-          temporary.setAttribute("readonly", "");
-          temporary.style.position = "fixed";
-          temporary.style.opacity = "0";
-          document.body.appendChild(temporary);
-          temporary.select();
-          const copied = document.execCommand("copy");
-          temporary.remove();
-          if(!copied) throw new Error("Copie impossible");
-        }
-        status.textContent = "Identifiant copié.";
-        copyButton.querySelector("span").textContent = "Copié";
-      }catch(error){
-        console.error("COPIE IDENTIFIANT MEMBRE :", error);
-        status.textContent = "Copie impossible. Sélectionnez l'identifiant manuellement.";
-      }
-
-      window.setTimeout(() => {
-        if(status) status.textContent = "";
-        const label = copyButton.querySelector("span");
-        if(label) label.textContent = "Copier";
-      }, 2200);
-    });
-  }
+  const button = document.getElementById("profileMemberIdCopy");
+  if (!button) return;
 
   const memberId = profile?.id || currentUser?.id || "";
-  const value = document.getElementById("profileMemberIdValue");
-  if(value) value.textContent = memberId;
+  if (!memberId) {
+    button.disabled = true;
+    return;
+  }
+
+  button.disabled = false;
+  if (button.dataset.initialized === "true") return;
+
+  button.addEventListener("click", async () => {
+    const status = document.getElementById("profileMemberIdStatus");
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(memberId);
+      } else {
+        const temporary = document.createElement("textarea");
+        temporary.value = memberId;
+        temporary.setAttribute("readonly", "");
+        temporary.style.position = "fixed";
+        temporary.style.opacity = "0";
+        document.body.appendChild(temporary);
+        temporary.select();
+        const copied = document.execCommand("copy");
+        temporary.remove();
+        if (!copied) throw new Error("Copie impossible");
+      }
+      if (status) status.textContent = "Identifiant copié";
+      button.querySelector("span").textContent = "Copié";
+    } catch (error) {
+      console.error("COPIE IDENTIFIANT MEMBRE :", error);
+      if (status) status.textContent = "Copie impossible";
+    }
+    window.setTimeout(() => {
+      if (status) status.textContent = "";
+      const label = button.querySelector("span");
+      if (label) label.textContent = "Mon ID parrain";
+    }, 1800);
+  });
+
+  button.dataset.initialized = "true";
 }
 
 
