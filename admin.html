@@ -232,25 +232,39 @@
 
 
 #profilePasswordMethod {
-    margin-top:16px;
-    padding:14px;
-    border:1px solid var(--border);
-    background:rgba(255,255,255,.025);
-}
-#profilePasswordMethod label {
-    display:block;
-    margin-bottom:8px;
-}
-.password-method-actions {
+    margin-top:4px;
+    padding:0;
+    border:0;
+    background:transparent;
     display:flex;
+    align-items:center;
     flex-wrap:wrap;
     gap:8px;
-    margin-top:10px;
 }
-.password-method-actions button {
-    width:auto;
+#profilePasswordMethodStatus {
+    display:inline;
     margin:0;
 }
+.password-method-actions {
+    display:inline-flex;
+    margin:0;
+}
+.password-method-link {
+    appearance:none;
+    border:0;
+    background:none;
+    color:var(--gold, #d6ad55);
+    padding:0;
+    margin:0;
+    width:auto;
+    font:inherit;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.04em;
+    text-decoration:underline;
+    cursor:pointer;
+}
+.password-method-link:hover { color:#f0d58a; }
 .password-method-modal .modal-box {
     max-width:460px;
 }
@@ -641,11 +655,9 @@
             </div>
         </div>
 
-        <div class="form-group full-width" id="profilePasswordMethod">
-                <label>VOTRE MOT DE PASSE (CONNEXION PAR AUTRE MÉTHODE D’IDENTIFICATION)</label>
-                <div id="profilePasswordMethodStatus" class="help" aria-live="polite">Chargement des paramètres de connexion…</div>
-                <div id="profilePasswordMethodActions" class="password-method-actions"></div>
-                <div id="profilePasswordMethodHelp" class="help">Cette méthode est indépendante de Google.</div>
+        <div id="profilePasswordMethod" class="help" aria-live="polite">
+            <span id="profilePasswordMethodStatus">Connexion secondaire : vérification…</span>
+            <span id="profilePasswordMethodActions" class="password-method-actions"></span>
         </div>
 
 
