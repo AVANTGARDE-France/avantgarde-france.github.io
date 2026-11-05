@@ -2630,7 +2630,8 @@ body.directory-filter-open{overflow:hidden}
     font: 13px/1.6 Arial, sans-serif;
 }
 .google-signup-button {
-    width: 100%;
+    flex: 1;
+    width: auto;
     display: flex;
     align-items: center;
     justify-content: center;
