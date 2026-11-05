@@ -207,35 +207,24 @@ async function actualiserMethodeMotDePasse() {
   const googleEnabled = identities.some(identity => identity.provider === "google");
 
   status.textContent = passwordEnabled
-    ? "La connexion par e-mail et mot de passe est activée."
-    : "Aucun mot de passe de connexion secondaire n’est actuellement configuré.";
+    ? "Mot de passe secondaire actif."
+    : "Mot de passe secondaire non configuré.";
 
-  const createOrChange = document.createElement("button");
-  createOrChange.type = "button";
-  createOrChange.className = "secondary-button";
-  createOrChange.textContent = passwordEnabled ? "MODIFIER" : "CRÉER";
-  createOrChange.addEventListener("click", () => ouvrirModalMotDePasse(passwordEnabled ? "change" : "create"));
-  actions.appendChild(createOrChange);
+  // Un seul lien discret sous l’adresse e-mail.
+  const manage = document.createElement("button");
+  manage.type = "button";
+  manage.className = "password-method-link";
+  manage.textContent = passwordEnabled ? "MODIFIER" : "CRÉER";
+  manage.addEventListener("click", () => ouvrirModalMotDePasse(passwordEnabled ? "change" : "create"));
+  actions.appendChild(manage);
 
-  if (passwordEnabled) {
-    const remove = document.createElement("button");
-    remove.type = "button";
-    remove.className = "delete-button";
-    remove.textContent = "SUPPRIMER";
-    remove.addEventListener("click", () => {
-      if (!googleEnabled) {
-        afficherMessageMotDePasse("Vous devez d’abord disposer d’une autre méthode de connexion, par exemple Google, pour ne pas perdre l’accès à votre compte.", "error");
-        return;
-      }
+  // La suppression reste accessible depuis la fenêtre de modification,
+  // sans ajouter un second bouton permanent au profil.
+  if (passwordEnabled && googleEnabled) {
+    manage.addEventListener("contextmenu", event => {
+      event.preventDefault();
       ouvrirModalMotDePasse("delete");
     });
-    actions.appendChild(remove);
-    if (!googleEnabled) {
-      const warning = document.createElement("div");
-      warning.className = "help";
-      warning.textContent = "Pour éviter de vous verrouiller hors de votre compte, la suppression sera possible uniquement après avoir configuré une autre méthode de connexion.";
-      actions.appendChild(warning);
-    }
   }
 }
 
