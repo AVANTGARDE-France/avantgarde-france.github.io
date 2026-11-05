@@ -1219,12 +1219,13 @@ function remplirProfil(profile){
       profile.nom || "";
 
 
-  document
-    .getElementById("profileEmail")
-    .value =
+  const profileEmailValue = document.getElementById("profileEmailValue");
+  if (profileEmailValue) {
+    profileEmailValue.textContent =
       (currentUser?.email || profile.email || "")
         .trim()
         .toLowerCase();
+  }
 
 
   document
