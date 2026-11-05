@@ -458,11 +458,14 @@ function appliquerFiltreAnnuaire(fermer = true) {
     lireFiltresAttributsAnnuaire();
 
     const membresPublicsFiltres = filtrerMembresAnnuaire(membresVisibles);
+    const profilsPublicsFiltres = filtrerMembresAnnuaire(
+        membresPourComptage.filter(membre => membre.anonyme === false)
+    );
     const profilsAnonymesFiltres = filtrerMembresAnnuaire(
         membresPourComptage.filter(membre => membre.anonyme === true)
     );
     const statistiques = {
-        sympathisants: membresPublicsFiltres.length,
+        sympathisants: profilsPublicsFiltres.length,
         anonymes: profilsAnonymesFiltres.length
     };
     statistiques.total = statistiques.sympathisants + statistiques.anonymes;
@@ -488,7 +491,7 @@ function afficherMembresFiltres(liste, statistiques = null) {
     };
     const total = Number(stats.total) || 0;
     const detail = stats.sympathisants.toLocaleString("fr-FR") +
-        " sympathisants publics · " +
+        " sympathisants publics (direction comprise) · " +
         stats.anonymes.toLocaleString("fr-FR") +
         " inscrits anonymes · 300 fiches maximum affichées";
 
