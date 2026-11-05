@@ -90,5 +90,5 @@ import "./admin-delete-profile.js";
  * Les autres modules doivent donc être chargés avant lui.
  */
 
-import "./admin-auth.js?v=google-first-single-email-20261105-1";
+import "./admin-auth.js?v=google-first-google-email-sync-20261105-1";
 
