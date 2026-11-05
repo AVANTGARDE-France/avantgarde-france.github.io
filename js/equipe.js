@@ -1700,7 +1700,7 @@ function afficherEtapeInscription(numero) {
     const titre = document.getElementById("joinModalTitle");
     if (titre) {
         titre.textContent = numero === 1
-            ? "Soutenir l’Avant-gardE"
+            ? "Participe à l’aventure"
             : numero === 2
                 ? "Conditions d’inscription"
                 : "Sécuriser votre inscription";
