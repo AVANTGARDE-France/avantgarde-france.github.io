@@ -230,6 +230,48 @@
 
 }
 
+
+#profilePasswordMethod {
+    margin-top:16px;
+    padding:14px;
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.025);
+}
+#profilePasswordMethod label {
+    display:block;
+    margin-bottom:8px;
+}
+.password-method-actions {
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+}
+.password-method-actions button {
+    width:auto;
+    margin:0;
+}
+.password-method-modal .modal-box {
+    max-width:460px;
+}
+.password-method-modal .form-group {
+    margin:14px 0;
+}
+.password-method-modal .password-method-message {
+    min-height:18px;
+    margin-top:10px;
+    font-size:12px;
+}
+.password-method-modal .password-method-message.error { color:#ff8178; }
+.password-method-modal .password-method-message.success { color:#35d078; }
+.password-method-modal .password-method-modal-actions {
+    display:flex;
+    gap:8px;
+    margin-top:18px;
+}
+.password-method-modal .password-method-modal-actions button { flex:1; margin:0; }
+.password-method-modal button:disabled { opacity:.55; cursor:wait; }
+
 </style>
 
   <meta name="theme-color" content="#07152d">
@@ -310,6 +352,10 @@
                 id="loginPassword"
                 autocomplete="current-password"
             >
+        </div>
+
+        <div class="help" style="margin:0 0 12px;">
+            Cette méthode est disponible uniquement si vous avez paramétré cet accès depuis vos paramètres de profil.
         </div>
 
         <button
@@ -589,7 +635,14 @@
             >
 
             <div class="help">
-                Cette adresse est également utilisée pour votre connexion.
+                Cette adresse est utilisée pour votre compte et votre connexion Google.
+            </div>
+
+            <div class="form-group" id="profilePasswordMethod">
+                <label>VOTRE MOT DE PASSE (CONNEXION PAR AUTRE MÉTHODE D’IDENTIFICATION)</label>
+                <div id="profilePasswordMethodStatus" class="help" aria-live="polite">Chargement des paramètres de connexion…</div>
+                <div id="profilePasswordMethodActions" class="password-method-actions"></div>
+                <div id="profilePasswordMethodHelp" class="help">Cette méthode est indépendante de Google.</div>
             </div>
 
         </div>
