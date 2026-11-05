@@ -300,8 +300,22 @@
 .profile-security-row { align-items:flex-start; margin-top:18px; }
 .profile-security-email,
 .profile-security-password { flex:1; min-width:0; }
-.profile-security-email input { width:100%; }
+.profile-security-heading { display:flex; align-items:center; flex-wrap:wrap; gap:12px; min-height:42px; }
+.profile-security-label {
+    display:inline-flex; align-items:center;
+    color:var(--gold-light,#f0d58a);
+    font-family:inherit; font-size:16px; font-weight:700;
+    letter-spacing:.04em; line-height:1.35;
+    white-space:normal; cursor:help;
+}
+.profile-email-value {
+    display:inline-flex; align-items:center; gap:7px;
+    color:var(--text,#f5f3ed); font-size:15px; font-weight:500;
+    cursor:help;
+}
+.profile-lock-icon { width:15px; height:15px; flex:none; color:var(--gold-light,#f0d58a); }
 .profile-security-password { display:flex; align-items:center; gap:10px; min-height:54px; }
+.profile-security-password .profile-security-label { font-size:16px; }
 .profile-password-inline {
     display:flex; align-items:center; flex-wrap:nowrap; gap:8px;
     color:var(--muted); font-size:11px;
@@ -319,7 +333,7 @@
 .password-method-link:hover { background:rgba(214,173,85,.09); }
 
 @media(max-width:900px){.profile-main-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
-@media(max-width:600px){.profile-visibility-row,.profile-security-row{align-items:flex-start;flex-direction:column;gap:8px}.profile-visibility-left{flex-wrap:wrap}.profile-id-copy{margin-left:0}.profile-main-grid{grid-template-columns:1fr 1fr}.profile-security-password{min-height:0;flex-wrap:wrap}.profile-main-grid .full-width{grid-column:1/-1}}
+@media(max-width:600px){.profile-security-label{font-size:13px}.profile-email-value{font-size:13px}.profile-security-heading{gap:8px}.profile-visibility-row,.profile-security-row{align-items:flex-start;flex-direction:column;gap:8px}.profile-visibility-left{flex-wrap:wrap}.profile-id-copy{margin-left:0}.profile-main-grid{grid-template-columns:1fr 1fr}.profile-security-password{min-height:0;flex-wrap:wrap}.profile-main-grid .full-width{grid-column:1/-1}}
 @media(max-width:380px){.profile-main-grid{grid-template-columns:1fr}.profile-main-grid .full-width{grid-column:auto}}
 .password-method-modal .modal-box {
     max-width:460px;
@@ -664,12 +678,19 @@
 
     <div class="profile-security-row">
         <div class="profile-security-email">
-            <label for="profileEmail">EMAIL</label>
-            <input type="email" id="profileEmail" required autocomplete="email" readonly aria-readonly="true">
-            <div class="help">Adresse vérifiée de votre compte Google.</div>
+            <div class="profile-security-heading">
+                <span class="profile-security-label">EMAIL</span>
+                <span class="profile-email-value" id="profileEmail" title="Impossible à modifier, adresse vérifiée depuis votre compte Google.">
+                    <svg class="profile-lock-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="4" y="10" width="16" height="11" rx="2"></rect>
+                        <path d="M8 10V7a4 4 0 1 1 8 0v3"></path>
+                    </svg>
+                    <span id="profileEmailValue"></span>
+                </span>
+            </div>
         </div>
         <div class="profile-security-password">
-            <span class="profile-row-label">MOT DE PASSE (AUTRE MÉTHODE)</span>
+            <span class="profile-security-label" title="Une autre méthode de connexion, supplémentaire, idéale si vous préférez vous connecter sans compte Google (depuis un PC non personnel par exemple).">CONNEXION PAR MAIL + MOT DE PASSE</span>
             <div id="profilePasswordMethod" class="profile-password-inline" aria-live="polite">
                 <span id="profilePasswordMethodStatus">Vérification…</span>
                 <span id="profilePasswordMethodActions" class="password-method-actions"></span>
