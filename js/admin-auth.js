@@ -788,11 +788,12 @@ async function verifierUtilisateur() {
     try {
 
         const {
-            data: {
-                user
-            }
+            data: authData
         } =
             await supabase.auth.getUser();
+
+        // L'utilisateur peut être remplacé après la synchronisation Google.
+        let user = authData?.user || null;
 
 
         /* =================================================
