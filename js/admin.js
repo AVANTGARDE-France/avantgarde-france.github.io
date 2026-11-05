@@ -76,7 +76,7 @@ import "./admin-tabs.js";
    SUPPRESSION DU PROFIL
 ========================================================= */
 
-import "./admin-delete-profile.js";
+import "./admin-delete-profile.js?v=delete-account-auth-20261105-1";
 
 
 /* =========================================================
