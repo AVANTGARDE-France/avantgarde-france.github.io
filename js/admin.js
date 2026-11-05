@@ -41,7 +41,7 @@ import "./admin-core.js";
    PROFIL
 ========================================================= */
 
-import "./admin-profile.js?v=20261105-profile-cleanup-4";
+import "./admin-profile.js?v=20261105-security-labels-5";
 
 
 /* =========================================================
