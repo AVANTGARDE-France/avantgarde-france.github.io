@@ -1796,14 +1796,21 @@ async function finaliserInscriptionGoogle() {
             button.textContent = "REDIRECTION VERS GOOGLE…";
         }
 
-        const { error } = await window.supabaseClient.auth.signInWithOAuth({
+        const popup = window.open("about:blank", "avantgarde_google_auth", "popup=yes,width=520,height=680,resizable=yes,scrollbars=yes");
+        if (!popup) throw new Error("La fenêtre Google a été bloquée. Autorisez les fenêtres pop-up pour ce site puis réessayez.");
+
+        const { data, error } = await window.supabaseClient.auth.signInWithOAuth({
             provider: "google",
             options: {
-                redirectTo: window.location.origin + window.location.pathname
+                redirectTo: window.location.origin + window.location.pathname,
+                skipBrowserRedirect: true
             }
         });
-
-        if (error) throw error;
+        if (error || !data?.url) {
+            popup.close();
+            throw error || new Error("Google n’a pas fourni d’adresse de connexion.");
+        }
+        popup.location.href = data.url;
     } catch (error) {
         console.error("Erreur authentification Google :", error);
         sessionStorage.removeItem("avantgarde_pending_google_signup");
@@ -1865,13 +1872,17 @@ async function traiterRetourInscriptionGoogle() {
 
         if (existingById) {
             sessionStorage.removeItem("avantgarde_pending_google_signup");
+            if (window.opener && !window.opener.closed) {
+                window.opener.postMessage({
+                    type: "AVANTGARDE_GOOGLE_SIGNUP_ERROR",
+                    text: "Ce compte Google possède déjà un profil. Fermez cette fenêtre et connectez-vous depuis l’espace membre."
+                }, window.location.origin);
+                window.close();
+                return;
+            }
             ouvrirModalEquipe(joinModal);
             afficherEtapeInscription(1);
-            if (message) {
-                message.className = "form-message success";
-                message.textContent = "Votre compte existant a été reconnu. Redirection vers votre espace membre…";
-            }
-            window.location.href = "admin.html";
+            afficherErreurFormulaire(message, "Votre compte existe déjà. Connectez-vous depuis l’espace membre.");
             return;
         }
 
@@ -1913,19 +1924,34 @@ async function traiterRetourInscriptionGoogle() {
         if (insertError) throw insertError;
 
         sessionStorage.removeItem("avantgarde_pending_google_signup");
+        const confirmation = {
+            type: "AVANTGARDE_GOOGLE_SIGNUP_SUCCESS",
+            text: pending.anonyme
+                ? "Votre compte est créé et votre profil restera caché de la liste publique."
+                : "Votre compte est créé. Votre profil apparaît désormais dans la liste des membres."
+        };
+        if (window.opener && !window.opener.closed) {
+            window.opener.postMessage(confirmation, window.location.origin);
+            window.close();
+            return;
+        }
         ouvrirModalEquipe(joinModal);
         afficherEtapeInscription(1);
-
         if (message) {
             message.className = "form-message success";
-            message.textContent = pending.anonyme
-                ? "Votre compte est créé et votre profil restera caché de la liste publique."
-                : "Votre compte est créé. Votre profil apparaît désormais dans la liste des membres.";
+            message.textContent = confirmation.text;
         }
-
         await chargerMembres();
     } catch (error) {
         console.error("Finalisation inscription Google :", error);
+        if (window.opener && !window.opener.closed) {
+            window.opener.postMessage({
+                type: "AVANTGARDE_GOOGLE_SIGNUP_ERROR",
+                text: error.message || "Impossible de finaliser votre inscription."
+            }, window.location.origin);
+            window.close();
+            return;
+        }
         ouvrirModalEquipe(joinModal);
         afficherEtapeInscription(1);
         afficherErreurFormulaire(message, error.message || "Impossible de finaliser votre inscription. Aucun profil n’a été créé.");
@@ -1938,6 +1964,30 @@ function initialiserFormulaireInscription() {
     form.dataset.initialized = "true";
 
     form.addEventListener("submit", event => event.preventDefault());
+
+    if (!window.__avantgardeGooglePopupListener) {
+        window.__avantgardeGooglePopupListener = true;
+        window.addEventListener("message", event => {
+            if (event.origin !== window.location.origin) return;
+            const payload = event.data || {};
+            if (payload.type !== "AVANTGARDE_GOOGLE_SIGNUP_SUCCESS" &&
+                payload.type !== "AVANTGARDE_GOOGLE_SIGNUP_ERROR") return;
+            const message = document.getElementById("formMessage");
+            ouvrirModalEquipe(document.getElementById("joinModal"));
+            afficherEtapeInscription(1);
+            if (message) {
+                message.className = payload.type === "AVANTGARDE_GOOGLE_SIGNUP_SUCCESS"
+                    ? "form-message success" : "form-message error";
+                message.textContent = payload.text || "Réponse de Google reçue.";
+            }
+            if (payload.type === "AVANTGARDE_GOOGLE_SIGNUP_SUCCESS") chargerMembres();
+            const button = document.getElementById("googleSignupButton");
+            if (button) {
+                button.disabled = false;
+                button.innerHTML = '<span class="google-g" aria-hidden="true">G</span> CONTINUER AVEC GOOGLE';
+            }
+        });
+    }
 
     document.getElementById("signupStep1Next")?.addEventListener("click", async () => {
         const nom = document.getElementById("nom");
