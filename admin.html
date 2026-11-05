@@ -272,55 +272,55 @@
 
 <form id="loginForm">
 
-    <div class="form-group">
-
-        <label for="loginEmail">
-            EMAIL
-        </label>
-
-        <input
-            type="email"
-            id="loginEmail"
-            required
-            autocomplete="email"
-        >
-
-    </div>
-
-
-    <div class="form-group">
-
-        <label for="loginPassword">
-            MOT DE PASSE
-        </label>
-
-        <input
-            type="password"
-            id="loginPassword"
-            required
-            autocomplete="current-password"
-        >
-
-    </div>
-
-
     <button
-        type="submit"
+        type="button"
         class="primary-button"
-        id="loginButton"
+        id="googleLoginButton"
+        style="width:100%;"
     >
-        SE CONNECTER
+        SE CONNECTER AVEC GOOGLE
     </button>
 
     <button
         type="button"
         class="secondary-button"
-        id="googleLoginButton"
-        style="width:100%;margin-top:12px;"
+        id="showEmailLoginButton"
+        aria-expanded="false"
+        aria-controls="emailLoginFields"
+        style="width:100%;margin-top:14px;"
     >
-        CONTINUER AVEC GOOGLE
+        AUTRES MÉTHODES DE CONNEXION
     </button>
 
+    <div id="emailLoginFields" hidden style="margin-top:22px;">
+
+        <div class="form-group">
+            <label for="loginEmail">EMAIL</label>
+            <input
+                type="email"
+                id="loginEmail"
+                autocomplete="email"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="loginPassword">MOT DE PASSE</label>
+            <input
+                type="password"
+                id="loginPassword"
+                autocomplete="current-password"
+            >
+        </div>
+
+        <button
+            type="submit"
+            class="secondary-button"
+            id="loginButton"
+            style="width:100%;"
+        >
+            SE CONNECTER PAR E-MAIL
+        </button>
+    </div>
 
     <a
         href="index.html"
@@ -329,11 +329,7 @@
         HOME
     </a>
 
-
-    <div
-        id="loginMessage"
-        class="message"
-    ></div>
+    <div id="loginMessage" class="message"></div>
 
 </form>
 
