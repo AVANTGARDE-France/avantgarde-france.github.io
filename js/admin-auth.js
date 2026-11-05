@@ -827,6 +827,30 @@ async function verifierUtilisateur() {
            UTILISATEUR TROUVÉ
         ================================================= */
 
+        /*
+         * Google est l'unique source de l'adresse e-mail.
+         * Le serveur vérifie l'identité Google liée à ce user_id
+         * et son email_verified avant de synchroniser Auth + profil.
+         */
+        const { data: googleEmailSync, error: googleEmailSyncError } =
+            await supabase.functions.invoke("sync-google-email", {
+                method: "POST"
+            });
+
+        if (googleEmailSyncError) {
+            console.error("AUTH — synchronisation Google de l'adresse :", googleEmailSyncError);
+        } else if (googleEmailSync?.reason === "email_already_in_use") {
+            console.error("AUTH — l'adresse Google vérifiée appartient déjà à un autre compte Avant-gardE.");
+        } else if (googleEmailSync?.reason && googleEmailSync.reason !== "no_google_identity") {
+            console.error("AUTH — adresse Google non synchronisée :", googleEmailSync.reason);
+        }
+
+        // Recharge l'utilisateur après une éventuelle mise à jour Auth.
+        const { data: refreshedAuth, error: refreshAuthError } = await supabase.auth.getUser();
+        if (!refreshAuthError && refreshedAuth?.user?.id === user.id) {
+            user = refreshedAuth.user;
+        }
+
         window.currentUser =
             user;
 
@@ -918,29 +942,6 @@ async function verifierUtilisateur() {
             return;
         }
 
-
-        /*
-         * L'adresse du profil ne constitue plus une donnée
-         * indépendante : elle reprend celle du compte Auth.
-         * On répare ainsi automatiquement les anciens profils
-         * dont l'adresse aurait divergé.
-         */
-        const emailCompte = (user.email || "").trim().toLowerCase();
-
-        if (emailCompte && (profile.email || "").trim().toLowerCase() !== emailCompte) {
-            const { data: profilSynchronise, error: syncEmailError } = await supabase
-                .from("profiles")
-                .update({ email: emailCompte })
-                .eq("id", user.id)
-                .select()
-                .single();
-
-            if (syncEmailError) {
-                console.error("AUTH — SYNCHRONISATION DE L'ADRESSE DU PROFIL :", syncEmailError);
-            } else if (profilSynchronise) {
-                Object.assign(profile, profilSynchronise);
-            }
-        }
 
         /* =================================================
            ETAT UTILISATEUR
