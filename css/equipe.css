@@ -2650,3 +2650,24 @@ body.directory-filter-open{overflow:hidden}
     .signup-navigation { gap: 7px; }
     .signup-navigation .signup-back-button { min-width: 95px; }
 }
+
+
+/* Champ de parrainage du formulaire public */
+.signup-sponsor-group input {
+    width: 100%;
+    box-sizing: border-box;
+}
+.signup-sponsor-help,
+.signup-sponsor-status {
+    margin: 7px 0 0;
+    color: rgba(245,243,237,.62);
+    font: 12px/1.5 Arial, sans-serif;
+}
+.signup-sponsor-status:empty { display: none; }
+.signup-sponsor-status { color: var(--gold-light, #f0d58a); }
+.signup-sponsor-group .optional {
+    color: rgba(245,243,237,.55);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: .04em;
+}
