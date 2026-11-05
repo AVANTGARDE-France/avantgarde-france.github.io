@@ -1805,8 +1805,9 @@ async function traiterRetourInscriptionGoogle() {
             afficherEtapeInscription(1);
             if (message) {
                 message.className = "form-message success";
-                message.textContent = "Un compte existe déjà avec cette adresse Google. Votre compte actuel a été reconnu : connectez-vous depuis l’espace membre.";
+                message.textContent = "Votre compte existant a été reconnu. Redirection vers votre espace membre…";
             }
+            window.location.href = "admin.html";
             return;
         }
 
