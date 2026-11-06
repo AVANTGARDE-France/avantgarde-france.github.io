@@ -27,6 +27,7 @@
 <header class="project-heading"><div class="section-kicker">AVANT-GARDE</div><h1>Notre projet</h1><div class="project-line"></div><p>Nos propositions et orientations, présentées en cartes.</p></header>
 <section class="project-toolbar" aria-label="Filtres et tri"><span class="project-toolbar-label">FILTRER PAR</span><div id="projectFilters" class="project-filters"><button type="button" class="project-filter active" data-filter="all">Tout</button></div><div class="project-sort"><label class="project-toolbar-label" for="projectSort">TRIER PAR</label><select id="projectSort"><option value="position">Ordre du projet</option><option value="priority">Priorité</option><option value="title">Ordre alphabétique</option></select></div></section>
 <section id="projectGrid" class="project-grid" aria-live="polite"><div class="project-loading">Chargement des contenus…</div></section>
+<div id="projectModal" class="project-modal" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle"><div class="project-modal-panel"><button id="projectModalClose" class="project-modal-close" type="button" aria-label="Fermer">×</button><h2 id="projectModalTitle"></h2><div id="projectModalContent" class="project-modal-content"></div></div></div>
 </main><div id="site-footer"></div><div id="site-rdv-modal"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script type="module" src="js/supabase.js"></script><script type="module" src="js/components.js"></script>
 <script type="module">
@@ -45,10 +46,10 @@ filters.addEventListener("click",e=>{const b=e.target.closest("[data-filter]");i
 grid.addEventListener("click",e=>{const c=e.target.closest(".project-card");if(!c)return;const item=items.find(x=>String(x.id)===c.dataset.id);if(item)window.dispatchEvent(new CustomEvent("avantgarde:project-card-open",{detail:{id:item.id,titre:item.titre,html:item.html||""}}))});
 const modal=document.getElementById("projectModal"),modalTitle=document.getElementById("projectModalTitle"),modalContent=document.getElementById("projectModalContent");
 function closeProjectModal(){modal.classList.remove("open");document.body.style.overflow=""}
-document.getElementById("projectModalClose").addEventListener("click",closeProjectModal);
-modal.addEventListener("click",e=>{if(e.target===modal)closeProjectModal()});
+document.getElementById("projectModalClose")?.addEventListener("click",closeProjectModal);
+modal?.addEventListener("click",e=>{if(e.target===modal)closeProjectModal()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeProjectModal()});
-window.addEventListener("avantgarde:project-card-open",e=>{modalTitle.textContent=e.detail.titre||"";modalContent.innerHTML=e.detail.html||"<p>Le contenu détaillé sera prochainement disponible.</p>";modal.classList.add("open");document.body.style.overflow="hidden"});
+window.addEventListener("avantgarde:project-card-open",e=>{if(!modal)return;modalTitle.textContent=e.detail.titre||"";modalContent.innerHTML=e.detail.html||"<p>Le contenu détaillé sera prochainement disponible.</p>";modal.classList.add("open");document.body.style.overflow="hidden"});
 
 grid.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("project-card")){e.preventDefault();e.target.click()}});
 async function load(){try{const [m,s,c,st]=await Promise.all([supabase.from("menus").select("*").eq("valide",true).order("position"),supabase.from("sous_menus").select("*").eq("valide",true).order("position"),supabase.from("contenus").select("*").eq("valide",true).order("position"),supabase.from("stats").select("*").order("nom")]);for(const r of [m,s,c,st])if(r.error)throw r.error;menus=m.data||[];subs=s.data||[];items=c.data||[];stats=st.data||[];renderFilters();render()}catch(e){console.error("Erreur chargement projet",e);grid.innerHTML='<div class="project-error">Impossible de charger les contenus du projet.</div>'}}
