@@ -440,6 +440,53 @@
 .project-modal-front[data-priority="absolue"] .project-card-finish:before{inset:8px!important;border-color:#f6d995a8!important;animation:absoluteEnergy 4.8s ease-in-out infinite!important}
 .project-modal-front[data-priority="absolue"] .project-card-finish:after{opacity:.34!important;animation:absoluteArcs 5.6s linear infinite!important}
 @media(prefers-reduced-motion:reduce){.project-card[data-priority="absolue"] .project-card-finish:before,.project-card[data-priority="absolue"] .project-card-finish:after,.project-modal-front[data-priority="absolue"] .project-card-finish:before,.project-modal-front[data-priority="absolue"] .project-card-finish:after{animation:none!important}}
+
+/* CORRECTION CADRES : le contour visible est porté par .project-card et .project-card:before.
+   On garde sa géométrie et on différencie la matière du cadre lui-même. */
+.project-card[data-priority="prioritaire"]{
+ border:2px solid transparent!important;
+ background:linear-gradient(#0d2344,#0d2344) padding-box,
+ linear-gradient(135deg,#f4d89c,#9b713c 22%,#e6c783 48%,#89602f 72%,#f4d89c) border-box!important;
+ box-shadow:0 8px 24px #0008,0 0 0 1px #d9b87566,inset 0 0 0 1px #fff2cf!important;
+}
+.project-card[data-priority="prioritaire"]:before{
+ content:""!important;inset:4px!important;border:0!important;border-radius:12px!important;
+ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 900' preserveAspectRatio='none'%3E%3Crect x='1' y='1' width='598' height='898' rx='28' fill='none' stroke='%23f0d69a' stroke-width='2' opacity='.8'/%3E%3Cpath d='M8 170 C55 130 30 65 93 30 C135 7 160 48 190 8 M8 170 C70 154 74 90 93 30 M592 230 C545 180 570 95 507 38 C465 2 440 50 410 8 M592 230 C530 205 526 125 507 38 M8 730 C65 770 30 835 93 870 C135 893 160 852 190 892 M592 730 C535 770 570 835 507 870 C465 898 440 850 410 892' fill='none' stroke='%23f0d69a' stroke-width='2' opacity='.9'/%3E%3Cpath d='M24 170 C75 140 50 77 104 43 M576 230 C525 190 550 107 496 51 M24 730 C75 760 50 823 104 857 M576 730 C525 760 550 843 496 849' fill='none' stroke='%23fff0c9' stroke-width='1' opacity='.65'/%3E%3C/svg%3E") center/100% 100% no-repeat!important;
+ box-shadow:inset 0 0 18px #c99d5420!important;
+}
+.project-card[data-priority="prioritaire"] .project-card-finish{
+ box-shadow:inset 0 0 0 1px #fff0c966,inset 0 0 0 3px #07152d99,inset 0 0 0 4px #d7b36b66!important;
+}
+.project-card[data-priority="prioritaire"] .project-card-finish:before{content:none!important}
+/* Absolue : cadre à âme lumineuse, deux arêtes nettes et impulsions qui courent sur le pourtour */
+.project-card[data-priority="absolue"]{
+ border:2px solid transparent!important;
+ background:linear-gradient(#0b1b34,#0b1b34) padding-box,
+ conic-gradient(from 0deg,#fff0c7,#8e642d 12%,#fff1c6 25%,#b4eaff 34%,#a87936 46%,#fff0c7 60%,#9b6d31 74%,#c6efff 86%,#fff0c7) border-box!important;
+ box-shadow:0 9px 27px #000a,0 0 0 1px #f5d997aa,0 0 15px #b9eaff22!important;
+}
+.project-card[data-priority="absolue"]:before{
+ content:""!important;inset:4px!important;border:1px solid #ffe9b8!important;border-radius:12px!important;
+ background:linear-gradient(90deg,transparent,#d8f4ff30 50%,transparent) top/100% 1px no-repeat,
+ linear-gradient(90deg,transparent,#f6d99566 50%,transparent) bottom/100% 1px no-repeat!important;
+ box-shadow:inset 0 0 18px #c4edff20,0 0 6px #bdeaff55!important;
+}
+.project-card[data-priority="absolue"] .project-card-finish{
+ box-shadow:inset 0 0 0 1px #fff5d5,inset 0 0 0 3px #07152dba,inset 0 0 0 4px #e8c77d,inset 0 0 0 6px #07152d8a,inset 0 0 22px 4px #bdeaff30!important;
+}
+.project-card[data-priority="absolue"] .project-card-finish:before{
+ inset:8px!important;border:1px solid #c9efff88!important;border-radius:9px!important;
+ background:linear-gradient(90deg,transparent 0%,#bdeaff99 18%,transparent 34%,transparent 66%,#ffe8ac99 82%,transparent 100%) top/100% 1px no-repeat,
+ linear-gradient(90deg,transparent 0%,#ffe8ac88 18%,transparent 34%,transparent 66%,#bdeaff88 82%,transparent 100%) bottom/100% 1px no-repeat!important;
+ box-shadow:inset 0 0 16px #bdeaff22,0 0 5px #bdeaff44!important;
+}
+.project-card[data-priority="absolue"] .project-card-finish:after{
+ inset:-25%!important;opacity:.25!important;
+ background:conic-gradient(from 15deg at 50% 50%,transparent 0 14%,#bdeaff00 15%,#bdeaffbb 15.2%,transparent 15.7% 48%,#fff0c9 48.2%,transparent 48.7% 100%)!important;
+ filter:drop-shadow(0 0 2px #bdeaff)!important;animation:absoluteArcs 4.2s linear infinite!important;
+}
+.project-card[data-priority="absolue"]:hover .project-card-finish:after{opacity:.8!important}
+@media(prefers-reduced-motion:reduce){.project-card[data-priority="absolue"] .project-card-finish:after{animation:none!important}}
 </style></head><body>
 <div id="site-header"></div>
 <main class="project-page">
