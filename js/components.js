@@ -399,6 +399,10 @@ function injecterHeader() {
                 id="eventsAccount"
                 class="events-account"
                 aria-live="polite"
+                role="link"
+                tabindex="0"
+                aria-label="Déconnecté — accéder à la page de connexion"
+                style="cursor:pointer;"
             >Déconnecté</div>
 
         </div>
@@ -512,6 +516,23 @@ async function actualiserIndicateurConnexion(session) {
 }
 
 function initialiserIndicateurConnexion() {
+    const indicateur = document.getElementById("eventsAccount");
+    if (indicateur && indicateur.dataset.loginNavigationInitialized !== "true") {
+        indicateur.dataset.loginNavigationInitialized = "true";
+        const allerAuLoginSiDeconnecte = () => {
+            if (!indicateur.classList.contains("is-connected")) {
+                window.location.href = new URL("admin.html", window.location.href).href;
+            }
+        };
+        indicateur.addEventListener("click", allerAuLoginSiDeconnecte);
+        indicateur.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                allerAuLoginSiDeconnecte();
+            }
+        });
+    }
+
     supabase.auth.getSession().then(({ data, error }) => {
         if (error) {
             console.warn("Impossible de lire la session :", error);
