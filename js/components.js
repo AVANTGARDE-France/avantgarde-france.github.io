@@ -346,31 +346,6 @@ function injecterHeader() {
 
     container.innerHTML = `
 
-        <style>
-            .events-bar .events-account {
-                flex: 0 1 auto;
-                max-width: 34%;
-                overflow: hidden;
-                padding: 0 16px;
-                color: rgba(240, 213, 138, .78);
-                font-family: Arial, sans-serif;
-                font-size: 10px;
-                font-weight: 400;
-                letter-spacing: .02em;
-                text-align: right;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-            .events-bar .events-account[hidden] { display: none; }
-            @media (max-width: 520px) {
-                .events-bar .events-account {
-                    max-width: 43%;
-                    padding: 0 9px;
-                    font-size: 9px;
-                }
-            }
-        </style>
-
         <!-- =================================================
              BARRE EVENEMENT
         ================================================== -->
@@ -395,13 +370,6 @@ function injecterHeader() {
                 </div>
 
             </div>
-
-            <div
-                id="eventsAccount"
-                class="events-account"
-                hidden
-                aria-live="polite"
-            ></div>
 
         </div>
 
@@ -471,63 +439,6 @@ function injecterHeader() {
         </header>
 
     `;
-}
-
-
-/* =========================================================
-   INDICATEUR DE CONNEXION — BARRE SUPÉRIEURE
-========================================================= */
-
-async function actualiserIndicateurConnexion(session) {
-
-    const indicateur = document.getElementById("eventsAccount");
-    if (!indicateur) return;
-
-    const user = session?.user;
-
-    if (!user) {
-        indicateur.hidden = true;
-        indicateur.textContent = "";
-        return;
-    }
-
-    let nom = "";
-
-    try {
-        const { data, error } = await supabase
-            .from("profiles")
-            .select("nom")
-            .eq("id", user.id)
-            .maybeSingle();
-
-        if (error) throw error;
-        nom = data?.nom?.trim() || "";
-    } catch (error) {
-        console.warn("Impossible de récupérer le nom du membre :", error);
-    }
-
-    // Évite d'afficher une ancienne réponse si la session a changé entre-temps.
-    const { data: sessionActuelle } = await supabase.auth.getSession();
-    if (sessionActuelle?.session?.user?.id !== user.id) return;
-
-    const identite = nom || user.email || "Membre";
-    indicateur.textContent = `Connecté : ${identite}`;
-    indicateur.hidden = false;
-}
-
-function initialiserIndicateurConnexion() {
-
-    supabase.auth.getSession().then(({ data, error }) => {
-        if (error) {
-            console.error("Lecture de la session :", error);
-            return;
-        }
-        actualiserIndicateurConnexion(data.session);
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-        actualiserIndicateurConnexion(session);
-    });
 }
 
 
@@ -1555,8 +1466,6 @@ async function initialiserComposants() {
      */
 
     injecterHeader();
-
-    initialiserIndicateurConnexion();
 
     injecterFooter();
 
