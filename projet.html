@@ -12,7 +12,7 @@
 .project-filter{border:1px solid rgba(214,173,85,.4);background:transparent;color:white;border-radius:999px;padding:9px 15px;font:12px Arial,sans-serif;cursor:pointer}.project-filter:hover,.project-filter.active{background:linear-gradient(135deg,#f2d17d,#c89537);color:#07152d}
 .project-sort{display:flex;align-items:center;gap:10px;border-left:1px solid #d6ad5555;padding-left:16px}.project-sort select{background:#07152d;color:white;border:1px solid var(--gold);border-radius:999px;padding:9px 13px;font:12px Arial,sans-serif}
 .project-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px}.project-card{position:relative;isolation:isolate;display:flex;flex-direction:column;min-width:0;aspect-ratio:2/3;overflow:hidden;border:2px solid #c99b45;border-radius:15px;background:#0d2344;box-shadow:0 7px 22px #0005;cursor:pointer;transition:.22s}.project-card:hover{transform:translateY(-5px);box-shadow:0 14px 30px #0008;border-color:#ffe09a}
-.project-card-image{position:absolute;inset:0;z-index:-2;background:linear-gradient(180deg,#030d1d99,transparent 35%,#030d1d18 58%,#030d1dcc),linear-gradient(135deg,#193d65,#07152d);background-size:cover;background-position:center}.project-card:before{content:"";position:absolute;inset:4px;z-index:-1;border:1px solid #ffe091a6;border-radius:10px;pointer-events:none}
+.project-card-image{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,#030d1d99,transparent 35%,#030d1d18 58%,#030d1dcc),linear-gradient(135deg,#193d65,#07152d);background-size:cover;background-position:center}.project-card:before{content:"";position:absolute;inset:4px;z-index:-1;border:1px solid #ffe091a6;border-radius:10px;pointer-events:none}
 .project-card-top{display:flex;justify-content:center;align-items:center;position:relative;padding:12px 58px 0 12px;min-height:78px}.project-card-title{margin:0;color:#ffe09a;text-align:center;font:700 clamp(17px,1.45vw,24px)/1.12 Georgia,serif;text-shadow:0 2px 5px #000,0 0 12px #000}
 .project-priority{position:absolute;right:0;top:0;min-width:58px;padding:5.5px 6px 7px;text-align:center;color:#fff2d5;background:linear-gradient(145deg,#9b6425,#432b17);border-left:1px solid #f4d184;border-bottom:1px solid #f4d184;border-radius:0 10px 0 13px;font:700 9px Arial,sans-serif;text-transform:uppercase}.project-priority strong{display:block;font:700 13px Georgia,serif;margin-top:2px;color:#ffe09a}
 .project-card-center{display:flex;flex:1;align-items:center;justify-content:center;padding:8px 15px;text-align:center}.project-card-tagline{max-width:95%;margin:0;color:white;text-shadow:0 2px 5px #000,0 0 10px #000;font:italic 600 clamp(12px,1.1vw,16px)/1.3 Georgia,serif}
@@ -25,6 +25,7 @@
 
 /* Cartes recto-verso */
 .project-card{perspective:1200px;transform-style:preserve-3d;overflow:visible;border:0;background:transparent;box-shadow:none}
+.project-card>.project-card-top,.project-card>.project-card-center,.project-card>.project-stats,.project-card>.project-synergies{position:relative;z-index:1}
 .project-card:hover{transform:translateY(-4px);box-shadow:none}
 .project-card.is-flipped,.project-card.is-flipped:hover{transform:rotateY(180deg)}
 .project-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .72s cubic-bezier(.2,.75,.25,1);border:2px solid #c99b45;border-radius:15px;background:#0d2344;box-shadow:0 7px 22px #0005}
@@ -62,7 +63,7 @@
 .project-modal-face{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:2px solid #c99b45;border-radius:18px;box-shadow:0 22px 65px #000a}
 .project-modal-front{display:flex;flex-direction:column;transform:rotateY(0);background:#0d2344}
 .project-modal-front .project-card-image{position:absolute;inset:0}
-.project-modal-front .project-card-top,.project-modal-front .project-card-center,.project-modal-front .project-stats,.project-modal-front .project-synergies{position:relative}
+.project-modal-front .project-card-top,.project-modal-front .project-card-center,.project-modal-front .project-stats,.project-modal-front .project-synergies{position:relative;z-index:1}
 .project-modal-back{transform:rotateY(180deg);display:flex;flex-direction:column;padding:36px 32px 30px;background:linear-gradient(155deg,#173657,#07152d 75%);color:#f5f3ed}
 .project-modal-back h2{flex:0 0 auto;color:#f0d58a;text-align:center;font:700 clamp(23px,3vw,32px) Georgia,serif;margin:12px 25px 22px}
 .project-modal-content{flex:1;min-height:0;overflow-y:auto;font:15px/1.75 Arial,sans-serif}
