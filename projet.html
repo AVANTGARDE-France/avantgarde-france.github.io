@@ -71,6 +71,13 @@
 @media(prefers-reduced-motion:reduce){.project-modal-card-inner{transition:transform 1.7s cubic-bezier(.2,.75,.25,1)!important}}
 
 
+/* Recherche instantanée par titre */
+.project-search-wrap{position:relative;flex:0 0 220px;min-width:150px}
+.project-search-icon{position:absolute;left:13px;top:50%;transform:translateY(-53%);color:#f0d58a;font:24px/1 Georgia,serif;pointer-events:none}
+.project-search{display:block;width:100%;box-sizing:border-box;padding:11px 13px 11px 36px;border:1px solid rgba(214,173,85,.65);border-radius:999px;background:rgba(3,13,29,.72);color:#fff;font:12px Arial,sans-serif;outline:none}
+.project-search::placeholder{color:#b9c4d3}
+.project-search:focus{border-color:#ffe09a;box-shadow:0 0 0 3px rgba(214,173,85,.16)}
+
 /* Navigation de la mosaïque : barre flottante fixe en bas de l'écran */
 .project-page{padding-bottom:150px}
 .project-toolbar{
@@ -90,11 +97,13 @@
 .project-sort{flex:0 0 auto}
 .project-page{padding-top:38px}
 @media(max-width:620px){
-  .project-page{padding:24px 13px 125px}
-  .project-toolbar{width:calc(100% - 20px);bottom:calc(9px + env(safe-area-inset-bottom));
+  .project-page{padding:24px 13px 160px}
+  .project-toolbar{flex-wrap:wrap;width:calc(100% - 20px);bottom:calc(9px + env(safe-area-inset-bottom));
     padding:9px 10px;gap:8px;border-radius:17px}
   .project-toolbar-label{display:none}
-  .project-filters{gap:6px}
+  .project-search-wrap{flex:1 0 100%;min-width:0}
+  .project-search{padding-top:10px;padding-bottom:10px}
+  .project-filters{flex:1 1 0;gap:6px}
   .project-filter{padding:9px 12px;font-size:11px}
   .project-sort{width:auto;gap:0;border-left:1px solid rgba(214,173,85,.45);padding-left:8px}
   .project-sort select{width:112px;max-width:30vw;flex:0 0 auto;padding:9px 7px;font-size:10px}
@@ -109,15 +118,15 @@
 </style></head><body>
 <div id="site-header"></div>
 <main class="project-page">
-<section class="project-toolbar" aria-label="Filtres et tri"><span class="project-toolbar-label">FILTRER PAR</span><div id="projectFilters" class="project-filters"><button type="button" class="project-filter active" data-filter="all">Tout</button></div><div class="project-sort"><label class="project-toolbar-label" for="projectSort">TRIER PAR</label><select id="projectSort"><option value="position">Ordre du projet</option><option value="priority">Priorité</option><option value="title">Ordre alphabétique</option></select></div></section>
+<section class="project-toolbar" aria-label="Recherche, filtres et tri"><label class="project-search-wrap" aria-label="Rechercher une carte par son titre"><span class="project-search-icon" aria-hidden="true">⌕</span><input id="projectSearch" class="project-search" type="search" placeholder="Rechercher une carte…" autocomplete="off" spellcheck="false"></label><span class="project-toolbar-label">FILTRER PAR</span><div id="projectFilters" class="project-filters"><button type="button" class="project-filter active" data-filter="all">Tout</button></div><div class="project-sort"><label class="project-toolbar-label" for="projectSort">TRIER PAR</label><select id="projectSort"><option value="position">Ordre du projet</option><option value="priority">Priorité</option><option value="title">Ordre alphabétique</option></select></div></section>
 <section id="projectGrid" class="project-grid" aria-live="polite"><div class="project-loading">Chargement des contenus…</div></section>
 <div id="projectModal" class="project-modal" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle"><div class="project-modal-panel"><button id="projectModalClose" class="project-modal-close" type="button" aria-label="Fermer">×</button><div class="project-modal-card" id="projectModalCard"><div class="project-modal-card-inner"><div class="project-modal-face project-modal-front" id="projectModalFront"></div><div class="project-modal-face project-modal-back"><h2 id="projectModalTitle"></h2><div id="projectModalContent" class="project-modal-content"></div></div></div></div></div></div>
 </main><div id="site-footer"></div><div id="site-rdv-modal"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script type="module" src="js/supabase.js"></script><script type="module" src="js/components.js"></script>
 <script type="module">
 import {supabase} from "./js/supabase.js";
-const grid=document.getElementById("projectGrid"),filters=document.getElementById("projectFilters"),sort=document.getElementById("projectSort");
-let menus=[],subs=[],items=[],stats=[],active="all";
+const grid=document.getElementById("projectGrid"),filters=document.getElementById("projectFilters"),sort=document.getElementById("projectSort"),search=document.getElementById("projectSearch");
+let menus=[],subs=[],items=[],stats=[],active="all",searchTerm="";
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function ids(v){if(Array.isArray(v))return v.map(x=>typeof x==="object"?(x.id||x.uuid||x.content_id):x).filter(Boolean).map(String);if(typeof v==="string"){try{return ids(JSON.parse(v))}catch{return v.replace(/[{}"]/g,"").split(",").map(x=>x.trim()).filter(Boolean)}}if(v&&Array.isArray(v.synergies))return ids(v.synergies);return []}
 function parent(item){const sub=subs.find(x=>String(x.id)===String(item.sous_menu_id));return menus.find(x=>sub&&String(x.id)===String(sub.menu_id))}
@@ -125,8 +134,9 @@ function priority(v){return ({prioritaire:"Prioritaire",secondaire:"Secondaire",
 function stat(id){if(!id)return "";const s=stats.find(x=>String(x.id)===String(id));if(!s)return "";const image=s.image_url||s.photo_url||s.icone_url||s.image||s.icone||"";return '<span class="project-stat">'+(image?'<img src="'+esc(image)+'" alt="">':'<span>◆</span>')+'<span class="project-stat-name">'+esc(s.nom||s.titre||"Stat")+'</span></span>'}
 function card(x){const photo=x.photo_url?'background-image:linear-gradient(180deg,#030d1d88,transparent 40%,#030d1dcc),url('+JSON.stringify(x.photo_url)+');':'';const sy=ids(x.synergies).map(id=>items.find(y=>String(y.id)===id)).filter(Boolean).map(y=>y.titre);const statMarkup=[stat(x.stat_1),stat(x.stat_2),stat(x.stat_3)].filter(Boolean).join('');return '<article class="project-card" tabindex="0" role="button" aria-label="Ouvrir la carte : '+esc(x.titre)+'" data-id="'+esc(x.id)+'"><div class="project-card-image" style="'+photo+'"></div><div class="project-card-top"><h2 class="project-card-title">'+esc(x.titre)+'</h2><div class="project-priority">Priorité<strong>'+esc(priority(x.priorite))+'</strong></div></div><div class="project-card-center"><p class="project-card-tagline">'+esc(x.accroche||"")+'</p></div><div class="project-stats">'+statMarkup+'</div><footer class="project-synergies">'+(sy.length?'Synergies : '+sy.map(esc).join(' · '):'')+'</footer></article>'}
 function renderFilters(){filters.innerHTML='<button type="button" class="project-filter '+(active==="all"?"active":"")+'" data-filter="all">Tout</button>'+menus.map(m=>'<button type="button" class="project-filter '+(active===String(m.id)?"active":"")+'" data-filter="'+esc(m.id)+'">'+esc(m.titre)+'</button>').join("")}
-function render(){let list=items.filter(x=>active==="all"||String((parent(x)||{}).id)===String(active));if(sort.value==="title")list.sort((a,b)=>String(a.titre).localeCompare(String(b.titre),"fr"));else if(sort.value==="priority"){const rank={prioritaire:0,secondaire:1,tertiaire:2};list.sort((a,b)=>(rank[String(a.priorite).toLowerCase()]??3)-(rank[String(b.priorite).toLowerCase()]??3)||(a.position||0)-(b.position||0))}else list.sort((a,b)=>(a.position||0)-(b.position||0));grid.innerHTML=list.length?list.map(card).join(""):'<div class="project-empty">Aucun contenu dans ce filtre pour le moment.</div>'}
-filters.addEventListener("click",e=>{const b=e.target.closest("[data-filter]");if(!b)return;active=b.dataset.filter;renderFilters();render()});sort.addEventListener("change",render);
+function normalizeTitle(v){return String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("fr").trim()}
+function render(){let list=items.filter(x=>(active==="all"||String((parent(x)||{}).id)===String(active))&&(!searchTerm||normalizeTitle(x.titre).includes(normalizeTitle(searchTerm))));if(sort.value==="title")list.sort((a,b)=>String(a.titre).localeCompare(String(b.titre),"fr"));else if(sort.value==="priority"){const rank={prioritaire:0,secondaire:1,tertiaire:2};list.sort((a,b)=>(rank[String(a.priorite).toLowerCase()]??3)-(rank[String(b.priorite).toLowerCase()]??3)||(a.position||0)-(b.position||0))}else list.sort((a,b)=>(a.position||0)-(b.position||0));grid.innerHTML=list.length?list.map(card).join(""):'<div class="project-empty">Aucune carte ne correspond à votre recherche ou à ce filtre.</div>'}
+filters.addEventListener("click",e=>{const b=e.target.closest("[data-filter]");if(!b)return;active=b.dataset.filter;renderFilters();render()});search.addEventListener("input",()=>{searchTerm=search.value;render()});sort.addEventListener("change",render);
 const modal=document.getElementById("projectModal"),modalTitle=document.getElementById("projectModalTitle"),modalContent=document.getElementById("projectModalContent");
 function openProjectCard(c){const item=items.find(x=>String(x.id)===c.dataset.id);if(!item||!modal)return;const front=document.getElementById("projectModalFront"),card=document.querySelector("#projectModalCard .project-modal-card-inner");front.innerHTML=c.innerHTML;front.querySelector(".project-card-image")?.setAttribute("aria-hidden","true");modalTitle.textContent=item.titre||"";modalContent.innerHTML=item.html||"<p>Ce contenu ne comporte pas encore de verso.</p>";card.classList.remove("is-flipped");modal.classList.add("open");document.body.style.overflow="hidden";requestAnimationFrame(()=>requestAnimationFrame(()=>card.classList.add("is-flipped")));document.getElementById("projectModalClose")?.focus()}
 function closeProjectModal(){modal?.classList.remove("open");document.body.style.overflow=""}
