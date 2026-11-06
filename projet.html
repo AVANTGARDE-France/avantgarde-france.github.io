@@ -59,9 +59,11 @@
 .project-modal-card{width:100%;height:100%;aspect-ratio:2/3;perspective:1600px}
 .project-modal-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 1.7s cubic-bezier(.2,.75,.25,1);will-change:transform}
 .project-modal-card-inner.is-flipped{transform:rotateY(180deg)}
-.project-modal-face{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:2px solid #c99b45;border-radius:18px;box-shadow:0 22px 65px #000a}
-.project-modal-front{display:flex;flex-direction:column;transform:rotateY(0);background:#0d2344}
-.project-modal-front .project-card-image{position:absolute;inset:0}
+.project-modal-face{position:absolute;inset:0;overflow:hidden;isolation:isolate;transform-style:flat;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important;border:2px solid #c99b45;border-radius:18px;box-shadow:0 22px 65px #000a}
+.project-modal-front{display:flex;flex-direction:column;transform:rotateY(0deg) translateZ(1px);background:#0d2344;z-index:2}
+.project-modal-front .project-card-image{position:absolute;inset:0;z-index:0;background-position:center;background-size:cover}
+.project-modal-front .project-card-top,.project-modal-front .project-card-center,.project-modal-front .project-stats,.project-modal-front .project-synergies{z-index:1}
+.project-modal-back{transform:rotateY(180deg) translateZ(1px);z-index:1}
 .project-modal-front .project-card-top,.project-modal-front .project-card-center,.project-modal-front .project-stats,.project-modal-front .project-synergies{position:relative}
 .project-modal-back{transform:rotateY(180deg);display:flex;flex-direction:column;padding:36px 32px 30px;background:linear-gradient(155deg,#173657,#07152d 75%);color:#f5f3ed}
 .project-modal-back h2{flex:0 0 auto;color:#f0d58a;text-align:center;font:700 clamp(23px,3vw,32px) Georgia,serif;margin:12px 25px 22px}
