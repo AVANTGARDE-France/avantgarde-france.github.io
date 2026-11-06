@@ -964,6 +964,28 @@ async function verifierUtilisateur() {
         window.currentProfile =
             profile;
 
+        /*
+         * Connexion depuis le site public :
+         * après validation complète du compte, retour à la page d'origine.
+         * La destination est limitée au même site pour éviter toute redirection externe.
+         */
+        const returnToParam = new URLSearchParams(window.location.search).get("returnTo");
+        if (returnToParam) {
+            try {
+                const returnUrl = new URL(returnToParam, window.location.origin);
+                const isLocalPath = returnUrl.origin === window.location.origin
+                    && returnUrl.pathname.startsWith("/")
+                    && !returnUrl.pathname.endsWith("/admin.html")
+                    && !returnUrl.pathname.endsWith("admin.html");
+                if (isLocalPath) {
+                    window.location.replace(returnUrl.href);
+                    return;
+                }
+            } catch (returnError) {
+                console.warn("Adresse de retour ignorée :", returnError);
+            }
+        }
+
 
         /*
          * Synchronisation explicite avec admin-core.js.
