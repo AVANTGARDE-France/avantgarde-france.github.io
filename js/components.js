@@ -521,7 +521,10 @@ function initialiserIndicateurConnexion() {
         indicateur.dataset.loginNavigationInitialized = "true";
         const allerAuLoginSiDeconnecte = () => {
             if (!indicateur.classList.contains("is-connected")) {
-                window.location.href = new URL("admin.html", window.location.href).href;
+                const destination = new URL("admin.html", window.location.href);
+                const returnTo = window.location.pathname + window.location.search + window.location.hash;
+                destination.searchParams.set("returnTo", returnTo);
+                window.location.href = destination.href;
             }
         };
         indicateur.addEventListener("click", allerAuLoginSiDeconnecte);
