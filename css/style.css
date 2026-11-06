@@ -149,7 +149,7 @@ a {
 .site-header {
     position: relative;
     width: 100%;
-    height: 82px;
+    height: 64px;
     padding: 0 5%;
     display: flex;
     align-items: center;
@@ -1037,13 +1037,13 @@ footer div:last-child {
 
     .site-header {
         height: auto;
-        min-height: 82px;
-        padding: 15px 4%;
+        min-height: 68px;
+        padding: 9px 4%;
     }
 
     .header-inner {
         flex-wrap: wrap;
-        gap: 18px;
+        gap: 10px;
     }
 
     .main-nav {
@@ -1051,7 +1051,7 @@ footer div:last-child {
         order: 3;
         justify-content: center;
         flex-wrap: wrap;
-        gap: 16px 22px;
+        gap: 10px 22px;
         margin-left: 0;
     }
 
