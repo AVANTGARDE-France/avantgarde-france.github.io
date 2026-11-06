@@ -90,5 +90,5 @@ import "./admin-delete-profile.js?v=delete-account-auth-20261105-1";
  * Les autres modules doivent donc être chargés avant lui.
  */
 
-import "./admin-auth.js?v=google-first-google-email-sync-fix-20261105-2";
+import "./admin-auth.js?v=public-return-flow-20261106-1";
 
