@@ -51,6 +51,13 @@ a {
 }
 
 
+/* EN-TÊTE COMMUN : BARRE ÉVÉNEMENTS + NAVIGATION TOUJOURS VISIBLE */
+#site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
 /* =========================================================
    BARRE EVENEMENTS
 ========================================================= */
