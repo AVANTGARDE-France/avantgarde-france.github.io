@@ -476,26 +476,38 @@ function injecterHeader() {
    INDICATEUR DE CONNEXION — BARRE ÉVÉNEMENT
 ========================================================= */
 
-function actualiserIndicateurConnexion(session) {
+async function actualiserIndicateurConnexion(session) {
     const indicateur = document.getElementById("eventsAccount");
     if (!indicateur) return;
 
     const user = session?.user;
-
     if (!user) {
         indicateur.textContent = "Déconnecté";
         indicateur.classList.remove("is-connected");
         return;
     }
 
-    const metadata = user.user_metadata || {};
-    const nom = metadata.full_name
-        || metadata.name
-        || [metadata.first_name, metadata.last_name].filter(Boolean).join(" ")
-        || user.email
-        || "Membre";
+    // Le nom affiché est celui saisi lors de l'adhésion
+    // (pseudo ou nom/prénom), stocké dans profiles.nom.
+    let identite = "Membre";
+    try {
+        const { data, error } = await window.supabaseClient
+            .from("profiles")
+            .select("nom")
+            .eq("id", user.id)
+            .maybeSingle();
 
-    indicateur.textContent = `Connecté en tant que : ${nom}`;
+        if (error) throw error;
+        identite = data?.nom?.trim() || "Membre";
+    } catch (error) {
+        console.warn("Impossible de récupérer le pseudo du membre :", error);
+    }
+
+    // Ne pas afficher le résultat d'une ancienne session.
+    const { data: sessionActuelle } = await window.supabaseClient.auth.getSession();
+    if (sessionActuelle?.session?.user?.id !== user.id) return;
+
+    indicateur.textContent = `Connecté en tant que : ${identite}`;
     indicateur.classList.add("is-connected");
 }
 
