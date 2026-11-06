@@ -145,12 +145,13 @@
 }
 
 .project-popularity-star{color:#f2c94c;font-size:1.12em;line-height:1;text-shadow:0 0 7px #f2c94c55}
-/* Votes rapprochés de l'angle supérieur du verso du popup */
-.project-modal-back{padding:17px 16px 22px}
-.project-vote-panel{gap:5px;margin:0 0 8px;padding:0;align-items:flex-start}
+/* Votes discrets en bas à droite du verso du popup */
+.project-modal-back{position:relative;padding:17px 16px 22px}
+.project-vote-panel{position:absolute;right:14px;bottom:12px;z-index:2;display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:5px;margin:0;padding:0}
 .project-vote-panel .project-vote-button{min-width:36px;min-height:34px;padding:4px 8px}
-.project-vote-message{font:italic 10px/1.35 Arial,sans-serif;color:#ffcf8b;margin-top:2px}
-@media(max-width:620px){.project-modal-back{padding:13px 12px 17px}.project-vote-panel{gap:4px;margin-bottom:7px}.project-vote-panel .project-vote-button{min-width:33px;min-height:31px;padding:3px 7px}.project-vote-message{font-size:9px}}
+.project-vote-message{flex:0 0 100%;font:italic 10px/1.35 Arial,sans-serif;color:#ffcf8b;margin-top:2px;text-align:right}
+.project-modal-content{padding-bottom:48px;box-sizing:border-box}
+@media(max-width:620px){.project-modal-back{padding:13px 12px 17px}.project-vote-panel{right:10px;bottom:9px;gap:4px}.project-vote-panel .project-vote-button{min-width:33px;min-height:31px;padding:3px 7px}.project-vote-message{font-size:9px}.project-modal-content{padding-bottom:44px}}
 </style></head><body>
 <div id="site-header"></div>
 <main class="project-page">
