@@ -253,6 +253,82 @@
 .project-modal-front:hover .project-card-finish:after{opacity:.65!important}
 @media(max-width:620px){.project-card:hover{transform:none!important}.project-card-finish:before{inset:6px!important}.project-card:before{inset:4px!important}}
 @media(prefers-reduced-motion:reduce){.project-card,.project-card-finish,.project-card-finish:after{transition:none!important;animation:none!important}.project-card:hover{transform:none!important}}
+
+/* --- Collector finish v3 : cadre ciselé et fusion photo/métal --- */
+.project-card{
+ border:3px solid transparent!important;border-radius:18px!important;
+ background:linear-gradient(#081a32,#081a32) padding-box,
+ linear-gradient(145deg,#fff1c5 0%,#c18a3e 7%,#6c461d 17%,#f5d995 29%,#9b682b 42%,#ffe8ae 54%,#805321 68%,#f1d18a 82%,#70481f 92%,#ffe9b2 100%) border-box!important;
+ box-shadow:0 10px 28px #000b,0 0 0 1px #f5d99788,0 0 18px #d5a34b35,inset 0 0 0 1px #fff5d8!important;
+}
+.project-card:before{
+ content:""!important;position:absolute!important;inset:5px!important;z-index:1!important;pointer-events:none!important;
+ border:1px solid #ffe9b6b8!important;border-radius:12px!important;
+ box-shadow:inset 0 0 0 1px #08172b,inset 0 0 18px #f5d58a2c,0 0 0 1px #08172b!important;
+ background:linear-gradient(135deg,#fff4d31c,transparent 22%,transparent 76%,#e8bd6a1c)!important;
+}
+.project-card-finish{
+ z-index:1!important;border-radius:inherit!important;overflow:hidden!important;
+ box-shadow:inset 0 0 0 1px #fff4d5,inset 0 0 0 3px #08172be8,inset 0 0 0 5px #d9a957,inset 0 0 0 6px #fff0c66e,inset 0 0 0 8px #08172b9c,inset 0 0 30px 7px #07152d99!important;
+ background:
+ radial-gradient(circle at 15px 15px,#fff4d8 0 1.5px,transparent 2.5px),
+ radial-gradient(circle at calc(100% - 15px) 15px,#fff4d8 0 1.5px,transparent 2.5px),
+ radial-gradient(circle at 15px calc(100% - 15px),#f4d38b 0 1.5px,transparent 2.5px),
+ radial-gradient(circle at calc(100% - 15px) calc(100% - 15px),#fff4d8 0 1.5px,transparent 2.5px),
+ linear-gradient(135deg,#f8dda43b,transparent 18%,transparent 82%,#f8dda42b)!important;
+}
+.project-card-finish:before{
+ content:""!important;position:absolute!important;inset:9px!important;border:0!important;border-radius:8px!important;
+ background:
+ linear-gradient(135deg,#ffe8ae 0 2px,transparent 2px 100%) top left/24px 24px no-repeat,
+ linear-gradient(225deg,#ffe8ae 0 2px,transparent 2px 100%) top right/24px 24px no-repeat,
+ linear-gradient(45deg,#e0b66d 0 2px,transparent 2px 100%) bottom left/24px 24px no-repeat,
+ linear-gradient(315deg,#ffe8ae 0 2px,transparent 2px 100%) bottom right/24px 24px no-repeat,
+ linear-gradient(90deg,#f4d28b99,transparent 22%,transparent 78%,#f4d28b99) top/100% 1px no-repeat,
+ linear-gradient(90deg,#a87836aa,transparent 22%,transparent 78%,#a87836aa) bottom/100% 1px no-repeat!important;
+ box-shadow:inset 0 0 18px #06132655!important;
+}
+.project-card-finish:after{
+ content:""!important;position:absolute!important;inset:-65%!important;pointer-events:none!important;
+ opacity:0!important;mix-blend-mode:screen!important;
+ background:linear-gradient(112deg,transparent 39%,#fff0c00a 44%,#fff7dc78 48%,#a8dfff55 50%,#f7d99665 52%,transparent 59%)!important;
+ transform:translate3d(-52%,0,0) rotate(18deg)!important;
+ transition:opacity .25s ease,transform 1.35s cubic-bezier(.2,.7,.2,1)!important;
+}
+.project-card:hover{transform:translateY(-4px)!important;box-shadow:0 15px 34px #000c,0 0 0 1px #ffe5a7,0 0 22px #dcae5b55!important}
+.project-card:hover .project-card-finish:after{opacity:1!important;transform:translate3d(48%,0,0) rotate(18deg)!important}
+.project-card[data-priority="absolue"]{box-shadow:0 10px 30px #000b,0 0 0 1px #ffe3a5,0 0 20px #e4b85f66!important}
+.project-card[data-priority="absolue"] .project-card-finish{animation:collectorGoldBreath 6s ease-in-out infinite!important}
+.project-card[data-priority="absolue"] .project-card-finish:before{filter:drop-shadow(0 0 2px #f7d99599)!important}
+.project-card[data-priority="absolue"] .project-card-finish:after{opacity:.2!important;animation:collectorArc 7s ease-in-out infinite!important}
+.project-card[data-priority="absolue"]:hover .project-card-finish:after{opacity:1!important;animation:none!important}
+@keyframes collectorGoldBreath{0%,100%{filter:brightness(1)}50%{filter:brightness(1.2)}}
+@keyframes collectorArc{0%,65%,100%{opacity:.08}69%{opacity:.72}73%{opacity:.12}79%{opacity:.5}83%{opacity:.08}}
+.project-card-image-wrap:after{
+ background:linear-gradient(180deg,#061326a6 0%,#06132620 22%,transparent 42%,#06132622 62%,#061326a8 100%),
+ linear-gradient(90deg,#06132658,transparent 13%,transparent 87%,#06132658),
+ radial-gradient(ellipse at center,transparent 48%,#06132625 100%)!important;
+}
+.project-synergies{
+ left:9px!important;right:9px!important;bottom:8px!important;z-index:2!important;
+ min-height:34px!important;padding:7px 10px 6px!important;box-sizing:border-box!important;
+ border:0!important;border-top:1px solid #f4d58a9c!important;border-bottom:1px solid #f4d58a55!important;
+ border-radius:0 0 9px 9px!important;
+ background:linear-gradient(180deg,#07152d00 0%,#07152d9c 35%,#07152df5 100%)!important;
+ box-shadow:0 -8px 20px #06132655,inset 0 1px #fff3d42c!important;
+}
+.project-stats{padding-bottom:46px!important}
+.project-modal-front .project-card-finish:before{inset:10px!important}
+.project-modal-front .project-card-finish:after{opacity:0!important}
+.project-modal-front:hover .project-card-finish:after{opacity:.75!important}
+@media(max-width:620px){
+ .project-card{border-width:2px!important}
+ .project-card:before{inset:4px!important}
+ .project-card-finish:before{inset:7px!important}
+ .project-card-finish{box-shadow:inset 0 0 0 1px #fff4d5,inset 0 0 0 3px #08172be8,inset 0 0 0 4px #d9a957,inset 0 0 0 6px #08172b9c!important}
+ .project-synergies{left:7px!important;right:7px!important;bottom:6px!important}
+}
+@media(prefers-reduced-motion:reduce){.project-card[data-priority="absolue"] .project-card-finish,.project-card[data-priority="absolue"] .project-card-finish:after{animation:none!important}}
 </style></head><body>
 <div id="site-header"></div>
 <main class="project-page">
