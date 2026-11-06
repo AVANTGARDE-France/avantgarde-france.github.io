@@ -391,6 +391,55 @@
 .project-grid .project-card:hover > .project-card-finish:after{opacity:1!important;transform:translateX(30%)!important}
 @media(max-width:620px){.project-grid .project-card{border-radius:12px 16px 10px 14px!important}.project-grid .project-card:before{inset:2px!important}}
 @media(prefers-reduced-motion:reduce){.project-grid .project-card > .project-card-finish:after{transition:none!important}}
+
+/* --- Finitions par niveau : décor strictement intérieur, silhouette inchangée --- */
+/* PRIORITAIRE : une ciselure organique continue, fine, non répétitive */
+.project-card[data-priority="prioritaire"] .project-card-finish{
+ box-shadow:inset 0 0 0 1px #f2d69a,inset 0 0 0 3px #07152d9c,inset 0 0 0 4px #d8b36e88,inset 0 0 22px 3px #c89b4b24!important;
+}
+.project-card[data-priority="prioritaire"] .project-card-finish:before{
+ inset:7px!important;border:0!important;border-radius:9px!important;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 900' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23f0d69a' stroke-width='1.15' opacity='.72'%3E%3Cpath d='M18 145 C48 112 20 66 73 35 C111 14 144 38 158 13 M18 145 C58 132 72 100 73 35 M18 145 C60 154 89 143 111 116 C128 96 132 61 158 13 M582 185 C540 145 575 82 526 42 C491 13 456 35 440 13 M582 185 C543 167 526 117 526 42 M582 185 C544 202 513 182 491 154 C471 129 467 67 440 13 M15 735 C54 765 25 824 75 865 C110 889 143 864 160 888 M15 735 C56 751 73 795 75 865 M15 735 C58 715 87 739 109 765 C130 790 133 840 160 888 M585 755 C544 785 574 837 525 873 C490 898 457 872 440 890 M585 755 C543 772 527 817 525 873 M585 755 C545 733 514 754 491 780 C471 805 467 845 440 890'/%3E%3C/g%3E%3Cg fill='none' stroke='%23f8e8bd' stroke-width='.65' opacity='.65'%3E%3Cpath d='M26 146 C70 116 37 68 84 42 C116 25 139 42 151 22 M574 185 C530 153 563 91 516 50 C484 26 461 43 447 22 M23 734 C69 762 40 817 85 856 C117 879 140 859 153 879 M577 754 C531 783 561 833 515 865 C484 886 461 866 447 879'/%3E%3C/g%3E%3C/svg%3E")!important;
+ background-repeat:no-repeat!important;background-size:100% 100%!important;
+ opacity:.9!important;box-shadow:none!important;
+}
+.project-card[data-priority="prioritaire"] .project-card-finish:after{
+ opacity:.08!important;mix-blend-mode:screen!important;
+ background:linear-gradient(115deg,transparent 43%,#fff2ce55 49%,#e6c98722 52%,transparent 58%)!important;
+}
+/* ABSOLUE : énergie contenue dans le cadre, impulsions et arcs fins */
+.project-card[data-priority="absolue"] .project-card-finish{
+ box-shadow:inset 0 0 0 1px #ffe8b8,inset 0 0 0 3px #07152d9c,inset 0 0 0 4px #e6bd6a9c,inset 0 0 20px 3px #f5d99735,0 0 10px #e8bd6a30!important;
+}
+.project-card[data-priority="absolue"] .project-card-finish:before{
+ inset:6px!important;border:1px solid #f6d995a8!important;border-radius:9px!important;
+ background:
+ radial-gradient(ellipse at 8% 17%,#fff0c9 0 1px,transparent 2px),
+ radial-gradient(ellipse at 91% 28%,#d8f2ff 0 1px,transparent 2px),
+ radial-gradient(ellipse at 12% 83%,#fff0c9 0 1px,transparent 2px),
+ radial-gradient(ellipse at 88% 76%,#d8f2ff 0 1px,transparent 2px),
+ linear-gradient(112deg,transparent 0 13%,#f4d58a22 13.2%,transparent 13.7% 86%,#f4d58a18 86.2%,transparent 86.7%)!important;
+ box-shadow:inset 0 0 18px #f0d58a20,0 0 5px #f0d58a22!important;
+ animation:absoluteEnergy 4.8s ease-in-out infinite!important;
+}
+.project-card[data-priority="absolue"] .project-card-finish:after{
+ inset:3px!important;opacity:.34!important;mix-blend-mode:screen!important;
+ background:
+ linear-gradient(118deg,transparent 0 18%,#bcecff00 19%,#d9f5ffb0 19.25%,#fff4d9 19.45%,transparent 19.8% 100%),
+ linear-gradient(72deg,transparent 0 78%,#fff0c900 78.5%,#fff0c9a0 78.7%,transparent 79.1%),
+ linear-gradient(164deg,transparent 0 42%,#c5eaff00 42.5%,#d7f4ff88 42.7%,transparent 43.1%)!important;
+ filter:drop-shadow(0 0 2px #bdeaff)!important;
+ animation:absoluteArcs 5.6s linear infinite!important;
+}
+.project-card[data-priority="absolue"]:hover .project-card-finish:before{filter:brightness(1.3)!important}
+.project-card[data-priority="absolue"]:hover .project-card-finish:after{opacity:.8!important}
+@keyframes absoluteEnergy{0%,100%{opacity:.58;filter:brightness(.95)}50%{opacity:1;filter:brightness(1.35)}}
+@keyframes absoluteArcs{0%,100%{transform:translateX(-1px);opacity:.18}30%{opacity:.48}58%{transform:translateX(1px);opacity:.7}80%{opacity:.24}}
+/* Même traitement sur la grande carte modale, sans modifier ses dimensions */
+.project-modal-front[data-priority="prioritaire"] .project-card-finish:before{inset:9px!important;border:0!important;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 900' preserveAspectRatio='none'%3E%3Cg fill='none' stroke='%23f0d69a' stroke-width='1.15' opacity='.72'%3E%3Cpath d='M18 145 C48 112 20 66 73 35 C111 14 144 38 158 13 M18 145 C58 132 72 100 73 35 M582 185 C540 145 575 82 526 42 C491 13 456 35 440 13 M582 185 C543 167 526 117 526 42 M15 735 C54 765 25 824 75 865 C110 889 143 864 160 888 M585 755 C544 785 574 837 525 873 C490 898 457 872 440 890'/%3E%3C/g%3E%3C/svg%3E")!important;background-size:100% 100%!important;background-repeat:no-repeat!important}
+.project-modal-front[data-priority="absolue"] .project-card-finish:before{inset:8px!important;border-color:#f6d995a8!important;animation:absoluteEnergy 4.8s ease-in-out infinite!important}
+.project-modal-front[data-priority="absolue"] .project-card-finish:after{opacity:.34!important;animation:absoluteArcs 5.6s linear infinite!important}
+@media(prefers-reduced-motion:reduce){.project-card[data-priority="absolue"] .project-card-finish:before,.project-card[data-priority="absolue"] .project-card-finish:after,.project-modal-front[data-priority="absolue"] .project-card-finish:before,.project-modal-front[data-priority="absolue"] .project-card-finish:after{animation:none!important}}
 </style></head><body>
 <div id="site-header"></div>
 <main class="project-page">
