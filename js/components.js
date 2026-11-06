@@ -346,6 +346,30 @@ function injecterHeader() {
 
     container.innerHTML = `
 
+        <style>
+            .events-bar .events-account {
+                flex: 0 0 auto;
+                max-width: 32%;
+                padding: 0 14px;
+                overflow: hidden;
+                color: rgba(240, 213, 138, .72);
+                font-family: Arial, sans-serif;
+                font-size: 10px;
+                font-weight: 400;
+                letter-spacing: .02em;
+                text-align: right;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            @media (max-width: 520px) {
+                .events-bar .events-account {
+                    max-width: 42%;
+                    padding: 0 8px;
+                    font-size: 9px;
+                }
+            }
+        </style>
+
         <!-- =================================================
              BARRE EVENEMENT
         ================================================== -->
@@ -370,6 +394,12 @@ function injecterHeader() {
                 </div>
 
             </div>
+
+            <div
+                id="eventsAccount"
+                class="events-account"
+                aria-live="polite"
+            >Déconnecté</div>
 
         </div>
 
@@ -439,6 +469,49 @@ function injecterHeader() {
         </header>
 
     `;
+}
+
+
+/* =========================================================
+   INDICATEUR DE CONNEXION — BARRE ÉVÉNEMENT
+========================================================= */
+
+function actualiserIndicateurConnexion(session) {
+    const indicateur = document.getElementById("eventsAccount");
+    if (!indicateur) return;
+
+    const user = session?.user;
+
+    if (!user) {
+        indicateur.textContent = "Déconnecté";
+        indicateur.classList.remove("is-connected");
+        return;
+    }
+
+    const metadata = user.user_metadata || {};
+    const nom = metadata.full_name
+        || metadata.name
+        || [metadata.first_name, metadata.last_name].filter(Boolean).join(" ")
+        || user.email
+        || "Membre";
+
+    indicateur.textContent = `Connecté en tant que : ${nom}`;
+    indicateur.classList.add("is-connected");
+}
+
+function initialiserIndicateurConnexion() {
+    supabase.auth.getSession().then(({ data, error }) => {
+        if (error) {
+            console.warn("Impossible de lire la session :", error);
+            actualiserIndicateurConnexion(null);
+            return;
+        }
+        actualiserIndicateurConnexion(data.session);
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+        actualiserIndicateurConnexion(session);
+    });
 }
 
 
@@ -1466,6 +1539,8 @@ async function initialiserComposants() {
      */
 
     injecterHeader();
+
+    initialiserIndicateurConnexion();
 
     injecterFooter();
 
