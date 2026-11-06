@@ -815,17 +815,10 @@ function mettreAJourNombrePointsVIP(audienceMax, nombreParrainages, donsCumules,
 
   if(element){
     element.textContent = points.toLocaleString("fr-FR");
-    element.title =
-      "(" + audience.toLocaleString("fr-FR") + " ÷ 100) × " +
-      parrainages.toLocaleString("fr-FR") + " × " +
-      dons.toLocaleString("fr-FR") + " × " +
-      evaluationsFavorables.toLocaleString("fr-FR") +
-      " (pouces verts ; dons provisoires)";
   }
   const multiplier = document.getElementById("vipVoteMultiplier");
   if(multiplier){
     multiplier.textContent = "×" + evaluationsFavorables.toLocaleString("fr-FR") + " 👍";
-    multiplier.title = "Nombre de pouces verts attribués à des propositions (minimum 1).";
   }
 }
 
