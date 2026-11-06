@@ -1700,14 +1700,14 @@ function afficherEtapeInscription(numero) {
     const titre = document.getElementById("joinModalTitle");
     if (titre) {
         titre.textContent = numero === 1
-            ? "Participe à l’aventure"
+            ? "Conditions d’inscription"
             : numero === 2
-                ? "Conditions d’inscription"
+                ? "Vos informations"
                 : "Sécuriser votre inscription";
     }
 
     const intro = document.querySelector("#joinModal .form-intro");
-    if (intro) intro.hidden = numero !== 1;
+    if (intro) intro.hidden = numero !== 2;
 }
 
 async function verifierCodeParrainage(identifiant, nouvelUtilisateurId = null) {
@@ -1989,7 +1989,18 @@ function initialiserFormulaireInscription() {
         });
     }
 
-    document.getElementById("signupStep1Next")?.addEventListener("click", async () => {
+    document.getElementById("signupStep1Next")?.addEventListener("click", () => {
+        const message = document.getElementById("formMessage");
+        if (message) {
+            message.textContent = "";
+            message.className = "form-message";
+        }
+        afficherEtapeInscription(2);
+    });
+
+    document.getElementById("signupStep2Back")?.addEventListener("click", () => afficherEtapeInscription(1));
+
+    document.getElementById("signupStep2Next")?.addEventListener("click", async () => {
         const nom = document.getElementById("nom");
         const region = document.getElementById("region");
         const message = document.getElementById("formMessage");
@@ -2021,11 +2032,9 @@ function initialiserFormulaireInscription() {
             message.textContent = "";
             message.className = "form-message";
         }
-        afficherEtapeInscription(2);
+        afficherEtapeInscription(3);
     });
 
-    document.getElementById("signupStep2Back")?.addEventListener("click", () => afficherEtapeInscription(1));
-    document.getElementById("signupStep2Next")?.addEventListener("click", () => afficherEtapeInscription(3));
     document.getElementById("signupStep3Back")?.addEventListener("click", () => afficherEtapeInscription(2));
     document.getElementById("googleSignupButton")?.addEventListener("click", finaliserInscriptionGoogle);
 
