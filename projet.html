@@ -43,6 +43,15 @@
 @media(max-width:620px){.project-card-inner{border-radius:12px}.project-card-face{border-radius:10px}.project-card-back{padding:15px 10px 12px;border-width:4px}.project-card-back h2{font-size:16px;margin:8px 0 10px}.project-back-content{font-size:10px}.project-back-hint,.project-back-return{font-size:8px}.project-stats{gap:4px}}
 @media(prefers-reduced-motion:reduce){.project-card-inner{transition:none}}
 
+
+/* Popup portrait : le verso configuré dans l'administration */
+.project-modal{padding:18px;overflow-y:auto}
+.project-modal-panel{width:min(620px,94vw);height:min(88vh,900px);aspect-ratio:2/3;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;padding:28px 30px 32px;border:2px solid #c99b45;border-radius:18px;background:linear-gradient(155deg,#173657,#07152d 75%);box-sizing:border-box}
+.project-modal h2{flex:0 0 auto;margin:10px 42px 22px;font-size:clamp(23px,3vw,32px)}
+.project-modal-content{flex:1;min-height:0;overflow-y:auto;font:15px/1.75 Arial,sans-serif}
+.project-modal-content img{max-width:100%;height:auto}
+@media(max-width:620px){.project-modal{padding:10px}.project-modal-panel{width:min(94vw,520px);height: min(84vh,780px);padding:22px 18px;border-radius:14px}.project-modal h2{font-size:23px;margin-bottom:16px}.project-modal-content{font-size:14px}}
+
 </style></head><body>
 <div id="site-header"></div>
 <main class="project-page">
@@ -60,20 +69,18 @@ function ids(v){if(Array.isArray(v))return v.map(x=>typeof x==="object"?(x.id||x
 function parent(item){const sub=subs.find(x=>String(x.id)===String(item.sous_menu_id));return menus.find(x=>sub&&String(x.id)===String(sub.menu_id))}
 function priority(v){return ({prioritaire:"Prioritaire",secondaire:"Secondaire",tertiaire:"Tertiaire"})[String(v||"").toLowerCase()]||v||"—"}
 function stat(id){if(!id)return "";const s=stats.find(x=>String(x.id)===String(id));if(!s)return "";const image=s.image_url||s.photo_url||s.icone_url||s.image||s.icone||"";return '<span class="project-stat">'+(image?'<img src="'+esc(image)+'" alt="">':'<span>◆</span>')+'<span class="project-stat-name">'+esc(s.nom||s.titre||"Stat")+'</span></span>'}
-function card(x){const photo=x.photo_url?'background-image:linear-gradient(180deg,#030d1d88,transparent 40%,#030d1dcc),url('+JSON.stringify(x.photo_url)+');':'';const sy=ids(x.synergies).map(id=>items.find(y=>String(y.id)===id)).filter(Boolean).map(y=>y.titre);const statMarkup=[stat(x.stat_1),stat(x.stat_2),stat(x.stat_3)].filter(Boolean).join('');return '<article class="project-card" tabindex="0" role="button" aria-label="Retourner la carte : '+esc(x.titre)+'" aria-pressed="false" data-id="'+esc(x.id)+'"><div class="project-card-inner"><div class="project-card-face project-card-front"><div class="project-card-image" style="'+photo+'"></div><div class="project-card-top"><h2 class="project-card-title">'+esc(x.titre)+'</h2><div class="project-priority">Priorité<strong>'+esc(priority(x.priorite))+'</strong></div></div><div class="project-card-center"><p class="project-card-tagline">'+esc(x.accroche||"")+'</p></div><div class="project-stats">'+statMarkup+'</div><footer class="project-synergies">'+(sy.length?'Synergies : '+sy.map(esc).join(' · '):'')+'</footer></div><div class="project-card-face project-card-back"><span class="project-back-hint">AVANT-GARDE · NOTRE PROJET</span><h2>'+esc(x.titre)+'</h2><div class="project-back-content">'+(x.html||'<p>Le contenu détaillé sera prochainement disponible.</p>')+'</div><span class="project-back-return">Cliquer pour retourner</span></div></div></article>'}
+function card(x){const photo=x.photo_url?'background-image:linear-gradient(180deg,#030d1d88,transparent 40%,#030d1dcc),url('+JSON.stringify(x.photo_url)+');':'';const sy=ids(x.synergies).map(id=>items.find(y=>String(y.id)===id)).filter(Boolean).map(y=>y.titre);const statMarkup=[stat(x.stat_1),stat(x.stat_2),stat(x.stat_3)].filter(Boolean).join('');return '<article class="project-card" tabindex="0" role="button" aria-label="Ouvrir la carte : '+esc(x.titre)+'" data-id="'+esc(x.id)+'"><div class="project-card-image" style="'+photo+'"></div><div class="project-card-top"><h2 class="project-card-title">'+esc(x.titre)+'</h2><div class="project-priority">Priorité<strong>'+esc(priority(x.priorite))+'</strong></div></div><div class="project-card-center"><p class="project-card-tagline">'+esc(x.accroche||"")+'</p></div><div class="project-stats">'+statMarkup+'</div><footer class="project-synergies">'+(sy.length?'Synergies : '+sy.map(esc).join(' · '):'')+'</footer></article>'}
 function renderFilters(){filters.innerHTML='<button type="button" class="project-filter '+(active==="all"?"active":"")+'" data-filter="all">Tout</button>'+menus.map(m=>'<button type="button" class="project-filter '+(active===String(m.id)?"active":"")+'" data-filter="'+esc(m.id)+'">'+esc(m.titre)+'</button>').join("")}
 function render(){let list=items.filter(x=>active==="all"||String((parent(x)||{}).id)===String(active));if(sort.value==="title")list.sort((a,b)=>String(a.titre).localeCompare(String(b.titre),"fr"));else if(sort.value==="priority"){const rank={prioritaire:0,secondaire:1,tertiaire:2};list.sort((a,b)=>(rank[String(a.priorite).toLowerCase()]??3)-(rank[String(b.priorite).toLowerCase()]??3)||(a.position||0)-(b.position||0))}else list.sort((a,b)=>(a.position||0)-(b.position||0));grid.innerHTML=list.length?list.map(card).join(""):'<div class="project-empty">Aucun contenu dans ce filtre pour le moment.</div>'}
 filters.addEventListener("click",e=>{const b=e.target.closest("[data-filter]");if(!b)return;active=b.dataset.filter;renderFilters();render()});sort.addEventListener("change",render);
-function flipCard(c){c.classList.toggle("is-flipped");c.setAttribute("aria-pressed",c.classList.contains("is-flipped")?"true":"false")}
-grid.addEventListener("click",e=>{const c=e.target.closest(".project-card");if(c)flipCard(c)});
 const modal=document.getElementById("projectModal"),modalTitle=document.getElementById("projectModalTitle"),modalContent=document.getElementById("projectModalContent");
-function closeProjectModal(){modal.classList.remove("open");document.body.style.overflow=""}
+function openProjectCard(c){const item=items.find(x=>String(x.id)===c.dataset.id);if(!item||!modal)return;modalTitle.textContent=item.titre||"";modalContent.innerHTML=item.html||"<p>Ce contenu ne comporte pas encore de verso.</p>";modal.classList.add("open");document.body.style.overflow="hidden";document.getElementById("projectModalClose")?.focus()}
+function closeProjectModal(){modal?.classList.remove("open");document.body.style.overflow=""}
+grid.addEventListener("click",e=>{const c=e.target.closest(".project-card");if(c)openProjectCard(c)});
 document.getElementById("projectModalClose")?.addEventListener("click",closeProjectModal);
 modal?.addEventListener("click",e=>{if(e.target===modal)closeProjectModal()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeProjectModal()});
-window.addEventListener("avantgarde:project-card-open",e=>{if(!modal)return;modalTitle.textContent=e.detail.titre||"";modalContent.innerHTML=e.detail.html||"<p>Le contenu détaillé sera prochainement disponible.</p>";modal.classList.add("open");document.body.style.overflow="hidden"});
-
-grid.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("project-card")){e.preventDefault();flipCard(e.target)}});
+grid.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("project-card")){e.preventDefault();openProjectCard(e.target)}});
 async function load(){try{const [m,s,c,st]=await Promise.all([supabase.from("menus").select("*").eq("valide",true).order("position"),supabase.from("sous_menus").select("*").eq("valide",true).order("position"),supabase.from("contenus").select("*").eq("valide",true).order("position"),supabase.from("stats").select("*").order("nom")]);for(const r of [m,s,c,st])if(r.error)throw r.error;menus=m.data||[];subs=s.data||[];items=c.data||[];stats=st.data||[];renderFilters();render()}catch(e){console.error("Erreur chargement projet",e);grid.innerHTML='<div class="project-error">Impossible de charger les contenus du projet.</div>'}}
 load();
 </script></body></html>
