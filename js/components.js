@@ -346,7 +346,32 @@ function injecterHeader() {
 
     container.innerHTML = `
 
-        ${css}        <!-- =================================================
+        <style>
+            .events-bar .events-account {
+                flex: 0 1 auto;
+                max-width: 34%;
+                overflow: hidden;
+                padding: 0 16px;
+                color: rgba(240, 213, 138, .78);
+                font-family: Arial, sans-serif;
+                font-size: 10px;
+                font-weight: 400;
+                letter-spacing: .02em;
+                text-align: right;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .events-bar .events-account[hidden] { display: none; }
+            @media (max-width: 520px) {
+                .events-bar .events-account {
+                    max-width: 43%;
+                    padding: 0 9px;
+                    font-size: 9px;
+                }
+            }
+        </style>
+
+        <!-- =================================================
              BARRE EVENEMENT
         ================================================== -->
 
