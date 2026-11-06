@@ -2003,3 +2003,30 @@ window.remplirProfil =
 ========================================================= */
 
 initialiserEcouteurOngletProfil();
+
+
+/* =========================================================
+   AIDE AU CALCUL DU SCORE VIP
+========================================================= */
+const vipScoreHelpButton = document.getElementById("vipScoreHelpButton");
+const vipScoreHelpModal = document.getElementById("vipScoreHelpModal");
+const vipScoreHelpClose = document.getElementById("vipScoreHelpClose");
+
+function fermerAideScoreVIP(){
+  if(vipScoreHelpModal) vipScoreHelpModal.style.display = "none";
+  document.body.style.overflow = "";
+}
+if(vipScoreHelpButton && vipScoreHelpModal){
+  vipScoreHelpButton.addEventListener("click",()=>{
+    vipScoreHelpModal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+    vipScoreHelpClose?.focus();
+  });
+  vipScoreHelpClose?.addEventListener("click",fermerAideScoreVIP);
+  vipScoreHelpModal.addEventListener("click",e=>{
+    if(e.target===vipScoreHelpModal) fermerAideScoreVIP();
+  });
+  document.addEventListener("keydown",e=>{
+    if(e.key==="Escape" && vipScoreHelpModal.style.display==="flex") fermerAideScoreVIP();
+  });
+}
