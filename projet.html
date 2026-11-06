@@ -366,6 +366,48 @@
 @media(prefers-reduced-motion:reduce){.project-grid .project-card > .project-card-finish:after{transition:none!important}}
 
 
+
+/* Position de référence des évaluations : coin inférieur droit du verso agrandi */
+#projectModalCard .project-modal-back { position:relative!important; }
+#projectModalCard .project-modal-back #projectVotePanel {
+  position:absolute!important;
+  right:16px!important;
+  bottom:14px!important;
+  left:auto!important;
+  top:auto!important;
+  z-index:5!important;
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:nowrap!important;
+  justify-content:flex-end!important;
+  align-items:center!important;
+  gap:5px!important;
+  width:max-content!important;
+  max-width:calc(100% - 32px)!important;
+  margin:0!important;
+  padding:0!important;
+}
+#projectModalCard .project-modal-back #projectVotePanel .project-vote-button {
+  flex:0 0 auto!important;
+  min-width:36px!important;
+  min-height:34px!important;
+  padding:4px 8px!important;
+}
+#projectModalCard .project-modal-back #projectVotePanel .project-vote-message {
+  flex:0 1 auto!important;
+  min-width:0!important;
+  margin:0 3px 0 0!important;
+  text-align:right!important;
+  white-space:nowrap!important;
+  font:italic 10px/1.2 Arial,sans-serif!important;
+}
+#projectModalCard .project-modal-back #projectModalContent { padding-bottom:52px!important; }
+@media(max-width:620px) {
+  #projectModalCard .project-modal-back #projectVotePanel { right:10px!important;bottom:9px!important;gap:4px!important; }
+  #projectModalCard .project-modal-back #projectVotePanel .project-vote-button { min-width:33px!important;min-height:31px!important;padding:3px 7px!important; }
+  #projectModalCard .project-modal-back #projectVotePanel .project-vote-message { font-size:9px!important; }
+  #projectModalCard .project-modal-back #projectModalContent { padding-bottom:46px!important; }
+}
 </style></head><body>
 <div id="site-header"></div>
 <main class="project-page">
