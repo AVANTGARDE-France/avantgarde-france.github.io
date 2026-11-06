@@ -816,10 +816,6 @@ function mettreAJourNombrePointsVIP(audienceMax, nombreParrainages, donsCumules,
   if(element){
     element.textContent = points.toLocaleString("fr-FR");
   }
-  const multiplier = document.getElementById("vipVoteMultiplier");
-  if(multiplier){
-    multiplier.textContent = "×" + evaluationsFavorables.toLocaleString("fr-FR") + " 👍";
-  }
 }
 
 async function actualiserFacteurVotesVIP(profile){
