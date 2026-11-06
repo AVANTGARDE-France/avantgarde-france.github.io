@@ -202,6 +202,33 @@
 }
 @media(max-width:620px){.project-card-finish:before{inset:4px;border-radius:8px}.project-card-finish{box-shadow:inset 0 0 0 1px #f4d58bdb,inset 0 0 0 3px #07152d9c,inset 0 0 0 4px #e6bd6a65,inset 0 0 14px 2px #07152d55}}
 @media(prefers-reduced-motion:reduce){.project-card-finish:after,.project-card[data-priority="absolue"] .project-card-finish:after{animation:none!important;transition:none!important}}
+
+/* --- Ajustements collector : synergies intégrées, photographie plein cadre, contour travaillé --- */
+.project-card{border:2px solid transparent!important;background:linear-gradient(#0d2344,#0d2344) padding-box,linear-gradient(135deg,#fff0bc 0%,#b98232 13%,#f5d994 25%,#76501e 42%,#f4d58a 57%,#98652b 75%,#ffe7aa 91%,#9a6a2c 100%) border-box!important;border-radius:16px!important;box-shadow:0 8px 24px #0008,0 0 0 1px #f5d99755, inset 0 0 0 1px #fff2cf!important}
+.project-card:before{inset:4px!important;z-index:1!important;border:1px solid #f7dfaa9c!important;border-radius:12px!important;box-shadow:inset 0 0 0 1px #07152d, inset 0 0 18px #f0d58a1c!important}
+.project-card-finish{z-index:1!important;border-radius:inherit!important;box-shadow:inset 0 0 0 1px #fff0c9,inset 0 0 0 3px #07152dba,inset 0 0 0 4px #e7bd6a,inset 0 0 0 6px #07152d8a,inset 0 0 25px 5px #07152d88!important;
+ background:radial-gradient(ellipse at 0% 0%,#fff0c94a,transparent 20%),radial-gradient(ellipse at 100% 0%,#fff0c938,transparent 19%),radial-gradient(ellipse at 0% 100%,#e8bd6a30,transparent 18%),radial-gradient(ellipse at 100% 100%,#fff0c938,transparent 19%),radial-gradient(circle at 2% 3%,#fff1c9 0 1px,transparent 3px),radial-gradient(circle at 98% 4%,#fff0bd 0 1px,transparent 3px),radial-gradient(circle at 3% 97%,#f7d98b 0 1px,transparent 3px),radial-gradient(circle at 97% 96%,#fff0bd 0 1px,transparent 3px)!important}
+.project-card-finish:before{inset:7px!important;border:1px solid #f5d997a8!important;border-radius:10px!important;
+ background:linear-gradient(135deg,#f9e5ad20,transparent 15%,transparent 78%,#e5bd7022),linear-gradient(180deg,#f5d9970c,transparent 20%,transparent 80%,#f5d99712)!important;
+ box-shadow:inset 0 0 20px #06132677,0 0 0 1px #07152d!important}
+.project-card-finish:after{inset:-45%!important;background:linear-gradient(112deg,transparent 39%,#ffffff0a 44%,#fff8df48 48%,#9bdcff30 50%,#f5d99732 53%,transparent 59%)!important}
+.project-card-image-wrap{inset:0!important}
+.project-card-image{object-fit:cover!important;object-position:center center!important;width:100%!important;height:100%!important}
+.project-card-image-wrap:after{background:linear-gradient(180deg,#030d1d9c 0%,#030d1d18 27%,#030d1d08 52%,#030d1d68 78%,#030d1de8 100%),linear-gradient(90deg,#06132636,transparent 18%,transparent 82%,#06132636)!important}
+.project-card-top,.project-card-center,.project-stats,.project-synergies{z-index:2!important}
+.project-stats{padding-bottom:46px!important}
+.project-synergies{position:absolute!important;left:9px!important;right:9px!important;bottom:8px!important;min-height:30px!important;box-sizing:border-box!important;padding:7px 9px 6px!important;
+ border-top:1px solid #f0d58a75!important;border-bottom:1px solid #f0d58a35!important;border-radius:0 0 9px 9px!important;
+ background:linear-gradient(180deg,#06132618 0%,#061326a8 42%,#061326df 100%)!important;
+ box-shadow:0 -7px 16px #06132638,inset 0 1px #fff1c01c!important;text-shadow:0 1px 5px #000,0 0 9px #07152d!important}
+.project-card[data-priority="absolue"]{box-shadow:0 8px 25px #0009,0 0 0 1px #f5d99788,0 0 13px #e8bd6a55,inset 0 0 0 1px #fff2cf!important}
+.project-card[data-priority="absolue"] .project-card-finish{box-shadow:inset 0 0 0 1px #fff2d2,inset 0 0 0 3px #07152dba,inset 0 0 0 4px #ffe3a0,inset 0 0 0 6px #07152d8a,inset 0 0 25px 5px #f5d99730!important}
+.project-card[data-priority="absolue"] .project-card-finish:before{border-color:#ffe7b7!important;box-shadow:inset 0 0 20px #f0d58a25,0 0 6px #f0d58a35!important}
+.project-modal-front .project-card-finish{border-radius:16px!important}
+.project-modal-front .project-card-finish:before{inset:8px!important}
+.project-modal-front .project-stats{padding-bottom:46px!important}
+.project-modal-front .project-synergies{left:10px!important;right:10px!important;bottom:9px!important}
+@media(max-width:620px){.project-card:before{inset:3px!important}.project-card-finish:before{inset:5px!important}.project-synergies{left:7px!important;right:7px!important;bottom:6px!important;padding:6px 6px 5px!important;font-size:9px!important}.project-stats{padding-bottom:42px!important}}
 </style></head><body>
 <div id="site-header"></div>
 <main class="project-page">
