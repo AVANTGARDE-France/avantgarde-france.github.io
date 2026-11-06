@@ -376,6 +376,51 @@
 @keyframes collectorMetalBreath{0%,100%{filter:brightness(1)}50%{filter:brightness(1.09)}}
 @media(max-width:620px){.project-card{border-width:2px!important}.project-card:before{inset:4px!important}.project-card-finish:before{inset:7px!important}}
 @media(prefers-reduced-motion:reduce){.project-card[data-priority="absolue"] .project-card-finish{animation:none!important}.project-card:hover{transform:none!important}}
+
+/* --- Cadre architectural gravé : reliefs décalés et guillochage d'angle --- */
+.project-card{
+ border:4px solid transparent!important;border-radius:16px!important;
+ background:
+ linear-gradient(#08172d,#08172d) padding-box,
+ conic-gradient(from 22deg,#fff0c5,#805322 11%,#d8ad61 19%,#fff0c5 27%,#65431e 39%,#f3d48f 51%,#805322 64%,#ffe9b2 76%,#69451f 88%,#fff0c5) border-box!important;
+ box-shadow:0 12px 30px #000c,0 0 0 1px #f2d28b99,0 0 0 3px #07152d,0 0 18px #d7aa5833,inset 0 0 0 1px #fff5d8!important;
+}
+.project-card:before{
+ inset:4px!important;border:1px solid #ffe8b1!important;border-radius:10px!important;
+ clip-path:polygon(0 0,27% 0,30% 3px,70% 3px,73% 0,100% 0,100% 27%,calc(100% - 3px) 30%,calc(100% - 3px) 70%,100% 73%,100% 100%,73% 100%,70% calc(100% - 3px),30% calc(100% - 3px),27% 100%,0 100%,0 73%,3px 70%,3px 30%,0 27%)!important;
+ box-shadow:inset 0 0 0 1px #08172d,inset 0 0 16px #e9c77b25!important;
+}
+.project-card-finish{
+ border-radius:inherit!important;
+ box-shadow:inset 0 0 0 1px #fff3d3,inset 0 0 0 3px #07152df2,inset 0 0 0 4px #d7a957,inset 0 0 0 6px #07152de0,inset 0 0 0 7px #f3d48c88,inset 0 0 0 9px #07152d99,inset 0 0 28px 8px #07152dbb!important;
+}
+.project-card-finish:before{
+ inset:8px!important;border:0!important;border-radius:7px!important;
+ background:
+ /* angles architecturaux à décrochements */
+ linear-gradient(135deg,#fff0c8 0 2px,transparent 2.5px) top left/34px 34px no-repeat,
+ linear-gradient(135deg,#c18a43 0 1px,transparent 1.5px) top left/43px 43px no-repeat,
+ linear-gradient(225deg,#fff0c8 0 2px,transparent 2.5px) top right/34px 34px no-repeat,
+ linear-gradient(225deg,#c18a43 0 1px,transparent 1.5px) top right/43px 43px no-repeat,
+ linear-gradient(45deg,#e2b96e 0 2px,transparent 2.5px) bottom left/34px 34px no-repeat,
+ linear-gradient(45deg,#9b6b31 0 1px,transparent 1.5px) bottom left/43px 43px no-repeat,
+ linear-gradient(315deg,#fff0c8 0 2px,transparent 2.5px) bottom right/34px 34px no-repeat,
+ linear-gradient(315deg,#c18a43 0 1px,transparent 1.5px) bottom right/43px 43px no-repeat,
+ /* fines lignes de guillochage dans les quatre angles */
+ repeating-linear-gradient(135deg,#f4d58a48 0 1px,transparent 1px 4px) top left/25px 25px no-repeat,
+ repeating-linear-gradient(225deg,#f4d58a38 0 1px,transparent 1px 4px) top right/25px 25px no-repeat,
+ repeating-linear-gradient(45deg,#f4d58a38 0 1px,transparent 1px 4px) bottom left/25px 25px no-repeat,
+ repeating-linear-gradient(315deg,#f4d58a48 0 1px,transparent 1px 4px) bottom right/25px 25px no-repeat,
+ linear-gradient(90deg,#f4d58a99,transparent 15%,transparent 85%,#f4d58a99) top/100% 1px no-repeat,
+ linear-gradient(90deg,#a97939aa,transparent 15%,transparent 85%,#a97939aa) bottom/100% 1px no-repeat,
+ linear-gradient(180deg,#f4d58a88,transparent 15%,transparent 85%,#f4d58a88) left/1px 100% no-repeat,
+ linear-gradient(180deg,#a97939aa,transparent 15%,transparent 85%,#a97939aa) right/1px 100% no-repeat!important;
+ filter:drop-shadow(0 0 1px #ffe9b755);
+}
+.project-card:hover{transform:translateY(-3px)!important;box-shadow:0 15px 34px #000c,0 0 0 1px #ffe5a7,0 0 22px #dcae5b55!important}
+.project-card:hover .project-card-finish:before{filter:drop-shadow(0 0 3px #f5d99788)!important}
+.project-card[data-priority="absolue"]{box-shadow:0 12px 30px #000c,0 0 0 1px #ffe3a5bb,0 0 20px #e4b85f55!important}
+@media(max-width:620px){.project-card{border-width:3px!important}.project-card:before{inset:3px!important}.project-card-finish:before{inset:7px!important}}
 </style></head><body>
 <div id="site-header"></div>
 <main class="project-page">
