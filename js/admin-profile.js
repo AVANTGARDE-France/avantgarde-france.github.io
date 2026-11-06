@@ -796,7 +796,7 @@ function mettreAJourMedailleVIP(audience){
  * (sans limite de période), depuis une table Supabase dédiée aux dons.
  * Ne pas ajouter ce montant à profiles.
  */
-function mettreAJourNombrePointsVIP(audienceMax, nombreParrainages, donsCumules){
+function mettreAJourNombrePointsVIP(audienceMax, nombreParrainages, donsCumules, poucesVerts = 1){
 
   const facteur = valeur => {
     const nombre = Number(valeur);
@@ -806,12 +806,11 @@ function mettreAJourNombrePointsVIP(audienceMax, nombreParrainages, donsCumules)
   const audience = facteur(audienceMax);
   const audiencePonderee = audience / 100;
   const parrainages = facteur(nombreParrainages);
-
-  // PROVISOIRE : aucun montant de don n'est encore disponible.
   const dons = facteur(donsCumules);
+  const evaluationsFavorables = facteur(poucesVerts);
 
-  // Même calcul que le déclencheur Supabase ; la colonne point est un integer.
-  const points = Math.min(2147483647, Math.round(audiencePonderee * parrainages * dons));
+  // Même calcul que le déclencheur Supabase ; chaque facteur nul vaut 1.
+  const points = Math.min(2147483647, Math.round(audiencePonderee * parrainages * dons * evaluationsFavorables));
   const element = document.getElementById("vipPoints");
 
   if(element){
@@ -819,8 +818,24 @@ function mettreAJourNombrePointsVIP(audienceMax, nombreParrainages, donsCumules)
     element.title =
       "(" + audience.toLocaleString("fr-FR") + " ÷ 100) × " +
       parrainages.toLocaleString("fr-FR") + " × " +
-      dons.toLocaleString("fr-FR") + " (dons provisoires)";
+      dons.toLocaleString("fr-FR") + " × " +
+      evaluationsFavorables.toLocaleString("fr-FR") +
+      " (pouces verts ; dons provisoires)";
   }
+}
+
+async function actualiserFacteurVotesVIP(profile){
+  if(!profile || !currentUser?.id) return;
+  const {count,error} = await supabaseClient
+    .from("contenus_votes")
+    .select("id",{count:"exact",head:true})
+    .eq("user_id",currentUser.id)
+    .eq("vote",1);
+  if(error){
+    console.error("Impossible de charger le multiplicateur des évaluations :",error);
+    return;
+  }
+  mettreAJourNombrePointsVIP(profile.audience_max,profile.parrainage,1,count||0);
 }
 
 /*
@@ -1210,8 +1225,10 @@ function remplirProfil(profile){
   mettreAJourNombrePointsVIP(
     profile.audience_max,
     profile.parrainage,
+    1,
     1
   );
+  actualiserFacteurVotesVIP(profile);
 
   document
     .getElementById("profileNom")
