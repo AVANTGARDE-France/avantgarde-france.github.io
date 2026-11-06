@@ -333,6 +333,49 @@
 }
 @media(prefers-reduced-motion:reduce){.project-card[data-priority="absolue"] .project-card-finish,.project-card[data-priority="absolue"] .project-card-finish:after{animation:none!important}}
 
+
+/* --- Essai collector architectural : angles ciselés, métal irisé, éclats --- */
+.project-card{
+ border:3px solid transparent!important;border-radius:17px!important;
+ background:linear-gradient(#08172d,#08172d) padding-box,
+ linear-gradient(132deg,#fff1c8 0%,#b47a32 8%,#f8dfa0 17%,#67451f 27%,#eac77e 43%,#fff0c4 54%,#775022 67%,#d6aa5c 82%,#fff0c5 93%,#8a5d28 100%) border-box!important;
+ box-shadow:0 10px 28px #000b,0 0 0 1px #f1d28a66,0 0 16px #d5a34b25,inset 0 0 0 1px #fff4d5!important;
+}
+.project-card:before{
+ inset:5px!important;border:1px solid #f4d8959c!important;border-radius:11px!important;
+ clip-path:polygon(0 0,20% 0,23% 2px,77% 2px,80% 0,100% 0,100% 20%,calc(100% - 2px) 23%,calc(100% - 2px) 77%,100% 80%,100% 100%,80% 100%,77% calc(100% - 2px),23% calc(100% - 2px),20% 100%,0 100%,0 80%,2px 77%,2px 23%,0 20%)!important;
+}
+.project-card-finish{
+ box-shadow:inset 0 0 0 1px #fff2cf,inset 0 0 0 3px #07152de8,inset 0 0 0 4px #d6a451,inset 0 0 0 6px #07152dbb,inset 0 0 22px 4px #07152d99!important;
+}
+.project-card-finish:before{
+ inset:8px!important;border:0!important;border-radius:8px!important;
+ background:
+ linear-gradient(135deg,#ffe9b7 0 2px,transparent 2.5px) top left/30px 30px no-repeat,
+ linear-gradient(225deg,#ffe9b7 0 2px,transparent 2.5px) top right/30px 30px no-repeat,
+ linear-gradient(45deg,#d5a451 0 2px,transparent 2.5px) bottom left/30px 30px no-repeat,
+ linear-gradient(315deg,#ffe9b7 0 2px,transparent 2.5px) bottom right/30px 30px no-repeat,
+ linear-gradient(90deg,#f3d18b99,transparent 18%,transparent 82%,#f3d18b99) top/100% 1px no-repeat,
+ linear-gradient(90deg,#b47b37aa,transparent 18%,transparent 82%,#b47b37aa) bottom/100% 1px no-repeat,
+ linear-gradient(180deg,#f3d18b88,transparent 18%,transparent 82%,#f3d18b88) left/1px 100% no-repeat,
+ linear-gradient(180deg,#b47b37aa,transparent 18%,transparent 82%,#b47b37aa) right/1px 100% no-repeat!important;
+ filter:drop-shadow(0 0 1px #ffe9b755);
+}
+.project-card-finish:after{
+ inset:-45%!important;opacity:0!important;mix-blend-mode:screen!important;
+ background:linear-gradient(112deg,transparent 43%,#ffffff08 46%,#fff4d27a 49%,#c5eaff55 50%,#f5d99570 52%,transparent 57%)!important;
+ transform:translate3d(-58%,0,0) rotate(22deg)!important;
+ transition:opacity .25s ease,transform 1.25s cubic-bezier(.2,.7,.2,1)!important;
+}
+.project-card:hover{transform:translateY(-3px)!important;box-shadow:0 14px 32px #000c,0 0 0 1px #ffe5a7,0 0 19px #dcae5b44!important}
+.project-card:hover .project-card-finish:after{opacity:.95!important;transform:translate3d(55%,0,0) rotate(22deg)!important}
+.project-card:hover .project-card-finish:before{filter:drop-shadow(0 0 3px #f5d99788)!important}
+.project-card[data-priority="absolue"]{box-shadow:0 10px 30px #000b,0 0 0 1px #ffe3a5aa,0 0 18px #e4b85f44!important}
+.project-card[data-priority="absolue"] .project-card-finish:before{filter:drop-shadow(0 0 2px #f7d99599)!important}
+.project-card[data-priority="absolue"]:not(:hover) .project-card-finish{animation:collectorMetalBreath 9s ease-in-out infinite!important}
+@keyframes collectorMetalBreath{0%,100%{filter:brightness(1)}50%{filter:brightness(1.09)}}
+@media(max-width:620px){.project-card{border-width:2px!important}.project-card:before{inset:4px!important}.project-card-finish:before{inset:7px!important}}
+@media(prefers-reduced-motion:reduce){.project-card[data-priority="absolue"] .project-card-finish{animation:none!important}.project-card:hover{transform:none!important}}
 </style></head><body>
 <div id="site-header"></div>
 <main class="project-page">
