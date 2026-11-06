@@ -787,8 +787,8 @@ function mettreAJourMedailleVIP(audience){
 
 /*
  * SCORE VIP — FORMULE PROVISOIRE.
- * Points = audience maximale × parrainages × dons cumulés depuis l'origine.
- * Chaque facteur nul ou absent vaut 1.
+ * Points = audience maximale × parrainages × dons cumulés × pouces verts depuis l'origine.
+ * Chaque facteur nul ou absent vaut 1, y compris les pouces verts.
  *
  * NOTE DE FINALISATION :
  * Les dons ne sont pas encore connectés. Le facteur dons vaut donc 1.
