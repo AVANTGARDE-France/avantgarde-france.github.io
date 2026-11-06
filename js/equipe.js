@@ -1484,7 +1484,7 @@ function initialiserOuvertureInscription() {
             }
 
 
-            afficherEtapeInscription(1);
+            afficherEtapeInscription(2);
             mettreAJourCompteurDescription();
 
 
@@ -1699,11 +1699,9 @@ function afficherEtapeInscription(numero) {
 
     const titre = document.getElementById("joinModalTitle");
     if (titre) {
-        titre.textContent = numero === 1
-            ? "Conditions d’inscription"
-            : numero === 2
-                ? "Vos informations"
-                : "Sécuriser votre inscription";
+        titre.textContent = numero === 2
+            ? "Vos informations"
+            : "Sécuriser votre inscription";
     }
 
     const intro = document.querySelector("#joinModal .form-intro");
@@ -1764,7 +1762,7 @@ async function finaliserInscriptionGoogle() {
     const anonyme = choix ? choix.value === "anonyme" : false;
 
     if (!nom || !region) {
-        afficherEtapeInscription(1);
+        afficherEtapeInscription(2);
         afficherErreurFormulaire(message, "Merci de renseigner votre nom et votre région.");
         return;
     }
@@ -1777,7 +1775,7 @@ async function finaliserInscriptionGoogle() {
     try {
         const validationParrain = await verifierCodeParrainage(parrainId);
         if (!validationParrain.valide) {
-            afficherEtapeInscription(1);
+            afficherEtapeInscription(2);
             afficherErreurFormulaire(message, "Le code de parrainage est invalide. Corrigez-le ou laissez le champ vide.");
             document.getElementById("signupSponsorId")?.focus();
             return;
@@ -1881,7 +1879,7 @@ async function traiterRetourInscriptionGoogle() {
                 return;
             }
             ouvrirModalEquipe(joinModal);
-            afficherEtapeInscription(1);
+            afficherEtapeInscription(2);
             afficherErreurFormulaire(message, "Votre compte existe déjà. Connectez-vous depuis l’espace membre.");
             return;
         }
@@ -1936,7 +1934,7 @@ async function traiterRetourInscriptionGoogle() {
             return;
         }
         ouvrirModalEquipe(joinModal);
-        afficherEtapeInscription(1);
+        afficherEtapeInscription(2);
         if (message) {
             message.className = "form-message success";
             message.textContent = confirmation.text;
@@ -1953,7 +1951,7 @@ async function traiterRetourInscriptionGoogle() {
             return;
         }
         ouvrirModalEquipe(joinModal);
-        afficherEtapeInscription(1);
+        afficherEtapeInscription(2);
         afficherErreurFormulaire(message, error.message || "Impossible de finaliser votre inscription. Aucun profil n’a été créé.");
     }
 }
@@ -1974,7 +1972,7 @@ function initialiserFormulaireInscription() {
                 payload.type !== "AVANTGARDE_GOOGLE_SIGNUP_ERROR") return;
             const message = document.getElementById("formMessage");
             ouvrirModalEquipe(document.getElementById("joinModal"));
-            afficherEtapeInscription(1);
+            afficherEtapeInscription(2);
             if (message) {
                 message.className = payload.type === "AVANTGARDE_GOOGLE_SIGNUP_SUCCESS"
                     ? "form-message success" : "form-message error";
@@ -1988,17 +1986,6 @@ function initialiserFormulaireInscription() {
             }
         });
     }
-
-    document.getElementById("signupStep1Next")?.addEventListener("click", () => {
-        const message = document.getElementById("formMessage");
-        if (message) {
-            message.textContent = "";
-            message.className = "form-message";
-        }
-        afficherEtapeInscription(2);
-    });
-
-    document.getElementById("signupStep2Back")?.addEventListener("click", () => afficherEtapeInscription(1));
 
     document.getElementById("signupStep2Next")?.addEventListener("click", async () => {
         const nom = document.getElementById("nom");
