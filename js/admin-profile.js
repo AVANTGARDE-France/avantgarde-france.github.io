@@ -822,6 +822,11 @@ function mettreAJourNombrePointsVIP(audienceMax, nombreParrainages, donsCumules,
       evaluationsFavorables.toLocaleString("fr-FR") +
       " (pouces verts ; dons provisoires)";
   }
+  const multiplier = document.getElementById("vipVoteMultiplier");
+  if(multiplier){
+    multiplier.textContent = "×" + evaluationsFavorables.toLocaleString("fr-FR") + " 👍";
+    multiplier.title = "Nombre de pouces verts attribués à des propositions (minimum 1).";
+  }
 }
 
 async function actualiserFacteurVotesVIP(profile){
