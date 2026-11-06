@@ -368,6 +368,23 @@
 .password-method-modal .password-method-modal-actions button { flex:1; margin:0; }
 .password-method-modal button:disabled { opacity:.55; cursor:wait; }
 
+
+.vip-points{position:relative}
+.vip-score-help-button{display:inline-grid;place-items:center;width:19px;height:19px;margin-left:5px;padding:0;border:1px solid rgba(240,213,138,.75);border-radius:50%;background:rgba(214,173,85,.12);color:#f0d58a;font:700 12px Arial,sans-serif;cursor:pointer;vertical-align:middle}
+.vip-score-help-button:hover{background:rgba(214,173,85,.28);border-color:#ffe09a}
+.vip-score-help-modal .modal-box{max-width:560px;max-height:min(82vh,760px);overflow-y:auto}
+.vip-score-help-modal h2{margin:0 34px 18px 0;color:var(--gold-light);font-size:20px}
+.vip-score-help-modal p{color:var(--white);font-size:13px;line-height:1.65}
+.vip-score-formula{display:grid;grid-template-columns:1fr;gap:7px;margin:18px 0}
+.vip-score-formula>div{padding:12px 14px;border:1px solid var(--border);background:rgba(255,255,255,.035)}
+.vip-score-formula>div strong,.vip-score-formula>div span{display:block}
+.vip-score-formula>div strong{color:var(--gold-light);font-size:12px;margin-bottom:4px}
+.vip-score-formula>div span{color:var(--white);font-size:12px;line-height:1.45}
+.vip-score-formula>b{text-align:center;color:var(--gold);font-size:15px;line-height:1}
+.vip-score-rule{padding:12px 14px;border-left:3px solid var(--gold);background:rgba(214,173,85,.08)}
+.vip-score-note{color:#c5d0df!important;font-size:12px!important}
+@media(max-width:520px){.vip-score-help-modal{padding:12px}.vip-score-help-modal .modal-box{padding:22px 18px;max-height:86vh}.vip-score-help-modal h2{font-size:18px}}
+
 </style>
 
   <meta name="theme-color" content="#07152d">
@@ -812,14 +829,8 @@
             <span class="vip-points-label">SCORE</span>
             <strong id="vipPoints">1</strong>
             <small id="vipVoteMultiplier" style="display:block;margin-top:3px;color:#f0d58a;font-size:10px;font-weight:700">×1 👍</small>
+            <button type="button" id="vipScoreHelpButton" class="vip-score-help-button" aria-label="Comprendre le calcul du score VIP" aria-haspopup="dialog">?</button>
         </div>
-    </div>
-
-
-    <div class="vip-intro">
-        <i>
-            (la maj de l'audience de vos réseaux peut prendre plusieurs jours. Patientez)<br>Le multiplicateur du score correspond à vos pouces verts sur les propositions (minimum ×1).
-        </i>
     </div>
 
 
@@ -2888,6 +2899,29 @@
 </div>
 
 
+
+<!-- =======================================================
+     EXPLICATION DU SCORE VIP
+======================================================= -->
+<div class="modal vip-score-help-modal" id="vipScoreHelpModal" role="dialog" aria-modal="true" aria-labelledby="vipScoreHelpTitle">
+  <div class="modal-box">
+    <button type="button" class="modal-close" id="vipScoreHelpClose" aria-label="Fermer">×</button>
+    <h2 id="vipScoreHelpTitle">Comment est calculé votre score ?</h2>
+    <p>Votre score VIP combine plusieurs facteurs qui valorisent votre audience, votre engagement et votre participation au projet.</p>
+    <div class="vip-score-formula">
+      <div><strong>Audience maximale</strong><span>Votre audience de référence, divisée par 100.</span></div>
+      <b>×</b>
+      <div><strong>Parrainages</strong><span>Le nombre de membres que vous avez parrainés.</span></div>
+      <b>×</b>
+      <div><strong>Dons cumulés</strong><span>Le facteur associé à vos dons. Son calcul reste provisoire tant que le suivi des dons n'est pas activé.</span></div>
+      <b>×</b>
+      <div><strong>Évaluations positives</strong><span>Le nombre de propositions auxquelles vous avez attribué un pouce vert.</span></div>
+    </div>
+    <p class="vip-score-rule"><strong>Règle du multiplicateur :</strong> chaque facteur nul ou absent est ramené à 1. Ainsi, si vous n'avez encore attribué aucun pouce vert, le multiplicateur reste ×1. Chaque pouce vert supplémentaire augmente ce facteur.</p>
+    <p class="vip-score-note">La popularité d'une proposition est un indicateur collectif distinct : elle correspond à la part des pouces verts parmi les votes verts et rouges. Les mains blanches n'entrent pas dans ce pourcentage.</p>
+    <p class="vip-score-note">La mise à jour de l'audience de vos réseaux peut prendre plusieurs jours.</p>
+  </div>
+</div>
 
 <!-- =======================================================
      MODAL SUPPRESSION PROFIL
