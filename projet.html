@@ -229,6 +229,30 @@
 .project-modal-front .project-stats{padding-bottom:46px!important}
 .project-modal-front .project-synergies{left:10px!important;right:10px!important;bottom:9px!important}
 @media(max-width:620px){.project-card:before{inset:3px!important}.project-card-finish:before{inset:5px!important}.project-synergies{left:7px!important;right:7px!important;bottom:6px!important;padding:6px 6px 5px!important;font-size:9px!important}.project-stats{padding-bottom:42px!important}}
+
+/* --- Edition prestige v2 : cadre vivant, angles ciselés et micro-reflets --- */
+.project-card{position:relative!important;isolation:isolate;border:2px solid transparent!important;border-radius:17px!important;background:linear-gradient(#0a1a33,#0a1a33) padding-box,conic-gradient(from 18deg at 50% 50%,#f8e2a4,#9a682b 9%,#f5d58b 19%,#6d481f 31%,#f8e4ad 43%,#a87332 57%,#fff0bf 69%,#805522 82%,#f8e2a4) border-box!important;box-shadow:0 9px 26px #0009,0 0 0 1px #e8c47b66,0 0 14px #d4a64a22,inset 0 0 0 1px #fff3d4!important;transition:box-shadow .35s ease,transform .45s cubic-bezier(.2,.7,.2,1)!important}
+.project-card:before{inset:5px!important;border:1px solid #f8e2ad9c!important;border-radius:12px!important;background:linear-gradient(135deg,#fff3cf20 0 1px,transparent 1px 100%),linear-gradient(315deg,#fff3cf18 0 1px,transparent 1px 100%)!important;box-shadow:inset 0 0 0 1px #07152d,inset 0 0 22px #f0d58a20,0 0 0 1px #07152d!important}
+.project-card-finish{z-index:1!important;overflow:hidden!important;border-radius:inherit!important;background:radial-gradient(circle at 12px 12px,#fff1c9 0 1px,transparent 1.8px),radial-gradient(circle at calc(100% - 12px) 12px,#fff1c9 0 1px,transparent 1.8px),radial-gradient(circle at 12px calc(100% - 12px),#f5d58b 0 1px,transparent 1.8px),radial-gradient(circle at calc(100% - 12px) calc(100% - 12px),#fff1c9 0 1px,transparent 1.8px),radial-gradient(ellipse at 0 0,#f8dfa04a,transparent 23%),radial-gradient(ellipse at 100% 0,#f8dfa038,transparent 23%),radial-gradient(ellipse at 0 100%,#e8bd6a32,transparent 22%),radial-gradient(ellipse at 100% 100%,#fff0c938,transparent 22%)!important;box-shadow:inset 0 0 0 1px #fff0c9,inset 0 0 0 3px #07152dce,inset 0 0 0 4px #e7bd6a,inset 0 0 0 6px #07152d8a,inset 0 0 24px 5px #07152d88!important}
+.project-card-finish:before{inset:7px!important;border:1px solid #f5d997a8!important;border-radius:10px!important;background:linear-gradient(90deg,#ffe6a8 0 12px,transparent 12px calc(100% - 12px),#ffe6a8 calc(100% - 12px)) top/100% 1px no-repeat,linear-gradient(90deg,#c08b42 0 12px,transparent 12px calc(100% - 12px),#c08b42 calc(100% - 12px)) bottom/100% 1px no-repeat,linear-gradient(180deg,#ffe6a8 0 12px,transparent 12px calc(100% - 12px),#ffe6a8 calc(100% - 12px)) left/1px 100% no-repeat,linear-gradient(180deg,#c08b42 0 12px,transparent 12px calc(100% - 12px),#c08b42 calc(100% - 12px)) right/1px 100% no-repeat,linear-gradient(135deg,#f9e5ad20,transparent 18%,transparent 78%,#e5bd7022)!important;box-shadow:inset 0 0 20px #06132677,0 0 0 1px #07152d!important}
+.project-card-finish:after{inset:-55%!important;opacity:0!important;transform:translate3d(-45%,0,0) rotate(18deg)!important;background:linear-gradient(112deg,transparent 40%,#ffffff08 44%,#fff8df55 48%,#a9dfff35 50%,#f5d99738 53%,transparent 59%)!important;transition:opacity .4s ease,transform 1.4s cubic-bezier(.2,.7,.2,1)!important}
+.project-card:hover{transform:translateY(-3px)!important;box-shadow:0 13px 30px #000b,0 0 0 1px #f5d99799,0 0 18px #e8bd6a38,inset 0 0 0 1px #fff2cf!important}
+.project-card:hover .project-card-finish:after{opacity:.9!important;transform:translate3d(42%,0,0) rotate(18deg)!important}
+.project-card:hover .project-card-finish:before{border-color:#fff0c9!important;filter:drop-shadow(0 0 2px #f5d99766)}
+.project-card[data-priority="absolue"]{box-shadow:0 9px 27px #0009,0 0 0 1px #f5d997a0,0 0 15px #e8bd6a44,inset 0 0 0 1px #fff2cf!important}
+.project-card[data-priority="absolue"] .project-card-finish{animation:collectorPulse 8s ease-in-out infinite!important}
+.project-card[data-priority="absolue"] .project-card-finish:before{border-color:#ffe7b7!important;box-shadow:inset 0 0 20px #f0d58a25,0 0 6px #f0d58a35!important}
+.project-card[data-priority="absolue"] .project-card-finish:after{opacity:.13!important;animation:collectorSpark 8s ease-in-out infinite!important}
+.project-card[data-priority="absolue"]:hover .project-card-finish:after{opacity:1!important;animation:none!important}
+@keyframes collectorPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.08)}}
+@keyframes collectorSpark{0%,68%,100%{opacity:.08}72%{opacity:.48}76%{opacity:.14}82%{opacity:.38}86%{opacity:.08}}
+.project-synergies{z-index:2!important;left:8px!important;right:8px!important;bottom:7px!important;border:0!important;border-top:1px solid #e9c77b65!important;border-bottom:1px solid #e9c77b35!important;border-radius:0 0 9px 9px!important;background:linear-gradient(180deg,#07152d08,#07152d8c 38%,#07152df0 100%)!important;box-shadow:0 -5px 15px #07152d35,inset 0 1px #fff2ce20!important}
+.project-card-image{object-position:center!important}
+.project-card-image-wrap:after{background:linear-gradient(180deg,#030d1d88 0%,#030d1d10 25%,#030d1d08 53%,#030d1d62 78%,#030d1de8 100%),linear-gradient(90deg,#06132630,transparent 15%,transparent 85%,#06132630)!important}
+.project-modal-front .project-card-finish:after{opacity:0!important}
+.project-modal-front:hover .project-card-finish:after{opacity:.65!important}
+@media(max-width:620px){.project-card:hover{transform:none!important}.project-card-finish:before{inset:6px!important}.project-card:before{inset:4px!important}}
+@media(prefers-reduced-motion:reduce){.project-card,.project-card-finish,.project-card-finish:after{transition:none!important;animation:none!important}.project-card:hover{transform:none!important}}
 </style></head><body>
 <div id="site-header"></div>
 <main class="project-page">
