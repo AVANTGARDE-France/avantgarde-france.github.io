@@ -45,6 +45,9 @@ let isSourceMode = false;
 let currentProfile = null;
 
 let messageTimer = null;
+let contentMode = 'project';
+let modeSelector = null;
+function tableName(base) { return contentMode === 'inspiration' ? ({menus:'inspiration_menus',sous_menus:'inspiration_sous_menus',contenus:'inspiration_contenus'})[base] : base; }
 
 
 /* =========================================================
@@ -570,7 +573,7 @@ async function chargerDonnees() {
         await Promise.all([
 
             supabase
-                .from("menus")
+                .from(tableName("menus"))
                 .select(
                     "id, titre, position, valide"
                 )
@@ -582,7 +585,7 @@ async function chargerDonnees() {
                 ),
 
             supabase
-                .from("sous_menus")
+                .from(tableName("sous_menus"))
                 .select(
                     "id, menu_id, titre, position, valide"
                 )
@@ -594,22 +597,8 @@ async function chargerDonnees() {
                 ),
 
             supabase
-                .from("contenus")
-                .select(`
-                    id,
-                    sous_menu_id,
-                    titre,
-                    html,
-                    position,
-                    valide,
-                    photo_url,
-                    accroche,
-                    priorite,
-                    stat_1,
-                    stat_2,
-                    stat_3,
-                    synergies
-                `)
+                .from(tableName("contenus"))
+                .select(contentMode === "inspiration" ? "id, sous_menu_id, titre, html, position, valide, photo_url, accroche" : "id, sous_menu_id, titre, html, position, valide, photo_url, accroche, priorite, stat_1, stat_2, stat_3, synergies")
                 .order(
                     "position",
                     {
@@ -1177,7 +1166,7 @@ async function synchroniserSynergiesBidirectionnelles(
             error: lectureError
         } =
             await supabase
-                .from("contenus")
+                .from(tableName("contenus"))
                 .select(
                     "id, synergies"
                 )
@@ -1229,7 +1218,7 @@ async function synchroniserSynergiesBidirectionnelles(
             error
         } =
             await supabase
-                .from("contenus")
+                .from(tableName("contenus"))
                 .update({
                     synergies:
                         synergiesExistantes
@@ -1261,7 +1250,7 @@ async function synchroniserSynergiesBidirectionnelles(
             error: lectureError
         } =
             await supabase
-                .from("contenus")
+                .from(tableName("contenus"))
                 .select(
                     "id, synergies"
                 )
@@ -1299,7 +1288,7 @@ async function synchroniserSynergiesBidirectionnelles(
             error
         } =
             await supabase
-                .from("contenus")
+                .from(tableName("contenus"))
                 .update({
                     synergies:
                         synergiesExistantes
@@ -1347,7 +1336,7 @@ async function supprimerReferencesSynergie(
         error
     } =
         await supabase
-            .from("contenus")
+            .from(tableName("contenus"))
             .select(
                 "id, synergies"
             );
@@ -1428,7 +1417,7 @@ async function supprimerReferencesSynergie(
             error: updateError
         } =
             await supabase
-                .from("contenus")
+                .from(tableName("contenus"))
                 .update({
                     synergies:
                         contenu.synergies
@@ -3036,7 +3025,7 @@ async function enregistrerStructure() {
                 error
             } =
                 await supabase
-                    .from("menus")
+                    .from(tableName("menus"))
                     .update({
                         titre
                     })
@@ -3170,7 +3159,7 @@ async function enregistrerStructure() {
             error
         } =
             await supabase
-                .from("sous_menus")
+                .from(tableName("sous_menus"))
                 .update({
 
                     titre,
@@ -3475,7 +3464,7 @@ async function creerElement() {
                 error
             } =
                 await supabase
-                    .from("menus")
+                    .from(tableName("menus"))
                     .insert({
 
                         titre,
@@ -3522,7 +3511,7 @@ async function creerElement() {
                 error
             } =
                 await supabase
-                    .from("sous_menus")
+                    .from(tableName("sous_menus"))
                     .insert({
 
                         menu_id:
@@ -3572,7 +3561,7 @@ async function creerElement() {
                 error
             } =
                 await supabase
-                    .from("contenus")
+                    .from(tableName("contenus"))
                     .insert({
 
                         sous_menu_id:
@@ -3597,20 +3586,10 @@ async function creerElement() {
                         accroche:
                             null,
 
-                        priorite:
-                            "secondaire",
-
-                        stat_1:
-                            null,
-
-                        stat_2:
-                            null,
-
-                        stat_3:
-                            null,
-
-                        synergies:
-                            []
+                        ...(contentMode === "project" ? {
+                            priorite: "secondaire", stat_1: null,
+                            stat_2: null, stat_3: null, synergies: []
+                        } : {})
 
                     });
 
@@ -3815,10 +3794,7 @@ function ouvrirContenu(id) {
        SYNERGIES
     ----------------------------------------------------- */
 
-    initialiserSynergies(
-        item.synergies,
-        item.id
-    );
+    if (contentMode === "project") initialiserSynergies(item.synergies, item.id);
 
 
     /* -----------------------------------------------------
@@ -4068,45 +4044,16 @@ async function enregistrerContenu() {
             error
         } =
             await supabase
-                .from("contenus")
-                .update({
-
-                    titre,
-
-                    html,
-
-                    sous_menu_id:
-                        nouveauSousMenuId,
-
-                    position:
-                        nouvellePosition,
-
-                    photo_url:
-                        photo || null,
-
-                    accroche:
-                        accroche || null,
-
-                    priorite:
-                        priorite || null,
-
-                    stat_1:
-                        stat1,
-
-                    stat_2:
-                        stat2,
-
-                    stat_3:
-                        stat3,
-
-                    /*
-                     * IMPORTANT :
-                     * On enregistre uniquement
-                     * les UUID des contenus.
-                     */
-                    synergies:
-                        synergies
-
+                .from(tableName("contenus"))
+.update(contentMode === "inspiration" ? {
+                    titre, html, sous_menu_id: nouveauSousMenuId,
+                    position: nouvellePosition, photo_url: photo || null,
+                    accroche: accroche || null
+                } : {
+                    titre, html, sous_menu_id: nouveauSousMenuId,
+                    position: nouvellePosition, photo_url: photo || null,
+                    accroche: accroche || null, priorite: priorite || null,
+                    stat_1: stat1, stat_2: stat2, stat_3: stat3, synergies
                 })
                 .eq(
                     "id",
@@ -4123,11 +4070,9 @@ async function enregistrerContenu() {
            SYNCHRONISATION BIDIRECTIONNELLE
         ------------------------------------------------- */
 
-        await synchroniserSynergiesBidirectionnelles(
-            editorId,
-            anciennesSynergies,
-            synergies
-        );
+        if (contentMode === "project") {
+            await synchroniserSynergiesBidirectionnelles(editorId, anciennesSynergies, synergies);
+        }
 
 
         /* -------------------------------------------------
@@ -4948,7 +4893,7 @@ async function supprimerMenu(id) {
             error
         } =
             await supabase
-                .from("contenus")
+                .from(tableName("contenus"))
                 .delete()
                 .eq(
                     "sous_menu_id",
@@ -4976,7 +4921,7 @@ async function supprimerMenu(id) {
         error: submenuError
     } =
         await supabase
-            .from("sous_menus")
+            .from(tableName("sous_menus"))
             .delete()
             .eq(
                 "menu_id",
@@ -5000,7 +4945,7 @@ async function supprimerMenu(id) {
         error
     } =
         await supabase
-            .from("menus")
+            .from(tableName("menus"))
             .delete()
             .eq(
                 "id",
@@ -5117,7 +5062,7 @@ async function supprimerSousMenu(id) {
         error: contentError
     } =
         await supabase
-            .from("contenus")
+            .from(tableName("contenus"))
             .delete()
             .eq(
                 "sous_menu_id",
@@ -5141,7 +5086,7 @@ async function supprimerSousMenu(id) {
         error
     } =
         await supabase
-            .from("sous_menus")
+            .from(tableName("sous_menus"))
             .delete()
             .eq(
                 "id",
@@ -5209,9 +5154,7 @@ async function supprimerContenu(id) {
 
     try {
 
-        await supprimerReferencesSynergie(
-            id
-        );
+        if (contentMode === "project") await supprimerReferencesSynergie(id);
 
     }
     catch (error) {
@@ -5234,7 +5177,7 @@ async function supprimerContenu(id) {
         error
     } =
         await supabase
-            .from("contenus")
+            .from(tableName("contenus"))
             .delete()
             .eq(
                 "id",
@@ -5527,6 +5470,46 @@ function initialiserEvenementClavier() {
 }
 
 
+
+function actualiserInterfaceMode() {
+    const inspiration = contentMode === "inspiration";
+    const title = inspiration ? "Contenu d'inspiration" : "Contenu du projet";
+    const intro = inspiration ? "Gérez les menus, sous-menus et contenus d'inspiration." : "Gérez les menus, sous-menus et contenus du projet.";
+    const panelTitle = document.querySelector("#contentProjectTab > .panel > .project-admin-heading .panel-title");
+    const panelIntro = document.querySelector("#contentProjectTab > .panel > .project-admin-heading .panel-intro");
+    const welcomeTitle = $("welcome")?.querySelector(".panel-title");
+    const treeTitle = document.querySelector("#contentProjectTab .project-tree-header h3");
+    if (panelTitle) panelTitle.textContent = title;
+    if (panelIntro) panelIntro.textContent = intro;
+    if (welcomeTitle) welcomeTitle.textContent = title.toUpperCase();
+    if (treeTitle) treeTitle.textContent = inspiration ? "STRUCTURE DES INSPIRATIONS" : "STRUCTURE DU PROJET";
+    [cardPriorite, cardStat1, cardStat2, cardStat3, cardSynergies].forEach(element => {
+        const group = element?.closest(".form-group");
+        if (group) group.style.display = inspiration ? "none" : "";
+    });
+}
+async function changerModeContenu(nextMode) {
+    if (!["project", "inspiration"].includes(nextMode) || nextMode === contentMode) return;
+    if ((contentEditor?.style.display !== "none" || structureEditor?.style.display !== "none") &&
+        !window.confirm("Le changement de bibliothèque fermera l'éditeur en cours. Les modifications non enregistrées seront perdues. Continuer ?")) {
+        modeSelector.value = contentMode; return;
+    }
+    contentMode = nextMode;
+    selectedType = null; selectedId = null; editorType = null; editorId = null;
+    currentSynergyContentId = null; selectedSynergyIds = [];
+    fermerEditeurs(); actualiserInterfaceMode();
+    if (tree) tree.innerHTML = '<div class="empty-tree">Chargement…</div>';
+    try { await chargerDonnees(); }
+    catch (error) { showMessage("Impossible de charger cette bibliothèque : " + (error?.message || "erreur inconnue"), "error"); }
+}
+function initialiserSelecteurContenu() {
+    modeSelector = $("contentModeSelector");
+    if (!modeSelector || modeSelector.dataset.initialized === "true") return;
+    modeSelector.dataset.initialized = "true";
+    modeSelector.value = contentMode;
+    modeSelector.addEventListener("change", () => changerModeContenu(modeSelector.value));
+    actualiserInterfaceMode();
+}
 /* =========================================================
    SECURITE — VERIFICATION DOM
 ========================================================= */
@@ -5551,6 +5534,7 @@ function verifierStructureDOM() {
 async function initialiser() {
 
     verifierStructureDOM();
+    initialiserSelecteurContenu();
 
 
     /*
