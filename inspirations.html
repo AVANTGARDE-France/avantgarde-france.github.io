@@ -580,63 +580,59 @@ function loadScriptOnce(src,test){if(test())return Promise.resolve();return new 
 function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
 async function createInspirationGif(){
  const source=document.getElementById("projectModalFront");
- if(!source)throw new Error("Recto de la carte introuvable.");
+ if(!source)throw new Error("Recto introuvable.");
  const rect=source.getBoundingClientRect();
  if(!rect.width||!rect.height)throw new Error("Le recto n’est pas visible.");
- if(!navigator.mediaDevices?.getDisplayMedia)throw new Error("La capture d’onglet n’est pas prise en charge par ce navigateur. Utilise Chrome ou Edge récent.");
- /* IMPORTANT : demander la capture immédiatement, avant tout await, pour conserver
-    l’autorisation liée au clic de l’utilisateur. Choisir l’onglet Avant-gardE. */
- shareMessage("Autorise le partage de l’onglet Avant-gardE dans la fenêtre du navigateur.");
- const streamPromise=navigator.mediaDevices.getDisplayMedia({video:{displaySurface:"browser",frameRate:{ideal:15,max:30}},audio:false});
+ /* Ouvrir la fenêtre dédiée immédiatement depuis le clic utilisateur. */
+ const captureWindow=window.open("inspiration-capture.html","avantgarde-card-capture","popup=yes,width="+Math.ceil(rect.width)+",height="+Math.ceil(rect.height)+",resizable=no,scrollbars=no");
+ if(!captureWindow)throw new Error("La fenêtre de capture a été bloquée. Autorise les fenêtres pop-up pour ce site.");
+ shareMessage("Ouverture du recto dans la fenêtre de capture…");
+ const styles=[...document.querySelectorAll("style")].map(x=>x.textContent);
+ const links=[...document.querySelectorAll('link[rel="stylesheet"]')].map(x=>x.href);
+ const payload={type:"AVANTGARDE_CAPTURE_CARD",html:source.outerHTML,styles,links,width:Math.round(rect.width),height:Math.round(rect.height)};
+ const ready=await new Promise((resolve,reject)=>{
+  const timeout=setTimeout(()=>reject(new Error("La fenêtre de capture ne répond pas. Vérifie qu’elle n’est pas bloquée.")),10000);
+  const listener=e=>{if(e.source!==captureWindow||e.data?.type!=="AVANTGARDE_CAPTURE_READY")return;clearTimeout(timeout);window.removeEventListener("message",listener);resolve()};
+  window.addEventListener("message",listener);
+ });
+ captureWindow.postMessage(payload,location.origin);
+ await new Promise((resolve,reject)=>{
+  const timeout=setTimeout(()=>reject(new Error("Le recto n’a pas fini de se charger dans la fenêtre indépendante.")),15000);
+  const listener=e=>{if(e.source!==captureWindow||e.data?.type!=="AVANTGARDE_CAPTURE_RENDERED")return;clearTimeout(timeout);window.removeEventListener("message",listener);e.data.error?reject(new Error(e.data.error)):resolve()};
+  window.addEventListener("message",listener);
+ });
+ shareMessage("Autorise la capture de la fenêtre « Avant-gardE — Capture ».");
  let stream=null,workerUrl=null;
  try{
-  stream=await streamPromise;
-  const track=stream.getVideoTracks()[0];
-  if(!track)throw new Error("Aucun flux vidéo n’a été fourni.");
-  const settings=track.getSettings();
-  if(settings.displaySurface && settings.displaySurface!=="browser")throw new Error("Sélectionne « Onglet Chrome/Edge », puis l’onglet Avant-gardE. Ne sélectionne ni écran entier ni fenêtre.");
-  const video=document.createElement("video");
-  video.muted=true;video.playsInline=true;video.srcObject=stream;
-  await new Promise((resolve,reject)=>{video.onloadedmetadata=resolve;video.onerror=()=>reject(new Error("Impossible de lire le flux de capture."));});
+  stream=await navigator.mediaDevices.getDisplayMedia({video:{displaySurface:"window",frameRate:{ideal:15,max:30}},audio:false});
+  const track=stream.getVideoTracks()[0],settings=track.getSettings();
+  if(!track)throw new Error("Flux de capture indisponible.");
+  if(settings.displaySurface&&settings.displaySurface!=="window")throw new Error("Sélectionne la fenêtre indépendante « Avant-gardE — Capture ».");
+  const video=document.createElement("video");video.muted=true;video.playsInline=true;video.srcObject=stream;
+  await new Promise((resolve,reject)=>{video.onloadedmetadata=resolve;video.onerror=()=>reject(new Error("Lecture du flux impossible."))});
   await video.play();
-  if(!video.videoWidth||!video.videoHeight)throw new Error("Le flux de capture ne contient aucune image.");
-  /* Le flux de l’onglet capture l’affichage réel : recadrage aux coordonnées du recto,
-     sans clone DOM, CSS reconstruit ni redessin de la photographie. */
-  const scaleX=video.videoWidth/window.innerWidth,scaleY=video.videoHeight/window.innerHeight;
-  const sx=Math.max(0,Math.round(rect.left*scaleX)),sy=Math.max(0,Math.round(rect.top*scaleY));
-  const sw=Math.min(video.videoWidth-sx,Math.round(rect.width*scaleX));
-  const sh=Math.min(video.videoHeight-sy,Math.round(rect.height*scaleY));
-  if(sw<2||sh<2)throw new Error("Impossible de repérer le recto dans l’onglet capturé. Vérifie que tu as partagé le bon onglet.");
-  const width=640,height=Math.max(1,Math.round(width*sh/sw));
+  const width=640,height=Math.max(1,Math.round(width*rect.height/rect.width));
   await loadScriptOnce("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js",()=>!!window.GIF);
-  const workerResponse=await fetch("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js");
-  if(!workerResponse.ok)throw new Error("Impossible de charger le moteur GIF.");
-  workerUrl=URL.createObjectURL(await workerResponse.blob());
+  const worker=await fetch("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js");
+  if(!worker.ok)throw new Error("Moteur GIF indisponible.");
+  workerUrl=URL.createObjectURL(await worker.blob());
   const encoder=new window.GIF({workers:2,quality:8,width,height,workerScript:workerUrl,repeat:0,background:"#07152d"});
-  const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
-  const ctx=canvas.getContext("2d",{alpha:false});
+  const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;const ctx=canvas.getContext("2d",{alpha:false});
   const total=30,delay=100;
-  shareMessage("Enregistrement direct du recto à l’écran…");
   for(let i=0;i<total;i++){
-   if(track.readyState!=="live")throw new Error("La capture d’écran a été interrompue.");
-   ctx.drawImage(video,sx,sy,sw,sh,0,0,width,height);
+   if(track.readyState!=="live")throw new Error("La capture a été interrompue.");
+   ctx.drawImage(video,0,0,video.videoWidth,video.videoHeight,0,0,width,height);
    encoder.addFrame(canvas,{copy:true,delay});
-   shareMessage("Enregistrement réel du recto : "+Math.round((i+1)/total*100)+" %");
-   await new Promise(resolve=>setTimeout(resolve,delay));
+   if(i%3===0)shareMessage("Enregistrement du recto original : "+Math.round((i+1)/total*100)+" %");
+   await wait(delay);
   }
-  shareMessage("Assemblage du GIF…");
-  const blob=await new Promise((resolve,reject)=>{
-   encoder.on("finished",resolve);
-   encoder.on("abort",()=>reject(new Error("Assemblage GIF interrompu.")));
-   encoder.on("error",reject);
-   encoder.render();
-  });
-  const signature=new TextDecoder().decode(await blob.slice(0,6).arrayBuffer());
-  if(!signature.startsWith("GIF8")||blob.size<1000)throw new Error("Le GIF final est invalide ou vide.");
+  const blob=await new Promise((resolve,reject)=>{encoder.on("finished",resolve);encoder.on("abort",()=>reject(new Error("Assemblage GIF interrompu.")));encoder.on("error",reject);encoder.render()});
+  if(!new TextDecoder().decode(await blob.slice(0,6).arrayBuffer()).startsWith("GIF8")||blob.size<1000)throw new Error("GIF final invalide.");
   return blob;
  }finally{
-  if(stream)stream.getTracks().forEach(track=>track.stop());
+  if(stream)stream.getTracks().forEach(t=>t.stop());
   if(workerUrl)URL.revokeObjectURL(workerUrl);
+  captureWindow.close();
  }
 }
 shareButton?.addEventListener("click",async()=>{
