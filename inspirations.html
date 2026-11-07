@@ -612,11 +612,12 @@ async function createInspirationGif(){
  clone.style.zIndex="-1";
  const cloneImage=clone.querySelector(".project-card-image");
  if(!cloneImage)throw new Error("Impossible de préparer la copie fidèle du recto.");
- const frameCanvas=document.createElement("canvas");
- const frameCtx=frameCanvas.getContext("2d",{willReadFrequently:false});
+ const parsedWidth=decoded[0].dims.width,parsedHeight=decoded[0].dims.height;
+ const animationCanvas=document.createElement("canvas");
+ animationCanvas.width=parsedWidth;animationCanvas.height=parsedHeight;
+ const animationCtx=animationCanvas.getContext("2d",{willReadFrequently:true});
  const replacementCanvas=document.createElement("canvas");
- replacementCanvas.width=image.naturalWidth||decoded[0].dims.width;
- replacementCanvas.height=image.naturalHeight||decoded[0].dims.height;
+ replacementCanvas.width=parsedWidth;replacementCanvas.height=parsedHeight;
  replacementCanvas.style.cssText=cloneImage.style.cssText;
  replacementCanvas.className=cloneImage.className;
  replacementCanvas.setAttribute("aria-hidden","true");
@@ -627,21 +628,24 @@ async function createInspirationGif(){
  const workerUrl=URL.createObjectURL(await workerResponse.blob());
  const encoder=new window.GIF({workers:2,quality:8,width,height,workerScript:workerUrl,repeat:0,background:"#07152d"});
  try{
+  let previous=null,restoreCanvas=null;
   for(let i=0;i<count;i++){
    const patch=decoded[i];
-   const patchCanvas=document.createElement("canvas");
-   patchCanvas.width=patch.dims.width;patchCanvas.height=patch.dims.height;
-   const patchCtx=patchCanvas.getContext("2d");
+   if(previous){
+    if(previous.disposalType===2)animationCtx.clearRect(previous.dims.left,previous.dims.top,previous.dims.width,previous.dims.height);
+    else if(previous.disposalType===3&&restoreCanvas){animationCtx.clearRect(0,0,parsedWidth,parsedHeight);animationCtx.drawImage(restoreCanvas,0,0)}
+   }
+   if(patch.disposalType===3){restoreCanvas=document.createElement("canvas");restoreCanvas.width=parsedWidth;restoreCanvas.height=parsedHeight;restoreCanvas.getContext("2d").drawImage(animationCanvas,0,0)}
    const pixels=patch.patch instanceof Uint8ClampedArray?patch.patch:new Uint8ClampedArray(patch.patch);
-   const frameImage=new ImageData(pixels,patch.dims.width,patch.dims.height);
-   patchCtx.putImageData(frameImage,0,0);
-   /* Le canvas d’image remplace seulement la balise IMG dans une copie exacte
-      du recto : toutes les couches, textes, bordures et règles CSS restent présentes. */
-   frameCtx.clearRect(0,0,replacementCanvas.width,replacementCanvas.height);
-   frameCtx.drawImage(patchCanvas,0,0,replacementCanvas.width,replacementCanvas.height);
+   animationCtx.putImageData(new ImageData(pixels,patch.dims.width,patch.dims.height),patch.dims.left,patch.dims.top);
+   /* Remplacement de la seule image dans le clone intégral du recto. */
+   const replacementCtx=replacementCanvas.getContext("2d");
+   replacementCtx.clearRect(0,0,parsedWidth,parsedHeight);
+   replacementCtx.drawImage(animationCanvas,0,0);
    const rendered=await html2canvas(clone,{backgroundColor:null,scale:width/box.width,width:box.width,height:box.height,useCORS:true,allowTaint:false,logging:false});
    encoder.addFrame(rendered,{copy:true,delay:Math.max(50,Math.min(1000,patch.delay||delay))});
-   rendered.width=1;rendered.height=1;patchCanvas.width=1;patchCanvas.height=1;
+   rendered.width=1;rendered.height=1;
+   previous=patch;
    if(i%3===0)shareMessage("Rendu fidèle du recto : "+Math.round((i+1)/count*100)+" %");
   }
   shareMessage("Assemblage du GIF…");
