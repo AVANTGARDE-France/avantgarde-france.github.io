@@ -581,81 +581,63 @@ function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
 async function createInspirationGif(){
  const source=document.getElementById("projectModalFront");
  if(!source)throw new Error("Recto de la carte introuvable.");
- const box=source.getBoundingClientRect();
- if(!box.width||!box.height)throw new Error("Le recto doit être visible pour être exporté.");
- const width=640,height=Math.round(width*box.height/box.width);
- const delay=100,framesLimit=36;
- const image=source.querySelector(".project-card-image");
- if(!image)throw new Error("Image du recto introuvable.");
- shareMessage("Lecture de l’animation originale…");
- const {default:html2canvas}=await import("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/+esm");
- await loadScriptOnce("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js",()=>!!window.GIF);
- const gifuct=await import("https://esm.sh/gifuct-js@2.1.2");
- const imageUrl=image.currentSrc||image.src;
- let decoded=[];
+ const rect=source.getBoundingClientRect();
+ if(!rect.width||!rect.height)throw new Error("Le recto n’est pas visible.");
+ if(!navigator.mediaDevices?.getDisplayMedia)throw new Error("La capture d’onglet n’est pas prise en charge par ce navigateur. Utilise Chrome ou Edge récent.");
+ /* IMPORTANT : demander la capture immédiatement, avant tout await, pour conserver
+    l’autorisation liée au clic de l’utilisateur. Choisir l’onglet Avant-gardE. */
+ shareMessage("Autorise le partage de l’onglet Avant-gardE dans la fenêtre du navigateur.");
+ const streamPromise=navigator.mediaDevices.getDisplayMedia({video:{displaySurface:"browser",frameRate:{ideal:15,max:30}},audio:false});
+ let stream=null,workerUrl=null;
  try{
-  const response=await fetch(imageUrl,{mode:"cors",cache:"force-cache"});
-  if(!response.ok)throw new Error("HTTP "+response.status);
-  const buffer=await response.arrayBuffer();
-  const parsed=gifuct.parseGIF(buffer);
-  decoded=gifuct.decompressFrames(parsed,true);
- }catch(error){
-  throw new Error("Impossible de lire les images animées originales. L’hébergeur de cette image bloque leur lecture depuis le site (CORS), ou le fichier n’est pas un GIF lisible. Détail : "+(error.message||error));
- }
- if(!decoded.length)throw new Error("Aucune image animée n’a été trouvée dans le fichier source.");
- const count=Math.min(decoded.length,framesLimit);
- const clone=source.cloneNode(true);
- clone.removeAttribute("id");
- clone.style.position="fixed";clone.style.left="-10000px";clone.style.top="0";
- clone.style.width=box.width+"px";clone.style.height=box.height+"px";
- clone.style.margin="0";clone.style.transform="none";clone.style.animation="none";
- clone.style.zIndex="-1";
- const cloneImage=clone.querySelector(".project-card-image");
- if(!cloneImage)throw new Error("Impossible de préparer la copie fidèle du recto.");
- const parsedWidth=image.naturalWidth,parsedHeight=image.naturalHeight;
- const animationCanvas=document.createElement("canvas");
- animationCanvas.width=parsedWidth;animationCanvas.height=parsedHeight;
- const animationCtx=animationCanvas.getContext("2d",{willReadFrequently:true});
- const replacementCanvas=document.createElement("canvas");
- replacementCanvas.width=parsedWidth;replacementCanvas.height=parsedHeight;
- replacementCanvas.style.cssText=cloneImage.style.cssText;
- replacementCanvas.className=cloneImage.className;
- replacementCanvas.setAttribute("aria-hidden","true");
- cloneImage.replaceWith(replacementCanvas);
- document.body.appendChild(clone);
- const workerResponse=await fetch("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js");
- if(!workerResponse.ok){clone.remove();throw new Error("Impossible de charger le moteur d’assemblage GIF.");}
- const workerUrl=URL.createObjectURL(await workerResponse.blob());
- const encoder=new window.GIF({workers:2,quality:8,width,height,workerScript:workerUrl,repeat:0,background:"#07152d"});
- try{
-  let previous=null,restoreCanvas=null;
-  for(let i=0;i<count;i++){
-   const patch=decoded[i];
-   if(previous){
-    if(previous.disposalType===2)animationCtx.clearRect(previous.dims.left,previous.dims.top,previous.dims.width,previous.dims.height);
-    else if(previous.disposalType===3&&restoreCanvas){animationCtx.clearRect(0,0,parsedWidth,parsedHeight);animationCtx.drawImage(restoreCanvas,0,0)}
-   }
-   if(patch.disposalType===3){restoreCanvas=document.createElement("canvas");restoreCanvas.width=parsedWidth;restoreCanvas.height=parsedHeight;restoreCanvas.getContext("2d").drawImage(animationCanvas,0,0)}
-   const pixels=patch.patch instanceof Uint8ClampedArray?patch.patch:new Uint8ClampedArray(patch.patch);
-   animationCtx.putImageData(new ImageData(pixels,patch.dims.width,patch.dims.height),patch.dims.left,patch.dims.top);
-   /* Remplacement de la seule image dans le clone intégral du recto. */
-   const replacementCtx=replacementCanvas.getContext("2d");
-   replacementCtx.clearRect(0,0,parsedWidth,parsedHeight);
-   replacementCtx.drawImage(animationCanvas,0,0);
-   const rendered=await html2canvas(clone,{backgroundColor:null,scale:width/box.width,width:box.width,height:box.height,useCORS:true,allowTaint:false,logging:false});
-   encoder.addFrame(rendered,{copy:true,delay:Math.max(50,Math.min(1000,patch.delay||delay))});
-   rendered.width=1;rendered.height=1;
-   previous=patch;
-   if(i%3===0)shareMessage("Rendu fidèle du recto : "+Math.round((i+1)/count*100)+" %");
+  stream=await streamPromise;
+  const track=stream.getVideoTracks()[0];
+  if(!track)throw new Error("Aucun flux vidéo n’a été fourni.");
+  const settings=track.getSettings();
+  if(settings.displaySurface && settings.displaySurface!=="browser")throw new Error("Sélectionne « Onglet Chrome/Edge », puis l’onglet Avant-gardE. Ne sélectionne ni écran entier ni fenêtre.");
+  const video=document.createElement("video");
+  video.muted=true;video.playsInline=true;video.srcObject=stream;
+  await new Promise((resolve,reject)=>{video.onloadedmetadata=resolve;video.onerror=()=>reject(new Error("Impossible de lire le flux de capture."));});
+  await video.play();
+  if(!video.videoWidth||!video.videoHeight)throw new Error("Le flux de capture ne contient aucune image.");
+  /* Le flux de l’onglet capture l’affichage réel : recadrage aux coordonnées du recto,
+     sans clone DOM, CSS reconstruit ni redessin de la photographie. */
+  const scaleX=video.videoWidth/window.innerWidth,scaleY=video.videoHeight/window.innerHeight;
+  const sx=Math.max(0,Math.round(rect.left*scaleX)),sy=Math.max(0,Math.round(rect.top*scaleY));
+  const sw=Math.min(video.videoWidth-sx,Math.round(rect.width*scaleX));
+  const sh=Math.min(video.videoHeight-sy,Math.round(rect.height*scaleY));
+  if(sw<2||sh<2)throw new Error("Impossible de repérer le recto dans l’onglet capturé. Vérifie que tu as partagé le bon onglet.");
+  const width=640,height=Math.max(1,Math.round(width*sh/sw));
+  await loadScriptOnce("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js",()=>!!window.GIF);
+  const workerResponse=await fetch("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js");
+  if(!workerResponse.ok)throw new Error("Impossible de charger le moteur GIF.");
+  workerUrl=URL.createObjectURL(await workerResponse.blob());
+  const encoder=new window.GIF({workers:2,quality:8,width,height,workerScript:workerUrl,repeat:0,background:"#07152d"});
+  const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
+  const ctx=canvas.getContext("2d",{alpha:false});
+  const total=30,delay=100;
+  shareMessage("Enregistrement direct du recto à l’écran…");
+  for(let i=0;i<total;i++){
+   if(track.readyState!=="live")throw new Error("La capture d’écran a été interrompue.");
+   ctx.drawImage(video,sx,sy,sw,sh,0,0,width,height);
+   encoder.addFrame(canvas,{copy:true,delay});
+   shareMessage("Enregistrement réel du recto : "+Math.round((i+1)/total*100)+" %");
+   await new Promise(resolve=>setTimeout(resolve,delay));
   }
   shareMessage("Assemblage du GIF…");
   const blob=await new Promise((resolve,reject)=>{
-   encoder.on("finished",resolve);encoder.on("abort",()=>reject(new Error("Assemblage GIF interrompu.")));encoder.on("error",reject);encoder.render();
+   encoder.on("finished",resolve);
+   encoder.on("abort",()=>reject(new Error("Assemblage GIF interrompu.")));
+   encoder.on("error",reject);
+   encoder.render();
   });
   const signature=new TextDecoder().decode(await blob.slice(0,6).arrayBuffer());
-  if(!signature.startsWith("GIF8")||blob.size<1000)throw new Error("Le fichier GIF final est invalide ou vide.");
+  if(!signature.startsWith("GIF8")||blob.size<1000)throw new Error("Le GIF final est invalide ou vide.");
   return blob;
- }finally{clone.remove();URL.revokeObjectURL(workerUrl)}
+ }finally{
+  if(stream)stream.getTracks().forEach(track=>track.stop());
+  if(workerUrl)URL.revokeObjectURL(workerUrl);
+ }
 }
 shareButton?.addEventListener("click",async()=>{
  if(shareBusy)return;
