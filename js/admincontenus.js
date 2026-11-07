@@ -4488,106 +4488,115 @@ async function changerValidation(
 ) {
 
     const nouveauStatut =
-        !Boolean(
-            item.valide
-        );
+        !Boolean(item.valide);
 
-    let table =
+    let baseTable =
         null;
 
     if (
         menus.some(
             element =>
-                toId(
-                    element.id
-                ) ===
-                toId(id)
+                toId(element.id) === toId(id)
         )
     ) {
-
-        table =
-            "menus";
-
+        baseTable = "menus";
     }
     else if (
         sousMenus.some(
             element =>
-                toId(
-                    element.id
-                ) ===
-                toId(id)
+                toId(element.id) === toId(id)
         )
     ) {
-
-        table =
-            "sous_menus";
-
+        baseTable = "sous_menus";
     }
     else if (
         contenus.some(
             element =>
-                toId(
-                    element.id
-                ) ===
-                toId(id)
+                toId(element.id) === toId(id)
         )
     ) {
-
-        table =
-            "contenus";
-
+        baseTable = "contenus";
     }
 
-    if (!table) {
-
+    if (!baseTable) {
         showMessage(
             "Élément introuvable.",
             "error"
         );
-
         return;
-
     }
 
-    const {
-        error
-    } =
-        await supabase
-            .from(table)
-            .update({
-                valide:
-                    nouveauStatut
-            })
-            .eq(
-                "id",
-                id
-            );
+    /*
+     * IMPORTANT :
+     * Le nom logique doit être converti vers la bibliothèque
+     * active. Sans tableName(), le mode Inspiration tentait
+     * de modifier menus/sous_menus/contenus (Projet), au lieu
+     * de inspiration_menus/inspiration_sous_menus/
+     * inspiration_contenus.
+     */
 
-    if (error) {
+    const activeTable = tableName(baseTable);
+
+    try {
+
+        const {
+            data,
+            error
+        } = await supabase
+            .from(activeTable)
+            .update({
+                valide: nouveauStatut
+            })
+            .eq("id", id)
+            .select("id, valide")
+            .maybeSingle();
+
+        if (error) {
+            throw error;
+        }
+
+        /*
+         * PostgREST peut renvoyer aucune erreur lorsqu'une
+         * politique RLS ou un filtre empêche de toucher une
+         * ligne. On vérifie donc que la ligne a réellement
+         * été modifiée avant d'actualiser l'interface.
+         */
+
+        if (!data) {
+            throw new Error(
+                "Aucune ligne modifiée dans " + activeTable +
+                ". Vérifiez les droits administrateur (RLS)."
+            );
+        }
+
+        item.valide = Boolean(data.valide);
+
+        renderTree();
 
         showMessage(
-            "Impossible de modifier le statut : " +
-            error.message,
+            item.valide
+                ? "Élément validé et enregistré."
+                : "Élément passé en brouillon et enregistré."
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Erreur enregistrement du statut :",
+            activeTable,
+            error
+        );
+
+        showMessage(
+            "Impossible d'enregistrer le statut : " +
+            (error?.message || "erreur inconnue"),
             "error"
         );
 
-        return;
-
     }
 
-    item.valide =
-        nouveauStatut;
-
-    renderTree();
-
-    showMessage(
-        nouveauStatut
-            ? "Élément validé."
-            : "Élément passé en brouillon."
-    );
-
 }
-
 
 /* =========================================================
    ORDRE
