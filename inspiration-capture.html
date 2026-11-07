@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Avant-gardE — Capture</title>
+<style>
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#07152d}
+#capture-root{width:100%;height:100%;overflow:hidden;position:relative}
+#capture-root>.project-modal-face{position:relative!important;inset:auto!important;width:100%!important;height:100%!important;min-height:100%!important;transform:none!important;backface-visibility:visible!important;display:block!important;overflow:hidden!important}
+</style></head><body><main id="capture-root"></main>
+<script>
+(function(){
+ const root=document.getElementById("capture-root");
+ window.opener?.postMessage({type:"AVANTGARDE_CAPTURE_READY"},"*");
+ window.addEventListener("message",async function receive(event){
+  if(event.source!==window.opener||event.data?.type!=="AVANTGARDE_CAPTURE_CARD")return;
+  window.removeEventListener("message",receive);
+  const d=event.data;
+  try{
+   for(const href of d.links||[]){const l=document.createElement("link");l.rel="stylesheet";l.href=href;document.head.appendChild(l)}
+   for(const css of d.styles||[]){const s=document.createElement("style");s.textContent=css;document.head.appendChild(s)}
+   document.documentElement.style.width=d.width+"px";document.documentElement.style.height=d.height+"px";
+   document.body.style.width=d.width+"px";document.body.style.height=d.height+"px";
+   root.style.width=d.width+"px";root.style.height=d.height+"px";
+   root.innerHTML=d.html;
+   const card=root.firstElementChild;
+   if(!card)throw new Error("Le recto transmis est vide.");
+   card.style.setProperty("position","relative","important");
+   card.style.setProperty("inset","auto","important");
+   card.style.setProperty("width","100%","important");
+   card.style.setProperty("height","100%","important");
+   card.style.setProperty("transform","none","important");
+   card.style.setProperty("backface-visibility","visible","important");
+   card.style.setProperty("display","flex","important");
+   await Promise.all([...root.querySelectorAll("img")].map(img=>img.decode?.().catch(()=>{})||Promise.resolve()));
+   if(document.fonts?.ready)await document.fonts.ready;
+   await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+   window.opener.postMessage({type:"AVANTGARDE_CAPTURE_RENDERED"},"*");
+  }catch(error){window.opener.postMessage({type:"AVANTGARDE_CAPTURE_RENDERED",error:error.message||String(error)},"*")}
+ });
+})();
+</script></body></html>
