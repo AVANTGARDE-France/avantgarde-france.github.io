@@ -16,7 +16,7 @@
 .project-toolbar-label{font:700 11px Arial,sans-serif;letter-spacing:1.2px;color:var(--gold-light);white-space:nowrap}.project-filters{display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap}
 .project-filter{border:1px solid rgba(214,173,85,.4);background:transparent;color:white;border-radius:999px;padding:9px 15px;font:12px Arial,sans-serif;cursor:pointer}.project-filter:hover,.project-filter.active{background:linear-gradient(135deg,#f2d17d,#c89537);color:#07152d}
 .project-sort{display:flex;align-items:center;gap:10px;border-left:1px solid #d6ad5555;padding-left:16px}.project-sort select{background:#07152d;color:white;border:1px solid var(--gold);border-radius:999px;padding:9px 13px;font:12px Arial,sans-serif}
-.project-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px}.project-card{position:relative;isolation:isolate;display:flex;flex-direction:column;min-width:0;aspect-ratio:2/3;overflow:hidden;border:2px solid #c99b45;border-radius:15px;background:#0d2344;box-shadow:0 7px 22px #0005;cursor:pointer;transition:.22s}.project-card:hover{transform:translateY(-5px);box-shadow:0 14px 30px #0008;border-color:#ffe09a}
+.project-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px}.project-card{position:relative;isolation:isolate;display:flex;flex-direction:column;min-width:0;aspect-ratio:4/5;overflow:hidden;border:2px solid #c99b45;border-radius:15px;background:#0d2344;box-shadow:0 7px 22px #0005;cursor:pointer;transition:.22s}.project-card:hover{transform:translateY(-5px);box-shadow:0 14px 30px #0008;border-color:#ffe09a}
 .project-card-image-wrap{position:absolute;inset:0;z-index:0;overflow:hidden;background:linear-gradient(135deg,#193d65,#07152d)}.project-card-image{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;object-position:center;z-index:0}.project-card-image-wrap:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,#030d1d99,transparent 35%,#030d1d18 58%,#030d1dcc)}.project-card:before{content:"";position:absolute;inset:4px;z-index:-1;border:1px solid #ffe091a6;border-radius:10px;pointer-events:none}
 .project-card-top{display:flex;justify-content:center;align-items:center;position:relative;padding:12px 58px 0 12px;min-height:78px}.project-card-title{margin:0;color:#ffe09a;text-align:center;font:700 clamp(17px,1.45vw,24px)/1.12 Georgia,serif;text-shadow:0 2px 5px #000,0 0 12px #000}
 .project-priority{position:absolute;right:0;top:0;min-width:58px;padding:5.5px 6px 7px;text-align:center;color:#fff2d5;background:linear-gradient(145deg,#9b6425,#432b17);border-left:1px solid #f4d184;border-bottom:1px solid #f4d184;border-radius:0 10px 0 13px;font:700 9px Arial,sans-serif;text-transform:uppercase}.project-priority strong{display:block;font:700 13px Georgia,serif;margin-top:2px;color:#ffe09a}
@@ -60,9 +60,9 @@
 
 
 /* Animation de retournement dans le popup portrait */
-.project-modal-panel{width:min(540px,92vw);height:min(82vh,810px);max-height:82vh;padding:0;background:transparent;border:0;box-shadow:none;overflow:visible;perspective:1600px}
+.project-modal-panel{width:min(540px,92vw,65.6vh);height:auto;aspect-ratio:4/5;max-height:82vh;padding:0;background:transparent;border:0;box-shadow:none;overflow:visible;perspective:1600px}
 .project-modal-close{position:absolute;z-index:5;right:-12px;top:-12px;float:none}
-.project-modal-card{width:100%;height:100%;aspect-ratio:2/3;perspective:1600px}
+.project-modal-card{width:100%;height:100%;aspect-ratio:4/5;perspective:1600px}
 .project-modal-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 1.7s cubic-bezier(.2,.75,.25,1);will-change:transform}
 .project-modal-card-inner.is-flipped{transform:rotateY(180deg)}
 .project-modal-face{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:2px solid #c99b45;border-radius:18px;box-shadow:0 22px 65px #000a}
@@ -76,7 +76,7 @@
 .project-modal-back h2{flex:0 0 auto;color:#f0d58a;text-align:center;font:700 clamp(23px,3vw,32px) Georgia,serif;margin:12px 25px 22px}
 .project-modal-content{flex:1;min-height:0;overflow-y:auto;font:15px/1.75 Arial,sans-serif}
 .project-modal-content img{max-width:100%;height:auto}
-@media(max-width:620px){.project-modal-panel{width:90vw;height:min(78vh,700px);max-height:78vh}.project-modal-close{right:-5px;top:-12px}.project-modal-face{border-radius:14px}.project-modal-back{padding:28px 20px 22px}.project-modal-back h2{font-size:23px;margin-bottom:16px}.project-modal-content{font-size:14px}}
+@media(max-width:620px){.project-modal-panel{width:min(90vw,62.4vh);height:auto;aspect-ratio:4/5;max-height:78vh}.project-modal-close{right:-5px;top:-12px}.project-modal-face{border-radius:14px}.project-modal-back{padding:28px 20px 22px}.project-modal-back h2{font-size:23px;margin-bottom:16px}.project-modal-content{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.project-modal-card-inner{transition:transform 1.7s cubic-bezier(.2,.75,.25,1)!important}}
 
 
@@ -196,8 +196,8 @@
 @media(max-width:620px){.project-modal-back{padding:13px 12px 17px}.project-vote-panel{right:10px;bottom:9px;gap:4px}.project-vote-panel .project-vote-button{min-width:33px;min-height:31px;padding:3px 7px}.project-vote-message{font-size:9px}.project-modal-content{padding-bottom:44px}}
 
 /* Dimensions fixes pendant et après le retournement ; seul le texte du verso défile */
-.project-modal-panel{box-sizing:border-box;overflow:visible;height:min(82vh,810px);max-height:82vh;display:flex;flex-direction:column}
-.project-modal-card{position:relative;display:block;flex:0 0 auto;width:100%;height:100%;min-height:0;aspect-ratio:2/3}
+.project-modal-panel{box-sizing:border-box;overflow:visible;aspect-ratio:4/5;height:auto;max-height:82vh;display:flex;flex-direction:column}
+.project-modal-card{position:relative;display:block;flex:0 0 auto;width:100%;height:100%;min-height:0;aspect-ratio:4/5}
 .project-modal-card-inner{position:relative;width:100%;height:100%;min-height:0;transform-style:preserve-3d}
 .project-modal-face{position:absolute;inset:0;width:100%;height:100%;box-sizing:border-box}
 .project-modal-back{display:flex;flex-direction:column;min-height:0;height:100%;box-sizing:border-box;overflow:hidden}
