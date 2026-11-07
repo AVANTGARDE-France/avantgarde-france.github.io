@@ -612,7 +612,7 @@ async function createInspirationGif(){
  clone.style.zIndex="-1";
  const cloneImage=clone.querySelector(".project-card-image");
  if(!cloneImage)throw new Error("Impossible de préparer la copie fidèle du recto.");
- const parsedWidth=decoded[0].dims.width,parsedHeight=decoded[0].dims.height;
+ const parsedWidth=image.naturalWidth,parsedHeight=image.naturalHeight;
  const animationCanvas=document.createElement("canvas");
  animationCanvas.width=parsedWidth;animationCanvas.height=parsedHeight;
  const animationCtx=animationCanvas.getContext("2d",{willReadFrequently:true});
