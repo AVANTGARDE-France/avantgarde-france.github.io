@@ -579,75 +579,79 @@ function clearPendingShare(){pendingShareFile=null;pendingShareText="";pendingSh
 function loadScriptOnce(src,test){if(test())return Promise.resolve();return new Promise((resolve,reject)=>{const existing=[...document.scripts].find(s=>s.src===src);if(existing){existing.addEventListener("load",resolve,{once:true});existing.addEventListener("error",reject,{once:true});return}const s=document.createElement("script");s.src=src;s.async=true;s.onload=resolve;s.onerror=()=>reject(new Error("Impossible de charger le moteur GIF."));document.head.appendChild(s)})}
 function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
 async function createInspirationGif(){
- const front=document.getElementById("projectModalFront");
- const image=front?.querySelector(".project-card-image");
- if(!front)throw new Error("Recto indisponible.");
- const rect=front.getBoundingClientRect();
- if(!rect.width||!rect.height)throw new Error("Recto non visible.");
- const width=640,height=Math.max(1,Math.round(width*rect.height/rect.width));
- const frames=24,delay=125;
+ const source=document.getElementById("projectModalFront");
+ if(!source)throw new Error("Recto de la carte introuvable.");
+ const box=source.getBoundingClientRect();
+ if(!box.width||!box.height)throw new Error("Le recto doit être visible pour être exporté.");
+ const width=640,height=Math.round(width*box.height/box.width);
+ const delay=100,framesLimit=36;
+ const image=source.querySelector(".project-card-image");
+ if(!image)throw new Error("Image du recto introuvable.");
+ shareMessage("Lecture de l’animation originale…");
  const {default:html2canvas}=await import("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/+esm");
  await loadScriptOnce("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js",()=>!!window.GIF);
- const response=await fetch("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js",{mode:"cors",cache:"force-cache"});
- if(!response.ok)throw new Error("Moteur GIF indisponible.");
- const workerUrl=URL.createObjectURL(await response.blob());
- const gif=new window.GIF({workers:2,quality:10,width,height,workerScript:workerUrl,repeat:0,background:"#07152d"});
- const oldVisibility=image?.style.visibility;
+ const gifuct=await import("https://esm.sh/gifuct-js@2.1.2");
+ const imageUrl=image.currentSrc||image.src;
+ let decoded=[];
  try{
-  shareMessage("Préparation du recto animé…");
-  /* Active CORS avant le rechargement : requis pour dessiner une image distante dans le canvas. */
-  if(image && image.src && !image.src.startsWith("data:") && !image.src.startsWith(location.origin)){
-   const imageUrl=image.currentSrc||image.src;
-   image.crossOrigin="anonymous";
-   image.src=imageUrl;
-   await new Promise((resolve,reject)=>{
-    if(image.complete && image.naturalWidth){resolve();return}
-    image.onload=()=>resolve();
-    image.onerror=()=>reject(new Error("L’image GIF distante refuse le chargement avec autorisation CORS. Son hébergeur interdit probablement son enregistrement."));
-    setTimeout(()=>reject(new Error("Délai dépassé pendant le rechargement de l’image GIF.")),12000);
-   });
-  }
-  /* Capture les éléments fixes une seule fois : html2canvas clone IMG et peut remettre le GIF au début. */
-  if(image)image.style.visibility="hidden";
-  const base=await html2canvas(front,{backgroundColor:"#07152d",scale:width/rect.width,width:rect.width,height:rect.height,useCORS:true,allowTaint:false,logging:false,imageTimeout:12000,removeContainer:true});
-  if(image)image.style.visibility=oldVisibility||"";
-  const frame=document.createElement("canvas");frame.width=width;frame.height=height;
-  const ctx=frame.getContext("2d");
-  if(image){
-   if(typeof image.decode==="function"){try{await image.decode()}catch(_){if(!image.complete||!image.naturalWidth)throw new Error("L’image de la carte n’a pas pu être décodée.")}}
-   const wrap=front.querySelector(".project-card-image-wrap"),wr=wrap?.getBoundingClientRect()||rect;
-   const dx=(wr.left-rect.left)/rect.width*width,dy=(wr.top-rect.top)/rect.height*height,dw=wr.width/rect.width*width,dh=wr.height/rect.height*height;
-   for(let i=0;i<frames;i++){
-    ctx.clearRect(0,0,width,height);ctx.drawImage(base,0,0,width,height);
-    if(image.complete&&image.naturalWidth){
-     const iw=image.naturalWidth,ih=image.naturalHeight,scale=Math.max(dw/iw,dh/ih),cw=dw/scale,ch=dh/scale;
-     ctx.save();ctx.beginPath();ctx.rect(dx,dy,dw,dh);ctx.clip();
-     ctx.drawImage(image,(iw-cw)/2,(ih-ch)/2,cw,ch,dx,dy,dw,dh);
-     const g=ctx.createLinearGradient(0,dy,0,dy+dh);
-     g.addColorStop(0,"rgba(3,13,29,.60)");g.addColorStop(.35,"rgba(3,13,29,0)");
-     g.addColorStop(.58,"rgba(3,13,29,.09)");g.addColorStop(1,"rgba(3,13,29,.80)");
-     ctx.fillStyle=g;ctx.fillRect(dx,dy,dw,dh);ctx.restore();
-    }
-    gif.addFrame(frame,{copy:true,delay});
-    if(i%4===3)shareMessage("Enregistrement de l’animation du recto… "+Math.round((i+1)/frames*100)+" %");
-    await wait(delay);
-   }
-  }else{
-   for(let i=0;i<frames;i++){ctx.drawImage(base,0,0,width,height);gif.addFrame(frame,{copy:true,delay});await wait(delay)}
-  }
-  const blob=await new Promise((resolve,reject)=>{
-   gif.on("finished",value=>{URL.revokeObjectURL(workerUrl);resolve(value)});
-   gif.on("abort",()=>reject(new Error("Création interrompue.")));
-   gif.on("error",reject);gif.render();
-  });
-  if(!new TextDecoder().decode(await blob.slice(0,6).arrayBuffer()).startsWith("GIF8"))throw new Error("Format GIF invalide.");
-  return blob;
+  const response=await fetch(imageUrl,{mode:"cors",cache:"force-cache"});
+  if(!response.ok)throw new Error("HTTP "+response.status);
+  const buffer=await response.arrayBuffer();
+  const parsed=gifuct.parseGIF(buffer);
+  decoded=gifuct.decompressFrames(parsed,true);
  }catch(error){
-  if(image)image.style.visibility=oldVisibility||"";
-  URL.revokeObjectURL(workerUrl);
-  console.error("Détail erreur génération GIF :",error);
-  throw error;
+  throw new Error("Impossible de lire les images animées originales. L’hébergeur de cette image bloque leur lecture depuis le site (CORS), ou le fichier n’est pas un GIF lisible. Détail : "+(error.message||error));
  }
+ if(!decoded.length)throw new Error("Aucune image animée n’a été trouvée dans le fichier source.");
+ const count=Math.min(decoded.length,framesLimit);
+ const clone=source.cloneNode(true);
+ clone.removeAttribute("id");
+ clone.style.position="fixed";clone.style.left="-10000px";clone.style.top="0";
+ clone.style.width=box.width+"px";clone.style.height=box.height+"px";
+ clone.style.margin="0";clone.style.transform="none";clone.style.animation="none";
+ clone.style.zIndex="-1";
+ const cloneImage=clone.querySelector(".project-card-image");
+ if(!cloneImage)throw new Error("Impossible de préparer la copie fidèle du recto.");
+ const frameCanvas=document.createElement("canvas");
+ const frameCtx=frameCanvas.getContext("2d",{willReadFrequently:false});
+ const replacementCanvas=document.createElement("canvas");
+ replacementCanvas.width=image.naturalWidth||decoded[0].dims.width;
+ replacementCanvas.height=image.naturalHeight||decoded[0].dims.height;
+ replacementCanvas.style.cssText=cloneImage.style.cssText;
+ replacementCanvas.className=cloneImage.className;
+ replacementCanvas.setAttribute("aria-hidden","true");
+ cloneImage.replaceWith(replacementCanvas);
+ document.body.appendChild(clone);
+ const workerResponse=await fetch("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js");
+ if(!workerResponse.ok){clone.remove();throw new Error("Impossible de charger le moteur d’assemblage GIF.");}
+ const workerUrl=URL.createObjectURL(await workerResponse.blob());
+ const encoder=new window.GIF({workers:2,quality:8,width,height,workerScript:workerUrl,repeat:0,background:"#07152d"});
+ try{
+  for(let i=0;i<count;i++){
+   const patch=decoded[i];
+   const patchCanvas=document.createElement("canvas");
+   patchCanvas.width=patch.dims.width;patchCanvas.height=patch.dims.height;
+   const patchCtx=patchCanvas.getContext("2d");
+   const pixels=patch.patch instanceof Uint8ClampedArray?patch.patch:new Uint8ClampedArray(patch.patch);
+   const frameImage=new ImageData(pixels,patch.dims.width,patch.dims.height);
+   patchCtx.putImageData(frameImage,0,0);
+   /* Le canvas d’image remplace seulement la balise IMG dans une copie exacte
+      du recto : toutes les couches, textes, bordures et règles CSS restent présentes. */
+   frameCtx.clearRect(0,0,replacementCanvas.width,replacementCanvas.height);
+   frameCtx.drawImage(patchCanvas,0,0,replacementCanvas.width,replacementCanvas.height);
+   const rendered=await html2canvas(clone,{backgroundColor:null,scale:width/box.width,width:box.width,height:box.height,useCORS:true,allowTaint:false,logging:false});
+   encoder.addFrame(rendered,{copy:true,delay:Math.max(50,Math.min(1000,patch.delay||delay))});
+   rendered.width=1;rendered.height=1;patchCanvas.width=1;patchCanvas.height=1;
+   if(i%3===0)shareMessage("Rendu fidèle du recto : "+Math.round((i+1)/count*100)+" %");
+  }
+  shareMessage("Assemblage du GIF…");
+  const blob=await new Promise((resolve,reject)=>{
+   encoder.on("finished",resolve);encoder.on("abort",()=>reject(new Error("Assemblage GIF interrompu.")));encoder.on("error",reject);encoder.render();
+  });
+  const signature=new TextDecoder().decode(await blob.slice(0,6).arrayBuffer());
+  if(!signature.startsWith("GIF8")||blob.size<1000)throw new Error("Le fichier GIF final est invalide ou vide.");
+  return blob;
+ }finally{clone.remove();URL.revokeObjectURL(workerUrl)}
 }
 shareButton?.addEventListener("click",async()=>{
  if(shareBusy)return;
