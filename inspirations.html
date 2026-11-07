@@ -623,7 +623,11 @@ async function createInspirationGif(){
   const total=30,delay=100;
   for(let i=0;i<total;i++){
    if(track.readyState!=="live")throw new Error("La capture a été interrompue.");
-   ctx.drawImage(video,0,0,video.videoWidth,video.videoHeight,0,0,width,height);
+   const targetRatio=rect.width/rect.height,videoRatio=video.videoWidth/video.videoHeight;
+   let cropX=0,cropY=0,cropW=video.videoWidth,cropH=video.videoHeight;
+   if(videoRatio>targetRatio){cropW=Math.round(video.videoHeight*targetRatio);cropX=Math.round((video.videoWidth-cropW)/2)}
+   else{cropH=Math.round(video.videoWidth/targetRatio);cropY=Math.round((video.videoHeight-cropH)/2)}
+   ctx.drawImage(video,cropX,cropY,cropW,cropH,0,0,width,height);
    encoder.addFrame(canvas,{copy:true,delay});
    if(i%3===0)shareMessage("Enregistrement du recto original : "+Math.round((i+1)/total*100)+" %");
    await wait(delay);
