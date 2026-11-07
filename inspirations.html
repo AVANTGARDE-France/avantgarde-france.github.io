@@ -635,6 +635,9 @@ shareButton?.addEventListener("click",async()=>{
  }
  const item=items.find(x=>String(x.id)===String(modalContent.dataset.itemId));
  if(!item)return;
+ pendingShareTitle=modalTitle.textContent||"Inspiration Avant-gardE";
+ pendingShareText=(modalTitle.textContent+"\\n\\n"+modalContent.innerText).trim();
+ if(navigator.clipboard?.writeText)navigator.clipboard.writeText(pendingShareText).catch(()=>{});
  shareBusy=true;shareButton.disabled=true;shareButton.querySelector("span").textContent="Création…";
  try{
   const blob=await createInspirationGif();
