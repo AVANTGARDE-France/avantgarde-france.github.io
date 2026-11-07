@@ -580,40 +580,32 @@ function loadScriptOnce(src,test){if(test())return Promise.resolve();return new 
 function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
 async function createInspirationGif(){
  const front=document.getElementById("projectModalFront");
- if(!front||!front.getBoundingClientRect().width)throw new Error("Le recto n'est pas disponible.");
- const {toCanvas}=await import("https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/+esm");
+ if(!front)throw new Error("Le recto n'est pas disponible.");
+ const rect=front.getBoundingClientRect();
+ if(!rect.width||!rect.height)throw new Error("Le recto n'est pas visible.");
+ /* Garde les proportions réelles du recto et sa totalité. */
+ const width=640,height=Math.max(1,Math.round(width*rect.height/rect.width));
+ const frames=24,delay=125;
+ const {default:html2canvas}=await import("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/+esm");
  await loadScriptOnce("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js",()=>!!window.GIF);
  const response=await fetch("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js",{mode:"cors",cache:"force-cache"});
  if(!response.ok)throw new Error("Moteur GIF indisponible.");
  const workerUrl=URL.createObjectURL(await response.blob());
- const width=480,height=720,frames=30,delay=100;
  const gif=new window.GIF({workers:2,quality:10,width,height,workerScript:workerUrl,repeat:0,background:"#07152d"});
  try{
-  shareMessage("Préparation du recto…");
-  /* Capture une seule fois le HTML : les animations du GIF sont ensuite dessinées
-     explicitement sur le canvas, au lieu de capturer 30 clones HTML identiques. */
-  const base=await toCanvas(front,{cacheBust:true,pixelRatio:1,width,height,backgroundColor:"#07152d"});
-  const frame=document.createElement("canvas");frame.width=width;frame.height=height;
-  const ctx=frame.getContext("2d",{willReadFrequently:true});
+  shareMessage("Astuce : Le texte de la carte sera automatiquement « copié » si vous souhaitez l’utiliser pour votre post. Préparation du GIF…");
   for(let i=0;i<frames;i++){
-   ctx.clearRect(0,0,width,height);
-   ctx.drawImage(base,0,0,width,height);
-   /* Balayage lumineux doré/bleuté sur la carte, animé de gauche à droite. */
-   ctx.save();
-   ctx.translate(-150+(i/(frames-1))*(width+300),0);
-   ctx.rotate(-0.28);
-   const shine=ctx.createLinearGradient(-95,0,95,0);
-   shine.addColorStop(0,"rgba(255,225,160,0)");
-   shine.addColorStop(.38,"rgba(255,232,175,.07)");
-   shine.addColorStop(.5,"rgba(255,255,235,.34)");
-   shine.addColorStop(.62,"rgba(135,210,255,.16)");
-   shine.addColorStop(1,"rgba(255,225,160,0)");
-   ctx.fillStyle=shine;ctx.fillRect(-95,-180,190,1100);
-   ctx.restore();
+   /* Capture du DOM réel à chaque instant : les IMG contenant un GIF animé
+      sont redessinées depuis leur image décodée courante. */
+   const canvas=await html2canvas(front,{backgroundColor:"#07152d",scale:width/rect.width,width:rect.width,height:rect.height,useCORS:true,allowTaint:false,logging:false,imageTimeout:10000,removeContainer:true});
+   const frame=document.createElement("canvas");frame.width=width;frame.height=height;
+   frame.getContext("2d").drawImage(canvas,0,0,width,height);
    gif.addFrame(frame,{copy:true,delay});
-   if(i%6===5)shareMessage("Création du GIF animé… "+Math.round((i+1)/frames*100)+" %");
-   await wait(12);
+   canvas.width=1;canvas.height=1;frame.width=1;frame.height=1;
+   if(i%4===3)shareMessage("Capture du recto animé… "+Math.round((i+1)/frames*100)+" %");
+   await wait(35);
   }
+  shareMessage("Assemblage du GIF…");
   const blob=await new Promise((resolve,reject)=>{
    gif.on("finished",value=>{URL.revokeObjectURL(workerUrl);resolve(value)});
    gif.on("abort",()=>{URL.revokeObjectURL(workerUrl);reject(new Error("Création interrompue."))});
@@ -628,13 +620,14 @@ async function createInspirationGif(){
 shareButton?.addEventListener("click",async()=>{
  if(shareBusy)return;
  if(pendingShareFile){
+  const facebookTab=window.open("https://www.facebook.com/post/create","_blank");
   /* Pas de menu de partage Windows : téléchargement explicite + ouverture Facebook.
      L'utilisateur joint ensuite le GIF téléchargé à sa publication. */
   const file=pendingShareFile;
   const url=URL.createObjectURL(file);
   const a=document.createElement("a");a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();
   try{await navigator.clipboard.writeText(pendingShareText)}catch(_){}
-  window.open("https://www.facebook.com/","_blank","noopener");
+  if(facebookTab)facebookTab.opener=null;
   clearPendingShare();
   shareMessage("GIF téléchargé et texte du verso copié. Facebook est ouvert dans un nouvel onglet : joins-y le GIF à ta publication.");
   setTimeout(()=>URL.revokeObjectURL(url),60000);
