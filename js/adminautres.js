@@ -4,7 +4,6 @@
 
    Gestion :
    - MANIFESTE
-   - INSPIRATIONS
    - éditeur HTML visuel
    - code HTML source
    - gras
@@ -71,34 +70,6 @@ const CONTENTS = {
         cancelButtonId: "manifestCancelButton",
         messageId: "manifestMessage"
     },
-
-
-    inspirations: {
-        slug: "inspirations",
-        titre: "Inspirations",
-
-        /*
-           IMPORTANT :
-           Le WYSIWYG réel dans admin.html est :
-           inspirationsWysiwyg
-
-           Il n'existe pas de #inspirationsEditor.
-        */
-        wysiwygId: "inspirationsWysiwyg",
-        sourceId: "inspirationsSourceEditor",
-
-        toolbarId: "inspirationsToolbar",
-
-        linkButtonId: "inspirationsLinkButton",
-        imageButtonId: "inspirationsImageButton",
-        videoButtonId: "inspirationsVideoButton",
-        sourceButtonId: "inspirationsSourceModeButton",
-
-        saveButtonId: "inspirationsSaveButton",
-        cancelButtonId: "inspirationsCancelButton",
-        messageId: "inspirationsMessage"
-    }
-
 };
 
 
@@ -112,12 +83,6 @@ const states = {
         row: null,
         sourceMode: false
     },
-
-    inspirations: {
-        row: null,
-        sourceMode: false
-    }
-
 };
 
 
@@ -142,7 +107,7 @@ let adminAutresModuleInitialized = false;
 ========================================================= */
 
 /*
-   AUTRES PAGES est une zone strictement réservée
+   MANIFESTE est une zone strictement réservée
    aux administrateurs.
 
    Le contrôle repose sur le grade principal du profil.
@@ -185,7 +150,7 @@ function exigerAdministrateur() {
     ) {
 
         console.warn(
-            "AVANT-GARDE — AUTRES PAGES : accès administrateur requis."
+            "AVANT-GARDE — MANIFESTE : accès administrateur requis."
         );
 
         return false;
@@ -1332,17 +1297,7 @@ async function actualiserContenusAutres(){
 
     try{
 
-        await Promise.all([
-
-            chargerContenu(
-                "manifeste"
-            ),
-
-            chargerContenu(
-                "inspirations"
-            )
-
-        ]);
+        await chargerContenu("manifeste");
 
     }
     catch(error){
@@ -2438,7 +2393,6 @@ async function initialiser() {
         ),
 
         initialiserEditeur(
-            "inspirations"
         )
 
     ]);
