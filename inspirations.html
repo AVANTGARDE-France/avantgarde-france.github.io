@@ -702,7 +702,6 @@ shareButton?.addEventListener("click",async()=>{
    video:{displaySurface:"browser",frameRate:{ideal:30,max:30}},
    audio:false
   });
-  facebookWindow=window.open("https://www.facebook.com/post/create","_blank");
   captureStream=await capturePromise;
   const track=captureStream.getVideoTracks()[0];
   if(!track)throw new Error("Aucun flux vidéo reçu.");
@@ -717,7 +716,13 @@ shareButton?.addEventListener("click",async()=>{
   const extension=downloadInspirationVideo(blob,item);
   try{await navigator.clipboard?.writeText(shareText)}catch(_){}
   const compatibility=extension==="mp4"?"MP4":"WebM (ce navigateur ne propose pas l’encodage MP4 natif)";
-  shareMessage("Vidéo "+compatibility+" téléchargée. Texte du verso copié. Ajoute la vidéo à ta publication Facebook.");
+  facebookWindow=window.open("https://www.facebook.com/post/create","_blank");
+  if(facebookWindow){
+   shareMessage("Vidéo "+compatibility+" téléchargée. Texte du verso copié. Ajoute la vidéo à ta publication Facebook.");
+  }else{
+   shareStatus.innerHTML="Vidéo "+compatibility+" téléchargée. Texte du verso copié. <a href=\"https://www.facebook.com/post/create\" target=\"_blank\" rel=\"noopener\">Ouvrir Facebook</a> pour ajouter la vidéo.";
+   shareStatus.classList.add("visible");
+  }
  }catch(error){
   console.error("Capture vidéo inspiration",error);
   if(facebookWindow&&!facebookWindow.closed)facebookWindow.close();
