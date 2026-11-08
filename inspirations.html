@@ -689,11 +689,13 @@ shareButton?.addEventListener("click",async()=>{
  pendingShareText=getInspirationShareText();
  if(navigator.clipboard?.writeText)navigator.clipboard.writeText(pendingShareText).catch(()=>{});
  shareBusy=true;shareButton.disabled=true;shareButton.querySelector("span").textContent="Création…";
- /* Préouvrir Facebook dans une fenêtre normale, distincte de la popup de capture.
-    L’ouverture est synchrone au clic pour éviter le blocage des pop-ups. */
- const facebookWindow=window.open("about:blank","_blank");
+ let facebookWindow=null;
  try{
-  const blob=await createInspirationGif();
+  /* Démarrer d’abord la capture depuis l’activation du clic : getDisplayMedia
+     doit être appelé immédiatement. Facebook est préouvert dans une fenêtre séparée. */
+  const capturePromise=createInspirationGif();
+  facebookWindow=window.open("about:blank","_blank");
+  const blob=await capturePromise;
   const safeName=(String(item.titre||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");
   pendingShareFile=new File([blob],safeName+".gif",{type:"image/gif"});
   pendingShareTitle=modalTitle.textContent||"Inspiration Avant-gardE";
