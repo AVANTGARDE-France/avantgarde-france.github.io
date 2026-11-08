@@ -570,11 +570,15 @@ grid.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.
 votePanel?.addEventListener("click",async e=>{const b=e.target.closest("[data-vote]");if(!b)return;const msg=votePanel.querySelector(".project-vote-message");if(!currentUser){if(msg)msg.textContent="Vote impossible — vous devez être connecté.";return}const value=Number(b.dataset.vote),id=modalContent.dataset.itemId;if(!id)return;const currentValue=myVotes.get(String(id)),removing=currentValue===value;b.disabled=true;if(msg)msg.textContent=removing?"Retrait de votre évaluation…":"Enregistrement de votre note…";const result=removing?await supabase.from("inspiration_votes").delete().eq("user_id",currentUser.id).eq("contenu_id",id):await supabase.from("inspiration_votes").upsert({user_id:currentUser.id,contenu_id:id,vote:value,updated_at:new Date().toISOString()},{onConflict:"user_id,contenu_id"});b.disabled=false;if(result.error){console.error("Erreur vote inspiration",result.error);if(msg)msg.textContent="Impossible de modifier votre note. Réessayez.";return}if(removing)myVotes.delete(String(id));else myVotes.set(String(id),value);await loadVoteData();render();const updated=items.find(x=>String(x.id)===String(id));if(updated){votePanel.innerHTML=voteControls(updated);const fresh=grid.querySelector('[data-id="'+CSS.escape(String(id))+'"]');if(fresh)document.getElementById("projectModalFront").innerHTML=fresh.innerHTML}});
 
 
-/* Vidéo temporaire en mémoire navigateur : aucun envoi ni stockage serveur. */
+/* Vidéo fidèle : capture directe de l’onglet, sans reconstruction du DOM. */
 const shareButton=document.getElementById("inspirationShareButton");
 const shareStatus=document.getElementById("inspirationShareStatus");
 let shareBusy=false;
-function shareMessage(message){if(!shareStatus)return;shareStatus.textContent=message;shareStatus.classList.add("visible")}
+function shareMessage(message){
+ if(!shareStatus)return;
+ shareStatus.textContent=message;
+ shareStatus.classList.add("visible");
+}
 function getInspirationShareText(){
  const clone=modalContent.cloneNode(true);
  clone.querySelectorAll("script,style,button,svg").forEach(el=>el.remove());
@@ -586,177 +590,87 @@ function getInspirationShareText(){
  const body=(clone.innerText||clone.textContent||"").split("\n").filter(line=>!line.trim().startsWith("http")).join("\n").trim();
  return [modalTitle.textContent.trim(),body].filter(Boolean).join("\n\n");
 }
-function loadScriptOnce(src,test){
- if(test())return Promise.resolve();
- return new Promise((resolve,reject)=>{
-  const existing=[...document.scripts].find(s=>s.src===src);
-  if(existing){
-   if(existing.dataset.loaded==="true"){resolve();return}
-   existing.addEventListener("load",resolve,{once:true});
-   existing.addEventListener("error",()=>reject(new Error("Impossible de charger le moteur vidéo.")),{once:true});
-   return;
-  }
-  const script=document.createElement("script");
-  script.src=src;script.async=true;
-  script.onload=()=>{script.dataset.loaded="true";resolve()};
-  script.onerror=()=>reject(new Error("Impossible de charger le moteur vidéo."));
-  document.head.appendChild(script);
- });
-}
 function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
-async function waitForImage(img){
- if(img.complete&&img.naturalWidth>0){try{await img.decode()}catch(_){}return}
- await new Promise(resolve=>{
-  const done=()=>resolve();
-  img.addEventListener("load",done,{once:true});
-  img.addEventListener("error",done,{once:true});
-  setTimeout(done,8000);
- });
+function nextFrame(){return new Promise(resolve=>requestAnimationFrame(()=>resolve()))}
+function stopStream(stream){
+ if(stream)stream.getTracks().forEach(track=>{try{track.stop()}catch(_){}});
 }
-function createVideoStage(source){
- const stage=document.createElement("div");
- stage.id="projectModalCard";
- stage.className="project-modal-card";
- stage.setAttribute("aria-hidden","true");
- Object.assign(stage.style,{
-  position:"fixed",left:"0",top:"0",width:"540px",height:"675px",
-  zIndex:"9999",pointerEvents:"none",overflow:"hidden",
-  transform:"none",margin:"0"
+async function recordCardFromTab(stream,onProgress){
+ const video=document.createElement("video");
+ video.muted=true;
+ video.playsInline=true;
+ video.srcObject=stream;
+ await new Promise((resolve,reject)=>{
+  if(video.readyState>=1){resolve();return}
+  video.onloadedmetadata=resolve;
+  video.onerror=()=>reject(new Error("Impossible de lire la capture de l’onglet."));
+  setTimeout(()=>reject(new Error("La capture de l’onglet ne démarre pas.")),10000);
  });
- const clone=source.cloneNode(true);
- clone.removeAttribute("id");
- clone.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
- Object.assign(clone.style,{
-  position:"absolute",inset:"0",left:"0",top:"0",width:"540px",height:"675px",
-  minWidth:"540px",minHeight:"675px",maxWidth:"none",maxHeight:"none",
-  transform:"none",transformOrigin:"top left",
-  backfaceVisibility:"visible",webkitBackfaceVisibility:"visible",
-  display:"flex",visibility:"visible",opacity:"1",margin:"0"
- });
- clone.querySelectorAll("img").forEach(img=>{
-  img.loading="eager";
-  img.decoding="sync";
-  img.crossOrigin="anonymous";
- });
- stage.appendChild(clone);
- document.body.appendChild(stage);
- return {stage,clone};
-}
-async function captureVideoFrame(clone,canvas,ctx,html2canvas){
- const snapshot=await html2canvas(clone,{
-  backgroundColor:"#0d2344",scale:2,width:540,height:675,
-  windowWidth:Math.max(document.documentElement.clientWidth,540),
-  windowHeight:Math.max(document.documentElement.clientHeight,675),
-  useCORS:true,allowTaint:false,logging:false,
-  imageTimeout:8000,removeContainer:true
- });
- ctx.clearRect(0,0,canvas.width,canvas.height);
- ctx.drawImage(snapshot,0,0,canvas.width,canvas.height);
-}
-async function createMp4Video(clone,canvas,ctx,html2canvas,onProgress){
- if(!("VideoEncoder" in window)||!("VideoFrame" in window))throw new Error("Encodage MP4 non pris en charge par ce navigateur.");
- const muxLib=await import("https://esm.sh/mp4-muxer@5.2.2");
- const target=new muxLib.ArrayBufferTarget();
- const fps=10,width=1080,height=1350,totalFrames=35;
- const muxer=new muxLib.Muxer({
-  target,
-  video:{codec:"avc",width,height,frameRate:fps},
-  fastStart:"in-memory",
-  firstTimestampBehavior:"offset"
- });
- let encoderError=null;
- const encoder=new VideoEncoder({
-  output:(chunk,meta)=>muxer.addVideoChunk(chunk,meta),
-  error:error=>{encoderError=error}
- });
- const config={codec:"avc1.420028",width,height,bitrate:5000000,framerate:fps,latencyMode:"quality"};
- const support=await VideoEncoder.isConfigSupported(config);
- if(!support.supported){encoder.close();throw new Error("Le navigateur ne propose pas d’encodeur MP4 H.264 compatible.")}
- encoder.configure(support.config||config);
- try{
-  for(let i=0;i<totalFrames;i++){
-   await captureVideoFrame(clone,canvas,ctx,html2canvas);
-   if(encoderError)throw encoderError;
-   const frame=new VideoFrame(canvas,{timestamp:i*100000,duration:100000});
-   encoder.encode(frame,{keyFrame:i===0});
-   frame.close();
-   onProgress(Math.round((i+1)/totalFrames*90));
-   await wait(65);
-  }
-  await encoder.flush();
-  if(encoderError)throw encoderError;
-  encoder.close();
-  muxer.finalize();
-  const buffer=target.buffer;
-  if(!buffer||buffer.byteLength<10000)throw new Error("Le fichier MP4 généré est vide ou incomplet.");
-  return new Blob([buffer],{type:"video/mp4"});
- }catch(error){
-  try{encoder.close()}catch(_){}
-  throw error;
- }
-}
-async function createRecorderVideo(clone,canvas,ctx,html2canvas,onProgress){
- if(!canvas.captureStream||!("MediaRecorder" in window))throw new Error("L’enregistrement vidéo n’est pas disponible dans ce navigateur.");
- const fps=10,totalFrames=35;
- const stream=canvas.captureStream(fps);
- const mimeType=["video/mp4;codecs=h264","video/mp4","video/webm;codecs=vp9","video/webm"].find(type=>MediaRecorder.isTypeSupported(type))||"";
- const recorder=new MediaRecorder(stream,mimeType?{mimeType,videoBitsPerSecond:5000000}:{videoBitsPerSecond:5000000});
+ await video.play();
+ const front=document.getElementById("projectModalFront");
+ const card=document.getElementById("projectModalCard");
+ const inner=card?.querySelector(".project-modal-card-inner");
+ if(!front||!card||!inner)throw new Error("Carte originale introuvable.");
+ const previousTransition=inner.style.transition;
+ const wasFlipped=inner.classList.contains("is-flipped");
+ inner.style.transition="none";
+ inner.classList.remove("is-flipped");
+ await nextFrame();await nextFrame();
+ const rect=front.getBoundingClientRect();
+ const viewportWidth=window.innerWidth,viewportHeight=window.innerHeight;
+ const scaleX=video.videoWidth/viewportWidth,scaleY=video.videoHeight/viewportHeight;
+ const sx=Math.round(rect.left*scaleX),sy=Math.round(rect.top*scaleY);
+ const sw=Math.round(rect.width*scaleX),sh=Math.round(rect.height*scaleY);
+ if(!rect.width||!rect.height||!video.videoWidth||!video.videoHeight)throw new Error("Dimensions de capture invalides.");
+ if(sx<0||sy<0||sx+sw>video.videoWidth||sy+sh>video.videoHeight)throw new Error("La carte sort de la zone capturée. Vérifie que la fenêtre du navigateur est assez grande.");
+ const canvas=document.createElement("canvas");
+ canvas.width=1080;canvas.height=1350;
+ const ctx=canvas.getContext("2d",{alpha:false});
+ if(!ctx)throw new Error("Impossible de créer la vidéo.");
+ const fps=30,durationMs=4000;
+ const canvasStream=canvas.captureStream(fps);
+ const mimeType=[
+  "video/mp4;codecs=avc1.42E01E",
+  "video/mp4",
+  "video/webm;codecs=vp9",
+  "video/webm;codecs=vp8",
+  "video/webm"
+ ].find(type=>MediaRecorder.isTypeSupported(type))||"";
+ const recorder=new MediaRecorder(canvasStream,mimeType?{mimeType,videoBitsPerSecond:12000000}:{videoBitsPerSecond:12000000});
  const chunks=[];
- const stopped=new Promise((resolve,reject)=>{
-  recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
-  recorder.onerror=()=>reject(new Error("L’enregistrement vidéo a échoué."));
-  recorder.onstop=resolve;
- });
- recorder.start(250);
- try{
-  for(let i=0;i<totalFrames;i++){
-   await captureVideoFrame(clone,canvas,ctx,html2canvas);
-   onProgress(Math.round((i+1)/totalFrames*90));
-   await wait(65);
-  }
-  await wait(300);
-  recorder.stop();
-  await stopped;
-  const type=recorder.mimeType||mimeType||"video/webm";
-  const blob=new Blob(chunks,{type});
-  if(blob.size<10000)throw new Error("Le fichier vidéo généré est vide ou incomplet.");
-  return blob;
- }finally{
-  stream.getTracks().forEach(track=>track.stop());
-  if(recorder.state!=="inactive")recorder.stop();
- }
-}
-async function createInspirationVideo(onProgress){
- const source=document.getElementById("projectModalFront");
- if(!source)throw new Error("Recto introuvable.");
- const rect=source.getBoundingClientRect();
- if(!rect.width||!rect.height)throw new Error("Le recto n’est pas visible.");
- await loadScriptOnce("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",()=>!!window.html2canvas);
- const {stage,clone}=createVideoStage(source);
- try{
-  const images=[...clone.querySelectorAll("img")];
-  await Promise.all(images.map(waitForImage));
-  if(document.fonts?.ready)await document.fonts.ready;
-  await wait(350); // Laisse notamment les images GIF animées démarrer dans le clone.
-  const canvas=document.createElement("canvas");
-  canvas.width=1080;canvas.height=1350;
-  const ctx=canvas.getContext("2d",{alpha:false,colorSpace:"srgb"});
-  if(!ctx)throw new Error("Impossible de créer le support vidéo.");
+ let recordingError=null;
+ recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+ recorder.onerror=()=>{recordingError=new Error("L’enregistrement vidéo a échoué.")};
+ const stopped=new Promise(resolve=>{recorder.onstop=resolve});
+ let raf=0;
+ const started=performance.now();
+ const draw=now=>{
   try{
-   return await createMp4Video(clone,canvas,ctx,window.html2canvas,onProgress);
-  }catch(mp4Error){
-   console.warn("Encodage MP4 indisponible, essai du format vidéo natif.",mp4Error);
-   shareMessage("MP4 non disponible sur ce navigateur : préparation d’une vidéo dans son format natif…");
-   return await createRecorderVideo(clone,canvas,ctx,window.html2canvas,onProgress);
+   ctx.clearRect(0,0,canvas.width,canvas.height);
+   ctx.drawImage(video,sx,sy,sw,sh,0,0,canvas.width,canvas.height);
+   const progress=Math.min(100,Math.round((now-started)/durationMs*100));
+   onProgress(progress);
+   if(now-started<durationMs)raf=requestAnimationFrame(draw);
+   else if(recorder.state!=="inactive")recorder.stop();
+  }catch(error){
+   recordingError=error;
+   if(recorder.state!=="inactive")recorder.stop();
   }
- }finally{
-  stage.remove();
- }
+ };
+ recorder.start(250);
+ raf=requestAnimationFrame(draw);
+ await stopped;
+ cancelAnimationFrame(raf);
+ stopStream(canvasStream);
+ if(recordingError)throw recordingError;
+ const type=recorder.mimeType||mimeType||"video/webm";
+ const blob=new Blob(chunks,{type});
+ if(blob.size<20000)throw new Error("La vidéo produite est vide ou incomplète.");
+ return blob;
 }
-function downloadVideo(blob,item){
+function downloadInspirationVideo(blob,item){
  const safeName=(String(item.titre||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");
- const isMp4=blob.type.toLowerCase().includes("mp4");
- const extension=isMp4?"mp4":"webm";
+ const extension=blob.type.toLowerCase().includes("mp4")?"mp4":"webm";
  const url=URL.createObjectURL(blob);
  const link=document.createElement("a");
  link.href=url;link.download=safeName+"."+extension;
@@ -768,32 +682,55 @@ shareButton?.addEventListener("click",async()=>{
  if(shareBusy)return;
  const item=items.find(x=>String(x.id)===String(modalContent.dataset.itemId));
  if(!item)return;
- shareBusy=true;shareButton.disabled=true;
+ if(!navigator.mediaDevices?.getDisplayMedia){
+  shareMessage("La capture d’onglet n’est pas disponible dans ce navigateur.");
+  return;
+ }
+ shareBusy=true;
+ shareButton.disabled=true;
  const label=shareButton.querySelector("span");
- if(label)label.textContent="Création…";
- const facebookWindow=window.open("about:blank","_blank");
- const shareText=getInspirationShareText();
- try{await navigator.clipboard?.writeText(shareText)}catch(_){}
+ if(label)label.textContent="Capture…";
+ let captureStream=null,facebookWindow=null;
+ const card=document.getElementById("projectModalCard");
+ const inner=card?.querySelector(".project-modal-card-inner");
+ const previousTransition=inner?.style.transition||"";
+ const wasFlipped=inner?.classList.contains("is-flipped")||false;
  try{
-  shareMessage("Création de la vidéo verticale 4:5…");
-  const blob=await createInspirationVideo(progress=>{
-   shareMessage("Création de la vidéo : "+progress+" %");
+  shareMessage("Choisis « Cet onglet » dans la fenêtre du navigateur, puis autorise la capture.");
+  /* Appel direct dans le clic : requis par l’API de capture d’écran. */
+  const capturePromise=navigator.mediaDevices.getDisplayMedia({
+   video:{displaySurface:"browser",frameRate:{ideal:30,max:30}},
+   audio:false
   });
-  const extension=downloadVideo(blob,item);
+  facebookWindow=window.open("https://www.facebook.com/post/create","_blank");
+  captureStream=await capturePromise;
+  const track=captureStream.getVideoTracks()[0];
+  if(!track)throw new Error("Aucun flux vidéo reçu.");
+  const settings=track.getSettings()||{};
+  if(settings.displaySurface&&settings.displaySurface!=="browser")throw new Error("Sélectionne « Cet onglet » et non « Fenêtre » ou « Écran entier ».");
+  const shareText=getInspirationShareText();
   try{await navigator.clipboard?.writeText(shareText)}catch(_){}
-  if(facebookWindow&&!facebookWindow.closed){
-   facebookWindow.location.href="https://www.facebook.com/post/create";
-   try{facebookWindow.opener=null}catch(_){}
-  }
-  shareMessage("Vidéo "+extension.toUpperCase()+" téléchargée, texte du verso copié"+
-   (facebookWindow?" et Facebook ouvert dans un nouvel onglet.":"." )+
-   " Ajoute le fichier vidéo à ta publication.");
+  shareMessage("Capture réelle en cours : ne change pas d’onglet pendant les 4 secondes d’enregistrement.");
+  const blob=await recordCardFromTab(captureStream,progress=>{
+   shareMessage("Enregistrement réel de la carte : "+progress+" %");
+  });
+  const extension=downloadInspirationVideo(blob,item);
+  try{await navigator.clipboard?.writeText(shareText)}catch(_){}
+  const compatibility=extension==="mp4"?"MP4":"WebM (ce navigateur ne propose pas l’encodage MP4 natif)";
+  shareMessage("Vidéo "+compatibility+" téléchargée. Texte du verso copié. Ajoute la vidéo à ta publication Facebook.");
  }catch(error){
-  console.error("Création vidéo inspiration",error);
+  console.error("Capture vidéo inspiration",error);
   if(facebookWindow&&!facebookWindow.closed)facebookWindow.close();
-  shareMessage("Échec de création de la vidéo : "+(error?.message||String(error)));
+  shareMessage("Capture annulée ou impossible : "+(error?.message||String(error)));
  }finally{
-  shareBusy=false;shareButton.disabled=false;
+  stopStream(captureStream);
+  if(inner){
+   inner.style.transition=previousTransition;
+   if(wasFlipped)inner.classList.add("is-flipped");
+   else inner.classList.remove("is-flipped");
+  }
+  shareBusy=false;
+  shareButton.disabled=false;
   if(label)label.textContent="Partager";
  }
 });
