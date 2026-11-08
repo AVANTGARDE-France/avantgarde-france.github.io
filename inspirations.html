@@ -699,7 +699,16 @@ shareButton?.addEventListener("click",async()=>{
   shareMessage("Choisis « Cet onglet » dans la fenêtre du navigateur, puis autorise la capture.");
   /* Appel direct dans le clic : requis par l’API de capture d’écran. */
   const capturePromise=navigator.mediaDevices.getDisplayMedia({
-   video:{displaySurface:"browser",frameRate:{ideal:30,max:30}},
+   video:{
+    displaySurface:"browser",
+    frameRate:{ideal:30,max:30},
+    /*
+     * Autorise explicitement le partage de l’onglet qui contient déjà
+     * la carte. Sans cela, Edge/Chromium peut masquer l’onglet courant.
+     */
+    selfBrowserSurface:"include",
+    surfaceSwitching:"exclude"
+   },
    audio:false
   });
   captureStream=await capturePromise;
