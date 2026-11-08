@@ -631,14 +631,19 @@ async function createInspirationGif(){
      en tenant compte du ratio entre pixels vidéo et pixels CSS du viewport. */
   const captureDoc=captureWindow.document;
   const captureRoot=captureDoc.getElementById("capture-root");
-  if(!captureRoot)throw new Error("Zone de capture introuvable.");
-  const captureRect=captureRoot.getBoundingClientRect();
+  const captureCard=captureRoot?.firstElementChild;
+  if(!captureCard)throw new Error("Carte de capture introuvable.");
+  /* On découpe le rectangle réellement affiché de la carte, pas celui du
+     viewport ni les dimensions théoriques de la popup. */
+  const captureRect=captureCard.getBoundingClientRect();
   const viewportWidth=captureWindow.innerWidth,viewportHeight=captureWindow.innerHeight;
-  if(!viewportWidth||!viewportHeight||!captureRect.width||!captureRect.height)throw new Error("Dimensions de capture invalides.");
-  const width=800,height=Math.max(1,Math.round(width*captureRect.height/captureRect.width));
+  if(!viewportWidth||!viewportHeight||!captureRect.width||!captureRect.height)throw new Error("Dimensions réelles de la carte invalides.");
   const scaleX=video.videoWidth/viewportWidth,scaleY=video.videoHeight/viewportHeight;
-  const sx=Math.round(captureRect.left*scaleX),sy=Math.round(captureRect.top*scaleY);
-  const sw=Math.round(captureRect.width*scaleX),sh=Math.round(captureRect.height*scaleY);
+  const sx=Math.max(0,Math.round(captureRect.left*scaleX)),sy=Math.max(0,Math.round(captureRect.top*scaleY));
+  const sw=Math.min(video.videoWidth-sx,Math.round(captureRect.width*scaleX));
+  const sh=Math.min(video.videoHeight-sy,Math.round(captureRect.height*scaleY));
+  if(sw<=0||sh<=0)throw new Error("La carte dépasse la zone réellement capturée.");
+  const width=800,height=Math.max(1,Math.round(width*sh/sw));
   await loadScriptOnce("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js",()=>!!window.GIF);
   const worker=await fetch("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js");
   if(!worker.ok)throw new Error("Moteur GIF indisponible.");
