@@ -594,6 +594,7 @@ async function createInspirationGif(){
  if(!source)throw new Error("Recto introuvable.");
  const rect=source.getBoundingClientRect();
  if(!rect.width||!rect.height)throw new Error("Le recto n’est pas visible.");
+ if(!navigator.mediaDevices?.getDisplayMedia)throw new Error("La capture GIF automatique n’est pas disponible sur iPhone/iOS. Utilise le partage depuis un ordinateur ; sur iPhone, le navigateur ne permet pas de capturer automatiquement cette fenêtre indépendante.");
  /* Ouvrir la fenêtre dédiée immédiatement depuis le clic utilisateur. */
  const captureWindow=window.open("inspiration-capture.html","avantgarde-card-capture","popup=yes,width="+Math.ceil(rect.width)+",height="+Math.ceil(rect.height)+",resizable=no,scrollbars=no");
  if(!captureWindow)throw new Error("La fenêtre de capture a été bloquée. Autorise les fenêtres pop-up pour ce site.");
@@ -638,8 +639,8 @@ async function createInspirationGif(){
    /* Capture d’onglet : conserver toute l’image et adapter sans rogner les bords. */
    const sourceRatio=video.videoWidth/video.videoHeight,targetRatio=rect.width/rect.height;
    let drawW=width,drawH=height,dx=0,dy=0;
-   if(sourceRatio>targetRatio){drawH=height;drawW=Math.round(height*sourceRatio);dx=Math.round((width-drawW)/2)}
-   else{drawW=width;drawH=Math.round(width/sourceRatio);dy=Math.round((height-drawH)/2)}
+   if(sourceRatio>targetRatio){drawW=width;drawH=Math.round(width/sourceRatio);dy=Math.round((height-drawH)/2)}
+   else{drawH=height;drawW=Math.round(height*sourceRatio);dx=Math.round((width-drawW)/2)}
    ctx.fillStyle="#07152d";ctx.fillRect(0,0,width,height);
    ctx.drawImage(video,dx,dy,drawW,drawH);
    encoder.addFrame(canvas,{copy:true,delay});
