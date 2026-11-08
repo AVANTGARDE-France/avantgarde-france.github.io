@@ -618,8 +618,16 @@ async function recordCardFromTab(stream,onProgress){
  await nextFrame();await nextFrame();
  const rect=front.getBoundingClientRect();
  const viewportWidth=window.innerWidth,viewportHeight=window.innerHeight;
- const scaleX=video.videoWidth/viewportWidth,scaleY=video.videoHeight/viewportHeight;
- const sx=Math.round(rect.left*scaleX),sy=Math.round(rect.top*scaleY);
+ const surface=trackSettings?.displaySurface||"browser";
+ const captureOuter=(surface==="window");
+ const sourceWidth=captureOuter?window.outerWidth:viewportWidth;
+ const sourceHeight=captureOuter?window.outerHeight:viewportHeight;
+ const scaleX=video.videoWidth/sourceWidth,scaleY=video.videoHeight/sourceHeight;
+ /* En capture de fenêtre, le flux peut inclure la barre du navigateur.
+    On replace le rectangle CSS de la carte dans les coordonnées de la fenêtre. */
+ const chromeLeft=captureOuter?Math.max(0,(window.outerWidth-window.innerWidth)/2):0;
+ const chromeTop=captureOuter?Math.max(0,window.outerHeight-window.innerHeight-(window.outerWidth-window.innerWidth)/2):0;
+ const sx=Math.round((chromeLeft+rect.left)*scaleX),sy=Math.round((chromeTop+rect.top)*scaleY);
  const sw=Math.round(rect.width*scaleX),sh=Math.round(rect.height*scaleY);
  if(!rect.width||!rect.height||!video.videoWidth||!video.videoHeight)throw new Error("Dimensions de capture invalides.");
  if(sx<0||sy<0||sx+sw>video.videoWidth||sy+sh>video.videoHeight)throw new Error("La carte sort de la zone capturée. Vérifie que la fenêtre du navigateur est assez grande.");
@@ -715,7 +723,8 @@ shareButton?.addEventListener("click",async()=>{
   const track=captureStream.getVideoTracks()[0];
   if(!track)throw new Error("Aucun flux vidéo reçu.");
   const settings=track.getSettings()||{};
-  if(settings.displaySurface&&settings.displaySurface!=="browser")throw new Error("Sélectionne « Cet onglet » et non « Fenêtre » ou « Écran entier ».");
+  const trackSettings=settings;
+  if(settings.displaySurface==="monitor")throw new Error("Sélectionne la fenêtre Avant-gardE, pas « Écran entier ».");
   const shareText=getInspirationShareText();
   try{await navigator.clipboard?.writeText(shareText)}catch(_){}
   shareMessage("Capture réelle en cours : ne change pas d’onglet pendant les 4 secondes d’enregistrement.");
