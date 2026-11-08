@@ -2,8 +2,8 @@
 <html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Avant-gardE — Capture</title>
 <style>
 html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#07152d}
-#capture-root{width:100%;height:100%;overflow:hidden;position:relative}
-#capture-root>.project-modal-face{position:relative!important;inset:auto!important;width:100%!important;height:100%!important;min-height:100%!important;transform:none!important;backface-visibility:visible!important;display:block!important;overflow:hidden!important}
+#capture-root{position:fixed;inset:0;width:100vw;height:100vh;overflow:hidden;background:#07152d}
+#capture-root>.project-modal-face{position:absolute!important;min-height:0!important;backface-visibility:visible!important;display:flex!important;overflow:hidden!important;transform-origin:top left!important}
 </style></head><body><main id="capture-root"></main>
 <script>
 (function(){
@@ -22,11 +22,22 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
    root.innerHTML=d.html;
    const card=root.firstElementChild;
    if(!card)throw new Error("Le recto transmis est vide.");
-   card.style.setProperty("position","relative","important");
+   /* Les dimensions demandées à window.open sont des dimensions extérieures.
+      On adapte donc la carte au viewport réellement disponible, sans l’étirer. */
+   const viewportW=window.innerWidth,viewportH=window.innerHeight;
+   const cardW=Number(d.width),cardH=Number(d.height);
+   if(!viewportW||!viewportH||!cardW||!cardH)throw new Error("Dimensions réelles de la fenêtre invalides.");
+   const scale=Math.min(viewportW/cardW,viewportH/cardH);
+   const renderedW=cardW*scale,renderedH=cardH*scale;
+   card.style.setProperty("position","absolute","important");
+   card.style.setProperty("left",((viewportW-renderedW)/2)+"px","important");
+   card.style.setProperty("top",((viewportH-renderedH)/2)+"px","important");
    card.style.setProperty("inset","auto","important");
-   card.style.setProperty("width","100%","important");
-   card.style.setProperty("height","100%","important");
-   card.style.setProperty("transform","none","important");
+   card.style.setProperty("width",cardW+"px","important");
+   card.style.setProperty("height",cardH+"px","important");
+   card.style.setProperty("min-height",cardH+"px","important");
+   card.style.setProperty("transform","scale("+scale+")","important");
+   card.style.setProperty("transform-origin","top left","important");
    card.style.setProperty("backface-visibility","visible","important");
    card.style.setProperty("display","flex","important");
    await Promise.all([...root.querySelectorAll("img")].map(img=>img.decode?.().catch(()=>{})||Promise.resolve()));
