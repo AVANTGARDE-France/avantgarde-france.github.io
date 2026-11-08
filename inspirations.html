@@ -527,7 +527,7 @@
 <div class="project-modal-face project-modal-front" id="projectModalFront"></div>
 <div class="project-modal-face project-modal-back">
 <div id="projectVotePanel" class="project-vote-panel"></div>
-<button id="inspirationShareButton" type="button" aria-label="Créer et partager cette carte sur Facebook" title="Créer et partager cette carte"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-8.2h2.8l.42-3.2H13.5V7.55c0-.93.26-1.56 1.6-1.56h1.72V3.13c-.3-.04-1.35-.13-2.56-.13-2.54 0-4.28 1.55-4.28 4.4v2.2H7.1v3.2h2.88V21h3.52z"/></svg><span>Partager</span></button>
+<button id="inspirationShareButton" type="button" aria-label="Créer une vidéo de cette carte pour Facebook" title="Créer une vidéo de cette carte"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-8.2h2.8l.42-3.2H13.5V7.55c0-.93.26-1.56 1.6-1.56h1.72V3.13c-.3-.04-1.35-.13-2.56-.13-2.54 0-4.28 1.55-4.28 4.4v2.2H7.1v3.2h2.88V21h3.52z"/></svg><span>Partager</span></button>
 <div id="inspirationShareStatus" role="status" aria-live="polite"></div>
 <h2 id="projectModalTitle"></h2>
 <div id="projectModalContent" class="project-modal-content"></div>
@@ -570,13 +570,11 @@ grid.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.
 votePanel?.addEventListener("click",async e=>{const b=e.target.closest("[data-vote]");if(!b)return;const msg=votePanel.querySelector(".project-vote-message");if(!currentUser){if(msg)msg.textContent="Vote impossible — vous devez être connecté.";return}const value=Number(b.dataset.vote),id=modalContent.dataset.itemId;if(!id)return;const currentValue=myVotes.get(String(id)),removing=currentValue===value;b.disabled=true;if(msg)msg.textContent=removing?"Retrait de votre évaluation…":"Enregistrement de votre note…";const result=removing?await supabase.from("inspiration_votes").delete().eq("user_id",currentUser.id).eq("contenu_id",id):await supabase.from("inspiration_votes").upsert({user_id:currentUser.id,contenu_id:id,vote:value,updated_at:new Date().toISOString()},{onConflict:"user_id,contenu_id"});b.disabled=false;if(result.error){console.error("Erreur vote inspiration",result.error);if(msg)msg.textContent="Impossible de modifier votre note. Réessayez.";return}if(removing)myVotes.delete(String(id));else myVotes.set(String(id),value);await loadVoteData();render();const updated=items.find(x=>String(x.id)===String(id));if(updated){votePanel.innerHTML=voteControls(updated);const fresh=grid.querySelector('[data-id="'+CSS.escape(String(id))+'"]');if(fresh)document.getElementById("projectModalFront").innerHTML=fresh.innerHTML}});
 
 
-/* GIF temporaire en mémoire navigateur : aucun envoi ni stockage serveur. */
+/* Vidéo temporaire en mémoire navigateur : aucun envoi ni stockage serveur. */
 const shareButton=document.getElementById("inspirationShareButton");
 const shareStatus=document.getElementById("inspirationShareStatus");
-let shareBusy=false,pendingShareFile=null,pendingShareText="",pendingShareTitle="",shareCaptureWindow=null;
+let shareBusy=false;
 function shareMessage(message){if(!shareStatus)return;shareStatus.textContent=message;shareStatus.classList.add("visible")}
-function clearPendingShare(){pendingShareFile=null;pendingShareText="";pendingShareTitle="";if(shareButton)shareButton.querySelector("span").textContent="Partager"}
-function loadScriptOnce(src,test){if(test())return Promise.resolve();return new Promise((resolve,reject)=>{const existing=[...document.scripts].find(s=>s.src===src);if(existing){existing.addEventListener("load",resolve,{once:true});existing.addEventListener("error",reject,{once:true});return}const s=document.createElement("script");s.src=src;s.async=true;s.onload=resolve;s.onerror=()=>reject(new Error("Impossible de charger le moteur GIF."));document.head.appendChild(s)})}
 function getInspirationShareText(){
  const clone=modalContent.cloneNode(true);
  clone.querySelectorAll("script,style,button,svg").forEach(el=>el.remove());
@@ -588,138 +586,216 @@ function getInspirationShareText(){
  const body=(clone.innerText||clone.textContent||"").split("\n").filter(line=>!line.trim().startsWith("http")).join("\n").trim();
  return [modalTitle.textContent.trim(),body].filter(Boolean).join("\n\n");
 }
+function loadScriptOnce(src,test){
+ if(test())return Promise.resolve();
+ return new Promise((resolve,reject)=>{
+  const existing=[...document.scripts].find(s=>s.src===src);
+  if(existing){
+   if(existing.dataset.loaded==="true"){resolve();return}
+   existing.addEventListener("load",resolve,{once:true});
+   existing.addEventListener("error",()=>reject(new Error("Impossible de charger le moteur vidéo.")),{once:true});
+   return;
+  }
+  const script=document.createElement("script");
+  script.src=src;script.async=true;
+  script.onload=()=>{script.dataset.loaded="true";resolve()};
+  script.onerror=()=>reject(new Error("Impossible de charger le moteur vidéo."));
+  document.head.appendChild(script);
+ });
+}
 function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
-async function createInspirationGif(){
+async function waitForImage(img){
+ if(img.complete&&img.naturalWidth>0){try{await img.decode()}catch(_){}return}
+ await new Promise(resolve=>{
+  const done=()=>resolve();
+  img.addEventListener("load",done,{once:true});
+  img.addEventListener("error",done,{once:true});
+  setTimeout(done,8000);
+ });
+}
+function createVideoStage(source){
+ const stage=document.createElement("div");
+ stage.id="projectModalCard";
+ stage.className="project-modal-card";
+ stage.setAttribute("aria-hidden","true");
+ Object.assign(stage.style,{
+  position:"fixed",left:"0",top:"0",width:"540px",height:"675px",
+  zIndex:"9999",pointerEvents:"none",overflow:"hidden",
+  transform:"none",margin:"0"
+ });
+ const clone=source.cloneNode(true);
+ clone.removeAttribute("id");
+ clone.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
+ Object.assign(clone.style,{
+  position:"absolute",inset:"0",left:"0",top:"0",width:"540px",height:"675px",
+  minWidth:"540px",minHeight:"675px",maxWidth:"none",maxHeight:"none",
+  transform:"none",transformOrigin:"top left",
+  backfaceVisibility:"visible",webkitBackfaceVisibility:"visible",
+  display:"flex",visibility:"visible",opacity:"1",margin:"0"
+ });
+ clone.querySelectorAll("img").forEach(img=>{
+  img.loading="eager";
+  img.decoding="sync";
+  img.crossOrigin="anonymous";
+ });
+ stage.appendChild(clone);
+ document.body.appendChild(stage);
+ return {stage,clone};
+}
+async function captureVideoFrame(clone,canvas,ctx,html2canvas){
+ const snapshot=await html2canvas(clone,{
+  backgroundColor:"#0d2344",scale:2,width:540,height:675,
+  windowWidth:Math.max(document.documentElement.clientWidth,540),
+  windowHeight:Math.max(document.documentElement.clientHeight,675),
+  useCORS:true,allowTaint:false,logging:false,
+  imageTimeout:8000,removeContainer:true
+ });
+ ctx.clearRect(0,0,canvas.width,canvas.height);
+ ctx.drawImage(snapshot,0,0,canvas.width,canvas.height);
+}
+async function createMp4Video(clone,canvas,ctx,html2canvas,onProgress){
+ if(!("VideoEncoder" in window)||!("VideoFrame" in window))throw new Error("Encodage MP4 non pris en charge par ce navigateur.");
+ const muxLib=await import("https://esm.sh/mp4-muxer@5.2.2");
+ const target=new muxLib.ArrayBufferTarget();
+ const fps=10,width=1080,height=1350,totalFrames=35;
+ const muxer=new muxLib.Muxer({
+  target,
+  video:{codec:"avc",width,height,frameRate:fps},
+  fastStart:"in-memory",
+  firstTimestampBehavior:"offset"
+ });
+ let encoderError=null;
+ const encoder=new VideoEncoder({
+  output:(chunk,meta)=>muxer.addVideoChunk(chunk,meta),
+  error:error=>{encoderError=error}
+ });
+ const config={codec:"avc1.420028",width,height,bitrate:5000000,framerate:fps,latencyMode:"quality"};
+ const support=await VideoEncoder.isConfigSupported(config);
+ if(!support.supported){encoder.close();throw new Error("Le navigateur ne propose pas d’encodeur MP4 H.264 compatible.")}
+ encoder.configure(support.config||config);
+ try{
+  for(let i=0;i<totalFrames;i++){
+   await captureVideoFrame(clone,canvas,ctx,html2canvas);
+   if(encoderError)throw encoderError;
+   const frame=new VideoFrame(canvas,{timestamp:i*100000,duration:100000});
+   encoder.encode(frame,{keyFrame:i===0});
+   frame.close();
+   onProgress(Math.round((i+1)/totalFrames*90));
+   await wait(65);
+  }
+  await encoder.flush();
+  if(encoderError)throw encoderError;
+  encoder.close();
+  muxer.finalize();
+  const buffer=target.buffer;
+  if(!buffer||buffer.byteLength<10000)throw new Error("Le fichier MP4 généré est vide ou incomplet.");
+  return new Blob([buffer],{type:"video/mp4"});
+ }catch(error){
+  try{encoder.close()}catch(_){}
+  throw error;
+ }
+}
+async function createRecorderVideo(clone,canvas,ctx,html2canvas,onProgress){
+ if(!canvas.captureStream||!("MediaRecorder" in window))throw new Error("L’enregistrement vidéo n’est pas disponible dans ce navigateur.");
+ const fps=10,totalFrames=35;
+ const stream=canvas.captureStream(fps);
+ const mimeType=["video/mp4;codecs=h264","video/mp4","video/webm;codecs=vp9","video/webm"].find(type=>MediaRecorder.isTypeSupported(type))||"";
+ const recorder=new MediaRecorder(stream,mimeType?{mimeType,videoBitsPerSecond:5000000}:{videoBitsPerSecond:5000000});
+ const chunks=[];
+ const stopped=new Promise((resolve,reject)=>{
+  recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
+  recorder.onerror=()=>reject(new Error("L’enregistrement vidéo a échoué."));
+  recorder.onstop=resolve;
+ });
+ recorder.start(250);
+ try{
+  for(let i=0;i<totalFrames;i++){
+   await captureVideoFrame(clone,canvas,ctx,html2canvas);
+   onProgress(Math.round((i+1)/totalFrames*90));
+   await wait(65);
+  }
+  await wait(300);
+  recorder.stop();
+  await stopped;
+  const type=recorder.mimeType||mimeType||"video/webm";
+  const blob=new Blob(chunks,{type});
+  if(blob.size<10000)throw new Error("Le fichier vidéo généré est vide ou incomplet.");
+  return blob;
+ }finally{
+  stream.getTracks().forEach(track=>track.stop());
+  if(recorder.state!=="inactive")recorder.stop();
+ }
+}
+async function createInspirationVideo(onProgress){
  const source=document.getElementById("projectModalFront");
  if(!source)throw new Error("Recto introuvable.");
  const rect=source.getBoundingClientRect();
  if(!rect.width||!rect.height)throw new Error("Le recto n’est pas visible.");
- if(!navigator.mediaDevices?.getDisplayMedia)throw new Error("La capture GIF automatique n’est pas disponible sur iPhone/iOS. Utilise le partage depuis un ordinateur ; sur iPhone, le navigateur ne permet pas de capturer automatiquement cette fenêtre indépendante.");
- /* Ouvrir la fenêtre dédiée immédiatement depuis le clic utilisateur. */
- const captureWindow=window.open("inspiration-capture.html","avantgarde-card-capture","popup=yes,width="+Math.ceil(rect.width+100)+",height="+Math.ceil(rect.height+160)+",resizable=yes,scrollbars=no");
- if(!captureWindow)throw new Error("La fenêtre de capture a été bloquée. Autorise les fenêtres pop-up pour ce site.");
- shareCaptureWindow=captureWindow;
- shareMessage("Dans la fenêtre de partage, choisis « Onglet Chrome » puis « Avant-gardE — Capture ». Ne choisis pas « Fenêtre » : cela inclut la barre du navigateur.");
- /* Appel immédiat depuis le clic utilisateur : getDisplayMedia exige une activation récente. */
- const streamPromise=navigator.mediaDevices.getDisplayMedia({video:{displaySurface:"browser",frameRate:{ideal:15,max:30}},audio:false});
- const styles=[...document.querySelectorAll("style")].map(x=>x.textContent);
- const links=[...document.querySelectorAll('link[rel="stylesheet"]')].map(x=>x.href);
- const payload={type:"AVANTGARDE_CAPTURE_CARD",html:source.outerHTML,styles,links,width:Math.round(rect.width),height:Math.round(rect.height)};
- const ready=await new Promise((resolve,reject)=>{
-  const timeout=setTimeout(()=>reject(new Error("La fenêtre de capture ne répond pas. Vérifie qu’elle n’est pas bloquée.")),10000);
-  const listener=e=>{if(e.source!==captureWindow||e.data?.type!=="AVANTGARDE_CAPTURE_READY")return;clearTimeout(timeout);window.removeEventListener("message",listener);resolve()};
-  window.addEventListener("message",listener);
- });
- captureWindow.postMessage(payload,location.origin);
- await new Promise((resolve,reject)=>{
-  const timeout=setTimeout(()=>reject(new Error("Le recto n’a pas fini de se charger dans la fenêtre indépendante.")),15000);
-  const listener=e=>{if(e.source!==captureWindow||e.data?.type!=="AVANTGARDE_CAPTURE_RENDERED")return;clearTimeout(timeout);window.removeEventListener("message",listener);e.data.error?reject(new Error(e.data.error)):resolve()};
-  window.addEventListener("message",listener);
- });
- shareMessage("Autorise la capture de la fenêtre « Avant-gardE — Capture ».");
- let stream=null,workerUrl=null;
+ await loadScriptOnce("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js",()=>!!window.html2canvas);
+ const {stage,clone}=createVideoStage(source);
  try{
-  if(!navigator.mediaDevices?.getDisplayMedia)throw new Error("La capture automatique n’est pas prise en charge sur cet iPhone. iOS ne permet pas à cette page d’enregistrer directement une autre fenêtre. Utilise l’enregistrement d’écran iOS, ou partage depuis un ordinateur.");
-  stream=await streamPromise;
-  const track=stream.getVideoTracks()[0],settings=track?.getSettings()||{};
-  if(!track)throw new Error("Flux de capture indisponible.");
-  if(settings.displaySurface&&settings.displaySurface!=="browser")throw new Error("La capture reçue inclut l’interface du navigateur. Recommence et sélectionne « Onglet Chrome » puis « Avant-gardE — Capture », pas « Fenêtre » ni « Écran entier ».");
-  const video=document.createElement("video");video.muted=true;video.playsInline=true;video.srcObject=stream;
-  await new Promise((resolve,reject)=>{video.onloadedmetadata=resolve;video.onerror=()=>reject(new Error("Lecture du flux impossible."))});
-  await video.play();
-  /* Le flux capture tout le viewport de l’onglet. On découpe exactement le recto,
-     en tenant compte du ratio entre pixels vidéo et pixels CSS du viewport. */
-  const captureDoc=captureWindow.document;
-  const captureRoot=captureDoc.getElementById("capture-root");
-  const captureCard=captureRoot?.firstElementChild;
-  if(!captureCard)throw new Error("Carte de capture introuvable.");
-  /* On découpe le rectangle réellement affiché de la carte, pas celui du
-     viewport ni les dimensions théoriques de la popup. */
-  const captureRect=captureCard.getBoundingClientRect();
-  const viewportWidth=captureWindow.innerWidth,viewportHeight=captureWindow.innerHeight;
-  if(!viewportWidth||!viewportHeight||!captureRect.width||!captureRect.height)throw new Error("Dimensions réelles de la carte invalides.");
-  const scaleX=video.videoWidth/viewportWidth,scaleY=video.videoHeight/viewportHeight;
-  const sx=Math.max(0,Math.round(captureRect.left*scaleX)),sy=Math.max(0,Math.round(captureRect.top*scaleY));
-  const sw=Math.min(video.videoWidth-sx,Math.round(captureRect.width*scaleX));
-  const sh=Math.min(video.videoHeight-sy,Math.round(captureRect.height*scaleY));
-  if(sw<=0||sh<=0)throw new Error("La carte dépasse la zone réellement capturée.");
-  const width=800,height=Math.max(1,Math.round(width*sh/sw));
-  await loadScriptOnce("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js",()=>!!window.GIF);
-  const worker=await fetch("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js");
-  if(!worker.ok)throw new Error("Moteur GIF indisponible.");
-  workerUrl=URL.createObjectURL(await worker.blob());
-  /* Une palette commune évite les changements de teinte d’une image à l’autre.
-     Pas de tramage : il altérait notamment les aplats bleu marine. */
-  const encoder=new window.GIF({workers:2,quality:1,width,height,workerScript:workerUrl,repeat:0,background:"#07152d",dither:false,globalPalette:true});
-  const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;const ctx=canvas.getContext("2d",{alpha:false,colorSpace:"srgb"});
-  const total=30,delay=100;
-  for(let i=0;i<total;i++){
-   if(track.readyState!=="live")throw new Error("La capture a été interrompue.");
-   ctx.clearRect(0,0,width,height);
-   ctx.drawImage(video,sx,sy,sw,sh,0,0,width,height);
-   encoder.addFrame(canvas,{copy:true,delay});
-   if(i%3===0)shareMessage("Enregistrement du recto original : "+Math.round((i+1)/total*100)+" %");
-   await wait(delay);
+  const images=[...clone.querySelectorAll("img")];
+  await Promise.all(images.map(waitForImage));
+  if(document.fonts?.ready)await document.fonts.ready;
+  await wait(350); // Laisse notamment les images GIF animées démarrer dans le clone.
+  const canvas=document.createElement("canvas");
+  canvas.width=1080;canvas.height=1350;
+  const ctx=canvas.getContext("2d",{alpha:false,colorSpace:"srgb"});
+  if(!ctx)throw new Error("Impossible de créer le support vidéo.");
+  try{
+   return await createMp4Video(clone,canvas,ctx,window.html2canvas,onProgress);
+  }catch(mp4Error){
+   console.warn("Encodage MP4 indisponible, essai du format vidéo natif.",mp4Error);
+   shareMessage("MP4 non disponible sur ce navigateur : préparation d’une vidéo dans son format natif…");
+   return await createRecorderVideo(clone,canvas,ctx,window.html2canvas,onProgress);
   }
-  const blob=await new Promise((resolve,reject)=>{encoder.on("finished",resolve);encoder.on("abort",()=>reject(new Error("Assemblage GIF interrompu.")));encoder.on("error",reject);encoder.render()});
-  if(!new TextDecoder().decode(await blob.slice(0,6).arrayBuffer()).startsWith("GIF8")||blob.size<1000)throw new Error("GIF final invalide.");
-  return blob;
  }finally{
-  if(stream)stream.getTracks().forEach(t=>t.stop());
-  if(workerUrl)URL.revokeObjectURL(workerUrl);
-  /* La fenêtre dédiée ne sert qu’à la capture : Facebook aura sa propre fenêtre normale. */
-  if(shareCaptureWindow&&!shareCaptureWindow.closed)shareCaptureWindow.close();
-  shareCaptureWindow=null;
+  stage.remove();
  }
+}
+function downloadVideo(blob,item){
+ const safeName=(String(item.titre||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");
+ const isMp4=blob.type.toLowerCase().includes("mp4");
+ const extension=isMp4?"mp4":"webm";
+ const url=URL.createObjectURL(blob);
+ const link=document.createElement("a");
+ link.href=url;link.download=safeName+"."+extension;
+ document.body.appendChild(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),120000);
+ return extension;
 }
 shareButton?.addEventListener("click",async()=>{
  if(shareBusy)return;
- if(pendingShareFile){
-  const facebookTab=window.open("https://www.facebook.com/post/create","_blank");
-  /* Pas de menu de partage Windows : téléchargement explicite + ouverture Facebook.
-     L'utilisateur joint ensuite le GIF téléchargé à sa publication. */
-  const file=pendingShareFile;
-  const url=URL.createObjectURL(file);
-  const a=document.createElement("a");a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();
-  try{await navigator.clipboard.writeText(pendingShareText)}catch(_){}
-  if(facebookTab)facebookTab.opener=null;
-  clearPendingShare();
-  shareMessage("GIF téléchargé et texte du verso copié. Facebook est ouvert dans un nouvel onglet : joins-y le GIF à ta publication.");
-  setTimeout(()=>URL.revokeObjectURL(url),60000);
-  return;
- }
  const item=items.find(x=>String(x.id)===String(modalContent.dataset.itemId));
  if(!item)return;
- pendingShareTitle=modalTitle.textContent||"Inspiration Avant-gardE";
- pendingShareText=getInspirationShareText();
- if(navigator.clipboard?.writeText)navigator.clipboard.writeText(pendingShareText).catch(()=>{});
- shareBusy=true;shareButton.disabled=true;shareButton.querySelector("span").textContent="Création…";
- let facebookWindow=null;
+ shareBusy=true;shareButton.disabled=true;
+ const label=shareButton.querySelector("span");
+ if(label)label.textContent="Création…";
+ const facebookWindow=window.open("about:blank","_blank");
+ const shareText=getInspirationShareText();
+ try{await navigator.clipboard?.writeText(shareText)}catch(_){}
  try{
-  /* Démarrer d’abord la capture depuis l’activation du clic : getDisplayMedia
-     doit être appelé immédiatement. Facebook est préouvert dans une fenêtre séparée. */
-  const capturePromise=createInspirationGif();
-  facebookWindow=window.open("about:blank","_blank");
-  const blob=await capturePromise;
-  const safeName=(String(item.titre||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");
-  pendingShareFile=new File([blob],safeName+".gif",{type:"image/gif"});
-  pendingShareTitle=modalTitle.textContent||"Inspiration Avant-gardE";
-  pendingShareText=getInspirationShareText();
-  try{await navigator.clipboard.writeText(pendingShareText)}catch(_){}
-  const fileUrl=URL.createObjectURL(pendingShareFile);
-  const download=document.createElement("a");download.href=fileUrl;download.download=pendingShareFile.name;document.body.appendChild(download);download.click();download.remove();
-  if(facebookWindow&&!facebookWindow.closed){facebookWindow.location.href="https://www.facebook.com/post/create";facebookWindow.opener=null}
-  clearPendingShare();
-  shareMessage((facebookWindow?"GIF téléchargé, texte du verso copié et Facebook ouvert.":"GIF téléchargé et texte du verso copié. Autorise les fenêtres pop-up pour ouvrir Facebook.")+" Ajoute le GIF à ta publication.");
-  setTimeout(()=>URL.revokeObjectURL(fileUrl),60000);
+  shareMessage("Création de la vidéo verticale 4:5…");
+  const blob=await createInspirationVideo(progress=>{
+   shareMessage("Création de la vidéo : "+progress+" %");
+  });
+  const extension=downloadVideo(blob,item);
+  try{await navigator.clipboard?.writeText(shareText)}catch(_){}
+  if(facebookWindow&&!facebookWindow.closed){
+   facebookWindow.location.href="https://www.facebook.com/post/create";
+   try{facebookWindow.opener=null}catch(_){}
+  }
+  shareMessage("Vidéo "+extension.toUpperCase()+" téléchargée, texte du verso copié"+
+   (facebookWindow?" et Facebook ouvert dans un nouvel onglet.":"." )+
+   " Ajoute le fichier vidéo à ta publication.");
  }catch(error){
-  console.error("Création GIF inspiration",error);
-  const detail=error?.message||String(error)||"Erreur inconnue";
+  console.error("Création vidéo inspiration",error);
   if(facebookWindow&&!facebookWindow.closed)facebookWindow.close();
-  shareMessage("Échec de création du GIF : "+detail);
-  clearPendingShare();
+  shareMessage("Échec de création de la vidéo : "+(error?.message||String(error)));
+ }finally{
+  shareBusy=false;shareButton.disabled=false;
+  if(label)label.textContent="Partager";
  }
- finally{shareBusy=false;shareButton.disabled=false}
 });
 
 document.getElementById("projectModalClose")?.addEventListener("click",closeInspirationModal);
