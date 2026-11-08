@@ -573,7 +573,7 @@ votePanel?.addEventListener("click",async e=>{const b=e.target.closest("[data-vo
 /* GIF temporaire en mémoire navigateur : aucun envoi ni stockage serveur. */
 const shareButton=document.getElementById("inspirationShareButton");
 const shareStatus=document.getElementById("inspirationShareStatus");
-let shareBusy=false,pendingShareFile=null,pendingShareText="",pendingShareTitle="";
+let shareBusy=false,pendingShareFile=null,pendingShareText="",pendingShareTitle="",shareCaptureWindow=null;
 function shareMessage(message){if(!shareStatus)return;shareStatus.textContent=message;shareStatus.classList.add("visible")}
 function clearPendingShare(){pendingShareFile=null;pendingShareText="";pendingShareTitle="";if(shareButton)shareButton.querySelector("span").textContent="Partager"}
 function loadScriptOnce(src,test){if(test())return Promise.resolve();return new Promise((resolve,reject)=>{const existing=[...document.scripts].find(s=>s.src===src);if(existing){existing.addEventListener("load",resolve,{once:true});existing.addEventListener("error",reject,{once:true});return}const s=document.createElement("script");s.src=src;s.async=true;s.onload=resolve;s.onerror=()=>reject(new Error("Impossible de charger le moteur GIF."));document.head.appendChild(s)})}
@@ -598,6 +598,7 @@ async function createInspirationGif(){
  /* Ouvrir la fenêtre dédiée immédiatement depuis le clic utilisateur. */
  const captureWindow=window.open("inspiration-capture.html","avantgarde-card-capture","popup=yes,width="+Math.ceil(rect.width+100)+",height="+Math.ceil(rect.height+160)+",resizable=yes,scrollbars=no");
  if(!captureWindow)throw new Error("La fenêtre de capture a été bloquée. Autorise les fenêtres pop-up pour ce site.");
+ shareCaptureWindow=captureWindow;
  shareMessage("Dans la fenêtre de partage, choisis « Onglet Chrome » puis « Avant-gardE — Capture ». Ne choisis pas « Fenêtre » : cela inclut la barre du navigateur.");
  /* Appel immédiat depuis le clic utilisateur : getDisplayMedia exige une activation récente. */
  const streamPromise=navigator.mediaDevices.getDisplayMedia({video:{displaySurface:"browser",frameRate:{ideal:15,max:30}},audio:false});
@@ -653,7 +654,7 @@ async function createInspirationGif(){
  }finally{
   if(stream)stream.getTracks().forEach(t=>t.stop());
   if(workerUrl)URL.revokeObjectURL(workerUrl);
-  captureWindow.close();
+  /* Garder cette fenêtre : elle sera réutilisée pour ouvrir Facebook, sans seconde popup. */
  }
 }
 shareButton?.addEventListener("click",async()=>{
@@ -680,7 +681,6 @@ shareButton?.addEventListener("click",async()=>{
  shareBusy=true;shareButton.disabled=true;shareButton.querySelector("span").textContent="Création…";
  try{
   /* Préouvrir Facebook pendant le clic initial évite le blocage des pop-ups après capture. */
-  const facebookTab=window.open("about:blank","avantgarde-facebook-post");
   const blob=await createInspirationGif();
   const safeName=(String(item.titre||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");
   pendingShareFile=new File([blob],safeName+".gif",{type:"image/gif"});
@@ -689,7 +689,8 @@ shareButton?.addEventListener("click",async()=>{
   try{await navigator.clipboard.writeText(pendingShareText)}catch(_){}
   const fileUrl=URL.createObjectURL(pendingShareFile);
   const download=document.createElement("a");download.href=fileUrl;download.download=pendingShareFile.name;document.body.appendChild(download);download.click();download.remove();
-  if(facebookTab){facebookTab.location.href="https://www.facebook.com/post/create";facebookTab.opener=null}
+  if(shareCaptureWindow&&!shareCaptureWindow.closed){shareCaptureWindow.location.href="https://www.facebook.com/post/create";shareCaptureWindow.opener=null}
+  shareCaptureWindow=null;
   clearPendingShare();
   shareMessage("GIF téléchargé, texte du verso copié et Facebook ouvert. Ajoute le GIF à ta publication.");
   setTimeout(()=>URL.revokeObjectURL(fileUrl),60000);
