@@ -618,7 +618,8 @@ async function recordCardFromTab(stream,onProgress){
  await nextFrame();await nextFrame();
  const rect=front.getBoundingClientRect();
  const viewportWidth=window.innerWidth,viewportHeight=window.innerHeight;
- const surface=trackSettings?.displaySurface||"browser";
+ const trackSettings=stream.getVideoTracks()[0]?.getSettings?.()||{};
+ const surface=trackSettings.displaySurface||"browser";
  const captureOuter=(surface==="window");
  const sourceWidth=captureOuter?window.outerWidth:viewportWidth;
  const sourceHeight=captureOuter?window.outerHeight:viewportHeight;
@@ -723,7 +724,6 @@ shareButton?.addEventListener("click",async()=>{
   const track=captureStream.getVideoTracks()[0];
   if(!track)throw new Error("Aucun flux vidéo reçu.");
   const settings=track.getSettings()||{};
-  const trackSettings=settings;
   if(settings.displaySurface==="monitor")throw new Error("Sélectionne la fenêtre Avant-gardE, pas « Écran entier ».");
   const shareText=getInspirationShareText();
   try{await navigator.clipboard?.writeText(shareText)}catch(_){}
