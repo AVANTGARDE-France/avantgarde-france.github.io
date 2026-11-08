@@ -477,6 +477,10 @@
 /* Partage animé — bouton Facebook sur le verso du popup */
 #projectModalCard .project-modal-back{position:relative!important}
 #inspirationShareButton{position:absolute;left:15px;bottom:12px;z-index:6;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:38px;height:36px;padding:0 12px;border:1px solid #6ea7ff;border-radius:999px;background:#1877f2;color:#fff;box-shadow:0 3px 12px #0006;cursor:pointer;font:700 11px Arial,sans-serif;transition:transform .18s,filter .18s,opacity .18s}
+#inspirationWebmotionTestButton{position:absolute;left:165px;bottom:12px;z-index:6;height:36px;padding:0 12px;border:1px solid #d6ad55;border-radius:999px;background:#d6ad55;color:#07152d;box-shadow:0 3px 12px #0006;cursor:pointer;font:700 10px Arial,sans-serif}
+#inspirationWebmotionTestButton:hover{filter:brightness(1.08);transform:translateY(-2px)}
+#inspirationWebmotionTestButton:disabled{opacity:.7;cursor:wait}
+@media(max-width:620px){#inspirationWebmotionTestButton{left:145px;bottom:9px;height:33px;padding:0 9px;font-size:9px}}
 #inspirationShareButton:hover{transform:translateY(-2px);filter:brightness(1.12)}
 #inspirationShareButton:disabled{opacity:.7;cursor:wait;transform:none}
 #inspirationShareButton svg{width:17px;height:17px;display:block;fill:currentColor}
@@ -528,63 +532,8 @@
 <div class="project-modal-face project-modal-back">
 <div id="projectVotePanel" class="project-vote-panel"></div>
 <button id="inspirationShareButton" type="button" aria-label="Créer une vidéo de cette carte pour Facebook" title="Créer une vidéo de cette carte"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-8.2h2.8l.42-3.2H13.5V7.55c0-.93.26-1.56 1.6-1.56h1.72V3.13c-.3-.04-1.35-.13-2.56-.13-2.54 0-4.28 1.55-4.28 4.4v2.2H7.1v3.2h2.88V21h3.52z"/></svg><span>Partager</span></button>
-<div id="inspirationShareStatus" role="status" aria-live="polite"></div>
-<script type="module">
-if(new URLSearchParams(location.search).has("webmotionTest")){
- const button=document.createElement("button");
- button.type="button";
- button.textContent="TEST WEBMOTION — exporter la carte en MP4";
- button.style.cssText="position:fixed;right:16px;bottom:16px;z-index:999999;padding:14px 18px;background:#d6ad55;color:#07152d;border:2px solid #07152d;border-radius:10px;font-weight:800;box-shadow:0 5px 20px #0008";
- document.body.appendChild(button);
- button.addEventListener("click",async()=>{
-  const source=document.getElementById("projectModalFront");
-  if(!source||!document.getElementById("projectModal")?.classList.contains("open")){
-   alert("Ouvre d’abord une carte Inspiration, puis relance le test.");
-   return;
-  }
-  button.disabled=true;button.textContent="WebMotion : préparation…";
-  let composition;
-  try{
-   await import("https://esm.sh/@superhq/webmotion@0.18.2/elements");
-   composition=document.createElement("w-composition");
-   composition.setAttribute("width","1080");
-   composition.setAttribute("height","1350");
-   composition.setAttribute("fps","30");
-   composition.setAttribute("duration","120");
-   composition.style.cssText="position:fixed;left:-20000px;top:0;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
-   const stage=document.createElement("w-el");
-   stage.setAttribute("x","0");stage.setAttribute("y","0");
-   stage.setAttribute("width","1080");stage.setAttribute("height","1350");
-   stage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden";
-   const wrapper=document.createElement("div");
-   wrapper.id="projectModalCard";
-   wrapper.className="project-modal-card";
-   wrapper.style.cssText="position:relative!important;width:540px!important;height:675px!important;min-width:540px!important;min-height:675px!important;max-width:none!important;max-height:none!important;aspect-ratio:4/5!important;transform:scale(2);transform-origin:top left;margin:0!important;overflow:hidden";
-   const face=source.cloneNode(true);
-   face.removeAttribute("id");
-   face.style.cssText+=";position:absolute!important;inset:0!important;width:540px!important;height:675px!important;transform:none!important;visibility:visible!important;opacity:1!important";
-   face.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
-   face.querySelectorAll("img").forEach(img=>{img.loading="eager";img.decoding="sync"});
-   wrapper.appendChild(face);stage.appendChild(wrapper);composition.appendChild(stage);document.body.appendChild(composition);
-   if(document.fonts?.ready)await document.fonts.ready;
-   await Promise.all([...face.querySelectorAll("img")].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,8000)})));
-   button.textContent="WebMotion : encodage MP4…";
-   const blob=await composition.export();
-   if(!(blob instanceof Blob)||blob.size<10000)throw new Error("WebMotion n’a pas produit de vidéo exploitable.");
-   const url=URL.createObjectURL(blob);
-   const link=document.createElement("a");link.href=url;link.download="avantgarde-webmotion-test.mp4";document.body.appendChild(link);link.click();link.remove();
-   setTimeout(()=>URL.revokeObjectURL(url),120000);
-   button.textContent="TEST TERMINÉ — MP4 téléchargé";
-  }catch(error){
-   console.error("WebMotion test",error);
-   alert("Échec WebMotion : "+(error?.message||error));
-   button.textContent="ÉCHEC — relancer le test";
-  }finally{
-   composition?.remove();button.disabled=false;
-  }
- });
-}
-</script>
+<div id="inspirationShareStatus" role="status" aria-live="polite"></div><button id="inspirationWebmotionTestButton" type="button" title="Tester l’export WebMotion">TEST WEBMOTION — MP4</button>
+
 <h2 id="projectModalTitle"></h2>
 <div id="projectModalContent" class="project-modal-content"></div>
 </div>
@@ -820,6 +769,62 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")closeInspirationModa
 async function loadVoteData(){const statsResult=await supabase.from("inspiration_vote_stats").select("*");if(statsResult.error)throw statsResult.error;voteStats=new Map((statsResult.data||[]).map(x=>[String(x.contenu_id),x]));myVotes=new Map();if(currentUser){const own=await supabase.from("inspiration_votes").select("contenu_id,vote").eq("user_id",currentUser.id);if(own.error)throw own.error;for(const v of own.data||[])myVotes.set(String(v.contenu_id),Number(v.vote))}}
 async function load(){try{const auth=await supabase.auth.getSession().catch(e=>({data:{session:null},error:e}));currentUser=auth?.data?.session?.user||null;const [m,s,c]=await Promise.all([supabase.from("inspiration_menus").select("*").eq("valide",true).order("position"),supabase.from("inspiration_sous_menus").select("*").eq("valide",true).order("position"),supabase.from("inspiration_contenus").select("*").eq("valide",true).order("position")]);for(const r of [m,s,c])if(r.error)throw r.error;menus=m.data||[];subs=s.data||[];items=c.data||[];if(voteFilterWrap)voteFilterWrap.hidden=!currentUser;renderFilters();render();try{await loadVoteData()}catch(voteError){console.warn("Statistiques/notes des inspirations indisponibles : les cartes restent accessibles.",voteError);voteStats=new Map();myVotes=new Map()}render()}catch(e){console.error("Erreur chargement inspirations",e);grid.innerHTML='<div class="project-error">Impossible de charger les inspirations. Réessayez dans quelques instants.</div>'}}
 load();
+</script>
+<script type="module">
+if(new URLSearchParams(location.search).has("webmotionTest")){
+ const button=document.createElement("button");
+ button.type="button";
+ button.textContent="TEST WEBMOTION — exporter la carte en MP4";
+ button.style.cssText="position:fixed;right:16px;bottom:16px;z-index:999999;padding:14px 18px;background:#d6ad55;color:#07152d;border:2px solid #07152d;border-radius:10px;font-weight:800;box-shadow:0 5px 20px #0008";
+ document.body.appendChild(button);
+ button.addEventListener("click",async()=>{
+  const source=document.getElementById("projectModalFront");
+  if(!source||!document.getElementById("projectModal")?.classList.contains("open")){
+   alert("Ouvre d’abord une carte Inspiration, puis relance le test.");
+   return;
+  }
+  button.disabled=true;button.textContent="WebMotion : préparation…";
+  let composition;
+  try{
+   await import("https://esm.sh/@superhq/webmotion@0.18.2/elements");
+   composition=document.createElement("w-composition");
+   composition.setAttribute("width","1080");
+   composition.setAttribute("height","1350");
+   composition.setAttribute("fps","30");
+   composition.setAttribute("duration","120");
+   composition.style.cssText="position:fixed;left:-20000px;top:0;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
+   const stage=document.createElement("w-el");
+   stage.setAttribute("x","0");stage.setAttribute("y","0");
+   stage.setAttribute("width","1080");stage.setAttribute("height","1350");
+   stage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden";
+   const wrapper=document.createElement("div");
+   wrapper.id="projectModalCard";
+   wrapper.className="project-modal-card";
+   wrapper.style.cssText="position:relative!important;width:540px!important;height:675px!important;min-width:540px!important;min-height:675px!important;max-width:none!important;max-height:none!important;aspect-ratio:4/5!important;transform:scale(2);transform-origin:top left;margin:0!important;overflow:hidden";
+   const face=source.cloneNode(true);
+   face.removeAttribute("id");
+   face.style.cssText+=";position:absolute!important;inset:0!important;width:540px!important;height:675px!important;transform:none!important;visibility:visible!important;opacity:1!important";
+   face.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
+   face.querySelectorAll("img").forEach(img=>{img.loading="eager";img.decoding="sync"});
+   wrapper.appendChild(face);stage.appendChild(wrapper);composition.appendChild(stage);document.body.appendChild(composition);
+   if(document.fonts?.ready)await document.fonts.ready;
+   await Promise.all([...face.querySelectorAll("img")].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,8000)})));
+   button.textContent="WebMotion : encodage MP4…";
+   const blob=await composition.export();
+   if(!(blob instanceof Blob)||blob.size<10000)throw new Error("WebMotion n’a pas produit de vidéo exploitable.");
+   const url=URL.createObjectURL(blob);
+   const link=document.createElement("a");link.href=url;link.download="avantgarde-webmotion-test.mp4";document.body.appendChild(link);link.click();link.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),120000);
+   button.textContent="TEST TERMINÉ — MP4 téléchargé";
+  }catch(error){
+   console.error("WebMotion test",error);
+   alert("Échec WebMotion : "+(error?.message||error));
+   button.textContent="ÉCHEC — relancer le test";
+  }finally{
+   composition?.remove();button.disabled=false;
+  }
+ });
+}
 </script>
 </body>
 </html>
