@@ -596,7 +596,7 @@ async function createInspirationGif(){
  if(!rect.width||!rect.height)throw new Error("Le recto n’est pas visible.");
  if(!navigator.mediaDevices?.getDisplayMedia)throw new Error("La capture GIF automatique n’est pas disponible sur iPhone/iOS. Utilise le partage depuis un ordinateur ; sur iPhone, le navigateur ne permet pas de capturer automatiquement cette fenêtre indépendante.");
  /* Ouvrir la fenêtre dédiée immédiatement depuis le clic utilisateur. */
- const captureWindow=window.open("inspiration-capture.html","avantgarde-card-capture","popup=yes,width="+Math.ceil(rect.width)+",height="+Math.ceil(rect.height)+",resizable=no,scrollbars=no");
+ const captureWindow=window.open("inspiration-capture.html","avantgarde-card-capture","popup=yes,width="+Math.ceil(rect.width+100)+",height="+Math.ceil(rect.height+160)+",resizable=yes,scrollbars=no");
  if(!captureWindow)throw new Error("La fenêtre de capture a été bloquée. Autorise les fenêtres pop-up pour ce site.");
  shareMessage("Dans la fenêtre de partage, choisis « Onglet Chrome » puis « Avant-gardE — Capture ». Ne choisis pas « Fenêtre » : cela inclut la barre du navigateur.");
  /* Appel immédiat depuis le clic utilisateur : getDisplayMedia exige une activation récente. */
@@ -626,12 +626,12 @@ async function createInspirationGif(){
   const video=document.createElement("video");video.muted=true;video.playsInline=true;video.srcObject=stream;
   await new Promise((resolve,reject)=>{video.onloadedmetadata=resolve;video.onerror=()=>reject(new Error("Lecture du flux impossible."))});
   await video.play();
-  const width=640,height=Math.max(1,Math.round(width*rect.height/rect.width));
+  const width=800,height=Math.max(1,Math.round(width*rect.height/rect.width));
   await loadScriptOnce("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js",()=>!!window.GIF);
   const worker=await fetch("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js");
   if(!worker.ok)throw new Error("Moteur GIF indisponible.");
   workerUrl=URL.createObjectURL(await worker.blob());
-  const encoder=new window.GIF({workers:2,quality:8,width,height,workerScript:workerUrl,repeat:0,background:"#07152d"});
+  const encoder=new window.GIF({workers:2,quality:2,width,height,workerScript:workerUrl,repeat:0,background:"#07152d",dither:"FloydSteinberg-serpentine"});
   const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;const ctx=canvas.getContext("2d",{alpha:false});
   const total=30,delay=100;
   for(let i=0;i<total;i++){
@@ -679,13 +679,20 @@ shareButton?.addEventListener("click",async()=>{
  if(navigator.clipboard?.writeText)navigator.clipboard.writeText(pendingShareText).catch(()=>{});
  shareBusy=true;shareButton.disabled=true;shareButton.querySelector("span").textContent="Création…";
  try{
+  /* Préouvrir Facebook pendant le clic initial évite le blocage des pop-ups après capture. */
+  const facebookTab=window.open("about:blank","avantgarde-facebook-post");
   const blob=await createInspirationGif();
   const safeName=(String(item.titre||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");
   pendingShareFile=new File([blob],safeName+".gif",{type:"image/gif"});
   pendingShareTitle=modalTitle.textContent||"Inspiration Avant-gardE";
-  pendingShareText=(modalTitle.textContent+"\n\n"+modalContent.innerText).trim();
-  shareButton.querySelector("span").textContent="Partager le GIF";
-  shareMessage("GIF prêt. Cliquez une deuxième fois sur Partager pour télécharger le GIF et ouvrir Facebook. Astuce : Le texte de la carte sera automatiquement copié si vous souhaitez l’utiliser pour votre post.");
+  pendingShareText=getInspirationShareText();
+  try{await navigator.clipboard.writeText(pendingShareText)}catch(_){}
+  const fileUrl=URL.createObjectURL(pendingShareFile);
+  const download=document.createElement("a");download.href=fileUrl;download.download=pendingShareFile.name;document.body.appendChild(download);download.click();download.remove();
+  if(facebookTab){facebookTab.location.href="https://www.facebook.com/post/create";facebookTab.opener=null}
+  clearPendingShare();
+  shareMessage("GIF téléchargé, texte du verso copié et Facebook ouvert. Ajoute le GIF à ta publication.");
+  setTimeout(()=>URL.revokeObjectURL(fileUrl),60000);
  }catch(error){
   console.error("Création GIF inspiration",error);
   const detail=error?.message||String(error)||"Erreur inconnue";
