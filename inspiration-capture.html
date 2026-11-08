@@ -30,9 +30,11 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
    const scale=Math.min(viewportW/cardW,viewportH/cardH);
    const renderedW=cardW*scale,renderedH=cardH*scale;
    card.style.setProperty("position","absolute","important");
+   /* Réinitialiser inset AVANT left/top : le shorthand inset:auto écraserait
+      sinon les coordonnées de centrage et pousserait la carte hors cadre. */
+   card.style.setProperty("inset","auto","important");
    card.style.setProperty("left",((viewportW-renderedW)/2)+"px","important");
    card.style.setProperty("top",((viewportH-renderedH)/2)+"px","important");
-   card.style.setProperty("inset","auto","important");
    card.style.setProperty("width",cardW+"px","important");
    card.style.setProperty("height",cardH+"px","important");
    card.style.setProperty("min-height",cardH+"px","important");
