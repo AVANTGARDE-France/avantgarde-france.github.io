@@ -598,9 +598,9 @@ async function createInspirationGif(){
  /* Ouvrir la fenêtre dédiée immédiatement depuis le clic utilisateur. */
  const captureWindow=window.open("inspiration-capture.html","avantgarde-card-capture","popup=yes,width="+Math.ceil(rect.width)+",height="+Math.ceil(rect.height)+",resizable=no,scrollbars=no");
  if(!captureWindow)throw new Error("La fenêtre de capture a été bloquée. Autorise les fenêtres pop-up pour ce site.");
- shareMessage("Une fenêtre indépendante s’ouvre. Sélectionne-la dans la demande de capture.");
+ shareMessage("Dans la fenêtre de partage, choisis « Onglet Chrome » puis « Avant-gardE — Capture ». Ne choisis pas « Fenêtre » : cela inclut la barre du navigateur.");
  /* Appel immédiat depuis le clic utilisateur : getDisplayMedia exige une activation récente. */
- const streamPromise=navigator.mediaDevices.getDisplayMedia({video:{displaySurface:"window",frameRate:{ideal:15,max:30}},audio:false});
+ const streamPromise=navigator.mediaDevices.getDisplayMedia({video:{displaySurface:"browser",frameRate:{ideal:15,max:30}},audio:false});
  const styles=[...document.querySelectorAll("style")].map(x=>x.textContent);
  const links=[...document.querySelectorAll('link[rel="stylesheet"]')].map(x=>x.href);
  const payload={type:"AVANTGARDE_CAPTURE_CARD",html:source.outerHTML,styles,links,width:Math.round(rect.width),height:Math.round(rect.height)};
@@ -622,7 +622,7 @@ async function createInspirationGif(){
   stream=await streamPromise;
   const track=stream.getVideoTracks()[0],settings=track?.getSettings()||{};
   if(!track)throw new Error("Flux de capture indisponible.");
-  if(settings.displaySurface&&settings.displaySurface!=="browser"&&settings.displaySurface!=="window")throw new Error("Sélectionne uniquement la fenêtre ou l’onglet « Avant-gardE — Capture », pas l’écran entier.");
+  if(settings.displaySurface&&settings.displaySurface!=="browser")throw new Error("La capture reçue inclut l’interface du navigateur. Recommence et sélectionne « Onglet Chrome » puis « Avant-gardE — Capture », pas « Fenêtre » ni « Écran entier ».");
   const video=document.createElement("video");video.muted=true;video.playsInline=true;video.srcObject=stream;
   await new Promise((resolve,reject)=>{video.onloadedmetadata=resolve;video.onerror=()=>reject(new Error("Lecture du flux impossible."))});
   await video.play();
