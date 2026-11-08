@@ -804,6 +804,15 @@ load();
    face.querySelectorAll("img").forEach(img=>{img.loading="eager";img.decoding="sync"});
    wrapper.appendChild(face);stage.appendChild(wrapper);composition.appendChild(stage);document.body.appendChild(composition);
    await composition.ready;
+   // Force WebMotion to re-rasterize the complete card layer on every
+   // exported frame. This keeps the original GIF <img> in the DOM: the browser
+   // advances its animation normally, while the existing card (gold frame,
+   // typography, overlays and CSS) is captured as one intact layer.
+   const renderCardFrame=composition.renderFrameAt.bind(composition);
+   composition.renderFrameAt=(frame)=>{
+    renderCardFrame(frame);
+    face.setAttribute("data-webmotion-frame",String(frame));
+   };
    if(document.fonts?.ready)await document.fonts.ready;
    await Promise.all([...face.querySelectorAll("img")].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,8000)})));
    button.textContent="WebMotion : encodage MP4…";
