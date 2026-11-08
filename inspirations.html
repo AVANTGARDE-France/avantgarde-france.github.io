@@ -703,11 +703,12 @@ shareButton?.addEventListener("click",async()=>{
   const download=document.createElement("a");download.href=fileUrl;download.download=pendingShareFile.name;document.body.appendChild(download);download.click();download.remove();
   if(facebookWindow&&!facebookWindow.closed){facebookWindow.location.href="https://www.facebook.com/post/create";facebookWindow.opener=null}
   clearPendingShare();
-  shareMessage("GIF téléchargé, texte du verso copié et Facebook ouvert. Ajoute le GIF à ta publication.");
+  shareMessage((facebookWindow?"GIF téléchargé, texte du verso copié et Facebook ouvert.":"GIF téléchargé et texte du verso copié. Autorise les fenêtres pop-up pour ouvrir Facebook.")+" Ajoute le GIF à ta publication.");
   setTimeout(()=>URL.revokeObjectURL(fileUrl),60000);
  }catch(error){
   console.error("Création GIF inspiration",error);
   const detail=error?.message||String(error)||"Erreur inconnue";
+  if(facebookWindow&&!facebookWindow.closed)facebookWindow.close();
   shareMessage("Échec de création du GIF : "+detail);
   clearPendingShare();
  }
