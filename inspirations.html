@@ -622,7 +622,7 @@ async function createInspirationGif(){
   stream=await streamPromise;
   const track=stream.getVideoTracks()[0],settings=track?.getSettings()||{};
   if(!track)throw new Error("Flux de capture indisponible.");
-  if(settings.displaySurface&&settings.displaySurface!=="browser")throw new Error("Sélectionne l’onglet du navigateur « Avant-gardE — Capture », pas la fenêtre entière.");
+  if(settings.displaySurface&&settings.displaySurface!=="browser"&&settings.displaySurface!=="window")throw new Error("Sélectionne uniquement la fenêtre ou l’onglet « Avant-gardE — Capture », pas l’écran entier.");
   const video=document.createElement("video");video.muted=true;video.playsInline=true;video.srcObject=stream;
   await new Promise((resolve,reject)=>{video.onloadedmetadata=resolve;video.onerror=()=>reject(new Error("Lecture du flux impossible."))});
   await video.play();
