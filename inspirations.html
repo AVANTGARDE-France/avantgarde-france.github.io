@@ -627,23 +627,31 @@ async function createInspirationGif(){
   const video=document.createElement("video");video.muted=true;video.playsInline=true;video.srcObject=stream;
   await new Promise((resolve,reject)=>{video.onloadedmetadata=resolve;video.onerror=()=>reject(new Error("Lecture du flux impossible."))});
   await video.play();
-  const width=800,height=Math.max(1,Math.round(width*rect.height/rect.width));
+  /* Le flux capture tout le viewport de l’onglet. On découpe exactement le recto,
+     en tenant compte du ratio entre pixels vidéo et pixels CSS du viewport. */
+  const captureDoc=captureWindow.document;
+  const captureRoot=captureDoc.getElementById("capture-root");
+  if(!captureRoot)throw new Error("Zone de capture introuvable.");
+  const captureRect=captureRoot.getBoundingClientRect();
+  const viewportWidth=captureWindow.innerWidth,viewportHeight=captureWindow.innerHeight;
+  if(!viewportWidth||!viewportHeight||!captureRect.width||!captureRect.height)throw new Error("Dimensions de capture invalides.");
+  const width=800,height=Math.max(1,Math.round(width*captureRect.height/captureRect.width));
+  const scaleX=video.videoWidth/viewportWidth,scaleY=video.videoHeight/viewportHeight;
+  const sx=Math.round(captureRect.left*scaleX),sy=Math.round(captureRect.top*scaleY);
+  const sw=Math.round(captureRect.width*scaleX),sh=Math.round(captureRect.height*scaleY);
   await loadScriptOnce("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js",()=>!!window.GIF);
   const worker=await fetch("https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js");
   if(!worker.ok)throw new Error("Moteur GIF indisponible.");
   workerUrl=URL.createObjectURL(await worker.blob());
-  const encoder=new window.GIF({workers:2,quality:2,width,height,workerScript:workerUrl,repeat:0,background:"#07152d",dither:"FloydSteinberg-serpentine"});
-  const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;const ctx=canvas.getContext("2d",{alpha:false});
+  /* Une palette commune évite les changements de teinte d’une image à l’autre.
+     Pas de tramage : il altérait notamment les aplats bleu marine. */
+  const encoder=new window.GIF({workers:2,quality:1,width,height,workerScript:workerUrl,repeat:0,background:"#07152d",dither:false,globalPalette:true});
+  const canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;const ctx=canvas.getContext("2d",{alpha:false,colorSpace:"srgb"});
   const total=30,delay=100;
   for(let i=0;i<total;i++){
    if(track.readyState!=="live")throw new Error("La capture a été interrompue.");
-   /* Capture d’onglet : conserver toute l’image et adapter sans rogner les bords. */
-   const sourceRatio=video.videoWidth/video.videoHeight,targetRatio=rect.width/rect.height;
-   let drawW=width,drawH=height,dx=0,dy=0;
-   if(sourceRatio>targetRatio){drawW=width;drawH=Math.round(width/sourceRatio);dy=Math.round((height-drawH)/2)}
-   else{drawH=height;drawW=Math.round(height*sourceRatio);dx=Math.round((width-drawW)/2)}
-   ctx.fillStyle="#07152d";ctx.fillRect(0,0,width,height);
-   ctx.drawImage(video,dx,dy,drawW,drawH);
+   ctx.clearRect(0,0,width,height);
+   ctx.drawImage(video,sx,sy,sw,sh,0,0,width,height);
    encoder.addFrame(canvas,{copy:true,delay});
    if(i%3===0)shareMessage("Enregistrement du recto original : "+Math.round((i+1)/total*100)+" %");
    await wait(delay);
@@ -654,7 +662,9 @@ async function createInspirationGif(){
  }finally{
   if(stream)stream.getTracks().forEach(t=>t.stop());
   if(workerUrl)URL.revokeObjectURL(workerUrl);
-  /* Garder cette fenêtre : elle sera réutilisée pour ouvrir Facebook, sans seconde popup. */
+  /* La fenêtre dédiée ne sert qu’à la capture : Facebook aura sa propre fenêtre normale. */
+  if(shareCaptureWindow&&!shareCaptureWindow.closed)shareCaptureWindow.close();
+  shareCaptureWindow=null;
  }
 }
 shareButton?.addEventListener("click",async()=>{
@@ -679,8 +689,10 @@ shareButton?.addEventListener("click",async()=>{
  pendingShareText=getInspirationShareText();
  if(navigator.clipboard?.writeText)navigator.clipboard.writeText(pendingShareText).catch(()=>{});
  shareBusy=true;shareButton.disabled=true;shareButton.querySelector("span").textContent="Création…";
+ /* Préouvrir Facebook dans une fenêtre normale, distincte de la popup de capture.
+    L’ouverture est synchrone au clic pour éviter le blocage des pop-ups. */
+ const facebookWindow=window.open("about:blank","_blank");
  try{
-  /* Préouvrir Facebook pendant le clic initial évite le blocage des pop-ups après capture. */
   const blob=await createInspirationGif();
   const safeName=(String(item.titre||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");
   pendingShareFile=new File([blob],safeName+".gif",{type:"image/gif"});
@@ -689,8 +701,7 @@ shareButton?.addEventListener("click",async()=>{
   try{await navigator.clipboard.writeText(pendingShareText)}catch(_){}
   const fileUrl=URL.createObjectURL(pendingShareFile);
   const download=document.createElement("a");download.href=fileUrl;download.download=pendingShareFile.name;document.body.appendChild(download);download.click();download.remove();
-  if(shareCaptureWindow&&!shareCaptureWindow.closed){shareCaptureWindow.location.href="https://www.facebook.com/post/create";shareCaptureWindow.opener=null}
-  shareCaptureWindow=null;
+  if(facebookWindow&&!facebookWindow.closed){facebookWindow.location.href="https://www.facebook.com/post/create";facebookWindow.opener=null}
   clearPendingShare();
   shareMessage("GIF téléchargé, texte du verso copié et Facebook ouvert. Ajoute le GIF à ta publication.");
   setTimeout(()=>URL.revokeObjectURL(fileUrl),60000);
