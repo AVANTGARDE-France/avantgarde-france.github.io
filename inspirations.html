@@ -836,7 +836,7 @@ load();
     overlays.push(overlay);const compositionStage=composition.firstElementChild;if(!compositionStage)throw new Error("Scène interne WebMotion introuvable.");compositionStage.appendChild(overlay);img.style.removeProperty("opacity");img.style.removeProperty("visibility");
     overlay.__setFrame=n=>{requestedFrame=n;};
    }
-   composition.appendChild(foregroundStage);await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+   const internalStage=composition.firstElementChild;if(!internalStage)throw new Error("Scène interne WebMotion introuvable.");internalStage.appendChild(foregroundStage);await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
    const renderCardFrame=composition.renderFrameAt.bind(composition);
    composition.renderFrameAt=frame=>{renderCardFrame(frame);for(const overlay of overlays)overlay.__setFrame(frame);};
    if(document.fonts?.ready)await document.fonts.ready;
