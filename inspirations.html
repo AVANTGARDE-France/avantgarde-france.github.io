@@ -489,6 +489,7 @@
 .inspiration-social-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
 .inspiration-social-options a{padding:13px 10px;border:1px solid #d6ad55;border-radius:10px;color:#f5f3ed;text-decoration:none;font-weight:700}
 .inspiration-social-options a:hover{background:#d6ad55;color:#07152d}
+.inspiration-download-help{margin:14px 0 4px;padding:10px 12px;border-radius:9px;background:#0d2344;color:#f5f3ed;font-size:12px;line-height:1.5}.inspiration-download-help strong{color:#f0d58a;font-size:inherit}
 #inspirationSocialClose{padding:8px 16px;border:1px solid #789;border-radius:8px;background:transparent;color:#f5f3ed;cursor:pointer}
 @media(max-width:620px){#inspirationShareButton{left:10px;bottom:9px;height:33px;font-size:10px}}
 </style>
@@ -536,7 +537,7 @@
 <div id="projectVotePanel" class="project-vote-panel"></div>
 <button id="inspirationShareButton" type="button" aria-label="Partager sur les réseaux sociaux" title="Télécharger la vidéo et choisir un réseau social">↗ <span>Partager sur les réseaux sociaux</span></button>
 <div id="inspirationShareStatus" role="status" aria-live="polite"></div>
-<div id="inspirationSocialChooser" role="dialog" aria-modal="true" aria-label="Choisir un réseau social" hidden><div class="inspiration-social-panel"><strong>Votre vidéo est prête !</strong><p>Le texte du verso est copié. Choisissez où publier :</p><div class="inspiration-social-options"><a href="https://www.facebook.com/post/create" target="_blank" rel="noopener">Facebook</a><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a><a href="https://www.tiktok.com/upload" target="_blank" rel="noopener">TikTok</a><a href="https://x.com/compose/post" target="_blank" rel="noopener">X</a></div><button type="button" id="inspirationSocialClose">Fermer</button></div></div>
+<div id="inspirationSocialChooser" role="dialog" aria-modal="true" aria-label="Choisir un réseau social" hidden><div class="inspiration-social-panel"><strong>Votre vidéo est prête !</strong><p>Le texte du verso est copié. Choisissez où publier :</p><div class="inspiration-social-options"><a href="https://www.facebook.com/post/create" target="_blank" rel="noopener">Facebook</a><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a><a href="https://www.tiktok.com/upload" target="_blank" rel="noopener">TikTok</a><a href="https://x.com/compose/post" target="_blank" rel="noopener">X</a></div><p class="inspiration-download-help">Une fois le réseau social ouvert, retrouvez votre vidéo dans les téléchargements du navigateur avec <strong>Ctrl + J</strong>, puis joignez le fichier à votre publication. Sur Mac, utilisez le raccourci de téléchargements propre à votre navigateur.</p><button type="button" id="inspirationSocialClose">Fermer</button></div></div>
 
 <h2 id="projectModalTitle"></h2>
 <div id="projectModalContent" class="project-modal-content"></div>
