@@ -831,9 +831,9 @@ load();
      const time=((requestedFrame/30)*1000000)%totalDuration;let elapsed=0;let frameIndex=0;
      while(frameIndex<durations.length-1&&elapsed+durations[frameIndex]<=time){elapsed+=durations[frameIndex];frameIndex++;}
      const decoded=await decoder.decode({frameIndex:frameIndex});
-     ctx.clearRect(0,0,canvas.width,canvas.height);const sw=img.naturalWidth||decoded.image.displayWidth||decoded.image.codedWidth,sh=img.naturalHeight||decoded.image.displayHeight||decoded.image.codedHeight;const scale=Math.min(canvas.width/sw,canvas.height/sh);const dw=sw*scale,dh=sh*scale,dx=(canvas.width-dw)/2,dy=(canvas.height-dh)/2;ctx.drawImage(decoded.image,0,0,sw,sh,dx,dy,dw,dh);decoded.image.close();
+     ctx.clearRect(0,0,canvas.width,canvas.height);const sw=decoded.image.displayWidth||decoded.image.codedWidth,sh=decoded.image.displayHeight||decoded.image.codedHeight;const scale=Math.max(canvas.width/sw,canvas.height/sh);const cropW=canvas.width/scale,cropH=canvas.height/scale,sx=(sw-cropW)/2,sy=(sh-cropH)/2;ctx.drawImage(decoded.image,sx,sy,cropW,cropH,0,0,canvas.width,canvas.height);decoded.image.close();
     };
-    overlays.push(overlay);const compositionStage=composition.firstElementChild;if(!compositionStage)throw new Error("Scène interne WebMotion introuvable.");compositionStage.appendChild(overlay);img.style.removeProperty("opacity");img.style.removeProperty("visibility");
+    await overlay.wmAwaitFrame();img.style.setProperty("opacity","0","important");img.style.setProperty("visibility","hidden","important");overlays.push(overlay);const compositionStage=composition.firstElementChild;if(!compositionStage)throw new Error("Scène interne WebMotion introuvable.");compositionStage.appendChild(overlay);
     overlay.__setFrame=n=>{requestedFrame=n;};
    }
    const internalStage=composition.firstElementChild;if(!internalStage)throw new Error("Scène interne WebMotion introuvable.");internalStage.appendChild(foregroundStage);await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
