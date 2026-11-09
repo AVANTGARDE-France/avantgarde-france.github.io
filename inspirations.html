@@ -775,62 +775,71 @@ load();
  const button=document.getElementById("inspirationWebmotionTestButton");
  if(button)button.addEventListener("click",async()=>{
   const source=document.getElementById("projectModalFront");
-  if(!source||!document.getElementById("projectModal")?.classList.contains("open")){
-   alert("Ouvre d’abord une carte Inspiration, puis relance le test.");
-   return;
-  }
+  if(!source||!document.getElementById("projectModal")?.classList.contains("open")){alert("Ouvre d’abord une carte Inspiration, puis relance le test.");return;}
   button.disabled=true;button.textContent="WebMotion : préparation…";
   let composition;
+  const decoders=[];
   try{
+   if(typeof ImageDecoder==="undefined")throw new Error("Ce navigateur ne propose pas le décodage GIF ImageDecoder nécessaire.");
    await import("https://esm.sh/@superhq/webmotion@0.18.2/elements");
    composition=document.createElement("w-composition");
-   composition.setAttribute("width","1080");
-   composition.setAttribute("height","1350");
-   composition.setAttribute("fps","30");
-   composition.setAttribute("duration","120");
+   composition.setAttribute("width","1080");composition.setAttribute("height","1350");composition.setAttribute("fps","30");composition.setAttribute("duration","120");
    composition.style.cssText="position:fixed;left:-20000px;top:0;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
-   const stage=document.createElement("w-el");
-   stage.setAttribute("x","0");stage.setAttribute("y","0");
-   stage.setAttribute("width","1080");stage.setAttribute("height","1350");
-   stage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden";
-   const wrapper=document.createElement("div");
-   wrapper.id="projectModalCard";
-   wrapper.className="project-modal-card";
+   const stage=document.createElement("w-el");stage.setAttribute("x","0");stage.setAttribute("y","0");stage.setAttribute("width","1080");stage.setAttribute("height","1350");stage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden";
+   const wrapper=document.createElement("div");wrapper.className="project-modal-card";
    wrapper.style.cssText="position:relative!important;width:540px!important;height:675px!important;min-width:540px!important;min-height:675px!important;max-width:none!important;max-height:none!important;aspect-ratio:4/5!important;transform:scale(2);transform-origin:top left;margin:0!important;overflow:hidden";
-   const face=source.cloneNode(true);
-   face.removeAttribute("id");
+   const face=source.cloneNode(true);face.removeAttribute("id");
    face.style.cssText+=";position:absolute!important;inset:0!important;width:540px!important;height:675px!important;transform:none!important;visibility:visible!important;opacity:1!important";
    face.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
    face.querySelectorAll("img").forEach(img=>{img.loading="eager";img.decoding="sync"});
    wrapper.appendChild(face);stage.appendChild(wrapper);composition.appendChild(stage);document.body.appendChild(composition);
    await composition.ready;
-   // Force WebMotion to re-rasterize the complete card layer on every
-   // exported frame. This keeps the original GIF <img> in the DOM: the browser
-   // advances its animation normally, while the existing card (gold frame,
-   // typography, overlays and CSS) is captured as one intact layer.
+   const gifImages=[...face.querySelectorAll("img")].filter(img=>/\.gif(?:$|[?#])/i.test(img.currentSrc||img.src));
+   if(!gifImages.length)throw new Error("Aucun GIF animé détecté dans cette face de carte.");
+   const overlays=[];
+   for(const img of gifImages){
+    const url=img.currentSrc||img.src;
+    const response=await fetch(url,{mode:"cors",credentials:"omit"});
+    if(!response.ok)throw new Error("Impossible de lire le GIF ("+response.status+").");
+    const bytes=await response.arrayBuffer();
+    const decoder=new ImageDecoder({data:bytes,type:"image/gif"});decoders.push(decoder);
+    await decoder.tracks.ready;
+    const track=decoder.tracks.selectedTrack;
+    if(!track||!track.frameCount)throw new Error("Le GIF ne contient aucune image décodable.");
+    const durations=[];let totalDuration=0;
+    for(let n=0;n<track.frameCount;n++){
+     const decoded=await decoder.decode({frameIndex:n});
+     const duration=decoded.image.duration||100000;durations.push(duration);totalDuration+=duration;decoded.image.close();
+    }
+    const rect=img.getBoundingClientRect();const stageRect=stage.getBoundingClientRect();
+    const overlay=document.createElement("w-el");
+    overlay.setAttribute("x",String(rect.left-stageRect.left));overlay.setAttribute("y",String(rect.top-stageRect.top));
+    overlay.setAttribute("width",String(rect.width));overlay.setAttribute("height",String(rect.height));
+    overlay.style.cssText="display:block;overflow:hidden;z-index:9999;pointer-events:none";
+    const canvas=document.createElement("canvas");canvas.width=img.naturalWidth||Math.round(rect.width);canvas.height=img.naturalHeight||Math.round(rect.height);
+    const ctx=canvas.getContext("2d");if(!ctx)throw new Error("Canvas GIF indisponible.");
+    let requestedFrame=0;
+    overlay.wmLiveCanvas=()=>canvas;
+    overlay.wmAwaitFrame=async()=>{
+     const time=((requestedFrame/30)*1000000)%totalDuration;let elapsed=0;let frameIndex=0;
+     while(frameIndex<durations.length-1&&elapsed+durations[frameIndex]<=time){elapsed+=durations[frameIndex];frameIndex++;}
+     const decoded=await decoder.decode({frameIndex:frameIndex});
+     ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(decoded.image,0,0,canvas.width,canvas.height);decoded.image.close();
+    };
+    overlays.push(overlay);stage.appendChild(overlay);img.style.setProperty("opacity","0","important");img.style.setProperty("visibility","hidden","important");
+    overlay.__setFrame=n=>{requestedFrame=n;};
+   }
    const renderCardFrame=composition.renderFrameAt.bind(composition);
-   composition.renderFrameAt=(frame)=>{
-    renderCardFrame(frame);
-    face.setAttribute("data-webmotion-frame",String(frame));
-   };
+   composition.renderFrameAt=frame=>{renderCardFrame(frame);for(const overlay of overlays)overlay.__setFrame(frame);};
    if(document.fonts?.ready)await document.fonts.ready;
-   await Promise.all([...face.querySelectorAll("img")].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,8000)})));
    button.textContent="WebMotion : encodage MP4…";
-   if(typeof composition.export!=="function")throw new Error("WebMotion n’a pas initialisé sa fonction export.");
    const blob=await composition.export({onProgress:({frame,total})=>{button.textContent="WebMotion : "+Math.round(frame/total*100)+" %";}});
    if(!(blob instanceof Blob)||blob.size<10000)throw new Error("WebMotion n’a pas produit de vidéo exploitable.");
-   const url=URL.createObjectURL(blob);
-   const link=document.createElement("a");link.href=url;link.download="avantgarde-webmotion-test.mp4";document.body.appendChild(link);link.click();link.remove();
-   setTimeout(()=>URL.revokeObjectURL(url),120000);
+   const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="avantgarde-webmotion-test.mp4";document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);
    button.textContent="TEST TERMINÉ — MP4 téléchargé";
-  }catch(error){
-   console.error("WebMotion test",error);
-   alert("Échec WebMotion : "+(error?.message||error));
-   button.textContent="ÉCHEC — relancer le test";
-  }finally{
-   composition?.remove();button.disabled=false;
-  }
- });
+  }catch(error){console.error("WebMotion test",error);alert("Échec WebMotion : "+(error?.message||error));button.textContent="ÉCHEC — relancer le test";}
+  finally{for(const decoder of decoders){try{decoder.close();}catch{}}composition?.remove();button.disabled=false;}
+ });;
 }
 </script>
 </body>
