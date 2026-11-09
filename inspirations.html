@@ -637,6 +637,8 @@ load();
    const foregroundStage=document.createElement("w-el");foregroundStage.setAttribute("x","0");foregroundStage.setAttribute("y","0");foregroundStage.setAttribute("width","1080");foregroundStage.setAttribute("height","1350");foregroundStage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
    const foregroundWrapper=document.createElement("div");foregroundWrapper.className="project-modal-card";foregroundWrapper.style.cssText=wrapper.style.cssText+";zoom:1!important;transform:scale(2)!important;transform-origin:top left!important;width:540px!important;height:675px!important;";
    const foregroundFace=face.cloneNode(true);foregroundFace.removeAttribute("id");foregroundFace.style.background="transparent";
+   const originalNodes=[face,...face.querySelectorAll("*")],cloneNodes=[foregroundFace,...foregroundFace.querySelectorAll("*")];
+   originalNodes.forEach((node,index)=>{const clone=cloneNodes[index];if(!clone)return;const computed=getComputedStyle(node);for(let k=0;k<computed.length;k++){const prop=computed[k];clone.style.setProperty(prop,computed.getPropertyValue(prop),computed.getPropertyPriority(prop));}});
    foregroundFace.querySelectorAll(".project-card-image-wrap").forEach(el=>el.remove());
    foregroundWrapper.appendChild(foregroundFace);foregroundStage.appendChild(foregroundWrapper);
    for(const img of gifImages){
