@@ -634,7 +634,7 @@ load();
    const overlays=[];
    const webmotionDiagnostics=[];
    const foregroundStage=document.createElement("w-el");foregroundStage.setAttribute("x","0");foregroundStage.setAttribute("y","0");foregroundStage.setAttribute("width","1080");foregroundStage.setAttribute("height","1350");foregroundStage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
-   const foregroundWrapper=document.createElement("div");foregroundWrapper.className="project-modal-card";foregroundWrapper.style.cssText=wrapper.style.cssText;
+   const foregroundWrapper=document.createElement("div");foregroundWrapper.className="project-modal-card";foregroundWrapper.style.cssText=wrapper.style.cssText+";zoom:2!important;transform: none!important;transform-origin:top left!important;width:540px!important;height:675px!important;";
    const foregroundFace=face.cloneNode(true);foregroundFace.removeAttribute("id");foregroundFace.style.background="transparent";
    foregroundFace.querySelectorAll(".project-card-image-wrap").forEach(el=>el.remove());
    foregroundWrapper.appendChild(foregroundFace);foregroundStage.appendChild(foregroundWrapper);
