@@ -474,20 +474,23 @@
  .project-card-rating.inspiration-card-rating{left:5px;top:6px;gap:3px;padding:4px 5px;font-size:9px}
 }
 
-/* Partage animé — bouton Facebook sur le verso du popup */
+/* Partage vidéo multi-réseaux */
 #projectModalCard .project-modal-back{position:relative!important}
-#inspirationShareButton{position:absolute;left:15px;bottom:12px;z-index:6;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:38px;height:36px;padding:0 12px;border:1px solid #6ea7ff;border-radius:999px;background:#1877f2;color:#fff;box-shadow:0 3px 12px #0006;cursor:pointer;font:700 11px Arial,sans-serif;transition:transform .18s,filter .18s,opacity .18s}
-#inspirationWebmotionTestButton{position:absolute;left:165px;bottom:12px;z-index:20;pointer-events:auto;height:36px;padding:0 12px;border:1px solid #d6ad55;border-radius:999px;background:#d6ad55;color:#07152d;box-shadow:0 3px 12px #0006;cursor:pointer;font:700 10px Arial,sans-serif}
-#inspirationWebmotionTestButton:hover{filter:brightness(1.08);transform:translateY(-2px)}
-#inspirationWebmotionTestButton:disabled{opacity:.7;cursor:wait}
-@media(max-width:620px){#inspirationWebmotionTestButton{left:145px;bottom:9px;height:33px;padding:0 9px;font-size:9px}}
-#inspirationShareButton:hover{transform:translateY(-2px);filter:brightness(1.12)}
-#inspirationShareButton:disabled{opacity:.7;cursor:wait;transform:none}
-#inspirationShareButton svg{width:17px;height:17px;display:block;fill:currentColor}
-#inspirationShareStatus{position:absolute;left:15px;bottom:54px;z-index:6;max-width:calc(100% - 30px);padding:6px 9px;border:1px solid #d6ad5580;border-radius:8px;background:#07152df2;color:#f5f3ed;font:10px/1.4 Arial,sans-serif;box-shadow:0 3px 12px #0006;display:none}
+#inspirationShareButton{position:absolute;left:15px;bottom:12px;z-index:20;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:36px;padding:0 13px;border:1px solid #d6ad55;border-radius:999px;background:#d6ad55;color:#07152d;box-shadow:0 3px 12px #0006;cursor:pointer;font:700 11px Arial,sans-serif}
+#inspirationShareButton:hover{filter:brightness(1.08);transform:translateY(-2px)}
+#inspirationShareButton:disabled{opacity:.7;cursor:wait}
+#inspirationShareStatus{position:absolute;left:15px;bottom:54px;z-index:21;max-width:calc(100% - 30px);padding:6px 9px;border:1px solid #d6ad5580;border-radius:8px;background:#07152df2;color:#f5f3ed;font:10px/1.4 Arial,sans-serif;display:none}
 #inspirationShareStatus.visible{display:block}
-@media(max-width:620px){#inspirationShareButton{left:10px;bottom:9px;height:33px;min-width:35px;padding:0 10px}#inspirationShareStatus{left:10px;bottom:49px}}
-
+#inspirationSocialChooser{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;padding:20px;background:#020817bb}
+#inspirationSocialChooser[hidden]{display:none}
+.inspiration-social-panel{width:min(420px,100%);padding:24px;border:1px solid #d6ad55;border-radius:16px;background:#07152d;color:#f5f3ed;box-shadow:0 18px 60px #0009;text-align:center;font:14px Arial,sans-serif}
+.inspiration-social-panel strong{font-size:19px;color:#f0d58a}
+.inspiration-social-panel p{line-height:1.5}
+.inspiration-social-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.inspiration-social-options a{padding:13px 10px;border:1px solid #d6ad55;border-radius:10px;color:#f5f3ed;text-decoration:none;font-weight:700}
+.inspiration-social-options a:hover{background:#d6ad55;color:#07152d}
+#inspirationSocialClose{padding:8px 16px;border:1px solid #789;border-radius:8px;background:transparent;color:#f5f3ed;cursor:pointer}
+@media(max-width:620px){#inspirationShareButton{left:10px;bottom:9px;height:33px;font-size:10px}}
 </style>
 </head>
 <body>
@@ -531,8 +534,9 @@
 <div class="project-modal-face project-modal-front" id="projectModalFront"></div>
 <div class="project-modal-face project-modal-back">
 <div id="projectVotePanel" class="project-vote-panel"></div>
-<button id="inspirationShareButton" type="button" aria-label="Créer une vidéo de cette carte pour Facebook" title="Créer une vidéo de cette carte"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-8.2h2.8l.42-3.2H13.5V7.55c0-.93.26-1.56 1.6-1.56h1.72V3.13c-.3-.04-1.35-.13-2.56-.13-2.54 0-4.28 1.55-4.28 4.4v2.2H7.1v3.2h2.88V21h3.52z"/></svg><span>Partager</span></button>
-<div id="inspirationShareStatus" role="status" aria-live="polite"></div><button id="inspirationWebmotionTestButton" type="button" title="Tester l’export WebMotion">TEST WEBMOTION — MP4</button>
+<button id="inspirationShareButton" type="button" aria-label="Partager sur les réseaux sociaux" title="Télécharger la vidéo et choisir un réseau social">↗ <span>Partager sur les réseaux sociaux</span></button>
+<div id="inspirationShareStatus" role="status" aria-live="polite"></div>
+<div id="inspirationSocialChooser" role="dialog" aria-modal="true" aria-label="Choisir un réseau social" hidden><div class="inspiration-social-panel"><strong>Votre vidéo est prête !</strong><p>Le texte du verso est copié. Choisissez où publier :</p><div class="inspiration-social-options"><a href="https://www.facebook.com/post/create" target="_blank" rel="noopener">Facebook</a><a href="https://www.instagram.com/" target="_blank" rel="noopener">Instagram</a><a href="https://www.tiktok.com/upload" target="_blank" rel="noopener">TikTok</a><a href="https://x.com/compose/post" target="_blank" rel="noopener">X</a></div><button type="button" id="inspirationSocialClose">Fermer</button></div></div>
 
 <h2 id="projectModalTitle"></h2>
 <div id="projectModalContent" class="project-modal-content"></div>
@@ -575,194 +579,19 @@ grid.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.
 votePanel?.addEventListener("click",async e=>{const b=e.target.closest("[data-vote]");if(!b)return;const msg=votePanel.querySelector(".project-vote-message");if(!currentUser){if(msg)msg.textContent="Vote impossible — vous devez être connecté.";return}const value=Number(b.dataset.vote),id=modalContent.dataset.itemId;if(!id)return;const currentValue=myVotes.get(String(id)),removing=currentValue===value;b.disabled=true;if(msg)msg.textContent=removing?"Retrait de votre évaluation…":"Enregistrement de votre note…";const result=removing?await supabase.from("inspiration_votes").delete().eq("user_id",currentUser.id).eq("contenu_id",id):await supabase.from("inspiration_votes").upsert({user_id:currentUser.id,contenu_id:id,vote:value,updated_at:new Date().toISOString()},{onConflict:"user_id,contenu_id"});b.disabled=false;if(result.error){console.error("Erreur vote inspiration",result.error);if(msg)msg.textContent="Impossible de modifier votre note. Réessayez.";return}if(removing)myVotes.delete(String(id));else myVotes.set(String(id),value);await loadVoteData();render();const updated=items.find(x=>String(x.id)===String(id));if(updated){votePanel.innerHTML=voteControls(updated);const fresh=grid.querySelector('[data-id="'+CSS.escape(String(id))+'"]');if(fresh)document.getElementById("projectModalFront").innerHTML=fresh.innerHTML}});
 
 
-/* Vidéo fidèle : capture directe de l’onglet, sans reconstruction du DOM. */
-const shareButton=document.getElementById("inspirationShareButton");
+/* Le bouton principal lance désormais directement l'export WebMotion.
+   Le texte du verso est copié après le téléchargement. */
 const shareStatus=document.getElementById("inspirationShareStatus");
-let shareBusy=false;
-function shareMessage(message){
- if(!shareStatus)return;
- shareStatus.textContent=message;
- shareStatus.classList.add("visible");
-}
+const socialChooser=document.getElementById("inspirationSocialChooser");
+function shareMessage(message){if(shareStatus){shareStatus.textContent=message;shareStatus.classList.add("visible")}}
 function getInspirationShareText(){
  const clone=modalContent.cloneNode(true);
  clone.querySelectorAll("script,style,button,svg").forEach(el=>el.remove());
- clone.querySelectorAll("a").forEach(link=>{
-  const label=(link.textContent||"").trim(),href=(link.getAttribute("href")||"").trim();
-  if(!label||label.startsWith("http")||label===href)link.remove();
-  else link.replaceWith(document.createTextNode(label));
- });
- const body=(clone.innerText||clone.textContent||"").split("\n").filter(line=>!line.trim().startsWith("http")).join("\n").trim();
+ const body=(clone.innerText||clone.textContent||"").trim();
  return [modalTitle.textContent.trim(),body].filter(Boolean).join("\n\n");
 }
-function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
-function nextFrame(){return new Promise(resolve=>requestAnimationFrame(()=>resolve()))}
-function stopStream(stream){
- if(stream)stream.getTracks().forEach(track=>{try{track.stop()}catch(_){}});
-}
-async function recordCardFromTab(stream,onProgress){
- const video=document.createElement("video");
- video.muted=true;
- video.playsInline=true;
- video.srcObject=stream;
- await new Promise((resolve,reject)=>{
-  if(video.readyState>=1){resolve();return}
-  video.onloadedmetadata=resolve;
-  video.onerror=()=>reject(new Error("Impossible de lire la capture de l’onglet."));
-  setTimeout(()=>reject(new Error("La capture de l’onglet ne démarre pas.")),10000);
- });
- await video.play();
- const front=document.getElementById("projectModalFront");
- const card=document.getElementById("projectModalCard");
- const inner=card?.querySelector(".project-modal-card-inner");
- if(!front||!card||!inner)throw new Error("Carte originale introuvable.");
- const previousTransition=inner.style.transition;
- const wasFlipped=inner.classList.contains("is-flipped");
- inner.style.transition="none";
- inner.classList.remove("is-flipped");
- await nextFrame();await nextFrame();
- const rect=front.getBoundingClientRect();
- const viewportWidth=window.innerWidth,viewportHeight=window.innerHeight;
- const trackSettings=stream.getVideoTracks()[0]?.getSettings?.()||{};
- const surface=trackSettings.displaySurface||"browser";
- const captureOuter=(surface==="window");
- const sourceWidth=captureOuter?window.outerWidth:viewportWidth;
- const sourceHeight=captureOuter?window.outerHeight:viewportHeight;
- const scaleX=video.videoWidth/sourceWidth,scaleY=video.videoHeight/sourceHeight;
- /* En capture de fenêtre, le flux peut inclure la barre du navigateur.
-    On replace le rectangle CSS de la carte dans les coordonnées de la fenêtre. */
- const chromeLeft=captureOuter?Math.max(0,(window.outerWidth-window.innerWidth)/2):0;
- const chromeTop=captureOuter?Math.max(0,window.outerHeight-window.innerHeight-(window.outerWidth-window.innerWidth)/2):0;
- const sx=Math.round((chromeLeft+rect.left)*scaleX),sy=Math.round((chromeTop+rect.top)*scaleY);
- const sw=Math.round(rect.width*scaleX),sh=Math.round(rect.height*scaleY);
- if(!rect.width||!rect.height||!video.videoWidth||!video.videoHeight)throw new Error("Dimensions de capture invalides.");
- if(sx<0||sy<0||sx+sw>video.videoWidth||sy+sh>video.videoHeight)throw new Error("La carte sort de la zone capturée. Vérifie que la fenêtre du navigateur est assez grande.");
- const canvas=document.createElement("canvas");
- canvas.width=1080;canvas.height=1350;
- const ctx=canvas.getContext("2d",{alpha:false});
- if(!ctx)throw new Error("Impossible de créer la vidéo.");
- const fps=30,durationMs=4000;
- const canvasStream=canvas.captureStream(fps);
- const mimeType=[
-  "video/mp4;codecs=avc1.42E01E",
-  "video/mp4",
-  "video/webm;codecs=vp9",
-  "video/webm;codecs=vp8",
-  "video/webm"
- ].find(type=>MediaRecorder.isTypeSupported(type))||"";
- const recorder=new MediaRecorder(canvasStream,mimeType?{mimeType,videoBitsPerSecond:12000000}:{videoBitsPerSecond:12000000});
- const chunks=[];
- let recordingError=null;
- recorder.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
- recorder.onerror=()=>{recordingError=new Error("L’enregistrement vidéo a échoué.")};
- const stopped=new Promise(resolve=>{recorder.onstop=resolve});
- let raf=0;
- const started=performance.now();
- const draw=now=>{
-  try{
-   ctx.clearRect(0,0,canvas.width,canvas.height);
-   ctx.drawImage(video,sx,sy,sw,sh,0,0,canvas.width,canvas.height);
-   const progress=Math.min(100,Math.round((now-started)/durationMs*100));
-   onProgress(progress);
-   if(now-started<durationMs)raf=requestAnimationFrame(draw);
-   else if(recorder.state!=="inactive")recorder.stop();
-  }catch(error){
-   recordingError=error;
-   if(recorder.state!=="inactive")recorder.stop();
-  }
- };
- recorder.start(250);
- raf=requestAnimationFrame(draw);
- await stopped;
- cancelAnimationFrame(raf);
- stopStream(canvasStream);
- if(recordingError)throw recordingError;
- const type=recorder.mimeType||mimeType||"video/webm";
- const blob=new Blob(chunks,{type});
- if(blob.size<20000)throw new Error("La vidéo produite est vide ou incomplète.");
- return blob;
-}
-function downloadInspirationVideo(blob,item){
- const safeName=(String(item.titre||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");
- const extension=blob.type.toLowerCase().includes("mp4")?"mp4":"webm";
- const url=URL.createObjectURL(blob);
- const link=document.createElement("a");
- link.href=url;link.download=safeName+"."+extension;
- document.body.appendChild(link);link.click();link.remove();
- setTimeout(()=>URL.revokeObjectURL(url),120000);
- return extension;
-}
-shareButton?.addEventListener("click",async()=>{
- if(shareBusy)return;
- const item=items.find(x=>String(x.id)===String(modalContent.dataset.itemId));
- if(!item)return;
- if(!navigator.mediaDevices?.getDisplayMedia){
-  shareMessage("La capture d’onglet n’est pas disponible dans ce navigateur.");
-  return;
- }
- shareBusy=true;
- shareButton.disabled=true;
- const label=shareButton.querySelector("span");
- if(label)label.textContent="Capture…";
- let captureStream=null,facebookWindow=null;
- const card=document.getElementById("projectModalCard");
- const inner=card?.querySelector(".project-modal-card-inner");
- const previousTransition=inner?.style.transition||"";
- const wasFlipped=inner?.classList.contains("is-flipped")||false;
- try{
-  shareMessage("Choisis « Cet onglet » dans la fenêtre du navigateur, puis autorise la capture.");
-  /* Appel direct dans le clic : requis par l’API de capture d’écran. */
-  const capturePromise=navigator.mediaDevices.getDisplayMedia({
-   video:{
-    displaySurface:"browser",
-    frameRate:{ideal:30,max:30},
-    /*
-     * Autorise explicitement le partage de l’onglet qui contient déjà
-     * la carte. Sans cela, Edge/Chromium peut masquer l’onglet courant.
-     */
-    selfBrowserSurface:"include",
-    surfaceSwitching:"exclude"
-   },
-   audio:false
-  });
-  captureStream=await capturePromise;
-  const track=captureStream.getVideoTracks()[0];
-  if(!track)throw new Error("Aucun flux vidéo reçu.");
-  const settings=track.getSettings()||{};
-  if(settings.displaySurface==="monitor")throw new Error("Sélectionne la fenêtre Avant-gardE, pas « Écran entier ».");
-  const shareText=getInspirationShareText();
-  try{await navigator.clipboard?.writeText(shareText)}catch(_){}
-  shareMessage("Capture réelle en cours : ne change pas d’onglet pendant les 4 secondes d’enregistrement.");
-  const blob=await recordCardFromTab(captureStream,progress=>{
-   shareMessage("Enregistrement réel de la carte : "+progress+" %");
-  });
-  const extension=downloadInspirationVideo(blob,item);
-  try{await navigator.clipboard?.writeText(shareText)}catch(_){}
-  const compatibility=extension==="mp4"?"MP4":"WebM (ce navigateur ne propose pas l’encodage MP4 natif)";
-  facebookWindow=window.open("https://www.facebook.com/post/create","_blank");
-  if(facebookWindow){
-   shareMessage("Vidéo "+compatibility+" téléchargée. Texte du verso copié. Ajoute la vidéo à ta publication Facebook.");
-  }else{
-   shareStatus.innerHTML="Vidéo "+compatibility+" téléchargée. Texte du verso copié. <a href=\"https://www.facebook.com/post/create\" target=\"_blank\" rel=\"noopener\">Ouvrir Facebook</a> pour ajouter la vidéo.";
-   shareStatus.classList.add("visible");
-  }
- }catch(error){
-  console.error("Capture vidéo inspiration",error);
-  if(facebookWindow&&!facebookWindow.closed)facebookWindow.close();
-  shareMessage("Capture annulée ou impossible : "+(error?.message||String(error)));
- }finally{
-  stopStream(captureStream);
-  if(inner){
-   inner.style.transition=previousTransition;
-   if(wasFlipped)inner.classList.add("is-flipped");
-   else inner.classList.remove("is-flipped");
-  }
-  shareBusy=false;
-  shareButton.disabled=false;
-  if(label)label.textContent="Partager";
- }
-});
-
+document.getElementById("inspirationSocialClose")?.addEventListener("click",()=>{socialChooser.hidden=true});
+socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)socialChooser.hidden=true});
 document.getElementById("projectModalClose")?.addEventListener("click",closeInspirationModal);
 modal?.addEventListener("click",e=>{if(e.target===modal)closeInspirationModal()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeInspirationModal()});
@@ -772,11 +601,11 @@ load();
 </script>
 <script type="module">
 {
- const button=document.getElementById("inspirationWebmotionTestButton");
+ const button=document.getElementById("inspirationShareButton");
  if(button)button.addEventListener("click",async()=>{
   const source=document.getElementById("projectModalFront");
   if(!source||!document.getElementById("projectModal")?.classList.contains("open")){alert("Ouvre d’abord une carte Inspiration, puis relance le test.");return;}
-  button.disabled=true;button.textContent="WebMotion : préparation…";
+  button.disabled=true;button.querySelector("span").textContent="Préparation de la vidéo…";
   let composition;
   const decoders=[];
   try{
@@ -844,12 +673,11 @@ load();
    const renderCardFrame=composition.renderFrameAt.bind(composition);
    composition.renderFrameAt=frame=>{renderCardFrame(frame);for(const overlay of overlays)overlay.__setFrame(frame);};
    if(document.fonts?.ready)await document.fonts.ready;
-   console.table(webmotionDiagnostics);button.dataset.webmotionDiagnostics=JSON.stringify(webmotionDiagnostics);button.textContent="WebMotion : encodage MP4…";
-   const blob=await composition.export({onProgress:({frame,total})=>{button.textContent="WebMotion : "+Math.round(frame/total*100)+" %";}});
+   console.table(webmotionDiagnostics);button.dataset.webmotionDiagnostics=JSON.stringify(webmotionDiagnostics);button.querySelector("span").textContent="Création de la vidéo…";
+   const blob=await composition.export({onProgress:({frame,total})=>{button.querySelector("span").textContent="Création "+Math.round(frame/total*100)+" %";}});
    if(!(blob instanceof Blob)||blob.size<10000)throw new Error("WebMotion n’a pas produit de vidéo exploitable.");
-   const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="avantgarde-webmotion-test.mp4";document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);
-   button.textContent="TEST TERMINÉ — MP4 téléchargé";alert("Diagnostic cadrage WebMotion (copie aussi disponible dans la console) :\n"+webmotionDiagnostics.map((d,n)=>"GIF "+(n+1)+"\nNaturel : "+d.natural+"\nZone CSS : "+d.cssBox+"\nParent : "+d.parentBox+"\nobject-fit : "+d.objectFit+" / "+d.objectPosition+"\nTransform : "+d.transform+"\nScène : "+d.stageBox+"\nCalque : "+d.overlayXY+" / "+d.overlayAttr+"\nCanvas : "+d.canvas+"\nFrame décodée : "+d.firstDecoded).join("\n\n"));
-  }catch(error){console.error("WebMotion test",error);alert("Échec WebMotion : "+(error?.message||error));button.textContent="ÉCHEC — relancer le test";}
+   const safeName=(String(items.find(x=>String(x.id)===String(document.getElementById("projectModalContent").dataset.itemId))?.titre||"inspiration").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");const extension=blob.type.toLowerCase().includes("mp4")?"mp4":"webm";const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="avantgarde-"+safeName+"."+extension;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);const shareText=getInspirationShareText();try{await navigator.clipboard.writeText(shareText)}catch(_){shareMessage("Vidéo téléchargée. Autorise le presse-papiers pour copier automatiquement le texte du verso.");}socialChooser.hidden=false;button.querySelector("span").textContent="Vidéo prête — choisir un réseau";
+  }catch(error){console.error("WebMotion test",error);alert("Impossible de créer la vidéo : "+(error?.message||error));button.querySelector("span").textContent="Réessayer";}
   finally{for(const decoder of decoders){try{decoder.close();}catch{}}composition?.remove();button.disabled=false;}
  });;
 }
