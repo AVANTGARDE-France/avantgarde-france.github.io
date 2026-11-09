@@ -799,6 +799,7 @@ load();
    const gifImages=[...face.querySelectorAll("img")].filter(img=>/\.gif(?:$|[?#])/i.test(img.currentSrc||img.src));
    if(!gifImages.length)throw new Error("Aucun GIF animé détecté dans cette face de carte.");
    const overlays=[];
+   const webmotionDiagnostics=[];
    const foregroundStage=document.createElement("w-el");foregroundStage.setAttribute("x","0");foregroundStage.setAttribute("y","0");foregroundStage.setAttribute("width","1080");foregroundStage.setAttribute("height","1350");foregroundStage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
    const foregroundWrapper=document.createElement("div");foregroundWrapper.className="project-modal-card";foregroundWrapper.style.cssText=wrapper.style.cssText;
    const foregroundFace=face.cloneNode(true);foregroundFace.removeAttribute("id");foregroundFace.style.background="transparent";
@@ -818,7 +819,7 @@ load();
      const decoded=await decoder.decode({frameIndex:n});
      const duration=decoded.image.duration||100000;durations.push(duration);totalDuration+=duration;decoded.image.close();
     }
-    const rect=img.getBoundingClientRect();const stageRect=stage.getBoundingClientRect();
+    const rect=img.getBoundingClientRect();const stageRect=stage.getBoundingClientRect();const imageStyle=getComputedStyle(img);const imageParent=img.parentElement;const parentRect=imageParent?.getBoundingClientRect();
     const overlay=document.createElement("w-el");
     overlay.setAttribute("x",String(rect.left-stageRect.left));overlay.setAttribute("y",String(rect.top-stageRect.top));
     overlay.setAttribute("width",String(rect.width));overlay.setAttribute("height",String(rect.height));
@@ -831,20 +832,21 @@ load();
      const time=((requestedFrame/30)*1000000)%totalDuration;let elapsed=0;let frameIndex=0;
      while(frameIndex<durations.length-1&&elapsed+durations[frameIndex]<=time){elapsed+=durations[frameIndex];frameIndex++;}
      const decoded=await decoder.decode({frameIndex:frameIndex});
+     if(requestedFrame===0){overlay.__firstFrameSize={width:decoded.image.displayWidth||decoded.image.codedWidth,height:decoded.image.displayHeight||decoded.image.codedHeight};}
      ctx.clearRect(0,0,canvas.width,canvas.height);const sw=img.naturalWidth||decoded.image.displayWidth||decoded.image.codedWidth,sh=img.naturalHeight||decoded.image.displayHeight||decoded.image.codedHeight;const scale=Math.max(canvas.width/sw,canvas.height/sh);const dw=sw*scale,dh=sh*scale,dx=(canvas.width-dw)/2,dy=(canvas.height-dh)/2;ctx.drawImage(decoded.image,0,0,decoded.image.displayWidth||decoded.image.codedWidth,decoded.image.displayHeight||decoded.image.codedHeight,dx,dy,dw,dh);decoded.image.close();
     };
-    await overlay.wmAwaitFrame();img.style.setProperty("opacity","0","important");img.style.setProperty("visibility","hidden","important");overlays.push(overlay);const compositionStage=composition.firstElementChild;if(!compositionStage)throw new Error("Scène interne WebMotion introuvable.");compositionStage.appendChild(overlay);
+    await overlay.wmAwaitFrame();webmotionDiagnostics.push({src:(img.currentSrc||img.src).split("/").pop(),natural:img.naturalWidth+"x"+img.naturalHeight,cssBox:Math.round(rect.width)+"x"+Math.round(rect.height),parentBox:parentRect?Math.round(parentRect.width)+"x"+Math.round(parentRect.height):"n/a",objectFit:imageStyle.objectFit,objectPosition:imageStyle.objectPosition,transform:imageStyle.transform,stageBox:Math.round(stageRect.width)+"x"+Math.round(stageRect.height),overlayXY:Math.round(rect.left-stageRect.left)+","+Math.round(rect.top-stageRect.top),overlayAttr:overlay.getAttribute("width")+"x"+overlay.getAttribute("height"),canvas:canvas.width+"x"+canvas.height,firstDecoded:overlay.__firstFrameSize?.width+"x"+overlay.__firstFrameSize?.height});img.style.setProperty("opacity","0","important");img.style.setProperty("visibility","hidden","important");overlays.push(overlay);const compositionStage=composition.firstElementChild;if(!compositionStage)throw new Error("Scène interne WebMotion introuvable.");compositionStage.appendChild(overlay);
     overlay.__setFrame=n=>{requestedFrame=n;};
    }
    const internalStage=composition.firstElementChild;if(!internalStage)throw new Error("Scène interne WebMotion introuvable.");internalStage.appendChild(foregroundStage);await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
    const renderCardFrame=composition.renderFrameAt.bind(composition);
    composition.renderFrameAt=frame=>{renderCardFrame(frame);for(const overlay of overlays)overlay.__setFrame(frame);};
    if(document.fonts?.ready)await document.fonts.ready;
-   button.textContent="WebMotion : encodage MP4…";
+   console.table(webmotionDiagnostics);button.dataset.webmotionDiagnostics=JSON.stringify(webmotionDiagnostics);button.textContent="WebMotion : encodage MP4…";
    const blob=await composition.export({onProgress:({frame,total})=>{button.textContent="WebMotion : "+Math.round(frame/total*100)+" %";}});
    if(!(blob instanceof Blob)||blob.size<10000)throw new Error("WebMotion n’a pas produit de vidéo exploitable.");
    const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="avantgarde-webmotion-test.mp4";document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);
-   button.textContent="TEST TERMINÉ — MP4 téléchargé";
+   button.textContent="TEST TERMINÉ — MP4 téléchargé";alert("Diagnostic cadrage WebMotion (copie aussi disponible dans la console) :\n"+webmotionDiagnostics.map((d,n)=>"GIF "+(n+1)+"\nNaturel : "+d.natural+"\nZone CSS : "+d.cssBox+"\nParent : "+d.parentBox+"\nobject-fit : "+d.objectFit+" / "+d.objectPosition+"\nTransform : "+d.transform+"\nScène : "+d.stageBox+"\nCalque : "+d.overlayXY+" / "+d.overlayAttr+"\nCanvas : "+d.canvas+"\nFrame décodée : "+d.firstDecoded).join("\n\n"));
   }catch(error){console.error("WebMotion test",error);alert("Échec WebMotion : "+(error?.message||error));button.textContent="ÉCHEC — relancer le test";}
   finally{for(const decoder of decoders){try{decoder.close();}catch{}}composition?.remove();button.disabled=false;}
  });;
