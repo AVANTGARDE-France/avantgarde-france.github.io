@@ -828,7 +828,7 @@ load();
      const decoded=await decoder.decode({frameIndex:frameIndex});
      ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(decoded.image,0,0,canvas.width,canvas.height);decoded.image.close();
     };
-    overlays.push(overlay);composition.appendChild(overlay);img.style.setProperty("opacity","0","important");img.style.setProperty("visibility","hidden","important");
+    overlays.push(overlay);const compositionStage=composition.firstElementChild;if(!compositionStage)throw new Error("Scène interne WebMotion introuvable.");compositionStage.appendChild(overlay);img.style.setProperty("opacity","0","important");img.style.setProperty("visibility","hidden","important");
     overlay.__setFrame=n=>{requestedFrame=n;};
    }
    const renderCardFrame=composition.renderFrameAt.bind(composition);
