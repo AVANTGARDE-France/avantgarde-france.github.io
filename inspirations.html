@@ -585,10 +585,13 @@ const shareStatus=document.getElementById("inspirationShareStatus");
 const socialChooser=document.getElementById("inspirationSocialChooser");
 function shareMessage(message){if(shareStatus){shareStatus.textContent=message;shareStatus.classList.add("visible")}}
 function getInspirationShareText(){
- const clone=modalContent.cloneNode(true);
+ const content=document.getElementById("projectModalContent");
+ const title=document.getElementById("projectModalTitle");
+ if(!content)throw new Error("Texte du verso introuvable.");
+ const clone=content.cloneNode(true);
  clone.querySelectorAll("script,style,button,svg").forEach(el=>el.remove());
  const body=(clone.innerText||clone.textContent||"").trim();
- return [modalTitle.textContent.trim(),body].filter(Boolean).join("\n\n");
+ return [title?.textContent?.trim(),body].filter(Boolean).join("\n\n");
 }
 document.getElementById("inspirationSocialClose")?.addEventListener("click",()=>{socialChooser.hidden=true});
 socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)socialChooser.hidden=true});
@@ -676,7 +679,7 @@ load();
    console.table(webmotionDiagnostics);button.dataset.webmotionDiagnostics=JSON.stringify(webmotionDiagnostics);button.querySelector("span").textContent="Création de la vidéo…";
    const blob=await composition.export({onProgress:({frame,total})=>{button.querySelector("span").textContent="Création "+Math.round(frame/total*100)+" %";}});
    if(!(blob instanceof Blob)||blob.size<10000)throw new Error("WebMotion n’a pas produit de vidéo exploitable.");
-   const safeName=(String(items.find(x=>String(x.id)===String(document.getElementById("projectModalContent").dataset.itemId))?.titre||"inspiration").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");const extension=blob.type.toLowerCase().includes("mp4")?"mp4":"webm";const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="avantgarde-"+safeName+"."+extension;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);const shareText=getInspirationShareText();try{await navigator.clipboard.writeText(shareText)}catch(_){shareMessage("Vidéo téléchargée. Autorise le presse-papiers pour copier automatiquement le texte du verso.");}socialChooser.hidden=false;button.querySelector("span").textContent="Vidéo prête — choisir un réseau";
+   const safeName=(String(document.getElementById("projectModalTitle")?.textContent||"inspiration").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");const extension=blob.type.toLowerCase().includes("mp4")?"mp4":"webm";const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="avantgarde-"+safeName+"."+extension;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);const shareText=getInspirationShareText();try{await navigator.clipboard.writeText(shareText)}catch(_){shareMessage("Vidéo téléchargée. Autorise le presse-papiers pour copier automatiquement le texte du verso.");}socialChooser.hidden=false;button.querySelector("span").textContent="Vidéo prête — choisir un réseau";
   }catch(error){console.error("WebMotion test",error);alert("Impossible de créer la vidéo : "+(error?.message||error));button.querySelector("span").textContent="Réessayer";}
   finally{for(const decoder of decoders){try{decoder.close();}catch{}}composition?.remove();button.disabled=false;}
  });;
