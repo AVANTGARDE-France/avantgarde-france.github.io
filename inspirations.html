@@ -820,11 +820,13 @@ load();
      const duration=decoded.image.duration||100000;durations.push(duration);totalDuration+=duration;decoded.image.close();
     }
     const rect=img.getBoundingClientRect();const stageRect=stage.getBoundingClientRect();const imageStyle=getComputedStyle(img);const imageParent=img.parentElement;const parentRect=imageParent?.getBoundingClientRect();
+    const compositionScaleX=1080/stageRect.width,compositionScaleY=1350/stageRect.height;
+    const logicalX=(rect.left-stageRect.left)*compositionScaleX,logicalY=(rect.top-stageRect.top)*compositionScaleY,logicalWidth=rect.width*compositionScaleX,logicalHeight=rect.height*compositionScaleY;
     const overlay=document.createElement("w-el");
-    overlay.setAttribute("x",String(rect.left-stageRect.left));overlay.setAttribute("y",String(rect.top-stageRect.top));
-    overlay.setAttribute("width",String(rect.width));overlay.setAttribute("height",String(rect.height));
+    overlay.setAttribute("x",String(logicalX));overlay.setAttribute("y",String(logicalY));
+    overlay.setAttribute("width",String(logicalWidth));overlay.setAttribute("height",String(logicalHeight));
     overlay.style.cssText="display:block;overflow:hidden;z-index:9999;pointer-events:none";
-    const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(rect.width));canvas.height=Math.max(1,Math.round(rect.height));
+    const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(logicalWidth));canvas.height=Math.max(1,Math.round(logicalHeight));
     const ctx=canvas.getContext("2d");if(!ctx)throw new Error("Canvas GIF indisponible.");
     let requestedFrame=0;
     overlay.wmLiveCanvas=()=>canvas;
@@ -833,7 +835,7 @@ load();
      while(frameIndex<durations.length-1&&elapsed+durations[frameIndex]<=time){elapsed+=durations[frameIndex];frameIndex++;}
      const decoded=await decoder.decode({frameIndex:frameIndex});
      if(requestedFrame===0){overlay.__firstFrameSize={width:decoded.image.displayWidth||decoded.image.codedWidth,height:decoded.image.displayHeight||decoded.image.codedHeight};}
-     ctx.clearRect(0,0,canvas.width,canvas.height);const sw=img.naturalWidth||decoded.image.displayWidth||decoded.image.codedWidth,sh=img.naturalHeight||decoded.image.displayHeight||decoded.image.codedHeight;const scale=Math.max(canvas.width/sw,canvas.height/sh);const dw=sw*scale,dh=sh*scale,dx=(canvas.width-dw)/2,dy=(canvas.height-dh)/2;ctx.drawImage(decoded.image,0,0,decoded.image.displayWidth||decoded.image.codedWidth,decoded.image.displayHeight||decoded.image.codedHeight,dx,dy,dw,dh);decoded.image.close();
+     ctx.clearRect(0,0,canvas.width,canvas.height);const sw=img.naturalWidth||decoded.image.displayWidth||decoded.image.codedWidth,sh=img.naturalHeight||decoded.image.displayHeight||decoded.image.codedHeight;const fw=decoded.image.displayWidth||decoded.image.codedWidth,fh=decoded.image.displayHeight||decoded.image.codedHeight;const coverScale=Math.max(canvas.width/sw,canvas.height/sh),coverW=sw*coverScale,coverH=sh*coverScale;ctx.save();ctx.filter="blur(28px)";ctx.globalAlpha=.72;ctx.drawImage(decoded.image,0,0,fw,fh,(canvas.width-coverW)/2-35,(canvas.height-coverH)/2-35,coverW+70,coverH+70);ctx.restore();const containScale=Math.min(canvas.width/sw,canvas.height/sh),drawW=sw*containScale,drawH=sh*containScale;ctx.drawImage(decoded.image,0,0,fw,fh,(canvas.width-drawW)/2,(canvas.height-drawH)/2,drawW,drawH);decoded.image.close();
     };
     await overlay.wmAwaitFrame();webmotionDiagnostics.push({src:(img.currentSrc||img.src).split("/").pop(),natural:img.naturalWidth+"x"+img.naturalHeight,cssBox:Math.round(rect.width)+"x"+Math.round(rect.height),parentBox:parentRect?Math.round(parentRect.width)+"x"+Math.round(parentRect.height):"n/a",objectFit:imageStyle.objectFit,objectPosition:imageStyle.objectPosition,transform:imageStyle.transform,stageBox:Math.round(stageRect.width)+"x"+Math.round(stageRect.height),overlayXY:Math.round(rect.left-stageRect.left)+","+Math.round(rect.top-stageRect.top),overlayAttr:overlay.getAttribute("width")+"x"+overlay.getAttribute("height"),canvas:canvas.width+"x"+canvas.height,firstDecoded:overlay.__firstFrameSize?.width+"x"+overlay.__firstFrameSize?.height});img.style.setProperty("opacity","0","important");img.style.setProperty("visibility","hidden","important");overlays.push(overlay);const compositionStage=composition.firstElementChild;if(!compositionStage)throw new Error("Scène interne WebMotion introuvable.");compositionStage.appendChild(overlay);
     overlay.__setFrame=n=>{requestedFrame=n;};
