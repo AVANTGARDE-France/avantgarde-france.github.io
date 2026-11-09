@@ -794,6 +794,8 @@ load();
    face.querySelectorAll("img").forEach(img=>{img.loading="eager";img.decoding="sync"});
    wrapper.appendChild(face);stage.appendChild(wrapper);composition.appendChild(stage);document.body.appendChild(composition);
    await composition.ready;
+   if(document.fonts?.ready)await document.fonts.ready;
+   await Promise.all([...face.querySelectorAll("img")].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,10000)})));
    const gifImages=[...face.querySelectorAll("img")].filter(img=>/\.gif(?:$|[?#])/i.test(img.currentSrc||img.src));
    if(!gifImages.length)throw new Error("Aucun GIF animé détecté dans cette face de carte.");
    const overlays=[];
