@@ -1304,6 +1304,35 @@
 #projectGrid .project-card-center:before,
 #projectModalFront .project-card-center:before{left:50%!important;transform:translate(-50%,-5px)!important}
 
+
+/* Affichage agrandi : seule la carte source est visible, sans habillage de modale. */
+#projectModal .project-modal-panel{
+ background:transparent!important;border:0!important;border-radius:0!important;
+ box-shadow:none!important;padding:0!important;overflow:visible!important;
+}
+#projectModal .project-modal-close{display:none!important}
+#projectModalCard,#projectModalCard .project-modal-card-inner,
+#projectModalCard .project-modal-face,#projectModalFront{
+ border:0!important;outline:0!important;box-shadow:none!important;
+ background:transparent!important;
+}
+#projectModalFront .project-modal-live-card>.project-card{
+ border-radius:inherit!important;
+}
+/* Réafficher les véritables ornements de la carte originale (masqués dans la grille). */
+#projectModalFront .project-card-finish{
+ display:block!important;visibility:visible!important;opacity:1!important;
+}
+#projectModalFront .project-card-finish:before,
+#projectModalFront .project-card-finish:after{display:block!important}
+/* Aucun voile sombre ajouté au-dessus de la photographie dans le recto agrandi. */
+#projectModalFront .project-card-image-wrap:after{
+ background:none!important;opacity:0!important;
+}
+#projectModalFront .project-card-image{
+ filter:none!important;transform:none!important;
+}
+
 </style>
 </head>
 <body>
