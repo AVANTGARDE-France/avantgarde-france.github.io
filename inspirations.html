@@ -543,6 +543,137 @@
 .project-filter-empty{padding:9px;color:#9eabbc;font:italic 11px Arial,sans-serif}
 @media(max-width:620px){.project-filter-wrap{min-width:0}.project-filter-toggle{min-height:37px;padding:8px 11px;font-size:11px}.project-filter-panel{left:0;width:min(520px,calc(100vw - 22px));max-height:min(360px,58vh);padding:8px}.project-filter-column{padding-right:7px}.project-filter-subcolumn{padding-left:8px}.project-filter-option{padding:8px 7px;font-size:11px}.project-filter-suboptions .project-filter-option{font-size:10px}}
 
+
+/* ── Direction artistique Inspirations : édition éditoriale ──
+   Portée volontairement au recto des cartes de la bibliothèque.
+   Le contenu, les votes, le verso et les interactions restent inchangés. */
+#projectGrid .project-card,
+#projectModalFront{
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  display:flex!important;flex-direction:column!important;aspect-ratio:4/5!important;
+  border:1px solid rgba(240,213,138,.72)!important;border-radius:17px!important;
+  background:#07152d!important;box-shadow:0 12px 30px rgba(0,0,0,.34),inset 0 0 0 5px rgba(7,21,45,.2)!important;
+}
+#projectGrid .project-card:before,
+#projectModalFront:before{
+  content:"";position:absolute;inset:8px!important;z-index:4!important;
+  border:1px solid rgba(245,243,237,.38)!important;border-radius:11px!important;
+  pointer-events:none!important;box-shadow:inset 0 0 28px rgba(0,0,0,.12)!important;
+}
+#projectGrid .project-card-image-wrap,
+#projectModalFront .project-card-image-wrap{
+  position:absolute!important;inset:0!important;z-index:0!important;overflow:hidden!important;
+  background:#0d2344!important;
+}
+#projectGrid .project-card-image,
+#projectModalFront .project-card-image{
+  width:100%!important;height:100%!important;object-fit:cover!important;
+  filter:saturate(.88) contrast(1.06)!important;transform:scale(1.015);
+}
+#projectGrid .project-card-image-wrap:after,
+#projectModalFront .project-card-image-wrap:after{
+  content:""!important;display:block!important;position:absolute!important;inset:0!important;z-index:1!important;
+  background:
+    linear-gradient(180deg,rgba(4,13,27,.34) 0%,rgba(4,13,27,.04) 25%,rgba(4,13,27,.18) 49%,rgba(4,13,27,.76) 76%,rgba(4,13,27,.96) 100%),
+    linear-gradient(90deg,rgba(4,13,27,.16),transparent 28%,transparent 72%,rgba(4,13,27,.16))!important;
+}
+#projectGrid .project-card-finish,
+#projectModalFront .project-card-finish{display:none!important}
+#projectGrid .project-card-top,
+#projectModalFront .project-card-top{
+  position:absolute!important;left:0!important;right:0!important;bottom:61px!important;z-index:3!important;
+  display:flex!important;justify-content:center!important;align-items:center!important;
+  min-height:0!important;padding:0 17px!important;
+}
+#projectGrid .project-card-title,
+#projectModalFront .project-card-title{
+  display:block!important;width:auto!important;max-width:84%!important;margin:0 auto!important;
+  padding:8px 13px 0!important;border-top:1px solid rgba(240,213,138,.68)!important;
+  color:#f0d58a!important;text-align:center!important;text-transform:uppercase!important;
+  font:600 clamp(9px,1vw,12px)/1.35 Arial,Helvetica,sans-serif!important;
+  letter-spacing:1.55px!important;text-shadow:0 2px 8px #000!important;
+}
+#projectGrid .project-card-center,
+#projectModalFront .project-card-center{
+  position:absolute!important;inset:15% 0 24% 0!important;z-index:2!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  min-height:0!important;padding:22px 23px!important;text-align:center!important;
+}
+#projectGrid .project-card-center:before,
+#projectModalFront .project-card-center:before{
+  content:"“"!important;position:absolute!important;top:0!important;left:50%!important;
+  transform:translateX(-50%)!important;color:#f0d58a!important;
+  font:400 clamp(48px,5vw,68px)/.85 Georgia,serif!important;
+  text-shadow:0 3px 12px rgba(0,0,0,.55)!important;
+}
+#projectGrid .project-card-tagline,
+#projectModalFront .project-card-tagline{
+  position:relative!important;z-index:2!important;display:block!important;
+  width:100%!important;max-width:100%!important;margin:0!important;padding:17px 0 0!important;
+  color:#fff!important;font-family:Georgia,"Times New Roman",serif!important;
+  font-style:normal!important;font-weight:500!important;
+  font-size:clamp(15px,1.55vw,22px)!important;line-height:1.34!important;
+  letter-spacing:-.22px!important;text-align:center!important;
+  text-shadow:0 2px 5px rgba(0,0,0,.92),0 0 18px rgba(0,0,0,.65)!important;
+  -webkit-text-stroke:0!important;
+  display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:7!important;
+  overflow:hidden!important;overflow-wrap:anywhere!important;
+}
+#projectGrid .inspiration-card-brand,
+#projectModalFront .inspiration-card-brand{
+  position:absolute!important;left:0!important;right:0!important;bottom:14px!important;z-index:5!important;
+  min-height:0!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;color:#f5f3ed!important;
+  font:700 15px/1 Georgia,serif!important;letter-spacing:-.3px!important;
+  text-shadow:0 2px 8px #000!important;
+}
+#projectGrid .inspiration-card-brand:before,
+#projectModalFront .inspiration-card-brand:before{
+  content:"";position:absolute;left:37%;right:37%;top:-9px;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(240,213,138,.8),transparent);
+}
+#projectGrid .inspiration-card-brand .brand-prefix,
+#projectModalFront .inspiration-card-brand .brand-prefix{
+  margin-right:4px!important;color:rgba(245,243,237,.82)!important;
+  font:italic 500 10px/1 Arial,sans-serif!important;letter-spacing:.2px!important;
+}
+#projectGrid .inspiration-card-brand .brand-a,
+#projectModalFront .inspiration-card-brand .brand-a{color:#4c9be0!important}
+#projectGrid .inspiration-card-brand .brand-e,
+#projectModalFront .inspiration-card-brand .brand-e{color:#ef4135!important}
+#projectGrid .project-card-rating,
+#projectModalFront .project-card-rating{
+  position:absolute!important;left:17px!important;top:17px!important;z-index:6!important;
+  padding:6px 9px!important;border:1px solid rgba(240,213,138,.42)!important;border-radius:999px!important;
+  background:rgba(7,21,45,.66)!important;backdrop-filter:blur(8px)!important;
+  box-shadow:0 3px 12px rgba(0,0,0,.2)!important;font:600 10px Arial,sans-serif!important;
+}
+#projectGrid .project-card-validation-stamp,
+#projectModalFront .project-card-validation-stamp{z-index:7!important}
+#projectGrid .project-card:hover{transform:translateY(-4px)!important;box-shadow:0 17px 36px rgba(0,0,0,.42)!important}
+@media(max-width:900px){
+  #projectGrid .project-card-tagline{font-size:clamp(13px,2vw,19px)!important;line-height:1.3!important}
+  #projectGrid .project-card-center{inset:14% 0 25% 0!important;padding:17px 16px!important}
+}
+@media(max-width:620px){
+  #projectGrid .project-card,#projectModalFront{border-radius:13px!important}
+  #projectGrid .project-card:before,#projectModalFront:before{inset:6px!important;border-radius:9px!important}
+  #projectGrid .project-card-center,#projectModalFront .project-card-center{inset:15% 0 25% 0!important;padding:16px 12px!important}
+  #projectGrid .project-card-center:before,#projectModalFront .project-card-center:before{font-size:44px!important}
+  #projectGrid .project-card-tagline,#projectModalFront .project-card-tagline{
+    font-size:clamp(12px,3.15vw,16px)!important;line-height:1.28!important;
+    -webkit-line-clamp:7!important;
+  }
+  #projectGrid .project-card-top,#projectModalFront .project-card-top{bottom:54px!important;padding:0 10px!important}
+  #projectGrid .project-card-title,#projectModalFront .project-card-title{
+    max-width:88%!important;padding-top:7px!important;font-size:9px!important;letter-spacing:1.1px!important;
+  }
+  #projectGrid .inspiration-card-brand,#projectModalFront .inspiration-card-brand{bottom:12px!important;font-size:13px!important}
+  #projectGrid .inspiration-card-brand .brand-prefix,#projectModalFront .inspiration-card-brand .brand-prefix{font-size:9px!important}
+  #projectGrid .project-card-rating,#projectModalFront .project-card-rating{left:12px!important;top:12px!important;padding:5px 7px!important}
+}
+
 </style>
 </head>
 <body>
