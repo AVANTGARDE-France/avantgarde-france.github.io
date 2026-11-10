@@ -1352,6 +1352,21 @@
  border:0!important;outline:0!important;box-shadow:none!important;
 }
 
+/* Scène de retournement transparente : l'unique habillage visible est la carte source clonée. */
+#projectModal{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:0!important}
+#projectModal .project-modal-panel{width:min(92vw,72vh,620px)!important;height:auto!important;max-height:92vh!important;aspect-ratio:4/5!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;perspective:1600px!important;overflow:visible!important}
+#projectModal .project-modal-close{display:none!important}
+#projectModalCard{width:100%!important;height:auto!important;aspect-ratio:4/5!important;border:0!important;box-shadow:none!important;background:transparent!important}
+#projectModalCard .project-modal-card-inner{width:100%!important;height:100%!important}
+#projectModalCard .project-modal-face{border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}
+#projectModalFront{display:block!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;isolation:isolate!important}
+#projectModalFront:before{display:none!important;content:none!important}
+#projectModalFront>.project-modal-live-card{transition:zoom 2s cubic-bezier(.18,.78,.2,1)!important}
+#projectModalFront .project-modal-live-card>.project-card{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;aspect-ratio:4/5!important;overflow:hidden!important;border-radius:inherit!important}
+#projectModalFront .project-modal-live-card .project-card-image-wrap:after{content:initial!important}
+#projectModalFront .project-modal-live-card .project-card-finish{display:block!important;visibility:visible!important;opacity:1!important}
+#projectModalFront .project-modal-live-card .project-card-finish:before,#projectModalFront .project-modal-live-card .project-card-finish:after{display:block!important}
+
 </style>
 </head>
 <body>
