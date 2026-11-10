@@ -1195,11 +1195,12 @@
 /* ===== Cycle unique des cartes Inspirations : un seul élément DOM ===== */
 #projectModal{position:fixed!important;inset:0!important;z-index:10000!important;display:none!important;padding:0!important;margin:0!important;overflow:visible!important;background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;pointer-events:none!important}
 #projectModal.open{display:block!important}
+#projectModal.open #projectModalCard{transition:width 2s cubic-bezier(.18,.78,.2,1),height 2s cubic-bezier(.18,.78,.2,1)!important}
 #projectModal:before,#projectModal:after{content:none!important;display:none!important}
 #projectModal .project-modal-panel{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;perspective:1600px!important;pointer-events:none!important}
 @supports(height:100dvh){#projectModal .project-modal-panel{height:100dvh!important}}
 #projectModal .project-modal-close{display:none!important}
-#projectModalCard{position:fixed!important;left:50%!important;top:50%!important;width:200px;height:250px;margin:0!important;padding:0!important;aspect-ratio:4/5!important;transform:translate(-50%,-50%)!important;transform-style:preserve-3d!important;perspective:1600px!important;transition:width 2s cubic-bezier(.18,.78,.2,1),height 2s cubic-bezier(.18,.78,.2,1)!important;pointer-events:auto!important;z-index:2!important}
+#projectModalCard{position:fixed!important;left:50%!important;top:50%!important;width:200px;height:250px;margin:0!important;padding:0!important;aspect-ratio:4/5!important;transform:translate(-50%,-50%)!important;transform-style:preserve-3d!important;perspective:1600px!important;transition:none!important;pointer-events:auto!important;z-index:2!important}
 #projectModalCard .project-modal-card-inner{position:relative!important;width:100%!important;height:100%!important;transform-style:preserve-3d!important;transition:transform 1.05s cubic-bezier(.2,.75,.25,1)!important}
 #projectModalCard .project-modal-card-inner.is-flipped{transform:rotateY(180deg)!important}
 #projectModalCard .project-modal-face{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;box-sizing:border-box!important;overflow:hidden!important;border:0!important;border-radius:0!important;box-shadow:none!important;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important}
