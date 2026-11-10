@@ -1279,7 +1279,7 @@
 #projectModalFront>.project-modal-live-card{
  transform:translate(-50%,-50%)!important;
  transform-origin:center center!important;
- transition:zoom 2s cubic-bezier(.18,.78,.2,1)!important;
+ transition:zoom 3s cubic-bezier(.18,.78,.2,1)!important;
 }
 #projectModalFront .project-modal-live-card>.project-card{
  position:absolute!important;inset:0!important;display:block!important;
@@ -1337,7 +1337,7 @@
 /* Carte agrandie : une source DOM, zoom de layout uniforme plafonné à x2. */
 #projectModalFront{overflow:visible!important;position:relative!important}
 #projectModalFront>.project-modal-live-card{
- transition:zoom 2s cubic-bezier(.18,.78,.2,1)!important;
+ transition:zoom 3s cubic-bezier(.18,.78,.2,1)!important;
  transform:translate(-50%,-50%)!important;
  transform-origin:center center!important;
 }
@@ -1361,7 +1361,7 @@
 #projectModalCard .project-modal-face{border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}
 #projectModalFront{display:block!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;isolation:isolate!important}
 #projectModalFront:before{display:none!important;content:none!important}
-#projectModalFront>.project-modal-live-card{transition:zoom 2s cubic-bezier(.18,.78,.2,1)!important}
+#projectModalFront>.project-modal-live-card{transition:zoom 3s cubic-bezier(.18,.78,.2,1)!important}
 #projectModalFront .project-modal-live-card>.project-card{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;aspect-ratio:4/5!important;overflow:hidden!important;border-radius:inherit!important}
 #projectModalFront .project-modal-live-card .project-card-image-wrap:after{content:""!important}
 #projectModalFront .project-modal-live-card .project-card-finish{display:block!important;visibility:visible!important;opacity:1!important}
@@ -1384,6 +1384,20 @@
 #projectModalFront{cursor:pointer!important;touch-action:manipulation!important}
 #projectModalFront .project-modal-live-card,
 #projectModalFront .project-modal-live-card *{pointer-events:auto!important}
+
+
+/* Correctif recto agrandi : supprimer le voile importé du pseudo-element image. */
+#projectModalFront .project-card-image-wrap:after{
+ display:none!important;content:none!important;background:none!important;opacity:0!important;
+}
+#projectModalFront .project-modal-live-card,
+#projectModalFront .project-modal-live-card>.project-card,
+#projectModalFront .project-modal-live-card .project-card-image-wrap,
+#projectModalFront .project-modal-live-card .project-card-image{
+ pointer-events:auto!important;
+}
+#projectModalFront .project-modal-live-card>.project-card{cursor:pointer!important}
+#projectModalFront .project-modal-live-card [data-frozen-pseudo]{pointer-events:none!important}
 
 </style>
 </head>
@@ -1471,6 +1485,7 @@ function copyRenderedCard(source){
    const cs=getComputedStyle(from);
    for(let i=0;i<cs.length;i++){const prop=cs[i];try{to.style.setProperty(prop,cs.getPropertyValue(prop),"important")}catch{}}
    for(const pseudo of ["::before","::after"]){
+     if(pseudo==="::after" && from.classList?.contains("project-card-image-wrap"))continue;
      const ps=getComputedStyle(from,pseudo),content=ps.content;
      if(!content||content==="none"||content==="normal")continue;
      const node=document.createElement("span");
@@ -1539,7 +1554,7 @@ grid.addEventListener("pointerout",e=>{const c=e.target.closest(".project-card")
 grid.addEventListener("click",e=>{const c=e.target.closest(".project-card");if(c)openInspirationCard(c)});
 const modalFront=document.getElementById("projectModalFront");
 function revealInspirationBack(){const flip=document.querySelector("#projectModalCard .project-modal-card-inner");if(!modal?.classList.contains("open")||modal.dataset.cardStage!=="RECTO_AGRANDI"||!flip)return;modal.dataset.cardStage="VERSO";flip.classList.add("is-flipped");modal.classList.add("is-flipped");modalFront?.setAttribute("aria-label","Verso de la carte.");}
-modalFront?.addEventListener("click",e=>{e.stopPropagation();if(modal?.dataset.cardStage!=="RECTO_AGRANDI")return;if(e.target.closest("button,a,input,select,textarea,[role=button],[contenteditable=true]"))return;revealInspirationBack()});
+modalFront?.addEventListener("click",e=>{e.stopPropagation();if(modal?.dataset.cardStage!=="RECTO_AGRANDI")return;if(e.target.closest("button,a,input,select,textarea,[role=button],[contenteditable=true]"))return;revealInspirationBack()},{capture:true});
 modalFront?.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&!e.target.closest("button,a")){e.preventDefault();revealInspirationBack()}});
 grid.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("project-card")){e.preventDefault();openInspirationCard(e.target)}});
 votePanel?.addEventListener("click",async e=>{const b=e.target.closest("[data-vote]");if(!b)return;const msg=votePanel.querySelector(".project-vote-message");if(!currentUser){const statusNode=document.getElementById("inspirationShareStatus");if(statusNode){statusNode.textContent="Vous devez être connecté pour noter.";statusNode.classList.add("visible");}return}const value=Number(b.dataset.vote),id=modalContent.dataset.itemId;if(!id)return;const currentValue=myVotes.get(String(id)),removing=currentValue===value;b.disabled=true;if(msg)msg.textContent=removing?"Retrait de votre évaluation…":"Enregistrement de votre note…";const result=removing?await supabase.from("inspiration_votes").delete().eq("user_id",currentUser.id).eq("contenu_id",id):await supabase.from("inspiration_votes").upsert({user_id:currentUser.id,contenu_id:id,vote:value,updated_at:new Date().toISOString()},{onConflict:"user_id,contenu_id"});b.disabled=false;if(result.error){console.error("Erreur vote inspiration",result.error);if(msg)msg.textContent="Impossible de modifier votre note. Réessayez.";return}if(removing)myVotes.delete(String(id));else myVotes.set(String(id),value);await loadVoteData();render();const updated=items.find(x=>String(x.id)===String(id));if(updated){votePanel.innerHTML=voteControls(updated);const fresh=grid.querySelector('[data-id="'+CSS.escape(String(id))+'"]');if(fresh){const live=document.querySelector("#projectModalFront .project-modal-live-card");if(live){const updatedCopy=fresh.cloneNode(true);updatedCopy.removeAttribute("id");updatedCopy.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));live.replaceChildren(updatedCopy)}}}});
