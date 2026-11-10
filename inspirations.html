@@ -710,20 +710,31 @@ jamais une boîte de hauteur fixe qui coupe le texte. */
   :is(#projectGrid, #projectModalFront) .project-card-center:before{font-size:58px!important;}
 }
 
-/* Compteur de popularité : pastille éditoriale, intégrée au coin supérieur gauche. */
+/* Compteur de popularité : collé au coin inférieur droit, sans marge extérieure. */
 :is(#projectGrid, #projectModalFront) .project-card-top .project-card-rating{
   position:absolute!important;
-  top:13px!important;left:13px!important;right:auto!important;bottom:auto!important;
+  top:auto!important;left:auto!important;right:0!important;bottom:0!important;
+  margin:0!important;
   z-index:10!important;
   display:inline-flex!important;align-items:center!important;justify-content:center!important;
   gap:6px!important;min-width:0!important;min-height:0!important;
   padding:6px 10px!important;
   border:1px solid rgba(240,213,138,.58)!important;
-  border-radius:999px!important;
-  background:rgba(7,21,45,.72)!important;
+  border-radius:12px 0 0 0!important;
+  background:rgba(7,21,45,.86)!important;
   box-shadow:0 2px 9px rgba(0,0,0,.24),inset 0 0 0 1px rgba(255,255,255,.035)!important;
   -webkit-backdrop-filter:blur(5px)!important;backdrop-filter:blur(5px)!important;
   color:#f5f3ed!important;line-height:1!important;
+}
+:is(#projectGrid, #projectModalFront) .project-card-top .project-card-rating .vote-symbol{font-size:13px!important;line-height:1!important}
+:is(#projectGrid, #projectModalFront) .project-card-top .project-card-rating strong{color:#35d078!important;font-size:11px!important;font-weight:700!important}
+@media(max-width:620px){
+  :is(#projectGrid, #projectModalFront) .project-card-top .project-card-rating{
+    top:auto!important;left:auto!important;right:0!important;bottom:0!important;
+    margin:0!important;gap:4px!important;padding:5px 8px!important;
+  }
+  :is(#projectGrid, #projectModalFront) .project-card-top .project-card-rating .vote-symbol{font-size:11px!important}
+  :is(#projectGrid, #projectModalFront) .project-card-top .project-card-rating strong{font-size:9px!important}
 }
 :is(#projectGrid, #projectModalFront) .project-card-top .project-card-rating .vote-symbol{
   font-size:13px!important;line-height:1!important;
