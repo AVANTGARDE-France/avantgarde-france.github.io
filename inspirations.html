@@ -681,6 +681,7 @@ import {supabase} from "./js/supabase.js";
    wrapper.style.cssText=`position:relative!important;z-index:1!important;width:${sourceRect.width}px!important;height:${sourceRect.height}px!important;min-width:${sourceRect.width}px!important;min-height:${sourceRect.height}px!important;max-width:none!important;max-height:none!important;aspect-ratio:4/5!important;transform:scale(${exportScale});transform-origin:top left;margin:0!important;overflow:hidden;background:transparent!important`;
    const face=source.cloneNode(true);face.removeAttribute("id");
    face.style.cssText+=`;position:absolute!important;inset:0!important;width:${sourceRect.width}px!important;height:${sourceRect.height}px!important;transform:none!important;visibility:visible!important;opacity:1!important;background:transparent!important;pointer-events:none!important`;
+   face.style.setProperty("background","transparent","important");face.style.setProperty("background-color","transparent","important");face.style.setProperty("background-image","none","important");
    face.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
    face.querySelectorAll("img").forEach(img=>{img.loading="eager";img.decoding="sync"});
    // L'image animée est injectée au niveau de la photo ; le fondu CSS existant reste au-dessus.
