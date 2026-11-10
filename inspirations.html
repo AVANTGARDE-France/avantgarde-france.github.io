@@ -724,14 +724,10 @@ load();
    if(!gifImages.length)throw new Error("Aucun GIF animé détecté dans cette face de carte.");
    const overlays=[];
    const webmotionDiagnostics=[];
-   const foregroundStage=document.createElement("w-el");foregroundStage.setAttribute("x","0");foregroundStage.setAttribute("y","0");foregroundStage.setAttribute("width","1080");foregroundStage.setAttribute("height","1350");foregroundStage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
-   const foregroundWrapper=document.createElement("div");foregroundWrapper.className="project-modal-card";foregroundWrapper.style.cssText=wrapper.style.cssText+";zoom:1!important;transform:scale(2)!important;transform-origin:top left!important;width:540px!important;height:675px!important;";
-   const foregroundFace=face.cloneNode(true);foregroundFace.removeAttribute("id");foregroundFace.style.background="transparent";
-   const captureWordSets=[face.querySelectorAll(".project-card-word"),foregroundFace.querySelectorAll(".project-card-word")];
-   const captureWordCount=captureWordSets[0].length;
+   // Une seule face HTML pour le graphisme : le cadre, le titre, le texte et le footer ne sont jamais dupliqués.
+   const captureWords=face.querySelectorAll(".project-card-word");
+   const captureWordCount=captureWords.length;
    const revealFrames=90;
-   foregroundFace.querySelectorAll(".project-card-image-wrap").forEach(el=>el.remove());
-   foregroundWrapper.appendChild(foregroundFace);foregroundStage.appendChild(foregroundWrapper);
    for(const img of gifImages){
     const url=img.currentSrc||img.src;
     const response=await fetch(url,{mode:"cors",credentials:"omit"});
@@ -752,7 +748,8 @@ load();
     const overlay=document.createElement("w-el");
     overlay.setAttribute("x",String(logicalX));overlay.setAttribute("y",String(logicalY));
     overlay.setAttribute("width",String(logicalWidth));overlay.setAttribute("height",String(logicalHeight));
-    overlay.style.cssText="display:block;overflow:hidden;z-index:9999;pointer-events:none";
+    // Le calque animé reste sous les éléments éditoriaux et le cadre de la face unique.
+    overlay.style.cssText="display:block;overflow:hidden;z-index:0;pointer-events:none";
     const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(logicalWidth));canvas.height=Math.max(1,Math.round(logicalHeight));
     const ctx=canvas.getContext("2d");if(!ctx)throw new Error("Canvas GIF indisponible.");
     let requestedFrame=0;
@@ -767,11 +764,11 @@ load();
     await overlay.wmAwaitFrame();webmotionDiagnostics.push({src:(img.currentSrc||img.src).split("/").pop(),natural:img.naturalWidth+"x"+img.naturalHeight,cssBox:Math.round(rect.width)+"x"+Math.round(rect.height),parentBox:parentRect?Math.round(parentRect.width)+"x"+Math.round(parentRect.height):"n/a",objectFit:imageStyle.objectFit,objectPosition:imageStyle.objectPosition,transform:imageStyle.transform,stageBox:Math.round(stageRect.width)+"x"+Math.round(stageRect.height),overlayXY:Math.round(rect.left-stageRect.left)+","+Math.round(rect.top-stageRect.top),overlayAttr:overlay.getAttribute("width")+"x"+overlay.getAttribute("height"),canvas:canvas.width+"x"+canvas.height,firstDecoded:overlay.__firstFrameSize?.width+"x"+overlay.__firstFrameSize?.height});img.style.setProperty("opacity","0","important");img.style.setProperty("visibility","hidden","important");overlays.push(overlay);const compositionStage=composition.firstElementChild;if(!compositionStage)throw new Error("Scène interne WebMotion introuvable.");compositionStage.appendChild(overlay);
     overlay.__setFrame=n=>{requestedFrame=n;};
    }
-   const internalStage=composition.firstElementChild;if(!internalStage)throw new Error("Scène interne WebMotion introuvable.");internalStage.appendChild(foregroundStage);await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+   const internalStage=composition.firstElementChild;if(!internalStage)throw new Error("Scène interne WebMotion introuvable.");await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
    const renderCardFrame=composition.renderFrameAt.bind(composition);
    composition.renderFrameAt=frame=>{
     const visibleWords=captureWordCount?Math.min(captureWordCount,Math.ceil((Math.max(0,frame)+1)/revealFrames*captureWordCount)):0;
-    for(const wordSet of captureWordSets)wordSet.forEach((word,index)=>{word.style.setProperty("opacity",index<visibleWords?"1":"0","important");});
+    captureWords.forEach((word,index)=>{word.style.setProperty("opacity",index<visibleWords?"1":"0","important");});
     renderCardFrame(frame);
     for(const overlay of overlays)overlay.__setFrame(frame);
    };
