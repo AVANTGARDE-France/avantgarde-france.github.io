@@ -709,6 +709,27 @@ jamais une boîte de hauteur fixe qui coupe le texte. */
 @media(max-width:620px){
   :is(#projectGrid, #projectModalFront) .project-card-center:before{font-size:58px!important;}
 }
+
+/* Séparateur éditorial au-dessus de la signature Avant-gardE. */
+:is(#projectGrid, #projectModalFront) .inspiration-card-brand:before{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  left:50%!important;
+  right:auto!important;
+  top:-9px!important;
+  width:48%!important;
+  height:1px!important;
+  transform:translateX(-50%)!important;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(214,173,85,.28) 15%,
+    rgba(240,213,138,.95) 50%,
+    rgba(214,173,85,.28) 85%,
+    transparent 100%)!important;
+  box-shadow:0 0 5px rgba(240,213,138,.38)!important;
+  pointer-events:none!important;
+}
 </style>
 </head>
 <body>
