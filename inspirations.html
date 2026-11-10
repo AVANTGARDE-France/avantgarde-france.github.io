@@ -1270,135 +1270,79 @@
  left:50%!important;right:auto!important;width:38px!important;
  transform:translateX(-50%)!important;bottom:4px!important;
 }
-/* Le recto agrandi est la carte source complète, copiée une fois et mise à
-   l'échelle uniformément comme dans l'export vidéo (composition 4:5). */
-#projectModalFront{overflow:visible!important;border:0!important;box-shadow:none!important;background:transparent!important}
-/* Même wrapper dimensionnel que l'export vidéo : les dimensions CSS
-   de la carte restent la référence et zoom (layout) reproportionne chaque
-   élément HTML, sans transformer une image aplatie. */
+
+/* ===== Carte Inspiration agrandie — règles consolidées ===== */
+#projectModal{
+ background:transparent!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ pointer-events:none!important;padding:0!important;
+}
+#projectModal:before,#projectModal:after{content:none!important;display:none!important}
+#projectModal .project-modal-panel{
+ width:min(92vw,72vh,620px)!important;height:auto!important;
+ max-height:92vh!important;aspect-ratio:4/5!important;
+ padding:0!important;margin:0!important;overflow:visible!important;
+ background:transparent!important;border:0!important;border-radius:0!important;
+ box-shadow:none!important;perspective:1600px!important;pointer-events:auto!important;
+}
+#projectModal .project-modal-close{display:none!important}
+#projectModalCard{
+ width:100%!important;height:auto!important;aspect-ratio:4/5!important;
+ border:0!important;box-shadow:none!important;background:transparent!important;
+ pointer-events:auto!important;
+}
+#projectModalCard .project-modal-card-inner{width:100%!important;height:100%!important}
+#projectModalCard .project-modal-face{
+ border:0!important;border-radius:0!important;box-shadow:none!important;
+ background:transparent!important;pointer-events:auto!important;
+}
+#projectModalFront{
+ display:block!important;position:relative!important;overflow:visible!important;
+ border:0!important;border-radius:0!important;background:transparent!important;
+ box-shadow:none!important;isolation:isolate!important;cursor:pointer!important;
+ touch-action:manipulation!important;pointer-events:auto!important;
+}
+#projectModalFront:before,#projectModalFront:after{
+ content:none!important;display:none!important;background:none!important;
+}
 #projectModalFront>.project-modal-live-card{
- transform:translate(-50%,-50%)!important;
- transform-origin:center center!important;
+ transform:translate(-50%,-50%)!important;transform-origin:center center!important;
  transition:zoom 3s cubic-bezier(.18,.78,.2,1)!important;
+ pointer-events:auto!important;
 }
 #projectModalFront .project-modal-live-card>.project-card{
  position:absolute!important;inset:0!important;display:block!important;
  width:100%!important;height:100%!important;aspect-ratio:4/5!important;
- overflow:hidden!important;transform:none!important;
+ overflow:hidden!important;transform:none!important;cursor:pointer!important;
 }
-#projectModalFront .project-modal-live-card .project-card-image-wrap:after{display:block!important;content:""!important}
-#projectModalFront .project-modal-live-card .project-card-finish{display:initial!important}
-.project-modal.open .project-modal-panel{animation:none!important}
-
-
-#projectGrid .inspiration-card-brand,
-#projectModalFront .inspiration-card-brand{
- left:0!important;right:0!important;width:100%!important;
- box-sizing:border-box!important;padding-left:7px!important;padding-right:7px!important;
- justify-content:flex-start!important;text-align:left!important;
+#projectModalFront .project-modal-live-card .project-card-image-wrap{
+ position:absolute!important;inset:0!important;overflow:hidden!important;
 }
-/* Décalage de quatre espaces avant « Je suis Avant-gardE ». */
-#projectGrid .inspiration-card-brand .brand-prefix,
-#projectModalFront .inspiration-card-brand .brand-prefix{margin-left:4ch!important}
-/* Le guillemet rouge reste centré horizontalement, même avec son décalage vertical. */
-#projectGrid .project-card-center:before,
-#projectModalFront .project-card-center:before{left:50%!important;transform:translate(-50%,-5px)!important}
-
-
-/* Affichage agrandi : seule la carte source est visible, sans habillage de modale. */
-#projectModal .project-modal-panel{
- background:transparent!important;border:0!important;border-radius:0!important;
- box-shadow:none!important;padding:0!important;overflow:visible!important;
+#projectModalFront .project-modal-live-card .project-card-image-wrap:before,
+#projectModalFront .project-modal-live-card .project-card-image-wrap:after{
+ content:none!important;display:none!important;background:none!important;
+ opacity:0!important;box-shadow:none!important;
 }
-#projectModal .project-modal-close{display:none!important}
-#projectModalCard,#projectModalCard .project-modal-card-inner,
-#projectModalCard .project-modal-face,#projectModalFront{
- border:0!important;outline:0!important;box-shadow:none!important;
- background:transparent!important;
-}
-#projectModalFront .project-modal-live-card>.project-card{
- border-radius:inherit!important;
-}
-/* Réafficher les véritables ornements de la carte originale (masqués dans la grille). */
-#projectModalFront .project-card-finish{
- display:block!important;visibility:visible!important;opacity:1!important;
-}
-#projectModalFront .project-card-finish:before,
-#projectModalFront .project-card-finish:after{display:block!important}
-/* Aucun voile sombre ajouté au-dessus de la photographie dans le recto agrandi. */
-#projectModalFront .project-card-image-wrap:after{
- background:none!important;opacity:0!important;
-}
-#projectModalFront .project-card-image{
+#projectModalFront .project-modal-live-card .project-card-image{
  filter:none!important;transform:none!important;
 }
-
-
-/* Carte agrandie : une source DOM, zoom de layout uniforme plafonné à x2. */
-#projectModalFront{overflow:visible!important;position:relative!important}
-#projectModalFront>.project-modal-live-card{
- transition:zoom 3s cubic-bezier(.18,.78,.2,1)!important;
- transform:translate(-50%,-50%)!important;
- transform-origin:center center!important;
+#projectModalFront .project-modal-live-card .project-card-finish{
+ display:block!important;visibility:visible!important;opacity:1!important;
 }
-#projectModalFront .project-modal-live-card>.project-card{
- position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
- aspect-ratio:4/5!important;overflow:hidden!important;
+#projectModalFront .project-modal-live-card .project-card-finish:before,
+#projectModalFront .project-modal-live-card .project-card-finish:after{
+ display:block!important;
 }
-#projectModal .project-modal-close{display:none!important}
-#projectModal .project-modal-panel,
-#projectModalCard,#projectModalCard .project-modal-card-inner,
-#projectModalCard .project-modal-face{
- border:0!important;outline:0!important;box-shadow:none!important;
+#projectModalFront .project-modal-live-card,
+#projectModalFront .project-modal-live-card *,
+#projectModalCard,#projectModalCard .project-modal-back{
+ pointer-events:auto!important;
 }
-
-/* Scène de retournement transparente : l'unique habillage visible est la carte source clonée. */
-#projectModal{background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:0!important}
-#projectModal .project-modal-panel{width:min(92vw,72vh,620px)!important;height:auto!important;max-height:92vh!important;aspect-ratio:4/5!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;perspective:1600px!important;overflow:visible!important}
-#projectModal .project-modal-close{display:none!important}
-#projectModalCard{width:100%!important;height:auto!important;aspect-ratio:4/5!important;border:0!important;box-shadow:none!important;background:transparent!important}
-#projectModalCard .project-modal-card-inner{width:100%!important;height:100%!important}
-#projectModalCard .project-modal-face{border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}
-#projectModalFront{display:block!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;isolation:isolate!important}
-#projectModalFront:before{display:none!important;content:none!important}
-#projectModalFront>.project-modal-live-card{transition:zoom 3s cubic-bezier(.18,.78,.2,1)!important}
-#projectModalFront .project-modal-live-card>.project-card{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;aspect-ratio:4/5!important;overflow:hidden!important;border-radius:inherit!important}
-#projectModalFront .project-modal-live-card .project-card-image-wrap:after{content:""!important}
-#projectModalFront .project-modal-live-card .project-card-finish{display:block!important;visibility:visible!important;opacity:1!important}
-#projectModalFront .project-modal-live-card .project-card-finish:before,#projectModalFront .project-modal-live-card .project-card-finish:after{display:block!important}
-
-
-/* La scène plein écran ne doit ni assombrir la page ni bloquer les contrôles autour. */
-#projectModal{
- background:transparent!important;
- background-color:transparent!important;
- backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+#projectModalFront .project-modal-live-card [data-frozen-pseudo]{
  pointer-events:none!important;
 }
-#projectModal:before,#projectModal:after{display:none!important;content:none!important}
-#projectModal .project-modal-panel,
-#projectModalCard,#projectModalFront,#projectModalCard .project-modal-back{
- pointer-events:auto!important;
-}
-#projectModal .project-modal-panel{z-index:1!important}
-#projectModalFront{cursor:pointer!important;touch-action:manipulation!important}
-#projectModalFront .project-modal-live-card,
-#projectModalFront .project-modal-live-card *{pointer-events:auto!important}
-
-
-/* Correctif recto agrandi : supprimer le voile importé du pseudo-element image. */
-#projectModalFront .project-card-image-wrap:after{
- display:none!important;content:none!important;background:none!important;opacity:0!important;
-}
-#projectModalFront .project-modal-live-card,
-#projectModalFront .project-modal-live-card>.project-card,
-#projectModalFront .project-modal-live-card .project-card-image-wrap,
-#projectModalFront .project-modal-live-card .project-card-image{
- pointer-events:auto!important;
-}
-#projectModalFront .project-modal-live-card>.project-card{cursor:pointer!important}
-#projectModalFront .project-modal-live-card [data-frozen-pseudo]{pointer-events:none!important}
-
+.project-modal.open .project-modal-panel{animation:none!important}
+/* ===== Fin des règles consolidées ===== */
 </style>
 </head>
 <body>
@@ -1485,7 +1429,7 @@ function copyRenderedCard(source){
    const cs=getComputedStyle(from);
    for(let i=0;i<cs.length;i++){const prop=cs[i];try{to.style.setProperty(prop,cs.getPropertyValue(prop),"important")}catch{}}
    for(const pseudo of ["::before","::after"]){
-     if(pseudo==="::after" && from.classList?.contains("project-card-image-wrap"))continue;
+     if(from.classList?.contains("project-card-image-wrap"))continue;
      const ps=getComputedStyle(from,pseudo),content=ps.content;
      if(!content||content==="none"||content==="normal")continue;
      const node=document.createElement("span");
