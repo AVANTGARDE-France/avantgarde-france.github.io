@@ -707,13 +707,12 @@ import {supabase} from "./js/supabase.js";
    await Promise.all([...face.querySelectorAll("img")].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,10000)})));
    const gifImages=[...face.querySelectorAll("img")].filter(img=>/\.gif(?:$|[?#])/i.test(img.currentSrc||img.src));
    if(!gifImages.length)throw new Error("Aucun GIF animé détecté dans cette face de carte.");
-   const overlays=[];
+   const gifLayers=[];
    const webmotionDiagnostics=[];
-   // Le rendu éditorial utilise la face originale, jamais un clone.
+   // Le premier plan reprend uniquement les éléments éditoriaux.
    const foregroundStage=document.createElement("w-el");foregroundStage.setAttribute("x","0");foregroundStage.setAttribute("y","0");foregroundStage.setAttribute("width","1080");foregroundStage.setAttribute("height","1350");foregroundStage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
    const foregroundWrapper=wrapper.cloneNode(false);foregroundWrapper.style.cssText=wrapper.style.cssText+";background:transparent!important;background-color:transparent!important";
    const foregroundFace=face.cloneNode(true);foregroundFace.removeAttribute("id");foregroundFace.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));foregroundFace.querySelectorAll(".project-card-image-wrap").forEach(el=>el.remove());
-   // La couche éditoriale ne doit jamais repeindre le fond bleu par-dessus le GIF.
    foregroundFace.style.setProperty("background","transparent","important");foregroundFace.style.setProperty("background-color","transparent","important");foregroundFace.style.setProperty("background-image","none","important");
    foregroundWrapper.appendChild(foregroundFace);foregroundStage.appendChild(foregroundWrapper);
    const captureWordSets=[face.querySelectorAll(".project-card-word"),foregroundFace.querySelectorAll(".project-card-word")];
@@ -728,40 +727,41 @@ import {supabase} from "./js/supabase.js";
     await decoder.tracks.ready;
     const track=decoder.tracks.selectedTrack;
     if(!track||!track.frameCount)throw new Error("Le GIF ne contient aucune image décodable.");
-    const durations=[];let totalDuration=0;
+    const frames=[],durations=[];let totalDuration=0;
     for(let n=0;n<track.frameCount;n++){
      const decoded=await decoder.decode({frameIndex:n});
-     const duration=decoded.image.duration||100000;durations.push(duration);totalDuration+=duration;decoded.image.close();
+     const bitmap=await createImageBitmap(decoded.image);
+     frames.push(bitmap);const duration=decoded.image.duration||100000;durations.push(duration);totalDuration+=duration;decoded.image.close();
     }
-    const rect=img.getBoundingClientRect();const stageRect=stage.getBoundingClientRect();const imageStyle=getComputedStyle(img);const imageParent=img.closest(".project-card-image-wrap")||img.parentElement;const parentRect=imageParent?.getBoundingClientRect()||rect;
-    const compositionScaleX=1080/stageRect.width,compositionScaleY=1350/stageRect.height;
-    const logicalX=(parentRect.left-stageRect.left)*compositionScaleX,logicalY=(parentRect.top-stageRect.top)*compositionScaleY,logicalWidth=parentRect.width*compositionScaleX,logicalHeight=parentRect.height*compositionScaleY;
-    const overlay=document.createElement("w-el");
-    overlay.setAttribute("x",String(logicalX));overlay.setAttribute("y",String(logicalY));
-    overlay.setAttribute("width",String(logicalWidth));overlay.setAttribute("height",String(logicalHeight));
-    // Le calque animé reste sous les éléments éditoriaux et le cadre de la face unique.
-    overlay.style.cssText="display:block;overflow:hidden;z-index:0;pointer-events:none";
-    const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(logicalWidth));canvas.height=Math.max(1,Math.round(logicalHeight));
-    const ctx=canvas.getContext("2d");if(!ctx)throw new Error("Canvas GIF indisponible.");
-    let requestedFrame=0;
-    overlay.wmLiveCanvas=()=>canvas;
-    overlay.wmAwaitFrame=async()=>{
-     const time=((requestedFrame/30)*1000000)%totalDuration;let elapsed=0;let frameIndex=0;
-     while(frameIndex<durations.length-1&&elapsed+durations[frameIndex]<=time){elapsed+=durations[frameIndex];frameIndex++;}
-     const decoded=await decoder.decode({frameIndex:frameIndex});
-     if(requestedFrame===0){overlay.__firstFrameSize={width:decoded.image.displayWidth||decoded.image.codedWidth,height:decoded.image.displayHeight||decoded.image.codedHeight};}
-     ctx.clearRect(0,0,canvas.width,canvas.height);const sw=img.naturalWidth||decoded.image.displayWidth||decoded.image.codedWidth,sh=img.naturalHeight||decoded.image.displayHeight||decoded.image.codedHeight;const fw=decoded.image.displayWidth||decoded.image.codedWidth,fh=decoded.image.displayHeight||decoded.image.codedHeight;const coverScale=Math.max(canvas.width/sw,canvas.height/sh),coverW=sw*coverScale,coverH=sh*coverScale;ctx.save();ctx.filter="blur(28px)";ctx.globalAlpha=.72;ctx.drawImage(decoded.image,0,0,fw,fh,(canvas.width-coverW)/2-35,(canvas.height-coverH)/2-35,coverW+70,coverH+70);ctx.restore();const coverCropScale=Math.max(canvas.width/sw,canvas.height/sh),cropW=canvas.width/coverCropScale,cropH=canvas.height/coverCropScale,cropX=(sw-cropW)/2,cropY=(sh-cropH)/2;ctx.drawImage(decoded.image,cropX,cropY,cropW,cropH,0,0,canvas.width,canvas.height);decoded.image.close();
+    const rect=img.getBoundingClientRect();const stageRect=stage.getBoundingClientRect();const imageParent=img.closest(".project-card-image-wrap")||img.parentElement;const parentRect=imageParent?.getBoundingClientRect()||rect;
+    const canvas=document.createElement("canvas");
+    canvas.width=Math.max(1,Math.round(parentRect.width*exportScale));canvas.height=Math.max(1,Math.round(parentRect.height*exportScale));
+    canvas.setAttribute("aria-hidden","true");
+    canvas.style.cssText="position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;z-index:0!important;object-fit:cover!important;pointer-events:none!important";
+    if(!imageParent)throw new Error("Conteneur de la photo introuvable.");
+    imageParent.appendChild(canvas);
+    const ctx=canvas.getContext("2d",{alpha:false});if(!ctx)throw new Error("Canvas GIF indisponible.");
+    const drawFrame=videoFrame=>{
+     const time=((videoFrame/30)*1000000)%totalDuration;let elapsed=0,index=0;
+     while(index<durations.length-1&&elapsed+durations[index]<=time){elapsed+=durations[index];index++;}
+     const bitmap=frames[index],sw=bitmap.width,sh=bitmap.height;
+     const coverScale=Math.max(canvas.width/sw,canvas.height/sh),coverW=sw*coverScale,coverH=sh*coverScale;
+     ctx.clearRect(0,0,canvas.width,canvas.height);ctx.save();ctx.filter="blur(28px)";ctx.globalAlpha=.72;ctx.drawImage(bitmap,(canvas.width-coverW)/2-35,(canvas.height-coverH)/2-35,coverW+70,coverH+70);ctx.restore();
+     const cropScale=Math.max(canvas.width/sw,canvas.height/sh),cropW=canvas.width/cropScale,cropH=canvas.height/cropScale,cropX=(sw-cropW)/2,cropY=(sh-cropH)/2;
+     ctx.drawImage(bitmap,cropX,cropY,cropW,cropH,0,0,canvas.width,canvas.height);
     };
-    await overlay.wmAwaitFrame();webmotionDiagnostics.push({src:(img.currentSrc||img.src).split("/").pop(),natural:img.naturalWidth+"x"+img.naturalHeight,cssBox:Math.round(rect.width)+"x"+Math.round(rect.height),parentBox:parentRect?Math.round(parentRect.width)+"x"+Math.round(parentRect.height):"n/a",objectFit:imageStyle.objectFit,objectPosition:imageStyle.objectPosition,transform:imageStyle.transform,stageBox:Math.round(stageRect.width)+"x"+Math.round(stageRect.height),overlayXY:Math.round(rect.left-stageRect.left)+","+Math.round(rect.top-stageRect.top),overlayAttr:overlay.getAttribute("width")+"x"+overlay.getAttribute("height"),canvas:canvas.width+"x"+canvas.height,firstDecoded:overlay.__firstFrameSize?.width+"x"+overlay.__firstFrameSize?.height});img.style.setProperty("opacity","0","important");img.style.setProperty("visibility","hidden","important");overlays.push(overlay);overlay.setAttribute("z","0");stage.appendChild(overlay);
-    overlay.__setFrame=n=>{requestedFrame=n;};
+    drawFrame(0);
+    img.style.setProperty("opacity","0","important");img.style.setProperty("visibility","hidden","important");
+    gifLayers.push({drawFrame,frames});
+    webmotionDiagnostics.push({src:url.split("/").pop(),gifFrames:frames.length,canvas:canvas.width+"x"+canvas.height,photoBox:Math.round(parentRect.width)+"x"+Math.round(parentRect.height),stageBox:Math.round(stageRect.width)+"x"+Math.round(stageRect.height)});
    }
    stage.appendChild(foregroundStage);
    const renderCardFrame=composition.renderFrameAt.bind(composition);
    composition.renderFrameAt=frame=>{
     const visibleWords=captureWordCount?Math.min(captureWordCount,Math.ceil((Math.max(0,frame)+1)/revealFrames*captureWordCount)):0;
     for(const wordSet of captureWordSets)wordSet.forEach((word,index)=>{word.style.setProperty("opacity",index<visibleWords?"1":"0","important");});
+    for(const layer of gifLayers)layer.drawFrame(frame);
     renderCardFrame(frame);
-    for(const overlay of overlays)overlay.__setFrame(frame);
    };
    if(document.fonts?.ready)await document.fonts.ready;
    console.table(webmotionDiagnostics);button.dataset.webmotionDiagnostics=JSON.stringify(webmotionDiagnostics);button.querySelector("span").textContent="Création de la vidéo…";
@@ -769,7 +769,7 @@ import {supabase} from "./js/supabase.js";
    if(!(blob instanceof Blob)||blob.size<10000)throw new Error("WebMotion n’a pas produit de vidéo exploitable.");
    const safeName=(String(document.getElementById("projectModalTitle")?.textContent||"inspiration").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");const extension=blob.type.toLowerCase().includes("mp4")?"mp4":"webm";const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="avantgarde-"+safeName+"."+extension;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);const versoNode=document.getElementById("projectModalContent");const versoClone=versoNode?.cloneNode(true);versoClone?.querySelectorAll("script,style,button,svg").forEach(el=>el.remove());const rawVersoText=(versoClone?.innerText||versoClone?.textContent||"").replace(/\r/g,"");const versoText=rawVersoText.split("\n").map(line=>line.replace(/[\t ]+/g," ").trim()).filter(Boolean).join("\n");const shareText=[versoText,connectedUser.id?`Deviens Avant-gardistE, je te parraine : ${connectedUser.id}`:""].filter(Boolean).join("\n\n");try{if(!versoText)throw new Error("Texte du verso introuvable");await navigator.clipboard.writeText(shareText);const statusNode=document.getElementById("inspirationShareStatus");if(statusNode){statusNode.textContent="Vidéo téléchargée et texte du verso copié.";statusNode.classList.add("visible");}}catch(copyError){const statusNode=document.getElementById("inspirationShareStatus");if(statusNode){statusNode.textContent="Vidéo téléchargée, mais le texte du verso n’a pas pu être copié automatiquement.";statusNode.classList.add("visible");}}if(socialChooser)socialChooser.hidden=false;button.querySelector("span").textContent="Vidéo prête — choisir un réseau";
   }catch(error){console.error("WebMotion test",error);alert("Impossible de créer la vidéo : "+(error?.message||error));button.querySelector("span").textContent="Réessayer";}
-  finally{for(const decoder of decoders){try{decoder.close();}catch{}}composition?.remove();button.disabled=false;}
+  finally{for(const decoder of decoders){try{decoder.close();}catch{}}for(const layer of (typeof gifLayers!=="undefined"?gifLayers:[]))for(const bitmap of layer.frames){try{bitmap.close();}catch{}}composition?.remove();button.disabled=false;}
  });;
 }
 </script>
