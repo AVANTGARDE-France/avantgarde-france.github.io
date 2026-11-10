@@ -1152,6 +1152,60 @@
  .project-modal .project-modal-panel{width:min(88vw,calc(90dvh * .8),620px)!important}
 }
 
+
+/* Position de l'accroche = repère d'alignement, jamais une fenêtre de découpe.
+   Le texte garde sa hauteur naturelle et peut passer devant la photographie. */
+#projectGrid .project-card-center,
+#projectModalFront .project-card-center{
+ position:absolute!important;left:25px!important;right:25px!important;
+ top:9%!important;bottom:17%!important;height:auto!important;
+ box-sizing:border-box!important;min-height:0!important;
+ display:flex!important;flex-direction:column!important;
+ overflow:visible!important;padding:0 3px!important;
+ z-index:4!important;
+}
+#projectGrid .project-card[data-accroche-position="top"] .project-card-center,
+#projectModalFront[data-accroche-position="top"] .project-card-center{
+ top:9%!important;bottom:17%!important;
+ justify-content:flex-start!important;align-items:center!important;
+}
+#projectGrid .project-card[data-accroche-position="center"] .project-card-center,
+#projectModalFront[data-accroche-position="center"] .project-card-center{
+ top:9%!important;bottom:17%!important;
+ justify-content:center!important;align-items:center!important;
+}
+#projectGrid .project-card[data-accroche-position="bottom"] .project-card-center,
+#projectModalFront[data-accroche-position="bottom"] .project-card-center{
+ top:9%!important;bottom:17%!important;
+ justify-content:flex-end!important;align-items:center!important;
+}
+#projectGrid .project-card-tagline,
+#projectModalFront .project-card-tagline{
+ display:block!important;position:relative!important;
+ width:100%!important;max-width:100%!important;height:auto!important;max-height:none!important;
+ margin:0!important;padding:0!important;overflow:visible!important;
+ white-space:normal!important;text-overflow:clip!important;
+ -webkit-line-clamp:unset!important;-webkit-box-orient:initial!important;
+ overflow-wrap:break-word!important;word-break:normal!important;
+}
+#projectGrid .inspiration-card-brand,
+#projectModalFront .inspiration-card-brand{
+ left:7px!important;right:7px!important;bottom:5px!important;
+ width:auto!important;padding-bottom:12px!important;
+}
+#projectGrid .inspiration-card-brand:after,
+#projectModalFront .inspiration-card-brand:after{
+ left:50%!important;right:auto!important;width:38px!important;
+ bottom:4px!important;height:2px!important;
+ transform:translateX(-50%)!important;
+}
+@media(max-width:620px){
+ #projectGrid .project-card-center,
+ #projectModalFront .project-card-center{left:23px!important;right:23px!important;top:9%!important;bottom:17%!important}
+ #projectGrid .project-card-tagline,
+ #projectModalFront .project-card-tagline{font-size:10px!important;line-height:1.06!important}
+}
+
 </style>
 </head>
 <body>
