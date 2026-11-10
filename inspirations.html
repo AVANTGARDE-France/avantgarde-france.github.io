@@ -685,7 +685,8 @@ import {supabase} from "./js/supabase.js";
    face.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
    face.querySelectorAll("img").forEach(img=>{img.loading="eager";img.decoding="sync"});
    // L'image animée est injectée au niveau de la photo ; le fondu CSS existant reste au-dessus.
-   face.querySelectorAll(".project-card-image-wrap").forEach(el=>{el.style.setProperty("z-index","0","important");el.style.setProperty("background","transparent","important");});
+   face.querySelectorAll(".project-card-image-wrap").forEach(el=>{el.style.setProperty("z-index","0","important");el.style.setProperty("background","transparent","important");el.style.setProperty("background-color","transparent","important");el.style.setProperty("background-image","none","important");el.style.setProperty("box-shadow","none","important");});
+   const videoPhotoStyle=document.createElement("style");videoPhotoStyle.textContent=".project-card-export-wrapper .project-card-image-wrap::before,.project-card-export-wrapper .project-card-image-wrap::after{content:none!important;display:none!important;background:transparent!important;box-shadow:none!important}";face.prepend(videoPhotoStyle);
    const tagline=face.querySelector(".project-card-tagline");
    if(tagline){
     const parts=(tagline.textContent||"").match(/\S+|\s+/g)||[];
@@ -732,9 +733,9 @@ import {supabase} from "./js/supabase.js";
      const decoded=await decoder.decode({frameIndex:n});
      const duration=decoded.image.duration||100000;durations.push(duration);totalDuration+=duration;decoded.image.close();
     }
-    const rect=img.getBoundingClientRect();const stageRect=stage.getBoundingClientRect();const imageStyle=getComputedStyle(img);const imageParent=img.closest(".project-card-image-wrap")||img.parentElement;const parentRect=imageParent?.getBoundingClientRect();
+    const rect=img.getBoundingClientRect();const stageRect=stage.getBoundingClientRect();const imageStyle=getComputedStyle(img);const imageParent=img.closest(".project-card-image-wrap")||img.parentElement;const parentRect=imageParent?.getBoundingClientRect()||rect;
     const compositionScaleX=1080/stageRect.width,compositionScaleY=1350/stageRect.height;
-    const logicalX=(rect.left-stageRect.left)*compositionScaleX,logicalY=(rect.top-stageRect.top)*compositionScaleY,logicalWidth=rect.width*compositionScaleX,logicalHeight=rect.height*compositionScaleY;
+    const logicalX=(parentRect.left-stageRect.left)*compositionScaleX,logicalY=(parentRect.top-stageRect.top)*compositionScaleY,logicalWidth=parentRect.width*compositionScaleX,logicalHeight=parentRect.height*compositionScaleY;
     const overlay=document.createElement("w-el");
     overlay.setAttribute("x",String(logicalX));overlay.setAttribute("y",String(logicalY));
     overlay.setAttribute("width",String(logicalWidth));overlay.setAttribute("height",String(logicalHeight));
