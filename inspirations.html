@@ -1131,6 +1131,27 @@
  #projectModalFront .project-card-tagline{font-size:10px!important;line-height:1.06!important}
 }
 
+
+/* Zoom uniforme : la carte garde son ratio 4:5 pendant toute l'animation. */
+.project-modal .project-modal-panel{
+ width:min(88vw,calc(90vh * .8),620px)!important;
+ height:auto!important;aspect-ratio:4/5!important;
+ transform-origin:center center!important;
+}
+.project-modal .project-modal-card,
+.project-modal .project-modal-card-inner,
+.project-modal .project-modal-front,
+.project-modal .project-modal-back{
+ width:100%!important;height:100%!important;
+ aspect-ratio:4/5!important;box-sizing:border-box!important;
+}
+.project-modal.open .project-modal-panel{
+ animation:inspiration-card-enlarge 2s cubic-bezier(.18,.78,.2,1) both!important;
+}
+@supports(height:100dvh){
+ .project-modal .project-modal-panel{width:min(88vw,calc(90dvh * .8),620px)!important}
+}
+
 </style>
 </head>
 <body>
@@ -1217,7 +1238,7 @@ grid.addEventListener("pointerout",e=>{const c=e.target.closest(".project-card")
 grid.addEventListener("click",e=>{const c=e.target.closest(".project-card");if(c)openInspirationCard(c)});
 const modalFront=document.getElementById("projectModalFront");
 function revealInspirationBack(){const flip=document.querySelector("#projectModalCard .project-modal-card-inner");if(!modal?.classList.contains("open")||!flip||flip.classList.contains("is-flipped"))return;flip.classList.add("is-flipped");modal.classList.add("is-flipped");modalFront?.setAttribute("aria-label","Verso de la carte.");}
-modalFront?.addEventListener("click",e=>{if(e.target.closest("button,a"))return;revealInspirationBack()});
+modalFront?.addEventListener("click",e=>{e.stopPropagation();if(e.target.closest("button,a,[role=button]"))return;revealInspirationBack()});
 modalFront?.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&!e.target.closest("button,a")){e.preventDefault();revealInspirationBack()}});
 grid.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("project-card")){e.preventDefault();openInspirationCard(e.target)}});
 votePanel?.addEventListener("click",async e=>{const b=e.target.closest("[data-vote]");if(!b)return;const msg=votePanel.querySelector(".project-vote-message");if(!currentUser){const statusNode=document.getElementById("inspirationShareStatus");if(statusNode){statusNode.textContent="Vous devez être connecté pour noter.";statusNode.classList.add("visible");}return}const value=Number(b.dataset.vote),id=modalContent.dataset.itemId;if(!id)return;const currentValue=myVotes.get(String(id)),removing=currentValue===value;b.disabled=true;if(msg)msg.textContent=removing?"Retrait de votre évaluation…":"Enregistrement de votre note…";const result=removing?await supabase.from("inspiration_votes").delete().eq("user_id",currentUser.id).eq("contenu_id",id):await supabase.from("inspiration_votes").upsert({user_id:currentUser.id,contenu_id:id,vote:value,updated_at:new Date().toISOString()},{onConflict:"user_id,contenu_id"});b.disabled=false;if(result.error){console.error("Erreur vote inspiration",result.error);if(msg)msg.textContent="Impossible de modifier votre note. Réessayez.";return}if(removing)myVotes.delete(String(id));else myVotes.set(String(id),value);await loadVoteData();render();const updated=items.find(x=>String(x.id)===String(id));if(updated){votePanel.innerHTML=voteControls(updated);const fresh=grid.querySelector('[data-id="'+CSS.escape(String(id))+'"]');if(fresh)document.getElementById("projectModalFront").innerHTML=fresh.innerHTML}});
@@ -1241,7 +1262,7 @@ document.getElementById("inspirationSocialClose")?.addEventListener("click",()=>
 socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)socialChooser.hidden=true});
 document.getElementById("projectModalClose")?.addEventListener("click",closeInspirationModal);
 modal?.addEventListener("click",e=>{if(e.target===modal)closeInspirationModal()});
-document.querySelector("#projectModalCard")?.addEventListener("click",e=>{if(e.target.closest("button,a,input,select,textarea,[role=button]"))return;closeInspirationModal()});
+document.querySelector("#projectModalCard")?.addEventListener("click",e=>{if(e.target.closest("button,a,input,select,textarea,[role=button]"))return;const flip=document.querySelector("#projectModalCard .project-modal-card-inner");if(flip?.classList.contains("is-flipped"))closeInspirationModal()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeInspirationModal()});
 async function loadVoteData(){const statsResult=await supabase.from("inspiration_vote_stats").select("*");if(statsResult.error)throw statsResult.error;voteStats=new Map((statsResult.data||[]).map(x=>[String(x.contenu_id),x]));myVotes=new Map();if(currentUser){const own=await supabase.from("inspiration_votes").select("contenu_id,vote").eq("user_id",currentUser.id);if(own.error)throw own.error;for(const v of own.data||[])myVotes.set(String(v.contenu_id),Number(v.vote))}}
 async function load(){try{const auth=await supabase.auth.getSession().catch(e=>({data:{session:null},error:e}));currentUser=auth?.data?.session?.user||null;const [m,s,c]=await Promise.all([supabase.from("inspiration_menus").select("*").eq("valide",true).order("position"),supabase.from("inspiration_sous_menus").select("*").eq("valide",true).order("position"),supabase.from("inspiration_contenus").select("*").eq("valide",true).order("position")]);for(const r of [m,s,c])if(r.error)throw r.error;menus=m.data||[];subs=s.data||[];items=c.data||[];if(voteFilterWrap)voteFilterWrap.hidden=!currentUser;renderFilters();render();try{await loadVoteData()}catch(voteError){console.warn("Statistiques/notes des inspirations indisponibles : les cartes restent accessibles.",voteError);voteStats=new Map();myVotes=new Map()}render()}catch(e){console.error("Erreur chargement inspirations",e);grid.innerHTML='<div class="project-error">Impossible de charger les inspirations. Réessayez dans quelques instants.</div>'}}
