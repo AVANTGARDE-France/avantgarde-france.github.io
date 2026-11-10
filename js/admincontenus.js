@@ -386,12 +386,15 @@ function initialiserApercuImageContenu() {
         contentPhotoPreview.textContent =
             "Aucune image";
 
-        cardPhoto.insertAdjacentElement(
-            "afterend",
-            contentPhotoPreview
-        );
-
     }
+
+    const uploadRow =
+        $("contentPhotoUploadRow") || cardPhoto;
+
+    uploadRow.insertAdjacentElement(
+        "afterend",
+        contentPhotoPreview
+    );
 
     const actualiser =
         () => {
