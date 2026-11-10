@@ -878,7 +878,6 @@ function closeInspirationModal(){
  activeInspirationCard=null;activeInspirationPlaceholder=null;activeInspirationStyle=null;activeInspirationSize=null;
  document.body.style.overflow="";
  /* Aucun partage différé à annuler : le bouton est autonome. */
- shareStatus?.classList.remove("visible");
  if(refreshGridAfterClose){refreshGridAfterClose=false;render();}
 }
 function updateCardHologram(c,e){if(!c||e.pointerType==="touch")return;const r=c.getBoundingClientRect();c.style.setProperty("--shine-x",((e.clientX-r.left)/r.width*100).toFixed(1)+"%");c.style.setProperty("--shine-y",((e.clientY-r.top)/r.height*100).toFixed(1)+"%")}
@@ -894,8 +893,6 @@ grid.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.
 votePanel?.addEventListener("click",async e=>{const b=e.target.closest("[data-vote]");if(!b)return;const msg=votePanel.querySelector(".project-vote-message");if(!currentUser){const statusNode=document.getElementById("inspirationShareStatus");if(statusNode){statusNode.textContent="Vous devez être connecté pour noter.";statusNode.classList.add("visible");}return}const value=Number(b.dataset.vote),id=modalContent.dataset.itemId;if(!id)return;const currentValue=myVotes.get(String(id)),removing=currentValue===value;b.disabled=true;if(msg)msg.textContent=removing?"Retrait de votre évaluation…":"Enregistrement de votre note…";const result=removing?await supabase.from("inspiration_votes").delete().eq("user_id",currentUser.id).eq("contenu_id",id):await supabase.from("inspiration_votes").upsert({user_id:currentUser.id,contenu_id:id,vote:value,updated_at:new Date().toISOString()},{onConflict:"user_id,contenu_id"});b.disabled=false;if(result.error){console.error("Erreur vote inspiration",result.error);if(msg)msg.textContent="Impossible de modifier votre note. Réessayez.";return}if(removing)myVotes.delete(String(id));else myVotes.set(String(id),value);await loadVoteData();const updated=items.find(x=>String(x.id)===String(id));if(updated){votePanel.innerHTML=voteControls(updated);if(activeInspirationCard){const rating=activeInspirationCard.querySelector(".project-card-rating strong");if(rating)rating.textContent=String(popularity(id).pouces_positifs||0);activeInspirationCard.querySelector(".project-card-validation-stamp")?.remove();const stampMarkup=voteIcon(myVotes.get(String(id)));if(stampMarkup){const holder=document.createElement("div");holder.innerHTML=stampMarkup;const stamp=holder.firstElementChild;if(stamp)activeInspirationCard.appendChild(stamp)}refreshGridAfterClose=true;}}});
 
 
-document.getElementById("inspirationSocialClose")?.addEventListener("click",()=>{socialChooser.hidden=true});
-socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)socialChooser.hidden=true});
 document.getElementById("projectModalClose")?.addEventListener("click",closeInspirationModal);
 modal?.addEventListener("click",e=>{if(e.target===modal&&modal.dataset.cardStage==="VERSO")closeInspirationModal()});
 document.querySelector("#projectModalCard")?.addEventListener("click",e=>{if(e.target.closest("button,a,input,select,textarea,[contenteditable=true],[data-vote]"))return;if(modal?.dataset.cardStage==="VERSO")closeInspirationModal()});
