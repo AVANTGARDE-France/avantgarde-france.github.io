@@ -136,6 +136,23 @@ let cardAccroche =
     $("contentAccroche") ||
     $("cardAccroche");
 
+let cardAccrochePosition = $("contentAccrochePositionControl");
+let currentAccrochePosition = "center";
+
+function definirPositionAccroche(position) {
+    currentAccrochePosition = ["top", "center", "bottom"].includes(position) ? position : "center";
+    cardAccrochePosition?.querySelectorAll("[data-quote-position]").forEach(button => {
+        const active = button.dataset.quotePosition === currentAccrochePosition;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+    });
+}
+
+cardAccrochePosition?.addEventListener("click", event => {
+    const button = event.target.closest("[data-quote-position]");
+    if (button) definirPositionAccroche(button.dataset.quotePosition);
+});
+
 let cardPriorite =
     $("contentPriorite") ||
     $("contentPriority") ||
@@ -721,7 +738,7 @@ async function chargerDonnees() {
 
             supabase
                 .from(tableName("contenus"))
-                .select(contentMode === "inspiration" ? "id, sous_menu_id, titre, html, position, valide, photo_url, accroche" : "id, sous_menu_id, titre, html, position, valide, photo_url, accroche, priorite, stat_1, stat_2, stat_3, synergies")
+                .select(contentMode === "inspiration" ? "id, sous_menu_id, titre, html, position, valide, photo_url, accroche, accroche_position" : "id, sous_menu_id, titre, html, position, valide, photo_url, accroche, accroche_position, priorite, stat_1, stat_2, stat_3, synergies")
                 .order(
                     "position",
                     {
@@ -3847,6 +3864,8 @@ function ouvrirContenu(id) {
 
     }
 
+    definirPositionAccroche(item.accroche_position || "center");
+
 
     /* -----------------------------------------------------
        PRIORITE
@@ -4046,6 +4065,8 @@ async function enregistrerContenu() {
             ).trim()
             : "";
 
+    const accrochePosition = currentAccrochePosition;
+
 
     /* -----------------------------------------------------
        PRIORITE
@@ -4173,11 +4194,11 @@ async function enregistrerContenu() {
 .update(contentMode === "inspiration" ? {
                     titre, html, sous_menu_id: nouveauSousMenuId,
                     position: nouvellePosition, photo_url: photo || null,
-                    accroche: accroche || null
+                    accroche: accroche || null, accroche_position: accrochePosition
                 } : {
                     titre, html, sous_menu_id: nouveauSousMenuId,
                     position: nouvellePosition, photo_url: photo || null,
-                    accroche: accroche || null, priorite: priorite || null,
+                    accroche: accroche || null, accroche_position: accrochePosition, priorite: priorite || null,
                     stat_1: stat1, stat_2: stat2, stat_3: stat3, synergies
                 })
                 .eq(
