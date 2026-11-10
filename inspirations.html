@@ -779,6 +779,18 @@ placé près du bord haut. */
   }#projectModalFront .inspiration-card-brand{bottom:12px!important;font-size:13px!important}#projectModalFront .inspiration-card-brand .brand-prefix{font-size:9px!important}#projectModalFront .project-card-rating{left:12px!important;top:12px!important;padding:5px 7px!important}
 }
 
+/* Transitions synchronisées : la typographie et les détails grandissent avec la carte. */
+#projectModalFront>.project-card{transition:border-width 2s cubic-bezier(.18,.78,.2,1),border-radius 2s cubic-bezier(.18,.78,.2,1)!important}
+#projectModalFront>.project-card .project-card-center{transition:padding 2s cubic-bezier(.18,.78,.2,1)!important}
+#projectModalFront>.project-card .project-card-center:before{transition:top 2s cubic-bezier(.18,.78,.2,1),font-size 2s cubic-bezier(.18,.78,.2,1)!important}
+#projectModalFront>.project-card .project-card-tagline{transition:font-size 2s cubic-bezier(.18,.78,.2,1),line-height 2s ease!important}
+#projectModalFront>.project-card .project-card-top{transition:bottom 2s cubic-bezier(.18,.78,.2,1),padding 2s ease!important}
+#projectModalFront>.project-card .project-card-title{transition:font-size 2s cubic-bezier(.18,.78,.2,1),letter-spacing 2s ease,padding 2s ease!important}
+#projectModalFront>.project-card .inspiration-card-brand{transition:font-size 2s cubic-bezier(.18,.78,.2,1),bottom 2s ease!important}
+#projectModalFront>.project-card .inspiration-card-brand .brand-prefix{transition:font-size 2s cubic-bezier(.18,.78,.2,1)!important}
+#projectModalFront>.project-card .project-card-rating{transition:font-size 2s cubic-bezier(.18,.78,.2,1),padding 2s ease,top 2s ease,right 2s ease!important}
+#projectModalFront>.project-card .project-card-taxonomy{transition:font-size 2s cubic-bezier(.18,.78,.2,1),padding 2s ease!important}
+
 /* Recto : guillemet rouge au ras du bord supérieur, sans cadre secondaire. */
 #projectGrid .project-card-center:before,
 #projectModalFront>.project-card .project-card-center:before{
