@@ -1363,7 +1363,7 @@
 #projectModalFront:before{display:none!important;content:none!important}
 #projectModalFront>.project-modal-live-card{transition:zoom 2s cubic-bezier(.18,.78,.2,1)!important}
 #projectModalFront .project-modal-live-card>.project-card{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;aspect-ratio:4/5!important;overflow:hidden!important;border-radius:inherit!important}
-#projectModalFront .project-modal-live-card .project-card-image-wrap:after{content:initial!important}
+#projectModalFront .project-modal-live-card .project-card-image-wrap:after{content:""!important}
 #projectModalFront .project-modal-live-card .project-card-finish{display:block!important;visibility:visible!important;opacity:1!important}
 #projectModalFront .project-modal-live-card .project-card-finish:before,#projectModalFront .project-modal-live-card .project-card-finish:after{display:block!important}
 
@@ -1484,20 +1484,20 @@ function openInspirationCard(c){
  votePanel.innerHTML=voteControls(item);
  flip.classList.remove("is-flipped");modal.classList.remove("is-flipped");
  liveWrapper.style.setProperty("zoom","1","important");
- modal.classList.add("open");document.body.style.overflow="hidden";
+ modal.dataset.cardStage="RECTO_AGRANDI";modal.classList.add("open");document.body.style.overflow="hidden";
  requestAnimationFrame(()=>{
    const area=front.getBoundingClientRect();
    const target=Math.min(2,area.width/sourceRect.width,area.height/sourceRect.height);
    liveWrapper.style.setProperty("zoom",String(target),"important");
  });
 }
-function closeInspirationModal(){modal?.classList.remove("open");document.body.style.overflow="";clearPendingShare();shareStatus?.classList.remove("visible")}
+function closeInspirationModal(){if(modal)modal.dataset.cardStage="FERME";modal?.classList.remove("open","is-flipped");document.querySelector("#projectModalCard .project-modal-card-inner")?.classList.remove("is-flipped");document.body.style.overflow="";clearPendingShare();shareStatus?.classList.remove("visible")}
 function updateCardHologram(c,e){if(!c||e.pointerType==="touch")return;const r=c.getBoundingClientRect();c.style.setProperty("--shine-x",((e.clientX-r.left)/r.width*100).toFixed(1)+"%");c.style.setProperty("--shine-y",((e.clientY-r.top)/r.height*100).toFixed(1)+"%")}
 grid.addEventListener("pointermove",e=>{const c=e.target.closest(".project-card");if(c)updateCardHologram(c,e)});
 grid.addEventListener("pointerout",e=>{const c=e.target.closest(".project-card");if(c&&!c.contains(e.relatedTarget)){c.style.removeProperty("--shine-x");c.style.removeProperty("--shine-y")}});
 grid.addEventListener("click",e=>{const c=e.target.closest(".project-card");if(c)openInspirationCard(c)});
 const modalFront=document.getElementById("projectModalFront");
-function revealInspirationBack(){const flip=document.querySelector("#projectModalCard .project-modal-card-inner");if(!modal?.classList.contains("open")||!flip||flip.classList.contains("is-flipped"))return;flip.classList.add("is-flipped");modal.classList.add("is-flipped");modalFront?.setAttribute("aria-label","Verso de la carte.");}
+function revealInspirationBack(){const flip=document.querySelector("#projectModalCard .project-modal-card-inner");if(!modal?.classList.contains("open")||modal.dataset.cardStage!=="RECTO_AGRANDI"||!flip)return;modal.dataset.cardStage="VERSO";flip.classList.add("is-flipped");modal.classList.add("is-flipped");modalFront?.setAttribute("aria-label","Verso de la carte.");}
 modalFront?.addEventListener("click",e=>{e.stopPropagation();if(e.target.closest("button,a,[role=button]"))return;revealInspirationBack()});
 modalFront?.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&!e.target.closest("button,a")){e.preventDefault();revealInspirationBack()}});
 grid.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("project-card")){e.preventDefault();openInspirationCard(e.target)}});
@@ -1521,8 +1521,8 @@ function getInspirationShareText(){
 document.getElementById("inspirationSocialClose")?.addEventListener("click",()=>{socialChooser.hidden=true});
 socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)socialChooser.hidden=true});
 document.getElementById("projectModalClose")?.addEventListener("click",closeInspirationModal);
-modal?.addEventListener("click",e=>{if(e.target===modal&&modal.classList.contains("is-flipped"))closeInspirationModal()});
-document.querySelector("#projectModalCard")?.addEventListener("click",e=>{if(e.target.closest("button,a,input,select,textarea,[role=button]"))return;const flip=document.querySelector("#projectModalCard .project-modal-card-inner");if(flip?.classList.contains("is-flipped"))closeInspirationModal()});
+modal?.addEventListener("click",e=>{if(e.target===modal&&modal.dataset.cardStage==="VERSO")closeInspirationModal()});
+document.querySelector("#projectModalCard")?.addEventListener("click",e=>{if(e.target.closest("button,a,input,select,textarea,[role=button],[contenteditable=true]"))return;if(modal?.dataset.cardStage==="VERSO")closeInspirationModal()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeInspirationModal()});
 async function loadVoteData(){const statsResult=await supabase.from("inspiration_vote_stats").select("*");if(statsResult.error)throw statsResult.error;voteStats=new Map((statsResult.data||[]).map(x=>[String(x.contenu_id),x]));myVotes=new Map();if(currentUser){const own=await supabase.from("inspiration_votes").select("contenu_id,vote").eq("user_id",currentUser.id);if(own.error)throw own.error;for(const v of own.data||[])myVotes.set(String(v.contenu_id),Number(v.vote))}}
 async function load(){try{const auth=await supabase.auth.getSession().catch(e=>({data:{session:null},error:e}));currentUser=auth?.data?.session?.user||null;const [m,s,c]=await Promise.all([supabase.from("inspiration_menus").select("*").eq("valide",true).order("position"),supabase.from("inspiration_sous_menus").select("*").eq("valide",true).order("position"),supabase.from("inspiration_contenus").select("*").eq("valide",true).order("position")]);for(const r of [m,s,c])if(r.error)throw r.error;menus=m.data||[];subs=s.data||[];items=c.data||[];if(voteFilterWrap)voteFilterWrap.hidden=!currentUser;renderFilters();render();try{await loadVoteData()}catch(voteError){console.warn("Statistiques/notes des inspirations indisponibles : les cartes restent accessibles.",voteError);voteStats=new Map();myVotes=new Map()}render()}catch(e){console.error("Erreur chargement inspirations",e);grid.innerHTML='<div class="project-error">Impossible de charger les inspirations. Réessayez dans quelques instants.</div>'}}
