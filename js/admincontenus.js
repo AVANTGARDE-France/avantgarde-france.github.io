@@ -2342,18 +2342,6 @@ function renderTree() {
                     )
                 );
 
-                actions.appendChild(
-                    creerBouton(
-                        "+",
-                        "Ajouter un sous-menu",
-                        () =>
-                            ouvrirModalCreation(
-                                "submenu",
-                                menu.id
-                            )
-                    )
-                );
-
                 const deleteButton =
                     creerBouton(
                         "×",
@@ -2391,6 +2379,25 @@ function renderTree() {
 
                 submenuList.className =
                     "submenu-list";
+
+                const addSubmenuButton =
+                    creerBouton(
+                        "+",
+                        "Ajouter un sous-menu",
+                        () =>
+                            ouvrirModalCreation(
+                                "submenu",
+                                menu.id
+                            )
+                    );
+
+                addSubmenuButton.classList.add(
+                    "tree-add-submenu"
+                );
+
+                submenuList.appendChild(
+                    addSubmenuButton
+                );
 
                 const siblings =
                     sousMenus
