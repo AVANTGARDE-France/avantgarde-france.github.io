@@ -1342,19 +1342,19 @@ textarea{
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  font-size:13px;
-  line-height:1.35;
+  font-size:11.5px;
+  line-height:1.3;
   font-weight:500;
 }
 
 #tree .tree-menu .tree-title{
-  font-size:13px;
+  font-size:11.5px;
   font-weight:600;
   color:var(--white);
 }
 
 #tree .tree-submenu .tree-title{
-  font-size:12.5px;
+  font-size:11px;
   color:rgba(245,243,237,.92);
 }
 
@@ -1370,7 +1370,7 @@ textarea{
   background:none;
   color:rgba(245,243,237,.72);
   font:inherit;
-  font-size:12px;
+  font-size:11px;
   text-align:left;
   cursor:pointer;
 }
@@ -1379,14 +1379,6 @@ textarea{
   color:var(--gold-light);
 }
 
-#tree .tree-subtitle{
-  flex:0 0 auto;
-  font-size:8px;
-  line-height:1;
-  letter-spacing:.10em;
-  color:rgba(214,173,85,.70);
-  white-space:nowrap;
-}
 
 #tree .tree-actions{
   display:flex;
@@ -1431,13 +1423,15 @@ textarea{
 }
 
 #tree .status-button{
-  min-width:58px;
-  height:21px;
-  padding:0 6px;
+  width:22px;
+  min-width:22px;
+  height:22px;
+  padding:0;
   border-radius:4px;
-  font-size:7px;
-  font-weight:600;
-  letter-spacing:.06em;
+  font-size:12px;
+  font-weight:700;
+  line-height:20px;
+  text-align:center;
   cursor:pointer;
 }
 
@@ -1828,30 +1822,8 @@ textarea{
     height:180px;
   }
 
-  #tree .tree-subtitle{
-    display:none;
-  }
-
   #tree .tree-actions{
     opacity:1;
-  }
-
-  #tree .status-button{
-    min-width:0;
-    width:22px;
-    padding:0;
-    overflow:hidden;
-    font-size:0;
-  }
-
-  #tree .status-button::after{
-    content:"";
-    display:block;
-    width:6px;
-    height:6px;
-    margin:auto;
-    border-radius:50%;
-    background:currentColor;
   }
 
   #contentOtherTab .other-content-section{
