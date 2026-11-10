@@ -466,6 +466,126 @@ function initialiserApercuImageContenu() {
 
 
 /* =========================================================
+   IMPORT IMAGE — SUPABASE STORAGE
+========================================================= */
+
+async function importerImageContenu(file) {
+
+    if (!file) return;
+
+    const typesAutorises = [
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "image/gif"
+    ];
+
+    if (!typesAutorises.includes(file.type)) {
+        showMessage("Format refusé. Utilisez JPG, PNG, WebP ou GIF.", "error");
+        return;
+    }
+
+    if (file.size > 8 * 1024 * 1024) {
+        showMessage("Image trop volumineuse : 8 Mo maximum.", "error");
+        return;
+    }
+
+    const button = $("uploadContentPhotoButton");
+    const fileInput = $("contentPhotoFileInput");
+
+    if (button) button.disabled = true;
+
+    try {
+
+        const extensionParType = {
+            "image/jpeg": "jpg",
+            "image/png": "png",
+            "image/webp": "webp",
+            "image/gif": "gif"
+        };
+
+        const extension = extensionParType[file.type];
+        const identifiant = (
+            typeof crypto !== "undefined" && crypto.randomUUID
+                ? crypto.randomUUID()
+                : Date.now() + "-" + Math.random().toString(36).slice(2)
+        );
+
+        const chemin = [
+            contentMode,
+            String(editorId || "nouveau"),
+            identifiant + "." + extension
+        ].join("/");
+
+        const { data, error } = await supabase
+            .storage
+            .from("content-images")
+            .upload(chemin, file, {
+                cacheControl: "31536000",
+                contentType: file.type,
+                upsert: false
+            });
+
+        if (error) throw error;
+
+        const { data: publicData } = supabase
+            .storage
+            .from("content-images")
+            .getPublicUrl(data.path);
+
+        if (!publicData?.publicUrl) {
+            throw new Error("Impossible de récupérer l'URL publique de l'image.");
+        }
+
+        if (cardPhoto) {
+            cardPhoto.value = publicData.publicUrl;
+            cardPhoto.dispatchEvent(new Event("input", { bubbles: true }));
+            cardPhoto.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+
+        showMessage("Image hébergée. Enregistrez le contenu pour valider son URL.");
+
+    }
+    catch (error) {
+
+        console.error("Import image contenu :", error);
+
+        showMessage(
+            "Impossible d'héberger l'image : " + (error?.message || "erreur inconnue"),
+            "error"
+        );
+
+    }
+    finally {
+
+        if (button) button.disabled = false;
+        if (fileInput) fileInput.value = "";
+
+    }
+
+}
+
+
+function initialiserImportImageContenu() {
+
+    const button = $("uploadContentPhotoButton");
+    const fileInput = $("contentPhotoFileInput");
+
+    if (!button || !fileInput || button.dataset.initialized === "true") return;
+
+    button.dataset.initialized = "true";
+
+    button.addEventListener("click", () => fileInput.click());
+
+    fileInput.addEventListener("change", () => {
+        const file = fileInput.files?.[0];
+        if (file) importerImageContenu(file);
+    });
+
+}
+
+
+/* =========================================================
    ADMIN
 ========================================================= */
 
@@ -5574,6 +5694,7 @@ async function initialiser() {
     initialiserEvenementClavier();
 
     initialiserApercuImageContenu();
+    initialiserImportImageContenu();
 
     initialiserListePriorite();
 
