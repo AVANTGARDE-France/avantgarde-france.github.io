@@ -1038,6 +1038,36 @@
  #projectModalFront .inspiration-card-brand{padding-left:27px!important}
 }
 
+
+/* Agrandissement recto : conserver strictement le ratio 4:5 de la carte.
+   Le panneau épouse la carte, sans zone de défilement autour du verso. */
+.project-modal{padding:0!important;overflow:hidden!important;align-items:center!important;justify-content:center!important}
+.project-modal .project-modal-panel{
+ width:min(90vw,72vh,620px)!important;height:auto!important;aspect-ratio:4/5!important;
+ max-height:90vh!important;overflow:visible!important;padding:0!important;
+ border:0!important;border-radius:18px!important;background:transparent!important;
+ box-shadow:none!important;flex:none!important;
+}
+.project-modal .project-modal-card{width:100%!important;height:100%!important;aspect-ratio:4/5!important}
+.project-modal .project-modal-close{
+ position:absolute!important;top:-15px!important;right:-15px!important;z-index:30!important;
+ float:none!important;margin:0!important;
+}
+.project-modal.open .project-modal-panel{
+ animation:inspiration-card-enlarge 2s cubic-bezier(.18,.78,.2,1) both!important;
+}
+@media(max-width:620px){
+ .project-modal .project-modal-panel{
+  width:min(88vw,70vh)!important;height:auto!important;max-height:90vh!important;
+  aspect-ratio:4/5!important;padding:0!important;
+ }
+ .project-modal .project-modal-close{top:-12px!important;right:-8px!important}
+}
+@supports(height:100dvh){
+ .project-modal .project-modal-panel{width:min(90vw,72dvh,620px)!important;max-height:90dvh!important}
+ @media(max-width:620px){.project-modal .project-modal-panel{width:min(88vw,70dvh)!important;max-height:90dvh!important}}
+}
+
 </style>
 </head>
 <body>
@@ -1148,6 +1178,7 @@ document.getElementById("inspirationSocialClose")?.addEventListener("click",()=>
 socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)socialChooser.hidden=true});
 document.getElementById("projectModalClose")?.addEventListener("click",closeInspirationModal);
 modal?.addEventListener("click",e=>{if(e.target===modal)closeInspirationModal()});
+document.querySelector("#projectModalCard")?.addEventListener("click",e=>{if(e.target.closest("button,a,input,select,textarea,[role=button]"))return;closeInspirationModal()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeInspirationModal()});
 async function loadVoteData(){const statsResult=await supabase.from("inspiration_vote_stats").select("*");if(statsResult.error)throw statsResult.error;voteStats=new Map((statsResult.data||[]).map(x=>[String(x.contenu_id),x]));myVotes=new Map();if(currentUser){const own=await supabase.from("inspiration_votes").select("contenu_id,vote").eq("user_id",currentUser.id);if(own.error)throw own.error;for(const v of own.data||[])myVotes.set(String(v.contenu_id),Number(v.vote))}}
 async function load(){try{const auth=await supabase.auth.getSession().catch(e=>({data:{session:null},error:e}));currentUser=auth?.data?.session?.user||null;const [m,s,c]=await Promise.all([supabase.from("inspiration_menus").select("*").eq("valide",true).order("position"),supabase.from("inspiration_sous_menus").select("*").eq("valide",true).order("position"),supabase.from("inspiration_contenus").select("*").eq("valide",true).order("position")]);for(const r of [m,s,c])if(r.error)throw r.error;menus=m.data||[];subs=s.data||[];items=c.data||[];if(voteFilterWrap)voteFilterWrap.hidden=!currentUser;renderFilters();render();try{await loadVoteData()}catch(voteError){console.warn("Statistiques/notes des inspirations indisponibles : les cartes restent accessibles.",voteError);voteStats=new Map();myVotes=new Map()}render()}catch(e){console.error("Erreur chargement inspirations",e);grid.innerHTML='<div class="project-error">Impossible de charger les inspirations. Réessayez dans quelques instants.</div>'}}
