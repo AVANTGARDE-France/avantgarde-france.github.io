@@ -1430,6 +1430,13 @@ const modal=document.getElementById("projectModal"),modalTitle=document.getEleme
 function voteControls(item){const value=myVotes.get(String(item.id));return '<div class="project-vote-message" aria-live="polite"></div><button type="button" class="project-vote-button positive '+(value===1?"selected":"")+'" data-vote="1" aria-label="Pouce vers le haut" aria-pressed="'+(value===1)+'"><span class="vote-symbol positive-symbol">👍</span></button><button type="button" class="project-vote-button neutral '+(value===0?"selected":"")+'" data-vote="0" aria-label="Note neutre" aria-pressed="'+(value===0)+'">✋🏻</button><button type="button" class="project-vote-button negative '+(value===-1?"selected":"")+'" data-vote="-1" aria-label="Pouce vers le bas" aria-pressed="'+(value===-1)+'"><span class="vote-symbol negative-symbol">👎</span></button>'}
 function copyRenderedCard(source){
  const copy=source.cloneNode(true);
+ const rootStyle=getComputedStyle(source);
+ const geometry=new Set(["position","top","right","bottom","left","width","height","min-width","min-height","max-width","max-height","margin","margin-top","margin-right","margin-bottom","margin-left","transform","transform-origin","aspect-ratio","z-index"]);
+ for(let i=0;i<rootStyle.length;i++){
+  const prop=rootStyle[i];
+  if(geometry.has(prop))continue;
+  try{copy.style.setProperty(prop,rootStyle.getPropertyValue(prop),"important")}catch{}
+ }
  copy.removeAttribute("id");
  copy.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
  return copy;
