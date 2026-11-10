@@ -542,6 +542,33 @@
 .project-filter-suboptions .project-filter-option.active{background:#d6ad5524;color:#f0d58a;font-weight:600}
 .project-filter-empty{padding:9px;color:#9eabbc;font:italic 11px Arial,sans-serif}
 @media(max-width:620px){.project-filter-wrap{min-width:0}.project-filter-toggle{min-height:37px;padding:8px 11px;font-size:11px}.project-filter-panel{left:0;width:min(520px,calc(100vw - 22px));max-height:min(360px,58vh);padding:8px}.project-filter-column{padding-right:7px}.project-filter-subcolumn{padding-left:8px}.project-filter-option{padding:8px 7px;font-size:11px}.project-filter-suboptions .project-filter-option{font-size:10px}}
+
+/* Finition éditoriale discrète — sans modifier le cadre */
+.project-card-title{
+  font-size:clamp(18px,1.55vw,25px)!important;
+  line-height:1.08!important;
+  letter-spacing:.12px!important;
+  text-wrap:balance;
+}
+.project-modal-front .project-card-title{
+  text-shadow:0 2px 5px #000,0 0 12px #000!important;
+}
+.inspiration-card-brand{
+  letter-spacing:.1px!important;
+}
+.inspiration-card-brand:after{
+  content:"";
+  position:absolute;
+  left:calc(50% - 22px);
+  bottom:0;
+  width:44px;
+  height:2px;
+  background:linear-gradient(90deg,#0055A4 0 33.333%,#f5f3ed 33.333% 66.666%,#EF4135 66.666% 100%);
+  opacity:.9;
+  pointer-events:none;
+}
+.project-card-word{opacity:0!important;transition:none!important}
+
 </style>
 </head>
 <body>
@@ -676,6 +703,18 @@ load();
    face.style.cssText+=";position:absolute!important;inset:0!important;width:540px!important;height:675px!important;transform:none!important;visibility:visible!important;opacity:1!important";
    face.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
    face.querySelectorAll("img").forEach(img=>{img.loading="eager";img.decoding="sync"});
+   const tagline=face.querySelector(".project-card-tagline");
+   if(tagline){
+    const parts=(tagline.textContent||"").match(/\\S+|\\s+/g)||[];
+    tagline.replaceChildren();
+    for(const part of parts){
+     if(/^\\s+$/.test(part)){tagline.appendChild(document.createTextNode(part));continue;}
+     const word=document.createElement("span");
+     word.className="project-card-word";word.textContent=part;
+     tagline.appendChild(word);
+    }
+   }
+
    wrapper.appendChild(face);stage.appendChild(wrapper);composition.appendChild(stage);document.body.appendChild(composition);
    await composition.ready;
    if(document.fonts?.ready)await document.fonts.ready;
@@ -687,6 +726,9 @@ load();
    const foregroundStage=document.createElement("w-el");foregroundStage.setAttribute("x","0");foregroundStage.setAttribute("y","0");foregroundStage.setAttribute("width","1080");foregroundStage.setAttribute("height","1350");foregroundStage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
    const foregroundWrapper=document.createElement("div");foregroundWrapper.className="project-modal-card";foregroundWrapper.style.cssText=wrapper.style.cssText+";zoom:1!important;transform:scale(2)!important;transform-origin:top left!important;width:540px!important;height:675px!important;";
    const foregroundFace=face.cloneNode(true);foregroundFace.removeAttribute("id");foregroundFace.style.background="transparent";
+   const captureWordSets=[face.querySelectorAll(".project-card-word"),foregroundFace.querySelectorAll(".project-card-word")];
+   const captureWordCount=captureWordSets[0].length;
+   const revealFrames=90;
    foregroundFace.querySelectorAll(".project-card-image-wrap").forEach(el=>el.remove());
    foregroundWrapper.appendChild(foregroundFace);foregroundStage.appendChild(foregroundWrapper);
    for(const img of gifImages){
@@ -726,7 +768,12 @@ load();
    }
    const internalStage=composition.firstElementChild;if(!internalStage)throw new Error("Scène interne WebMotion introuvable.");internalStage.appendChild(foregroundStage);await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
    const renderCardFrame=composition.renderFrameAt.bind(composition);
-   composition.renderFrameAt=frame=>{renderCardFrame(frame);for(const overlay of overlays)overlay.__setFrame(frame);};
+   composition.renderFrameAt=frame=>{
+    const visibleWords=captureWordCount?Math.min(captureWordCount,Math.ceil((Math.max(0,frame)+1)/revealFrames*captureWordCount)):0;
+    for(const wordSet of captureWordSets)wordSet.forEach((word,index)=>{word.style.setProperty("opacity",index<visibleWords?"1":"0","important");});
+    renderCardFrame(frame);
+    for(const overlay of overlays)overlay.__setFrame(frame);
+   };
    if(document.fonts?.ready)await document.fonts.ready;
    console.table(webmotionDiagnostics);button.dataset.webmotionDiagnostics=JSON.stringify(webmotionDiagnostics);button.querySelector("span").textContent="Création de la vidéo…";
    const blob=await composition.export({onProgress:({frame,total})=>{button.querySelector("span").textContent="Création "+Math.round(frame/total*100)+" %";}});
