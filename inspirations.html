@@ -669,6 +669,7 @@ import {supabase} from "./js/supabase.js";
   button.disabled=true;button.querySelector("span").textContent="Préparation de la vidéo…";
   let composition;
   const decoders=[];
+  const gifLayers=[];
   try{
    if(typeof ImageDecoder==="undefined")throw new Error("Ce navigateur ne propose pas le décodage GIF ImageDecoder nécessaire.");
    await import("https://esm.sh/@superhq/webmotion@0.18.2/elements");
@@ -707,7 +708,6 @@ import {supabase} from "./js/supabase.js";
    await Promise.all([...face.querySelectorAll("img")].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,10000)})));
    const gifImages=[...face.querySelectorAll("img")].filter(img=>/\.gif(?:$|[?#])/i.test(img.currentSrc||img.src));
    if(!gifImages.length)throw new Error("Aucun GIF animé détecté dans cette face de carte.");
-   const gifLayers=[];
    const webmotionDiagnostics=[];
    // Le premier plan reprend uniquement les éléments éditoriaux.
    const foregroundStage=document.createElement("w-el");foregroundStage.setAttribute("x","0");foregroundStage.setAttribute("y","0");foregroundStage.setAttribute("width","1080");foregroundStage.setAttribute("height","1350");foregroundStage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
@@ -769,7 +769,7 @@ import {supabase} from "./js/supabase.js";
    if(!(blob instanceof Blob)||blob.size<10000)throw new Error("WebMotion n’a pas produit de vidéo exploitable.");
    const safeName=(String(document.getElementById("projectModalTitle")?.textContent||"inspiration").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");const extension=blob.type.toLowerCase().includes("mp4")?"mp4":"webm";const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="avantgarde-"+safeName+"."+extension;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);const versoNode=document.getElementById("projectModalContent");const versoClone=versoNode?.cloneNode(true);versoClone?.querySelectorAll("script,style,button,svg").forEach(el=>el.remove());const rawVersoText=(versoClone?.innerText||versoClone?.textContent||"").replace(/\r/g,"");const versoText=rawVersoText.split("\n").map(line=>line.replace(/[\t ]+/g," ").trim()).filter(Boolean).join("\n");const shareText=[versoText,connectedUser.id?`Deviens Avant-gardistE, je te parraine : ${connectedUser.id}`:""].filter(Boolean).join("\n\n");try{if(!versoText)throw new Error("Texte du verso introuvable");await navigator.clipboard.writeText(shareText);const statusNode=document.getElementById("inspirationShareStatus");if(statusNode){statusNode.textContent="Vidéo téléchargée et texte du verso copié.";statusNode.classList.add("visible");}}catch(copyError){const statusNode=document.getElementById("inspirationShareStatus");if(statusNode){statusNode.textContent="Vidéo téléchargée, mais le texte du verso n’a pas pu être copié automatiquement.";statusNode.classList.add("visible");}}if(socialChooser)socialChooser.hidden=false;button.querySelector("span").textContent="Vidéo prête — choisir un réseau";
   }catch(error){console.error("WebMotion test",error);alert("Impossible de créer la vidéo : "+(error?.message||error));button.querySelector("span").textContent="Réessayer";}
-  finally{for(const decoder of decoders){try{decoder.close();}catch{}}for(const layer of (typeof gifLayers!=="undefined"?gifLayers:[]))for(const bitmap of layer.frames){try{bitmap.close();}catch{}}composition?.remove();button.disabled=false;}
+  finally{for(const decoder of decoders){try{decoder.close();}catch{}}for(const layer of gifLayers)for(const bitmap of layer.frames){try{bitmap.close();}catch{}}composition?.remove();button.disabled=false;}
  });;
 }
 </script>
