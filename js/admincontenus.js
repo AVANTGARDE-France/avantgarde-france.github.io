@@ -2293,13 +2293,7 @@ function renderTree() {
                         ${escapeHtml(
                             menu.titre
                         )}
-                    </span>
-
-                    <span class="tree-subtitle">
-                        MENU
-                    </span>
-
-                `;
+                    </span>`;
 
                 menuButton.addEventListener(
                     "click",
@@ -2485,13 +2479,7 @@ function renderSousMenu(
             ${escapeHtml(
                 submenu.titre
             )}
-        </span>
-
-        <span class="tree-subtitle">
-            SOUS-MENU
-        </span>
-
-    `;
+        </span>`;
 
     button.addEventListener(
         "click",
@@ -2814,8 +2802,8 @@ function creerStatusButton(item) {
             "status-valid"
         );
 
-        button.textContent =
-            "VALIDÉ";
+        button.textContent = "✓";
+        button.setAttribute("aria-label", "Validé");
 
     }
     else {
@@ -2824,8 +2812,8 @@ function creerStatusButton(item) {
             "status-draft"
         );
 
-        button.textContent =
-            "BROUILLON";
+        button.textContent = "✎";
+        button.setAttribute("aria-label", "Brouillon");
 
     }
 
