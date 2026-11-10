@@ -905,90 +905,101 @@ load();
 import {supabase} from "./js/supabase.js";
 const button=document.getElementById("inspirationShareButton");
 const statusNode=document.getElementById("inspirationShareStatus");
-const socialChooser=document.getElementById("inspirationSocialChooser");
 const modal=document.getElementById("projectModal");
-const flip=document.querySelector("#projectModalCard .project-modal-card-inner");
-function showShareStatus(message){if(statusNode){statusNode.textContent=message;statusNode.classList.add("visible")}}
-function getVersoShareText(){
+const captureUrl=new URL("./inspiration-capture.html",location.href).href;
+let busy=false;
+function status(message){if(statusNode){statusNode.textContent=message;statusNode.classList.add("visible")}}
+function versoText(){
  const title=document.getElementById("projectModalTitle")?.textContent?.trim()||"";
- const content=document.getElementById("projectModalContent");
- if(!content)throw new Error("Texte du verso introuvable.");
- const clone=content.cloneNode(true);
- clone.querySelectorAll("script,style,button,svg").forEach(el=>el.remove());
- return [title,(clone.innerText||clone.textContent||"").trim()].filter(Boolean).join("\n\n");
+ const node=document.getElementById("projectModalContent");
+ if(!node)throw new Error("Texte du verso introuvable.");
+ const copy=node.cloneNode(true);
+ copy.querySelectorAll("script,style,button,svg").forEach(el=>el.remove());
+ copy.querySelectorAll("a").forEach(a=>{const t=(a.textContent||"").trim();if(!t||/^https?:/i.test(t))a.remove();else a.replaceWith(document.createTextNode(t))});
+ return [title,(copy.innerText||copy.textContent||"").trim()].filter(Boolean).join("\n\n");
 }
-async function copyVersoText(userId){
- const text=[getVersoShareText(),userId?`Deviens Avant-gardistE, je te parraine : ${userId}`:""].filter(Boolean).join("\n\n");
- try{await navigator.clipboard.writeText(text);return true}catch(_){
-  const field=document.createElement("textarea");field.value=text;field.setAttribute("readonly","");
-  field.style.cssText="position:fixed;left:-9999px;top:0;opacity:0";document.body.appendChild(field);
-  field.select();const copied=document.execCommand("copy");field.remove();return copied;
- }
-}
-function downloadVideo(blob,title){
- const safe=(title||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration";
- const url=URL.createObjectURL(blob),link=document.createElement("a");
- link.href=url;link.download="avantgarde-"+safe+".webm";document.body.appendChild(link);link.click();link.remove();
+function download(blob,title){
+ const name=(title||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration";
+ const ext=blob.type.toLowerCase().includes("mp4")?"mp4":"webm";
+ const url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download="avantgarde-"+name+"."+ext;document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(url),120000);
+ return ext;
 }
-async function recordOriginalFront(stream){
- const source=document.querySelector("#projectModalFront > .project-card");
- if(!source||!flip||!modal?.classList.contains("open"))throw new Error("Le recto original agrandi est introuvable.");
+function waitMessage(win,type,timeoutMs){
+ return new Promise((resolve,reject)=>{
+  const timer=setTimeout(()=>{window.removeEventListener("message",listener);reject(new Error("La fenêtre de capture ne répond pas."))},timeoutMs);
+  function listener(e){if(e.source!==win||e.origin!==location.origin||e.data?.type!==type)return;clearTimeout(timer);window.removeEventListener("message",listener);e.data.error?reject(new Error(e.data.error)):resolve(e.data)}
+  window.addEventListener("message",listener);
+ });
+}
+async function recordCapture(stream,onProgress){
  const video=document.createElement("video");video.muted=true;video.playsInline=true;video.srcObject=stream;
- await new Promise((resolve,reject)=>{video.onloadedmetadata=resolve;video.onerror=()=>reject(new Error("Flux de capture illisible."))});
+ await new Promise((resolve,reject)=>{if(video.readyState>=1)return resolve();video.onloadedmetadata=resolve;video.onerror=()=>reject(new Error("Lecture du flux de capture impossible."));setTimeout(()=>reject(new Error("La capture ne démarre pas.")),10000)});
  await video.play();
- const wasFlipped=flip.classList.contains("is-flipped"),oldStage=modal.dataset.cardStage;
- let output=null,raf=0;
- try{
-  flip.classList.remove("is-flipped");modal.classList.remove("is-flipped");modal.dataset.cardStage="RECTO_AGRANDI";
-  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-  const rect=source.getBoundingClientRect();
-  if(!rect.width||!rect.height)throw new Error("Le recto agrandi n’est pas visible.");
-  const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;
-  const ctx=canvas.getContext("2d");if(!ctx)throw new Error("Cadrage vidéo indisponible.");
-  output=canvas.captureStream(30);
-  const mime=["video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"].find(x=>MediaRecorder.isTypeSupported(x));
-  if(!mime)throw new Error("Enregistrement WebM non pris en charge.");
-  const recorder=new MediaRecorder(output,{mimeType:mime}),chunks=[];
-  recorder.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};
-  const sx=rect.left*video.videoWidth/window.innerWidth,sy=rect.top*video.videoHeight/window.innerHeight;
-  const sw=rect.width*video.videoWidth/window.innerWidth,sh=rect.height*video.videoHeight/window.innerHeight;
-  const draw=()=>{ctx.clearRect(0,0,1080,1350);ctx.drawImage(video,sx,sy,sw,sh,0,0,1080,1350);raf=requestAnimationFrame(draw)};
-  const finished=new Promise((resolve,reject)=>{recorder.onstop=()=>resolve(new Blob(chunks,{type:mime}));recorder.onerror=()=>reject(new Error("Échec de l’enregistrement."))});
-  draw();recorder.start(250);await new Promise(resolve=>setTimeout(resolve,6000));recorder.stop();
-  const blob=await finished;
-  if(blob.size<10000)throw new Error("La vidéo capturée est vide.");
-  return blob;
- }finally{
-  cancelAnimationFrame(raf);output?.getTracks().forEach(t=>t.stop());video.pause();video.srcObject=null;
-  if(wasFlipped){flip.classList.add("is-flipped");modal.classList.add("is-flipped");modal.dataset.cardStage="VERSO"}else modal.dataset.cardStage=oldStage||"RECTO_AGRANDI";
- }
+ const track=stream.getVideoTracks()[0],settings=track?.getSettings?.()||{};
+ if(!track)throw new Error("Aucun flux vidéo reçu.");
+ if(settings.displaySurface&&settings.displaySurface!=="window")throw new Error("Sélectionne la fenêtre « Avant-gardE — Capture ».");
+ const width=1080,height=1350,canvas=document.createElement("canvas");canvas.width=width;canvas.height=height;
+ const ctx=canvas.getContext("2d",{alpha:false});if(!ctx)throw new Error("Canvas vidéo indisponible.");
+ const output=canvas.captureStream(30);
+ const mime=["video/mp4;codecs=avc1.42E01E","video/mp4","video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"].find(x=>MediaRecorder.isTypeSupported(x))||"";
+ const recorder=new MediaRecorder(output,mime?{mimeType:mime,videoBitsPerSecond:12000000}:{videoBitsPerSecond:12000000});
+ const chunks=[];let fault=null,raf=0;
+ recorder.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};
+ recorder.onerror=()=>{fault=new Error("L’enregistrement vidéo a échoué.")};
+ const stopped=new Promise(resolve=>{recorder.onstop=resolve});
+ const started=performance.now(),duration=10000;
+ const sx=0,sy=0,sw=video.videoWidth,sh=video.videoHeight;
+ if(!sw||!sh)throw new Error("Dimensions de capture invalides.");
+ const draw=now=>{
+  try{
+   const sourceRatio=sw/sh,targetRatio=width/height;
+   let cropX=0,cropY=0,cropW=sw,cropH=sh;
+   if(sourceRatio>targetRatio){cropW=sh*targetRatio;cropX=(sw-cropW)/2}else{cropH=sw/targetRatio;cropY=(sh-cropH)/2}
+   ctx.drawImage(video,cropX,cropY,cropW,cropH,0,0,width,height);
+   const progress=Math.min(100,Math.round((now-started)/duration*100));onProgress(progress);
+   if(now-started<duration)raf=requestAnimationFrame(draw);else if(recorder.state!=="inactive")recorder.stop();
+  }catch(error){fault=error;if(recorder.state!=="inactive")recorder.stop()}
+ };
+ recorder.start(250);raf=requestAnimationFrame(draw);await stopped;cancelAnimationFrame(raf);
+ output.getTracks().forEach(t=>t.stop());video.pause();video.srcObject=null;
+ if(fault)throw fault;
+ const blob=new Blob(chunks,{type:recorder.mimeType||mime||"video/webm"});
+ if(blob.size<20000)throw new Error("La vidéo capturée est vide ou incomplète.");
+ return blob;
 }
-document.getElementById("inspirationSocialClose")?.addEventListener("click",()=>{socialChooser.hidden=true});
-socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)socialChooser.hidden=true});
 button?.addEventListener("click",async()=>{
- if(button.disabled)return;
- let displayStream=null;const label=button.querySelector("span");
+ if(busy)return;
+ const front=document.querySelector("#projectModalFront > .project-card");
+ if(!front||!modal?.classList.contains("open")){status("Ouvre d’abord une carte Inspiration.");return}
+ const session=await supabase.auth.getSession();
+ if(!session?.data?.session?.user){status("Vous devez être connecté pour partager.");return}
+ busy=true;button.disabled=true;
+ const label=button.querySelector("span");let popup=null,stream=null;
  try{
-  if(!navigator.mediaDevices?.getDisplayMedia)throw new Error("La capture d’onglet nécessite un navigateur compatible et une page HTTPS.");
-  button.disabled=true;if(label)label.textContent="Sélectionne cet onglet…";
-  showShareStatus("Dans la fenêtre de partage, sélectionne l’onglet Avant-gardE pour conserver exactement le rendu de la carte.");
-  const displayRequest=navigator.mediaDevices.getDisplayMedia({video:{frameRate:30,displaySurface:"browser"},audio:false,preferCurrentTab:true});
-  displayStream=await displayRequest;
-  const session=await supabase.auth.getSession(),user=session?.data?.session?.user||null;
-  if(!user)throw new Error("Vous devez être connecté pour partager.");
-  if(!modal?.classList.contains("open")||modal.dataset.cardStage!=="VERSO")throw new Error("Ouvre le verso d’une carte Inspiration avant de partager.");
-  if(label)label.textContent="Enregistrement du recto original…";
+  const rect=front.getBoundingClientRect();
+  popup=window.open(captureUrl,"avantgarde-card-capture","popup=yes,width="+Math.max(420,Math.round(rect.width))+",height="+Math.max(525,Math.round(rect.height))+",resizable=yes,scrollbars=no");
+  if(!popup)throw new Error("Autorise les fenêtres pop-up pour ce site.");
+  if(label)label.textContent="Préparation…";
+  status("Préparation du recto original agrandi…");
+  await waitMessage(popup,"AVANTGARDE_CAPTURE_READY",10000);
+  const payload={type:"AVANTGARDE_CAPTURE_CARD",html:front.outerHTML,styles:[...document.querySelectorAll("style")].map(x=>x.textContent),links:[...document.querySelectorAll('link[rel="stylesheet"]')].map(x=>x.href),width:Math.round(rect.width),height:Math.round(rect.height)};
+  popup.postMessage(payload,location.origin);
+  await waitMessage(popup,"AVANTGARDE_CAPTURE_RENDERED",15000);
+  if(label)label.textContent="Autorise la capture…";
+  status("Dans la fenêtre de partage, choisis la fenêtre « Avant-gardE — Capture ».");
+  const capturePromise=navigator.mediaDevices.getDisplayMedia({video:{displaySurface:"window",frameRate:{ideal:30,max:30}},audio:false});
+  stream=await capturePromise;
+  const blob=await recordCapture(stream,p=>{if(label)label.textContent="Vidéo "+p+" %";status("Enregistrement du recto original : "+p+" %")});
   const title=document.getElementById("projectModalTitle")?.textContent?.trim()||"inspiration";
-  const blob=await recordOriginalFront(displayStream);downloadVideo(blob,title);
-  const copied=await copyVersoText(user.id);
-  showShareStatus(copied?"Recto original téléchargé ; texte du verso copié.":"Vidéo téléchargée ; copie du texte à effectuer manuellement.");
-  if(socialChooser)socialChooser.hidden=false;
-  if(label)label.textContent="Vidéo prête — choisir un réseau";
- }catch(error){
-  console.error("Partage Inspiration",error);showShareStatus(error?.message||"Impossible d’enregistrer la carte.");
-  if(label)label.textContent="Réessayer";
- }finally{displayStream?.getTracks().forEach(t=>{if(t.readyState!=="ended")t.stop()});button.disabled=false}
+  const ext=download(blob,title);
+  try{await navigator.clipboard.writeText(versoText())}catch(_){}
+  const fb=window.open("https://www.facebook.com/post/create","_blank");
+  status("Vidéo "+ext.toUpperCase()+" de 10 secondes téléchargée. Texte du verso copié."+ (fb?" Facebook est ouvert.":""));
+  if(label)label.textContent="Partager";
+ }catch(error){console.error("Partage vidéo Inspiration",error);status(error?.message||"Impossible de créer la vidéo.");if(label)label.textContent="Réessayer"}
+ finally{stream?.getTracks().forEach(t=>t.stop());if(popup&&!popup.closed)popup.close();busy=false;button.disabled=false}
 });
 </script>
 </body>
