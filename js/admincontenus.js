@@ -2537,18 +2537,6 @@ function renderSousMenu(
         )
     );
 
-    actions.appendChild(
-        creerBouton(
-            "+",
-            "Ajouter un contenu",
-            () =>
-                ouvrirModalCreation(
-                    "content",
-                    submenu.id
-                )
-        )
-    );
-
     const deleteButton =
         creerBouton(
             "×",
@@ -2586,6 +2574,25 @@ function renderSousMenu(
 
     contentList.className =
         "content-list";
+
+    const addContentButton =
+        creerBouton(
+            "+",
+            "Ajouter un contenu",
+            () =>
+                ouvrirModalCreation(
+                    "content",
+                    submenu.id
+                )
+        );
+
+    addContentButton.classList.add(
+        "tree-add-content"
+    );
+
+    contentList.appendChild(
+        addContentButton
+    );
 
     const contentSiblings =
         contenus
