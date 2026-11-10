@@ -704,8 +704,10 @@ load();
    const webmotionDiagnostics=[];
    // Le rendu éditorial utilise la face originale, jamais un clone.
    const foregroundStage=document.createElement("w-el");foregroundStage.setAttribute("x","0");foregroundStage.setAttribute("y","0");foregroundStage.setAttribute("width","1080");foregroundStage.setAttribute("height","1350");foregroundStage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
-   const foregroundWrapper=wrapper.cloneNode(false);foregroundWrapper.style.cssText=wrapper.style.cssText;
+   const foregroundWrapper=wrapper.cloneNode(false);foregroundWrapper.style.cssText=wrapper.style.cssText+";background:transparent!important;background-color:transparent!important";
    const foregroundFace=face.cloneNode(true);foregroundFace.removeAttribute("id");foregroundFace.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));foregroundFace.querySelectorAll(".project-card-image-wrap").forEach(el=>el.remove());
+   // La couche éditoriale ne doit jamais repeindre le fond bleu par-dessus le GIF.
+   foregroundFace.style.setProperty("background","transparent","important");foregroundFace.style.setProperty("background-color","transparent","important");foregroundFace.style.setProperty("background-image","none","important");
    foregroundWrapper.appendChild(foregroundFace);foregroundStage.appendChild(foregroundWrapper);
    const captureWordSets=[face.querySelectorAll(".project-card-word"),foregroundFace.querySelectorAll(".project-card-word")];
    const captureWordCount=captureWordSets[0].length;
