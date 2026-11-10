@@ -705,10 +705,10 @@ load();
    face.querySelectorAll("img").forEach(img=>{img.loading="eager";img.decoding="sync"});
    const tagline=face.querySelector(".project-card-tagline");
    if(tagline){
-    const parts=(tagline.textContent||"").match(/\\S+|\\s+/g)||[];
+    const parts=(tagline.textContent||"").match(/\S+|\s+/g)||[];
     tagline.replaceChildren();
     for(const part of parts){
-     if(/^\\s+$/.test(part)){tagline.appendChild(document.createTextNode(part));continue;}
+     if(/^\s+$/.test(part)){tagline.appendChild(document.createTextNode(part));continue;}
      const word=document.createElement("span");
      word.className="project-card-word";word.textContent=part;
      tagline.appendChild(word);
