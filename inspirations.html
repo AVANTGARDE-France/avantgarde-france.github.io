@@ -693,7 +693,7 @@ load();
    }
 
    // Une seule face HTML : elle est placée dans son calque WebMotion sans être clonée.
-   const faceStage=document.createElement("w-el");faceStage.setAttribute("x","0");faceStage.setAttribute("y","0");faceStage.setAttribute("width","1080");faceStage.setAttribute("height","1350");faceStage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
+   const faceStage=document.createElement("w-el");faceStage.setAttribute("x","0");faceStage.setAttribute("y","0");faceStage.setAttribute("width","1080");faceStage.setAttribute("height","1350");faceStage.style.cssText="display:block;position:relative;z-index:1;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
    wrapper.appendChild(face);faceStage.appendChild(wrapper);stage.appendChild(faceStage);composition.appendChild(stage);document.body.appendChild(composition);
    await composition.ready;
    if(document.fonts?.ready)await document.fonts.ready;
