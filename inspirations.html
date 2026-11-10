@@ -894,20 +894,6 @@ grid.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.
 votePanel?.addEventListener("click",async e=>{const b=e.target.closest("[data-vote]");if(!b)return;const msg=votePanel.querySelector(".project-vote-message");if(!currentUser){const statusNode=document.getElementById("inspirationShareStatus");if(statusNode){statusNode.textContent="Vous devez être connecté pour noter.";statusNode.classList.add("visible");}return}const value=Number(b.dataset.vote),id=modalContent.dataset.itemId;if(!id)return;const currentValue=myVotes.get(String(id)),removing=currentValue===value;b.disabled=true;if(msg)msg.textContent=removing?"Retrait de votre évaluation…":"Enregistrement de votre note…";const result=removing?await supabase.from("inspiration_votes").delete().eq("user_id",currentUser.id).eq("contenu_id",id):await supabase.from("inspiration_votes").upsert({user_id:currentUser.id,contenu_id:id,vote:value,updated_at:new Date().toISOString()},{onConflict:"user_id,contenu_id"});b.disabled=false;if(result.error){console.error("Erreur vote inspiration",result.error);if(msg)msg.textContent="Impossible de modifier votre note. Réessayez.";return}if(removing)myVotes.delete(String(id));else myVotes.set(String(id),value);await loadVoteData();const updated=items.find(x=>String(x.id)===String(id));if(updated){votePanel.innerHTML=voteControls(updated);if(activeInspirationCard){const rating=activeInspirationCard.querySelector(".project-card-rating strong");if(rating)rating.textContent=String(popularity(id).pouces_positifs||0);activeInspirationCard.querySelector(".project-card-validation-stamp")?.remove();const stampMarkup=voteIcon(myVotes.get(String(id)));if(stampMarkup){const holder=document.createElement("div");holder.innerHTML=stampMarkup;const stamp=holder.firstElementChild;if(stamp)activeInspirationCard.appendChild(stamp)}refreshGridAfterClose=true;}}});
 
 
-/* Le bouton principal lance désormais directement l'export WebMotion.
-   Le texte du verso est copié après le téléchargement. */
-const shareStatus=document.getElementById("inspirationShareStatus");
-const socialChooser=document.getElementById("inspirationSocialChooser");
-function shareMessage(message){if(shareStatus){shareStatus.textContent=message;shareStatus.classList.add("visible")}}
-function getInspirationShareText(){
- const content=document.getElementById("projectModalContent");
- const title=document.getElementById("projectModalTitle");
- if(!content)throw new Error("Texte du verso introuvable.");
- const clone=content.cloneNode(true);
- clone.querySelectorAll("script,style,button,svg").forEach(el=>el.remove());
- const body=(clone.innerText||clone.textContent||"").trim();
- return [title?.textContent?.trim(),body].filter(Boolean).join("\n\n");
-}
 document.getElementById("inspirationSocialClose")?.addEventListener("click",()=>{socialChooser.hidden=true});
 socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)socialChooser.hidden=true});
 document.getElementById("projectModalClose")?.addEventListener("click",closeInspirationModal);
@@ -920,132 +906,88 @@ load();
 </script>
 <script type="module">
 import {supabase} from "./js/supabase.js";
-{
- const button=document.getElementById("inspirationShareButton");
- if(button)button.addEventListener("click",async()=>{
-  const socialChooser=document.getElementById("inspirationSocialChooser");
-  const statusNode=document.getElementById("inspirationShareStatus");
-  const sessionResult=await supabase.auth.getSession();
-  const connectedUser=sessionResult?.data?.session?.user||null;
-  if(!connectedUser){if(statusNode){statusNode.textContent="Vous devez être connecté pour partager.";statusNode.classList.add("visible");}return;}
-  const sourceId=document.getElementById("projectModalContent")?.dataset.itemId;const source=sourceId?document.querySelector("#projectModalFront > .project-card[data-id=\""+CSS.escape(String(sourceId))+"\"]"):null;
-  if(!source||!document.getElementById("projectModal")?.classList.contains("open")){alert("Ouvre d’abord une carte Inspiration, puis relance le test.");return;}
-  button.disabled=true;button.querySelector("span").textContent="Préparation de la vidéo…";
-  let composition;
-  const decoders=[];
-  const gifLayers=[];
-  try{
-   if(typeof ImageDecoder==="undefined")throw new Error("Ce navigateur ne propose pas le décodage GIF ImageDecoder nécessaire.");
-   await import("https://esm.sh/@superhq/webmotion@0.18.2/elements");
-   composition=document.createElement("w-composition");
-   composition.setAttribute("width","1080");composition.setAttribute("height","1350");composition.setAttribute("fps","30");composition.setAttribute("duration","210");
-   composition.style.cssText="position:fixed;left:-20000px;top:0;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
-   const stage=document.createElement("w-el");stage.className="project-grid";stage.setAttribute("x","0");stage.setAttribute("y","0");stage.setAttribute("width","1080");stage.setAttribute("height","1350");stage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden";
-   const sourceRect=source.getBoundingClientRect();if(!sourceRect.width||!sourceRect.height)throw new Error("La carte publique de référence est introuvable ou masquée.");const exportScale=1080/sourceRect.width;
-   const wrapper=document.createElement("div");wrapper.className="project-card-export-wrapper";
-   wrapper.style.cssText=`position:relative!important;z-index:1!important;width:${sourceRect.width}px!important;height:${sourceRect.height}px!important;min-width:${sourceRect.width}px!important;min-height:${sourceRect.height}px!important;max-width:none!important;max-height:none!important;aspect-ratio:4/5!important;transform:scale(${exportScale});transform-origin:top left;margin:0!important;overflow:hidden;background:transparent!important`;
-   const face=source.cloneNode(true);face.removeAttribute("id");
-   face.style.cssText+=`;position:absolute!important;inset:0!important;width:${sourceRect.width}px!important;height:${sourceRect.height}px!important;transform:none!important;visibility:visible!important;opacity:1!important;background:transparent!important;pointer-events:none!important`;
-   face.style.setProperty("background","transparent","important");face.style.setProperty("background-color","transparent","important");face.style.setProperty("background-image","none","important");
-   face.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
-   face.querySelectorAll("img").forEach(img=>{img.loading="eager";img.decoding="sync"});
-   // L'image animée est injectée au niveau de la photo ; le fondu CSS existant reste au-dessus.
-   face.querySelectorAll(".project-card-image-wrap").forEach(el=>{el.style.setProperty("z-index","0","important");el.style.setProperty("background","transparent","important");el.style.setProperty("background-color","transparent","important");el.style.setProperty("background-image","none","important");el.style.setProperty("box-shadow","none","important");});
-   const videoPhotoStyle=document.createElement("style");videoPhotoStyle.textContent=".project-card-export-wrapper .project-card-image-wrap::before,.project-card-export-wrapper .project-card-image-wrap::after{content:none!important;display:none!important;background:transparent!important;box-shadow:none!important}";face.prepend(videoPhotoStyle);
-   const tagline=face.querySelector(".project-card-tagline");
-   if(tagline){
-    const parts=(tagline.textContent||"").match(/\S+|\s+/g)||[];
-    tagline.replaceChildren();
-    for(const part of parts){
-     if(/^\s+$/.test(part)){tagline.appendChild(document.createTextNode(part));continue;}
-     const word=document.createElement("span");
-     word.className="project-card-word";
-     const chars=Array.from(part);
-     for(let i=0;i<chars.length;){
-      if(/\p{Lu}/u.test(chars[i])){
-       let j=i+1;while(j<chars.length&&/\p{Lu}/u.test(chars[j]))j++;
-       const run=chars.slice(i,j).join("");
-       if(run.length>=2){const cap=document.createElement("span");cap.className="inspiration-cap";cap.textContent=run;word.appendChild(cap);}
-       else word.appendChild(document.createTextNode(run));
-       i=j;
-      }else{word.appendChild(document.createTextNode(chars[i]));i++;}
-     }
-     tagline.appendChild(word);
-    }
-   }
-
-   // Une seule face HTML : elle est placée dans son calque WebMotion sans être clonée.
-   const faceStage=document.createElement("w-el");faceStage.setAttribute("x","0");faceStage.setAttribute("y","0");faceStage.setAttribute("width","1080");faceStage.setAttribute("height","1350");faceStage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
-   wrapper.appendChild(face);faceStage.appendChild(wrapper);stage.appendChild(faceStage);composition.appendChild(stage);document.body.appendChild(composition);
-   await composition.ready;
-   if(document.fonts?.ready)await document.fonts.ready;
-   await Promise.all([...face.querySelectorAll("img")].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,10000)})));
-   const gifImages=[...face.querySelectorAll("img")].filter(img=>/\.gif(?:$|[?#])/i.test(img.currentSrc||img.src));
-   if(!gifImages.length)throw new Error("Aucun GIF animé détecté dans cette face de carte.");
-   const webmotionDiagnostics=[];
-   // Le premier plan reprend uniquement les éléments éditoriaux.
-   const foregroundStage=document.createElement("w-el");foregroundStage.setAttribute("x","0");foregroundStage.setAttribute("y","0");foregroundStage.setAttribute("width","1080");foregroundStage.setAttribute("height","1350");foregroundStage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
-   const foregroundWrapper=wrapper.cloneNode(false);foregroundWrapper.style.cssText=wrapper.style.cssText+";background:transparent!important;background-color:transparent!important";
-   const foregroundFace=face.cloneNode(true);foregroundFace.removeAttribute("id");foregroundFace.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));foregroundFace.querySelectorAll(".project-card-image-wrap").forEach(el=>el.remove());
-   foregroundFace.style.setProperty("background","transparent","important");foregroundFace.style.setProperty("background-color","transparent","important");foregroundFace.style.setProperty("background-image","none","important");
-   foregroundWrapper.appendChild(foregroundFace);foregroundStage.appendChild(foregroundWrapper);
-   const captureWordSets=[face.querySelectorAll(".project-card-word"),foregroundFace.querySelectorAll(".project-card-word")];
-   const captureWordCount=captureWordSets[0].length;
-   const revealFrames=90;
-   for(const img of gifImages){
-    const url=img.currentSrc||img.src;
-    const response=await fetch(url,{mode:"cors",credentials:"omit"});
-    if(!response.ok)throw new Error("Impossible de lire le GIF ("+response.status+").");
-    const bytes=await response.arrayBuffer();
-    const decoder=new ImageDecoder({data:bytes,type:"image/gif"});decoders.push(decoder);
-    await decoder.tracks.ready;
-    const track=decoder.tracks.selectedTrack;
-    if(!track||!track.frameCount)throw new Error("Le GIF ne contient aucune image décodable.");
-    const frames=[],durations=[];let totalDuration=0;
-    const sampleCount=Math.min(track.frameCount,24);
-    const frameIndexes=Array.from({length:sampleCount},(_,i)=>Math.round(i*(track.frameCount-1)/Math.max(1,sampleCount-1)));
-    for(const n of frameIndexes){
-     const decoded=await decoder.decode({frameIndex:n});
-     const bitmap=await createImageBitmap(decoded.image,{resizeWidth:Math.max(1,Math.round((img.naturalWidth||decoded.image.displayWidth)*exportScale)),resizeHeight:Math.max(1,Math.round((img.naturalHeight||decoded.image.displayHeight)*exportScale)),resizeQuality:"low"});
-     frames.push(bitmap);durations.push(1000000/sampleCount);totalDuration+=1000000/sampleCount;decoded.image.close();
-    }
-    const rect=img.getBoundingClientRect();const stageRect=stage.getBoundingClientRect();const imageParent=img.closest(".project-card-image-wrap")||img.parentElement;const parentRect=imageParent?.getBoundingClientRect()||rect;
-    const canvas=document.createElement("canvas");
-    canvas.width=Math.max(1,Math.round(parentRect.width*exportScale));canvas.height=Math.max(1,Math.round(parentRect.height*exportScale));
-    canvas.setAttribute("aria-hidden","true");
-    canvas.style.cssText="position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;z-index:0!important;object-fit:cover!important;pointer-events:none!important";
-    if(!imageParent)throw new Error("Conteneur de la photo introuvable.");
-    imageParent.appendChild(canvas);
-    const ctx=canvas.getContext("2d",{alpha:false});if(!ctx)throw new Error("Canvas GIF indisponible.");
-    const drawFrame=videoFrame=>{
-     const time=((videoFrame/30)*1000000)%totalDuration;let elapsed=0,index=0;
-     while(index<durations.length-1&&elapsed+durations[index]<=time){elapsed+=durations[index];index++;}
-     const bitmap=frames[index],sw=bitmap.width,sh=bitmap.height;
-     const cropScale=Math.max(canvas.width/sw,canvas.height/sh),cropW=canvas.width/cropScale,cropH=sh>0?canvas.height/cropScale:sh,cropX=(sw-cropW)/2,cropY=(sh-cropH)/2;
-     ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(bitmap,cropX,cropY,cropW,cropH,0,0,canvas.width,canvas.height);
-    };
-    drawFrame(0);
-    img.style.setProperty("opacity","0","important");img.style.setProperty("visibility","hidden","important");
-    gifLayers.push({drawFrame,frames});
-    webmotionDiagnostics.push({src:url.split("/").pop(),gifFrames:frames.length,canvas:canvas.width+"x"+canvas.height,photoBox:Math.round(parentRect.width)+"x"+Math.round(parentRect.height),stageBox:Math.round(stageRect.width)+"x"+Math.round(stageRect.height)});
-   }
-   stage.appendChild(foregroundStage);
-   const renderCardFrame=composition.renderFrameAt.bind(composition);
-   composition.renderFrameAt=frame=>{
-    const visibleWords=captureWordCount?Math.min(captureWordCount,Math.ceil((Math.max(0,frame)+1)/revealFrames*captureWordCount)):0;
-    for(const wordSet of captureWordSets)wordSet.forEach((word,index)=>{word.style.setProperty("opacity",index<visibleWords?"1":"0","important");});
-    for(const layer of gifLayers)layer.drawFrame(frame);
-    renderCardFrame(frame);
-   };
-   if(document.fonts?.ready)await document.fonts.ready;
-   console.table(webmotionDiagnostics);button.dataset.webmotionDiagnostics=JSON.stringify(webmotionDiagnostics);button.querySelector("span").textContent="Création de la vidéo…";
-   const blob=await composition.export({onProgress:({frame,total})=>{button.querySelector("span").textContent="Création "+Math.round(frame/total*100)+" %";}});
-   if(!(blob instanceof Blob)||blob.size<10000)throw new Error("WebMotion n’a pas produit de vidéo exploitable.");
-   const safeName=(String(document.getElementById("projectModalTitle")?.textContent||"inspiration").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration");const extension=blob.type.toLowerCase().includes("mp4")?"mp4":"webm";const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="avantgarde-"+safeName+"."+extension;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);const versoNode=document.getElementById("projectModalContent");const versoClone=versoNode?.cloneNode(true);versoClone?.querySelectorAll("script,style,button,svg").forEach(el=>el.remove());const rawVersoText=(versoClone?.innerText||versoClone?.textContent||"").replace(/\r/g,"");const versoText=rawVersoText.split("\n").map(line=>line.replace(/[\t ]+/g," ").trim()).filter(Boolean).join("\n");const shareText=[versoText,connectedUser.id?`Deviens Avant-gardistE, je te parraine : ${connectedUser.id}`:""].filter(Boolean).join("\n\n");try{if(!versoText)throw new Error("Texte du verso introuvable");let copied=false;if(navigator.clipboard?.writeText){try{await navigator.clipboard.writeText(shareText);copied=true;}catch(_){}}if(!copied){const field=document.createElement("textarea");field.value=shareText;field.setAttribute("readonly","");field.style.cssText="position:fixed;left:-9999px;top:0;opacity:0";document.body.appendChild(field);field.focus();field.select();copied=!!document.execCommand("copy");field.remove();}const statusNode=document.getElementById("inspirationShareStatus");if(statusNode){statusNode.textContent=copied?"Vidéo téléchargée et texte du verso copié.":"Vidéo téléchargée. Copiez le texte du verso manuellement.";statusNode.classList.add("visible");}}catch(copyError){const statusNode=document.getElementById("inspirationShareStatus");if(statusNode){statusNode.textContent="Vidéo téléchargée. Copiez le texte du verso manuellement.";statusNode.classList.add("visible");}}if(socialChooser)socialChooser.hidden=false;button.querySelector("span").textContent="Vidéo prête — choisir un réseau";
-  }catch(error){console.error("WebMotion test",error);alert("Impossible de créer la vidéo : "+(error?.message||error));button.querySelector("span").textContent="Réessayer";}
-  finally{for(const decoder of decoders){try{decoder.close();}catch{}}for(const layer of gifLayers)for(const bitmap of layer.frames){try{bitmap.close();}catch{}}composition?.remove();button.disabled=false;}
- });;
+const button=document.getElementById("inspirationShareButton");
+const statusNode=document.getElementById("inspirationShareStatus");
+const socialChooser=document.getElementById("inspirationSocialChooser");
+const modal=document.getElementById("projectModal");
+const flip=document.querySelector("#projectModalCard .project-modal-card-inner");
+function showShareStatus(message){if(statusNode){statusNode.textContent=message;statusNode.classList.add("visible")}}
+function getVersoShareText(){
+ const title=document.getElementById("projectModalTitle")?.textContent?.trim()||"";
+ const content=document.getElementById("projectModalContent");
+ if(!content)throw new Error("Texte du verso introuvable.");
+ const clone=content.cloneNode(true);
+ clone.querySelectorAll("script,style,button,svg").forEach(el=>el.remove());
+ return [title,(clone.innerText||clone.textContent||"").trim()].filter(Boolean).join("\n\n");
 }
+async function copyVersoText(userId){
+ const text=[getVersoShareText(),userId?`Deviens Avant-gardistE, je te parraine : ${userId}`:""].filter(Boolean).join("\n\n");
+ try{await navigator.clipboard.writeText(text);return true}catch(_){
+  const field=document.createElement("textarea");field.value=text;field.setAttribute("readonly","");
+  field.style.cssText="position:fixed;left:-9999px;top:0;opacity:0";document.body.appendChild(field);
+  field.select();const copied=document.execCommand("copy");field.remove();return copied;
+ }
+}
+function downloadVideo(blob,title){
+ const safe=(title||"inspiration").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration";
+ const url=URL.createObjectURL(blob),link=document.createElement("a");
+ link.href=url;link.download="avantgarde-"+safe+".webm";document.body.appendChild(link);link.click();link.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),120000);
+}
+async function recordOriginalFront(stream){
+ const source=document.querySelector("#projectModalFront > .project-card");
+ if(!source||!flip||!modal?.classList.contains("open"))throw new Error("Le recto original agrandi est introuvable.");
+ const video=document.createElement("video");video.muted=true;video.playsInline=true;video.srcObject=stream;
+ await new Promise((resolve,reject)=>{video.onloadedmetadata=resolve;video.onerror=()=>reject(new Error("Flux de capture illisible."))});
+ await video.play();
+ const wasFlipped=flip.classList.contains("is-flipped"),oldStage=modal.dataset.cardStage;
+ flip.classList.remove("is-flipped");modal.classList.remove("is-flipped");modal.dataset.cardStage="RECTO_AGRANDI";
+ await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+ const rect=source.getBoundingClientRect();
+ if(!rect.width||!rect.height)throw new Error("Le recto agrandi n’est pas visible.");
+ const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;
+ const ctx=canvas.getContext("2d");if(!ctx)throw new Error("Cadrage vidéo indisponible.");
+ const output=canvas.captureStream(30);
+ const mime=["video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"].find(x=>MediaRecorder.isTypeSupported(x));
+ if(!mime)throw new Error("Enregistrement WebM non pris en charge.");
+ const recorder=new MediaRecorder(output,{mimeType:mime}),chunks=[];
+ recorder.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};
+ const sx=rect.left*video.videoWidth/window.innerWidth,sy=rect.top*video.videoHeight/window.innerHeight;
+ const sw=rect.width*video.videoWidth/window.innerWidth,sh=rect.height*video.videoHeight/window.innerHeight;
+ let raf=0;
+ const draw=()=>{ctx.clearRect(0,0,1080,1350);ctx.drawImage(video,sx,sy,sw,sh,0,0,1080,1350);raf=requestAnimationFrame(draw)};
+ const finished=new Promise((resolve,reject)=>{recorder.onstop=()=>resolve(new Blob(chunks,{type:mime}));recorder.onerror=()=>reject(new Error("Échec de l’enregistrement."))});
+ draw();recorder.start(250);await new Promise(resolve=>setTimeout(resolve,6000));recorder.stop();
+ const blob=await finished;cancelAnimationFrame(raf);output.getTracks().forEach(t=>t.stop());video.pause();video.srcObject=null;
+ if(wasFlipped){flip.classList.add("is-flipped");modal.classList.add("is-flipped");modal.dataset.cardStage="VERSO"}else modal.dataset.cardStage=oldStage||"RECTO_AGRANDI";
+ if(blob.size<10000)throw new Error("La vidéo capturée est vide.");
+ return blob;
+}
+document.getElementById("inspirationSocialClose")?.addEventListener("click",()=>{socialChooser.hidden=true});
+socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)socialChooser.hidden=true});
+button?.addEventListener("click",async()=>{
+ if(button.disabled)return;
+ let displayStream=null;const label=button.querySelector("span");
+ try{
+  if(!navigator.mediaDevices?.getDisplayMedia)throw new Error("La capture d’onglet nécessite un navigateur compatible et une page HTTPS.");
+  const displayRequest=navigator.mediaDevices.getDisplayMedia({video:{frameRate:30},audio:false});
+  button.disabled=true;if(label)label.textContent="Sélectionne cet onglet…";
+  displayStream=await displayRequest;
+  const session=await supabase.auth.getSession(),user=session?.data?.session?.user||null;
+  if(!user)throw new Error("Vous devez être connecté pour partager.");
+  if(!modal?.classList.contains("open")||modal.dataset.cardStage!=="VERSO")throw new Error("Ouvre le verso d’une carte Inspiration avant de partager.");
+  if(label)label.textContent="Enregistrement du recto original…";
+  const title=document.getElementById("projectModalTitle")?.textContent?.trim()||"inspiration";
+  const blob=await recordOriginalFront(displayStream);downloadVideo(blob,title);
+  const copied=await copyVersoText(user.id);
+  showShareStatus(copied?"Recto original téléchargé ; texte du verso copié.":"Vidéo téléchargée ; copie du texte à effectuer manuellement.");
+  if(socialChooser)socialChooser.hidden=false;
+  if(label)label.textContent="Vidéo prête — choisir un réseau";
+ }catch(error){
+  console.error("Partage Inspiration",error);showShareStatus(error?.message||"Impossible d’enregistrer la carte.");
+  if(label)label.textContent="Réessayer";
+ }finally{displayStream?.getTracks().forEach(t=>{if(t.readyState!=="ended")t.stop()});button.disabled=false}
+});
 </script>
 </body>
 </html>
