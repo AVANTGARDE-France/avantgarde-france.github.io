@@ -1343,6 +1343,25 @@
 }
 .project-modal.open .project-modal-panel{animation:none!important}
 /* ===== Fin des règles consolidées ===== */
+
+/* Finitions demandées : guillemets et tricolore centrés, signature resserrée. */
+#projectGrid .project-card-center:before,
+#projectModalFront .project-card-center:before{
+ left:50%!important;right:auto!important;transform:translateX(-50%)!important;
+}
+#projectGrid .inspiration-card-brand,
+#projectModalFront .inspiration-card-brand{
+ left:0!important;right:0!important;width:100%!important;
+ margin:0!important;padding-left:7px!important;padding-right:7px!important;
+ box-sizing:border-box!important;justify-content:flex-start!important;
+}
+#projectGrid .inspiration-card-brand:after,
+#projectModalFront .inspiration-card-brand:after{
+ left:50%!important;right:auto!important;transform:translateX(-50%)!important;
+}
+#projectGrid .inspiration-card-brand .brand-prefix,
+#projectModalFront .inspiration-card-brand .brand-prefix{margin-right:3px!important}
+
 </style>
 </head>
 <body>
