@@ -422,6 +422,17 @@
 .vip-score-note{color:#c5d0df!important;font-size:12px!important}
 @media(max-width:520px){.vip-score-help-modal{padding:12px}.vip-score-help-modal .modal-box{padding:22px 18px;max-height:86vh}.vip-score-help-modal h2{font-size:18px}}
 
+
+.quote-position-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.quote-position-option{display:flex;align-items:center;justify-content:center;gap:9px;min-height:52px;margin:0;padding:8px 10px;border:1px solid rgba(214,173,85,.32);border-radius:7px;background:rgba(255,255,255,.025);color:var(--white,#f5f3ed);font:600 11px Arial,sans-serif;cursor:pointer;transition:.18s}
+.quote-position-option:hover{border-color:rgba(240,213,138,.8);background:rgba(214,173,85,.08)}
+.quote-position-option.is-active{border-color:var(--gold-light,#f0d58a);background:rgba(214,173,85,.16);color:var(--gold-light,#f0d58a);box-shadow:inset 0 0 0 1px rgba(240,213,138,.15)}
+.quote-position-icon{position:relative;display:block;width:19px;height:27px;flex:none;border:1px solid rgba(240,213,138,.7);border-radius:3px;background:linear-gradient(180deg,#17365b,#07152d)}
+.quote-position-icon:before{content:"";position:absolute;left:3px;right:3px;top:3px;height:4px;border-radius:2px;background:rgba(240,213,138,.22)}
+.quote-position-icon i{position:absolute;left:3px;right:3px;height:5px;border-radius:2px;background:#f0d58a}
+.quote-position-icon-top i{top:8px}.quote-position-icon-center i{top:11px}.quote-position-icon-bottom i{bottom:3px}
+@media(max-width:520px){.quote-position-options{gap:5px}.quote-position-option{gap:5px;padding:7px 4px;font-size:10px}}
+
 </style>
 
   <meta name="theme-color" content="#07152d">
@@ -2007,6 +2018,17 @@
                         ></textarea>
 
                     </div>
+
+<div class="form-group full-width quote-position-control" id="contentAccrochePositionControl">
+  <label>POSITION DE L'ACCROCHE</label>
+  <div class="quote-position-options" role="group" aria-label="Position de l'accroche sur la carte">
+    <button type="button" class="quote-position-option" data-quote-position="top" aria-pressed="false"><span class="quote-position-icon quote-position-icon-top" aria-hidden="true"><i></i></span><span>En haut</span></button>
+    <button type="button" class="quote-position-option is-active" data-quote-position="center" aria-pressed="true"><span class="quote-position-icon quote-position-icon-center" aria-hidden="true"><i></i></span><span>Au centre</span></button>
+    <button type="button" class="quote-position-option" data-quote-position="bottom" aria-pressed="false"><span class="quote-position-icon quote-position-icon-bottom" aria-hidden="true"><i></i></span><span>En bas</span></button>
+  </div>
+  <div class="help">Choisissez l'emplacement qui laisse le mieux respirer l'image. Ce réglage ne concerne que cette carte.</div>
+</div>
+
 
 
                     <div class="form-group">
