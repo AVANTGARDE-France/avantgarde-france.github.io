@@ -981,6 +981,8 @@ button?.addEventListener("click",async()=>{
   const rect=front.getBoundingClientRect();
   popup=window.open(captureUrl,"avantgarde-card-capture","popup=yes,width="+Math.max(420,Math.round(rect.width))+",height="+Math.max(525,Math.round(rect.height))+",resizable=yes,scrollbars=no");
   if(!popup)throw new Error("Autorise les fenêtres pop-up pour ce site.");
+  const capturePromise=navigator.mediaDevices.getDisplayMedia({video:{displaySurface:"window",frameRate:{ideal:30,max:30}},audio:false});
+  const facebookWindow=window.open("about:blank","_blank");
   if(label)label.textContent="Préparation…";
   status("Préparation du recto original agrandi…");
   await waitMessage(popup,"AVANTGARDE_CAPTURE_READY",10000);
@@ -989,14 +991,13 @@ button?.addEventListener("click",async()=>{
   await waitMessage(popup,"AVANTGARDE_CAPTURE_RENDERED",15000);
   if(label)label.textContent="Autorise la capture…";
   status("Dans la fenêtre de partage, choisis la fenêtre « Avant-gardE — Capture ».");
-  const capturePromise=navigator.mediaDevices.getDisplayMedia({video:{displaySurface:"window",frameRate:{ideal:30,max:30}},audio:false});
   stream=await capturePromise;
   const blob=await recordCapture(stream,p=>{if(label)label.textContent="Vidéo "+p+" %";status("Enregistrement du recto original : "+p+" %")});
   const title=document.getElementById("projectModalTitle")?.textContent?.trim()||"inspiration";
   const ext=download(blob,title);
   try{await navigator.clipboard.writeText(versoText())}catch(_){}
-  const fb=window.open("https://www.facebook.com/post/create","_blank");
-  status("Vidéo "+ext.toUpperCase()+" de 10 secondes téléchargée. Texte du verso copié."+ (fb?" Facebook est ouvert.":""));
+  if(facebookWindow&&!facebookWindow.closed)facebookWindow.location.href="https://www.facebook.com/post/create";
+  status("Vidéo "+ext.toUpperCase()+" de 10 secondes téléchargée. Texte du verso copié."+ (facebookWindow?" Facebook est ouvert.":""));
   if(label)label.textContent="Partager";
  }catch(error){console.error("Partage vidéo Inspiration",error);status(error?.message||"Impossible de créer la vidéo.");if(label)label.textContent="Réessayer"}
  finally{stream?.getTracks().forEach(t=>t.stop());if(popup&&!popup.closed)popup.close();busy=false;button.disabled=false}
