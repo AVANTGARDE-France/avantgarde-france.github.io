@@ -659,7 +659,7 @@ load();
  const button=document.getElementById("inspirationShareButton");
  if(button)button.addEventListener("click",async()=>{
   const socialChooser=document.getElementById("inspirationSocialChooser");
-  const source=document.getElementById("projectModalFront");
+  const sourceId=document.getElementById("projectModalContent")?.dataset.itemId;const source=sourceId?document.querySelector('#projectGrid .project-card[data-id="'+CSS.escape(String(sourceId))+'"]'):null;
   if(!source||!document.getElementById("projectModal")?.classList.contains("open")){alert("Ouvre d’abord une carte Inspiration, puis relance le test.");return;}
   button.disabled=true;button.querySelector("span").textContent="Préparation de la vidéo…";
   let composition;
@@ -670,15 +670,16 @@ load();
    composition=document.createElement("w-composition");
    composition.setAttribute("width","1080");composition.setAttribute("height","1350");composition.setAttribute("fps","30");composition.setAttribute("duration","120");
    composition.style.cssText="position:fixed;left:-20000px;top:0;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
-   const stage=document.createElement("w-el");stage.setAttribute("x","0");stage.setAttribute("y","0");stage.setAttribute("width","1080");stage.setAttribute("height","1350");stage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden";
-   const wrapper=document.createElement("div");wrapper.className="project-modal-card";
-   wrapper.style.cssText="position:relative!important;width:540px!important;height:675px!important;min-width:540px!important;min-height:675px!important;max-width:none!important;max-height:none!important;aspect-ratio:4/5!important;transform:scale(2);transform-origin:top left;margin:0!important;overflow:hidden";
+   const stage=document.createElement("w-el");stage.className="project-grid";stage.setAttribute("x","0");stage.setAttribute("y","0");stage.setAttribute("width","1080");stage.setAttribute("height","1350");stage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden";
+   const sourceRect=source.getBoundingClientRect();if(!sourceRect.width||!sourceRect.height)throw new Error("La carte publique de référence est introuvable ou masquée.");const exportScale=1080/sourceRect.width;
+   const wrapper=document.createElement("div");wrapper.className="project-card-export-wrapper";
+   wrapper.style.cssText=`position:relative!important;width:${sourceRect.width}px!important;height:${sourceRect.height}px!important;min-width:${sourceRect.width}px!important;min-height:${sourceRect.height}px!important;max-width:none!important;max-height:none!important;aspect-ratio:4/5!important;transform:scale(${exportScale});transform-origin:top left;margin:0!important;overflow:hidden`;
    const face=source.cloneNode(true);face.removeAttribute("id");
-   face.style.cssText+=";position:absolute!important;inset:0!important;width:540px!important;height:675px!important;transform:none!important;visibility:visible!important;opacity:1!important";
+   face.style.cssText+=`;position:absolute!important;inset:0!important;width:${sourceRect.width}px!important;height:${sourceRect.height}px!important;transform:none!important;visibility:visible!important;opacity:1!important;background:transparent!important;pointer-events:none!important`;
    face.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
    face.querySelectorAll("img").forEach(img=>{img.loading="eager";img.decoding="sync"});
    // L'image animée est injectée au niveau de la photo ; le fondu CSS existant reste au-dessus.
-   face.querySelectorAll(".project-card-image-wrap").forEach(el=>{el.style.setProperty("z-index","auto","important");el.style.setProperty("background","transparent","important");});
+   face.querySelectorAll(".project-card-image-wrap").forEach(el=>{el.style.setProperty("z-index","0","important");el.style.setProperty("background","transparent","important");});
    const tagline=face.querySelector(".project-card-tagline");
    if(tagline){
     const parts=(tagline.textContent||"").match(/\S+|\s+/g)||[];
