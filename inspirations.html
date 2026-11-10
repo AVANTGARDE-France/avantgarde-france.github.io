@@ -1305,24 +1305,12 @@
 #projectModalFront:before,#projectModalFront:after{
  content:none!important;display:none!important;background:none!important;
 }
-#projectModalFront>.project-modal-live-card{
- transform:translate(-50%,-50%)!important;transform-origin:center center!important;
- transition:zoom 3s cubic-bezier(.18,.78,.2,1)!important;
- pointer-events:auto!important;
-}
-#projectModalFront .project-modal-live-card>.project-card{
- position:absolute!important;inset:0!important;display:block!important;
- width:100%!important;height:100%!important;aspect-ratio:4/5!important;
- overflow:hidden!important;transform:none!important;cursor:pointer!important;
-}
+#projectModalFront>.project-modal-live-card{transform:translate(-50%,-50%) scale(1)!important;transform-origin:center center!important;transition:transform 3s cubic-bezier(.18,.78,.2,1)!important;pointer-events:auto!important}
+#projectModalFront .project-modal-live-card>.project-card{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;aspect-ratio:4/5!important;overflow:hidden!important;transform:none!important;cursor:pointer!important;pointer-events:auto!important}
 #projectModalFront .project-modal-live-card .project-card-image-wrap{
  position:absolute!important;inset:0!important;overflow:hidden!important;
 }
-#projectModalFront .project-modal-live-card .project-card-image-wrap:before,
-#projectModalFront .project-modal-live-card .project-card-image-wrap:after{
- content:none!important;display:none!important;background:none!important;
- opacity:0!important;box-shadow:none!important;
-}
+#projectModalFront .project-modal-live-card .project-card-image-wrap:before,#projectModalFront .project-modal-live-card .project-card-image-wrap:after{content:none!important;display:none!important;background:none!important;opacity:0!important;box-shadow:none!important}
 #projectModalFront .project-modal-live-card .project-card-image{
  filter:none!important;transform:none!important;
 }
@@ -1442,74 +1430,49 @@ const modal=document.getElementById("projectModal"),modalTitle=document.getEleme
 function voteControls(item){const value=myVotes.get(String(item.id));return '<div class="project-vote-message" aria-live="polite"></div><button type="button" class="project-vote-button positive '+(value===1?"selected":"")+'" data-vote="1" aria-label="Pouce vers le haut" aria-pressed="'+(value===1)+'"><span class="vote-symbol positive-symbol">👍</span></button><button type="button" class="project-vote-button neutral '+(value===0?"selected":"")+'" data-vote="0" aria-label="Note neutre" aria-pressed="'+(value===0)+'">✋🏻</button><button type="button" class="project-vote-button negative '+(value===-1?"selected":"")+'" data-vote="-1" aria-label="Pouce vers le bas" aria-pressed="'+(value===-1)+'"><span class="vote-symbol negative-symbol">👎</span></button>'}
 function copyRenderedCard(source){
  const copy=source.cloneNode(true);
- const sourceNodes=[source,...source.querySelectorAll("*")];
- const copyNodes=[copy,...copy.querySelectorAll("*")];
- const freeze=(from,to)=>{
-   const cs=getComputedStyle(from);
-   for(let i=0;i<cs.length;i++){const prop=cs[i];try{to.style.setProperty(prop,cs.getPropertyValue(prop),"important")}catch{}}
-   for(const pseudo of ["::before","::after"]){
-     if(from.classList?.contains("project-card-image-wrap"))continue;
-     const ps=getComputedStyle(from,pseudo),content=ps.content;
-     if(!content||content==="none"||content==="normal")continue;
-     const node=document.createElement("span");
-     node.setAttribute("aria-hidden","true");
-     node.dataset.frozenPseudo=pseudo;
-     for(let i=0;i<ps.length;i++){const prop=ps[i];try{node.style.setProperty(prop,ps.getPropertyValue(prop),"important")}catch{}}
-     node.textContent=content.replace(/^["']|["']$/g,"");
-     if(pseudo==="::before")to.prepend(node);else to.append(node);
-   }
- };
- sourceNodes.forEach((node,i)=>{if(copyNodes[i])freeze(node,copyNodes[i])});
- copy.removeAttribute("id");copy.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
- copy.querySelectorAll("[data-frozen-pseudo]").forEach(el=>el.style.pointerEvents="none");
+ copy.removeAttribute("id");
+ copy.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
  return copy;
 }
 function openInspirationCard(c){
- const item=items.find(x=>String(x.id)===c.dataset.id);if(!item||!modal||modal.classList.contains("open"))return;
+ const item=items.find(x=>String(x.id)===c.dataset.id);
+ if(!item||!modal||modal.classList.contains("open"))return;
  const front=document.getElementById("projectModalFront");
  const back=document.querySelector("#projectModalCard .project-modal-back");
  const flip=document.querySelector("#projectModalCard .project-modal-card-inner");
+ if(!front||!back||!flip)return;
  const sourceRect=c.getBoundingClientRect();
  const cardCopy=copyRenderedCard(c);
- cardCopy.style.setProperty("position","absolute","important");
- cardCopy.style.setProperty("left","0","important");cardCopy.style.setProperty("top","0","important");
- cardCopy.style.setProperty("width","100%","important");
- cardCopy.style.setProperty("height","100%","important");
- cardCopy.style.setProperty("min-width","0","important");
- cardCopy.style.setProperty("max-width","none","important");
- cardCopy.style.setProperty("aspect-ratio","4/5","important");
- cardCopy.style.setProperty("margin","0","important");
- cardCopy.style.setProperty("transform","none","important");
- cardCopy.style.setProperty("box-sizing","border-box","important");
+ cardCopy.style.cssText+=";position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-width:0!important;max-width:none!important;aspect-ratio:4/5!important;margin:0!important;transform:none!important;box-sizing:border-box!important;pointer-events:auto!important";
  const liveWrapper=document.createElement("div");
  liveWrapper.className="project-modal-live-card";
- liveWrapper.style.cssText="position:absolute!important;left:50%!important;top:50%!important;width:"+sourceRect.width+"px!important;height:"+sourceRect.height+"px!important;transform:translate(-50%,-50%)!important;transform-origin:center center!important;margin:0!important;overflow:visible!important;transition:width 3s cubic-bezier(.18,.78,.2,1),height 3s cubic-bezier(.18,.78,.2,1)!important";
- liveWrapper.appendChild(cardCopy);front.replaceChildren(liveWrapper);
- liveWrapper.addEventListener("click",e=>{e.stopPropagation();if(modal?.dataset.cardStage!=="RECTO_AGRANDI")return;if(e.target.closest("button,a,input,select,textarea,[role=button],[contenteditable=true]"))return;revealInspirationBack()});
+ liveWrapper.style.cssText="position:absolute!important;left:50%!important;top:50%!important;width:"+sourceRect.width+"px!important;height:"+sourceRect.height+"px!important;transform:translate(-50%,-50%) scale(1)!important;transform-origin:center center!important;margin:0!important;overflow:visible!important;transition:transform 3s cubic-bezier(.18,.78,.2,1)!important;pointer-events:auto!important";
+ liveWrapper.appendChild(cardCopy);
+ front.replaceChildren(liveWrapper);
  front.dataset.accrochePosition=item.accroche_position||"center";
- front.setAttribute("aria-label","Recto agrandi. Cliquez pour retourner la carte.");
+ front.setAttribute("aria-label","Recto agrandi. Touchez la carte pour la retourner.");
  const sourceImage=c.querySelector(".project-card-image");
  if(sourceImage){
-   const imageUrl=sourceImage.currentSrc||sourceImage.src||sourceImage.getAttribute("src")||"";
-   const enlargedImage=cardCopy.querySelector(".project-card-image");
-   if(enlargedImage&&imageUrl){enlargedImage.src=imageUrl;enlargedImage.loading="eager"}
-   let backArt=back.querySelector(".project-modal-back-art");
-   if(!backArt){backArt=document.createElement("img");backArt.className="project-modal-back-art";backArt.alt="";backArt.setAttribute("aria-hidden","true");back.insertBefore(backArt,back.firstChild)}
-   backArt.src=imageUrl;backArt.style.display=imageUrl?"block":"none";
+  const imageUrl=sourceImage.currentSrc||sourceImage.src||sourceImage.getAttribute("src")||"";
+  const enlargedImage=cardCopy.querySelector(".project-card-image");
+  if(enlargedImage&&imageUrl){enlargedImage.src=imageUrl;enlargedImage.loading="eager"}
+  let backArt=back.querySelector(".project-modal-back-art");
+  if(!backArt){backArt=document.createElement("img");backArt.className="project-modal-back-art";backArt.alt="";backArt.setAttribute("aria-hidden","true");back.insertBefore(backArt,back.firstChild)}
+  backArt.src=imageUrl;backArt.style.display=imageUrl?"block":"none";
  }
  modalTitle.textContent=item.titre||"";
  modalContent.dataset.itemId=String(item.id);
  modalContent.innerHTML=item.html||"<p>Cette inspiration ne comporte pas encore de verso.</p>";
  votePanel.innerHTML=voteControls(item);
- flip.classList.remove("is-flipped");modal.classList.remove("is-flipped");
+ flip.classList.remove("is-flipped");
+ modal.classList.remove("is-flipped");
  modal.dataset.cardStage="RECTO_AGRANDI";
- liveWrapper.style.setProperty("width",sourceRect.width+"px","important");liveWrapper.style.setProperty("height",sourceRect.height+"px","important");
- modal.classList.add("open");document.body.style.overflow="hidden";
+ modal.classList.add("open");
+ document.body.style.overflow="hidden";
  requestAnimationFrame(()=>{
-   const area=front.getBoundingClientRect();
-   const target=Math.min(2,area.width/sourceRect.width,area.height/sourceRect.height);
-   liveWrapper.style.setProperty("width",(sourceRect.width*target)+"px","important");
-   liveWrapper.style.setProperty("height",(sourceRect.height*target)+"px","important");
+  const area=front.getBoundingClientRect();
+  const scale=Math.min(2,area.width/sourceRect.width,area.height/sourceRect.height);
+  liveWrapper.style.setProperty("transform","translate(-50%,-50%) scale("+scale+")","important");
  });
 }
 function closeInspirationModal(){if(modal)modal.dataset.cardStage="FERME";modal?.classList.remove("open","is-flipped");document.querySelector("#projectModalCard .project-modal-card-inner")?.classList.remove("is-flipped");document.body.style.overflow="";clearPendingShare();shareStatus?.classList.remove("visible")}
