@@ -277,46 +277,46 @@ sans empilement décoratif */
    Le contenu,
 les votes,
 le verso et les interactions restent inchangés. */
-#projectGrid .project-card{
+:is(#projectGrid, #projectModalFront) .project-card{
   position:relative!important;isolation:isolate!important;overflow:hidden!important;
   display:flex!important;flex-direction:column!important;aspect-ratio:4/5!important;
   border:1px solid rgba(240,213,138,.72)!important;border-radius:17px!important;
   background:#07152d!important;box-shadow:0 12px 30px rgba(0,0,0,.34),inset 0 0 0 5px rgba(7,21,45,.2)!important;
-}#projectGrid .project-card:before{
+}:is(#projectGrid, #projectModalFront) .project-card:before{
   content:"";position:absolute;inset:8px!important;z-index:4!important;
   border:1px solid rgba(245,243,237,.38)!important;border-radius:11px!important;
   pointer-events:none!important;box-shadow:inset 0 0 28px rgba(0,0,0,.12)!important;
-}#projectGrid .project-card-image-wrap{
+}:is(#projectGrid, #projectModalFront) .project-card-image-wrap{
   position:absolute!important;inset:0!important;z-index:0!important;overflow:hidden!important;
   background:#0d2344!important;
-}#projectGrid .project-card-image{
+}:is(#projectGrid, #projectModalFront) .project-card-image{
   width:100%!important;height:100%!important;object-fit:cover!important;
   filter:saturate(.88) contrast(1.06)!important;transform:scale(1.015);
-}#projectGrid .project-card-image-wrap:after{
+}:is(#projectGrid, #projectModalFront) .project-card-image-wrap:after{
   content:""!important;display:block!important;position:absolute!important;inset:0!important;z-index:1!important;
   background:
     linear-gradient(180deg,rgba(4,13,27,.34) 0%,rgba(4,13,27,.04) 25%,rgba(4,13,27,.18) 49%,rgba(4,13,27,.76) 76%,rgba(4,13,27,.96) 100%),
     linear-gradient(90deg,rgba(4,13,27,.16),transparent 28%,transparent 72%,rgba(4,13,27,.16))!important;
-}#projectGrid .project-card-finish{display:none!important}#projectGrid .project-card-top{
+}:is(#projectGrid, #projectModalFront) .project-card-finish{display:none!important}:is(#projectGrid, #projectModalFront) .project-card-top{
   position:absolute!important;left:0!important;right:0!important;bottom:61px!important;z-index:3!important;
   display:flex!important;justify-content:center!important;align-items:center!important;
   min-height:0!important;padding:0 17px!important;
-}#projectGrid .project-card-title{
+}:is(#projectGrid, #projectModalFront) .project-card-title{
   display:block!important;width:auto!important;max-width:84%!important;margin:0 auto!important;
   padding:8px 13px 0!important;border-top:1px solid rgba(240,213,138,.68)!important;
   color:#f0d58a!important;text-align:center!important;text-transform:uppercase!important;
   font:600 clamp(9px,1vw,12px)/1.35 Arial,Helvetica,sans-serif!important;
   letter-spacing:1.55px!important;text-shadow:0 2px 8px #000!important;
-}#projectGrid .project-card-center{
+}:is(#projectGrid, #projectModalFront) .project-card-center{
   position:absolute!important;inset:15% 0 24% 0!important;z-index:2!important;
   display:flex!important;align-items:center!important;justify-content:center!important;
   min-height:0!important;padding:22px 23px!important;text-align:center!important;
-}#projectGrid .project-card-center:before{
+}:is(#projectGrid, #projectModalFront) .project-card-center:before{
   content:"“"!important;position:absolute!important;top:0!important;left:50%!important;
   transform:translateX(-50%)!important;color:#f0d58a!important;
   font:400 clamp(48px,5vw,68px)/.85 Georgia,serif!important;
   text-shadow:0 3px 12px rgba(0,0,0,.55)!important;
-}#projectGrid .project-card-tagline{
+}:is(#projectGrid, #projectModalFront) .project-card-tagline{
   position:relative!important;z-index:2!important;display:block!important;
   width:100%!important;max-width:100%!important;margin:0!important;padding:17px 0 0!important;
   color:#fff!important;font-family:Georgia,"Times New Roman",serif!important;
@@ -327,54 +327,54 @@ le verso et les interactions restent inchangés. */
   -webkit-text-stroke:0!important;
   display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:7!important;
   overflow:hidden!important;overflow-wrap:anywhere!important;
-}#projectGrid .inspiration-card-brand{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand{
   position:absolute!important;left:0!important;right:0!important;bottom:14px!important;z-index:5!important;
   min-height:0!important;display:flex!important;align-items:center!important;justify-content:center!important;
   padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;
   box-shadow:none!important;color:#f5f3ed!important;
   font:700 15px/1 Georgia,serif!important;letter-spacing:-.3px!important;
   text-shadow:0 2px 8px #000!important;
-}#projectGrid .inspiration-card-brand:before{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand:before{
   content:"";position:absolute;left:37%;right:37%;top:-9px;height:1px;
   background:linear-gradient(90deg,transparent,rgba(240,213,138,.8),transparent);
-}#projectGrid .inspiration-card-brand .brand-prefix{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand .brand-prefix{
   margin-right:4px!important;color:rgba(245,243,237,.82)!important;
   font:italic 500 10px/1 Arial,sans-serif!important;letter-spacing:.2px!important;
-}#projectGrid .inspiration-card-brand .brand-a{color:#4c9be0!important}#projectGrid .inspiration-card-brand .brand-e{color:#ef4135!important}#projectGrid .project-card-rating{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand .brand-a{color:#4c9be0!important}:is(#projectGrid, #projectModalFront) .inspiration-card-brand .brand-e{color:#ef4135!important}:is(#projectGrid, #projectModalFront) .project-card-rating{
   position:absolute!important;left:17px!important;top:17px!important;z-index:6!important;
   padding:6px 9px!important;border:1px solid rgba(240,213,138,.42)!important;border-radius:999px!important;
   background:rgba(7,21,45,.66)!important;backdrop-filter:blur(8px)!important;
   box-shadow:0 3px 12px rgba(0,0,0,.2)!important;font:600 10px Arial,sans-serif!important;
-}#projectGrid .project-card-validation-stamp{z-index:7!important}#projectGrid .project-card:hover{transform:translateY(-4px)!important;box-shadow:0 17px 36px rgba(0,0,0,.42)!important}
-@media(max-width:900px){#projectGrid .project-card-tagline{font-size:clamp(13px,2vw,19px)!important;line-height:1.3!important}#projectGrid .project-card-center{inset:14% 0 25% 0!important;padding:17px 16px!important}
+}:is(#projectGrid, #projectModalFront) .project-card-validation-stamp{z-index:7!important}:is(#projectGrid, #projectModalFront) .project-card:hover{transform:translateY(-4px)!important;box-shadow:0 17px 36px rgba(0,0,0,.42)!important}
+@media(max-width:900px){:is(#projectGrid, #projectModalFront) .project-card-tagline{font-size:clamp(13px,2vw,19px)!important;line-height:1.3!important}:is(#projectGrid, #projectModalFront) .project-card-center{inset:14% 0 25% 0!important;padding:17px 16px!important}
 }
-@media(max-width:620px){#projectGrid .project-card{border-radius:13px!important}#projectGrid .project-card:before{inset:6px!important;border-radius:9px!important}#projectGrid .project-card-center{inset:15% 0 25% 0!important;padding:16px 12px!important}#projectGrid .project-card-center:before{font-size:44px!important}#projectGrid .project-card-tagline{
+@media(max-width:620px){:is(#projectGrid, #projectModalFront) .project-card{border-radius:13px!important}:is(#projectGrid, #projectModalFront) .project-card:before{inset:6px!important;border-radius:9px!important}:is(#projectGrid, #projectModalFront) .project-card-center{inset:15% 0 25% 0!important;padding:16px 12px!important}:is(#projectGrid, #projectModalFront) .project-card-center:before{font-size:44px!important}:is(#projectGrid, #projectModalFront) .project-card-tagline{
     font-size:clamp(12px,3.15vw,16px)!important;line-height:1.28!important;
     -webkit-line-clamp:7!important;
-  }#projectGrid .project-card-top{bottom:54px!important;padding:0 10px!important}#projectGrid .project-card-title{
+  }:is(#projectGrid, #projectModalFront) .project-card-top{bottom:54px!important;padding:0 10px!important}:is(#projectGrid, #projectModalFront) .project-card-title{
     max-width:88%!important;padding-top:7px!important;font-size:9px!important;letter-spacing:1.1px!important;
-  }#projectGrid .inspiration-card-brand{bottom:12px!important;font-size:13px!important}#projectGrid .inspiration-card-brand .brand-prefix{font-size:9px!important}#projectGrid .project-card-rating{left:12px!important;top:12px!important;padding:5px 7px!important}
+  }:is(#projectGrid, #projectModalFront) .inspiration-card-brand{bottom:12px!important;font-size:13px!important}:is(#projectGrid, #projectModalFront) .inspiration-card-brand .brand-prefix{font-size:9px!important}:is(#projectGrid, #projectModalFront) .project-card-rating{left:12px!important;top:12px!important;padding:5px 7px!important}
 }/* Ajustement demandé : pouce cantonné à un angle,
 citation plus typée,
 auteur relégué au rang de référence discrète. */
-#projectGrid .project-card-rating{
+:is(#projectGrid, #projectModalFront) .project-card-rating{
   left:auto!important;right:9px!important;top:9px!important;
   min-width:31px!important;min-height:31px!important;box-sizing:border-box!important;
   display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:4px!important;
   padding:5px 7px!important;border:1px solid rgba(240,213,138,.72)!important;
   border-radius:0 9px 0 11px!important;background:rgba(7,21,45,.88)!important;
   box-shadow:0 3px 12px rgba(0,0,0,.28)!important;backdrop-filter:blur(5px)!important;
-}#projectGrid .project-card-rating .vote-symbol{font-size:13px!important;line-height:1!important}#projectGrid .project-card-rating strong{font:700 11px/1 Arial,sans-serif!important;color:#f0d58a!important}#projectGrid .project-card-center:before{
+}:is(#projectGrid, #projectModalFront) .project-card-rating .vote-symbol{font-size:13px!important;line-height:1!important}:is(#projectGrid, #projectModalFront) .project-card-rating strong{font:700 11px/1 Arial,sans-serif!important;color:#f0d58a!important}:is(#projectGrid, #projectModalFront) .project-card-center:before{
   color:#ef4135!important;font:italic 400 clamp(54px,6vw,76px)/.8 Georgia,serif!important;
   opacity:.94!important;
-}#projectGrid .project-card-tagline{
+}:is(#projectGrid, #projectModalFront) .project-card-tagline{
   color:#f4e7c8!important;
   font-family:Georgia,"Times New Roman",serif!important;
   font-style:italic!important;font-weight:400!important;
   font-size:clamp(17px,1.8vw,25px)!important;line-height:1.3!important;
   letter-spacing:.08px!important;
   text-shadow:0 2px 3px rgba(0,0,0,.98),0 3px 15px rgba(0,0,0,.78)!important;
-}#projectGrid .project-card-title{
+}:is(#projectGrid, #projectModalFront) .project-card-title{
   max-width:76%!important;padding:7px 10px 0!important;
   border-top:1px solid rgba(240,213,138,.36)!important;
   color:rgba(245,243,237,.68)!important;
@@ -382,25 +382,25 @@ auteur relégué au rang de référence discrète. */
   letter-spacing:2.1px!important;text-transform:uppercase!important;
   text-shadow:0 1px 5px rgba(0,0,0,.95)!important;
 }
-@media(max-width:900px){#projectGrid .project-card-tagline{font-size:clamp(14px,2.2vw,21px)!important}
+@media(max-width:900px){:is(#projectGrid, #projectModalFront) .project-card-tagline{font-size:clamp(14px,2.2vw,21px)!important}
 }
-@media(max-width:620px){#projectGrid .project-card-rating{
+@media(max-width:620px){:is(#projectGrid, #projectModalFront) .project-card-rating{
     left:auto!important;right:7px!important;top:7px!important;
     min-width:28px!important;min-height:28px!important;padding:4px 6px!important;
-  }#projectGrid .project-card-tagline{
+  }:is(#projectGrid, #projectModalFront) .project-card-tagline{
     font-size:clamp(13px,3.45vw,17px)!important;line-height:1.28!important;
-  }#projectGrid .project-card-title{
+  }:is(#projectGrid, #projectModalFront) .project-card-title{
     max-width:78%!important;font-size:7px!important;letter-spacing:1.65px!important;
   }
 }/* Composition éditoriale du recto : citation en tête,
 image au centre,
 références et signature en pied. */
-#projectGrid .project-card-image-wrap{
+:is(#projectGrid, #projectModalFront) .project-card-image-wrap{
   position:absolute!important;inset:0!important;z-index:0!important;
-}#projectGrid .project-card-image{
+}:is(#projectGrid, #projectModalFront) .project-card-image{
   position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
   object-fit:cover!important;object-position:center!important;
-}#projectGrid .project-card:after{
+}:is(#projectGrid, #projectModalFront) .project-card:after{
   content:""!important;position:absolute!important;inset:0!important;z-index:1!important;
   pointer-events:none!important;
   background:linear-gradient(180deg,
@@ -410,15 +410,15 @@ références et signature en pied. */
     rgba(4,13,27,.02) 62%,
     rgba(4,13,27,.48) 79%,
     rgba(4,13,27,.88) 100%)!important;
-}#projectGrid .project-card-center{
+}:is(#projectGrid, #projectModalFront) .project-card-center{
   inset:5% 5% 64% 5%!important;z-index:3!important;
   display:flex!important;align-items:center!important;justify-content:center!important;
   padding:20px 12px 4px!important;background:transparent!important;
-}#projectGrid .project-card-center:before{
+}:is(#projectGrid, #projectModalFront) .project-card-center:before{
   top:-2px!important;left:50%!important;transform:translateX(-50%)!important;
   font-size:clamp(43px,5vw,62px)!important;line-height:.72!important;
   color:#ef4135!important;opacity:1!important;
-}#projectGrid .project-card-tagline{
+}:is(#projectGrid, #projectModalFront) .project-card-tagline{
   padding:24px 0 0!important;max-width:100%!important;
   color:#fff8e9!important;font-family:Georgia,"Times New Roman",serif!important;
   font-style:italic!important;font-weight:500!important;
@@ -426,36 +426,36 @@ références et signature en pied. */
   letter-spacing:0!important;text-align:center!important;
   text-shadow:0 2px 5px rgba(0,0,0,.98),0 0 16px rgba(0,0,0,.9)!important;
   -webkit-line-clamp:5!important;
-}#projectGrid .project-card-top{
+}:is(#projectGrid, #projectModalFront) .project-card-top{
   top:auto!important;bottom:43px!important;left:0!important;right:0!important;
   z-index:4!important;display:flex!important;justify-content:center!important;
   padding:0 14px!important;
-}#projectGrid .project-card-title{
+}:is(#projectGrid, #projectModalFront) .project-card-title{
   max-width:82%!important;margin:0 auto!important;padding:0!important;
   border:0!important;color:rgba(245,243,237,.72)!important;
   font:500 8px/1.35 Arial,Helvetica,sans-serif!important;
   letter-spacing:1.8px!important;text-transform:uppercase!important;
-}#projectGrid .inspiration-card-brand{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand{
   bottom:12px!important;z-index:5!important;
   font-size:14px!important;text-shadow:0 2px 7px rgba(0,0,0,.95)!important;
-}#projectGrid .inspiration-card-brand:before{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand:before{
   display:none!important;
-}#projectGrid .project-card-rating{
+}:is(#projectGrid, #projectModalFront) .project-card-rating{
   top:auto!important;left:auto!important;right:5px!important;bottom:5px!important;
   z-index:8!important;min-width:25px!important;min-height:25px!important;
   padding:3px 5px!important;gap:3px!important;
   border-radius:7px 0 0 0!important;border:1px solid rgba(240,213,138,.8)!important;
   background:rgba(7,21,45,.92)!important;box-shadow:0 1px 7px rgba(0,0,0,.5)!important;
-}#projectGrid .project-card-rating .vote-symbol{font-size:11px!important}#projectGrid .project-card-rating strong{font-size:9px!important}
-@media(max-width:900px){#projectGrid .project-card-center{inset:5% 4% 64% 4%!important;padding:20px 9px 4px!important}#projectGrid .project-card-tagline{font-size:clamp(14px,2vw,20px)!important}
+}:is(#projectGrid, #projectModalFront) .project-card-rating .vote-symbol{font-size:11px!important}:is(#projectGrid, #projectModalFront) .project-card-rating strong{font-size:9px!important}
+@media(max-width:900px){:is(#projectGrid, #projectModalFront) .project-card-center{inset:5% 4% 64% 4%!important;padding:20px 9px 4px!important}:is(#projectGrid, #projectModalFront) .project-card-tagline{font-size:clamp(14px,2vw,20px)!important}
 }
-@media(max-width:620px){#projectGrid .project-card-center{inset:5% 3% 65% 3%!important;padding:18px 7px 3px!important}#projectGrid .project-card-center:before{font-size:39px!important}#projectGrid .project-card-tagline{
+@media(max-width:620px){:is(#projectGrid, #projectModalFront) .project-card-center{inset:5% 3% 65% 3%!important;padding:18px 7px 3px!important}:is(#projectGrid, #projectModalFront) .project-card-center:before{font-size:39px!important}:is(#projectGrid, #projectModalFront) .project-card-tagline{
     padding-top:20px!important;font-size:clamp(12px,3.15vw,16px)!important;
     line-height:1.2!important;-webkit-line-clamp:5!important;
-  }#projectGrid .project-card-top{bottom:39px!important;padding:0 9px!important}#projectGrid .project-card-title{font-size:7px!important;letter-spacing:1.35px!important}#projectGrid .inspiration-card-brand{bottom:11px!important;font-size:12px!important}#projectGrid .project-card-rating{right:4px!important;bottom:4px!important;min-width:23px!important;min-height:23px!important}
+  }:is(#projectGrid, #projectModalFront) .project-card-top{bottom:39px!important;padding:0 9px!important}:is(#projectGrid, #projectModalFront) .project-card-title{font-size:7px!important;letter-spacing:1.35px!important}:is(#projectGrid, #projectModalFront) .inspiration-card-brand{bottom:11px!important;font-size:12px!important}:is(#projectGrid, #projectModalFront) .project-card-rating{right:4px!important;bottom:4px!important;min-width:23px!important;min-height:23px!important}
 }/* Signature tricolore,
 clin d'œil discret au marquage Made in France. */
-#projectGrid .inspiration-card-brand:after{
+:is(#projectGrid, #projectModalFront) .inspiration-card-brand:after{
   content:""!important;position:absolute!important;
   left:50%!important;bottom:-7px!important;transform:translateX(-50%)!important;
   display:block!important;width:43px!important;height:3px!important;
@@ -464,34 +464,34 @@ clin d'œil discret au marquage Made in France. */
   box-shadow:0 1px 4px rgba(0,0,0,.55)!important;
 }/* Le compteur est enfant de .project-card-top : ce conteneur couvre
    toute la carte pour que le badge se cale réellement sur l'angle bas droit. */
-#projectGrid .project-card-top{
+:is(#projectGrid, #projectModalFront) .project-card-top{
   top:0!important;right:0!important;bottom:0!important;left:0!important;
   width:100%!important;height:100%!important;min-height:0!important;
   display:block!important;padding:0!important;margin:0!important;
   pointer-events:none!important;z-index:8!important;
-}#projectGrid .project-card-top .project-card-title{
+}:is(#projectGrid, #projectModalFront) .project-card-top .project-card-title{
   position:absolute!important;left:0!important;right:0!important;
   bottom:43px!important;margin:0 auto!important;
   pointer-events:none!important;
-}#projectGrid .project-card-top .project-card-rating{
+}:is(#projectGrid, #projectModalFront) .project-card-top .project-card-rating{
   position:absolute!important;top:auto!important;left:auto!important;
   right:5px!important;bottom:5px!important;z-index:10!important;
   pointer-events:auto!important;
 }
-@media(max-width:620px){#projectGrid .project-card-top .project-card-title{bottom:39px!important}#projectGrid .project-card-top .project-card-rating{
+@media(max-width:620px){:is(#projectGrid, #projectModalFront) .project-card-top .project-card-title{bottom:39px!important}:is(#projectGrid, #projectModalFront) .project-card-top .project-card-rating{
     right:4px!important;bottom:4px!important;
   }
 }/* Position de l'accroche réglable carte par carte. */
-#projectGrid .project-card[data-accroche-position="top"] .project-card-center{top:5%!important;bottom:auto!important;height:30%!important;inset-inline:5%!important}#projectGrid .project-card[data-accroche-position="center"] .project-card-center{top:35%!important;bottom:auto!important;height:30%!important;inset-inline:5%!important}#projectGrid .project-card[data-accroche-position="bottom"] .project-card-center{top:auto!important;bottom:23%!important;height:30%!important;inset-inline:5%!important}#projectGrid .project-card[data-accroche-position="top"] .project-card-center:before{top:-1px!important}#projectGrid .project-card[data-accroche-position="center"] .project-card-center:before{top:0!important}#projectGrid .project-card[data-accroche-position="bottom"] .project-card-center:before{top:0!important}
-@media(max-width:620px){#projectGrid .project-card[data-accroche-position="top"] .project-card-center{top:5%!important;height:30%!important}#projectGrid .project-card[data-accroche-position="center"] .project-card-center{top:35%!important;height:30%!important}#projectGrid .project-card[data-accroche-position="bottom"] .project-card-center{top:auto!important;bottom:23%!important;height:30%!important}
+:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="top"] .project-card-center{top:5%!important;bottom:auto!important;height:30%!important;inset-inline:5%!important}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="center"] .project-card-center{top:35%!important;bottom:auto!important;height:30%!important;inset-inline:5%!important}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="bottom"] .project-card-center{top:auto!important;bottom:23%!important;height:30%!important;inset-inline:5%!important}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="top"] .project-card-center:before{top:-1px!important}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="center"] .project-card-center:before{top:0!important}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="bottom"] .project-card-center:before{top:0!important}
+@media(max-width:620px){:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="top"] .project-card-center{top:5%!important;height:30%!important}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="center"] .project-card-center{top:35%!important;height:30%!important}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="bottom"] .project-card-center{top:auto!important;bottom:23%!important;height:30%!important}
 }/* Inspirations publiques : référence verticale,
 signature alignée à gauche,
 compteur réservé au coin inférieur droit pour laisser respirer la carte. */
-#projectGrid .project-card-top{
+:is(#projectGrid, #projectModalFront) .project-card-top{
   position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
   display:block!important;padding:0!important;margin:0!important;
   min-height:0!important;pointer-events:none!important;z-index:7!important;
-}#projectGrid .project-card-top .project-card-title{
+}:is(#projectGrid, #projectModalFront) .project-card-top .project-card-title{
   position:absolute!important;left:13px!important;top:50%!important;right:auto!important;bottom:auto!important;
   width: min(145px, 58%)!important;max-width:none!important;
   margin:0!important;padding:0 4px!important;
@@ -503,7 +503,7 @@ compteur réservé au coin inférieur droit pour laisser respirer la carte. */
   white-space:normal!important;overflow:hidden!important;display:-webkit-box!important;
   -webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;
   text-shadow:0 1px 4px #000!important;
-}#projectGrid .project-card-center{padding-left:31px!important}#projectGrid .inspiration-card-brand{
+}:is(#projectGrid, #projectModalFront) .project-card-center{padding-left:31px!important}:is(#projectGrid, #projectModalFront) .inspiration-card-brand{
   left:32px!important;right:auto!important;bottom:12px!important;
   width:auto!important;min-height:0!important;height:auto!important;
   display:flex!important;justify-content:flex-start!important;align-items:center!important;
@@ -511,19 +511,19 @@ compteur réservé au coin inférieur droit pour laisser respirer la carte. */
   border:0!important;border-radius:0!important;background:transparent!important;
   box-shadow:none!important;text-align:left!important;
   font-size:12px!important;letter-spacing:-.2px!important;
-}#projectGrid .inspiration-card-brand:after{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand:after{
   left:0!important;right:auto!important;bottom:2px!important;
   transform:none!important;width:38px!important;height:2px!important;
-}#projectGrid .project-card-top .project-card-rating{
+}:is(#projectGrid, #projectModalFront) .project-card-top .project-card-rating{
   position:absolute!important;top:auto!important;left:auto!important;
   right:5px!important;bottom:5px!important;z-index:10!important;
   pointer-events:auto!important;
 }
-@media(max-width:620px){#projectGrid .project-card-top .project-card-title{
+@media(max-width:620px){:is(#projectGrid, #projectModalFront) .project-card-top .project-card-title{
    left:12px!important;width:min(125px,58%)!important;font-size:8px!important;
- }#projectGrid .project-card-center{padding-left:27px!important}#projectGrid .inspiration-card-brand{left:27px!important;bottom:10px!important;font-size:11px!important}
+ }:is(#projectGrid, #projectModalFront) .project-card-center{padding-left:27px!important}:is(#projectGrid, #projectModalFront) .inspiration-card-brand{left:27px!important;bottom:10px!important;font-size:11px!important}
 }/* Finitions des deux bordures latérales de la carte Inspiration. */
-#projectGrid .project-card-top .project-card-title{font-size:10px!important}#projectGrid .project-card-taxonomy{
+:is(#projectGrid, #projectModalFront) .project-card-top .project-card-title{font-size:10px!important}:is(#projectGrid, #projectModalFront) .project-card-taxonomy{
  position:absolute!important;right:13px!important;top:50%!important;
  width:min(125px,52%)!important;max-width:none!important;
  transform:translate(50%,-50%) rotate(90deg)!important;transform-origin:center center!important;
@@ -532,53 +532,53 @@ compteur réservé au coin inférieur droit pour laisser respirer la carte. */
  letter-spacing:.45px!important;text-align:center!important;
  white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
  text-shadow:0 1px 4px #000!important;z-index:7!important;pointer-events:none!important;
-}#projectGrid .project-card-center{padding-right:29px!important}#projectGrid .inspiration-card-brand:after{
+}:is(#projectGrid, #projectModalFront) .project-card-center{padding-right:29px!important}:is(#projectGrid, #projectModalFront) .inspiration-card-brand:after{
  left:50%!important;right:auto!important;bottom:2px!important;
  transform:translateX(-50%)!important;width:38px!important;height:2px!important;
 }
-@media(max-width:620px){#projectGrid .project-card-top .project-card-title{font-size:9px!important}#projectGrid .project-card-taxonomy{right:12px!important;width:min(110px,52%)!important;font-size:6.5px!important}#projectGrid .project-card-center{padding-right:25px!important}
+@media(max-width:620px){:is(#projectGrid, #projectModalFront) .project-card-top .project-card-title{font-size:9px!important}:is(#projectGrid, #projectModalFront) .project-card-taxonomy{right:12px!important;width:min(110px,52%)!important;font-size:6.5px!important}:is(#projectGrid, #projectModalFront) .project-card-center{padding-right:25px!important}
 }/* Corrections finales de composition et interaction recto > verso. */
-#projectGrid .project-card-top .project-card-title{
+:is(#projectGrid, #projectModalFront) .project-card-top .project-card-title{
  left:7px!important;right:auto!important;
-}#projectGrid .project-card-taxonomy{
+}:is(#projectGrid, #projectModalFront) .project-card-taxonomy{
  right:7px!important;
  transform:translate(50%,-50%) rotate(-90deg)!important;
-}#projectGrid .project-card-center{padding-left:27px!important;padding-right:27px!important}#projectGrid .project-card-tagline{
+}:is(#projectGrid, #projectModalFront) .project-card-center{padding-left:27px!important;padding-right:27px!important}:is(#projectGrid, #projectModalFront) .project-card-tagline{
  display:block!important;-webkit-box-orient:initial!important;-webkit-line-clamp:unset!important;
  overflow:visible!important;text-overflow:clip!important;
  max-height:none!important;white-space:normal!important;overflow-wrap:normal!important;
-}#projectGrid .inspiration-card-brand{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand{
  left:0!important;right:0!important;width:100%!important;box-sizing:border-box!important;
  justify-content:flex-start!important;padding-left:32px!important;
-}#projectGrid .inspiration-card-brand:after{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand:after{
  left:50%!important;right:auto!important;transform:translateX(-50%)!important;
  width:38px!important;bottom:2px!important;
 }.project-modal.open .project-modal-panel{
  animation:none!important;
 }.project-modal-card-inner{transition:transform 1.7s cubic-bezier(.2,.75,.25,1)!important}
-@media(max-width:620px){#projectGrid .project-card-top .project-card-title{left:6px!important}#projectGrid .project-card-taxonomy{right:6px!important}#projectGrid .project-card-center{padding-left:24px!important;padding-right:24px!important}#projectGrid .inspiration-card-brand{padding-left:27px!important}
+@media(max-width:620px){:is(#projectGrid, #projectModalFront) .project-card-top .project-card-title{left:6px!important}:is(#projectGrid, #projectModalFront) .project-card-taxonomy{right:6px!important}:is(#projectGrid, #projectModalFront) .project-card-center{padding-left:24px!important;padding-right:24px!important}:is(#projectGrid, #projectModalFront) .inspiration-card-brand{padding-left:27px!important}
 }/* Dernier ajustement de l'alignement bas et de la densité de l'accroche. */
-#projectGrid .inspiration-card-brand{
+:is(#projectGrid, #projectModalFront) .inspiration-card-brand{
  bottom:5px!important;
  padding-bottom:12px!important;
-}#projectGrid .inspiration-card-brand:after{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand:after{
  position:absolute!important;
  left:10px!important;right:10px!important;width:auto!important;
  bottom:5px!important;height:2px!important;
  transform:none!important;
 }/* L'accroche reste strictement dans la zone intérieure du cadre,
 quelle que soit la position choisie. */
-#projectGrid .project-card-center{
+:is(#projectGrid, #projectModalFront) .project-card-center{
  box-sizing:border-box!important;
  min-height:0!important;
  overflow:hidden!important;
-}#projectGrid .project-card[data-accroche-position="top"] .project-card-center{
+}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="top"] .project-card-center{
  top:7%!important;bottom:auto!important;height:27%!important;
-}#projectGrid .project-card[data-accroche-position="center"] .project-card-center{
+}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="center"] .project-card-center{
  top:36.5%!important;bottom:auto!important;height:27%!important;
-}#projectGrid .project-card[data-accroche-position="bottom"] .project-card-center{
+}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="bottom"] .project-card-center{
  top:auto!important;bottom:25%!important;height:27%!important;
-}#projectGrid .project-card-tagline{
+}:is(#projectGrid, #projectModalFront) .project-card-tagline{
  box-sizing:border-box!important;
  width:100%!important;max-width:100%!important;
  margin:0 auto!important;padding:0!important;
@@ -586,90 +586,90 @@ quelle que soit la position choisie. */
  line-height:1.08!important;
  letter-spacing:0!important;
  overflow-wrap:anywhere!important;
-}#projectGrid .project-card-center:before{
+}:is(#projectGrid, #projectModalFront) .project-card-center:before{
  font-size:42px!important;line-height:.72!important;
 }
-@media(max-width:620px){#projectGrid .inspiration-card-brand{bottom:4px!important;padding-bottom:11px!important}#projectGrid .inspiration-card-brand:after{left:8px!important;right:8px!important;bottom:4px!important}#projectGrid .project-card[data-accroche-position="top"] .project-card-center{top:7%!important;height:27%!important}#projectGrid .project-card[data-accroche-position="center"] .project-card-center{top:36.5%!important;height:27%!important}#projectGrid .project-card[data-accroche-position="bottom"] .project-card-center{top:auto!important;bottom:25%!important;height:27%!important}#projectGrid .project-card-tagline{font-size:10px!important;line-height:1.06!important}
+@media(max-width:620px){:is(#projectGrid, #projectModalFront) .inspiration-card-brand{bottom:4px!important;padding-bottom:11px!important}:is(#projectGrid, #projectModalFront) .inspiration-card-brand:after{left:8px!important;right:8px!important;bottom:4px!important}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="top"] .project-card-center{top:7%!important;height:27%!important}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="center"] .project-card-center{top:36.5%!important;height:27%!important}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="bottom"] .project-card-center{top:auto!important;bottom:25%!important;height:27%!important}:is(#projectGrid, #projectModalFront) .project-card-tagline{font-size:10px!important;line-height:1.06!important}
 }/* Position de l'accroche = repère d'alignement,
 jamais une fenêtre de découpe.
    Le texte garde sa hauteur naturelle et peut passer devant la photographie. */
-#projectGrid .project-card-center{
+:is(#projectGrid, #projectModalFront) .project-card-center{
  position:absolute!important;left:25px!important;right:25px!important;
  top:9%!important;bottom:17%!important;height:auto!important;
  box-sizing:border-box!important;min-height:0!important;
  display:flex!important;flex-direction:column!important;
  overflow:visible!important;padding:0 3px!important;
  z-index:4!important;
-}#projectGrid .project-card[data-accroche-position="top"] .project-card-center{
+}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="top"] .project-card-center{
  top:9%!important;bottom:17%!important;
  justify-content:flex-start!important;align-items:center!important;
-}#projectGrid .project-card[data-accroche-position="center"] .project-card-center{
+}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="center"] .project-card-center{
  top:9%!important;bottom:17%!important;
  justify-content:center!important;align-items:center!important;
-}#projectGrid .project-card[data-accroche-position="bottom"] .project-card-center{
+}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="bottom"] .project-card-center{
  top:9%!important;bottom:17%!important;
  justify-content:flex-end!important;align-items:center!important;
-}#projectGrid .project-card-tagline{
+}:is(#projectGrid, #projectModalFront) .project-card-tagline{
  display:block!important;position:relative!important;
  width:100%!important;max-width:100%!important;height:auto!important;max-height:none!important;
  margin:0!important;padding:0!important;overflow:visible!important;
  white-space:normal!important;text-overflow:clip!important;
  -webkit-line-clamp:unset!important;-webkit-box-orient:initial!important;
  overflow-wrap:break-word!important;word-break:normal!important;
-}#projectGrid .inspiration-card-brand{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand{
  left:7px!important;right:7px!important;bottom:5px!important;
  width:auto!important;padding-bottom:12px!important;
-}#projectGrid .inspiration-card-brand:after{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand:after{
  left:50%!important;right:auto!important;width:38px!important;
  bottom:4px!important;height:2px!important;
  transform:translateX(-50%)!important;
 }
-@media(max-width:620px){#projectGrid .project-card-center{left:23px!important;right:23px!important;top:9%!important;bottom:17%!important}#projectGrid .project-card-tagline{font-size:10px!important;line-height:1.06!important}
+@media(max-width:620px){:is(#projectGrid, #projectModalFront) .project-card-center{left:23px!important;right:23px!important;top:9%!important;bottom:17%!important}:is(#projectGrid, #projectModalFront) .project-card-tagline{font-size:10px!important;line-height:1.06!important}
 }/* Réactivation fidèle des 3 alignements : le conteneur est une zone de
    placement pleine hauteur,
 jamais une boîte de hauteur fixe qui coupe le texte. */
-#projectGrid .project-card-center{
+:is(#projectGrid, #projectModalFront) .project-card-center{
  top:7%!important;bottom:17%!important;height:auto!important;
  min-height:0!important;max-height:none!important;
  overflow:visible!important;display:flex!important;
  flex-direction:column!important;justify-content:center!important;
-}#projectGrid .project-card[data-accroche-position="top"] .project-card-center{
+}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="top"] .project-card-center{
  top:7%!important;bottom:17%!important;height:auto!important;
  justify-content:flex-start!important;
-}#projectGrid .project-card[data-accroche-position="center"] .project-card-center{
+}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="center"] .project-card-center{
  top:7%!important;bottom:17%!important;height:auto!important;
  justify-content:center!important;
-}#projectGrid .project-card[data-accroche-position="bottom"] .project-card-center{
+}:is(#projectGrid, #projectModalFront) .project-card[data-accroche-position="bottom"] .project-card-center{
  top:7%!important;bottom:17%!important;height:auto!important;
  justify-content:flex-end!important;
-}#projectGrid .project-card-tagline{
+}:is(#projectGrid, #projectModalFront) .project-card-tagline{
  flex:none!important;max-height:none!important;overflow:visible!important;
 }/* Signature et petit liseré descendus ensemble de quelques pixels. */
-#projectGrid .inspiration-card-brand{bottom:1px!important;padding-bottom:12px!important}#projectGrid .inspiration-card-brand:after{bottom:0!important}/* Guillemets plus présents et rapprochés du bord supérieur de la carte. */
-#projectGrid .project-card-center:before{
+:is(#projectGrid, #projectModalFront) .inspiration-card-brand{bottom:1px!important;padding-bottom:12px!important}:is(#projectGrid, #projectModalFront) .inspiration-card-brand:after{bottom:0!important}/* Guillemets plus présents et rapprochés du bord supérieur de la carte. */
+:is(#projectGrid, #projectModalFront) .project-card-center:before{
  font-size:50px!important;line-height:.7!important;
  margin-top:-5px!important;margin-bottom:2px!important;
  transform:translateY(-5px)!important;
 }
-@media(max-width:620px){#projectGrid .project-card-center{top:7%!important;bottom:17%!important;height:auto!important}#projectGrid .inspiration-card-brand{bottom:0!important}#projectGrid .inspiration-card-brand:after{bottom:0!important}#projectGrid .project-card-center:before{font-size:46px!important}
+@media(max-width:620px){:is(#projectGrid, #projectModalFront) .project-card-center{top:7%!important;bottom:17%!important;height:auto!important}:is(#projectGrid, #projectModalFront) .inspiration-card-brand{bottom:0!important}:is(#projectGrid, #projectModalFront) .inspiration-card-brand:after{bottom:0!important}:is(#projectGrid, #projectModalFront) .project-card-center:before{font-size:46px!important}
 }/* La signature est à gauche ; le petit accent tricolore reste centré et remonte. */
-#projectGrid .inspiration-card-brand{
+:is(#projectGrid, #projectModalFront) .inspiration-card-brand{
  left:7px!important;right:auto!important;width:auto!important;
  justify-content:flex-start!important;text-align:left!important;
-}#projectGrid .inspiration-card-brand:after{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand:after{
  left:50%!important;right:auto!important;width:38px!important;
  transform:translateX(-50%)!important;bottom:4px!important;
 }/* Finitions demandées : guillemets et tricolore centrés,
 signature resserrée. */
-#projectGrid .project-card-center:before{
+:is(#projectGrid, #projectModalFront) .project-card-center:before{
  left:50%!important;right:auto!important;transform:translateX(-50%)!important;
-}#projectGrid .inspiration-card-brand{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand{
  left:0!important;right:0!important;width:100%!important;
  margin:0!important;padding-left:7px!important;padding-right:7px!important;
  box-sizing:border-box!important;justify-content:flex-start!important;
-}#projectGrid .inspiration-card-brand:after{
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand:after{
  left:50%!important;right:auto!important;transform:translateX(-50%)!important;
-}#projectGrid .inspiration-card-brand .brand-prefix{margin-right:3px!important}/* ===== Cycle unique des cartes Inspirations : un seul élément DOM ===== */
+}:is(#projectGrid, #projectModalFront) .inspiration-card-brand .brand-prefix{margin-right:3px!important}/* ===== Cycle unique des cartes Inspirations : un seul élément DOM ===== */
 #projectModal{position:fixed!important;inset:0!important;z-index:10000!important;display:none!important;padding:0!important;margin:0!important;overflow:visible!important;background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;pointer-events:none!important}#projectModal.open{display:block!important}#projectModal.open #projectModalCard{transition:width 2s cubic-bezier(.18,.78,.2,1),height 2s cubic-bezier(.18,.78,.2,1)!important}#projectModal:before,
 #projectModal:after{content:none!important;display:none!important}#projectModal .project-modal-panel{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;perspective:1600px!important;pointer-events:none!important}
 @supports(height:100dvh){#projectModal .project-modal-panel{height:100dvh!important}}#projectModal .project-modal-close{display:none!important}#projectModalCard{position:fixed!important;left:50%!important;top:50%!important;width:200px;height:250px;margin:0!important;padding:0!important;aspect-ratio:4/5!important;transform:translate(-50%,-50%)!important;transform-style:preserve-3d!important;perspective:1600px!important;transition:none!important;pointer-events:auto!important;z-index:2!important}#projectModalCard .project-modal-card-inner{position:relative!important;width:100%!important;height:100%!important;transform-style:preserve-3d!important;transition:transform 1.05s cubic-bezier(.2,.75,.25,1)!important}#projectModalCard .project-modal-card-inner.is-flipped{transform:rotateY(180deg)!important}#projectModalCard .project-modal-face{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;box-sizing:border-box!important;overflow:hidden!important;border:0!important;border-radius:0!important;box-shadow:none!important;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important}#projectModalCard .project-modal-back{position:absolute!important;inset:0!important;transform:rotateY(180deg)!important;display:flex!important;flex-direction:column!important;min-height:0!important;height:100%!important;box-sizing:border-box!important;padding:17px 16px 22px!important;overflow:hidden!important;isolation:isolate!important;color:#f5f3ed!important;background:transparent!important;pointer-events:auto!important}#projectModalCard .project-modal-back:after{content:none!important;display:none!important}#projectModalCard .project-modal-back-art{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;transform:scaleX(-1)!important;opacity:.22!important;filter:saturate(.82) contrast(1.08)!important;pointer-events:none!important;z-index:0!important}#projectModalCard .project-modal-back>*:not(.project-modal-back-art){position:relative;z-index:1}#projectModalCard .project-modal-back h2{flex:0 0 auto!important;margin:12px 25px 16px!important;color:#f0d58a!important;text-align:center!important;font:700 clamp(20px,3vw,30px)/1.2 Georgia,serif!important}#projectModalCard .project-modal-back .project-modal-content{display:block!important;flex:1 1 0!important;min-height:0!important;height:0!important;overflow-y:auto!important;overflow-x:hidden!important;padding:0 0 52px!important;box-sizing:border-box!important;font:14px/1.65 Arial,sans-serif!important;overscroll-behavior:contain!important;scrollbar-width:thin!important;scrollbar-color:#c99b45 #07152d!important}#projectModalCard .project-modal-content img{max-width:100%;height:auto}#projectModalCard .project-vote-panel{position:absolute!important;right:14px!important;bottom:12px!important;left:auto!important;top:auto!important;z-index:5!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;justify-content:flex-end!important;align-items:center!important;gap:5px!important;width:max-content!important;max-width:calc(100% - 32px)!important;margin:0!important;padding:0!important}#projectModalCard .project-vote-panel .project-vote-button{flex:0 0 auto!important;min-width:36px!important;min-height:34px!important;padding:4px 8px!important}#projectModalCard .project-vote-panel .project-vote-message{flex:0 1 auto!important;min-width:0!important;margin:0 3px 0 0!important;text-align:right!important;white-space:nowrap!important;font:italic 10px/1.2 Arial,sans-serif!important}#projectModalCard #inspirationShareButton{position:absolute!important;left:15px!important;bottom:12px!important;z-index:20!important}#projectModalCard #inspirationShareStatus{position:absolute!important;left:15px!important;bottom:54px!important;z-index:21!important}#projectModalCard #projectModalContent{padding-bottom:52px!important}#projectModalCard #inspirationSocialChooser{pointer-events:auto!important}#projectModalCard .project-modal-back button,
@@ -678,124 +678,18 @@ signature resserrée. */
 @media(prefers-reduced-motion:reduce){#projectModalCard{transition:width .01ms,height .01ms!important}#projectModalCard .project-modal-card-inner{transition:transform .01ms!important}}/* ===== Ajustements visuels ciblés — carte Inspiration unique ===== */
 /* Recto en liste : guillemet plus grand,
 placé près du bord haut. */
-#projectGrid .project-card-center:before{
- top:-10px!important;
+:is(#projectGrid, #projectModalFront) .project-card-center:before{
+ top:-14.5%!important;
  font-size:64px!important;
  line-height:.72!important;
-}/* Pendant l'agrandissement{
- border-width:2px!important;
- border-radius:30px 40px 24px 34px!important;
- transition:border-radius 2s cubic-bezier(.18,.78,.2,1),border-width 2s cubic-bezier(.18,.78,.2,1)!important;
-}#projectModalCard .project-modal-back{
- background:#07152d!important;
-}#projectModalCard .project-modal-back-art{
- opacity:.22!important;
-}
-@media(max-width:620px){#projectGrid .project-card-center:before{top:-8px!important;font-size:58px!important}
-}
-@media(prefers-reduced-motion:reduce){
-}
-
-
-
-/* Carte agrandie : reprise exacte de la direction artistique de la grille.
-   Les anciennes règles #projectModalFront ont été supprimées ; une seule source visuelle subsiste. */
-#projectModalFront .project-card{
-  position:relative!important;isolation:isolate!important;overflow:hidden!important;
-  display:flex!important;flex-direction:column!important;aspect-ratio:4/5!important;
-  border:1px solid rgba(240,213,138,.72)!important;border-radius:17px!important;
-  background:#07152d!important;box-shadow:0 12px 30px rgba(0,0,0,.34),inset 0 0 0 5px rgba(7,21,45,.2)!important;
-}#projectModalFront .project-card:before{
-  content:"";position:absolute;inset:8px!important;z-index:4!important;
-  border:1px solid rgba(245,243,237,.38)!important;border-radius:11px!important;
-  pointer-events:none!important;box-shadow:inset 0 0 28px rgba(0,0,0,.12)!important;
-}#projectModalFront .project-card-image-wrap{
-  position:absolute!important;inset:0!important;z-index:0!important;overflow:hidden!important;
-  background:#0d2344!important;
-}#projectModalFront .project-card-image{
-  width:100%!important;height:100%!important;object-fit:cover!important;
-  filter:saturate(.88) contrast(1.06)!important;transform:scale(1.015);
-}#projectModalFront .project-card-image-wrap:after{
-  content:""!important;display:block!important;position:absolute!important;inset:0!important;z-index:1!important;
-  background:
-    linear-gradient(180deg,rgba(4,13,27,.34) 0%,rgba(4,13,27,.04) 25%,rgba(4,13,27,.18) 49%,rgba(4,13,27,.76) 76%,rgba(4,13,27,.96) 100%),
-    linear-gradient(90deg,rgba(4,13,27,.16),transparent 28%,transparent 72%,rgba(4,13,27,.16))!important;
-}#projectModalFront .project-card-finish{display:none!important}#projectModalFront .project-card-top{
-  position:absolute!important;left:0!important;right:0!important;bottom:61px!important;z-index:3!important;
-  display:flex!important;justify-content:center!important;align-items:center!important;
-  min-height:0!important;padding:0 17px!important;
-}#projectModalFront .project-card-title{
-  display:block!important;width:auto!important;max-width:84%!important;margin:0 auto!important;
-  padding:8px 13px 0!important;border-top:1px solid rgba(240,213,138,.68)!important;
-  color:#f0d58a!important;text-align:center!important;text-transform:uppercase!important;
-  font:600 clamp(9px,1vw,12px)/1.35 Arial,Helvetica,sans-serif!important;
-  letter-spacing:1.55px!important;text-shadow:0 2px 8px #000!important;
-}#projectModalFront .project-card-center{
-  position:absolute!important;inset:15% 0 24% 0!important;z-index:2!important;
-  display:flex!important;align-items:center!important;justify-content:center!important;
-  min-height:0!important;padding:22px 23px!important;text-align:center!important;
-}#projectModalFront .project-card-center:before{
-  content:"“"!important;position:absolute!important;top:0!important;left:50%!important;
-  transform:translateX(-50%)!important;color:#f0d58a!important;
-  font:400 clamp(48px,5vw,68px)/.85 Georgia,serif!important;
-  text-shadow:0 3px 12px rgba(0,0,0,.55)!important;
-}#projectModalFront .project-card-tagline{
-  position:relative!important;z-index:2!important;display:block!important;
-  width:100%!important;max-width:100%!important;margin:0!important;padding:17px 0 0!important;
-  color:#fff!important;font-family:Georgia,"Times New Roman",serif!important;
-  font-style:normal!important;font-weight:500!important;
-  font-size:clamp(15px,1.55vw,22px)!important;line-height:1.34!important;
-  letter-spacing:-.22px!important;text-align:center!important;
-  text-shadow:0 2px 5px rgba(0,0,0,.92),0 0 18px rgba(0,0,0,.65)!important;
-  -webkit-text-stroke:0!important;
-  display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:7!important;
-  overflow:hidden!important;overflow-wrap:anywhere!important;
-}#projectModalFront .inspiration-card-brand{
-  position:absolute!important;left:0!important;right:0!important;bottom:14px!important;z-index:5!important;
-  min-height:0!important;display:flex!important;align-items:center!important;justify-content:center!important;
-  padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;
-  box-shadow:none!important;color:#f5f3ed!important;
-  font:700 15px/1 Georgia,serif!important;letter-spacing:-.3px!important;
-  text-shadow:0 2px 8px #000!important;
-}#projectModalFront .inspiration-card-brand:before{
-  content:"";position:absolute;left:37%;right:37%;top:-9px;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(240,213,138,.8),transparent);
-}#projectModalFront .inspiration-card-brand .brand-prefix{
-  margin-right:4px!important;color:rgba(245,243,237,.82)!important;
-  font:italic 500 10px/1 Arial,sans-serif!important;letter-spacing:.2px!important;
-}#projectModalFront .inspiration-card-brand .brand-a{color:#4c9be0!important}#projectModalFront .inspiration-card-brand .brand-e{color:#ef4135!important}#projectModalFront .project-card-rating{
-  position:absolute!important;left:17px!important;top:17px!important;z-index:6!important;
-  padding:6px 9px!important;border:1px solid rgba(240,213,138,.42)!important;border-radius:999px!important;
-  background:rgba(7,21,45,.66)!important;backdrop-filter:blur(8px)!important;
-  box-shadow:0 3px 12px rgba(0,0,0,.2)!important;font:600 10px Arial,sans-serif!important;
-}#projectModalFront .project-card-validation-stamp{z-index:7!important}#projectModalFront .project-card:hover{transform:translateY(-4px)!important;box-shadow:0 17px 36px rgba(0,0,0,.42)!important}
-@media(max-width:900px){#projectModalFront .project-card-tagline{font-size:clamp(13px,2vw,19px)!important;line-height:1.3!important}#projectModalFront .project-card-center{inset:14% 0 25% 0!important;padding:17px 16px!important}
-}
-@media(max-width:620px){#projectModalFront .project-card{border-radius:13px!important}#projectModalFront .project-card:before{inset:6px!important;border-radius:9px!important}#projectModalFront .project-card-center{inset:15% 0 25% 0!important;padding:16px 12px!important}#projectModalFront .project-card-center:before{font-size:44px!important}#projectModalFront .project-card-tagline{
-    font-size:clamp(12px,3.15vw,16px)!important;line-height:1.28!important;
-    -webkit-line-clamp:7!important;
-  }#projectModalFront .project-card-top{bottom:54px!important;padding:0 10px!important}#projectModalFront .project-card-title{
-    max-width:88%!important;padding-top:7px!important;font-size:9px!important;letter-spacing:1.1px!important;
-  }#projectModalFront .inspiration-card-brand{bottom:12px!important;font-size:13px!important}#projectModalFront .inspiration-card-brand .brand-prefix{font-size:9px!important}#projectModalFront .project-card-rating{left:12px!important;top:12px!important;padding:5px 7px!important}
-}
-
-/* Transitions synchronisées : la typographie et les détails grandissent avec la carte. */
-#projectModalFront>.project-card{transition:border-width 2s cubic-bezier(.18,.78,.2,1),border-radius 2s cubic-bezier(.18,.78,.2,1)!important}
-#projectModalFront>.project-card .project-card-center{transition:padding 2s cubic-bezier(.18,.78,.2,1)!important}
-#projectModalFront>.project-card .project-card-center:before{transition:top 2s cubic-bezier(.18,.78,.2,1),font-size 2s cubic-bezier(.18,.78,.2,1)!important}
-#projectModalFront>.project-card .project-card-tagline{transition:font-size 2s cubic-bezier(.18,.78,.2,1),line-height 2s ease!important}
-#projectModalFront>.project-card .project-card-top{transition:bottom 2s cubic-bezier(.18,.78,.2,1),padding 2s ease!important}
-#projectModalFront>.project-card .project-card-title{transition:font-size 2s cubic-bezier(.18,.78,.2,1),letter-spacing 2s ease,padding 2s ease!important}
-#projectModalFront>.project-card .inspiration-card-brand{transition:font-size 2s cubic-bezier(.18,.78,.2,1),bottom 2s ease!important}
-#projectModalFront>.project-card .inspiration-card-brand .brand-prefix{transition:font-size 2s cubic-bezier(.18,.78,.2,1)!important}
-#projectModalFront>.project-card .project-card-rating{transition:font-size 2s cubic-bezier(.18,.78,.2,1),padding 2s ease,top 2s ease,right 2s ease!important}
-#projectModalFront>.project-card .project-card-taxonomy{transition:font-size 2s cubic-bezier(.18,.78,.2,1),padding 2s ease!important}
-
+}/* Agrandissement proportionnel : la carte originale est mise à l’échelle, sans être redessinée. */
+#projectModalFront>.project-card.is-enlarged,
+#projectModalFront>.project-card.is-enlarged:hover{transform:scale(2)!important;transform-origin:top left!important;transition:transform 2s cubic-bezier(.18,.78,.2,1)!important;}
 /* Recto initial : deux espaces visuels avant la signature et guillemet rouge près du bord haut. */
-#projectGrid .inspiration-card-brand .brand-prefix{
+:is(#projectGrid, #projectModalFront) .inspiration-card-brand .brand-prefix{
   margin-left:8px!important;
 }
-#projectGrid .project-card-center:before{
+:is(#projectGrid, #projectModalFront) .project-card-center:before{
   top:-27px!important;
   left:50%!important;
   color:#EF4135!important;
@@ -803,7 +697,7 @@ placé près du bord haut. */
   line-height:.72!important;
 }
 @media(max-width:620px){
-  #projectGrid .project-card-center:before{
+  :is(#projectGrid, #projectModalFront) .project-card-center:before{
     top:-18px!important;
     font-size:58px!important;
   }
@@ -833,7 +727,7 @@ placé près du bord haut. */
 #projectModalCard .project-modal-back{border-radius:15px 20px 12px 17px!important;background:#07152d!important}
 #projectModalCard .project-modal-back-art{border-radius:inherit!important}
 @media(max-width:620px){
- #projectGrid .project-card-center:before,#projectModalFront>.project-card .project-card-center:before{top:-30px!important;font-size:58px!important}
+ :is(#projectGrid, #projectModalFront) .project-card-center:before,#projectModalFront>.project-card .project-card-center:before{top:-30px!important;font-size:58px!important}
  #projectModalFront>.project-card.is-enlarged .project-card-center{padding-left:24px!important;padding-right:24px!important}
  #projectModalFront>.project-card.is-enlarged .project-card-center:before{top:-60px!important;font-size:116px!important}
  #projectModalFront>.project-card.is-enlarged .project-card-tagline{font-size:clamp(24px,5vw,34px)!important}
@@ -913,7 +807,7 @@ function parent(item){const sub=subs.find(x=>String(x.id)===String(item.sous_men
 function popularity(id){return voteStats.get(String(id))||{pouces_positifs:0,pouces_negatifs:0,votes_neutres:0,votes_exprimes:0,popularite:0}}
 function voteIcon(v){return v===1?'<span class="project-card-validation-stamp positive" title="Votre évaluation : favorable" aria-label="Votre évaluation : favorable">👍</span>':v===0?'<span class="project-card-validation-stamp neutral" title="Votre évaluation : neutre" aria-label="Votre évaluation : neutre">✋🏻</span>':v===-1?'<span class="project-card-validation-stamp negative" title="Votre évaluation : défavorable" aria-label="Votre évaluation : défavorable">👎</span>':""}
 function ratingMarkup(item){const s=popularity(item.id);const count=Number(s.pouces_positifs||0);return '<div class="project-card-rating inspiration-card-rating" title="'+count+' pouce(s) vert(s)" aria-label="Popularité : '+count+' pouce(s) vert(s)"><span class="vote-symbol positive-symbol" aria-hidden="true">👍</span> <strong>'+count+'</strong></div>'}
-function card(x){const photo=x.photo_url?'<img class="project-card-image" src="'+esc(x.photo_url)+'" alt="" aria-hidden="true" loading="lazy" decoding="async" referrerpolicy="no-referrer">':'';const menuName=menus.find(m=>String(m.id)===String(x.menu_id))?.titre||"";const subName=subs.find(v=>String(v.id)===String(x.sous_menu_id))?.titre||"";const taxonomy=[menuName,subName].filter(Boolean).join(" · ");return '<article class="project-card" data-accroche-position="'+esc(x.accroche_position||"center")+'" tabindex="0" role="button" aria-label="Ouvrir l’inspiration : '+esc(x.titre)+'" data-id="'+esc(x.id)+'"><div class="project-card-image-wrap" aria-hidden="true">'+photo+'</div><span class="project-card-finish" aria-hidden="true"></span><div class="project-card-top">'+ratingMarkup(x)+'<h2 class="project-card-title">'+esc(x.titre)+'</h2></div><div class="project-card-taxonomy" aria-label="Rubrique">'+esc(taxonomy)+'</div><div class="project-card-center"><p class="project-card-tagline">'+esc(x.accroche||"")+'</p></div><footer class="inspiration-card-brand" aria-label="Je suis Avant-gardE"><span class="brand-prefix">&nbsp;&nbsp;Je suis&nbsp;</span><span class="brand-name"><span class="brand-a">A</span>vant-gard<span class="brand-e">E</span></span></footer>'+(currentUser?voteIcon(myVotes.get(String(x.id))):"")+'</article>'}
+function card(x){const photo=x.photo_url?'<img class="project-card-image" src="'+esc(x.photo_url)+'" alt="" aria-hidden="true" loading="lazy" decoding="async" referrerpolicy="no-referrer">':'';const menuName=menus.find(m=>String(m.id)===String(x.menu_id))?.titre||"";const subName=subs.find(v=>String(v.id)===String(x.sous_menu_id))?.titre||"";const taxonomy=[menuName,subName].filter(Boolean).join(" · ");return '<article class="project-card" data-accroche-position="'+esc(x.accroche_position||"center")+'" tabindex="0" role="button" aria-label="Ouvrir l’inspiration : '+esc(x.titre)+'" data-id="'+esc(x.id)+'"><div class="project-card-image-wrap" aria-hidden="true">'+photo+'</div><span class="project-card-finish" aria-hidden="true"></span><div class="project-card-top">'+ratingMarkup(x)+'<h2 class="project-card-title">'+esc(x.titre)+'</h2></div><div class="project-card-taxonomy" aria-label="Rubrique">'+esc(taxonomy)+'</div><div class="project-card-center"><p class="project-card-tagline">'+esc(x.accroche||"")+'</p></div><footer class="inspiration-card-brand" aria-label="Je suis Avant-gardE"><span class="brand-prefix">&nbsp;&nbsp;&nbsp;&nbsp;Je suis&nbsp;</span><span class="brand-name"><span class="brand-a">A</span>vant-gard<span class="brand-e">E</span></span></footer>'+(currentUser?voteIcon(myVotes.get(String(x.id))):"")+'</article>'}
 function renderFilters(){const menuList=document.getElementById("projectMenuOptions"),subList=document.getElementById("projectSubmenuOptions");if(!menuList||!subList)return;const menuRows=[{id:"all",titre:"Tout"},...menus];menuList.innerHTML=menuRows.length?menuRows.map(m=>'<button type="button" class="project-filter-option '+(active===String(m.id)?"active":"")+'" data-menu-filter="'+esc(m.id)+'">'+esc(m.titre)+'</button>').join(""):'<div class="project-filter-empty">Aucun résultat</div>';const availableSubs=active==="all"?subs:subs.filter(s=>String(s.menu_id)===String(active));const subRows=[{id:"all",titre:"Tout"},...availableSubs];subList.innerHTML=subRows.length?subRows.map(s=>'<button type="button" class="project-filter-option '+(activeSub===String(s.id)?"active":"")+'" data-submenu-filter="'+esc(s.id)+'">'+esc(s.titre)+'</button>').join(""):'<div class="project-filter-empty">Aucun résultat</div>';const toggle=document.getElementById("projectFilterToggle");if(toggle){const selectedMenu=menus.find(m=>String(m.id)===String(active));const selectedSub=subs.find(s=>String(s.id)===String(activeSub));toggle.querySelector("span:nth-child(2)").textContent=selectedSub?selectedSub.titre:selectedMenu?selectedMenu.titre:"Filtrer";}}
 function normalizeTitle(v){return String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("fr").trim()}
 function render(){let list=items.filter(x=>{const own=myVotes.get(String(x.id));const voteOk=!currentUser||!voteFilter||voteFilter.value==="all"||(voteFilter.value==="unrated"?own===undefined:voteFilter.value==="positive"?own===1:voteFilter.value==="neutral"?own===0:own===-1);return (active==="all"||String((parent(x)||{}).id)===String(active))&&(activeSub==="all"||String(x.sous_menu_id)===String(activeSub))&&(!searchTerm||normalizeTitle(x.titre).includes(normalizeTitle(searchTerm))||normalizeTitle(x.accroche).includes(normalizeTitle(searchTerm))||normalizeTitle(subs.find(sub=>String(sub.id)===String(x.sous_menu_id))?.titre).includes(normalizeTitle(searchTerm)))&&voteOk});if(sort.value==="title")list.sort((a,b)=>String(a.titre).localeCompare(String(b.titre),"fr"));else if(sort.value==="popularity")list.sort((a,b)=>popularity(b.id).pouces_positifs-popularity(a.id).pouces_positifs||(a.position||0)-(b.position||0));else list.sort((a,b)=>(a.position||0)-(b.position||0));grid.innerHTML=list.length?list.map(card).join(""):'<div class="project-empty">Aucune inspiration ne correspond à votre recherche ou à ce filtre.</div>'}
@@ -942,7 +836,7 @@ function openInspirationCard(cardElement){
  front.replaceChildren(cardElement);
  front.dataset.accrochePosition=item.accroche_position||"center";
  front.setAttribute("aria-label","Recto agrandi. Touchez la carte pour la retourner.");
- cardElement.style.cssText+=";position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-width:0!important;max-width:none!important;aspect-ratio:4/5!important;margin:0!important;transform:none!important;box-sizing:border-box!important;pointer-events:auto!important";
+ cardElement.style.cssText+=";position:absolute!important;inset:0 auto auto 0!important;width:"+rect.width+"px!important;height:"+rect.height+"px!important;min-width:0!important;max-width:none!important;aspect-ratio:4/5!important;margin:0!important;box-sizing:border-box!important;pointer-events:auto!important";
  const sourceImage=cardElement.querySelector(".project-card-image");
  const imageUrl=sourceImage?.currentSrc||sourceImage?.src||sourceImage?.getAttribute("src")||"";
  let backArt=back.querySelector(".project-modal-back-art");
