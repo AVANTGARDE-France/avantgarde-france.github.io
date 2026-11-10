@@ -1230,6 +1230,107 @@
 @media(max-width:620px){#projectModalCard .project-modal-back{padding:13px 12px 17px!important}#projectModalCard .project-modal-back h2{font-size:21px!important;margin:8px 16px 12px!important}#projectModalCard .project-modal-back .project-modal-content{font-size:12px!important;padding-bottom:46px!important}#projectModalCard .project-vote-panel{right:10px!important;bottom:9px!important;gap:4px!important}#projectModalCard .project-vote-panel .project-vote-button{min-width:33px!important;min-height:31px!important;padding:3px 7px!important}#projectModalCard .project-vote-panel .project-vote-message{font-size:9px!important}#projectModalCard #inspirationShareButton{left:10px!important;bottom:9px!important}#projectModalCard #inspirationShareStatus{left:10px!important;bottom:49px!important}}
 @media(prefers-reduced-motion:reduce){#projectModalCard{transition:width .01ms,height .01ms!important}#projectModalCard .project-modal-card-inner{transition:transform .01ms!important}}
 
+
+/* ===== Ajustements visuels ciblés — carte Inspiration unique ===== */
+/* Recto en liste : guillemet plus grand, placé près du bord haut. */
+#projectGrid .project-card-center:before{
+ top:-10px!important;
+ font-size:64px!important;
+ line-height:.72!important;
+}
+/* Pendant l'agrandissement, les proportions des éléments éditoriaux
+   suivent la taille de la même carte (aucun clone / aucun zoom global). */
+#projectModalFront>.project-card.is-enlarged{
+ border-width:2px!important;
+ border-radius:30px 40px 24px 34px!important;
+ transition:border-radius 2s cubic-bezier(.18,.78,.2,1),border-width 2s cubic-bezier(.18,.78,.2,1)!important;
+}
+#projectModalFront>.project-card.is-enlarged:before{
+ inset:6px!important;
+ border-width:2px!important;
+ border-radius:20px 28px 16px 24px!important;
+}
+#projectModalFront>.project-card.is-enlarged .project-card-center{
+ left:50px!important;right:50px!important;
+ padding-left:6px!important;padding-right:6px!important;
+}
+#projectModalFront>.project-card.is-enlarged .project-card-center:before{
+ top:-20px!important;
+ font-size:128px!important;
+ line-height:.72!important;
+}
+#projectModalFront>.project-card.is-enlarged .project-card-tagline{
+ font-size:20px!important;
+ line-height:1.08!important;
+ letter-spacing:0!important;
+ text-shadow:0 4px 6px rgba(0,0,0,.98),0 6px 30px rgba(0,0,0,.78)!important;
+}
+#projectModalFront>.project-card.is-enlarged .project-card-top{
+ bottom:122px!important;
+ padding-left:34px!important;padding-right:34px!important;
+}
+#projectModalFront>.project-card.is-enlarged .project-card-title{
+ max-width:76%!important;
+ padding:14px 20px 0!important;
+ border-top-width:2px!important;
+ font-size:16px!important;
+ letter-spacing:4px!important;
+}
+#projectModalFront>.project-card.is-enlarged .inspiration-card-brand{
+ left:0!important;right:0!important;bottom:2px!important;
+ width:100%!important;padding:0 14px 24px!important;
+ font-size:30px!important;letter-spacing:-.6px!important;
+}
+#projectModalFront>.project-card.is-enlarged .inspiration-card-brand .brand-prefix{
+ margin-right:8px!important;font-size:20px!important;letter-spacing:.4px!important;
+}
+#projectModalFront>.project-card.is-enlarged .inspiration-card-brand:before{
+ top:-18px!important;height:2px!important;
+}
+#projectModalFront>.project-card.is-enlarged .inspiration-card-brand:after{
+ left:50%!important;right:auto!important;width:76px!important;
+ bottom:8px!important;height:4px!important;
+}
+#projectModalFront>.project-card.is-enlarged .project-card-rating{
+ left:auto!important;right:14px!important;top:14px!important;
+ padding:8px 12px!important;border-width:2px!important;
+ font-size:20px!important;
+}
+#projectModalFront>.project-card.is-enlarged .project-card-rating .vote-symbol{
+ font-size:26px!important;
+}
+#projectModalFront>.project-card.is-enlarged .project-card-rating strong{
+ font-size:22px!important;
+}
+#projectModalFront>.project-card.is-enlarged .project-card-validation-stamp{
+ transform:scale(2)!important;transform-origin:bottom right!important;
+}
+#projectModalFront>.project-card.is-enlarged .project-card-taxonomy{
+ font-size:20px!important;padding:8px 16px!important;
+}
+#projectModalCard .project-modal-back{
+ background:#07152d!important;
+}
+#projectModalCard .project-modal-back-art{
+ opacity:.22!important;
+}
+@media(max-width:620px){
+ #projectGrid .project-card-center:before{top:-8px!important;font-size:58px!important}
+ #projectModalFront>.project-card.is-enlarged .project-card-center{left:38px!important;right:38px!important}
+ #projectModalFront>.project-card.is-enlarged .project-card-center:before{top:-17px!important;font-size:116px!important}
+ #projectModalFront>.project-card.is-enlarged .project-card-tagline{font-size:20px!important}
+ #projectModalFront>.project-card.is-enlarged .project-card-top{bottom:108px!important;padding-left:24px!important;padding-right:24px!important}
+ #projectModalFront>.project-card.is-enlarged .project-card-title{font-size:14px!important;letter-spacing:3.3px!important}
+ #projectModalFront>.project-card.is-enlarged .inspiration-card-brand{font-size:26px!important;padding-bottom:22px!important}
+ #projectModalFront>.project-card.is-enlarged .inspiration-card-brand .brand-prefix{font-size:18px!important}
+ #projectModalFront>.project-card.is-enlarged .project-card-rating{right:14px!important;top:14px!important;font-size:18px!important}
+ #projectModalFront>.project-card.is-enlarged .project-card-rating .vote-symbol{font-size:24px!important}
+ #projectModalFront>.project-card.is-enlarged .project-card-rating strong{font-size:20px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ #projectModalFront>.project-card.is-enlarged{transition:none!important}
+}
+
 </style>
 </head>
 <body>
@@ -1298,7 +1399,7 @@ function parent(item){const sub=subs.find(x=>String(x.id)===String(item.sous_men
 function popularity(id){return voteStats.get(String(id))||{pouces_positifs:0,pouces_negatifs:0,votes_neutres:0,votes_exprimes:0,popularite:0}}
 function voteIcon(v){return v===1?'<span class="project-card-validation-stamp positive" title="Votre évaluation : favorable" aria-label="Votre évaluation : favorable">👍</span>':v===0?'<span class="project-card-validation-stamp neutral" title="Votre évaluation : neutre" aria-label="Votre évaluation : neutre">✋🏻</span>':v===-1?'<span class="project-card-validation-stamp negative" title="Votre évaluation : défavorable" aria-label="Votre évaluation : défavorable">👎</span>':""}
 function ratingMarkup(item){const s=popularity(item.id);const count=Number(s.pouces_positifs||0);return '<div class="project-card-rating inspiration-card-rating" title="'+count+' pouce(s) vert(s)" aria-label="Popularité : '+count+' pouce(s) vert(s)"><span class="vote-symbol positive-symbol" aria-hidden="true">👍</span> <strong>'+count+'</strong></div>'}
-function card(x){const photo=x.photo_url?'<img class="project-card-image" src="'+esc(x.photo_url)+'" alt="" aria-hidden="true" loading="lazy" decoding="async" referrerpolicy="no-referrer">':'';const menuName=menus.find(m=>String(m.id)===String(x.menu_id))?.titre||"";const subName=subs.find(v=>String(v.id)===String(x.sous_menu_id))?.titre||"";const taxonomy=[menuName,subName].filter(Boolean).join(" · ");return '<article class="project-card" data-accroche-position="'+esc(x.accroche_position||"center")+'" tabindex="0" role="button" aria-label="Ouvrir l’inspiration : '+esc(x.titre)+'" data-id="'+esc(x.id)+'"><div class="project-card-image-wrap" aria-hidden="true">'+photo+'</div><span class="project-card-finish" aria-hidden="true"></span><div class="project-card-top">'+ratingMarkup(x)+'<h2 class="project-card-title">'+esc(x.titre)+'</h2></div><div class="project-card-taxonomy" aria-label="Rubrique">'+esc(taxonomy)+'</div><div class="project-card-center"><p class="project-card-tagline">'+esc(x.accroche||"")+'</p></div><footer class="inspiration-card-brand" aria-label="Je suis Avant-gardE"><span class="brand-prefix">Je suis&nbsp;</span><span class="brand-name"><span class="brand-a">A</span>vant-gard<span class="brand-e">E</span></span></footer>'+(currentUser?voteIcon(myVotes.get(String(x.id))):"")+'</article>'}
+function card(x){const photo=x.photo_url?'<img class="project-card-image" src="'+esc(x.photo_url)+'" alt="" aria-hidden="true" loading="lazy" decoding="async" referrerpolicy="no-referrer">':'';const menuName=menus.find(m=>String(m.id)===String(x.menu_id))?.titre||"";const subName=subs.find(v=>String(v.id)===String(x.sous_menu_id))?.titre||"";const taxonomy=[menuName,subName].filter(Boolean).join(" · ");return '<article class="project-card" data-accroche-position="'+esc(x.accroche_position||"center")+'" tabindex="0" role="button" aria-label="Ouvrir l’inspiration : '+esc(x.titre)+'" data-id="'+esc(x.id)+'"><div class="project-card-image-wrap" aria-hidden="true">'+photo+'</div><span class="project-card-finish" aria-hidden="true"></span><div class="project-card-top">'+ratingMarkup(x)+'<h2 class="project-card-title">'+esc(x.titre)+'</h2></div><div class="project-card-taxonomy" aria-label="Rubrique">'+esc(taxonomy)+'</div><div class="project-card-center"><p class="project-card-tagline">'+esc(x.accroche||"")+'</p></div><footer class="inspiration-card-brand" aria-label="Je suis Avant-gardE"><span class="brand-prefix">&nbsp;&nbsp;&nbsp;Je suis&nbsp;</span><span class="brand-name"><span class="brand-a">A</span>vant-gard<span class="brand-e">E</span></span></footer>'+(currentUser?voteIcon(myVotes.get(String(x.id))):"")+'</article>'}
 function renderFilters(){const menuList=document.getElementById("projectMenuOptions"),subList=document.getElementById("projectSubmenuOptions");if(!menuList||!subList)return;const menuRows=[{id:"all",titre:"Tout"},...menus];menuList.innerHTML=menuRows.length?menuRows.map(m=>'<button type="button" class="project-filter-option '+(active===String(m.id)?"active":"")+'" data-menu-filter="'+esc(m.id)+'">'+esc(m.titre)+'</button>').join(""):'<div class="project-filter-empty">Aucun résultat</div>';const availableSubs=active==="all"?subs:subs.filter(s=>String(s.menu_id)===String(active));const subRows=[{id:"all",titre:"Tout"},...availableSubs];subList.innerHTML=subRows.length?subRows.map(s=>'<button type="button" class="project-filter-option '+(activeSub===String(s.id)?"active":"")+'" data-submenu-filter="'+esc(s.id)+'">'+esc(s.titre)+'</button>').join(""):'<div class="project-filter-empty">Aucun résultat</div>';const toggle=document.getElementById("projectFilterToggle");if(toggle){const selectedMenu=menus.find(m=>String(m.id)===String(active));const selectedSub=subs.find(s=>String(s.id)===String(activeSub));toggle.querySelector("span:nth-child(2)").textContent=selectedSub?selectedSub.titre:selectedMenu?selectedMenu.titre:"Filtrer";}}
 function normalizeTitle(v){return String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("fr").trim()}
 function render(){let list=items.filter(x=>{const own=myVotes.get(String(x.id));const voteOk=!currentUser||!voteFilter||voteFilter.value==="all"||(voteFilter.value==="unrated"?own===undefined:voteFilter.value==="positive"?own===1:voteFilter.value==="neutral"?own===0:own===-1);return (active==="all"||String((parent(x)||{}).id)===String(active))&&(activeSub==="all"||String(x.sous_menu_id)===String(activeSub))&&(!searchTerm||normalizeTitle(x.titre).includes(normalizeTitle(searchTerm))||normalizeTitle(x.accroche).includes(normalizeTitle(searchTerm))||normalizeTitle(subs.find(sub=>String(sub.id)===String(x.sous_menu_id))?.titre).includes(normalizeTitle(searchTerm)))&&voteOk});if(sort.value==="title")list.sort((a,b)=>String(a.titre).localeCompare(String(b.titre),"fr"));else if(sort.value==="popularity")list.sort((a,b)=>popularity(b.id).pouces_positifs-popularity(a.id).pouces_positifs||(a.position||0)-(b.position||0));else list.sort((a,b)=>(a.position||0)-(b.position||0));grid.innerHTML=list.length?list.map(card).join(""):'<div class="project-empty">Aucune inspiration ne correspond à votre recherche ou à ce filtre.</div>'}
@@ -1346,6 +1447,7 @@ function openInspirationCard(cardElement){
  document.body.style.overflow="hidden";
  requestAnimationFrame(()=>requestAnimationFrame(()=>{
   if(modal.dataset.cardStage!=="AGRANDISSEMENT")return;
+  cardElement.classList.add("is-enlarged");
   modalCard.style.width=(rect.width*2)+"px";
   modalCard.style.height=(rect.height*2)+"px";
  }));
@@ -1360,6 +1462,7 @@ function closeInspirationModal(){
  document.querySelector("#projectModalCard .project-modal-card-inner")?.classList.remove("is-flipped");
  const card=activeInspirationCard,placeholder=activeInspirationPlaceholder;
  if(card&&placeholder?.parentNode){
+  card.classList.remove("is-enlarged");
   placeholder.parentNode.insertBefore(card,placeholder);
   placeholder.remove();
   if(activeInspirationStyle===null)card.removeAttribute("style");else card.setAttribute("style",activeInspirationStyle);
