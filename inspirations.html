@@ -704,6 +704,8 @@ load();
    face.style.cssText+=";position:absolute!important;inset:0!important;width:540px!important;height:675px!important;transform:none!important;visibility:visible!important;opacity:1!important";
    face.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
    face.querySelectorAll("img").forEach(img=>{img.loading="eager";img.decoding="sync"});
+   // L'image animée est injectée au niveau de la photo ; le fondu CSS existant reste au-dessus.
+   face.querySelectorAll(".project-card-image-wrap").forEach(el=>el.style.setProperty("z-index","auto","important"));
    const tagline=face.querySelector(".project-card-tagline");
    if(tagline){
     const parts=(tagline.textContent||"").match(/\S+|\s+/g)||[];
