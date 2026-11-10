@@ -746,14 +746,16 @@ jamais une boîte de hauteur fixe qui coupe le texte. */
   pointer-events:none!important;
 }
 
-/* Capitales éditoriales : accent rouge vif, contour or et halo lumineux. */
+/* Capitales éditoriales : contraste net, sans halo ni flou. */
 :is(#projectGrid, #projectModalFront) .project-card-tagline .inspiration-cap{
-  color:#ff3347!important;
+  color:#EF4135!important;
   font-weight:900!important;
   font-style:normal!important;
-  -webkit-text-stroke:.55px #ffe09a;
+  font-size:1.08em!important;
+  -webkit-text-stroke:.65px #f5f3ed;
   paint-order:stroke fill;
-  text-shadow:0 0 2px #fff0c2,0 0 7px rgba(239,65,53,.9),0 0 13px rgba(239,65,53,.55);
+  text-shadow:none!important;
+  filter:none!important;
 }
 </style>
 </head>
