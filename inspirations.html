@@ -1206,6 +1206,58 @@
  #projectModalFront .project-card-tagline{font-size:10px!important;line-height:1.06!important}
 }
 
+
+/* Réactivation fidèle des 3 alignements : le conteneur est une zone de
+   placement pleine hauteur, jamais une boîte de hauteur fixe qui coupe le texte. */
+#projectGrid .project-card-center,
+#projectModalFront .project-card-center{
+ top:7%!important;bottom:17%!important;height:auto!important;
+ min-height:0!important;max-height:none!important;
+ overflow:visible!important;display:flex!important;
+ flex-direction:column!important;justify-content:center!important;
+}
+#projectGrid .project-card[data-accroche-position="top"] .project-card-center,
+#projectModalFront[data-accroche-position="top"] .project-card-center{
+ top:7%!important;bottom:17%!important;height:auto!important;
+ justify-content:flex-start!important;
+}
+#projectGrid .project-card[data-accroche-position="center"] .project-card-center,
+#projectModalFront[data-accroche-position="center"] .project-card-center{
+ top:7%!important;bottom:17%!important;height:auto!important;
+ justify-content:center!important;
+}
+#projectGrid .project-card[data-accroche-position="bottom"] .project-card-center,
+#projectModalFront[data-accroche-position="bottom"] .project-card-center{
+ top:7%!important;bottom:17%!important;height:auto!important;
+ justify-content:flex-end!important;
+}
+#projectGrid .project-card-tagline,
+#projectModalFront .project-card-tagline{
+ flex:none!important;max-height:none!important;overflow:visible!important;
+}
+/* Signature et petit liseré descendus ensemble de quelques pixels. */
+#projectGrid .inspiration-card-brand,
+#projectModalFront .inspiration-card-brand{bottom:1px!important;padding-bottom:12px!important}
+#projectGrid .inspiration-card-brand:after,
+#projectModalFront .inspiration-card-brand:after{bottom:0!important}
+/* Guillemets plus présents et rapprochés du bord supérieur de la carte. */
+#projectGrid .project-card-center:before,
+#projectModalFront .project-card-center:before{
+ font-size:50px!important;line-height:.7!important;
+ margin-top:-5px!important;margin-bottom:2px!important;
+ transform:translateY(-5px)!important;
+}
+@media(max-width:620px){
+ #projectGrid .project-card-center,
+ #projectModalFront .project-card-center{top:7%!important;bottom:17%!important;height:auto!important}
+ #projectGrid .inspiration-card-brand,
+ #projectModalFront .inspiration-card-brand{bottom:0!important}
+ #projectGrid .inspiration-card-brand:after,
+ #projectModalFront .inspiration-card-brand:after{bottom:0!important}
+ #projectGrid .project-card-center:before,
+ #projectModalFront .project-card-center:before{font-size:46px!important}
+}
+
 </style>
 </head>
 <body>
