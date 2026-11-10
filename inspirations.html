@@ -987,6 +987,57 @@
  #projectModalFront .project-card-center{padding-right:25px!important}
 }
 
+
+/* Corrections finales de composition et interaction recto > verso. */
+#projectGrid .project-card-top .project-card-title,
+#projectModalFront .project-card-top .project-card-title{
+ left:7px!important;right:auto!important;
+}
+#projectGrid .project-card-taxonomy,
+#projectModalFront .project-card-taxonomy{
+ right:7px!important;
+ transform:translate(50%,-50%) rotate(-90deg)!important;
+}
+#projectGrid .project-card-center,
+#projectModalFront .project-card-center{padding-left:27px!important;padding-right:27px!important}
+#projectGrid .project-card-tagline,
+#projectModalFront .project-card-tagline{
+ display:block!important;-webkit-box-orient:initial!important;-webkit-line-clamp:unset!important;
+ overflow:visible!important;text-overflow:clip!important;
+ max-height:none!important;white-space:normal!important;overflow-wrap:normal!important;
+}
+#projectGrid .inspiration-card-brand,
+#projectModalFront .inspiration-card-brand{
+ left:0!important;right:0!important;width:100%!important;box-sizing:border-box!important;
+ justify-content:flex-start!important;padding-left:32px!important;
+}
+#projectGrid .inspiration-card-brand:after,
+#projectModalFront .inspiration-card-brand:after{
+ left:50%!important;right:auto!important;transform:translateX(-50%)!important;
+ width:38px!important;bottom:2px!important;
+}
+.project-modal.open .project-modal-panel{
+ animation:inspiration-card-enlarge 2s cubic-bezier(.18,.78,.2,1) both;
+}
+@keyframes inspiration-card-enlarge{
+ 0%{transform:scale(.22);opacity:.35}
+ 65%{transform:scale(1.035);opacity:1}
+ 100%{transform:scale(1);opacity:1}
+}
+#projectModalFront{cursor:pointer}
+#projectModalFront:focus-visible{outline:2px solid #f0d58a;outline-offset:-5px}
+.project-modal-card-inner{transition:transform 1.7s cubic-bezier(.2,.75,.25,1)!important}
+@media(max-width:620px){
+ #projectGrid .project-card-top .project-card-title,
+ #projectModalFront .project-card-top .project-card-title{left:6px!important}
+ #projectGrid .project-card-taxonomy,
+ #projectModalFront .project-card-taxonomy{right:6px!important}
+ #projectGrid .project-card-center,
+ #projectModalFront .project-card-center{padding-left:24px!important;padding-right:24px!important}
+ #projectGrid .inspiration-card-brand,
+ #projectModalFront .inspiration-card-brand{padding-left:27px!important}
+}
+
 </style>
 </head>
 <body>
@@ -1065,12 +1116,16 @@ sort.addEventListener("change",render);
 voteFilter?.addEventListener("change",render);
 const modal=document.getElementById("projectModal"),modalTitle=document.getElementById("projectModalTitle"),modalContent=document.getElementById("projectModalContent"),votePanel=document.getElementById("projectVotePanel");
 function voteControls(item){const value=myVotes.get(String(item.id));return '<div class="project-vote-message" aria-live="polite"></div><button type="button" class="project-vote-button positive '+(value===1?"selected":"")+'" data-vote="1" aria-label="Pouce vers le haut" aria-pressed="'+(value===1)+'"><span class="vote-symbol positive-symbol">👍</span></button><button type="button" class="project-vote-button neutral '+(value===0?"selected":"")+'" data-vote="0" aria-label="Note neutre" aria-pressed="'+(value===0)+'">✋🏻</button><button type="button" class="project-vote-button negative '+(value===-1?"selected":"")+'" data-vote="-1" aria-label="Pouce vers le bas" aria-pressed="'+(value===-1)+'"><span class="vote-symbol negative-symbol">👎</span></button>'}
-function openInspirationCard(c){const item=items.find(x=>String(x.id)===c.dataset.id);if(!item||!modal)return;const front=document.getElementById("projectModalFront"),back=document.querySelector("#projectModalCard .project-modal-back"),flip=document.querySelector("#projectModalCard .project-modal-card-inner");front.innerHTML=c.innerHTML;front.dataset.accrochePosition=item.accroche_position||"center";front.querySelector(".project-card-image")?.setAttribute("aria-hidden","true");const sourceImage=front.querySelector(".project-card-image");let backArt=back.querySelector(".project-modal-back-art");if(!backArt){backArt=document.createElement("img");backArt.className="project-modal-back-art";backArt.alt="";backArt.setAttribute("aria-hidden","true");back.insertBefore(backArt,back.firstChild)}backArt.src=sourceImage?.currentSrc||sourceImage?.src||"";backArt.style.display=backArt.src?"block":"none";modalTitle.textContent=item.titre||"";modalContent.dataset.itemId=String(item.id);modalContent.innerHTML=item.html||"<p>Cette inspiration ne comporte pas encore de verso.</p>";votePanel.innerHTML=voteControls(item);flip.classList.remove("is-flipped");modal.classList.add("open");document.body.style.overflow="hidden";requestAnimationFrame(()=>requestAnimationFrame(()=>flip.classList.add("is-flipped")));document.getElementById("projectModalClose")?.focus()}
+function openInspirationCard(c){const item=items.find(x=>String(x.id)===c.dataset.id);if(!item||!modal)return;const front=document.getElementById("projectModalFront"),back=document.querySelector("#projectModalCard .project-modal-back"),flip=document.querySelector("#projectModalCard .project-modal-card-inner");front.innerHTML=c.innerHTML;front.dataset.accrochePosition=item.accroche_position||"center";front.setAttribute("aria-label","Recto de la carte. Cliquez pour découvrir le verso.");front.setAttribute("tabindex","0");front.querySelector(".project-card-image")?.setAttribute("aria-hidden","true");const sourceImage=front.querySelector(".project-card-image");let backArt=back.querySelector(".project-modal-back-art");if(!backArt){backArt=document.createElement("img");backArt.className="project-modal-back-art";backArt.alt="";backArt.setAttribute("aria-hidden","true");back.insertBefore(backArt,back.firstChild)}backArt.src=sourceImage?.currentSrc||sourceImage?.src||"";backArt.style.display=backArt.src?"block":"none";modalTitle.textContent=item.titre||"";modalContent.dataset.itemId=String(item.id);modalContent.innerHTML=item.html||"<p>Cette inspiration ne comporte pas encore de verso.</p>";votePanel.innerHTML=voteControls(item);flip.classList.remove("is-flipped");modal.classList.remove("is-flipped");modal.classList.add("open");document.body.style.overflow="hidden";document.getElementById("projectModalClose")?.focus()}
 function closeInspirationModal(){modal?.classList.remove("open");document.body.style.overflow="";clearPendingShare();shareStatus?.classList.remove("visible")}
 function updateCardHologram(c,e){if(!c||e.pointerType==="touch")return;const r=c.getBoundingClientRect();c.style.setProperty("--shine-x",((e.clientX-r.left)/r.width*100).toFixed(1)+"%");c.style.setProperty("--shine-y",((e.clientY-r.top)/r.height*100).toFixed(1)+"%")}
 grid.addEventListener("pointermove",e=>{const c=e.target.closest(".project-card");if(c)updateCardHologram(c,e)});
 grid.addEventListener("pointerout",e=>{const c=e.target.closest(".project-card");if(c&&!c.contains(e.relatedTarget)){c.style.removeProperty("--shine-x");c.style.removeProperty("--shine-y")}});
 grid.addEventListener("click",e=>{const c=e.target.closest(".project-card");if(c)openInspirationCard(c)});
+const modalFront=document.getElementById("projectModalFront");
+function revealInspirationBack(){const flip=document.querySelector("#projectModalCard .project-modal-card-inner");if(!modal?.classList.contains("open")||!flip||flip.classList.contains("is-flipped"))return;flip.classList.add("is-flipped");modal.classList.add("is-flipped");modalFront?.setAttribute("aria-label","Verso de la carte.");}
+modalFront?.addEventListener("click",e=>{if(e.target.closest("button,a"))return;revealInspirationBack()});
+modalFront?.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&!e.target.closest("button,a")){e.preventDefault();revealInspirationBack()}});
 grid.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("project-card")){e.preventDefault();openInspirationCard(e.target)}});
 votePanel?.addEventListener("click",async e=>{const b=e.target.closest("[data-vote]");if(!b)return;const msg=votePanel.querySelector(".project-vote-message");if(!currentUser){const statusNode=document.getElementById("inspirationShareStatus");if(statusNode){statusNode.textContent="Vous devez être connecté pour noter.";statusNode.classList.add("visible");}return}const value=Number(b.dataset.vote),id=modalContent.dataset.itemId;if(!id)return;const currentValue=myVotes.get(String(id)),removing=currentValue===value;b.disabled=true;if(msg)msg.textContent=removing?"Retrait de votre évaluation…":"Enregistrement de votre note…";const result=removing?await supabase.from("inspiration_votes").delete().eq("user_id",currentUser.id).eq("contenu_id",id):await supabase.from("inspiration_votes").upsert({user_id:currentUser.id,contenu_id:id,vote:value,updated_at:new Date().toISOString()},{onConflict:"user_id,contenu_id"});b.disabled=false;if(result.error){console.error("Erreur vote inspiration",result.error);if(msg)msg.textContent="Impossible de modifier votre note. Réessayez.";return}if(removing)myVotes.delete(String(id));else myVotes.set(String(id),value);await loadVoteData();render();const updated=items.find(x=>String(x.id)===String(id));if(updated){votePanel.innerHTML=voteControls(updated);const fresh=grid.querySelector('[data-id="'+CSS.escape(String(id))+'"]');if(fresh)document.getElementById("projectModalFront").innerHTML=fresh.innerHTML}});
 
