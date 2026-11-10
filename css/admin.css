@@ -1242,7 +1242,7 @@ textarea{
 #tree .tree-add-submenu{
   position:absolute;
   z-index:2;
-  top:-5px;
+  top:-18px;
   left:-9px;
   width:18px;
   min-width:18px;
@@ -1320,7 +1320,7 @@ textarea{
 #tree .tree-add-content{
   position:absolute;
   z-index:2;
-  top:-5px;
+  top:-18px;
   left:-9px;
   width:18px;
   min-width:18px;
