@@ -1333,6 +1333,25 @@
  filter:none!important;transform:none!important;
 }
 
+
+/* Carte agrandie : une source DOM, zoom de layout uniforme plafonné à x2. */
+#projectModalFront{overflow:visible!important;position:relative!important}
+#projectModalFront>.project-modal-live-card{
+ transition:zoom 2s cubic-bezier(.18,.78,.2,1)!important;
+ transform:translate(-50%,-50%)!important;
+ transform-origin:center center!important;
+}
+#projectModalFront .project-modal-live-card>.project-card{
+ position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+ aspect-ratio:4/5!important;overflow:hidden!important;
+}
+#projectModal .project-modal-close{display:none!important}
+#projectModal .project-modal-panel,
+#projectModalCard,#projectModalCard .project-modal-card-inner,
+#projectModalCard .project-modal-face{
+ border:0!important;outline:0!important;box-shadow:none!important;
+}
+
 </style>
 </head>
 <body>
@@ -1411,7 +1430,52 @@ sort.addEventListener("change",render);
 voteFilter?.addEventListener("change",render);
 const modal=document.getElementById("projectModal"),modalTitle=document.getElementById("projectModalTitle"),modalContent=document.getElementById("projectModalContent"),votePanel=document.getElementById("projectVotePanel");
 function voteControls(item){const value=myVotes.get(String(item.id));return '<div class="project-vote-message" aria-live="polite"></div><button type="button" class="project-vote-button positive '+(value===1?"selected":"")+'" data-vote="1" aria-label="Pouce vers le haut" aria-pressed="'+(value===1)+'"><span class="vote-symbol positive-symbol">👍</span></button><button type="button" class="project-vote-button neutral '+(value===0?"selected":"")+'" data-vote="0" aria-label="Note neutre" aria-pressed="'+(value===0)+'">✋🏻</button><button type="button" class="project-vote-button negative '+(value===-1?"selected":"")+'" data-vote="-1" aria-label="Pouce vers le bas" aria-pressed="'+(value===-1)+'"><span class="vote-symbol negative-symbol">👎</span></button>'}
-function openInspirationCard(c){const item=items.find(x=>String(x.id)===c.dataset.id);if(!item||!modal)return;const front=document.getElementById("projectModalFront"),back=document.querySelector("#projectModalCard .project-modal-back"),flip=document.querySelector("#projectModalCard .project-modal-card-inner");const sourceRect=c.getBoundingClientRect();const cardCopy=c.cloneNode(true);cardCopy.removeAttribute("id");cardCopy.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));cardCopy.style.setProperty("width",sourceRect.width+"px","important");cardCopy.style.setProperty("height",sourceRect.height+"px","important");cardCopy.style.setProperty("min-width",sourceRect.width+"px","important");cardCopy.style.setProperty("max-width","none","important");cardCopy.style.setProperty("aspect-ratio","4/5","important");cardCopy.style.setProperty("margin","0","important");cardCopy.style.setProperty("transform","none","important");cardCopy.style.setProperty("box-sizing","border-box","important");const liveWrapper=document.createElement("div");liveWrapper.className="project-card-export-wrapper project-modal-live-card";liveWrapper.style.cssText=`position:absolute!important;left:50%!important;top:50%!important;width:${sourceRect.width}px!important;height:${sourceRect.height}px!important;min-width:${sourceRect.width}px!important;min-height:${sourceRect.height}px!important;max-width:none!important;max-height:none!important;aspect-ratio:4/5!important;zoom:1;transform:translate(-50%,-50%)!important;transform-origin:center center!important;margin:0!important;overflow:visible!important`;cardCopy.style.setProperty("position","absolute","important");cardCopy.style.setProperty("inset","0","important");liveWrapper.appendChild(cardCopy);front.replaceChildren(liveWrapper);front.dataset.accrochePosition=item.accroche_position||"center";front.setAttribute("aria-label","Recto de la carte. Cliquez pour découvrir le verso.");front.setAttribute("tabindex","0");const sourceImage=cardCopy.querySelector(".project-card-image");let backArt=back.querySelector(".project-modal-back-art");if(!backArt){backArt=document.createElement("img");backArt.className="project-modal-back-art";backArt.alt="";backArt.setAttribute("aria-hidden","true");back.insertBefore(backArt,back.firstChild)}backArt.src=sourceImage?.currentSrc||sourceImage?.src||"";backArt.style.display=backArt.src?"block":"none";modalTitle.textContent=item.titre||"";modalContent.dataset.itemId=String(item.id);modalContent.innerHTML=item.html||"<p>Cette inspiration ne comporte pas encore de verso.</p>";votePanel.innerHTML=voteControls(item);flip.classList.remove("is-flipped");modal.classList.remove("is-flipped");modal.classList.add("open");document.body.style.overflow="hidden";requestAnimationFrame(()=>{const frontRect=front.getBoundingClientRect();const scale=Math.min(frontRect.width/sourceRect.width,frontRect.height/sourceRect.height);liveWrapper.style.setProperty("zoom",String(scale),"important")});document.getElementById("projectModalClose")?.focus()}
+function openInspirationCard(c){
+ const item=items.find(x=>String(x.id)===c.dataset.id);if(!item||!modal)return;
+ const front=document.getElementById("projectModalFront");
+ const back=document.querySelector("#projectModalCard .project-modal-back");
+ const flip=document.querySelector("#projectModalCard .project-modal-card-inner");
+ const sourceRect=c.getBoundingClientRect();
+ const cardCopy=c.cloneNode(true);
+ cardCopy.removeAttribute("id");cardCopy.querySelectorAll("[id]").forEach(el=>el.removeAttribute("id"));
+ cardCopy.style.setProperty("position","absolute","important");
+ cardCopy.style.setProperty("inset","0","important");
+ cardCopy.style.setProperty("width","100%","important");
+ cardCopy.style.setProperty("height","100%","important");
+ cardCopy.style.setProperty("min-width","0","important");
+ cardCopy.style.setProperty("max-width","none","important");
+ cardCopy.style.setProperty("aspect-ratio","4/5","important");
+ cardCopy.style.setProperty("margin","0","important");
+ cardCopy.style.setProperty("transform","none","important");
+ cardCopy.style.setProperty("box-sizing","border-box","important");
+ const liveWrapper=document.createElement("div");
+ liveWrapper.className="project-modal-live-card";
+ liveWrapper.style.cssText="position:absolute!important;left:50%!important;top:50%!important;width:"+sourceRect.width+"px!important;height:"+sourceRect.height+"px!important;transform:translate(-50%,-50%)!important;transform-origin:center center!important;zoom:1!important;margin:0!important;overflow:visible!important";
+ liveWrapper.appendChild(cardCopy);front.replaceChildren(liveWrapper);
+ front.dataset.accrochePosition=item.accroche_position||"center";
+ front.setAttribute("aria-label","Recto agrandi. Cliquez pour retourner la carte.");
+ const sourceImage=cardCopy.querySelector(".project-card-image");
+ if(sourceImage){
+   const imageUrl=sourceImage.currentSrc||sourceImage.src||sourceImage.getAttribute("src")||"";
+   sourceImage.loading="eager";
+   if(imageUrl&&!sourceImage.getAttribute("src"))sourceImage.src=imageUrl;
+   let backArt=back.querySelector(".project-modal-back-art");
+   if(!backArt){backArt=document.createElement("img");backArt.className="project-modal-back-art";backArt.alt="";backArt.setAttribute("aria-hidden","true");back.insertBefore(backArt,back.firstChild)}
+   backArt.src=imageUrl;backArt.style.display=imageUrl?"block":"none";
+ }
+ modalTitle.textContent=item.titre||"";
+ modalContent.dataset.itemId=String(item.id);
+ modalContent.innerHTML=item.html||"<p>Cette inspiration ne comporte pas encore de verso.</p>";
+ votePanel.innerHTML=voteControls(item);
+ flip.classList.remove("is-flipped");modal.classList.remove("is-flipped");
+ liveWrapper.style.setProperty("zoom","1","important");
+ modal.classList.add("open");document.body.style.overflow="hidden";
+ requestAnimationFrame(()=>{
+   const area=front.getBoundingClientRect();
+   const target=Math.min(2,area.width/sourceRect.width,area.height/sourceRect.height);
+   liveWrapper.style.setProperty("zoom",String(target),"important");
+ });
+}
 function closeInspirationModal(){modal?.classList.remove("open");document.body.style.overflow="";clearPendingShare();shareStatus?.classList.remove("visible")}
 function updateCardHologram(c,e){if(!c||e.pointerType==="touch")return;const r=c.getBoundingClientRect();c.style.setProperty("--shine-x",((e.clientX-r.left)/r.width*100).toFixed(1)+"%");c.style.setProperty("--shine-y",((e.clientY-r.top)/r.height*100).toFixed(1)+"%")}
 grid.addEventListener("pointermove",e=>{const c=e.target.closest(".project-card");if(c)updateCardHologram(c,e)});
@@ -1442,7 +1506,7 @@ function getInspirationShareText(){
 document.getElementById("inspirationSocialClose")?.addEventListener("click",()=>{socialChooser.hidden=true});
 socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)socialChooser.hidden=true});
 document.getElementById("projectModalClose")?.addEventListener("click",closeInspirationModal);
-modal?.addEventListener("click",e=>{if(e.target===modal)closeInspirationModal()});
+modal?.addEventListener("click",e=>{if(e.target===modal&&modal.classList.contains("is-flipped"))closeInspirationModal()});
 document.querySelector("#projectModalCard")?.addEventListener("click",e=>{if(e.target.closest("button,a,input,select,textarea,[role=button]"))return;const flip=document.querySelector("#projectModalCard .project-modal-card-inner");if(flip?.classList.contains("is-flipped"))closeInspirationModal()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeInspirationModal()});
 async function loadVoteData(){const statsResult=await supabase.from("inspiration_vote_stats").select("*");if(statsResult.error)throw statsResult.error;voteStats=new Map((statsResult.data||[]).map(x=>[String(x.contenu_id),x]));myVotes=new Map();if(currentUser){const own=await supabase.from("inspiration_votes").select("contenu_id,vote").eq("user_id",currentUser.id);if(own.error)throw own.error;for(const v of own.data||[])myVotes.set(String(v.contenu_id),Number(v.vote))}}
