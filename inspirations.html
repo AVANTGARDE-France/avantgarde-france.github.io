@@ -50,36 +50,6 @@
 @media(prefers-reduced-motion:reduce){.project-card-inner{transition:transform .72s cubic-bezier(.2,.75,.25,1)}}
 
 
-/* Popup portrait : le verso configuré dans l'administration */
-.project-modal{padding:18px;overflow-y:auto}
-.project-modal-panel{width:min(620px,94vw);height:min(88vh,900px);aspect-ratio:2/3;max-height:88vh;overflow-y:auto;display:flex;flex-direction:column;padding:28px 30px 32px;border:2px solid #c99b45;border-radius:18px;background:linear-gradient(155deg,#173657,#07152d 75%);box-sizing:border-box}
-.project-modal h2{flex:0 0 auto;margin:10px 42px 22px;font-size:clamp(23px,3vw,32px)}
-.project-modal-content{flex:1;min-height:0;overflow-y:auto;font:15px/1.75 Arial,sans-serif}
-.project-modal-content img{max-width:100%;height:auto}
-@media(max-width:620px){.project-modal{padding:10px}.project-modal-panel{width:min(94vw,520px);height: min(84vh,780px);padding:22px 18px;border-radius:14px}.project-modal h2{font-size:23px;margin-bottom:16px}.project-modal-content{font-size:14px}}
-
-
-/* Animation de retournement dans le popup portrait */
-.project-modal-panel{width:min(540px,92vw,65.6vh);height:auto;aspect-ratio:4/5;max-height:82vh;padding:0;background:transparent;border:0;box-shadow:none;overflow:visible;perspective:1600px}
-.project-modal-close{position:absolute;z-index:5;right:-12px;top:-12px;float:none}
-.project-modal-card{width:100%;height:100%;aspect-ratio:4/5;perspective:1600px}
-.project-modal-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 1.7s cubic-bezier(.2,.75,.25,1);will-change:transform}
-.project-modal-card-inner.is-flipped{transform:rotateY(180deg)}
-.project-modal-face{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:2px solid #c99b45;border-radius:18px;box-shadow:0 22px 65px #000a}
-.project-modal-front{display:flex;flex-direction:column;transform:rotateY(0);background:#0d2344}
-.project-modal-front .project-card-image-wrap{position:absolute;inset:0;z-index:0;overflow:hidden}.project-modal-front .project-card-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.project-modal-front .project-card-image-wrap:after{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,#030d1d99,transparent 35%,#030d1d18 58%,#030d1dcc)}
-.project-modal-front .project-card-top,.project-modal-front .project-card-center,.project-modal-front .project-stats,.project-modal-front .project-synergies{position:relative;z-index:2}
-.project-modal-back{position:relative;isolation:isolate;transform:rotateY(180deg);display:flex;flex-direction:column;padding:36px 32px 30px;background:linear-gradient(155deg,#173657,#07152d 75%);color:#f5f3ed;overflow:hidden}
-.project-modal-back-art{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;object-position:center;transform:scaleX(-1);opacity:.2;filter:saturate(.82) contrast(1.08);pointer-events:none}
-.project-modal-back:after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,#07152d9c,#07152dbb 45%,#07152de8),linear-gradient(90deg,#07152d55,transparent 24%,transparent 76%,#07152d55)}
-.project-modal-back>*:not(.project-modal-back-art){position:relative;z-index:1}
-.project-modal-back h2{flex:0 0 auto;color:#f0d58a;text-align:center;font:700 clamp(23px,3vw,32px) Georgia,serif;margin:12px 25px 22px}
-.project-modal-content{flex:1;min-height:0;overflow-y:auto;font:15px/1.75 Arial,sans-serif}
-.project-modal-content img{max-width:100%;height:auto}
-@media(max-width:620px){.project-modal-panel{width:min(90vw,62.4vh);height:auto;aspect-ratio:4/5;max-height:78vh}.project-modal-close{right:-5px;top:-12px}.project-modal-face{border-radius:14px}.project-modal-back{padding:28px 20px 22px}.project-modal-back h2{font-size:23px;margin-bottom:16px}.project-modal-content{font-size:14px}}
-@media(prefers-reduced-motion:reduce){.project-modal-card-inner{transition:transform 1.7s cubic-bezier(.2,.75,.25,1)!important}}
-
-
 /* Évaluations des propositions */
 .project-card-top{padding-left:108px}
 .project-card-rating{position:absolute;left:9px;top:9px;z-index:2;display:flex;align-items:center;gap:5px;padding:5px 7px;border:1px solid #f0d58a9c;border-radius:999px;background:#061326eF;color:#f5f3ed;font:700 10px Arial,sans-serif;white-space:nowrap}
@@ -197,19 +167,6 @@
 .project-vote-message{flex:0 1 auto;min-width:0;font:italic 10px/1.2 Arial,sans-serif;color:#ffcf8b;margin:0 3px 0 0;text-align:right;white-space:nowrap}
 .project-modal-content{padding-bottom:48px;box-sizing:border-box}
 @media(max-width:620px){.project-modal-back{padding:13px 12px 17px}.project-vote-panel{right:10px;bottom:9px;gap:4px}.project-vote-panel .project-vote-button{min-width:33px;min-height:31px;padding:3px 7px}.project-vote-message{font-size:9px}.project-modal-content{padding-bottom:44px}}
-
-/* Dimensions fixes pendant et après le retournement ; seul le texte du verso défile */
-.project-modal-panel{box-sizing:border-box;overflow:visible;aspect-ratio:4/5;height:auto;max-height:82vh;display:flex;flex-direction:column}
-.project-modal-card{position:relative;display:block;flex:0 0 auto;width:100%;height:100%;min-height:0;aspect-ratio:4/5}
-.project-modal-card-inner{position:relative;width:100%;height:100%;min-height:0;transform-style:preserve-3d}
-.project-modal-face{position:absolute;inset:0;width:100%;height:100%;box-sizing:border-box}
-.project-modal-back{display:flex;flex-direction:column;min-height:0;height:100%;box-sizing:border-box;overflow:hidden}
-.project-modal-back h2{flex:0 0 auto}
-.project-modal-back .project-modal-content{display:block;flex:1 1 0;min-height:0;height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#c99b45 #07152d}
-.project-modal-back .project-modal-content::-webkit-scrollbar{width:7px}
-.project-modal-back .project-modal-content::-webkit-scrollbar-track{background:#07152d;border-radius:8px}
-.project-modal-back .project-modal-content::-webkit-scrollbar-thumb{background:#c99b45;border-radius:8px}
-@media(max-width:620px){.project-modal-panel{height:min(78vh,700px);max-height:78vh}.project-modal-card{height:100%}}
 
 /* Tampon d’évaluation personnel : décor superposé, sans modifier la mise en page */
 .project-card-validation-stamp{position:absolute;right:-11px;bottom:-11px;z-index:8;width:48px;height:48px;display:grid;place-items:center;box-sizing:border-box;border:3px double currentColor;border-radius:50%;background:radial-gradient(circle,#0d2344 48%,#07152d 100%);font:700 25px/1 Arial,sans-serif;box-shadow:0 3px 9px #0009,0 0 0 2px #07152d;transform:rotate(-13deg);pointer-events:none;text-shadow:0 1px 2px #000;filter:drop-shadow(0 1px 1px #000)}
@@ -1017,13 +974,9 @@
  width:38px!important;bottom:2px!important;
 }
 .project-modal.open .project-modal-panel{
- animation:inspiration-card-enlarge 2s cubic-bezier(.18,.78,.2,1) both;
+ animation:none!important;
 }
-@keyframes inspiration-card-enlarge{
- 0%{transform:scale(.22);opacity:.35}
- 65%{transform:scale(1.035);opacity:1}
- 100%{transform:scale(1);opacity:1}
-}
+
 #projectModalFront{cursor:pointer}
 #projectModalFront:focus-visible{outline:2px solid #f0d58a;outline-offset:-5px}
 .project-modal-card-inner{transition:transform 1.7s cubic-bezier(.2,.75,.25,1)!important}
@@ -1036,36 +989,6 @@
  #projectModalFront .project-card-center{padding-left:24px!important;padding-right:24px!important}
  #projectGrid .inspiration-card-brand,
  #projectModalFront .inspiration-card-brand{padding-left:27px!important}
-}
-
-
-/* Agrandissement recto : conserver strictement le ratio 4:5 de la carte.
-   Le panneau épouse la carte, sans zone de défilement autour du verso. */
-.project-modal{padding:0!important;overflow:hidden!important;align-items:center!important;justify-content:center!important}
-.project-modal .project-modal-panel{
- width:min(90vw,72vh,620px)!important;height:auto!important;aspect-ratio:4/5!important;
- max-height:90vh!important;overflow:visible!important;padding:0!important;
- border:0!important;border-radius:18px!important;background:transparent!important;
- box-shadow:none!important;flex:none!important;
-}
-.project-modal .project-modal-card{width:100%!important;height:100%!important;aspect-ratio:4/5!important}
-.project-modal .project-modal-close{
- position:absolute!important;top:-15px!important;right:-15px!important;z-index:30!important;
- float:none!important;margin:0!important;
-}
-.project-modal.open .project-modal-panel{
- animation:inspiration-card-enlarge 2s cubic-bezier(.18,.78,.2,1) both!important;
-}
-@media(max-width:620px){
- .project-modal .project-modal-panel{
-  width:min(88vw,70vh)!important;height:auto!important;max-height:90vh!important;
-  aspect-ratio:4/5!important;padding:0!important;
- }
- .project-modal .project-modal-close{top:-12px!important;right:-8px!important}
-}
-@supports(height:100dvh){
- .project-modal .project-modal-panel{width:min(90vw,72dvh,620px)!important;max-height:90dvh!important}
- @media(max-width:620px){.project-modal .project-modal-panel{width:min(88vw,70dvh)!important;max-height:90dvh!important}}
 }
 
 
@@ -1129,27 +1052,6 @@
  #projectModalFront[data-accroche-position="bottom"] .project-card-center{top:auto!important;bottom:25%!important;height:27%!important}
  #projectGrid .project-card-tagline,
  #projectModalFront .project-card-tagline{font-size:10px!important;line-height:1.06!important}
-}
-
-
-/* Zoom uniforme : la carte garde son ratio 4:5 pendant toute l'animation. */
-.project-modal .project-modal-panel{
- width:min(88vw,calc(90vh * .8),620px)!important;
- height:auto!important;aspect-ratio:4/5!important;
- transform-origin:center center!important;
-}
-.project-modal .project-modal-card,
-.project-modal .project-modal-card-inner,
-.project-modal .project-modal-front,
-.project-modal .project-modal-back{
- width:100%!important;height:100%!important;
- aspect-ratio:4/5!important;box-sizing:border-box!important;
-}
-.project-modal.open .project-modal-panel{
- animation:inspiration-card-enlarge 2s cubic-bezier(.18,.78,.2,1) both!important;
-}
-@supports(height:100dvh){
- .project-modal .project-modal-panel{width:min(88vw,calc(90dvh * .8),620px)!important}
 }
 
 
@@ -1271,67 +1173,6 @@
  transform:translateX(-50%)!important;bottom:4px!important;
 }
 
-/* ===== Carte Inspiration agrandie — règles consolidées ===== */
-#projectModal{
- background:transparent!important;
- backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
- pointer-events:none!important;padding:0!important;
-}
-#projectModal:before,#projectModal:after{content:none!important;display:none!important}
-#projectModal .project-modal-panel{
- width:min(92vw,72vh,620px)!important;height:auto!important;
- max-height:92vh!important;aspect-ratio:4/5!important;
- padding:0!important;margin:0!important;overflow:visible!important;
- background:transparent!important;border:0!important;border-radius:0!important;
- box-shadow:none!important;perspective:1600px!important;pointer-events:auto!important;
-}
-#projectModal .project-modal-close{display:none!important}
-#projectModalCard{
- width:100%!important;height:auto!important;aspect-ratio:4/5!important;
- border:0!important;box-shadow:none!important;background:transparent!important;
- pointer-events:auto!important;
-}
-#projectModalCard .project-modal-card-inner{width:100%!important;height:100%!important}
-#projectModalCard .project-modal-face{
- border:0!important;border-radius:0!important;box-shadow:none!important;
- background:transparent!important;pointer-events:auto!important;
-}
-#projectModalFront{
- display:block!important;position:relative!important;overflow:visible!important;
- border:0!important;border-radius:0!important;background:transparent!important;
- box-shadow:none!important;isolation:isolate!important;cursor:pointer!important;
- touch-action:manipulation!important;pointer-events:auto!important;
-}
-#projectModalFront:before,#projectModalFront:after{
- content:none!important;display:none!important;background:none!important;
-}
-#projectModalFront>.project-modal-live-card{transform:translate(-50%,-50%) scale(1)!important;transform-origin:center center!important;transition:transform 3s cubic-bezier(.18,.78,.2,1)!important;pointer-events:auto!important}
-#projectModalFront .project-modal-live-card>.project-card{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;aspect-ratio:4/5!important;overflow:hidden!important;transform:none!important;cursor:pointer!important;pointer-events:auto!important}
-#projectModalFront .project-modal-live-card .project-card-image-wrap{
- position:absolute!important;inset:0!important;overflow:hidden!important;
-}
-#projectModalFront .project-modal-live-card .project-card-image-wrap:before,#projectModalFront .project-modal-live-card .project-card-image-wrap:after{content:none!important;display:none!important;background:none!important;opacity:0!important;box-shadow:none!important}
-#projectModalFront .project-modal-live-card .project-card-image{
- filter:none!important;transform:none!important;
-}
-#projectModalFront .project-modal-live-card .project-card-finish{
- display:block!important;visibility:visible!important;opacity:1!important;
-}
-#projectModalFront .project-modal-live-card .project-card-finish:before,
-#projectModalFront .project-modal-live-card .project-card-finish:after{
- display:block!important;
-}
-#projectModalFront .project-modal-live-card,
-#projectModalFront .project-modal-live-card *,
-#projectModalCard,#projectModalCard .project-modal-back{
- pointer-events:auto!important;
-}
-#projectModalFront .project-modal-live-card [data-frozen-pseudo]{
- pointer-events:none!important;
-}
-.project-modal.open .project-modal-panel{animation:none!important}
-/* ===== Fin des règles consolidées ===== */
-
 /* Finitions demandées : guillemets et tricolore centrés, signature resserrée. */
 #projectGrid .project-card-center:before,
 #projectModalFront .project-card-center:before{
@@ -1349,6 +1190,44 @@
 }
 #projectGrid .inspiration-card-brand .brand-prefix,
 #projectModalFront .inspiration-card-brand .brand-prefix{margin-right:3px!important}
+
+
+/* ===== Cycle unique des cartes Inspirations : un seul élément DOM ===== */
+#projectModal{position:fixed!important;inset:0!important;z-index:10000!important;display:none!important;padding:0!important;margin:0!important;overflow:visible!important;background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;pointer-events:none!important}
+#projectModal.open{display:block!important}
+#projectModal:before,#projectModal:after{content:none!important;display:none!important}
+#projectModal .project-modal-panel{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;perspective:1600px!important;pointer-events:none!important}
+@supports(height:100dvh){#projectModal .project-modal-panel{height:100dvh!important}}
+#projectModal .project-modal-close{display:none!important}
+#projectModalCard{position:fixed!important;left:50%!important;top:50%!important;width:var(--inspiration-card-width,200px)!important;height:var(--inspiration-card-height,250px)!important;margin:0!important;padding:0!important;aspect-ratio:4/5!important;transform:translate(-50%,-50%)!important;transform-style:preserve-3d!important;perspective:1600px!important;transition:width 2s cubic-bezier(.18,.78,.2,1),height 2s cubic-bezier(.18,.78,.2,1)!important;pointer-events:auto!important;z-index:2!important}
+#projectModalCard .project-modal-card-inner{position:relative!important;width:100%!important;height:100%!important;transform-style:preserve-3d!important;transition:transform 1.05s cubic-bezier(.2,.75,.25,1)!important}
+#projectModalCard .project-modal-card-inner.is-flipped{transform:rotateY(180deg)!important}
+#projectModalCard .project-modal-face{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;box-sizing:border-box!important;overflow:hidden!important;border:0!important;border-radius:0!important;box-shadow:none!important;backface-visibility:hidden!important;-webkit-backface-visibility:hidden!important}
+#projectModalFront{display:block!important;position:absolute!important;inset:0!important;overflow:visible!important;padding:0!important;margin:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;isolation:isolate!important;cursor:pointer!important;pointer-events:auto!important;touch-action:manipulation!important}
+#projectModalFront:before,#projectModalFront:after{content:none!important;display:none!important}
+#projectModalFront>.project-card{position:absolute!important;inset:0!important;display:block!important;width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;max-width:none!important;max-height:none!important;aspect-ratio:4/5!important;margin:0!important;padding:0!important;box-sizing:border-box!important;overflow:hidden!important;transform:none!important;cursor:pointer!important;border:1px solid #c9a45f!important;border-radius:15px 20px 12px 17px!important;background:#08172d!important;box-shadow:0 10px 24px #000b,0 0 0 1px #07152d,0 0 9px #c49a4b22!important;pointer-events:auto!important}
+#projectModalFront>.project-card:before{content:""!important;position:absolute!important;inset:3px!important;z-index:4!important;border:1px solid #f2d89a99!important;border-radius:10px 14px 8px 12px!important;pointer-events:none!important}
+#projectModalFront .project-card-image-wrap{position:absolute!important;inset:1px!important;overflow:hidden!important}
+#projectModalFront .project-card-image{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;filter:none!important;transform:none!important}
+#projectModalFront .project-card-finish{display:block!important;visibility:visible!important;opacity:1!important}
+#projectModalFront .project-card-validation-stamp{z-index:7!important}
+#projectModalCard .project-modal-back{position:absolute!important;inset:0!important;display:flex!important;flex-direction:column!important;min-height:0!important;height:100%!important;box-sizing:border-box!important;padding:17px 16px 22px!important;overflow:hidden!important;isolation:isolate!important;color:#f5f3ed!important;background:transparent!important;pointer-events:auto!important}
+#projectModalCard .project-modal-back:after{content:none!important;display:none!important}
+#projectModalCard .project-modal-back-art{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:cover!important;object-position:center!important;transform:scaleX(-1)!important;opacity:.22!important;filter:saturate(.82) contrast(1.08)!important;pointer-events:none!important;z-index:0!important}
+#projectModalCard .project-modal-back>*:not(.project-modal-back-art){position:relative;z-index:1}
+#projectModalCard .project-modal-back h2{flex:0 0 auto!important;margin:12px 25px 16px!important;color:#f0d58a!important;text-align:center!important;font:700 clamp(20px,3vw,30px)/1.2 Georgia,serif!important}
+#projectModalCard .project-modal-back .project-modal-content{display:block!important;flex:1 1 0!important;min-height:0!important;height:0!important;overflow-y:auto!important;overflow-x:hidden!important;padding:0 0 52px!important;box-sizing:border-box!important;font:14px/1.65 Arial,sans-serif!important;overscroll-behavior:contain!important;scrollbar-width:thin!important;scrollbar-color:#c99b45 #07152d!important}
+#projectModalCard .project-modal-content img{max-width:100%;height:auto}
+#projectModalCard .project-vote-panel{position:absolute!important;right:14px!important;bottom:12px!important;left:auto!important;top:auto!important;z-index:5!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;justify-content:flex-end!important;align-items:center!important;gap:5px!important;width:max-content!important;max-width:calc(100% - 32px)!important;margin:0!important;padding:0!important}
+#projectModalCard .project-vote-panel .project-vote-button{flex:0 0 auto!important;min-width:36px!important;min-height:34px!important;padding:4px 8px!important}
+#projectModalCard .project-vote-panel .project-vote-message{flex:0 1 auto!important;min-width:0!important;margin:0 3px 0 0!important;text-align:right!important;white-space:nowrap!important;font:italic 10px/1.2 Arial,sans-serif!important}
+#projectModalCard #inspirationShareButton{position:absolute!important;left:15px!important;bottom:12px!important;z-index:20!important}
+#projectModalCard #inspirationShareStatus{position:absolute!important;left:15px!important;bottom:54px!important;z-index:21!important}
+#projectModalCard #projectModalContent{padding-bottom:52px!important}
+#projectModalCard #inspirationSocialChooser{pointer-events:auto!important}
+#projectModalCard .project-modal-back button,#projectModalCard .project-modal-back a{pointer-events:auto!important}
+@media(max-width:620px){#projectModalCard .project-modal-back{padding:13px 12px 17px!important}#projectModalCard .project-modal-back h2{font-size:21px!important;margin:8px 16px 12px!important}#projectModalCard .project-modal-back .project-modal-content{font-size:12px!important;padding-bottom:46px!important}#projectModalCard .project-vote-panel{right:10px!important;bottom:9px!important;gap:4px!important}#projectModalCard .project-vote-panel .project-vote-button{min-width:33px!important;min-height:31px!important;padding:3px 7px!important}#projectModalCard .project-vote-panel .project-vote-message{font-size:9px!important}#projectModalCard #inspirationShareButton{left:10px!important;bottom:9px!important}#projectModalCard #inspirationShareStatus{left:10px!important;bottom:49px!important}}
+@media(prefers-reduced-motion:reduce){#projectModalCard{transition:width .01ms,height .01ms!important}#projectModalCard .project-modal-card-inner{transition:transform .01ms!important}}
 
 </style>
 </head>
