@@ -32,6 +32,43 @@
 
 <style>
 
+.content-photo-upload-row {
+    display:flex;
+    align-items:center;
+    gap:7px;
+}
+.content-photo-upload-row input[type="url"] {
+    flex:1;
+    min-width:0;
+}
+.content-photo-upload-button {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:38px;
+    min-width:38px;
+    height:38px;
+    margin:0;
+    padding:0;
+    border:1px solid rgba(214,173,85,.45);
+    border-radius:5px;
+    background:rgba(214,173,85,.08);
+    color:var(--gold-light,#f0d58a);
+    cursor:pointer;
+}
+.content-photo-upload-button:hover {
+    background:rgba(214,173,85,.18);
+    border-color:var(--gold-light,#f0d58a);
+}
+.content-photo-upload-button:disabled {
+    opacity:.55;
+    cursor:wait;
+}
+.content-photo-upload-button svg {
+    width:18px;
+    height:18px;
+}
+
 #contentProjectTab .project-layout {
     display:grid;
     grid-template-columns:320px minmax(0,1fr);
@@ -1930,11 +1967,28 @@
                             IMAGE
                         </label>
 
-                        <input
-                            type="url"
-                            id="contentPhotoUrl"
-                            placeholder="https://..."
-                        >
+                        <div class="content-photo-upload-row" id="contentPhotoUploadRow">
+                            <input
+                                type="url"
+                                id="contentPhotoUrl"
+                                placeholder="https://..."
+                            >
+                            <button
+                                type="button"
+                                id="uploadContentPhotoButton"
+                                class="content-photo-upload-button"
+                                title="Héberger une image sur Avant-gardE"
+                                aria-label="Héberger une image"
+                            >
+                                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 16V4"></path>
+                                    <path d="m7 9 5-5 5 5"></path>
+                                    <path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"></path>
+                                </svg>
+                            </button>
+                            <input type="file" id="contentPhotoFileInput" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+                        </div>
+                        <div class="help">Collez une URL ou importez une image avec l'icône.</div>
 
                     </div>
 
@@ -2837,7 +2891,7 @@
 
 <script
     type="module"
-    src="./js/admincontenus.js?v=inspiration-validation-fix-20261107"
+    src="./js/admincontenus.js?v=content-image-upload-20261110"
 ></script>
 
 
