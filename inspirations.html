@@ -877,7 +877,7 @@ function closeInspirationModal(){
  }
  activeInspirationCard=null;activeInspirationPlaceholder=null;activeInspirationStyle=null;activeInspirationSize=null;
  document.body.style.overflow="";
- clearPendingShare();
+ /* Aucun partage différé à annuler : le bouton est autonome. */
  shareStatus?.classList.remove("visible");
  if(refreshGridAfterClose){refreshGridAfterClose=false;render();}
 }
@@ -928,7 +928,7 @@ import {supabase} from "./js/supabase.js";
   const sessionResult=await supabase.auth.getSession();
   const connectedUser=sessionResult?.data?.session?.user||null;
   if(!connectedUser){if(statusNode){statusNode.textContent="Vous devez être connecté pour partager.";statusNode.classList.add("visible");}return;}
-  const sourceId=document.getElementById("projectModalContent")?.dataset.itemId;const source=sourceId&&activeInspirationCard&&String(activeInspirationCard.dataset.id)===String(sourceId)?activeInspirationCard:(sourceId?document.querySelector('#projectGrid .project-card[data-id="'+CSS.escape(String(sourceId))+'"]'):null);
+  const sourceId=document.getElementById("projectModalContent")?.dataset.itemId;const source=sourceId?document.querySelector("#projectModalFront > .project-card[data-id=\""+CSS.escape(String(sourceId))+"\"]"):null;
   if(!source||!document.getElementById("projectModal")?.classList.contains("open")){alert("Ouvre d’abord une carte Inspiration, puis relance le test.");return;}
   button.disabled=true;button.querySelector("span").textContent="Préparation de la vidéo…";
   let composition;
