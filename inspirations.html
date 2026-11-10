@@ -729,6 +729,110 @@
   }
 }
 
+
+/* Composition éditoriale du recto : citation en tête, image au centre,
+   références et signature en pied. */
+#projectGrid .project-card-image-wrap,
+#projectModalFront .project-card-image-wrap{
+  position:absolute!important;inset:0!important;z-index:0!important;
+}
+#projectGrid .project-card-image,
+#projectModalFront .project-card-image{
+  position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+  object-fit:cover!important;object-position:center!important;
+}
+#projectGrid .project-card:after,
+#projectModalFront:after{
+  content:""!important;position:absolute!important;inset:0!important;z-index:1!important;
+  pointer-events:none!important;
+  background:linear-gradient(180deg,
+    rgba(4,13,27,.82) 0%,
+    rgba(4,13,27,.62) 24%,
+    rgba(4,13,27,.08) 43%,
+    rgba(4,13,27,.02) 62%,
+    rgba(4,13,27,.48) 79%,
+    rgba(4,13,27,.88) 100%)!important;
+}
+#projectGrid .project-card-center,
+#projectModalFront .project-card-center{
+  inset:5% 5% 64% 5%!important;z-index:3!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  padding:20px 12px 4px!important;background:transparent!important;
+}
+#projectGrid .project-card-center:before,
+#projectModalFront .project-card-center:before{
+  top:-2px!important;left:50%!important;transform:translateX(-50%)!important;
+  font-size:clamp(43px,5vw,62px)!important;line-height:.72!important;
+  color:#ef4135!important;opacity:1!important;
+}
+#projectGrid .project-card-tagline,
+#projectModalFront .project-card-tagline{
+  padding:24px 0 0!important;max-width:100%!important;
+  color:#fff8e9!important;font-family:Georgia,"Times New Roman",serif!important;
+  font-style:italic!important;font-weight:500!important;
+  font-size:clamp(16px,1.65vw,23px)!important;line-height:1.24!important;
+  letter-spacing:0!important;text-align:center!important;
+  text-shadow:0 2px 5px rgba(0,0,0,.98),0 0 16px rgba(0,0,0,.9)!important;
+  -webkit-line-clamp:5!important;
+}
+#projectGrid .project-card-top,
+#projectModalFront .project-card-top{
+  top:auto!important;bottom:43px!important;left:0!important;right:0!important;
+  z-index:4!important;display:flex!important;justify-content:center!important;
+  padding:0 14px!important;
+}
+#projectGrid .project-card-title,
+#projectModalFront .project-card-title{
+  max-width:82%!important;margin:0 auto!important;padding:0!important;
+  border:0!important;color:rgba(245,243,237,.72)!important;
+  font:500 8px/1.35 Arial,Helvetica,sans-serif!important;
+  letter-spacing:1.8px!important;text-transform:uppercase!important;
+}
+#projectGrid .inspiration-card-brand,
+#projectModalFront .inspiration-card-brand{
+  bottom:12px!important;z-index:5!important;
+  font-size:14px!important;text-shadow:0 2px 7px rgba(0,0,0,.95)!important;
+}
+#projectGrid .inspiration-card-brand:before,
+#projectModalFront .inspiration-card-brand:before{
+  display:none!important;
+}
+#projectGrid .project-card-rating,
+#projectModalFront .project-card-rating{
+  top:auto!important;left:auto!important;right:5px!important;bottom:5px!important;
+  z-index:8!important;min-width:25px!important;min-height:25px!important;
+  padding:3px 5px!important;gap:3px!important;
+  border-radius:7px 0 0 0!important;border:1px solid rgba(240,213,138,.8)!important;
+  background:rgba(7,21,45,.92)!important;box-shadow:0 1px 7px rgba(0,0,0,.5)!important;
+}
+#projectGrid .project-card-rating .vote-symbol,
+#projectModalFront .project-card-rating .vote-symbol{font-size:11px!important}
+#projectGrid .project-card-rating strong,
+#projectModalFront .project-card-rating strong{font-size:9px!important}
+@media(max-width:900px){
+  #projectGrid .project-card-center{inset:5% 4% 64% 4%!important;padding:20px 9px 4px!important}
+  #projectGrid .project-card-tagline{font-size:clamp(14px,2vw,20px)!important}
+}
+@media(max-width:620px){
+  #projectGrid .project-card-center,
+  #projectModalFront .project-card-center{inset:5% 3% 65% 3%!important;padding:18px 7px 3px!important}
+  #projectGrid .project-card-center:before,
+  #projectModalFront .project-card-center:before{font-size:39px!important}
+  #projectGrid .project-card-tagline,
+  #projectModalFront .project-card-tagline{
+    padding-top:20px!important;font-size:clamp(12px,3.15vw,16px)!important;
+    line-height:1.2!important;-webkit-line-clamp:5!important;
+  }
+  #projectGrid .project-card-top,
+  #projectModalFront .project-card-top{bottom:39px!important;padding:0 9px!important}
+  #projectGrid .project-card-title,
+  #projectModalFront .project-card-title{font-size:7px!important;letter-spacing:1.35px!important}
+  #projectGrid .inspiration-card-brand,
+  #projectModalFront .inspiration-card-brand{bottom:11px!important;font-size:12px!important}
+  #projectGrid .project-card-rating,
+  #projectModalFront .project-card-rating{right:4px!important;bottom:4px!important;min-width:23px!important;min-height:23px!important}
+}
+
 </style>
 </head>
 <body>
