@@ -929,7 +929,7 @@ async function copyVersoText(userId){
  }
 }
 function downloadVideo(blob,title){
- const safe=(title||"inspiration").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration";
+ const safe=(title||"inspiration").normalize("NFD").replace(/\\p{M}/gu,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration";
  const url=URL.createObjectURL(blob),link=document.createElement("a");
  link.href=url;link.download="avantgarde-"+safe+".webm";document.body.appendChild(link);link.click();link.remove();
  setTimeout(()=>URL.revokeObjectURL(url),120000);
@@ -941,27 +941,31 @@ async function recordOriginalFront(stream){
  await new Promise((resolve,reject)=>{video.onloadedmetadata=resolve;video.onerror=()=>reject(new Error("Flux de capture illisible."))});
  await video.play();
  const wasFlipped=flip.classList.contains("is-flipped"),oldStage=modal.dataset.cardStage;
- flip.classList.remove("is-flipped");modal.classList.remove("is-flipped");modal.dataset.cardStage="RECTO_AGRANDI";
- await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
- const rect=source.getBoundingClientRect();
- if(!rect.width||!rect.height)throw new Error("Le recto agrandi n’est pas visible.");
- const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;
- const ctx=canvas.getContext("2d");if(!ctx)throw new Error("Cadrage vidéo indisponible.");
- const output=canvas.captureStream(30);
- const mime=["video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"].find(x=>MediaRecorder.isTypeSupported(x));
- if(!mime)throw new Error("Enregistrement WebM non pris en charge.");
- const recorder=new MediaRecorder(output,{mimeType:mime}),chunks=[];
- recorder.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};
- const sx=rect.left*video.videoWidth/window.innerWidth,sy=rect.top*video.videoHeight/window.innerHeight;
- const sw=rect.width*video.videoWidth/window.innerWidth,sh=rect.height*video.videoHeight/window.innerHeight;
- let raf=0;
- const draw=()=>{ctx.clearRect(0,0,1080,1350);ctx.drawImage(video,sx,sy,sw,sh,0,0,1080,1350);raf=requestAnimationFrame(draw)};
- const finished=new Promise((resolve,reject)=>{recorder.onstop=()=>resolve(new Blob(chunks,{type:mime}));recorder.onerror=()=>reject(new Error("Échec de l’enregistrement."))});
- draw();recorder.start(250);await new Promise(resolve=>setTimeout(resolve,6000));recorder.stop();
- const blob=await finished;cancelAnimationFrame(raf);output.getTracks().forEach(t=>t.stop());video.pause();video.srcObject=null;
- if(wasFlipped){flip.classList.add("is-flipped");modal.classList.add("is-flipped");modal.dataset.cardStage="VERSO"}else modal.dataset.cardStage=oldStage||"RECTO_AGRANDI";
- if(blob.size<10000)throw new Error("La vidéo capturée est vide.");
- return blob;
+ let output=null,raf=0;
+ try{
+  flip.classList.remove("is-flipped");modal.classList.remove("is-flipped");modal.dataset.cardStage="RECTO_AGRANDI";
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  const rect=source.getBoundingClientRect();
+  if(!rect.width||!rect.height)throw new Error("Le recto agrandi n’est pas visible.");
+  const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;
+  const ctx=canvas.getContext("2d");if(!ctx)throw new Error("Cadrage vidéo indisponible.");
+  output=canvas.captureStream(30);
+  const mime=["video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"].find(x=>MediaRecorder.isTypeSupported(x));
+  if(!mime)throw new Error("Enregistrement WebM non pris en charge.");
+  const recorder=new MediaRecorder(output,{mimeType:mime}),chunks=[];
+  recorder.ondataavailable=e=>{if(e.data?.size)chunks.push(e.data)};
+  const sx=rect.left*video.videoWidth/window.innerWidth,sy=rect.top*video.videoHeight/window.innerHeight;
+  const sw=rect.width*video.videoWidth/window.innerWidth,sh=rect.height*video.videoHeight/window.innerHeight;
+  const draw=()=>{ctx.clearRect(0,0,1080,1350);ctx.drawImage(video,sx,sy,sw,sh,0,0,1080,1350);raf=requestAnimationFrame(draw)};
+  const finished=new Promise((resolve,reject)=>{recorder.onstop=()=>resolve(new Blob(chunks,{type:mime}));recorder.onerror=()=>reject(new Error("Échec de l’enregistrement."))});
+  draw();recorder.start(250);await new Promise(resolve=>setTimeout(resolve,6000));recorder.stop();
+  const blob=await finished;
+  if(blob.size<10000)throw new Error("La vidéo capturée est vide.");
+  return blob;
+ }finally{
+  cancelAnimationFrame(raf);output?.getTracks().forEach(t=>t.stop());video.pause();video.srcObject=null;
+  if(wasFlipped){flip.classList.add("is-flipped");modal.classList.add("is-flipped");modal.dataset.cardStage="VERSO"}else modal.dataset.cardStage=oldStage||"RECTO_AGRANDI";
+ }
 }
 document.getElementById("inspirationSocialClose")?.addEventListener("click",()=>{socialChooser.hidden=true});
 socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)socialChooser.hidden=true});
@@ -970,8 +974,9 @@ button?.addEventListener("click",async()=>{
  let displayStream=null;const label=button.querySelector("span");
  try{
   if(!navigator.mediaDevices?.getDisplayMedia)throw new Error("La capture d’onglet nécessite un navigateur compatible et une page HTTPS.");
-  const displayRequest=navigator.mediaDevices.getDisplayMedia({video:{frameRate:30},audio:false});
   button.disabled=true;if(label)label.textContent="Sélectionne cet onglet…";
+  showShareStatus("Dans la fenêtre de partage, sélectionne l’onglet Avant-gardE pour conserver exactement le rendu de la carte.");
+  const displayRequest=navigator.mediaDevices.getDisplayMedia({video:{frameRate:30,displaySurface:"browser"},audio:false,preferCurrentTab:true});
   displayStream=await displayRequest;
   const session=await supabase.auth.getSession(),user=session?.data?.session?.user||null;
   if(!user)throw new Error("Vous devez être connecté pour partager.");
