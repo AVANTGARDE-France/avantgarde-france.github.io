@@ -823,7 +823,7 @@ import {supabase} from "./js/supabase.js";
 const grid=document.getElementById("projectGrid"),filters=document.getElementById("projectFilters"),sort=document.getElementById("projectSort"),search=document.getElementById("projectSearch"),voteFilter=document.getElementById("projectVoteFilter"),voteFilterWrap=document.getElementById("projectVoteFilterWrap");
 let menus=[],subs=[],items=[],active="all",activeSub="all",searchTerm="",currentUser=null,voteStats=new Map(),myVotes=new Map();
 const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const styleUppercase=v=>esc(v).replace(/\p{Lu}/gu,letter=>'<span class="inspiration-cap">'+letter+'</span>');
+const styleUppercase=v=>esc(v).replace(/\p{Lu}{2,}/gu,run=>'<span class="inspiration-cap">'+run+'</span>');
 function parent(item){const sub=subs.find(x=>String(x.id)===String(item.sous_menu_id));return menus.find(x=>sub&&String(x.id)===String(sub.menu_id))}
 function popularity(id){return voteStats.get(String(id))||{pouces_positifs:0,pouces_negatifs:0,votes_neutres:0,votes_exprimes:0,popularite:0}}
 function voteIcon(v){return v===1?'<span class="project-card-validation-stamp positive" title="Votre évaluation : favorable" aria-label="Votre évaluation : favorable">👍</span>':v===0?'<span class="project-card-validation-stamp neutral" title="Votre évaluation : neutre" aria-label="Votre évaluation : neutre">✋🏻</span>':v===-1?'<span class="project-card-validation-stamp negative" title="Votre évaluation : défavorable" aria-label="Votre évaluation : défavorable">👎</span>':""}
@@ -981,7 +981,16 @@ import {supabase} from "./js/supabase.js";
      if(/^\s+$/.test(part)){tagline.appendChild(document.createTextNode(part));continue;}
      const word=document.createElement("span");
      word.className="project-card-word";
-     for(const character of part){if(/\p{Lu}/u.test(character)){const cap=document.createElement("span");cap.className="inspiration-cap";cap.textContent=character;word.appendChild(cap);}else{word.appendChild(document.createTextNode(character));}}
+     const chars=Array.from(part);
+     for(let i=0;i<chars.length;){
+      if(/\p{Lu}/u.test(chars[i])){
+       let j=i+1;while(j<chars.length&&/\p{Lu}/u.test(chars[j]))j++;
+       const run=chars.slice(i,j).join("");
+       if(run.length>=2){const cap=document.createElement("span");cap.className="inspiration-cap";cap.textContent=run;word.appendChild(cap);}
+       else word.appendChild(document.createTextNode(run));
+       i=j;
+      }else{word.appendChild(document.createTextNode(chars[i]));i++;}
+     }
      tagline.appendChild(word);
     }
    }
