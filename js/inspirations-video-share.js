@@ -109,8 +109,29 @@ async function fetchYouTubeAssets(youtubeUrl, onProgress) {
   onProgress("Téléchargement du flux vidéo " + (videoFormat.label || "MP4") + "…");
   const videoResponse = await fetchStage(mp4Url, undefined, "Téléchargement du MP4 GenDownload");
   if (!videoResponse.ok) throw new Error("Récupération vidéo impossible (HTTP " + videoResponse.status + ").");
-  const videoBlob = await videoResponse.blob();
+  let videoBlob;
+  if (videoResponse.body?.getReader) {
+    const reader = videoResponse.body.getReader();
+    const chunks = [];
+    let received = 0;
+    const total = Number(videoResponse.headers.get("content-length")) || 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      received += value.byteLength;
+      const mb = (received / 1048576).toFixed(1);
+      const totalText = total ? " / " + (total / 1048576).toFixed(1) + " Mo" : "";
+      const percent = total ? " (" + Math.floor(received / total * 100) + " %)" : "";
+      onProgress("Téléchargement MP4 : " + mb + totalText + percent + " — patientez, cela peut prendre 3 à 10 minutes…");
+    }
+    videoBlob = new Blob(chunks, { type: videoResponse.headers.get("content-type") || "video/mp4" });
+  } else {
+    onProgress("Téléchargement MP4 en cours — patientez, cela peut prendre 3 à 10 minutes…");
+    videoBlob = await videoResponse.blob();
+  }
   if (!videoBlob.size) throw new Error("Le fichier vidéo reçu est vide.");
+  onProgress("MP4 téléchargé (" + (videoBlob.size / 1048576).toFixed(1) + " Mo). Préparation de l'habillage…");
 
   let audioBlob = null;
   if (audioFormat) {
