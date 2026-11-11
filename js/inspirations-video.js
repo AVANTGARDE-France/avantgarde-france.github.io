@@ -125,7 +125,7 @@
       if (host === "youtu.be") id = url.pathname.split("/").filter(Boolean)[0] || "";
       else if (host.includes("youtube")) id = url.searchParams.get("v") || (url.pathname.match(/\/(?:embed|shorts|live)\/([^/?]+)/) || [])[1] || "";
       if (id && /^[a-zA-Z0-9_-]{6,}$/.test(id))
-        return {provider:"youtube",src:"https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id)+"?autoplay=0&mute=0&playsinline=1&controls=1&cc_load_policy=0&loop=1&playlist="+encodeURIComponent(id)};
+        return {provider:"youtube",src:"https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id)+"?autoplay=1&mute=0&playsinline=1&controls=1&cc_load_policy=0&loop=1&playlist="+encodeURIComponent(id)};
       if (host === "vimeo.com" || host === "player.vimeo.com") {
         id = (url.pathname.match(/\/(?:video\/)?(\d+)/) || [])[1] || "";
         if (id) { const hash=url.searchParams.get("h")||""; return {provider:"vimeo",src:"https://player.vimeo.com/video/"+id+(hash?"?h="+encodeURIComponent(hash)+"&":"?")+"autoplay=1&muted=0&loop=1&controls=1&cc_load_policy=0"}; }
