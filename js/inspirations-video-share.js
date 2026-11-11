@@ -89,7 +89,8 @@ export async function prepareYouTubeDownload(youtubeUrl, onProgress = () => {}) 
 }
 
 export async function generateVideoShare({ source, mediaUrl, sourceFile = null, onProgress = () => {} }) {
-  if (!source || !mediaUrl) throw new Error("Carte ou URL source introuvable.");\n  if (sourceFile && !(sourceFile instanceof File)) throw new Error("Fichier vidéo local invalide.");
+  if (!source || !mediaUrl) throw new Error("Carte ou URL source introuvable.");
+  if (sourceFile && !(sourceFile instanceof File)) throw new Error("Fichier vidéo local invalide.");
   if (!("VideoEncoder" in window) || !("OffscreenCanvas" in window)) {
     throw new Error("L'export MP4 nécessite un navigateur Chromium récent (WebCodecs), comme Edge ou Chrome.");
   }
