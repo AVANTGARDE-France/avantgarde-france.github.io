@@ -93,8 +93,21 @@ async function fetchYouTubeAssets(youtubeUrl, onProgress) {
   const audioFormat = audios[0] || null;
   const streamUrl = value => new URL(value, "https://gendownload.com").href;
 
+  const mp4Url = streamUrl(videoFormat.url);
+  console.info("[GenDownload diagnostic] Format MP4 sélectionné", {
+    label: videoFormat.label || "MP4",
+    ext: videoFormat.ext,
+    url: mp4Url,
+    format: videoFormat
+  });
+  onProgress("Lien MP4 reçu. Test direct possible via la fenêtre qui va s'afficher…");
+  // Diagnostic manuel ciblé : permet de copier l'URL signée et de l'ouvrir
+  // dans un onglet indépendant pour distinguer CORS et refus du serveur.
+  try {
+    window.prompt("URL MP4 fournie par GenDownload (copiez-la pour l'ouvrir dans un nouvel onglet et tester l'accès direct) :", mp4Url);
+  } catch (_) {}
   onProgress("Téléchargement du flux vidéo " + (videoFormat.label || "MP4") + "…");
-  const videoResponse = await fetchStage(streamUrl(videoFormat.url), undefined, "Téléchargement du MP4 GenDownload");
+  const videoResponse = await fetchStage(mp4Url, undefined, "Téléchargement du MP4 GenDownload");
   if (!videoResponse.ok) throw new Error("Récupération vidéo impossible (HTTP " + videoResponse.status + ").");
   const videoBlob = await videoResponse.blob();
   if (!videoBlob.size) throw new Error("Le fichier vidéo reçu est vide.");
