@@ -1,8 +1,9 @@
 /* ==========================================================================
    AVANT-GARDE — INSPIRATIONS VIDEO SHARE
-   Export MP4 vidéo intégrale + audio avec WebMotion.
-   Module appelé uniquement pour les cartes dont la source est un fichier vidéo.
-   Le moteur photo/GIF et le parcours de partage existant restent séparés.
+   Module autonome de test : MP4 direct OU YouTube via GenDownload.
+   Les fichiers sont traités en mémoire dans le navigateur, sans Supabase.
+   Utiliser uniquement des vidéos que l'utilisateur possède ou est autorisé
+   à télécharger.
    ========================================================================== */
 const FPS = 30;
 const WIDTH = 1080;
@@ -10,12 +11,28 @@ const HEIGHT = 1350;
 const WEBMOTION = "https://esm.sh/@superhq/webmotion@0.18.2";
 const EXTRACT_API = "https://gendownload.com/api/extract";
 
+function isYouTubeUrl(value) {
+  try {
+    const host = new URL(value).hostname.replace(/^www\./i, "").toLowerCase();
+    return host === "youtube.com" || host === "m.youtube.com" || host === "youtu.be";
+  } catch (_) {
+    return false;
+  }
+}
+
+function isDirectVideo(value) {
+  try {
+    return /\.(mp4|m4v)(?:$|[?#])/i.test(new URL(value, document.baseURI).href);
+  } catch (_) {
+    return false;
+  }
+}
+
 function waitForMetadata(url) {
   return new Promise((resolve, reject) => {
     const video = document.createElement("video");
     video.preload = "metadata";
     video.crossOrigin = "anonymous";
-    video.muted = true;
     const cleanup = () => {
       video.removeEventListener("loadedmetadata", loaded);
       video.removeEventListener("error", failed);
@@ -23,34 +40,22 @@ function waitForMetadata(url) {
       video.load();
     };
     const loaded = () => {
-      const duration = video.duration;
-      const width = video.videoWidth;
-      const height = video.videoHeight;
+      const result = { duration: video.duration, width: video.videoWidth, height: video.videoHeight };
       cleanup();
-      if (!Number.isFinite(duration) || duration <= 0 || !width || !height) {
+      if (!Number.isFinite(result.duration) || result.duration <= 0 || !result.width || !result.height) {
         reject(new Error("Durée ou dimensions de la vidéo source indisponibles."));
-        return;
-      }
-      resolve({ duration, width, height });
+      } else resolve(result);
     };
     const failed = () => {
-      const error = video.error;
+      const code = video.error?.code;
       cleanup();
-      reject(new Error("La vidéo source ne peut pas être chargée. Vérifie son URL et les autorisations CORS de son hébergement." + (error?.message ? " " + error.message : "")));
+      reject(new Error("Le fichier vidéo récupéré ne peut pas être décodé (erreur média " + (code || "inconnue") + ")."));
     };
     video.addEventListener("loadedmetadata", loaded, { once: true });
     video.addEventListener("error", failed, { once: true });
     video.src = url;
     video.load();
   });
-}
-
-function isDirectVideo(url) {
-  try {
-    return /\.(mp4|m4v)(?:$|[?#])/i.test(new URL(url, document.baseURI).href);
-  } catch (_) {
-    return false;
-  }
 }
 
 async function fetchYouTubeAssets(youtubeUrl, onProgress) {
@@ -62,79 +67,86 @@ async function fetchYouTubeAssets(youtubeUrl, onProgress) {
   });
   if (!response.ok) throw new Error("GenDownload a répondu HTTP " + response.status + ".");
   const data = await response.json();
-  if (!Array.isArray(data.formats)) throw new Error(data.error || "GenDownload n'a retourné aucun format vidéo exploitable.");
+  if (!Array.isArray(data.formats)) {
+    throw new Error(data.error || data.message || "GenDownload n'a retourné aucun format vidéo.");
+  }
 
-  const videos = data.formats.filter(f => f && f.type === "video" && String(f.ext).toLowerCase() === "mp4" && f.url);
-  const audios = data.formats.filter(f => f && f.type === "audio" && ["m4a","mp4","aac"].includes(String(f.ext).toLowerCase()) && f.url);
-  if (!videos.length) throw new Error("GenDownload n'a proposé aucun flux vidéo MP4.");
-  if (!audios.length) throw new Error("GenDownload n'a proposé aucune piste audio séparée compatible. Aucun MP4 final ne sera créé sans vérifier la présence du son.");
+  const videos = data.formats.filter(f => f?.type === "video" && String(f.ext).toLowerCase() === "mp4" && f.url);
+  const audios = data.formats.filter(f => f?.type === "audio" && ["m4a", "mp4", "aac"].includes(String(f.ext).toLowerCase()) && f.url);
+  if (!videos.length) throw new Error("Aucun flux vidéo MP4 proposé par GenDownload.");
+  if (!audios.length) throw new Error("Aucune piste audio séparée compatible proposée. Arrêt pour éviter un export silencieux.");
 
-  const quality = f => Number((String(f.label || "").match(/(\\d{3,4})p?/i) || [])[1] || 0);
-  videos.sort((a,b) => quality(b) - quality(a));
+  const quality = f => Number((String(f.label || "").match(/(\d{3,4})p?/i) || [])[1] || 0);
+  videos.sort((a, b) => quality(b) - quality(a));
   const videoFormat = videos[0];
   const audioFormat = audios[0];
+  const streamUrl = value => new URL(value, "https://gendownload.com").href;
 
-  const resolveStream = value => new URL(value, "https://gendownload.com").href;
-  onProgress("Récupération du flux vidéo " + (videoFormat.label || "MP4") + "…");
-  const [videoResponse, audioResponse] = await Promise.all([
-    fetch(resolveStream(videoFormat.url)),
-    fetch(resolveStream(audioFormat.url))
-  ]);
-  if (!videoResponse.ok) throw new Error("Impossible de récupérer le flux vidéo (HTTP " + videoResponse.status + ").");
-  if (!audioResponse.ok) throw new Error("Impossible de récupérer le flux audio (HTTP " + audioResponse.status + ").");
-  const [videoBlob, audioBlob] = await Promise.all([videoResponse.blob(), audioResponse.blob()]);
-  if (!videoBlob.size || !audioBlob.size) throw new Error("GenDownload a renvoyé un fichier vide.");
-  if (!videoBlob.type.includes("video") && videoBlob.size < 10000) throw new Error("Le flux vidéo reçu n'est pas un fichier exploitable.");
-  return { videoBlob, audioBlob, title: data.title || "inspiration", duration: Number(data.duration) || 0 };
+  onProgress("Téléchargement du flux vidéo " + (videoFormat.label || "MP4") + "…");
+  const videoResponse = await fetch(streamUrl(videoFormat.url));
+  if (!videoResponse.ok) throw new Error("Récupération vidéo impossible (HTTP " + videoResponse.status + ").");
+  const videoBlob = await videoResponse.blob();
+  if (!videoBlob.size) throw new Error("Le fichier vidéo reçu est vide.");
+
+  onProgress("Téléchargement de la piste audio…");
+  const audioResponse = await fetch(streamUrl(audioFormat.url));
+  if (!audioResponse.ok) throw new Error("Récupération audio impossible (HTTP " + audioResponse.status + ").");
+  const audioBlob = await audioResponse.blob();
+  if (!audioBlob.size) throw new Error("Le fichier audio reçu est vide.");
+
+  return { videoBlob, audioBlob, title: data.title || "inspiration" };
 }
 
 export async function generateVideoShare({ source, mediaUrl, onProgress = () => {} }) {
-  if (!source || !mediaUrl) throw new Error("Source vidéo introuvable.");
+  if (!source || !mediaUrl) throw new Error("Carte ou URL source introuvable.");
   if (!("VideoEncoder" in window) || !("OffscreenCanvas" in window)) {
-    throw new Error("L’export MP4 WebMotion nécessite un navigateur Chromium récent (WebCodecs).");
+    throw new Error("L'export MP4 nécessite un navigateur Chromium récent (WebCodecs), comme Edge ou Chrome.");
   }
 
-  let videoBlob = null;
-  let audioBlob = null;
-  let videoSource = mediaUrl;
-  let audioSource = null;
   let videoObjectUrl = null;
   let audioObjectUrl = null;
+  let composition = null;
+  let originalParent = null;
+  let originalNext = null;
+  let originalStyle = null;
+  let originalClass = null;
+  let mediaWrap = null;
+  let originalMediaStyle = null;
 
   try {
-    if (/^(https?:\\/\\/)?(www\\.)?(youtube\\.com|youtu\\.be)\\//i.test(mediaUrl)) {
+    let videoSource = mediaUrl;
+    let audioSource = null;
+
+    if (isYouTubeUrl(mediaUrl)) {
       const assets = await fetchYouTubeAssets(mediaUrl, onProgress);
-      videoBlob = assets.videoBlob;
-      audioBlob = assets.audioBlob;
-      videoObjectUrl = URL.createObjectURL(videoBlob);
-      audioObjectUrl = URL.createObjectURL(audioBlob);
+      videoObjectUrl = URL.createObjectURL(assets.videoBlob);
+      audioObjectUrl = URL.createObjectURL(assets.audioBlob);
       videoSource = videoObjectUrl;
       audioSource = audioObjectUrl;
     } else if (!isDirectVideo(mediaUrl)) {
       throw new Error("La source doit être une URL YouTube ou un fichier MP4 direct.");
     }
 
-    onProgress("Analyse du fichier vidéo…");
+    onProgress("Analyse de la vidéo récupérée…");
     const metadata = await waitForMetadata(videoSource);
     const durationFrames = Math.max(1, Math.ceil(metadata.duration * FPS));
 
+    onProgress("Chargement du moteur WebMotion…");
     await Promise.all([
       import(WEBMOTION + "/elements?bundle"),
       import(WEBMOTION + "/video?bundle")
     ]);
 
-  const rect = source.getBoundingClientRect();
-  if (!rect.width || !rect.height) throw new Error("Le recto agrandi est introuvable.");
+    const rect = source.getBoundingClientRect();
+    if (!rect.width || !rect.height) throw new Error("Le recto agrandi de la carte est introuvable.");
 
-  const originalParent = source.parentNode;
-  const originalNext = source.nextSibling;
-  const originalStyle = source.getAttribute("style");
-  const originalClass = source.getAttribute("class");
-  const mediaWrap = source.querySelector(".project-card-image-wrap");
-  const originalMediaStyle = mediaWrap?.getAttribute("style") ?? null;
-  let composition = null;
+    originalParent = source.parentNode;
+    originalNext = source.nextSibling;
+    originalStyle = source.getAttribute("style");
+    originalClass = source.getAttribute("class");
+    mediaWrap = source.querySelector(".project-card-image-wrap");
+    originalMediaStyle = mediaWrap?.getAttribute("style") ?? null;
 
-  try {
     onProgress("Préparation de la composition vidéo…");
     composition = document.createElement("w-composition");
     composition.setAttribute("width", String(WIDTH));
@@ -150,8 +162,16 @@ export async function generateVideoShare({ source, mediaUrl, onProgress = () => 
     videoLayer.setAttribute("width", String(WIDTH));
     videoLayer.setAttribute("height", String(HEIGHT));
     videoLayer.setAttribute("fit", "cover");
-    videoLayer.setAttribute("volume", audioSource ? "0" : "1");\n    if (audioSource) videoLayer.setAttribute("muted", "");\n    composition.appendChild(videoLayer);\n\n    if (audioSource) {\n      const audioLayer = document.createElement("w-audio");\n      audioLayer.setAttribute("src", audioSource);\n      audioLayer.setAttribute("gain", "1");\n      composition.appendChild(audioLayer);\n    }
+    if (audioSource) videoLayer.setAttribute("muted", "");
+    else videoLayer.setAttribute("volume", "1");
     composition.appendChild(videoLayer);
+
+    if (audioSource) {
+      const audioLayer = document.createElement("w-audio");
+      audioLayer.setAttribute("src", audioSource);
+      audioLayer.setAttribute("gain", "1");
+      composition.appendChild(audioLayer);
+    }
 
     const overlay = document.createElement("w-el");
     overlay.setAttribute("x", "0");
@@ -172,8 +192,6 @@ export async function generateVideoShare({ source, mediaUrl, onProgress = () => 
     source.style.setProperty("transform-origin", "top left", "important");
     source.style.setProperty("margin", "0", "important");
 
-    // La vidéo source est fournie par w-video, sous l’habillage HTML existant.
-    // Masquer seulement l’ancienne couche média évite un doublon de l’image/lecteur.
     if (mediaWrap) mediaWrap.style.setProperty("visibility", "hidden", "important");
     overlay.appendChild(source);
     composition.appendChild(overlay);
@@ -181,19 +199,18 @@ export async function generateVideoShare({ source, mediaUrl, onProgress = () => 
 
     await composition.ready;
     if (document.fonts?.ready) await document.fonts.ready;
-
     onProgress("Vérification du décodage vidéo et audio…");
-    // Le moteur WebMotion attend que son décodeur vidéo ait préparé la source.
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-    onProgress("Création vidéo 0 %…");
+    onProgress("Création du MP4 0 %…");
     const blob = await composition.export({
       onProgress: ({ frame, total }) => {
-        onProgress("Création vidéo " + Math.min(100, Math.round(frame / total * 100)) + " %…");
+        const percent = total ? Math.min(100, Math.round(frame / total * 100)) : 0;
+        onProgress("Création du MP4 " + percent + " %…");
       }
     });
     if (!(blob instanceof Blob) || blob.size < 10000) {
-      throw new Error("WebMotion n’a pas produit de vidéo MP4 exploitable.");
+      throw new Error("WebMotion n'a pas produit de MP4 exploitable.");
     }
     return blob;
   } finally {
@@ -202,13 +219,17 @@ export async function generateVideoShare({ source, mediaUrl, onProgress = () => 
       if (originalNext && originalNext.parentNode === originalParent) originalParent.insertBefore(source, originalNext);
       else originalParent.appendChild(source);
     }
-    if (originalStyle === null) source.removeAttribute("style");
-    else source.setAttribute("style", originalStyle);
-    if (originalClass === null) source.removeAttribute("class");
-    else source.setAttribute("class", originalClass);
+    if (source) {
+      if (originalStyle === null) source.removeAttribute("style");
+      else source.setAttribute("style", originalStyle);
+      if (originalClass === null) source.removeAttribute("class");
+      else source.setAttribute("class", originalClass);
+    }
     if (mediaWrap) {
       if (originalMediaStyle === null) mediaWrap.removeAttribute("style");
       else mediaWrap.setAttribute("style", originalMediaStyle);
     }
+    if (videoObjectUrl) URL.revokeObjectURL(videoObjectUrl);
+    if (audioObjectUrl) URL.revokeObjectURL(audioObjectUrl);
   }
 }
