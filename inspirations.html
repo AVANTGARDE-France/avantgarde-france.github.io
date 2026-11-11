@@ -1020,7 +1020,7 @@ button?.addEventListener("click",async()=>{
   const animationIssues=[];
   for(const img of imgs){
    const url=img.currentSrc||img.src;if(!url)continue;
-   const extension=(new URL(url,location.href).pathname.match(/\\.([a-z0-9]+)$/i)||[])[1]?.toLowerCase()||"";
+   const extension=(new URL(url,location.href).pathname.match(/\.([a-z0-9]+)$/i)||[])[1]?.toLowerCase()||"";
    let response;
    try{response=await fetch(url,{mode:"cors",credentials:"omit"})}
    catch(error){if(["gif","apng","webp"].includes(extension))animationIssues.push("Image animée inaccessible (CORS) : "+new URL(url,location.href).hostname);continue}
