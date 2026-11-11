@@ -885,7 +885,12 @@ function openInspirationCard(cardElement){
  front.setAttribute("aria-label","Recto agrandi. Touchez la carte pour la retourner.");
  cardElement.style.cssText+=";position:absolute!important;inset:0 auto auto 0!important;width:"+rect.width+"px!important;height:"+rect.height+"px!important;min-width:0!important;max-width:none!important;aspect-ratio:4/5!important;margin:0!important;box-sizing:border-box!important;pointer-events:auto!important";
  const sourceImage=cardElement.querySelector(".project-card-image");
- const imageUrl=sourceImage?.currentSrc||sourceImage?.src||sourceImage?.getAttribute("src")||"";
+ const mediaWrap=cardElement.querySelector(".project-card-image-wrap");
+ const isVideoElement=sourceImage?.tagName==="VIDEO";
+ const posterImage=mediaWrap?.querySelector(".inspiration-platform-poster-image");
+ const imageUrl=isVideoElement
+  ? (sourceImage.getAttribute("poster")||posterImage?.currentSrc||posterImage?.src||"")
+  : (sourceImage?.currentSrc||sourceImage?.src||sourceImage?.getAttribute("src")||"");
  let backArt=back.querySelector(".project-modal-back-art");
  if(!backArt){backArt=document.createElement("img");backArt.className="project-modal-back-art";backArt.alt="";backArt.setAttribute("aria-hidden","true");back.insertBefore(backArt,back.firstChild)}
  backArt.src=imageUrl;backArt.style.display=imageUrl?"block":"none";
@@ -1101,6 +1106,6 @@ button?.addEventListener("click",async()=>{
  }
 });
 </script>
-<script type="module" src="js/inspirations-video.js?v=20261111-6"></script>
+<script type="module" src="js/inspirations-video.js?v=20261111-7"></script>
 </body>
 </html>
