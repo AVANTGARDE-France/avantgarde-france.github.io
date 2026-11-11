@@ -1065,7 +1065,7 @@ button?.addEventListener("click",async()=>{
     animationIssues.push("Décodage de l’image animée impossible : "+(error?.message||type));
    }
   }
-  if(animationIssues.length&&!animatedCount)throw new Error("Le GIF du recto ne peut pas être animé dans cette vidéo. Vérifie que son hébergement autorise le chargement depuis le site (CORS). "+animationIssues[0]);
+  if(animationIssues.length)throw new Error("Une image animée du recto ne peut pas être animée dans cette vidéo. Vérifie que son hébergement autorise le chargement depuis le site (CORS). "+animationIssues[0]);
   const renderFrame=composition.renderFrameAt.bind(composition);
   composition.renderFrameAt=frame=>{for(const draw of animatedLayers)draw(frame);renderFrame(frame)};
   if(label)label.textContent="Création vidéo 0 %…";
