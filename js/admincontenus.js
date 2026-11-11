@@ -46,7 +46,7 @@ let currentProfile = null;
 
 let messageTimer = null;
 let contentMode = 'project';
-let modeSelector = null;
+let modeToggle = null;
 function tableName(base) { return contentMode === 'inspiration' ? ({menus:'inspiration_menus',sous_menus:'inspiration_sous_menus',contenus:'inspiration_contenus'})[base] : base; }
 
 
@@ -5638,6 +5638,14 @@ function actualiserInterfaceMode() {
     if (panelIntro) panelIntro.textContent = intro;
     if (welcomeTitle) welcomeTitle.textContent = title.toUpperCase();
     if (treeTitle) treeTitle.textContent = inspiration ? "STRUCTURE DES INSPIRATIONS" : "STRUCTURE DU PROJET";
+    if (modeToggle) {
+        modeToggle.setAttribute("aria-pressed", inspiration ? "true" : "false");
+        modeToggle.querySelector(".content-mode-toggle-label").textContent =
+            inspiration ? "CONTENU D'INSPIRATION" : "CONTENU DU PROJET";
+        modeToggle.title = inspiration
+            ? "Basculer vers le contenu du projet"
+            : "Basculer vers le contenu d'inspiration";
+    }
     [cardPriorite, cardStat1, cardStat2, cardStat3, cardSynergies].forEach(element => {
         const group = element?.closest(".form-group");
         if (group) group.style.display = inspiration ? "none" : "";
@@ -5647,7 +5655,7 @@ async function changerModeContenu(nextMode) {
     if (!["project", "inspiration"].includes(nextMode) || nextMode === contentMode) return;
     if ((contentEditor?.style.display !== "none" || structureEditor?.style.display !== "none") &&
         !window.confirm("Le changement de bibliothèque fermera l'éditeur en cours. Les modifications non enregistrées seront perdues. Continuer ?")) {
-        modeSelector.value = contentMode; return;
+        actualiserInterfaceMode(); return;
     }
     contentMode = nextMode;
     selectedType = null; selectedId = null; editorType = null; editorId = null;
@@ -5657,12 +5665,13 @@ async function changerModeContenu(nextMode) {
     try { await chargerDonnees(); }
     catch (error) { showMessage("Impossible de charger cette bibliothèque : " + (error?.message || "erreur inconnue"), "error"); }
 }
-function initialiserSelecteurContenu() {
-    modeSelector = $("contentModeSelector");
-    if (!modeSelector || modeSelector.dataset.initialized === "true") return;
-    modeSelector.dataset.initialized = "true";
-    modeSelector.value = contentMode;
-    modeSelector.addEventListener("change", () => changerModeContenu(modeSelector.value));
+function initialiserBasculeContenu() {
+    modeToggle = $("contentModeToggle");
+    if (!modeToggle || modeToggle.dataset.initialized === "true") return;
+    modeToggle.dataset.initialized = "true";
+    modeToggle.addEventListener("click", () => {
+        changerModeContenu(contentMode === "project" ? "inspiration" : "project");
+    });
     actualiserInterfaceMode();
 }
 /* =========================================================
@@ -5689,7 +5698,7 @@ function verifierStructureDOM() {
 async function initialiser() {
 
     verifierStructureDOM();
-    initialiserSelecteurContenu();
+    initialiserBasculeContenu();
 
 
     /*
