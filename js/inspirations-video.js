@@ -129,7 +129,36 @@
     return video;
   }
 
+  function convertMediaWrapper(wrap) {
+    const url = wrap.dataset.inspirationMediaUrl || "";
+    if (!isVideoUrl(url) || wrap.querySelector("video.inspiration-video")) return null;
+
+    const video = document.createElement("video");
+    video.className = "project-card-image inspiration-video";
+    video.setAttribute("aria-hidden", "true");
+    video.setAttribute("playsinline", "");
+    video.setAttribute("webkit-playsinline", "");
+    video.setAttribute("muted", "");
+    video.muted = true;
+    video.defaultMuted = true;
+    video.controls = false;
+    video.disablePictureInPicture = true;
+    video.preload = "none";
+    video.loop = false;
+    video.autoplay = false;
+    video.dataset.inspirationVideo = "true";
+    video.dataset.inspirationVideoSrc = url;
+    video.dataset.inspirationVideoMode = "preview";
+    video.dataset.inspirationPreviewActive = "false";
+    attachVideoEvents(video);
+    wrap.appendChild(video);
+    intersectionObserver.observe(video);
+    return video;
+  }
+
   function scan(root = document) {
+    if (root.matches?.(".project-card-image-wrap[data-inspiration-media-url]")) convertMediaWrapper(root);
+    root.querySelectorAll?.(".project-card-image-wrap[data-inspiration-media-url]").forEach(convertMediaWrapper);
     if (root.matches?.("img.project-card-image")) convertImageToVideo(root);
     root.querySelectorAll?.("img.project-card-image").forEach(convertImageToVideo);
     root.querySelectorAll?.("video.inspiration-video").forEach(video => {
