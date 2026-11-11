@@ -17,7 +17,7 @@
   const previewTimers = new WeakMap();
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const videoStyle = document.createElement("style");
-  videoStyle.textContent = ".project-card-image.inspiration-video{object-fit:cover;opacity:0;transition:opacity .18s ease}.project-card-image.inspiration-video[data-inspiration-ready='true']{opacity:1}";
+  videoStyle.textContent = ".project-card-image.inspiration-video{object-fit:cover;opacity:0;transition:opacity .18s ease}.project-card-image.inspiration-video[data-inspiration-ready='true']{opacity:1}.project-card-image-wrap.inspiration-platform-poster iframe.inspiration-platform-player{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:0;background:#07152d}";
   document.head.appendChild(videoStyle);
 
   const intersectionObserver = new IntersectionObserver((entries) => {
@@ -37,14 +37,41 @@
     threshold: [0, 0.05, 0.15, 0.3, 0.5, 0.75, 1]
   });
 
-  function isVideoUrl(value) {
-    if (!value) return false;
+  function mediaType(value) {
+    if (!value) return null;
     try {
       const url = new URL(value, document.baseURI);
-      return VIDEO_EXTENSIONS.test(url.pathname);
+      const host = url.hostname.toLowerCase().replace(/^www\\./, "");
+      if (host === "youtu.be" || host.includes("youtube")) return "youtube";
+      if (host === "vimeo.com" || host === "player.vimeo.com") return "vimeo";
+      if (host === "dailymotion.com" || host === "dai.ly" || host === "geo.dailymotion.com") return "dailymotion";
+      if (VIDEO_EXTENSIONS.test(url.pathname)) return "file";
     } catch (_) {
-      return VIDEO_EXTENSIONS.test(String(value).split(/[?#]/)[0]);
+      if (VIDEO_EXTENSIONS.test(String(value).split(/[?#]/)[0])) return "file";
     }
+    return null;
+  }
+  function isVideoUrl(value) { return mediaType(value) === "file"; }
+  function platformEmbed(value) {
+    try {
+      const url = new URL(value, document.baseURI);
+      const host = url.hostname.toLowerCase().replace(/^www\\./, "");
+      let id = "";
+      if (host === "youtu.be") id = url.pathname.split("/").filter(Boolean)[0] || "";
+      else if (host.includes("youtube")) id = url.searchParams.get("v") || (url.pathname.match(/\\/(?:embed|shorts|live)\\/([^/?]+)/) || [])[1] || "";
+      if (id && /^[a-zA-Z0-9_-]{6,}$/.test(id))
+        return {provider:"youtube",src:"https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id)+"?autoplay=1&mute=1&playsinline=1&controls=1&loop=1&playlist="+encodeURIComponent(id)};
+      if (host === "vimeo.com" || host === "player.vimeo.com") {
+        id = (url.pathname.match(/\\/(?:video\\/)?(\\d+)/) || [])[1] || "";
+        if (id) { const hash=url.searchParams.get("h")||""; return {provider:"vimeo",src:"https://player.vimeo.com/video/"+id+(hash?"?h="+encodeURIComponent(hash)+"&":"?")+"autoplay=1&muted=1&loop=1"}; }
+      }
+      if (host === "dai.ly" || host.includes("dailymotion.com")) {
+        id = (url.pathname.match(/\\/(?:video|embed/video)\\/([a-zA-Z0-9]+)/) || [])[1] || "";
+        if (!id && host === "dai.ly") id=url.pathname.split("/").filter(Boolean)[0]||"";
+        if (id) return {provider:"dailymotion",src:"https://www.dailymotion.com/embed/video/"+encodeURIComponent(id)+"?autoplay=1&mute=1&queue-enable=false"};
+      }
+    } catch (_) {}
+    return null;
   }
 
   function sourceOf(video) {
@@ -142,7 +169,9 @@
 
   function convertMediaWrapper(wrap) {
     const url = wrap.dataset.inspirationMediaUrl || "";
-    if (!isVideoUrl(url) || wrap.querySelector("video.inspiration-video")) return null;
+    const type = mediaType(url);
+    if (!type || wrap.querySelector("video.inspiration-video, iframe.inspiration-platform-player")) return null;
+    if (type !== "file") { wrap.dataset.inspirationPlatform = type; wrap.classList.add("inspiration-platform-poster"); return null; }
 
     const video = document.createElement("video");
     video.className = "project-card-image inspiration-video";
@@ -265,21 +294,38 @@
   }
 
   function syncModalVideo() {
-    const video = MODAL_FRONT.querySelector("video.inspiration-video");
+    const stage = MODAL.dataset.cardStage;
+    const mediaWrap = MODAL_FRONT.querySelector(".project-card-image-wrap[data-inspiration-media-url]");
+    const video = mediaWrap?.querySelector("video.inspiration-video");
+    const platform = mediaWrap?.dataset.inspirationPlatform;
+    const expanded = stage === "RECTO_AGRANDI";
+    if (mediaWrap && platform && expanded) {
+      let frame = mediaWrap.querySelector("iframe.inspiration-platform-player");
+      if (!frame) {
+        const embed = platformEmbed(mediaWrap.dataset.inspirationMediaUrl);
+        if (embed) {
+          frame = document.createElement("iframe");
+          frame.className = "inspiration-platform-player";
+          frame.title = "Lecteur " + embed.provider;
+          frame.src = embed.src;
+          frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+          frame.allowFullscreen = true;
+          frame.loading = "eager";
+          frame.referrerPolicy = "strict-origin-when-cross-origin";
+          mediaWrap.appendChild(frame);
+        }
+      }
+    } else if (mediaWrap) mediaWrap.querySelector("iframe.inspiration-platform-player")?.remove();
+
     if (!video) {
       document.querySelectorAll("video.inspiration-video").forEach(v => {
-        if (inGrid(v)) {
-          v.dataset.inspirationVideoMode = "preview";
-          v.loop = false;
-        }
+        if (inGrid(v)) { v.dataset.inspirationVideoMode = "preview"; v.loop = false; }
       });
       selectVisiblePreview();
       return;
     }
-
-    if (MODAL.dataset.cardStage === "RECTO_AGRANDI") {
-      showFullVideo(video);
-    } else {
+    if (expanded) showFullVideo(video);
+    else {
       clearPreviewTimer(video);
       video.pause();
       video.dataset.inspirationPreviewActive = "false";
