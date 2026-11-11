@@ -17,7 +17,7 @@
   const previewTimers = new WeakMap();
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const videoStyle = document.createElement("style");
-  videoStyle.textContent = ".project-card-image.inspiration-video{object-fit:cover;opacity:0;transition:opacity .18s ease}.project-card-image.inspiration-video[data-inspiration-ready='true']{opacity:1}.project-card-image-wrap.inspiration-platform-poster{position:relative;background:linear-gradient(135deg,#07152d,#17345b)}.inspiration-platform-poster-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}.inspiration-platform-poster-image[data-poster-unavailable='true']{display:none}.project-card-image-wrap.inspiration-platform-poster iframe.inspiration-platform-player{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:2;background:#07152d}.project-card-image-wrap.inspiration-platform-expanded .inspiration-platform-poster-image{display:none}";
+  videoStyle.textContent = ".project-card-image.inspiration-video{object-fit:cover;opacity:0;transition:opacity .18s ease}.project-card-image.inspiration-video[data-inspiration-ready='true']{opacity:1}.project-card-image-wrap.inspiration-platform-poster{position:relative;background:linear-gradient(135deg,#07152d,#17345b)}.inspiration-platform-poster-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}.inspiration-platform-poster-image[data-poster-unavailable='true']{display:none}.project-card-image-wrap.inspiration-platform-poster iframe.inspiration-platform-player{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:2;background:#07152d}.project-card-image-wrap.inspiration-platform-expanded .inspiration-platform-poster-image{display:block}";
   document.head.appendChild(videoStyle);
 
   const intersectionObserver = new IntersectionObserver((entries) => {
@@ -367,26 +367,10 @@
     const stage = MODAL.dataset.cardStage;
     const mediaWrap = MODAL_FRONT.querySelector(".project-card-image-wrap[data-inspiration-media-url]");
     const video = mediaWrap?.querySelector("video.inspiration-video");
-    const platform = mediaWrap?.dataset.inspirationPlatform;
-    const expanded = stage === "RECTO_AGRANDI";
-    if (mediaWrap && platform && expanded) {
-      let frame = mediaWrap.querySelector("iframe.inspiration-platform-player");
-      if (!frame) {
-        const embed = platformEmbed(mediaWrap.dataset.inspirationMediaUrl);
-        if (embed) {
-          frame = document.createElement("iframe");
-          frame.className = "inspiration-platform-player";
-          frame.title = "Lecteur " + embed.provider;
-          frame.src = embed.src;
-          frame.allow = "encrypted-media; picture-in-picture; fullscreen";
-          frame.allowFullscreen = true;
-          frame.loading = "lazy";
-          frame.referrerPolicy = "strict-origin-when-cross-origin";
-          mediaWrap.classList.add("inspiration-platform-expanded");
-          mediaWrap.appendChild(frame);
-        }
-      }
-    } else if (mediaWrap) {
+
+    // Platform-hosted embeds are deliberately disabled while investigating browser freezes.
+    // Keep the poster visible in both card sizes; never create a third-party iframe.
+    if (mediaWrap) {
       mediaWrap.querySelector("iframe.inspiration-platform-player")?.remove();
       mediaWrap.classList.remove("inspiration-platform-expanded");
     }
@@ -398,7 +382,7 @@
       selectVisiblePreview();
       return;
     }
-    if (expanded) showFullVideo(video);
+    if (stage === "RECTO_AGRANDI") showFullVideo(video);
     else {
       clearPreviewTimer(video);
       video.pause();
