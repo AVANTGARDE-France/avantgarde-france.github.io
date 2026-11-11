@@ -938,7 +938,7 @@ button?.addEventListener("click",async()=>{
  if(!user){status("Vous devez être connecté pour partager.");return}
  busy=true;button.disabled=true;const label=button.querySelector("span");
  let composition=null,parent=null,next=null,sourceStyle=null,sourceClass=null;
- const decoders=[],bitmaps=[],replacements=[];
+ const decoders=[],bitmaps=[],replacements=[],animatedLayers=[];
  try{
   if(typeof ImageDecoder==="undefined")throw new Error("Ce navigateur ne prend pas en charge ImageDecoder pour l’animation du fond.");
   if(label)label.textContent="Préparation du recto agrandi…";
