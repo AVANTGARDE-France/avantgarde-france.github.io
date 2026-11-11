@@ -974,7 +974,7 @@ function versoText(){
 }
 function download(blob,title){
  const name=(title||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration";
- const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="avantgarde-"+name+".webm";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);
+ const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="avantgarde-"+name+".mp4";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);
 }
 button?.addEventListener("click",async()=>{
  if(busy)return;
@@ -1057,6 +1057,8 @@ button?.addEventListener("click",async()=>{
      while(index<durations.length-1&&elapsed+durations[index]<=time){elapsed+=durations[index];index++}
      ctx.clearRect(0,0,canvas.width,canvas.height);
      ctx.drawImage(frames[index],0,0,canvas.width,canvas.height);
+     // Invalide le cache DOM de WebMotion : les pixels du canvas changent à chaque frame.
+     canvas.setAttribute("data-wm-frame",String(frame));
     };
     draw(0);animatedLayers.push(draw);animatedCount++;
    }catch(error){
@@ -1073,7 +1075,7 @@ button?.addEventListener("click",async()=>{
   if(!(blob instanceof Blob)||blob.size<10000)throw new Error("WebMotion n’a pas produit de vidéo exploitable.");
   download(blob,document.getElementById("projectModalTitle")?.textContent?.trim()||"inspiration");
   let copied=false;try{await navigator.clipboard.writeText(versoText());copied=true}catch(_){}
-  status(copied?"Vidéo animée de 10 secondes téléchargée ; texte du verso copié.":"Vidéo téléchargée ; copie du texte du verso impossible.");
+  status(copied?"Vidéo MP4 animée de 10 secondes téléchargée ; texte du verso copié.":"Vidéo MP4 téléchargée ; copie du texte du verso impossible.");
   if(socialChooser)socialChooser.hidden=false;
   if(label)label.textContent="Partager";
  }catch(error){console.error("Export du recto agrandi WebMotion",error);status(error?.message||"Impossible de créer la vidéo.");if(label)label.textContent="Réessayer"}
