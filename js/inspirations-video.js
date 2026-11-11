@@ -376,15 +376,36 @@
   function syncModalVideo() {
     const stage = MODAL.dataset.cardStage;
     const mediaWrap = MODAL_FRONT.querySelector(".project-card-image-wrap[data-inspiration-media-url]");
-    const video = mediaWrap?.querySelector("video.inspiration-video");
-
-    // Platform-hosted embeds are deliberately disabled while investigating browser freezes.
-    // Keep the poster visible in both card sizes; never create a third-party iframe.
     if (mediaWrap) {
-      mediaWrap.querySelector("iframe.inspiration-platform-player")?.remove();
+      const url = mediaWrap.dataset.inspirationMediaUrl || "";
+      const type = mediaWrap.dataset.inspirationPlatform || mediaType(url);
+      const existingFrame = mediaWrap.querySelector("iframe.inspiration-platform-player");
+
+      // Keep the poster only during the small-card and enlargement stages.
+      // Mount the third-party player only after the historical enlargement finishes.
+      if (stage === "RECTO_AGRANDI" && type && type !== "file") {
+        const embed = platformEmbed(url);
+        if (embed && (!existingFrame || existingFrame.dataset.embedSrc !== embed.src)) {
+          existingFrame?.remove();
+          const frame = document.createElement("iframe");
+          frame.className = "inspiration-platform-player";
+          frame.dataset.embedSrc = embed.src;
+          frame.src = embed.src;
+          frame.title = "Lecteur vidéo " + embed.provider;
+          frame.loading = "eager";
+          frame.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+          frame.allowFullscreen = true;
+          frame.referrerPolicy = "strict-origin-when-cross-origin";
+          mediaWrap.appendChild(frame);
+        }
+        mediaWrap.classList.add("inspiration-platform-expanded");
+        return;
+      }
+      existingFrame?.remove();
       mediaWrap.classList.remove("inspiration-platform-expanded");
     }
 
+    const video = mediaWrap?.querySelector("video.inspiration-video");
     if (!video) {
       document.querySelectorAll("video.inspiration-video").forEach(v => {
         if (inGrid(v)) { v.dataset.inspirationVideoMode = "preview"; v.loop = false; }
@@ -394,7 +415,7 @@
     }
     if (stage === "RECTO_AGRANDI") showFullVideo(video);
     else {
-      if (video) delete video.dataset.inspirationFullPlayAttempted;
+      delete video.dataset.inspirationFullPlayAttempted;
       clearPreviewTimer(video);
       video.pause();
       video.dataset.inspirationPreviewActive = "false";
