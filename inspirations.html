@@ -1004,7 +1004,7 @@ button?.addEventListener("click",async()=>{
   if(videoUrl){
    const directFile=/\.(mp4|m4v)(?:$|[?#])/i.test(videoUrl);
    if(!directFile)throw new Error("Pour partager une vidéo YouTube, il faut son fichier vidéo original MP4. Le lecteur intégré ne donne pas accès au flux complet pour l’export.");
-   const videoShare=await import("./js/inspirations-video-share.js");
+   const videoShare=await import("./js/inspirations-video-share.js?v=20261111-1");
    const blob=await videoShare.generateVideoShare({
     source,
     mediaUrl:videoUrl,
