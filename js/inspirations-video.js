@@ -284,8 +284,6 @@
     if (video.getAttribute("src") !== url) {
       video.src = url;
       video.load();
-    } else if (video.readyState === 0 && preload !== "none") {
-      video.load();
     }
   }
 
@@ -357,8 +355,11 @@
     video.preload = "auto";
     video.controls = false;
     ensureSource(video, "auto");
+    if (video.dataset.inspirationFullPlayAttempted === "true") return;
     const play = () => {
       if (!inModal(video) || MODAL.dataset.cardStage !== "RECTO_AGRANDI") return;
+      if (video.dataset.inspirationFullPlayAttempted === "true") return;
+      video.dataset.inspirationFullPlayAttempted = "true";
       // The card-opening click may no longer count as a media gesture after async loading.
       // Try audible playback; if the browser blocks it, expose native controls for one explicit tap.
       video.play().then(() => {
@@ -393,6 +394,7 @@
     }
     if (stage === "RECTO_AGRANDI") showFullVideo(video);
     else {
+      if (video) delete video.dataset.inspirationFullPlayAttempted;
       clearPreviewTimer(video);
       video.pause();
       video.dataset.inspirationPreviewActive = "false";
