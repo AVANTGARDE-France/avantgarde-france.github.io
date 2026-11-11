@@ -125,7 +125,7 @@
       if (host === "youtu.be") id = url.pathname.split("/").filter(Boolean)[0] || "";
       else if (host.includes("youtube")) id = url.searchParams.get("v") || (url.pathname.match(/\/(?:embed|shorts|live)\/([^/?]+)/) || [])[1] || "";
       if (id && /^[a-zA-Z0-9_-]{6,}$/.test(id))
-        return {provider:"youtube",src:"https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id)+"?autoplay=1&mute=1&playsinline=1&controls=0&loop=1&playlist="+encodeURIComponent(id)};
+        return {provider:"youtube",src:"https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id)+"?autoplay=0&mute=1&playsinline=1&controls=1&loop=1&playlist="+encodeURIComponent(id)};
       if (host === "vimeo.com" || host === "player.vimeo.com") {
         id = (url.pathname.match(/\/(?:video\/)?(\d+)/) || [])[1] || "";
         if (id) { const hash=url.searchParams.get("h")||""; return {provider:"vimeo",src:"https://player.vimeo.com/video/"+id+(hash?"?h="+encodeURIComponent(hash)+"&":"?")+"autoplay=1&muted=1&loop=1"}; }
@@ -133,7 +133,7 @@
       if (host === "dai.ly" || host.includes("dailymotion.com")) {
         id = (url.pathname.match(/\/(?:video\/|embed\/video\/)([a-zA-Z0-9]+)/) || [])[1] || "";
         if (!id && host === "dai.ly") id=url.pathname.split("/").filter(Boolean)[0]||"";
-        if (id) return {provider:"dailymotion",src:"https://www.dailymotion.com/embed/video/"+encodeURIComponent(id)+"?autoplay=1&mute=1&queue-enable=false"};
+        if (id) return {provider:"dailymotion",src:"https://www.dailymotion.com/embed/video/"+encodeURIComponent(id)+"?autoplay=0&mute=1&queue-enable=false"};
       }
     } catch (_) {}
     return null;
@@ -378,9 +378,9 @@
           frame.className = "inspiration-platform-player";
           frame.title = "Lecteur " + embed.provider;
           frame.src = embed.src;
-          frame.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+          frame.allow = "encrypted-media; picture-in-picture; fullscreen";
           frame.allowFullscreen = true;
-          frame.loading = "eager";
+          frame.loading = "lazy";
           frame.referrerPolicy = "strict-origin-when-cross-origin";
           mediaWrap.classList.add("inspiration-platform-expanded");
           mediaWrap.appendChild(frame);
