@@ -926,7 +926,7 @@ button?.addEventListener("click",async()=>{
  if(!auth?.data?.session?.user){status("Vous devez être connecté pour partager.");return}
  busy=true;button.disabled=true;const label=button.querySelector("span");
  let composition=null,originalParent=null,originalNext=null,originalStyle=null,originalClass=null,rating=null,ratingParent=null,ratingNext=null;
- const decoders=[],bitmaps=[],animatedLayers=[];
+ const decoders=[],bitmaps=[],animatedLayers=[],replacedImages=[];
  try{
   if(typeof ImageDecoder==="undefined")throw new Error("Ce navigateur ne prend pas en charge le décodage des images animées.");
   if(label)label.textContent="Préparation WebMotion…";
@@ -971,7 +971,7 @@ button?.addEventListener("click",async()=>{
     for(const index of indexes){const decoded=await decoder.decode({frameIndex:index});const bitmap=await createImageBitmap(decoded.image);frames.push(bitmap);const duration=decoded.image.duration||100000;durations.push(duration);total+=duration;decoded.image.close()}
     bitmaps.push(...frames);
     const canvas=document.createElement("canvas");canvas.className=img.className;canvas.width=img.naturalWidth||frames[0].width;canvas.height=img.naturalHeight||frames[0].height;canvas.alt=img.alt||"";
-    img.replaceWith(canvas);
+    img.replaceWith(canvas);replacedImages.push({img,canvas});
     const ctx=canvas.getContext("2d",{alpha:false});if(!ctx)throw new Error("Canvas d’animation indisponible.");
     const drawFrame=frame=>{const time=((frame/30)*1000000)%total;let elapsed=0,index=0;while(index<durations.length-1&&elapsed+durations[index]<=time){elapsed+=durations[index];index++}ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(frames[index],0,0,canvas.width,canvas.height)};
     drawFrame(0);animatedLayers.push(drawFrame);
@@ -991,6 +991,7 @@ button?.addEventListener("click",async()=>{
  finally{
   for(const decoder of decoders){try{decoder.close()}catch{}}
   for(const bitmap of bitmaps){try{bitmap.close()}catch{}}
+  for(const pair of replacedImages.reverse()){if(pair.canvas.parentNode)pair.canvas.replaceWith(pair.img)}
   composition?.remove();
   if(originalParent&&front.parentNode!==originalParent){if(originalNext&&originalNext.parentNode===originalParent)originalParent.insertBefore(front,originalNext);else originalParent.appendChild(front)}
   if(originalStyle===null)front.removeAttribute("style");else front.setAttribute("style",originalStyle);
