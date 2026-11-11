@@ -349,15 +349,24 @@
     });
     video.dataset.inspirationVideoMode = "full";
     video.dataset.inspirationPreviewActive = "false";
-    video.muted = true;
-    video.defaultMuted = true;
+    // In full view restore sound; small previews remain muted.
+    video.muted = false;
+    video.defaultMuted = false;
+    video.removeAttribute("muted");
     video.loop = true;
     video.preload = "auto";
+    video.controls = false;
     ensureSource(video, "auto");
     const play = () => {
-      if (inModal(video) && MODAL.dataset.cardStage === "RECTO_AGRANDI") {
-        video.play().catch(error => console.warn("[Inspirations vidéo] Lecture agrandie refusée :", error));
-      }
+      if (!inModal(video) || MODAL.dataset.cardStage !== "RECTO_AGRANDI") return;
+      // The card-opening click may no longer count as a media gesture after async loading.
+      // Try audible playback; if the browser blocks it, expose native controls for one explicit tap.
+      video.play().then(() => {
+        video.controls = false;
+      }).catch(error => {
+        video.controls = true;
+        console.info("[Inspirations vidéo] Le navigateur demande un clic pour autoriser le son.", error);
+      });
     };
     if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) play();
     else video.addEventListener("canplay", play, { once: true });
