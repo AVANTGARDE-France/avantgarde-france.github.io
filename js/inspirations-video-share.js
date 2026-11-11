@@ -8,6 +8,7 @@ const FPS = 30;
 const WIDTH = 1080;
 const HEIGHT = 1350;
 const WEBMOTION = "https://esm.sh/@superhq/webmotion@0.18.2";
+const EXTRACT_API = "https://gendownload.com/api/extract";
 
 function waitForMetadata(url) {
   return new Promise((resolve, reject) => {
@@ -52,21 +53,75 @@ function isDirectVideo(url) {
   }
 }
 
+async function fetchYouTubeAssets(youtubeUrl, onProgress) {
+  onProgress("Demande d'extraction à GenDownload…");
+  const response = await fetch(EXTRACT_API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+    body: JSON.stringify({ url: youtubeUrl })
+  });
+  if (!response.ok) throw new Error("GenDownload a répondu HTTP " + response.status + ".");
+  const data = await response.json();
+  if (!Array.isArray(data.formats)) throw new Error(data.error || "GenDownload n'a retourné aucun format vidéo exploitable.");
+
+  const videos = data.formats.filter(f => f && f.type === "video" && String(f.ext).toLowerCase() === "mp4" && f.url);
+  const audios = data.formats.filter(f => f && f.type === "audio" && ["m4a","mp4","aac"].includes(String(f.ext).toLowerCase()) && f.url);
+  if (!videos.length) throw new Error("GenDownload n'a proposé aucun flux vidéo MP4.");
+  if (!audios.length) throw new Error("GenDownload n'a proposé aucune piste audio séparée compatible. Aucun MP4 final ne sera créé sans vérifier la présence du son.");
+
+  const quality = f => Number((String(f.label || "").match(/(\\d{3,4})p?/i) || [])[1] || 0);
+  videos.sort((a,b) => quality(b) - quality(a));
+  const videoFormat = videos[0];
+  const audioFormat = audios[0];
+
+  const resolveStream = value => new URL(value, "https://gendownload.com").href;
+  onProgress("Récupération du flux vidéo " + (videoFormat.label || "MP4") + "…");
+  const [videoResponse, audioResponse] = await Promise.all([
+    fetch(resolveStream(videoFormat.url)),
+    fetch(resolveStream(audioFormat.url))
+  ]);
+  if (!videoResponse.ok) throw new Error("Impossible de récupérer le flux vidéo (HTTP " + videoResponse.status + ").");
+  if (!audioResponse.ok) throw new Error("Impossible de récupérer le flux audio (HTTP " + audioResponse.status + ").");
+  const [videoBlob, audioBlob] = await Promise.all([videoResponse.blob(), audioResponse.blob()]);
+  if (!videoBlob.size || !audioBlob.size) throw new Error("GenDownload a renvoyé un fichier vide.");
+  if (!videoBlob.type.includes("video") && videoBlob.size < 10000) throw new Error("Le flux vidéo reçu n'est pas un fichier exploitable.");
+  return { videoBlob, audioBlob, title: data.title || "inspiration", duration: Number(data.duration) || 0 };
+}
+
 export async function generateVideoShare({ source, mediaUrl, onProgress = () => {} }) {
   if (!source || !mediaUrl) throw new Error("Source vidéo introuvable.");
-  if (!isDirectVideo(mediaUrl)) {
-    throw new Error("Pour exporter une carte YouTube, il faut disposer du fichier vidéo MP4 original. Le lecteur YouTube intégré ne donne pas accès au flux vidéo complet pour un export WebMotion.");
-  }
   if (!("VideoEncoder" in window) || !("OffscreenCanvas" in window)) {
     throw new Error("L’export MP4 WebMotion nécessite un navigateur Chromium récent (WebCodecs).");
   }
 
-  onProgress("Analyse de la vidéo source…");
-  const metadata = await waitForMetadata(mediaUrl);
-  const durationFrames = Math.max(1, Math.ceil(metadata.duration * FPS));
+  let videoBlob = null;
+  let audioBlob = null;
+  let videoSource = mediaUrl;
+  let audioSource = null;
+  let videoObjectUrl = null;
+  let audioObjectUrl = null;
 
-  await import(WEBMOTION + "/elements");
-  await import(WEBMOTION + "/video");
+  try {
+    if (/^(https?:\\/\\/)?(www\\.)?(youtube\\.com|youtu\\.be)\\//i.test(mediaUrl)) {
+      const assets = await fetchYouTubeAssets(mediaUrl, onProgress);
+      videoBlob = assets.videoBlob;
+      audioBlob = assets.audioBlob;
+      videoObjectUrl = URL.createObjectURL(videoBlob);
+      audioObjectUrl = URL.createObjectURL(audioBlob);
+      videoSource = videoObjectUrl;
+      audioSource = audioObjectUrl;
+    } else if (!isDirectVideo(mediaUrl)) {
+      throw new Error("La source doit être une URL YouTube ou un fichier MP4 direct.");
+    }
+
+    onProgress("Analyse du fichier vidéo…");
+    const metadata = await waitForMetadata(videoSource);
+    const durationFrames = Math.max(1, Math.ceil(metadata.duration * FPS));
+
+    await Promise.all([
+      import(WEBMOTION + "/elements?bundle"),
+      import(WEBMOTION + "/video?bundle")
+    ]);
 
   const rect = source.getBoundingClientRect();
   if (!rect.width || !rect.height) throw new Error("Le recto agrandi est introuvable.");
@@ -89,13 +144,13 @@ export async function generateVideoShare({ source, mediaUrl, onProgress = () => 
     composition.style.cssText = "position:fixed;left:-30000px;top:0;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
 
     const videoLayer = document.createElement("w-video");
-    videoLayer.setAttribute("src", mediaUrl);
+    videoLayer.setAttribute("src", videoSource);
     videoLayer.setAttribute("x", "0");
     videoLayer.setAttribute("y", "0");
     videoLayer.setAttribute("width", String(WIDTH));
     videoLayer.setAttribute("height", String(HEIGHT));
     videoLayer.setAttribute("fit", "cover");
-    videoLayer.setAttribute("volume", "1");
+    videoLayer.setAttribute("volume", audioSource ? "0" : "1");\n    if (audioSource) videoLayer.setAttribute("muted", "");\n    composition.appendChild(videoLayer);\n\n    if (audioSource) {\n      const audioLayer = document.createElement("w-audio");\n      audioLayer.setAttribute("src", audioSource);\n      audioLayer.setAttribute("gain", "1");\n      composition.appendChild(audioLayer);\n    }
     composition.appendChild(videoLayer);
 
     const overlay = document.createElement("w-el");
