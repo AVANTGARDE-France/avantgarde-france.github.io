@@ -16,6 +16,9 @@
   const visibility = new Map();
   const previewTimers = new WeakMap();
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const videoStyle = document.createElement("style");
+  videoStyle.textContent = ".project-card-image.inspiration-video{object-fit:cover;opacity:0;transition:opacity .18s ease}.project-card-image.inspiration-video[data-inspiration-ready='true']{opacity:1}";
+  document.head.appendChild(videoStyle);
 
   const intersectionObserver = new IntersectionObserver((entries) => {
     for (const entry of entries) {
@@ -81,6 +84,14 @@
         }, 180);
         previewTimers.set(video, timer);
       }
+    });
+
+    video.addEventListener("loadeddata", () => {
+      video.dataset.inspirationReady = "true";
+    });
+
+    video.addEventListener("emptied", () => {
+      delete video.dataset.inspirationReady;
     });
 
     video.addEventListener("ended", () => {
@@ -272,9 +283,7 @@
       clearPreviewTimer(video);
       video.pause();
       video.dataset.inspirationPreviewActive = "false";
-      if (MODAL.dataset.cardStage === "VERSO") {
-        try { video.currentTime = 0; } catch (_) {}
-      }
+      try { video.currentTime = 0; } catch (_) {}
     }
   }
 
