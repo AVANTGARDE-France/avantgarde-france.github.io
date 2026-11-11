@@ -939,7 +939,7 @@ grid.addEventListener("pointerout",e=>{const c=e.target.closest(".project-card")
 grid.addEventListener("click",e=>{const c=e.target.closest(".project-card");if(c)openInspirationCard(c)});
 const modalFront=document.getElementById("projectModalFront");
 function revealInspirationBack(){const flip=document.querySelector("#projectModalCard .project-modal-card-inner");if(!modal?.classList.contains("open")||modal.dataset.cardStage!=="RECTO_AGRANDI"||!flip)return;modal.dataset.cardStage="VERSO";flip.classList.add("is-flipped");modal.classList.add("is-flipped");modalFront?.setAttribute("aria-label","Verso de la carte.");}
-modalFront?.addEventListener("click",e=>{if(modal?.dataset.cardStage!=="RECTO_AGRANDI")return;if(e.target.closest("button,a,input,select,textarea,[contenteditable=true],iframe,.inspiration-platform-player"))return;e.preventDefault();e.stopPropagation();revealInspirationBack()});
+modalFront?.addEventListener("click",e=>{if(modal?.dataset.cardStage!=="RECTO_AGRANDI")return;if(e.target.closest("button,a,input,select,textarea,[contenteditable=true],iframe,.inspiration-platform-player,.project-card-image-wrap"))return;e.preventDefault();e.stopPropagation();revealInspirationBack()});
 
 modalFront?.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&!e.target.closest("button,a")){e.preventDefault();revealInspirationBack()}});
 grid.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("project-card")){e.preventDefault();openInspirationCard(e.target)}});
@@ -1106,6 +1106,6 @@ button?.addEventListener("click",async()=>{
  }
 });
 </script>
-<script type="module" src="js/inspirations-video.js?v=20261111-11"></script>
+<script type="module" src="js/inspirations-video.js?v=20261111-12"></script>
 </body>
 </html>
