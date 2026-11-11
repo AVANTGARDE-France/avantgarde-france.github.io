@@ -402,25 +402,26 @@
     }
   }
 
-  const mutationObserver = new MutationObserver(records => {
+  // The card is already initialized while it is in GRID.
+  // Do not rescan its subtree when openInspirationCard moves it into the modal:
+  // that transfer is presentation-only and must not trigger media conversion.
+  const gridObserver = new MutationObserver(records => {
     for (const record of records) {
-      if (record.type === "childList") {
-        record.addedNodes.forEach(node => {
-          if (node.nodeType === Node.ELEMENT_NODE) scan(node);
-        });
-      }
+      if (record.type !== "childList") continue;
+      record.addedNodes.forEach(node => {
+        if (node.nodeType === Node.ELEMENT_NODE) scan(node);
+      });
     }
-    syncModalVideo();
   });
 
-  mutationObserver.observe(GRID, { childList: true, subtree: true });
-  mutationObserver.observe(MODAL, {
-    childList: true,
-    subtree: true,
+  // Synchronize the player only when the modal state changes, never on card transfer.
+  const modalObserver = new MutationObserver(() => syncModalVideo());
+
+  gridObserver.observe(GRID, { childList: true, subtree: true });
+  modalObserver.observe(MODAL, {
     attributes: true,
     attributeFilter: ["class", "data-card-stage"]
   });
-  mutationObserver.observe(MODAL_FRONT, { childList: true, subtree: true });
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
