@@ -976,7 +976,7 @@ function versoText(referralId){
  const node=document.getElementById("projectModalContent");if(!node)throw new Error("Texte du verso introuvable.");
  const copy=node.cloneNode(true);copy.querySelectorAll("script,style,button,svg").forEach(x=>x.remove());
  const cardText=(copy.innerText||copy.textContent||"").replace(/\r/g,"").split("\n").map(x=>x.replace(/[\t ]+/g," ").trim()).filter(Boolean).join("\n");
- return cardText+"\n\nDeviens Avant-gadistE avec moi!\nMon code parrainage : "+referralId+"\nSi tu es curieux, viens sur notre site internet!";
+ return cardText+"\n\nDeviens Avant-gardistE avec moi!\nMon code parrainage : "+referralId+"\nSi tu es curieux, viens sur notre site internet!";
 }
 function download(blob,title){
  const name=(title||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration";
