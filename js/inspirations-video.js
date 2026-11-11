@@ -17,7 +17,7 @@
   const previewTimers = new WeakMap();
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const videoStyle = document.createElement("style");
-  videoStyle.textContent = ".project-card-image.inspiration-video{object-fit:cover;opacity:0;transition:opacity .18s ease}.project-card-image.inspiration-video[data-inspiration-ready='true']{opacity:1}.project-card-image-wrap.inspiration-platform-poster{position:relative;background:linear-gradient(135deg,#07152d,#17345b)}.inspiration-platform-poster-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}.inspiration-platform-poster-image[data-poster-unavailable='true']{display:none}.project-card-image-wrap.inspiration-platform-poster iframe.inspiration-platform-player{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:2;background:#07152d}.project-card-image-wrap.inspiration-platform-expanded .inspiration-platform-poster-image{display:block}";
+  videoStyle.textContent = ".project-card-image.inspiration-video{object-fit:cover;opacity:0;transition:opacity .18s ease}.project-card-image.inspiration-video[data-inspiration-ready='true']{opacity:1}.project-card-image-wrap.inspiration-platform-poster{position:relative;background:linear-gradient(135deg,#07152d,#17345b)}.inspiration-platform-poster-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}.inspiration-platform-poster-image[data-poster-unavailable='true']{display:none}.project-card-image-wrap.inspiration-platform-poster iframe.inspiration-platform-player{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:2;background:#07152d}.project-card-image-wrap.inspiration-platform-expanded .inspiration-platform-poster-image{display:block};pointer-events:none}.project-card-image-wrap.inspiration-platform-expanded iframe.inspiration-platform-player{z-index:5;pointer-events:auto}";
   document.head.appendChild(videoStyle);
 
   const intersectionObserver = new IntersectionObserver((entries) => {
@@ -125,7 +125,7 @@
       if (host === "youtu.be") id = url.pathname.split("/").filter(Boolean)[0] || "";
       else if (host.includes("youtube")) id = url.searchParams.get("v") || (url.pathname.match(/\/(?:embed|shorts|live)\/([^/?]+)/) || [])[1] || "";
       if (id && /^[a-zA-Z0-9_-]{6,}$/.test(id))
-        return {provider:"youtube",src:"https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id)+"?autoplay=1&mute=0&playsinline=1&controls=1&cc_load_policy=0&loop=1&playlist="+encodeURIComponent(id)};
+        return {provider:"youtube",src:"https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id)+"?autoplay=0&mute=0&playsinline=1&controls=1&cc_load_policy=0&loop=1&playlist="+encodeURIComponent(id)};
       if (host === "vimeo.com" || host === "player.vimeo.com") {
         id = (url.pathname.match(/\/(?:video\/)?(\d+)/) || [])[1] || "";
         if (id) { const hash=url.searchParams.get("h")||""; return {provider:"vimeo",src:"https://player.vimeo.com/video/"+id+(hash?"?h="+encodeURIComponent(hash)+"&":"?")+"autoplay=1&muted=0&loop=1&controls=1&cc_load_policy=0"}; }
