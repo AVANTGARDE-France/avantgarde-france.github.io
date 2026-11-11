@@ -11,6 +11,15 @@ const HEIGHT = 1350;
 const WEBMOTION = "https://esm.sh/@superhq/webmotion@0.18.2";
 const EXTRACT_API = "https://gendownload.com/api/extract";
 
+async function fetchStage(url, options, stage) {
+  try {
+    return await fetch(url, options);
+  } catch (error) {
+    const reason = error?.message || String(error);
+    throw new Error(stage + " : échec réseau/CORS (« " + reason + " »). Le navigateur n'a pas reçu de réponse exploitable.");
+  }
+}
+
 function isYouTubeUrl(value) {
   try {
     const host = new URL(value).hostname.replace(/^www\./i, "").toLowerCase();
@@ -60,7 +69,7 @@ function waitForMetadata(url) {
 
 async function fetchYouTubeAssets(youtubeUrl, onProgress) {
   onProgress("Demande d'extraction à GenDownload…");
-  const response = await fetch(EXTRACT_API, {
+  const response = await fetchStage(EXTRACT_API, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Accept": "application/json" },
     body: JSON.stringify({ url: youtubeUrl })
@@ -85,7 +94,7 @@ async function fetchYouTubeAssets(youtubeUrl, onProgress) {
   const streamUrl = value => new URL(value, "https://gendownload.com").href;
 
   onProgress("Téléchargement du flux vidéo " + (videoFormat.label || "MP4") + "…");
-  const videoResponse = await fetch(streamUrl(videoFormat.url));
+  const videoResponse = await fetchStage(streamUrl(videoFormat.url), undefined, "Téléchargement du MP4 GenDownload");
   if (!videoResponse.ok) throw new Error("Récupération vidéo impossible (HTTP " + videoResponse.status + ").");
   const videoBlob = await videoResponse.blob();
   if (!videoBlob.size) throw new Error("Le fichier vidéo reçu est vide.");
@@ -93,7 +102,7 @@ async function fetchYouTubeAssets(youtubeUrl, onProgress) {
   let audioBlob = null;
   if (audioFormat) {
     onProgress("Téléchargement de la piste audio séparée…");
-    const audioResponse = await fetch(streamUrl(audioFormat.url));
+    const audioResponse = await fetchStage(streamUrl(audioFormat.url), undefined, "Téléchargement de la piste audio GenDownload");
     if (!audioResponse.ok) throw new Error("Récupération audio impossible (HTTP " + audioResponse.status + ").");
     audioBlob = await audioResponse.blob();
     if (!audioBlob.size) throw new Error("Le fichier audio reçu est vide.");
