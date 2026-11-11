@@ -908,11 +908,10 @@ const statusNode=document.getElementById("inspirationShareStatus");
 let busy=false;
 function status(message){if(statusNode){statusNode.textContent=message;statusNode.classList.add("visible")}}
 function getVersoText(){
- const title=document.getElementById("projectModalTitle")?.textContent?.trim()||"";
  const node=document.getElementById("projectModalContent");
  if(!node)throw new Error("Texte du verso introuvable.");
  const copy=node.cloneNode(true);copy.querySelectorAll("script,style,button,svg").forEach(x=>x.remove());
- return [title,(copy.innerText||copy.textContent||"").trim()].filter(Boolean).join("\n\n");
+ return (copy.innerText||copy.textContent||"").replace(/\r/g,"").split("\n").map(x=>x.replace(/[\t ]+/g," ").trim()).filter(Boolean).join("\n");
 }
 function download(blob,title){
  const name=(title||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration";
@@ -921,53 +920,74 @@ function download(blob,title){
 }
 button?.addEventListener("click",async()=>{
  if(busy)return;
- const front=document.querySelector("#projectModalFront > .project-card");
- const modal=document.getElementById("projectModal");
+ const front=document.querySelector("#projectModalFront > .project-card"),modal=document.getElementById("projectModal");
  if(!front||!modal?.classList.contains("open")){status("Ouvre d’abord le recto d’une carte Inspiration.");return}
  const auth=await supabase.auth.getSession();
  if(!auth?.data?.session?.user){status("Vous devez être connecté pour partager.");return}
  busy=true;button.disabled=true;const label=button.querySelector("span");
- let composition=null,parent=null,next=null,originalStyle=null,originalClass=null;
+ let composition=null,originalParent=null,originalNext=null,originalStyle=null,originalClass=null,originalTagline=null,originalRatingStyle=null;
+ const decoders=[],canvases=[],gifBitmaps=[];
  try{
+  if(typeof ImageDecoder==="undefined")throw new Error("Ce navigateur ne prend pas en charge le décodage des GIF animés.");
   if(label)label.textContent="Préparation WebMotion…";
   await import("https://esm.sh/@superhq/webmotion@0.18.2/elements");
-  const rect=front.getBoundingClientRect();
-  if(!rect.width||!rect.height)throw new Error("Le recto agrandi n’est pas visible.");
-  parent=front.parentNode;next=front.nextSibling;originalStyle=front.getAttribute("style");originalClass=front.getAttribute("class");
+  const rect=front.getBoundingClientRect();if(!rect.width||!rect.height)throw new Error("Le recto agrandi n’est pas visible.");
+  originalParent=front.parentNode;originalNext=front.nextSibling;originalStyle=front.getAttribute("style");originalClass=front.getAttribute("class");
+  const rating=front.querySelector(".project-card-rating");if(rating)originalRatingStyle=rating.getAttribute("style");
+  const tagline=front.querySelector(".project-card-tagline");
+  if(tagline){
+   originalTagline=tagline.innerHTML;
+   const parts=(tagline.textContent||"").match(/\S+|\s+/g)||[];tagline.replaceChildren();
+   for(const part of parts){if(/^\s+$/.test(part)){tagline.appendChild(document.createTextNode(part));continue}const word=document.createElement("span");word.className="project-card-word";word.textContent=part;tagline.appendChild(word)}
+  }
   composition=document.createElement("w-composition");
-  composition.setAttribute("width","1080");composition.setAttribute("height","1350");
-  composition.setAttribute("fps","30");composition.setAttribute("duration","300");
-  composition.style.cssText="position:fixed;left:-20000px;top:0;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
-  const stage=document.createElement("w-el");
-  stage.setAttribute("x","0");stage.setAttribute("y","0");stage.setAttribute("width","1080");stage.setAttribute("height","1350");
-  stage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden";
-  const scale=Math.min(1080/rect.width,1350/rect.height);
-  const x=(1080-rect.width*scale)/2,y=(1350-rect.height*scale)/2;
-  front.style.setProperty("position","absolute","important");
-  front.style.setProperty("left",x+"px","important");front.style.setProperty("top",y+"px","important");
-  front.style.setProperty("width",rect.width+"px","important");front.style.setProperty("height",rect.height+"px","important");
-  front.style.setProperty("min-height",rect.height+"px","important");front.style.setProperty("transform","scale("+scale+")","important");
-  front.style.setProperty("transform-origin","top left","important");front.style.setProperty("margin","0","important");
-  stage.appendChild(front);composition.appendChild(stage);document.body.appendChild(composition);
-  await composition.ready;
-  if(document.fonts?.ready)await document.fonts.ready;
-  await Promise.all([...front.querySelectorAll("img")].map(img=>img.decode?.().catch(()=>{})||Promise.resolve()));
+  composition.setAttribute("width","1080");composition.setAttribute("height","1350");composition.setAttribute("fps","30");composition.setAttribute("duration","300");
+  composition.style.cssText="position:fixed!important;left:-20000px!important;top:0!important;width:1080px!important;height:1350px!important;overflow:hidden!important;pointer-events:none!important";
+  const stage=document.createElement("w-el");stage.className="project-grid";stage.setAttribute("x","0");stage.setAttribute("y","0");stage.setAttribute("width","1080");stage.setAttribute("height","1350");stage.style.cssText="display:block!important;position:relative!important;width:1080px!important;height:1350px!important;overflow:hidden!important";
+  const scale=1080/rect.width,wrapper=document.createElement("div");wrapper.className="project-card-export-wrapper";
+  wrapper.style.cssText="position:absolute!important;left:0!important;top:0!important;width:"+rect.width+"px!important;height:"+rect.height+"px!important;min-width:"+rect.width+"px!important;min-height:"+rect.height+"px!important;max-width:none!important;max-height:none!important;aspect-ratio:4/5!important;transform:scale("+scale+")!important;transform-origin:top left!important;margin:0!important;overflow:hidden!important";
+  front.style.setProperty("position","absolute","important");front.style.setProperty("inset","0","important");front.style.setProperty("width",rect.width+"px","important");front.style.setProperty("height",rect.height+"px","important");front.style.setProperty("min-height",rect.height+"px","important");front.style.setProperty("transform","none","important");front.style.setProperty("margin","0","important");front.style.setProperty("cursor","default","important");
+  if(rating)rating.style.setProperty("display","none","important");
+  wrapper.appendChild(front);stage.appendChild(wrapper);composition.appendChild(stage);originalParent.appendChild(composition);
+  await composition.ready;if(document.fonts?.ready)await document.fonts.ready;
+  await Promise.all([...front.querySelectorAll("img")].map(img=>img.complete?Promise.resolve():new Promise(resolve=>{img.onload=resolve;img.onerror=resolve;setTimeout(resolve,10000)})));
+  const gifImages=[...front.querySelectorAll(".project-card-image-wrap img, img.project-card-image")].filter(img=>/\.gif(?:$|[?#])/i.test(img.currentSrc||img.src));
+  if(!gifImages.length)throw new Error("Aucun GIF animé n’est présent dans l’image de fond de cette carte.");
+  const gifLayers=[];
+  for(const img of gifImages){
+   const response=await fetch(img.currentSrc||img.src,{mode:"cors",credentials:"omit"});if(!response.ok)throw new Error("Impossible de lire l’image animée ("+response.status+").");
+   const decoder=new ImageDecoder({data:await response.arrayBuffer(),type:"image/gif"});decoders.push(decoder);await decoder.tracks.ready;
+   const track=decoder.tracks.selectedTrack;if(!track?.frameCount)throw new Error("Le GIF ne contient aucune image.");
+   const count=Math.min(track.frameCount,36),indices=Array.from({length:count},(_,i)=>Math.round(i*(track.frameCount-1)/Math.max(1,count-1))),frames=[],durations=[];let total=0;
+   for(const index of indices){const decoded=await decoder.decode({frameIndex:index});const bitmap=await createImageBitmap(decoded.image);frames.push(bitmap);const duration=decoded.image.duration||100000;durations.push(duration);total+=duration;decoded.image.close()}
+   gifBitmaps.push(...frames);
+   const photo=img.closest(".project-card-image-wrap")||img.parentElement;if(!photo)throw new Error("Conteneur de l’image de fond introuvable.");
+   const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(rect.width*scale));canvas.height=Math.max(1,Math.round(rect.height*scale));canvas.style.cssText="position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:0!important;display:block!important;object-fit:cover!important;pointer-events:none!important";
+   // Le canvas couvre exactement la zone photo, pas la carte entière.
+   const photoRect=photo.getBoundingClientRect();canvas.width=Math.max(1,Math.round(photoRect.width*scale));canvas.height=Math.max(1,Math.round(photoRect.height*scale));photo.appendChild(canvas);canvases.push(canvas);
+   const ctx=canvas.getContext("2d",{alpha:false});if(!ctx)throw new Error("Canvas d’animation indisponible.");
+   const drawFrame=frame=>{const time=((frame/30)*1000000)%total;let elapsed=0,index=0;while(index<durations.length-1&&elapsed+durations[index]<=time){elapsed+=durations[index];index++}const bitmap=frames[index],sw=bitmap.width,sh=bitmap.height,cropScale=Math.max(canvas.width/sw,canvas.height/sh),cw=canvas.width/cropScale,ch=canvas.height/cropScale;ctx.clearRect(0,0,canvas.width,canvas.height);ctx.drawImage(bitmap,(sw-cw)/2,(sh-ch)/2,cw,ch,0,0,canvas.width,canvas.height)};
+   drawFrame(0);img.style.setProperty("opacity","0","important");img.style.setProperty("visibility","hidden","important");gifLayers.push(drawFrame);
+  }
+  const words=[...front.querySelectorAll(".project-card-word")],wordCount=words.length,revealFrames=90;
+  const render=composition.renderFrameAt.bind(composition);
+  composition.renderFrameAt=frame=>{const visible=wordCount?Math.min(wordCount,Math.ceil((Math.max(0,frame)+1)/revealFrames*wordCount)):0;words.forEach((word,i)=>word.style.setProperty("opacity",i<visible?"1":"0","important"));gifLayers.forEach(draw=>draw(frame));render(frame)};
   if(label)label.textContent="Création vidéo 0 %…";
-  const blob=await composition.export({onProgress:({frame,total})=>{
-   const pct=Math.min(100,Math.round(frame/total*100));if(label)label.textContent="Création vidéo "+pct+" %…";
-  }});
+  const blob=await composition.export({onProgress:({frame,total})=>{if(label)label.textContent="Création vidéo "+Math.round(frame/total*100)+" %…"}});
   if(!(blob instanceof Blob)||blob.size<10000)throw new Error("WebMotion n’a pas produit de vidéo exploitable.");
   download(blob,document.getElementById("projectModalTitle")?.textContent?.trim()||"inspiration");
   let copied=false;try{await navigator.clipboard.writeText(getVersoText());copied=true}catch(_){}
-  status(copied?"Vidéo WebMotion de 10 secondes téléchargée ; texte du verso copié.":"Vidéo téléchargée ; copie du texte du verso impossible.");
-  document.getElementById("inspirationSocialChooser")?.removeAttribute("hidden");
-  if(label)label.textContent="Partager";
- }catch(error){console.error("Export WebMotion Inspiration",error);status(error?.message||"Impossible de créer la vidéo.");if(label)label.textContent="Réessayer"}
+  status(copied?"Vidéo animée de 10 secondes téléchargée ; texte du verso copié.":"Vidéo téléchargée ; copie du texte du verso impossible.");
+  document.getElementById("inspirationSocialChooser")?.removeAttribute("hidden");if(label)label.textContent="Partager";
+ }catch(error){console.error("Export WebMotion animé Inspirations",error);status(error?.message||"Impossible de créer la vidéo.");if(label)label.textContent="Réessayer"}
  finally{
+  canvases.forEach(c=>c.remove());for(const d of decoders){try{d.close()}catch{}}for(const b of gifBitmaps){try{b.close()}catch{}}
   composition?.remove();
-  if(parent&&front.parentNode!==parent){if(next&&next.parentNode===parent)parent.insertBefore(front,next);else parent.appendChild(front)}
+  if(originalParent&&front.parentNode!==originalParent){if(originalNext&&originalNext.parentNode===originalParent)originalParent.insertBefore(front,originalNext);else originalParent.appendChild(front)}
   if(originalStyle===null)front.removeAttribute("style");else front.setAttribute("style",originalStyle);
   if(originalClass===null)front.removeAttribute("class");else front.setAttribute("class",originalClass);
+  const rating=front.querySelector(".project-card-rating");if(rating){if(originalRatingStyle===null)rating.removeAttribute("style");else rating.setAttribute("style",originalRatingStyle)}
+  const tagline=front.querySelector(".project-card-tagline");if(tagline&&originalTagline!==null)tagline.innerHTML=originalTagline;
   busy=false;button.disabled=false;
  }
 });
