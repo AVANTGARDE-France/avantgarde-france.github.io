@@ -982,7 +982,7 @@ testButton?.addEventListener("click",async()=>{
  const oldLabel=testButton.textContent;
  try{
   if(!window.confirm("Confirmez-vous que vous possédez les droits nécessaires pour télécharger et réutiliser cette vidéo ?"))return;
-  const videoShare=await import("./js/inspirations-video-share.js?v=20261111-2");
+  const videoShare=await import("./js/inspirations-video-share.js?v=20261111-3");
   const blob=await videoShare.generateVideoShare({
    source,
    mediaUrl,
