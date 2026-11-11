@@ -67,88 +67,29 @@ function waitForMetadata(url) {
   });
 }
 
-async function fetchYouTubeAssets(youtubeUrl, onProgress) {
-  onProgress("Demande d'extraction à GenDownload…");
+export async function prepareYouTubeDownload(youtubeUrl, onProgress = () => {}) {
+  onProgress("Extraction de la vidéo YouTube…");
   const response = await fetchStage(EXTRACT_API, {
     method: "POST",
     headers: { "Content-Type": "application/json", "Accept": "application/json" },
     body: JSON.stringify({ url: youtubeUrl })
-  });
+  }, "Extraction YouTube GenDownload");
   if (!response.ok) throw new Error("GenDownload a répondu HTTP " + response.status + ".");
   const data = await response.json();
-  if (!Array.isArray(data.formats)) {
-    throw new Error(data.error || data.message || "GenDownload n'a retourné aucun format vidéo.");
-  }
-
+  if (!Array.isArray(data.formats)) throw new Error(data.error || data.message || "Aucun format vidéo retourné.");
   const videos = data.formats.filter(f => f?.type === "video" && String(f.ext).toLowerCase() === "mp4" && f.url);
-  const audios = data.formats.filter(f => f?.type === "audio" && ["m4a", "mp4", "aac"].includes(String(f.ext).toLowerCase()) && f.url);
-  if (!videos.length) throw new Error("Aucun flux vidéo MP4 proposé par GenDownload.");
-  // GenDownload peut proposer un MP4 déjà muxé (image + son).
-  // La piste audio séparée est donc facultative : on ne doit jamais
-  // interrompre l'export simplement parce qu'elle n'existe pas.
-
-  const quality = f => Number((String(f.label || "").match(/(\d{3,4})p?/i) || [])[1] || 0);
-  videos.sort((a, b) => quality(b) - quality(a));
-  const videoFormat = videos[0];
-  const audioFormat = audios[0] || null;
-  const streamUrl = value => new URL(value, "https://gendownload.com").href;
-
-  const mp4Url = streamUrl(videoFormat.url);
-  console.info("[GenDownload diagnostic] Format MP4 sélectionné", {
-    label: videoFormat.label || "MP4",
-    ext: videoFormat.ext,
-    url: mp4Url,
-    format: videoFormat
-  });
-  onProgress("Lien MP4 reçu. Test direct possible via la fenêtre qui va s'afficher…");
-  // Diagnostic manuel ciblé : permet de copier l'URL signée et de l'ouvrir
-  // dans un onglet indépendant pour distinguer CORS et refus du serveur.
-  try {
-    window.prompt("URL MP4 fournie par GenDownload (copiez-la pour l'ouvrir dans un nouvel onglet et tester l'accès direct) :", mp4Url);
-  } catch (_) {}
-  onProgress("Téléchargement du flux vidéo " + (videoFormat.label || "MP4") + "…");
-  const videoResponse = await fetchStage(mp4Url, undefined, "Téléchargement du MP4 GenDownload");
-  if (!videoResponse.ok) throw new Error("Récupération vidéo impossible (HTTP " + videoResponse.status + ").");
-  let videoBlob;
-  if (videoResponse.body?.getReader) {
-    const reader = videoResponse.body.getReader();
-    const chunks = [];
-    let received = 0;
-    const total = Number(videoResponse.headers.get("content-length")) || 0;
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-      received += value.byteLength;
-      const mb = (received / 1048576).toFixed(1);
-      const totalText = total ? " / " + (total / 1048576).toFixed(1) + " Mo" : "";
-      const percent = total ? " (" + Math.floor(received / total * 100) + " %)" : "";
-      onProgress("Téléchargement MP4 : " + mb + totalText + percent + " — patientez, cela peut prendre 3 à 10 minutes…");
-    }
-    videoBlob = new Blob(chunks, { type: videoResponse.headers.get("content-type") || "video/mp4" });
-  } else {
-    onProgress("Téléchargement MP4 en cours — patientez, cela peut prendre 3 à 10 minutes…");
-    videoBlob = await videoResponse.blob();
-  }
-  if (!videoBlob.size) throw new Error("Le fichier vidéo reçu est vide.");
-  onProgress("MP4 téléchargé (" + (videoBlob.size / 1048576).toFixed(1) + " Mo). Préparation de l'habillage…");
-
-  let audioBlob = null;
-  if (audioFormat) {
-    onProgress("Téléchargement de la piste audio séparée…");
-    const audioResponse = await fetchStage(streamUrl(audioFormat.url), undefined, "Téléchargement de la piste audio GenDownload");
-    if (!audioResponse.ok) throw new Error("Récupération audio impossible (HTTP " + audioResponse.status + ").");
-    audioBlob = await audioResponse.blob();
-    if (!audioBlob.size) throw new Error("Le fichier audio reçu est vide.");
-  } else {
-    onProgress("Aucune piste séparée : utilisation du MP4 avec sa piste audio intégrée si présente…");
-  }
-
-  return { videoBlob, audioBlob, title: data.title || "inspiration" };
+  if (!videos.length) throw new Error("Aucun fichier MP4 proposé par GenDownload.");
+  const quality = f => Number((String(f.label || "").match(/(\\d{3,4})p?/i) || [])[1] || 0);
+  videos.sort((a,b) => quality(b)-quality(a));
+  const format = videos[0];
+  return {
+    url: new URL(format.url, "https://gendownload.com").href,
+    filename: (data.title || "inspiration").replace(/[^a-z0-9-_]+/gi,"-") + ".mp4"
+  };
 }
 
-export async function generateVideoShare({ source, mediaUrl, onProgress = () => {} }) {
-  if (!source || !mediaUrl) throw new Error("Carte ou URL source introuvable.");
+export async function generateVideoShare({ source, mediaUrl, sourceFile = null, onProgress = () => {} }) {
+  if (!source || !mediaUrl) throw new Error("Carte ou URL source introuvable.");\n  if (sourceFile && !(sourceFile instanceof File)) throw new Error("Fichier vidéo local invalide.");
   if (!("VideoEncoder" in window) || !("OffscreenCanvas" in window)) {
     throw new Error("L'export MP4 nécessite un navigateur Chromium récent (WebCodecs), comme Edge ou Chrome.");
   }
