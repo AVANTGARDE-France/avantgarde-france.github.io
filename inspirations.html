@@ -968,6 +968,7 @@ import {supabase} from "./js/supabase.js";
 const button=document.getElementById("inspirationShareButton");
 const testButton=document.getElementById("inspirationVideoTestButton");
 let videoTestBusy=false;
+let pendingYoutubeDownload=null;
 testButton?.addEventListener("click",async()=>{
  if(videoTestBusy)return;
  const modal=document.getElementById("projectModal");
@@ -978,35 +979,73 @@ testButton?.addEventListener("click",async()=>{
   status("Ouvre le verso de la carte avant de lancer le test.");return;
  }
  if(!mediaUrl){status("Aucune URL vidéo trouvée sur cette carte.");return;}
+
+ // Deuxième étape : le clic utilisateur ouvre le sélecteur de fichier.
+ if(pendingYoutubeDownload && pendingYoutubeDownload.mediaUrl===mediaUrl){
+  const picker=document.createElement("input");
+  picker.type="file";
+  picker.accept="video/mp4,.mp4,.m4v";
+  picker.style.display="none";
+  document.body.appendChild(picker);
+  picker.addEventListener("change",async()=>{
+   const file=picker.files?.[0];
+   picker.remove();
+   if(!file)return;
+   videoTestBusy=true;testButton.disabled=true;
+   const oldLabel="Test";
+   try{
+    if(!/\\.(mp4|m4v)$/i.test(file.name))throw new Error("Sélectionne le fichier MP4 téléchargé depuis GenDownload.");
+    const videoShare=await import("./js/inspirations-video-share.js?v=20261111-7");
+    const blob=await videoShare.generateVideoShare({
+     source,mediaUrl,sourceFile:file,
+     onProgress:message=>{testButton.textContent=message;status(message);}
+    });
+    download(blob,document.getElementById("projectModalTitle")?.textContent?.trim()||"test-video");
+    status("Test terminé : MP4 final généré avec le fichier local.");
+    pendingYoutubeDownload=null;
+   }catch(error){
+    console.error("Test du moteur vidéo indépendant",error);
+    status(error?.message||"Échec du test vidéo.");
+   }finally{
+    testButton.textContent=oldLabel;testButton.disabled=false;videoTestBusy=false;
+   }
+  },{once:true});
+  picker.click();
+  return;
+ }
+
  videoTestBusy=true;testButton.disabled=true;
  const oldLabel=testButton.textContent;
- const testStartedAt=Date.now();
- status("Préparation de votre vidéo. Le téléchargement et l'habillage peuvent prendre entre 3 et 10 minutes selon votre connexion et votre ordinateur. Merci de patienter et de ne pas fermer cette fenêtre.");
- const waitNotice=setInterval(()=>{
-  const elapsed=Math.floor((Date.now()-testStartedAt)/1000);
-  const minutes=Math.floor(elapsed/60),seconds=String(elapsed%60).padStart(2,"0");
-  if(videoTestBusy && !testButton.textContent.includes("Téléchargement MP4 :")) {
-   testButton.textContent="Préparation vidéo — "+minutes+":"+seconds+" écoulées";
-  }
+ const started=Date.now();
+ const timer=setInterval(()=>{
+  const elapsed=Math.floor((Date.now()-started)/1000);
+  testButton.textContent="Extraction — "+Math.floor(elapsed/60)+":"+String(elapsed%60).padStart(2,"0");
  },1000);
  try{
-  if(!window.confirm("Confirmez-vous que vous possédez les droits nécessaires pour télécharger et réutiliser cette vidéo ?"))return;
-  const videoShare=await import("./js/inspirations-video-share.js?v=20261111-6");
-  const blob=await videoShare.generateVideoShare({
-   source,
-   mediaUrl,
-   onProgress:message=>{testButton.textContent=message;status(message);}
-  });
-  download(blob,document.getElementById("projectModalTitle")?.textContent?.trim()||"test-video");
-  status("Test terminé : fichier MP4 généré par le moteur vidéo indépendant.");
+  const videoShare=await import("./js/inspirations-video-share.js?v=20261111-7");
+  if(/^https?:\\/\\//i.test(mediaUrl) && /(?:youtube\\.com|youtu\\.be)/i.test(new URL(mediaUrl).hostname)){
+   const result=await videoShare.prepareYouTubeDownload(mediaUrl,message=>status(message));
+   pendingYoutubeDownload={mediaUrl,filename:result.filename};
+   const link=document.createElement("a");
+   link.href=result.url;
+   link.download=result.filename;
+   link.target="_blank";
+   link.rel="noopener";
+   document.body.appendChild(link);link.click();link.remove();
+   status("Téléchargement MP4 lancé. Une fois terminé, clique de nouveau sur Test pour sélectionner le fichier téléchargé et lancer l'habillage.");
+   testButton.textContent="Sélectionner le MP4 téléchargé";
+  }else{
+   const blob=await videoShare.generateVideoShare({source,mediaUrl,onProgress:message=>{testButton.textContent=message;status(message);}});
+   download(blob,document.getElementById("projectModalTitle")?.textContent?.trim()||"test-video");
+   status("Test terminé : fichier MP4 généré.");
+  }
  }catch(error){
   console.error("Test du moteur vidéo indépendant",error);
   status(error?.message||"Échec du test vidéo.");
  }finally{
-  testButton.textContent=oldLabel;
-  testButton.disabled=false;
-  videoTestBusy=false;
-  clearInterval(waitNotice);
+  clearInterval(timer);
+  testButton.disabled=false;videoTestBusy=false;
+  if(!pendingYoutubeDownload)testButton.textContent=oldLabel;
  }
 });
 
