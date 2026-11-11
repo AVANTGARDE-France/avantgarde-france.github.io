@@ -65,10 +65,8 @@ export async function generateVideoShare({ source, mediaUrl, onProgress = () => 
   const metadata = await waitForMetadata(mediaUrl);
   const durationFrames = Math.max(1, Math.ceil(metadata.duration * FPS));
 
-  const [{}, {}] = await Promise.all([
-    import(WEBMOTION + "/elements?bundle"),
-    import(WEBMOTION + "/video?bundle")
-  ]);
+  await import(WEBMOTION + "/elements");
+  await import(WEBMOTION + "/video");
 
   const rect = source.getBoundingClientRect();
   if (!rect.width || !rect.height) throw new Error("Le recto agrandi est introuvable.");
