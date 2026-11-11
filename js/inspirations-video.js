@@ -17,7 +17,7 @@
   const previewTimers = new WeakMap();
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   const videoStyle = document.createElement("style");
-  videoStyle.textContent = ".project-card-image.inspiration-video{object-fit:cover;opacity:0;transition:opacity .18s ease}.project-card-image.inspiration-video[data-inspiration-ready='true']{opacity:1}.project-card-image-wrap.inspiration-platform-poster iframe.inspiration-platform-player{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:0;background:#07152d}";
+  videoStyle.textContent = ".project-card-image.inspiration-video{object-fit:cover;opacity:0;transition:opacity .18s ease}.project-card-image.inspiration-video[data-inspiration-ready='true']{opacity:1}.project-card-image-wrap.inspiration-platform-poster{position:relative;background:linear-gradient(135deg,#07152d,#17345b)}.inspiration-platform-poster-image{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}.inspiration-platform-poster-image[data-poster-unavailable='true']{display:none}.project-card-image-wrap.inspiration-platform-poster iframe.inspiration-platform-player{position:absolute;inset:0;width:100%;height:100%;border:0;z-index:2;background:#07152d}.project-card-image-wrap.inspiration-platform-expanded .inspiration-platform-poster-image{display:none}";
   document.head.appendChild(videoStyle);
 
   const intersectionObserver = new IntersectionObserver((entries) => {
@@ -52,6 +52,62 @@
     return null;
   }
   function isVideoUrl(value) { return mediaType(value) === "file"; }
+
+  function platformIdAndPoster(value, type) {
+    try {
+      const url = new URL(value, document.baseURI);
+      const host = url.hostname.toLowerCase().replace(/^www\\./, "");
+      let id = "";
+      if (type === "youtube") {
+        id = host === "youtu.be"
+          ? url.pathname.split("/").filter(Boolean)[0] || ""
+          : url.searchParams.get("v") || (url.pathname.match(/\\/(?:embed|shorts|live)\\/([^/?]+)/) || [])[1] || "";
+        return id ? { id, poster: "https://i.ytimg.com/vi/" + encodeURIComponent(id) + "/hqdefault.jpg" } : null;
+      }
+      if (type === "vimeo") {
+        id = (url.pathname.match(/\\/(?:video\\/)?(\\d+)/) || [])[1] || "";
+        return id ? { id, oembed: "https://vimeo.com/api/oembed.json?url=" + encodeURIComponent(url.href) } : null;
+      }
+      if (type === "dailymotion") {
+        id = (url.pathname.match(/\\/(?:video\\/|embed\\/video\\/)([a-zA-Z0-9]+)/) || [])[1] || "";
+        if (!id && host === "dai.ly") id = url.pathname.split("/").filter(Boolean)[0] || "";
+        return id ? { id, oembed: "https://www.dailymotion.com/services/oembed?url=" + encodeURIComponent(url.href) } : null;
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  function ensurePlatformPoster(wrap, type, value) {
+    if (wrap.querySelector(".inspiration-platform-poster-image")) return;
+    const info = platformIdAndPoster(value, type);
+    const poster = document.createElement("img");
+    poster.className = "inspiration-platform-poster-image";
+    poster.alt = "";
+    poster.setAttribute("aria-hidden", "true");
+    poster.loading = "lazy";
+    poster.decoding = "async";
+    poster.referrerPolicy = "no-referrer";
+    poster.src = info?.poster || "";
+    wrap.appendChild(poster);
+
+    if (info?.oembed) {
+      fetch(info.oembed, { mode: "cors", credentials: "omit" })
+        .then(response => {
+          if (!response.ok) throw new Error("Métadonnées vidéo indisponibles");
+          return response.json();
+        })
+        .then(data => {
+          if (data.thumbnail_url) poster.src = data.thumbnail_url;
+        })
+        .catch(() => {
+          // Le visuel de repli CSS reste affiché si la plateforme ne fournit pas de miniature.
+          poster.dataset.posterUnavailable = "true";
+        });
+    }
+    if (!info?.poster && !info?.oembed) poster.dataset.posterUnavailable = "true";
+    poster.addEventListener("error", () => { poster.dataset.posterUnavailable = "true"; });
+  }
+
   function platformEmbed(value) {
     try {
       const url = new URL(value, document.baseURI);
@@ -171,7 +227,12 @@
     const url = wrap.dataset.inspirationMediaUrl || "";
     const type = mediaType(url);
     if (!type || wrap.querySelector("video.inspiration-video, iframe.inspiration-platform-player")) return null;
-    if (type !== "file") { wrap.dataset.inspirationPlatform = type; wrap.classList.add("inspiration-platform-poster"); return null; }
+    if (type !== "file") {
+      wrap.dataset.inspirationPlatform = type;
+      wrap.classList.add("inspiration-platform-poster");
+      ensurePlatformPoster(wrap, type, url);
+      return null;
+    }
 
     const video = document.createElement("video");
     video.className = "project-card-image inspiration-video";
@@ -312,10 +373,14 @@
           frame.allowFullscreen = true;
           frame.loading = "eager";
           frame.referrerPolicy = "strict-origin-when-cross-origin";
+          mediaWrap.classList.add("inspiration-platform-expanded");
           mediaWrap.appendChild(frame);
         }
       }
-    } else if (mediaWrap) mediaWrap.querySelector("iframe.inspiration-platform-player")?.remove();
+    } else if (mediaWrap) {
+      mediaWrap.querySelector("iframe.inspiration-platform-player")?.remove();
+      mediaWrap.classList.remove("inspiration-platform-expanded");
+    }
 
     if (!video) {
       document.querySelectorAll("video.inspiration-video").forEach(v => {
