@@ -950,6 +950,7 @@ if(statusNode){statusNode.textContent="Vous devez être connecté pour noter.";s
 
 
 document.getElementById("projectModalClose")?.addEventListener("click",closeInspirationModal);
+modal?.addEventListener("inspiration:share-complete",()=>closeInspirationModal());
 modal?.addEventListener("click",e=>{if(e.target===modal&&["AGRANDISSEMENT","RECTO_AGRANDI","VERSO"].includes(modal.dataset.cardStage))closeInspirationModal()});
 document.querySelector("#projectModalCard")?.addEventListener("click",e=>{if(e.target.closest("button,a,input,select,textarea,[contenteditable=true],[data-vote]"))return;if(modal?.dataset.cardStage==="VERSO")closeInspirationModal()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeInspirationModal()});
@@ -962,9 +963,13 @@ import {supabase} from "./js/supabase.js";
 const button=document.getElementById("inspirationShareButton");
 const statusNode=document.getElementById("inspirationShareStatus");
 const socialChooser=document.getElementById("inspirationSocialChooser");
-document.getElementById("inspirationSocialClose")?.addEventListener("click",()=>{if(socialChooser)socialChooser.hidden=true});
-socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)socialChooser.hidden=true});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&socialChooser&&!socialChooser.hidden)socialChooser.hidden=true});
+// Le panneau de diffusion est indépendant du verso : il remplace la carte dans la fenêtre.
+if(socialChooser&&socialChooser.parentNode!==document.body)document.body.appendChild(socialChooser);
+function hideSocialChooser(){if(socialChooser)socialChooser.hidden=true}
+document.getElementById("inspirationSocialClose")?.addEventListener("click",hideSocialChooser);
+socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)hideSocialChooser()});
+socialChooser?.querySelectorAll(".inspiration-social-options a").forEach(link=>link.addEventListener("click",hideSocialChooser));
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&socialChooser&&!socialChooser.hidden)hideSocialChooser()});
 let busy=false;
 function status(message){if(statusNode){statusNode.textContent=message;statusNode.classList.add("visible")}}
 function versoText(referralId){
@@ -986,7 +991,7 @@ button?.addEventListener("click",async()=>{
  const session=await supabase.auth.getSession();const user=session?.data?.session?.user;
  if(!user){status("Vous devez être connecté pour partager.");return}
  busy=true;button.disabled=true;const label=button.querySelector("span");
- let composition=null,parent=null,next=null,sourceStyle=null,sourceClass=null;
+ let composition=null,parent=null,next=null,sourceStyle=null,sourceClass=null,showSocialAfterRestore=false;
  const decoders=[],bitmaps=[],replacements=[],animatedLayers=[];
  try{
   if(typeof ImageDecoder==="undefined")throw new Error("Ce navigateur ne prend pas en charge ImageDecoder pour l’animation du fond.");
@@ -1077,7 +1082,7 @@ button?.addEventListener("click",async()=>{
   download(blob,document.getElementById("projectModalTitle")?.textContent?.trim()||"inspiration");
   let copied=false;try{await navigator.clipboard.writeText(versoText(user.id));copied=true}catch(_){}
   status(copied?"Vidéo MP4 animée de 10 secondes téléchargée ; texte du verso copié.":"Vidéo MP4 téléchargée ; copie du texte du verso impossible.");
-  if(socialChooser)socialChooser.hidden=false;
+  showSocialAfterRestore=true;
   if(label)label.textContent="Partager";
  }catch(error){console.error("Export du recto agrandi WebMotion",error);status(error?.message||"Impossible de créer la vidéo.");if(label)label.textContent="Réessayer"}
  finally{
@@ -1088,6 +1093,10 @@ button?.addEventListener("click",async()=>{
   if(parent&&source.parentNode!==parent){if(next&&next.parentNode===parent)parent.insertBefore(source,next);else parent.appendChild(source)}
   if(sourceStyle===null)source.removeAttribute("style");else source.setAttribute("style",sourceStyle);
   if(sourceClass===null)source.removeAttribute("class");else source.setAttribute("class",sourceClass);
+  if(showSocialAfterRestore){
+   modal.dispatchEvent(new Event("inspiration:share-complete"));
+   if(socialChooser)socialChooser.hidden=false;
+  }
   busy=false;button.disabled=false;
  }
 });
