@@ -46,7 +46,7 @@ function waitForMetadata(url) {
 
 function isDirectVideo(url) {
   try {
-    return /\.(mp4|m4v|webm|ogv|ogg|mov)(?:$|[?#])/i.test(new URL(url, document.baseURI).href);
+    return /\.(mp4|m4v)(?:$|[?#])/i.test(new URL(url, document.baseURI).href);
   } catch (_) {
     return false;
   }
