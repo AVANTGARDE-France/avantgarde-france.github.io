@@ -999,6 +999,24 @@ button?.addEventListener("click",async()=>{
  let composition=null,parent=null,next=null,sourceStyle=null,sourceClass=null,showSocialAfterRestore=false;
  const decoders=[],bitmaps=[],replacements=[],animatedLayers=[];
  try{
+  const videoWrap=source.querySelector(".project-card-image-wrap[data-inspiration-media-url]");
+  const videoUrl=videoWrap?.dataset.inspirationMediaUrl||"";
+  if(videoUrl){
+   const directFile=/\\.(mp4|m4v|webm|ogv|ogg|mov)(?:$|[?#])/i.test(videoUrl);
+   if(!directFile)throw new Error("Pour partager une vidéo YouTube, il faut son fichier vidéo original MP4. Le lecteur intégré ne donne pas accès au flux complet pour l’export.");
+   const videoShare=await import("./js/inspirations-video-share.js");
+   const blob=await videoShare.generateVideoShare({
+    source,
+    mediaUrl:videoUrl,
+    onProgress:message=>{if(label)label.textContent=message}
+   });
+   download(blob,document.getElementById("projectModalTitle")?.textContent?.trim()||"inspiration");
+   let copied=false;try{await navigator.clipboard.writeText(versoText(user.id));copied=true}catch(_){}
+   status(copied?"Vidéo MP4 complète avec son téléchargée ; texte du verso copié.":"Vidéo MP4 complète téléchargée ; copie du texte du verso impossible.");
+   showSocialAfterRestore=true;
+   if(label)label.textContent="Partager";
+   return;
+  }
   if(typeof ImageDecoder==="undefined")throw new Error("Ce navigateur ne prend pas en charge ImageDecoder pour l’animation du fond.");
   if(label)label.textContent="Préparation du recto agrandi…";
   await import("https://esm.sh/@superhq/webmotion@0.18.2/elements");
