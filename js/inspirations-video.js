@@ -56,21 +56,24 @@
   function platformIdAndPoster(value, type) {
     try {
       const url = new URL(value, document.baseURI);
-      const host = url.hostname.toLowerCase().replace(/^www\\./, "");
+      const host = url.hostname.toLowerCase().replace(/^www\./, "");
+      const parts = url.pathname.split("/").filter(Boolean);
       let id = "";
+
       if (type === "youtube") {
         id = host === "youtu.be"
-          ? url.pathname.split("/").filter(Boolean)[0] || ""
-          : url.searchParams.get("v") || (url.pathname.match(/\\/(?:embed|shorts|live)\\/([^/?]+)/) || [])[1] || "";
+          ? (parts[0] || "")
+          : (url.searchParams.get("v") || (parts[0] === "embed" || parts[0] === "shorts" || parts[0] === "live" ? (parts[1] || "") : ""));
         return id ? { id, poster: "https://i.ytimg.com/vi/" + encodeURIComponent(id) + "/hqdefault.jpg" } : null;
       }
+
       if (type === "vimeo") {
-        id = (url.pathname.match(/\\/(?:video\\/)?(\\d+)/) || [])[1] || "";
+        id = parts[0] === "video" ? (parts[1] || "") : (parts.find(part => /^\d+$/.test(part)) || "");
         return id ? { id, oembed: "https://vimeo.com/api/oembed.json?url=" + encodeURIComponent(url.href) } : null;
       }
+
       if (type === "dailymotion") {
-        id = (url.pathname.match(/\\/(?:video\\/|embed\\/video\\/)([a-zA-Z0-9]+)/) || [])[1] || "";
-        if (!id && host === "dai.ly") id = url.pathname.split("/").filter(Boolean)[0] || "";
+        id = host === "dai.ly" ? (parts[0] || "") : (parts[0] === "video" ? (parts[1] || "") : (parts[0] === "embed" && parts[1] === "video" ? (parts[2] || "") : ""));
         return id ? { id, oembed: "https://www.dailymotion.com/services/oembed?url=" + encodeURIComponent(url.href) } : null;
       }
     } catch (_) {}
@@ -105,7 +108,13 @@
         });
     }
     if (!info?.poster && !info?.oembed) poster.dataset.posterUnavailable = "true";
-    poster.addEventListener("error", () => { poster.dataset.posterUnavailable = "true"; });
+    poster.addEventListener("error", () => {
+      poster.dataset.posterUnavailable = "true";
+      if (type === "youtube" && info?.id && !poster.dataset.triedFallback) {
+        poster.dataset.triedFallback = "true";
+        poster.src = "https://img.youtube.com/vi/" + encodeURIComponent(info.id) + "/0.jpg";
+      }
+    });
   }
 
   function platformEmbed(value) {
