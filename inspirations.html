@@ -980,9 +980,18 @@ testButton?.addEventListener("click",async()=>{
  if(!mediaUrl){status("Aucune URL vidéo trouvée sur cette carte.");return;}
  videoTestBusy=true;testButton.disabled=true;
  const oldLabel=testButton.textContent;
+ const testStartedAt=Date.now();
+ status("Préparation de votre vidéo. Le téléchargement et l'habillage peuvent prendre entre 3 et 10 minutes selon votre connexion et votre ordinateur. Merci de patienter et de ne pas fermer cette fenêtre.");
+ const waitNotice=setInterval(()=>{
+  const elapsed=Math.floor((Date.now()-testStartedAt)/1000);
+  const minutes=Math.floor(elapsed/60),seconds=String(elapsed%60).padStart(2,"0");
+  if(videoTestBusy && !testButton.textContent.includes("Téléchargement MP4 :")) {
+   testButton.textContent="Préparation vidéo — "+minutes+":"+seconds+" écoulées";
+  }
+ },1000);
  try{
   if(!window.confirm("Confirmez-vous que vous possédez les droits nécessaires pour télécharger et réutiliser cette vidéo ?"))return;
-  const videoShare=await import("./js/inspirations-video-share.js?v=20261111-5");
+  const videoShare=await import("./js/inspirations-video-share.js?v=20261111-6");
   const blob=await videoShare.generateVideoShare({
    source,
    mediaUrl,
@@ -997,6 +1006,7 @@ testButton?.addEventListener("click",async()=>{
   testButton.textContent=oldLabel;
   testButton.disabled=false;
   videoTestBusy=false;
+  clearInterval(waitNotice);
  }
 });
 
