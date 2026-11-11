@@ -32,6 +32,29 @@
 
 <style>
 
+.content-mode-toggle {
+    display:inline-flex; align-items:center; justify-content:space-between;
+    gap:14px; min-width:235px; margin:0; padding:10px 13px;
+    border:1px solid rgba(214,173,85,.48); border-radius:6px;
+    background:rgba(214,173,85,.08); color:var(--gold-light,#f0d58a);
+    font:700 10px Arial,sans-serif; letter-spacing:.07em;
+    cursor:pointer; transition:background .18s,border-color .18s;
+}
+.content-mode-toggle:hover { background:rgba(214,173,85,.16); border-color:var(--gold-light,#f0d58a); }
+.content-mode-toggle-label { white-space:nowrap; }
+.content-mode-toggle-track {
+    position:relative; display:inline-block; width:38px; height:20px; flex:none;
+    border:1px solid rgba(214,173,85,.55); border-radius:20px;
+    background:#07152d; transition:background .18s;
+}
+.content-mode-toggle-track span {
+    position:absolute; top:2px; left:2px; width:14px; height:14px;
+    border-radius:50%; background:var(--gold-light,#f0d58a); transition:transform .18s;
+}
+.content-mode-toggle[aria-pressed="true"] .content-mode-toggle-track { background:rgba(214,173,85,.32); }
+.content-mode-toggle[aria-pressed="true"] .content-mode-toggle-track span { transform:translateX(18px); }
+@media(max-width:600px) { .content-mode-toggle { min-width:0; width:100%; } }
+
 .content-photo-upload-row {
     display:flex;
     align-items:center;
@@ -1757,13 +1780,16 @@
             <h2 class="panel-title">Contenu du projet</h2>
             <p class="panel-intro" style="margin-bottom:0;">Gérez les menus, sous-menus et contenus du projet.</p>
         </div>
-        <div style="min-width:220px;">
-            <label for="contentModeSelector" style="display:block;margin-bottom:6px;">BIBLIOTHÈQUE</label>
-            <select id="contentModeSelector" style="margin:0;width:100%;">
-                <option value="project">Contenu du projet</option>
-                <option value="inspiration">Contenu d'inspiration</option>
-            </select>
-        </div>
+        <button
+            type="button"
+            id="contentModeToggle"
+            class="content-mode-toggle"
+            aria-pressed="false"
+            title="Basculer vers le contenu d'inspiration"
+        >
+            <span class="content-mode-toggle-label">CONTENU DU PROJET</span>
+            <span class="content-mode-toggle-track" aria-hidden="true"><span></span></span>
+        </button>
     </div>
 
 
