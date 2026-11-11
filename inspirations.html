@@ -967,10 +967,11 @@ socialChooser?.addEventListener("click",e=>{if(e.target===socialChooser)socialCh
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&socialChooser&&!socialChooser.hidden)socialChooser.hidden=true});
 let busy=false;
 function status(message){if(statusNode){statusNode.textContent=message;statusNode.classList.add("visible")}}
-function versoText(){
+function versoText(referralId){
  const node=document.getElementById("projectModalContent");if(!node)throw new Error("Texte du verso introuvable.");
  const copy=node.cloneNode(true);copy.querySelectorAll("script,style,button,svg").forEach(x=>x.remove());
- return (copy.innerText||copy.textContent||"").replace(/\r/g,"").split("\n").map(x=>x.replace(/[\t ]+/g," ").trim()).filter(Boolean).join("\n");
+ const cardText=(copy.innerText||copy.textContent||"").replace(/\r/g,"").split("\n").map(x=>x.replace(/[\t ]+/g," ").trim()).filter(Boolean).join("\n");
+ return cardText+"\n\nDeviens Avant-gadistE avec moi!\nMon code parrainage : "+referralId+"\nSi tu es curieux, viens sur notre site internet!";
 }
 function download(blob,title){
  const name=(title||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration";
@@ -1074,7 +1075,7 @@ button?.addEventListener("click",async()=>{
   const blob=await composition.export({onProgress:({frame,total})=>{if(label)label.textContent="Création vidéo "+Math.round(frame/total*100)+" %…"}});
   if(!(blob instanceof Blob)||blob.size<10000)throw new Error("WebMotion n’a pas produit de vidéo exploitable.");
   download(blob,document.getElementById("projectModalTitle")?.textContent?.trim()||"inspiration");
-  let copied=false;try{await navigator.clipboard.writeText(versoText());copied=true}catch(_){}
+  let copied=false;try{await navigator.clipboard.writeText(versoText(user.id));copied=true}catch(_){}
   status(copied?"Vidéo MP4 animée de 10 secondes téléchargée ; texte du verso copié.":"Vidéo MP4 téléchargée ; copie du texte du verso impossible.");
   if(socialChooser)socialChooser.hidden=false;
   if(label)label.textContent="Partager";
