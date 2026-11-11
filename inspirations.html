@@ -1002,7 +1002,7 @@ button?.addEventListener("click",async()=>{
   const videoWrap=source.querySelector(".project-card-image-wrap[data-inspiration-media-url]");
   const videoUrl=videoWrap?.dataset.inspirationMediaUrl||"";
   if(videoUrl){
-   const directFile=/\\.(mp4|m4v|webm|ogv|ogg|mov)(?:$|[?#])/i.test(videoUrl);
+   const directFile=/\.(mp4|m4v)(?:$|[?#])/i.test(videoUrl);
    if(!directFile)throw new Error("Pour partager une vidéo YouTube, il faut son fichier vidéo original MP4. Le lecteur intégré ne donne pas accès au flux complet pour l’export.");
    const videoShare=await import("./js/inspirations-video-share.js");
    const blob=await videoShare.generateVideoShare({
