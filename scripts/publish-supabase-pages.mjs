@@ -826,6 +826,29 @@ async function publishPage(page) {
         html;
 
 
+    /*
+     * inspirations.html est désormais une interface de cartes
+     * dynamiques alimentée côté navigateur. Elle ne possède plus
+     * de wrapper <article id="editorialContent">.
+     *
+     * L'enregistrement historique other_contents est lu pour
+     * vérifier l'accès Supabase, mais ne doit pas être injecté
+     * dans cette page : cela écraserait son interface.
+     */
+    if (
+        page.slug === "inspirations" &&
+        !trouverOuvertureParId(html, "article", "editorialContent")
+    ) {
+        console.log(
+            "ℹ Inspirations : page à cartes dynamiques ; injection éditoriale statique ignorée."
+        );
+        console.log(
+            `✓ Accès Supabase confirmé — updated_at : ${data.updated_at || "inconnu"}`
+        );
+        return false;
+    }
+
+
     /* --------------------------------------------------------
        INJECTION DU CONTENU SUPABASE
     -------------------------------------------------------- */
