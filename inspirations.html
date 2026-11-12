@@ -995,7 +995,7 @@ testButton?.addEventListener("click",async()=>{
    const oldLabel="Test";
    try{
     if(!/\.(mp4|m4v)$/i.test(file.name))throw new Error("Sélectionne le fichier MP4 téléchargé depuis GenDownload.");
-    const videoShare=await import("./js/inspirations-video-share.js?v=20261111-7");
+    const videoShare=await import("./js/inspirations-video-share.js?v=20261112-1");
     const blob=await videoShare.generateVideoShare({
      source,mediaUrl,sourceFile:file,
      onProgress:message=>{testButton.textContent=message;status(message);}
@@ -1022,7 +1022,7 @@ testButton?.addEventListener("click",async()=>{
   testButton.textContent="Extraction — "+Math.floor(elapsed/60)+":"+String(elapsed%60).padStart(2,"0");
  },1000);
  try{
-  const videoShare=await import("./js/inspirations-video-share.js?v=20261111-7");
+  const videoShare=await import("./js/inspirations-video-share.js?v=20261112-1");
   if(/^https?:\/\//i.test(mediaUrl) && /(?:youtube\.com|youtu\.be)/i.test(new URL(mediaUrl).hostname)){
    const result=await videoShare.prepareYouTubeDownload(mediaUrl,message=>status(message));
    pendingYoutubeDownload={mediaUrl,filename:result.filename};
