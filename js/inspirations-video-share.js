@@ -109,16 +109,15 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     let videoSource = mediaUrl;
     let audioSource = null;
 
-    if (isYouTubeUrl(mediaUrl)) {
-      const assets = await fetchYouTubeAssets(mediaUrl, onProgress);
-      videoObjectUrl = URL.createObjectURL(assets.videoBlob);
-      if (assets.audioBlob) {
-        audioObjectUrl = URL.createObjectURL(assets.audioBlob);
-        audioSource = audioObjectUrl;
-      }
+    if (sourceFile) {
+      // Le MP4 a déjà été téléchargé par l'utilisateur depuis GenDownload.
+      // On le donne directement à WebMotion : l'audio reste dans le MP4.
+      videoObjectUrl = URL.createObjectURL(sourceFile);
       videoSource = videoObjectUrl;
+    } else if (isYouTubeUrl(mediaUrl)) {
+      throw new Error("Télécharge d'abord le MP4 YouTube, puis sélectionne-le avec le bouton Test.");
     } else if (!isDirectVideo(mediaUrl)) {
-      throw new Error("La source doit être une URL YouTube ou un fichier MP4 direct.");
+      throw new Error("La source doit être un MP4 local ou une URL MP4 directe.");
     }
 
     onProgress("Analyse de la vidéo récupérée…");
