@@ -7,9 +7,6 @@ on:
 
   workflow_dispatch:
 
-  schedule:
-    - cron: "*/5 * * * *"
-
 
 concurrency:
   group: publication-supabase
