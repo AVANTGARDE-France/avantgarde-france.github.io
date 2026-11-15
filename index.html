@@ -102,6 +102,9 @@
     #home-experience .quiz-range{width:100%;accent-color:var(--q-gold);margin:12px 0}
     #home-experience .quiz-range-labels{display:flex;justify-content:space-between;gap:10px;color:#9aabbd;font-size:10px}
     #home-experience .quiz-range-labels span{color:#ef4135}#home-experience .quiz-range-labels b{color:#ef4135;font-size:22px;font-weight:900;line-height:0;vertical-align:-2px;margin-right:2px}
+    #home-experience .immigration-range-labels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;text-align:center;font-size:clamp(8px,.75vw,10px);line-height:1.35}
+    #home-experience .immigration-range-labels span{color:#ef4135;overflow-wrap:anywhere}
+    @media(max-width:480px){#home-experience .immigration-range-labels{font-size:8px;gap:3px}}
     #home-experience .quiz-range-current{margin:20px 0 0;padding:16px;border-left:2px solid var(--q-gold);background:#e2bd690d}
     #home-experience .quiz-range-current strong{display:block;color:var(--q-gold);font-size:11px;letter-spacing:.1em;margin-bottom:8px}
     #home-experience .quiz-range-current p{margin:0;color:#dce2e8;font-size:12px;line-height:1.6}
@@ -209,7 +212,7 @@
           <div class="quiz-card-head">
             <span class="quiz-step-label" id="quiz-step-label">ÉTAPE 01 / 05</span>
             <div class="quiz-progress" id="quiz-progress" aria-hidden="true">
-              <span class="active"></span><span></span><span></span><span></span><span></span>
+              <span class="active"></span><span></span><span></span><span></span><span></span><span></span>
             </div>
           </div>
           <div id="quiz-content" aria-live="polite"></div>
@@ -454,7 +457,7 @@
       updateDebt();
       window.setInterval(updateDebt, 100);
     }
-    const answers = {patrie:null, souverainete:null, justice:null, liberte:2, parti:null};
+    const answers = {patrie:null, souverainete:null, justice:null, immigration:3, liberte:2, parti:null};
     let step = 0;
 
     const questions = [
@@ -478,6 +481,16 @@
         ["Rassemblement national","RN"],["La France insoumise","LFI"],["Les Républicains","LR"],["Renaissance / Ensemble","RE"],["Parti socialiste","PS"],["Les Écologistes","Écologistes"],["Reconquête !","Reconquête"],["Debout la France","DLF"],["Union populaire républicaine","UPR"],["Nouvelle Énergie","Nouvelle Énergie"],["Avant-gardE","Avant-gardE"],["Aucun / autre","Aucun / autre"]
       ]}
     ];
+    const immigration = [
+      ["UNIVERSALISTE","Immigration bienvenue, ni plafonnement ni sélection, priorité à l’asile et aux critères humanitaires, régularisation des travailleurs, étudiants et parents d’enfants scolarisés, facilitation des visas, droit du sol intégral."],
+      ["SOCIALE","Immigration régulée et conditionnée selon des critères de travail et sociaux : travail, ancienneté de présence et intégration, situations familiales, régularisations ciblées."],
+      ["MAÎTRISÉE MAIS PAS DIRIGÉE","Immigration fortement contrôlée, sans dirigisme migratoire ; expulsion des étrangers en situation irrégulière."],
+      ["LIMITÉE PAR QUOTAS SECTORIELS","Immigration réduite par quotas selon les besoins des secteurs en tension ; regroupement familial conditionné ; aucune régularisation des clandestins ; droit du sol conditionné ; rétention administrative prolongée."],
+      ["DIRIGÉE ET CHOISIE","Immigration fortement réduite, sélective selon des critères d’origine, de travail et de ressources ; suppression du droit du sol ; restriction du regroupement familial ; expulsion des clandestins ; priorité nationale pour les prestations sociales."],
+      ["TRAVAILLISTE ET UTILITARISTE","Immigration fortement réduite, sélection individuelle et utilitariste, strictement conditionnée à un emploi validé ; suppression du droit du sol et du regroupement familial ; lutte stricte contre l’immigration clandestine ; expulsion des étrangers en situation irrégulière ou en situation régulière sans emploi ; suppression des prestations sociales aux étrangers."],
+      ["ZÉRO ! SOUS RÉSERVE DE FAISABILITÉ UE","Objectif d’immigration nette nulle ; politique de remigration fondée sur l’assimilation et la nationalité ; suppression du droit du sol et du regroupement familial ; expulsions massives ; suppression des prestations sociales aux étrangers."]
+    ];
+    const immigrationQuestion = {key:"immigration", title:"Votre position sur l’immigration", hint:"Choisissez la position qui se rapproche le plus de la vôtre.", slider:true};
     const liberty = [
       ["ANTICAPITALISTE","Dirigisme économique<br>Fiscalité plus confiscatoire<br>Redistribution massive"],
       ["SOCIAL-UNIVERSALISTE","Fort interventionnisme économique<br>Pression fiscale renforcée<br>Redistribution générale renforcée<br>Sur fond humaniste, ou d'intérêt social"],
@@ -486,18 +499,25 @@
       ["LIBÉRAL RADICAL","Fin de l’interventionnisme économique<br>Réduction drastique de la pression fiscale<br>Refonte intégrale du modèle social français<br>Rupture totale avec le système existant"]
     ];
 
+    const stepQuestions = [questions[0], questions[1], questions[2], immigrationQuestion, questions[3], questions[4]];
+
     function escapeHtml(value){return String(value).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
     function render(){
-      const q = questions[step];
-      label.textContent = "ÉTAPE " + String(step+1).padStart(2,"0") + " / 05";
+      const q = stepQuestions[step];
+      label.textContent = "ÉTAPE " + String(step+1).padStart(2,"0") + " / 06";
       progress.forEach((el,i)=>el.classList.toggle("active",i<=step));
       back.disabled = step===0;
-      next.textContent = step===4 ? "Analyser mes choix ↗" : "Continuer →";
+      next.textContent = step===5 ? "Analyser mes choix ↗" : "Continuer →";
       next.disabled = q.slider ? false : !answers[q.key];
       let html = '<h2 class="quiz-question">'+q.title+'</h2>'+(q.hint?'<p class="quiz-hint">'+q.hint+'</p>':'');
       if(q.slider){
-        const val = answers.liberte;
-        html += '<input class="quiz-range" id="liberte-range" type="range" min="0" max="4" step="1" value="'+val+'" aria-label="Votre rapport à l’État, à l’économie, à la fiscalité et au social"><div class="quiz-range-labels"><span><b>+</b> d’État<br><b>+</b> d’aides<br><b>+</b> de taxes</span><span><b>+</b> de liberté<br><b>+</b> de responsabilité<br><b>+</b> de salaire</span></div><div class="quiz-range-current"><strong>'+liberty[val][0]+'</strong><p>'+liberty[val][1]+'</p></div>';
+        const scale = q.key === "immigration" ? immigration : liberty;
+        const val = answers[q.key];
+        const aria = q.key === "immigration" ? "Votre position sur l’immigration" : "Votre rapport à l’État, à l’économie, à la fiscalité et au social";
+        const labels = q.key === "immigration"
+          ? '<div class="quiz-range-labels immigration-range-labels"><span>+ d’accueil<br>+ de régularisations massives</span><span>+ de régulation<br>+ de contrôles, sans objectif chiffré</span><span>Immigration réduite<br>+ sélective</span><span>Quasi stoppée<br>Remigration</span></div>'
+          : '<div class="quiz-range-labels"><span><b>+</b> d’État<br><b>+</b> d’aides<br><b>+</b> de taxes</span><span><b>+</b> de liberté<br><b>+</b> de responsabilité<br><b>+</b> de salaire</span></div>';
+        html += '<input class="quiz-range" id="'+q.key+'-range" type="range" min="0" max="'+(scale.length-1)+'" step="1" value="'+val+'" aria-label="'+aria+'">'+labels+'<div class="quiz-range-current"><strong>'+scale[val][0]+'</strong><p>'+scale[val][1]+'</p></div>';
       } else {
         html += '<div class="'+(q.parties?'quiz-parties':'quiz-options')+'">';
         q.options.forEach((option,i)=>{
@@ -514,11 +534,12 @@
         answers[q.key]=button.dataset.answer;
         render();
       }));
-      const range = content.querySelector("#liberte-range");
+      const range = content.querySelector("#"+q.key+"-range");
       if(range) range.addEventListener("input",()=>{
-        answers.liberte=Number(range.value);
+        answers[q.key]=Number(range.value);
+        const scale = q.key === "immigration" ? immigration : liberty;
         const current=content.querySelector(".quiz-range-current");
-        current.innerHTML='<strong>'+liberty[answers.liberte][0]+'</strong><p>'+liberty[answers.liberte][1]+'</p>';
+        current.innerHTML='<strong>'+scale[answers[q.key]][0]+'</strong><p>'+scale[answers[q.key]][1]+'</p>';
       });
       next.disabled = q.slider ? false : !answers[q.key];
     }
@@ -532,7 +553,7 @@
     }
     back.addEventListener("click",()=>{if(step>0){step--;render();}});
     next.addEventListener("click",()=>{
-      if(step<4){step++;render();return;}
+      if(step<5){step++;render();return;}
       field.value=buildAnalysisPrompt();
       field.dispatchEvent(new Event("input",{bubbles:true}));
       document.querySelector(".quiz-free").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
