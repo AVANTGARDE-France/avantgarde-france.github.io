@@ -583,7 +583,6 @@
       if(step<5){step++;render();return;}
       field.value=buildAnalysisPrompt();
       field.dispatchEvent(new Event("input",{bubbles:true}));
-      document.querySelector(".quiz-free").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
       const status=document.getElementById("aiStatus");
       status.textContent="Votre analyse est prête. ChatGPT va s’ouvrir avec vos réponses et les consignes d’analyse.";
       window.envoyerVersIA?.("chatgpt");
