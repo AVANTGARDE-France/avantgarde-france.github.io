@@ -50,6 +50,17 @@
     #home-experience.quiz-logo-first .quiz-reopen{display:flex;min-height:0;height:100%;border:0;background:transparent}
     #home-experience.quiz-logo-first .quiz-reopen img{width:min(100%,390px);max-height:390px}
     #home-experience.quiz-logo-first .quiz-reopen span{display:none}
+    #home-experience .quiz-final{display:none;min-height:0;height:100%;width:100%;padding:24px;border:1px solid #e2bd6959;background:rgba(5,13,25,.24);color:#f2d58a;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,2.5vh,24px);text-align:center}
+    #home-experience .quiz-final img{display:block;width:min(100%,330px);max-height:44%;object-fit:contain;filter:drop-shadow(0 12px 28px #0008)}
+    #home-experience .quiz-final h2{margin:0;color:#f5f2e9;font-family:Georgia,'Times New Roman',serif;font-size:clamp(23px,2.7vw,34px);line-height:1.15;font-weight:400;letter-spacing:-.025em}
+    #home-experience .quiz-final-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:12px;width:100%}
+    #home-experience .quiz-final-actions button{min-width:118px;min-height:44px;padding:12px 18px;border:1px solid #e2bd69;background:transparent;color:#f2d58a;font-size:11px;font-weight:700;letter-spacing:.1em;cursor:pointer;transition:background .2s,color .2s}
+    #home-experience .quiz-final-actions button.primary{background:#e2bd69;color:#071321}
+    #home-experience .quiz-final-actions button:hover{background:#f2d58a;color:#071321}
+    #home-experience.quiz-is-final .quiz-card,#home-experience.quiz-is-final .quiz-reopen{display:none}
+    #home-experience.quiz-is-final .quiz-final{display:flex}
+    @media(max-width:800px){#home-experience .quiz-final{height:clamp(240px,42svh,390px)}}
+
     #home-experience .quiz-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:20px;border-bottom:1px solid #ffffff1c}
     #home-experience .quiz-step-label{color:var(--q-gold);font-size:10px;font-weight:700;letter-spacing:.17em}
     #home-experience .quiz-progress{display:flex;gap:5px}
@@ -225,6 +236,14 @@
           <img src="/image/Emblem%20with%20hexagona2.png" alt="Emblème Avant-gardE">
           <span>OUVRIR LE QUESTIONNAIRE</span>
         </button>
+        <section class="quiz-final" id="quiz-final" aria-label="Votre avis sur le projet Avant-gardE">
+          <img src="/image/Emblem%20with%20hexagona2.png" alt="Emblème Avant-gardE">
+          <h2>Alors le projet Avant-gardE&nbsp;?</h2>
+          <div class="quiz-final-actions">
+            <button type="button" class="primary" id="quiz-final-yes">POUR 👍</button>
+            <button type="button" id="quiz-final-no">CONTRE 👎</button>
+          </div>
+        </section>
       </div>
 
     </section>
@@ -433,9 +452,17 @@
     const next = document.getElementById("quiz-next");
     const closeQuiz = document.getElementById("quiz-close");
     const reopenQuiz = document.getElementById("quiz-reopen");
+    const finalYes = document.getElementById("quiz-final-yes");
+    const finalNo = document.getElementById("quiz-final-no");
     const field = document.getElementById("aiQuestion");
     closeQuiz.addEventListener("click",()=>root.classList.add("quiz-is-closed"));
     reopenQuiz.addEventListener("click",()=>root.classList.remove("quiz-is-closed"));
+    finalYes.addEventListener("click",()=>{window.location.href="admin.html";});
+    finalNo.addEventListener("click",()=>{
+      root.classList.remove("quiz-is-final");
+      root.classList.remove("quiz-logo-first");
+      root.classList.add("quiz-is-closed");
+    });
     setTimeout(()=>{root.classList.remove("quiz-logo-first");root.classList.add("quiz-is-closed");},5000);
     // Reproduction de la formule du compteur Horloge de la dette publique (projection 2026).
     const debtDisplay = document.getElementById("public-debt-value");
@@ -560,6 +587,9 @@
       const status=document.getElementById("aiStatus");
       status.textContent="Votre analyse est prête. ChatGPT va s’ouvrir avec vos réponses et les consignes d’analyse.";
       window.envoyerVersIA?.("chatgpt");
+      root.classList.remove("quiz-is-closed");
+      root.classList.remove("quiz-logo-first");
+      root.classList.add("quiz-is-final");
     });
     root.querySelectorAll("[data-question]").forEach(button=>button.addEventListener("click",()=>{
       field.value=button.dataset.question||"";
