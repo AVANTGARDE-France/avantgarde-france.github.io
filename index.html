@@ -182,8 +182,9 @@
       #home-experience .quiz-stats-placeholder .stats-marquee-group > .debt-counter .debt-counter-note{max-width:220px}
     }
 
-    /* Emblème : dimension fixe et identique sur les deux panneaux */
-    #home-experience .quiz-reopen img,
+    /* Même dimension uniquement dans les deux fenêtres secondaires.
+       L'emblème de l'écran initial conserve son dimensionnement d'origine. */
+    #home-experience.quiz-is-closed .quiz-reopen img,
     #home-experience .quiz-final img{
       display:block;
       flex:0 0 180px;
