@@ -182,21 +182,27 @@
       #home-experience .quiz-stats-placeholder .stats-marquee-group > .debt-counter .debt-counter-note{max-width:220px}
     }
 
-    /* Écran final : mêmes dimensions d’image et même typographie que la fenêtre de réouverture */
+    /* Emblème : dimension fixe et identique sur les deux panneaux */
     #home-experience .quiz-reopen img,
     #home-experience .quiz-final img{
       display:block;
-      width:min(100%,330px);
-      max-height:100%;
+      flex:0 0 180px;
+      width:180px;
+      height:180px;
+      max-width:100%;
+      max-height:22svh;
       object-fit:contain;
       filter:drop-shadow(0 12px 28px #0008);
     }
-    #home-experience .quiz-final{gap:clamp(9px,1.5vh,14px)}
+    #home-experience .quiz-final{
+      gap:clamp(9px,1.5vh,14px);
+      min-height:0;
+    }
     #home-experience .quiz-final-kicker{
       margin:0;
       color:#e2bd69;
-      font:700 10px/1.2 inherit;
       font-size:10px;
+      line-height:1.2;
       font-weight:700;
       letter-spacing:.16em;
       text-transform:uppercase;
@@ -641,6 +647,13 @@
       root.classList.remove("quiz-is-closed");
       root.classList.remove("quiz-logo-first");
       root.classList.add("quiz-is-final");
+      requestAnimationFrame(()=>{
+        document.querySelector("#quiz-final img")?.scrollIntoView({
+          behavior:"smooth",
+          block:"center",
+          inline:"nearest"
+        });
+      });
     });
     root.querySelectorAll("[data-question]").forEach(button=>button.addEventListener("click",()=>{
       field.value=button.dataset.question||"";
