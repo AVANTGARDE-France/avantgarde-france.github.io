@@ -2072,6 +2072,19 @@ async function initialiserEquipe() {
 
     initialiserCompteurDescription();
 
+    // Depuis le questionnaire d'accueil, ouvrir directement le tunnel d'inscription.
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("ouvrir-inscription") === "1") {
+        const boutonInscription = document.getElementById("openJoin");
+        if (boutonInscription) {
+            boutonInscription.click();
+            params.delete("ouvrir-inscription");
+            const query = params.toString();
+            const nouvelleUrl = window.location.pathname + (query ? "?" + query : "") + window.location.hash;
+            window.history.replaceState({}, "", nouvelleUrl);
+        }
+    }
+
 }
 
 
