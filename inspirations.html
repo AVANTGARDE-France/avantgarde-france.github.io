@@ -1023,9 +1023,11 @@ testButton?.addEventListener("click",async()=>{
   const elapsed=Math.floor((Date.now()-started)/1000);
   testButton.textContent="Extraction — "+Math.floor(elapsed/60)+":"+String(elapsed%60).padStart(2,"0");
  },1000);
+ let extractionStarted=false;
  try{
-  const videoShare=await import("./js/inspirations-video-share.js?v=20261127-19");
+  const videoShare=await import("./js/inspirations-video-share.js?v=20261127-20");
   if(/^https?:\/\//i.test(mediaUrl) && /(?:youtube\.com|youtu\.be)/i.test(new URL(mediaUrl).hostname)){
+   extractionStarted=true;
    const result=await videoShare.prepareYouTubeDownload(mediaUrl,message=>status(message));
    pendingYoutubeDownload={mediaUrl};
    const link=document.createElement("a");
@@ -1040,10 +1042,11 @@ testButton?.addEventListener("click",async()=>{
   }
  }catch(error){
   console.error("Test du moteur vidéo indépendant",error);
-  const isYouTube = /(?:youtube\.com|youtu\.be)/i.test(new URL(mediaUrl).hostname);
-  status(isYouTube
-    ? "Le service d’extraction ne répond pas correctement pour le moment. Réessaie dans quelques minutes."
-    : (error?.message||"Échec du test vidéo."));
+  if(extractionStarted){
+   status("Le service d’extraction ne répond pas correctement pour le moment. Réessaie dans quelques minutes.");
+  }else{
+   status(error?.message||"Échec du test vidéo.");
+  }
  }finally{
   clearInterval(timer);
   testButton.disabled=false;videoTestBusy=false;
