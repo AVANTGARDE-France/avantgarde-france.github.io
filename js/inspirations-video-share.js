@@ -195,7 +195,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
 
     onProgress("Chargement du moteur WebMotion…");
     await Promise.all([
-      import(WEBMOTION + "/elements?bundle"),
+      import(WEBMOTION + "/elements?bundle&deps=mp4box@2.4.1"),
       import(WEBMOTION + "/video?bundle&deps=mp4box@2.4.1")
     ]);
 
