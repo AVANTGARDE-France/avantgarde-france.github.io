@@ -991,6 +991,20 @@ function download(blob,title){
  const name=(title||"inspiration").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9_-]+/gi,"-").replace(/^-|-$/g,"").slice(0,55)||"inspiration";
  const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="avantgarde-"+name+".mp4";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);
 }
+async function copyShareText(text){
+ try{await navigator.clipboard.writeText(text);return true}catch(_){}
+ const field=document.createElement("textarea");field.value=text;field.setAttribute("readonly","");
+ field.style.cssText="position:fixed;left:-9999px;top:0;opacity:0";document.body.appendChild(field);field.select();
+ let ok=false;try{ok=document.execCommand("copy")}catch(_){}field.remove();return ok;
+}
+async function finishShare(blob,user){
+ download(blob,document.getElementById("projectModalTitle")?.textContent?.trim()||"inspiration");
+ const copied=await copyShareText(versoText(user.id));
+ status(copied
+  ?"Votre vidéo est prête dans les téléchargements (Ctrl + J), pour votre publication.\nLe texte du verso a été copié : un simple Ctrl + V suffit dans le champ texte pour votre contenu !\nÀ bientôt !"
+  :"Votre vidéo est prête dans les téléchargements (Ctrl + J), pour votre publication.\nLa copie du texte du verso a échoué : vous pouvez le copier depuis la carte.\nÀ bientôt !");
+ return copied;
+}
 button?.addEventListener("click",async()=>{
  if(busy)return;
  const modal=document.getElementById("projectModal");
@@ -1028,7 +1042,7 @@ button?.addEventListener("click",async()=>{
      pendingYoutubeDownload={mediaUrl:videoUrl};
      const a=document.createElement("a");a.href=result.url;a.target="_blank";a.rel="noopener";
      document.body.appendChild(a);a.click();a.remove();
-     status("MP4 récupéré. Clique encore sur Partager pour le sélectionner et créer ta vidéo.");
+     status('Clique sur "Choisir le MP4" pour le sélectionner et créer ta vidéo.');
      if(label)label.textContent="Choisir le MP4";
      return;
     }
@@ -1038,11 +1052,9 @@ button?.addEventListener("click",async()=>{
     onProgress:message=>{if(label){const pct=message.startsWith("Encodage MP4 : démarrage")?"Création 0 %…":message.startsWith("Création du MP4 ")?message.replace("Création du MP4 ","Création "):message.startsWith("Analyse")?"Vidéo 15 %…":message.startsWith("Vérification")?"Vidéo 25 %…":message.startsWith("Chargement")?"Vidéo 35 %…":message.startsWith("Préparation")?"Vidéo 45 %…":message.startsWith("Images animées")?"Vidéo 60 %…":message;label.textContent=pct}}
    });
    download(blob,document.getElementById("projectModalTitle")?.textContent?.trim()||"inspiration");
+   await finishShare(blob,user);
    pendingYoutubeDownload=null;
-   let copied=false;try{await navigator.clipboard.writeText(versoText(user.id));copied=true}catch(_){}
-   status(copied?"Vidéo prête et téléchargée · texte copié.":"Vidéo téléchargée · copie du texte impossible.");
    showSocialAfterRestore=true;
-   if(label)label.textContent="Partager";
    return;
   }
   if(typeof ImageDecoder==="undefined")throw new Error("Ce navigateur ne prend pas en charge ImageDecoder pour l’animation du fond.");
@@ -1052,7 +1064,7 @@ button?.addEventListener("click",async()=>{
   if(!rect.width||!rect.height)throw new Error("Le recto agrandi est introuvable.");
   parent=source.parentNode;next=source.nextSibling;sourceStyle=source.getAttribute("style");sourceClass=source.getAttribute("class");
   composition=document.createElement("w-composition");
-  composition.setAttribute("width","1080");composition.setAttribute("height","1350");composition.setAttribute("fps","30");composition.setAttribute("duration","300");
+  composition.setAttribute("width","1080");composition.setAttribute("height","1350");composition.setAttribute("fps","30");composition.setAttribute("duration","150");
   composition.style.cssText="position:fixed;left:-20000px;top:0;width:1080px;height:1350px;overflow:hidden;pointer-events:none";
   const stage=document.createElement("w-el");stage.setAttribute("x","0");stage.setAttribute("y","0");stage.setAttribute("width","1080");stage.setAttribute("height","1350");
   stage.style.cssText="display:block;width:1080px;height:1350px;overflow:hidden";
@@ -1130,9 +1142,8 @@ button?.addEventListener("click",async()=>{
   if(label)label.textContent="Création 0 %…";
   const blob=await composition.export({onProgress:({frame,total})=>{if(label)label.textContent="Création "+Math.round(frame/total*100)+" %…"}});
   if(!(blob instanceof Blob)||blob.size<10000)throw new Error("WebMotion n’a pas produit de vidéo exploitable.");
-  download(blob,document.getElementById("projectModalTitle")?.textContent?.trim()||"inspiration");
-  let copied=false;try{await navigator.clipboard.writeText(versoText(user.id));copied=true}catch(_){}
-  status(copied?"Vidéo MP4 animée de 10 secondes téléchargée ; texte du verso copié.":"Vidéo MP4 téléchargée ; copie du texte du verso impossible.");
+  await finishShare(blob,user);
+  showSocialAfterRestore=true;
   showSocialAfterRestore=true;
   if(label)label.textContent="Partager";
  }catch(error){console.error("Export du recto agrandi WebMotion",error);status(error?.message||"Impossible de créer la vidéo.");if(label)label.textContent="Réessayer"}
