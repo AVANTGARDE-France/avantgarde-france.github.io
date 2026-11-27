@@ -135,144 +135,21 @@ async function probeNativePlayback(url) {
   }
 }
 
-async function exportVideoAwaitingDecodedFrames({ compositionElement, videoLayer, sourceFile, sourceUrl, width, height, fps, durationFrames, onProgress }) {
-  const [wm, html, muxerModule] = await Promise.all([
-    import(WEBMOTION + "?bundle"),
-    import(WEBMOTION + "/html-in-canvas?bundle"),
-    import("https://esm.sh/mp4-muxer@5.2.2?bundle")
-  ]);
-  const { Composition, Runtime, Layer, exportVideo } = wm;
-  const { HtmlRenderer } = html;
-  const { Muxer, ArrayBufferTarget } = muxerModule;
-
-  let videoCodec = null;
-  for (const codec of ["avc1.640028", "avc1.42001f", "avc1.42e01e"]) {
-    const support = await VideoEncoder.isConfigSupported({
-      codec, width, height, bitrate: 8_000_000, framerate: fps
-    });
-    if (support.supported) { videoCodec = codec; break; }
+async function exportVideoAwaitingDecodedFrames({ compositionElement, onProgress }) {
+  // Utiliser l'export officiel du module elements de WebMotion.
+  // Il installe StageLayerPlanner : les <w-video> sont capturés comme calques
+  // vivants via wmLiveCanvas(), après wmAwaitFrame(), et non comme DOM statique.
+  const elements = await import(WEBMOTION + "/elements?bundle&deps=mp4box@2.4.1");
+  if (typeof elements.exportComposition !== "function") {
+    throw new Error("L'export officiel exportComposition de WebMotion est indisponible.");
   }
-  if (!videoCodec) throw new Error("Aucun encodeur vidéo H.264 compatible dans ce navigateur.");
-
-  // Préparer la piste audio du même MP4 source. WebMotion sait déjà mixer
-  // l'audio du <w-video>; on reprend ici le même principe dans le muxer,
-  // puisque son export standard ne permet pas d'attendre le décodage vidéo.
-  const sampleRate = 48000;
-  const channels = 2;
-  let audioBuffer = null;
-  {
-    try {
-      const audioContext = new AudioContext({ sampleRate });
-      try {
-        let bytes;
-        if (sourceFile) bytes = await sourceFile.arrayBuffer();
-        else {
-          const response = await fetchStage(sourceUrl, {}, "Lecture de la piste audio MP4");
-          if (!response.ok) throw new Error("HTTP " + response.status);
-          bytes = await response.arrayBuffer();
-        }
-        const decoded = await audioContext.decodeAudioData(bytes.slice(0));
-        const frameCount = Math.ceil((durationFrames / fps) * sampleRate);
-        const offline = new OfflineAudioContext(channels, frameCount, sampleRate);
-        const source = offline.createBufferSource();
-        source.buffer = decoded;
-        source.connect(offline.destination);
-        const usableDuration = Math.min(durationFrames / fps, decoded.duration);
-        if (usableDuration > 0) source.start(0, 0, usableDuration);
-        audioBuffer = await offline.startRendering();
-      } finally {
-        await audioContext.close();
-      }
-    } catch (error) {
-      console.warn("[Inspirations vidéo] Audio source non décodable séparément :", error);
+  return await elements.exportComposition(compositionElement, {
+    bitrate: 8_000_000,
+    onProgress: ({ frame, total }) => {
+      const percent = total ? Math.min(100, Math.round(frame / total * 100)) : 0;
+      onProgress("Création du MP4 " + percent + " %…");
     }
-  }
-
-  let audioCodec = null;
-  if (audioBuffer && typeof AudioEncoder !== "undefined") {
-    const support = await AudioEncoder.isConfigSupported({
-      codec: "mp4a.40.2", sampleRate, numberOfChannels: channels, bitrate: 128000
-    });
-    if (support.supported) audioCodec = "aac";
-  }
-  if (!audioCodec) throw new Error("Impossible de préparer la piste audio AAC du MP4 source.");
-
-  const muxer = new Muxer({
-    target: new ArrayBufferTarget(),
-    video: { codec: "avc", width, height },
-    audio: { codec: audioCodec, sampleRate, numberOfChannels: channels },
-    fastStart: "in-memory"
   });
-
-  // Encodage audio en blocs AAC, avant l'encodage vidéo comme dans WebMotion.
-  let audioError = null;
-  const audioEncoder = new AudioEncoder({
-    output: (chunk, meta) => muxer.addAudioChunk(chunk, meta),
-    error: error => { audioError = error; }
-  });
-  audioEncoder.configure({
-    codec: "mp4a.40.2", sampleRate, numberOfChannels: channels, bitrate: 128000
-  });
-  const chunkFrames = 9600;
-  for (let offset = 0; offset < audioBuffer.length; offset += chunkFrames) {
-    const count = Math.min(chunkFrames, audioBuffer.length - offset);
-    const data = new Float32Array(count * channels);
-    for (let channel = 0; channel < channels; channel++) {
-      audioBuffer.copyFromChannel(data.subarray(channel * count, (channel + 1) * count), channel, offset);
-    }
-    const audioData = new AudioData({
-      format: "f32-planar", sampleRate, numberOfFrames: count, numberOfChannels: channels,
-      timestamp: Math.round(offset / sampleRate * 1_000_000), data
-    });
-    audioEncoder.encode(audioData);
-    audioData.close();
-    if (audioError) break;
-  }
-  await audioEncoder.flush();
-  audioEncoder.close();
-  if (audioError) throw new Error("Échec de l'encodage audio AAC : " + audioError.message);
-
-  const renderComposition = new Composition({
-    width, height, fps, durationInFrames: durationFrames
-  });
-  const renderer = new HtmlRenderer(width, height, {
-    canvas: typeof OffscreenCanvas !== "undefined" ? new OffscreenCanvas(width, height) : document.createElement("canvas"),
-    container: compositionElement.stage,
-    background: "rgba(0,0,0,0)"
-  });
-
-  // CORRECTION CENTRALE : le driver standard de WebMotion appelle renderFrameAt()
-  // sans retourner/attendre wmAwaitFrame(). Son export capture donc le canvas
-  // avant que VideoDecoder ait peint la frame demandée. Ce driver asynchrone
-  // attend le décodage de CHAQUE frame avant que Runtime.capture() soit appelé.
-  const driver = {
-    mount() {},
-    renderFrame(ctx) {
-      compositionElement.renderFrameAt(ctx.frame);
-      return videoLayer.wmAwaitFrame();
-    },
-    destroy() {}
-  };
-  const runtime = new Runtime({
-    composition: renderComposition,
-    renderer,
-    layers: [new Layer({ component: driver })]
-  });
-
-  onProgress("Assemblage vidéo : attente du décodage de chaque image…");
-  try {
-    await exportVideo(runtime, {
-      muxer, codec: videoCodec, bitrate: 8_000_000,
-      onProgress: ({ frame, total }) => {
-        const percent = total ? Math.min(100, Math.round(frame / total * 100)) : 0;
-        onProgress("Création du MP4 " + percent + " %…");
-      }
-    });
-    return new Blob([muxer.target.buffer], { type: "video/mp4" });
-  } catch (error) {
-    try { if (audioEncoder.state !== "closed") audioEncoder.close(); } catch (_) {}
-    throw error;
-  }
 }
 
 export async function generateVideoShare({ source, mediaUrl, sourceFile = null, onProgress = () => {} }) {
@@ -475,13 +352,6 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     onProgress("Encodage MP4 : démarrage…");
     const blob = await exportVideoAwaitingDecodedFrames({
       compositionElement: composition,
-      videoLayer,
-      sourceFile,
-      sourceUrl: videoSource,
-      width: WIDTH,
-      height: HEIGHT,
-      fps: FPS,
-      durationFrames,
       onProgress
     });
     if (!(blob instanceof Blob) || blob.size < 10000) {
