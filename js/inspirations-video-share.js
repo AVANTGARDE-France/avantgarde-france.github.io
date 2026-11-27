@@ -104,6 +104,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
   let originalClass = null;
   let mediaWrap = null;
   let originalMediaStyle = null;
+  let transparentLayers = [];
 
   try {
     let videoSource = mediaUrl;
@@ -139,6 +140,23 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     originalClass = source.getAttribute("class");
     mediaWrap = source.querySelector(".project-card-image-wrap");
     originalMediaStyle = mediaWrap?.getAttribute("style") ?? null;
+
+    // Le recto agrandi conserve son fond bleu opaque dans le DOM.
+    // Dans le rendu vidéo, ce fond recouvrait le calque MP4 placé dessous.
+    // On rend transparents uniquement les fonds des conteneurs de carte,
+    // sans supprimer les cadres, textes, pseudo-éléments ni décorations.
+    const cardRoot = source.querySelector(".project-card");
+    const surfaces = [cardRoot, ...source.querySelectorAll(".project-card-inner, .project-card-face, .project-card-front")]
+      .filter(Boolean);
+    transparentLayers = surfaces.map(el => ({
+      el,
+      style: el.getAttribute("style")
+    }));
+    for (const { el } of transparentLayers) {
+      el.style.setProperty("background", "transparent", "important");
+      el.style.setProperty("background-color", "transparent", "important");
+      el.style.setProperty("background-image", "none", "important");
+    }
 
     onProgress("Préparation de la composition vidéo…");
     composition = document.createElement("w-composition");
@@ -230,6 +248,10 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     if (mediaWrap) {
       if (originalMediaStyle === null) mediaWrap.removeAttribute("style");
       else mediaWrap.setAttribute("style", originalMediaStyle);
+    }
+    for (const item of transparentLayers) {
+      if (item.style === null) item.el.removeAttribute("style");
+      else item.el.setAttribute("style", item.style);
     }
     if (videoObjectUrl) URL.revokeObjectURL(videoObjectUrl);
     if (audioObjectUrl) URL.revokeObjectURL(audioObjectUrl);
