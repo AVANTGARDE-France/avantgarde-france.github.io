@@ -192,10 +192,19 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
 
     await composition.ready;
     if (document.fonts?.ready) await document.fonts.ready;
-    onProgress("Vérification du décodage vidéo et audio…");
+
+    // WebMotion prépare le MP4 source (démultiplexage MP4Box + premier décodage)
+    // avant de pouvoir encoder la première image. Ne pas afficher 0 % pendant
+    // cette phase : elle peut durer sur un fichier local volumineux.
+    onProgress("Analyse du MP4 local (préparation vidéo)…");
+    await videoLayer.wmReady;
+    if (!videoLayer.source) {
+      throw new Error("WebMotion n'a pas réussi à analyser/décoder le MP4 local. Vérifie que le fichier est bien un MP4 H.264 compatible.");
+    }
+    onProgress("Vidéo décodée. Préparation de la piste audio et de l'encodage…");
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-    onProgress("Création du MP4 0 %…");
+    onProgress("Encodage MP4 : démarrage…");
     const blob = await composition.export({
       onProgress: ({ frame, total }) => {
         const percent = total ? Math.min(100, Math.round(frame / total * 100)) : 0;
