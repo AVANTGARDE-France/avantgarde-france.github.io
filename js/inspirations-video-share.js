@@ -340,7 +340,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     // par PlaybackController et peut ne pas peindre immédiatement une frame
     // lorsque la composition est en pause. renderFrameAt() applique le FrameContext
     // de façon synchrone, puis wmAwaitFrame() attend le décodage vidéo réel.
-    await composition.seek(0);
+    composition.renderFrameAt(0);
     await videoLayer.wmAwaitFrame();
     const firstFrameContext = liveVideoCanvas.getContext("2d", { willReadFrequently: true });
     if (!firstFrameContext) throw new Error("Canvas du décodeur WebMotion inaccessible.");
@@ -357,7 +357,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     const diagnosticFrame = Math.min(FPS, durationFrames - 1);
     let frameDifference = { changedPixels: 0, changedPercent: 0, averageDifference: 0 };
     if (diagnosticFrame > 0) {
-      await composition.seek(diagnosticFrame);
+      composition.renderFrameAt(diagnosticFrame);
       await videoLayer.wmAwaitFrame();
       frameDifference = compareCanvasSamples(firstFrameSample, sampleCanvas(liveVideoCanvas));
     }
@@ -378,7 +378,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
         "Les mesures techniques ont été enregistrées dans la console du navigateur."
       );
     }
-    await composition.seek(0);
+    composition.renderFrameAt(0);
     await videoLayer.wmAwaitFrame();
     onProgress("Images animées vérifiées. Vérification de la composition…");
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
