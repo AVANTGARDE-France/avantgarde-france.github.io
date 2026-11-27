@@ -337,6 +337,13 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
       nativeFrameVideo.addEventListener("error", () => { clearTimeout(timer); reject(new Error("Le lecteur natif ne peut pas décoder le MP4 (erreur " + (nativeFrameVideo.error?.code || "inconnue") + ").")); }, { once: true });
       nativeFrameVideo.load();
     });
+    if (nativeFrameVideo.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+      await new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error("Le navigateur n'a pas fourni la première image décodée du MP4.")), 15000);
+        nativeFrameVideo.addEventListener("loadeddata", () => { clearTimeout(timer); resolve(); }, { once: true });
+        nativeFrameVideo.addEventListener("error", () => { clearTimeout(timer); reject(new Error("Échec du décodage de la première image MP4.")); }, { once: true });
+      });
+    }
     const nativeFrameDuration = nativeFrameVideo.duration;
     let nativeFramePending = Promise.resolve();
     let nativeFrameRequest = 0;
