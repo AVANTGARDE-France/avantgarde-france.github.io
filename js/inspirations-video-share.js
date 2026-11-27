@@ -176,6 +176,18 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     videoLayer.setAttribute("fit", "cover");
     if (audioSource) videoLayer.setAttribute("muted", "");
     else videoLayer.setAttribute("volume", "1");
+    // WebMotion 0.18.2 ne déclenche wmApplyFrame() que si renderEntity()
+    // détecte au moins un composant ou tween sur l'élément. <w-video> n'en
+    // déclare aucun par lui-même : sans ce tween neutre, son canvas reste
+    // bloqué sur la première image. Ce tween 1 → 1 active le hook sans effet
+    // visuel et laisse le décodage vidéo entièrement géré par WebMotion.
+    const videoFrameHook = document.createElement("w-animate");
+    videoFrameHook.setAttribute("property", "opacity");
+    videoFrameHook.setAttribute("from", "1");
+    videoFrameHook.setAttribute("to", "1");
+    videoFrameHook.setAttribute("start", "0");
+    videoFrameHook.setAttribute("end", String(durationFrames));
+    videoLayer.appendChild(videoFrameHook);
     composition.appendChild(videoLayer);
 
     if (audioSource) {
