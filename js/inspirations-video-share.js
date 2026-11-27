@@ -179,7 +179,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     onProgress("Chargement du moteur WebMotion…");
     await Promise.all([
       import(WEBMOTION + "/elements?bundle"),
-      import(WEBMOTION + "/video?bundle&external=mp4box")
+      import(WEBMOTION + "/video?bundle")
     ]);
 
     const rect = source.getBoundingClientRect();
@@ -226,18 +226,6 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     videoLayer.setAttribute("fit", "cover");
     if (audioSource) videoLayer.setAttribute("muted", "");
     else videoLayer.setAttribute("volume", "1");
-    // WebMotion 0.18.2 ne déclenche wmApplyFrame() que si renderEntity()
-    // détecte au moins un composant ou tween sur l'élément. <w-video> n'en
-    // déclare aucun par lui-même : sans ce tween neutre, son canvas reste
-    // bloqué sur la première image. Ce tween 1 → 1 active le hook sans effet
-    // visuel et laisse le décodage vidéo entièrement géré par WebMotion.
-    const videoFrameHook = document.createElement("w-animate");
-    videoFrameHook.setAttribute("property", "opacity");
-    videoFrameHook.setAttribute("from", "1");
-    videoFrameHook.setAttribute("to", "1");
-    videoFrameHook.setAttribute("start", "0");
-    videoFrameHook.setAttribute("end", String(durationFrames));
-    videoLayer.appendChild(videoFrameHook);
     composition.appendChild(videoLayer);
 
     if (audioSource) {
@@ -298,56 +286,47 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     // pendant composition.export(). Le calque doit simplement rester un enfant
     // direct de stage (contrat documenté de WebMotion pour les vidéos).
     
-    // WebMotion prépare le MP4 source (démultiplexage MP4Box + premier décodage)
-    // avant de pouvoir encoder la première image. Ne pas afficher 0 % pendant
-    // cette phase : elle peut durer sur un fichier local volumineux.
-    onProgress("Analyse du MP4 local (préparation vidéo)…");
+    // WebMotion 0.18.2 expose wmReady, mais son composant <w-video>
+    // absorbe en interne les erreurs de démultiplexage. Vérifier la taille
+    // du canvas réellement initialisé : le canvas vierge reste en 300×150.
+    onProgress("Analyse du MP4 local (démultiplexage et décodage WebMotion)…");
     await videoLayer.wmReady;
     const liveVideoCanvas = videoLayer.wmLiveCanvas();
-    if (!liveVideoCanvas || !liveVideoCanvas.width || !liveVideoCanvas.height) {
-      throw new Error("WebMotion n'a pas créé le calque vidéo animé. Vérifie que le MP4 est compatible H.264.");
-    }
-    // DIAGNOSTIC CIBLÉ : utiliser l'API publique de navigation par frame
-    // de WebMotion (composition.seek), puis attendre le décodage de <w-video>.
-    // renderFrameAt() n'est pas l'API documentée pour piloter cette scène.
-    const readVideoCanvasSignature = () => {
-      const canvas = videoLayer.wmLiveCanvas();
-      if (!canvas || !canvas.width || !canvas.height) {
-        throw new Error("DIAGNOSTIC VIDÉO : canvas WebMotion absent ou vide.");
-      }
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      if (!ctx) throw new Error("DIAGNOSTIC VIDÉO : contexte 2D indisponible.");
-      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-      // Échantillonnage réparti sur toute l'image pour éviter de comparer
-      // uniquement une zone noire ou un aplat.
-      let signature = 2166136261;
-      const samples = 32 * 32;
-      for (let i = 0; i < samples; i++) {
-        const pixel = Math.floor(i * (data.length / 4 - 1) / (samples - 1)) * 4;
-        signature ^= data[pixel] | (data[pixel + 1] << 8) | (data[pixel + 2] << 16);
-        signature = Math.imul(signature, 16777619);
-      }
-      return signature >>> 0;
-    };
-    // Diagnostic déterministe : seek() appelle immédiatement renderFrameAt(),
-    // qui déclenche wmApplyFrame() sur <w-video>. On attend ensuite le décodage
-    // réel de la frame. Ne pas utiliser play() + temporisation ici : WebMotion
-    // peut attendre le chargement/décodage audio avant de démarrer son horloge,
-    // ce qui ferait arrêter le test avant même la première frame suivante.
-    await composition.seek(0);
-    await videoLayer.wmAwaitFrame();
-    const firstVideoSignature = readVideoCanvasSignature();
-    const diagnosticFrame = Math.min(30, durationFrames - 1);
-    await composition.seek(diagnosticFrame);
-    await videoLayer.wmAwaitFrame();
-    const laterVideoSignature = readVideoCanvasSignature();
-    if (firstVideoSignature === laterVideoSignature) {
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const expectedCanvasWidth = Math.round(WIDTH * dpr);
+    const expectedCanvasHeight = Math.round(HEIGHT * dpr);
+    if (!liveVideoCanvas ||
+        liveVideoCanvas.width !== expectedCanvasWidth ||
+        liveVideoCanvas.height !== expectedCanvasHeight) {
       throw new Error(
-        "DIAGNOSTIC VIDÉO : le canvas <w-video> est identique à la frame 0 et à la frame " + diagnosticFrame + ". " +
-        "Le décodage de cette frame n'a pas produit de nouvelle image ; le MP4 n'est pas déclaré défectueux."
+        "WebMotion n'a pas initialisé son décodeur MP4 (canvas vidéo non dimensionné). " +
+        "Le module vidéo doit charger MP4Box pour démultiplexer le fichier. " +
+        "Vérifie le chargement du module vidéo et la compatibilité du MP4."
       );
     }
-    // Revenir au début : export() parcourt ensuite les frames depuis zéro.
+
+    // Le seek déclenche le décodage frame-exact de WebMotion. On attend la
+    // promesse du calque après chaque navigation, sans comparer les pixels :
+    // deux images légitimement proches ou identiques ne doivent pas bloquer
+    // la génération d'une vidéo pourtant décodable.
+    await composition.seek(0);
+    await videoLayer.wmAwaitFrame();
+    const firstFrameContext = liveVideoCanvas.getContext("2d", { willReadFrequently: true });
+    if (!firstFrameContext) throw new Error("Canvas du décodeur WebMotion inaccessible.");
+    const firstFramePixels = firstFrameContext.getImageData(
+      Math.floor(liveVideoCanvas.width / 2),
+      Math.floor(liveVideoCanvas.height / 2),
+      1, 1
+    ).data;
+    if (firstFramePixels[3] === 0) {
+      throw new Error("WebMotion a créé son canvas, mais n'a pas peint la première image du MP4.");
+    }
+
+    const diagnosticFrame = Math.min(30, durationFrames - 1);
+    if (diagnosticFrame > 0) {
+      await composition.seek(diagnosticFrame);
+      await videoLayer.wmAwaitFrame();
+    }
     await composition.seek(0);
     await videoLayer.wmAwaitFrame();
     onProgress("Diagnostic vidéo réussi : les images du MP4 changent. Vérification de la composition…");
