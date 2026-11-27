@@ -298,10 +298,31 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
       composition.stage.insertBefore(videoLayer, composition.stage.firstChild);
     }
 
-    // Ne pas surcharger renderFrameAt ni appeler wmApplyFrame manuellement.
-    // WebMotion 0.18.2 pilote lui-même le décodage frame-exact de <w-video>
-    // pendant composition.export(). Le calque doit simplement rester un enfant
-    // direct de stage (contrat documenté de WebMotion pour les vidéos).
+    // Pont explicite entre l'horloge de la composition et le décodeur vidéo.
+    // Selon la façon dont esm.sh résout les bundles /elements et /video,
+    // les deux bundles peuvent embarquer des instances distinctes du registre
+    // applyFrame. Dans ce cas le frame-walk de <w-composition> ne voit pas le
+    // hook wmApplyFrame du <w-video>, et l'export capture éternellement le poster.
+    // On appelle donc le hook vidéo directement à chaque frame demandée par
+    // l'export officiel. Si le frame-walk l'a déjà appelé, lastKey rend l'appel
+    // supplémentaire sans effet ; sinon, cela garantit le décodage attendu.
+    if (typeof videoLayer.wmApplyFrame !== "function" ||
+        typeof videoLayer.wmAwaitFrame !== "function" ||
+        typeof videoLayer.wmLiveCanvas !== "function") {
+      throw new Error("Le module vidéo WebMotion n'a pas exposé ses trois hooks d'export.");
+    }
+    const originalRenderFrameAt = composition.renderFrameAt.bind(composition);
+    composition.renderFrameAt = (frame) => {
+      originalRenderFrameAt(frame);
+      videoLayer.wmApplyFrame({
+        frame,
+        globalFrame: frame,
+        fps: FPS,
+        width: WIDTH,
+        height: HEIGHT
+      });
+    };
+
     
     // WebMotion 0.18.2 expose wmReady, mais son composant <w-video>
     // absorbe en interne les erreurs de démultiplexage. Vérifier la taille
