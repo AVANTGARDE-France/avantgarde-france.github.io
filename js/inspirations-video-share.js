@@ -135,7 +135,7 @@ async function probeNativePlayback(url) {
   }
 }
 
-async function exportVideoAwaitingDecodedFrames({ compositionElement, videoLayer, sourceFile, width, height, fps, durationFrames, onProgress }) {
+async function exportVideoAwaitingDecodedFrames({ compositionElement, videoLayer, sourceFile, sourceUrl, width, height, fps, durationFrames, onProgress }) {
   const [wm, html, muxerModule] = await Promise.all([
     import(WEBMOTION + "?bundle"),
     import(WEBMOTION + "/html-in-canvas?bundle"),
@@ -160,11 +160,17 @@ async function exportVideoAwaitingDecodedFrames({ compositionElement, videoLayer
   const sampleRate = 48000;
   const channels = 2;
   let audioBuffer = null;
-  if (sourceFile) {
+  {
     try {
       const audioContext = new AudioContext({ sampleRate });
       try {
-        const bytes = await sourceFile.arrayBuffer();
+        let bytes;
+        if (sourceFile) bytes = await sourceFile.arrayBuffer();
+        else {
+          const response = await fetchStage(sourceUrl, {}, "Lecture de la piste audio MP4");
+          if (!response.ok) throw new Error("HTTP " + response.status);
+          bytes = await response.arrayBuffer();
+        }
         const decoded = await audioContext.decodeAudioData(bytes.slice(0));
         const frameCount = Math.ceil((durationFrames / fps) * sampleRate);
         const offline = new OfflineAudioContext(channels, frameCount, sampleRate);
@@ -471,6 +477,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
       compositionElement: composition,
       videoLayer,
       sourceFile,
+      sourceUrl: videoSource,
       width: WIDTH,
       height: HEIGHT,
       fps: FPS,
