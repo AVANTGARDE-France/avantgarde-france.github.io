@@ -997,7 +997,7 @@ testButton?.addEventListener("click",async()=>{
    videoTestBusy=true;testButton.disabled=true;
    const oldLabel="Test";
    try{
-    const videoShare=await import("./js/inspirations-video-share.js?v=20261127-22");
+    const videoShare=await import("./js/inspirations-video-share.js?v=20261127-23");
     const blob=await videoShare.generateVideoShare({
      source,mediaUrl,sourceFile:file,
      onProgress:message=>{testButton.textContent=message;status(message);}
