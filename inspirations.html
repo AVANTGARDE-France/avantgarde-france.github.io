@@ -786,15 +786,15 @@ jamais une boîte de hauteur fixe qui coupe le texte. */
 
 /* Ajustements du recto : textes latéraux sur une seule ligne et signature enrichie. */
 :is(#projectGrid,#projectModalFront) .project-card-top .project-card-title{
-  width:250px!important;max-width:none!important;
+  width:300px!important;max-width:none!important;
   font-size:12px!important;white-space:nowrap!important;
-  overflow:hidden!important;text-overflow:ellipsis!important;
+  overflow:visible!important;text-overflow:clip!important;
   display:block!important;-webkit-line-clamp:unset!important;
 }
 :is(#projectGrid,#projectModalFront) .project-card-taxonomy{
-  width:250px!important;max-width:none!important;
+  width:300px!important;max-width:none!important;
   font-size:9px!important;white-space:nowrap!important;
-  overflow:hidden!important;text-overflow:ellipsis!important;
+  overflow:visible!important;text-overflow:clip!important;
 }
 :is(#projectGrid,#projectModalFront) .project-card-tagline{
   font-size:clamp(11px,calc(1vw + 1px),14px)!important;
@@ -817,10 +817,10 @@ jamais une boîte de hauteur fixe qui coupe le texte. */
 }
 @media(max-width:620px){
   :is(#projectGrid,#projectModalFront) .project-card-top .project-card-title{
-    width:220px!important;font-size:11px!important;
+    width:260px!important;font-size:11px!important;
   }
   :is(#projectGrid,#projectModalFront) .project-card-taxonomy{
-    width:220px!important;font-size:8.5px!important;
+    width:260px!important;font-size:8.5px!important;
   }
   :is(#projectGrid,#projectModalFront) .project-card-tagline{font-size:11px!important}
   :is(#projectGrid,#projectModalFront) .inspiration-card-brand{bottom:3px!important;padding-bottom:7px!important}
