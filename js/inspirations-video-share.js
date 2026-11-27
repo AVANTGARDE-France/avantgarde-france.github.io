@@ -184,6 +184,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
   let videoObjectUrl = null;
   let audioObjectUrl = null;
   let composition = null;
+  let nativeFrameVideo = null;
   let originalParent = null;
   let originalNext = null;
   let originalStyle = null;
@@ -324,7 +325,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     // sa piste audio), mais alimenter son canvas avec le décodeur MP4 natif
     // du navigateur. Le décodeur WebCodecs interne de WebMotion reste bloqué
     // sur la première image sur certains MP4 pourtant lisibles nativement.
-    const nativeFrameVideo = document.createElement("video");
+    nativeFrameVideo = document.createElement("video");
     nativeFrameVideo.muted = true;
     nativeFrameVideo.playsInline = true;
     nativeFrameVideo.preload = "auto";
