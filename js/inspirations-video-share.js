@@ -105,6 +105,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
   let mediaWrap = null;
   let originalMediaStyle = null;
   let transparentLayers = [];
+  let hiddenMediaNodes = [];
 
   try {
     let videoSource = mediaUrl;
@@ -203,7 +204,19 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     source.style.setProperty("transform-origin", "top left", "important");
     source.style.setProperty("margin", "0", "important");
 
-    if (mediaWrap) mediaWrap.style.setProperty("visibility", "hidden", "important");
+    // Garder le conteneur et ses dégradés décoratifs, mais masquer toute
+    // image/vidéo de prévisualisation qui pourrait recouvrir la vraie vidéo.
+    if (mediaWrap) {
+      mediaWrap.style.setProperty("background", "transparent", "important");
+      mediaWrap.style.setProperty("background-image", "none", "important");
+      hiddenMediaNodes = Array.from(mediaWrap.querySelectorAll("img, video, picture, .inspiration-platform-poster-image"))
+        .map(el => ({ el, style: el.getAttribute("style"), hidden: el.hidden }));
+      for (const item of hiddenMediaNodes) {
+        item.el.style.setProperty("visibility", "hidden", "important");
+        item.el.style.setProperty("display", "none", "important");
+        item.el.hidden = true;
+      }
+    }
     overlay.appendChild(source);
     composition.appendChild(overlay);
     document.body.appendChild(composition);
@@ -211,13 +224,37 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     await composition.ready;
     if (document.fonts?.ready) await document.fonts.ready;
 
+    // Garantir que <w-video> soit un calque autonome directement dans la scène.
+    // C'est une exigence de WebMotion : imbriqué dans <w-el>, son canvas serait
+    // rasterisé comme du DOM et l'animation pourrait se figer sur la vignette.
+    if (videoLayer.parentElement !== composition.stage) {
+      composition.stage.insertBefore(videoLayer, composition.stage.firstChild);
+    }
+
+    // Le moteur appelle normalement wmApplyFrame pendant renderFrameAt.
+    // On le relie explicitement au frame clock de l'export également : l'appel
+    // est idempotent (WebMotion ignore les timestamps déjà affichés), et le
+    // renderer attend ensuite wmAwaitFrame avant de capturer le canvas.
+    const nativeRenderFrameAt = composition.renderFrameAt.bind(composition);
+    composition.renderFrameAt = frame => {
+      nativeRenderFrameAt(frame);
+      videoLayer.wmApplyFrame({
+        frame,
+        globalFrame: frame,
+        fps: FPS,
+        width: WIDTH,
+        height: HEIGHT
+      });
+    };
+
     // WebMotion prépare le MP4 source (démultiplexage MP4Box + premier décodage)
     // avant de pouvoir encoder la première image. Ne pas afficher 0 % pendant
     // cette phase : elle peut durer sur un fichier local volumineux.
     onProgress("Analyse du MP4 local (préparation vidéo)…");
     await videoLayer.wmReady;
-    if (!videoLayer.source) {
-      throw new Error("WebMotion n'a pas réussi à analyser/décoder le MP4 local. Vérifie que le fichier est bien un MP4 H.264 compatible.");
+    const liveVideoCanvas = videoLayer.wmLiveCanvas();
+    if (!liveVideoCanvas || !liveVideoCanvas.width || !liveVideoCanvas.height) {
+      throw new Error("WebMotion n'a pas créé le calque vidéo animé. Vérifie que le MP4 est compatible H.264.");
     }
     onProgress("Vidéo décodée. Préparation de la piste audio et de l'encodage…");
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -248,6 +285,11 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     if (mediaWrap) {
       if (originalMediaStyle === null) mediaWrap.removeAttribute("style");
       else mediaWrap.setAttribute("style", originalMediaStyle);
+    }
+    for (const item of hiddenMediaNodes) {
+      if (item.style === null) item.el.removeAttribute("style");
+      else item.el.setAttribute("style", item.style);
+      item.el.hidden = item.hidden;
     }
     for (const item of transparentLayers) {
       if (item.style === null) item.el.removeAttribute("style");
