@@ -997,8 +997,7 @@ testButton?.addEventListener("click",async()=>{
    videoTestBusy=true;testButton.disabled=true;
    const oldLabel="Test";
    try{
-    if(!/\.(mp4|m4v)$/i.test(file.name))throw new Error("Sélectionne le fichier MP4 téléchargé depuis GenDownload.");
-    const videoShare=await import("./js/inspirations-video-share.js?v=20261127-18");
+    const videoShare=await import("./js/inspirations-video-share.js?v=20261127-19");
     const blob=await videoShare.generateVideoShare({
      source,mediaUrl,sourceFile:file,
      onProgress:message=>{testButton.textContent=message;status(message);}
@@ -1025,33 +1024,14 @@ testButton?.addEventListener("click",async()=>{
   testButton.textContent="Extraction — "+Math.floor(elapsed/60)+":"+String(elapsed%60).padStart(2,"0");
  },1000);
  try{
-  const videoShare=await import("./js/inspirations-video-share.js?v=20261127-16");
+  const videoShare=await import("./js/inspirations-video-share.js?v=20261127-19");
   if(/^https?:\/\//i.test(mediaUrl) && /(?:youtube\.com|youtu\.be)/i.test(new URL(mediaUrl).hostname)){
    const result=await videoShare.prepareYouTubeDownload(mediaUrl,message=>status(message));
-   pendingYoutubeDownload={mediaUrl,filename:result.filename};
-   status("Récupération du MP4 pour appliquer le nom de fichier…");
-   // Un lien distant cross-origin ignore souvent l'attribut download.
-   // Le Blob local permet d'imposer un nom stable.
-   let sourceBlob;
-   try{
-    const fileResponse=await fetch(result.url);
-    if(!fileResponse.ok)throw new Error("HTTP "+fileResponse.status);
-    sourceBlob=await fileResponse.blob();
-   }catch(fetchError){
-    console.warn("Téléchargement Blob impossible, téléchargement direct :",fetchError);
-    const fallback=document.createElement("a");
-    fallback.href=result.url;fallback.download=result.filename;fallback.target="_blank";fallback.rel="noopener";
-    document.body.appendChild(fallback);fallback.click();fallback.remove();
-    status("Téléchargement direct lancé. Le nom imposé peut être ignoré par le serveur distant ; si le fichier garde le titre YouTube, renomme-le en Avantgarde-Video-source.mp4. Une fois terminé, clique de nouveau sur Test.");
-    testButton.textContent="Sélectionner le MP4 téléchargé";
-    return;
-   }
-   const localUrl=URL.createObjectURL(sourceBlob);
+   pendingYoutubeDownload={mediaUrl};
    const link=document.createElement("a");
-   link.href=localUrl;link.download=result.filename;
+   link.href=result.url;link.target="_blank";link.rel="noopener";
    document.body.appendChild(link);link.click();link.remove();
-   setTimeout(()=>URL.revokeObjectURL(localUrl),120000);
-   status("Téléchargement MP4 lancé sous le nom "+result.filename+". Une fois terminé, clique de nouveau sur Test pour sélectionner le fichier.");
+   status("Téléchargement du MP4 lancé. Une fois terminé, clique de nouveau sur Test pour sélectionner le fichier.");
    testButton.textContent="Sélectionner le MP4 téléchargé";
   }else{
    const blob=await videoShare.generateVideoShare({source,mediaUrl,onProgress:message=>{testButton.textContent=message;status(message);}});
@@ -1060,7 +1040,10 @@ testButton?.addEventListener("click",async()=>{
   }
  }catch(error){
   console.error("Test du moteur vidéo indépendant",error);
-  status(error?.message||"Échec du test vidéo.");
+  const isYouTube = /(?:youtube\.com|youtu\.be)/i.test(new URL(mediaUrl).hostname);
+  status(isYouTube
+    ? "Le service d’extraction ne répond pas correctement pour le moment. Réessaie dans quelques minutes."
+    : (error?.message||"Échec du test vidéo."));
  }finally{
   clearInterval(timer);
   testButton.disabled=false;videoTestBusy=false;
@@ -1106,7 +1089,7 @@ button?.addEventListener("click",async()=>{
   if(videoUrl){
    const directFile=/\.(mp4|m4v)(?:$|[?#])/i.test(videoUrl);
    if(!directFile)throw new Error("Pour partager une vidéo YouTube, il faut son fichier vidéo original MP4. Le lecteur intégré ne donne pas accès au flux complet pour l’export.");
-   const videoShare=await import("./js/inspirations-video-share.js?v=20261127-16");
+   const videoShare=await import("./js/inspirations-video-share.js?v=20261127-19");
    const blob=await videoShare.generateVideoShare({
     source,
     mediaUrl:videoUrl,
