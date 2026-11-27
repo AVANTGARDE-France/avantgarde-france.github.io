@@ -319,6 +319,66 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     onProgress("Analyse du MP4 local (démultiplexage et décodage WebMotion)…");
     await videoLayer.wmReady;
     const liveVideoCanvas = videoLayer.wmLiveCanvas();
+
+    // Correctif ciblé : conserver <w-video> comme calque WebMotion (y compris
+    // sa piste audio), mais alimenter son canvas avec le décodeur MP4 natif
+    // du navigateur. Le décodeur WebCodecs interne de WebMotion reste bloqué
+    // sur la première image sur certains MP4 pourtant lisibles nativement.
+    const nativeFrameVideo = document.createElement("video");
+    nativeFrameVideo.muted = true;
+    nativeFrameVideo.playsInline = true;
+    nativeFrameVideo.preload = "auto";
+    nativeFrameVideo.src = videoSource;
+    await new Promise((resolve, reject) => {
+      if (nativeFrameVideo.readyState >= HTMLMediaElement.HAVE_METADATA) return resolve();
+      const timer = setTimeout(() => reject(new Error("Le lecteur vidéo natif n'a pas préparé les images à temps.")), 20000);
+      nativeFrameVideo.addEventListener("loadedmetadata", () => { clearTimeout(timer); resolve(); }, { once: true });
+      nativeFrameVideo.addEventListener("error", () => { clearTimeout(timer); reject(new Error("Le lecteur natif ne peut pas décoder le MP4 (erreur " + (nativeFrameVideo.error?.code || "inconnue") + ").")); }, { once: true });
+      nativeFrameVideo.load();
+    });
+    const nativeFrameDuration = nativeFrameVideo.duration;
+    let nativeFramePending = Promise.resolve();
+    let nativeFrameRequest = 0;
+    const originalApplyFrame = videoLayer.wmApplyFrame.bind(videoLayer);
+    videoLayer.wmApplyFrame = (ctx) => {
+      const localFrame = Math.max(0, ctx.frame);
+      const targetTime = Math.min(localFrame / ctx.fps, Math.max(0, nativeFrameDuration - 0.001));
+      const requestId = ++nativeFrameRequest;
+      nativeFramePending = new Promise((resolve, reject) => {
+        const draw = () => {
+          if (requestId !== nativeFrameRequest) return resolve();
+          try {
+            const context = liveVideoCanvas.getContext("2d");
+            if (!context) throw new Error("Canvas du calque vidéo inaccessible.");
+            context.clearRect(0, 0, liveVideoCanvas.width, liveVideoCanvas.height);
+            const sw = nativeFrameVideo.videoWidth, sh = nativeFrameVideo.videoHeight;
+            const scale = Math.max(liveVideoCanvas.width / sw, liveVideoCanvas.height / sh);
+            const dw = sw * scale, dh = sh * scale;
+            context.drawImage(nativeFrameVideo, (liveVideoCanvas.width - dw) / 2, (liveVideoCanvas.height - dh) / 2, dw, dh);
+            resolve();
+          } catch (error) { reject(error); }
+        };
+        if (Math.abs(nativeFrameVideo.currentTime - targetTime) < 0.0005 && nativeFrameVideo.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+          draw();
+          return;
+        }
+        const onSeeked = () => { cleanup(); draw(); };
+        const onError = () => { cleanup(); reject(new Error("Échec du décodage natif à " + targetTime.toFixed(3) + " s.")); };
+        const timer = setTimeout(() => { cleanup(); reject(new Error("Délai dépassé pendant le décodage de l'image à " + targetTime.toFixed(3) + " s.")); }, 10000);
+        const cleanup = () => {
+          clearTimeout(timer);
+          nativeFrameVideo.removeEventListener("seeked", onSeeked);
+          nativeFrameVideo.removeEventListener("error", onError);
+        };
+        nativeFrameVideo.addEventListener("seeked", onSeeked, { once: true });
+        nativeFrameVideo.addEventListener("error", onError, { once: true });
+        nativeFrameVideo.currentTime = targetTime;
+      });
+      nativeFramePending.catch(() => {});
+    };
+    videoLayer.wmAwaitFrame = () => nativeFramePending;
+    videoLayer.wmLiveCanvas = () => liveVideoCanvas;
+
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     const expectedCanvasWidth = Math.round(WIDTH * dpr);
     const expectedCanvasHeight = Math.round(HEIGHT * dpr);
@@ -393,6 +453,11 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     }
     return blob;
   } finally {
+    nativeFrameVideo?.pause();
+    if (nativeFrameVideo) {
+      nativeFrameVideo.removeAttribute("src");
+      nativeFrameVideo.load();
+    }
     composition?.remove();
     if (originalParent && source.parentNode !== originalParent) {
       if (originalNext && originalNext.parentNode === originalParent) originalParent.insertBefore(source, originalNext);
