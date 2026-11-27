@@ -179,7 +179,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     onProgress("Chargement du moteur WebMotion…");
     await Promise.all([
       import(WEBMOTION + "/elements?bundle"),
-      import(WEBMOTION + "/video?bundle")
+      import(WEBMOTION + "/video?bundle&deps=mp4box@2.4.1")
     ]);
 
     const rect = source.getBoundingClientRect();
@@ -329,7 +329,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     }
     await composition.seek(0);
     await videoLayer.wmAwaitFrame();
-    onProgress("Diagnostic vidéo réussi : les images du MP4 changent. Vérification de la composition…");
+    onProgress("Décodage WebMotion validé. Vérification de la composition…");
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
     onProgress("Encodage MP4 : démarrage…");
