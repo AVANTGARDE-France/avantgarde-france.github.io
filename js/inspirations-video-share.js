@@ -99,7 +99,8 @@ export async function prepareYouTubeDownload(youtubeUrl, onProgress = () => {}) 
   const format = videos[0];
   return {
     url: new URL(format.url, "https://gendownload.com").href,
-    filename: (data.title || "inspiration").replace(/[^a-z0-9-_]+/gi,"-") + ".mp4"
+    // Nom stable : le titre YouTube n'est pas repris dans le fichier téléchargé.
+    filename: "Avantgarde-Video-source.mp4"
   };
 }
 
@@ -294,18 +295,22 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
       }
       return signature >>> 0;
     };
+    // Le seek de composition déplace la timeline, mais ne garantit pas à lui
+    // seul que le décodeur média interne de <w-video> ait avancé. Pour vérifier
+    // le vrai rafraîchissement du lecteur, on observe une seconde de lecture
+    // réelle du moteur, puis on compare les canvases.
     await composition.seek(0);
     await videoLayer.wmAwaitFrame();
     const firstVideoSignature = readVideoCanvasSignature();
-    const diagnosticFrame = Math.min(FPS, Math.max(1, durationFrames - 1));
-    await composition.seek(diagnosticFrame);
+    composition.play();
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    composition.pause();
     await videoLayer.wmAwaitFrame();
     const laterVideoSignature = readVideoCanvasSignature();
     if (firstVideoSignature === laterVideoSignature) {
       throw new Error(
-        "DIAGNOSTIC VIDÉO : WebMotion n'a pas actualisé le canvas <w-video> entre 0 s et " +
-        (diagnosticFrame / FPS).toFixed(1) +
-        " s. Ce test ne permet pas de conclure que le fichier MP4 est défectueux."
+        "DIAGNOSTIC VIDÉO : après 1,2 seconde de lecture réelle, le canvas <w-video> est toujours identique. " +
+        "Le lecteur WebMotion ne rafraîchit pas ses images ; le MP4 n'est pas déclaré défectueux."
       );
     }
     // Revenir au début : export() parcourt ensuite les frames depuis zéro.
