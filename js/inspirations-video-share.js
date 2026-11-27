@@ -313,39 +313,6 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     await composition.ready;
     if (document.fonts?.ready) await document.fonts.ready;
 
-    // Garantir que <w-video> soit un calque autonome directement dans la scène.
-    // C'est une exigence de WebMotion : imbriqué dans <w-el>, son canvas serait
-    // rasterisé comme du DOM et l'animation pourrait se figer sur la vignette.
-    if (videoLayer.parentElement !== composition.stage) {
-      composition.stage.insertBefore(videoLayer, composition.stage.firstChild);
-    }
-
-    // Pont explicite entre l'horloge de la composition et le décodeur vidéo.
-    // Selon la façon dont esm.sh résout les bundles /elements et /video,
-    // les deux bundles peuvent embarquer des instances distinctes du registre
-    // applyFrame. Dans ce cas le frame-walk de <w-composition> ne voit pas le
-    // hook wmApplyFrame du <w-video>, et l'export capture éternellement le poster.
-    // On appelle donc le hook vidéo directement à chaque frame demandée par
-    // l'export officiel. Si le frame-walk l'a déjà appelé, lastKey rend l'appel
-    // supplémentaire sans effet ; sinon, cela garantit le décodage attendu.
-    if (typeof videoLayer.wmApplyFrame !== "function" ||
-        typeof videoLayer.wmAwaitFrame !== "function" ||
-        typeof videoLayer.wmLiveCanvas !== "function") {
-      throw new Error("Le module vidéo WebMotion n'a pas exposé ses trois hooks d'export.");
-    }
-    const originalRenderFrameAt = composition.renderFrameAt.bind(composition);
-    composition.renderFrameAt = (frame) => {
-      originalRenderFrameAt(frame);
-      videoLayer.wmApplyFrame({
-        frame,
-        globalFrame: frame,
-        fps: FPS,
-        width: WIDTH,
-        height: HEIGHT
-      });
-    };
-
-    
     // WebMotion 0.18.2 expose wmReady, mais son composant <w-video>
     // absorbe en interne les erreurs de démultiplexage. Vérifier la taille
     // du canvas réellement initialisé : le canvas vierge reste en 300×150.
@@ -373,7 +340,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     // par PlaybackController et peut ne pas peindre immédiatement une frame
     // lorsque la composition est en pause. renderFrameAt() applique le FrameContext
     // de façon synchrone, puis wmAwaitFrame() attend le décodage vidéo réel.
-    composition.renderFrameAt(0);
+    await composition.seek(0);
     await videoLayer.wmAwaitFrame();
     const firstFrameContext = liveVideoCanvas.getContext("2d", { willReadFrequently: true });
     if (!firstFrameContext) throw new Error("Canvas du décodeur WebMotion inaccessible.");
@@ -390,7 +357,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     const diagnosticFrame = Math.min(FPS, durationFrames - 1);
     let frameDifference = { changedPixels: 0, changedPercent: 0, averageDifference: 0 };
     if (diagnosticFrame > 0) {
-      composition.renderFrameAt(diagnosticFrame);
+      await composition.seek(diagnosticFrame);
       await videoLayer.wmAwaitFrame();
       frameDifference = compareCanvasSamples(firstFrameSample, sampleCanvas(liveVideoCanvas));
     }
@@ -411,7 +378,7 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
         "Les mesures techniques ont été enregistrées dans la console du navigateur."
       );
     }
-    composition.renderFrameAt(0);
+    await composition.seek(0);
     await videoLayer.wmAwaitFrame();
     onProgress("Images animées vérifiées. Vérification de la composition…");
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
