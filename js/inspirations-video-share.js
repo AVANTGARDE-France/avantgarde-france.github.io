@@ -74,7 +74,22 @@ export async function prepareYouTubeDownload(youtubeUrl, onProgress = () => {}) 
     headers: { "Content-Type": "application/json", "Accept": "application/json" },
     body: JSON.stringify({ url: youtubeUrl })
   }, "Extraction YouTube GenDownload");
-  if (!response.ok) throw new Error("GenDownload a répondu HTTP " + response.status + ".");
+  if (!response.ok) {
+    let detail = "";
+    let payload = null;
+    try {
+      payload = await response.clone().json();
+      detail = payload?.error || payload?.message || payload?.detail || payload?.reason || "";
+      if (typeof detail !== "string") detail = JSON.stringify(detail);
+    } catch (_) {
+      try { detail = (await response.text()).slice(0, 1200); } catch (_) {}
+    }
+    const label = response.status === 422
+      ? "GenDownload n'a pas réussi à extraire cette vidéo (HTTP 422)"
+      : "GenDownload a répondu HTTP " + response.status;
+    throw new Error(label + (detail ? " : " + detail : ".") +
+      " La demande envoyée était : " + youtubeUrl);
+  }
   const data = await response.json();
   if (!Array.isArray(data.formats)) throw new Error(data.error || data.message || "Aucun format vidéo retourné.");
   const videos = data.formats.filter(f => f?.type === "video" && String(f.ext).toLowerCase() === "mp4" && f.url);
