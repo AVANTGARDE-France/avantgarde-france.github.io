@@ -784,6 +784,9 @@ jamais une boîte de hauteur fixe qui coupe le texte. */
 #projectModal.open .project-modal-panel{pointer-events:none!important}
 #projectModal.open #projectModalCard{pointer-events:auto!important}
 </style>
+<script type="importmap">
+{"imports":{"mp4box":"https://esm.sh/mp4box@2.4.1?bundle"}}
+</script>
 </head>
 <body>
 <div id="site-header"></div>
@@ -995,7 +998,7 @@ testButton?.addEventListener("click",async()=>{
    const oldLabel="Test";
    try{
     if(!/\.(mp4|m4v)$/i.test(file.name))throw new Error("Sélectionne le fichier MP4 téléchargé depuis GenDownload.");
-    const videoShare=await import("./js/inspirations-video-share.js?v=20261127-5");
+    const videoShare=await import("./js/inspirations-video-share.js?v=20261127-6");
     const blob=await videoShare.generateVideoShare({
      source,mediaUrl,sourceFile:file,
      onProgress:message=>{testButton.textContent=message;status(message);}
@@ -1022,7 +1025,7 @@ testButton?.addEventListener("click",async()=>{
   testButton.textContent="Extraction — "+Math.floor(elapsed/60)+":"+String(elapsed%60).padStart(2,"0");
  },1000);
  try{
-  const videoShare=await import("./js/inspirations-video-share.js?v=20261127-5");
+  const videoShare=await import("./js/inspirations-video-share.js?v=20261127-6");
   if(/^https?:\/\//i.test(mediaUrl) && /(?:youtube\.com|youtu\.be)/i.test(new URL(mediaUrl).hostname)){
    const result=await videoShare.prepareYouTubeDownload(mediaUrl,message=>status(message));
    pendingYoutubeDownload={mediaUrl,filename:result.filename};
@@ -1087,7 +1090,7 @@ button?.addEventListener("click",async()=>{
   if(videoUrl){
    const directFile=/\.(mp4|m4v)(?:$|[?#])/i.test(videoUrl);
    if(!directFile)throw new Error("Pour partager une vidéo YouTube, il faut son fichier vidéo original MP4. Le lecteur intégré ne donne pas accès au flux complet pour l’export.");
-   const videoShare=await import("./js/inspirations-video-share.js?v=20261127-5");
+   const videoShare=await import("./js/inspirations-video-share.js?v=20261127-6");
    const blob=await videoShare.generateVideoShare({
     source,
     mediaUrl:videoUrl,
