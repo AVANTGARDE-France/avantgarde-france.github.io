@@ -998,7 +998,7 @@ testButton?.addEventListener("click",async()=>{
    const oldLabel="Test";
    try{
     if(!/\.(mp4|m4v)$/i.test(file.name))throw new Error("Sélectionne le fichier MP4 téléchargé depuis GenDownload.");
-    const videoShare=await import("./js/inspirations-video-share.js?v=20261127-17");
+    const videoShare=await import("./js/inspirations-video-share.js?v=20261127-18");
     const blob=await videoShare.generateVideoShare({
      source,mediaUrl,sourceFile:file,
      onProgress:message=>{testButton.textContent=message;status(message);}
