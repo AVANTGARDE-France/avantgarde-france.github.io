@@ -998,7 +998,7 @@ testButton?.addEventListener("click",async()=>{
    const oldLabel="Test";
    try{
     if(!/\.(mp4|m4v)$/i.test(file.name))throw new Error("Sélectionne le fichier MP4 téléchargé depuis GenDownload.");
-    const videoShare=await import("./js/inspirations-video-share.js?v=20261127-9");
+    const videoShare=await import("./js/inspirations-video-share.js?v=20261127-10");
     const blob=await videoShare.generateVideoShare({
      source,mediaUrl,sourceFile:file,
      onProgress:message=>{testButton.textContent=message;status(message);}
@@ -1025,7 +1025,7 @@ testButton?.addEventListener("click",async()=>{
   testButton.textContent="Extraction — "+Math.floor(elapsed/60)+":"+String(elapsed%60).padStart(2,"0");
  },1000);
  try{
-  const videoShare=await import("./js/inspirations-video-share.js?v=20261127-9");
+  const videoShare=await import("./js/inspirations-video-share.js?v=20261127-10");
   if(/^https?:\/\//i.test(mediaUrl) && /(?:youtube\.com|youtu\.be)/i.test(new URL(mediaUrl).hostname)){
    const result=await videoShare.prepareYouTubeDownload(mediaUrl,message=>status(message));
    pendingYoutubeDownload={mediaUrl,filename:result.filename};
@@ -1040,9 +1040,9 @@ testButton?.addEventListener("click",async()=>{
    }catch(fetchError){
     console.warn("Téléchargement Blob impossible, téléchargement direct :",fetchError);
     const fallback=document.createElement("a");
-    fallback.href=result.url;fallback.target="_blank";fallback.rel="noopener";
+    fallback.href=result.url;fallback.download=result.filename;fallback.target="_blank";fallback.rel="noopener";
     document.body.appendChild(fallback);fallback.click();fallback.remove();
-    status("Téléchargement direct lancé. Si nécessaire, enregistre le fichier sous Avantgarde-Video-source.mp4. Une fois terminé, clique de nouveau sur Test.");
+    status("Téléchargement direct lancé. Le nom imposé peut être ignoré par le serveur distant ; si le fichier garde le titre YouTube, renomme-le en Avantgarde-Video-source.mp4. Une fois terminé, clique de nouveau sur Test.");
     testButton.textContent="Sélectionner le MP4 téléchargé";
     return;
    }
@@ -1106,7 +1106,7 @@ button?.addEventListener("click",async()=>{
   if(videoUrl){
    const directFile=/\.(mp4|m4v)(?:$|[?#])/i.test(videoUrl);
    if(!directFile)throw new Error("Pour partager une vidéo YouTube, il faut son fichier vidéo original MP4. Le lecteur intégré ne donne pas accès au flux complet pour l’export.");
-   const videoShare=await import("./js/inspirations-video-share.js?v=20261127-9");
+   const videoShare=await import("./js/inspirations-video-share.js?v=20261127-10");
    const blob=await videoShare.generateVideoShare({
     source,
     mediaUrl:videoUrl,
