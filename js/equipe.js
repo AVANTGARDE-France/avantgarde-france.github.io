@@ -1484,7 +1484,7 @@ function initialiserOuvertureInscription() {
             }
 
 
-            afficherEtapeInscription(2);
+            afficherEtapeInscription(1);
             mettreAJourCompteurDescription();
 
 
@@ -1697,15 +1697,8 @@ function afficherEtapeInscription(numero) {
         panneau.classList.toggle("active", etape === numero);
     });
 
-    const titre = document.getElementById("joinModalTitle");
-    if (titre) {
-        titre.textContent = numero === 2
-            ? "Vos informations"
-            : "Sécuriser votre inscription";
-    }
-
     const intro = document.querySelector("#joinModal .form-intro");
-    if (intro) intro.hidden = numero !== 2;
+    if (intro) intro.hidden = numero === 3;
 }
 
 async function verifierCodeParrainage(identifiant, nouvelUtilisateurId = null) {
@@ -1986,6 +1979,9 @@ function initialiserFormulaireInscription() {
             }
         });
     }
+
+    document.getElementById("signupStep1Next")?.addEventListener("click", () => afficherEtapeInscription(2));
+    document.getElementById("signupStep2Back")?.addEventListener("click", () => afficherEtapeInscription(1));
 
     document.getElementById("signupStep2Next")?.addEventListener("click", async () => {
         const nom = document.getElementById("nom");
