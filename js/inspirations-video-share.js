@@ -104,6 +104,37 @@ export async function prepareYouTubeDownload(youtubeUrl, onProgress = () => {}) 
   };
 }
 
+async function probeNativePlayback(url) {
+  const video = document.createElement("video");
+  video.muted = true;
+  video.playsInline = true;
+  video.preload = "auto";
+  video.src = url;
+  try {
+    await new Promise((resolve, reject) => {
+      if (video.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) return resolve();
+      const timer = setTimeout(() => reject(new Error("Le lecteur natif n'a pas chargé assez de données en 15 secondes.")), 15000);
+      video.addEventListener("canplay", () => { clearTimeout(timer); resolve(); }, { once: true });
+      video.addEventListener("error", () => { clearTimeout(timer); reject(new Error("Erreur média native " + (video.error?.code || "inconnue") + ".")); }, { once: true });
+      video.load();
+    });
+    const start = video.currentTime;
+    await video.play();
+    const deadline = performance.now() + 5000;
+    while (video.currentTime - start < 0.75 && performance.now() < deadline) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    const advanced = video.currentTime - start;
+    video.pause();
+    if (advanced < 0.5) throw new Error("La lecture native n'a avancé que de " + advanced.toFixed(2) + " seconde.");
+    return { advanced, width: video.videoWidth, height: video.videoHeight };
+  } finally {
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+  }
+}
+
 export async function generateVideoShare({ source, mediaUrl, sourceFile = null, onProgress = () => {} }) {
   if (!source || !mediaUrl) throw new Error("Carte ou URL source introuvable.");
   if (sourceFile && !(sourceFile instanceof File)) throw new Error("Fichier vidéo local invalide.");
@@ -140,6 +171,9 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
 
     onProgress("Analyse de la vidéo récupérée…");
     const metadata = await waitForMetadata(videoSource);
+    onProgress("Vérification de la lecture native du MP4…");
+    const nativeProbe = await probeNativePlayback(videoSource);
+    console.info("[Inspirations vidéo] Lecture native MP4 validée :", nativeProbe);
     const durationFrames = Math.max(1, Math.ceil(metadata.duration * FPS));
 
     onProgress("Chargement du moteur WebMotion…");
