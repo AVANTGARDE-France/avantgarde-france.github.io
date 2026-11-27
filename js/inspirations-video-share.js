@@ -295,22 +295,22 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
       }
       return signature >>> 0;
     };
-    // Le seek de composition déplace la timeline, mais ne garantit pas à lui
-    // seul que le décodeur média interne de <w-video> ait avancé. Pour vérifier
-    // le vrai rafraîchissement du lecteur, on observe une seconde de lecture
-    // réelle du moteur, puis on compare les canvases.
+    // Diagnostic déterministe : seek() appelle immédiatement renderFrameAt(),
+    // qui déclenche wmApplyFrame() sur <w-video>. On attend ensuite le décodage
+    // réel de la frame. Ne pas utiliser play() + temporisation ici : WebMotion
+    // peut attendre le chargement/décodage audio avant de démarrer son horloge,
+    // ce qui ferait arrêter le test avant même la première frame suivante.
     await composition.seek(0);
     await videoLayer.wmAwaitFrame();
     const firstVideoSignature = readVideoCanvasSignature();
-    composition.play();
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    composition.pause();
+    const diagnosticFrame = Math.min(30, durationFrames - 1);
+    await composition.seek(diagnosticFrame);
     await videoLayer.wmAwaitFrame();
     const laterVideoSignature = readVideoCanvasSignature();
     if (firstVideoSignature === laterVideoSignature) {
       throw new Error(
-        "DIAGNOSTIC VIDÉO : après 1,2 seconde de lecture réelle, le canvas <w-video> est toujours identique. " +
-        "Le lecteur WebMotion ne rafraîchit pas ses images ; le MP4 n'est pas déclaré défectueux."
+        "DIAGNOSTIC VIDÉO : le canvas <w-video> est identique à la frame 0 et à la frame " + diagnosticFrame + ". " +
+        "Le décodage de cette frame n'a pas produit de nouvelle image ; le MP4 n'est pas déclaré défectueux."
       );
     }
     // Revenir au début : export() parcourt ensuite les frames depuis zéro.
