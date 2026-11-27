@@ -157,7 +157,7 @@ function compareCanvasSamples(first, second) {
   };
 }
 
-async function exportVideoAwaitingDecodedFrames({ compositionElement, onProgress })
+async function exportVideoAwaitingDecodedFrames({ compositionElement, onProgress }) {
   // Utiliser l'export officiel du module elements de WebMotion.
   // Il installe StageLayerPlanner : les <w-video> sont capturés comme calques
   // vivants via wmLiveCanvas(), après wmAwaitFrame(), et non comme DOM statique.
