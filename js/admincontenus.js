@@ -374,234 +374,95 @@ function showMessage(
 
 
 /* =========================================================
-   APERCU PHOTO
+   APERCU IMAGE / GIF / YOUTUBE
 ========================================================= */
 
 let contentPhotoPreview = null;
 
+function extraireIdYouTube(url) {
+    try {
+        const parsed = new URL(url);
+        const host = parsed.hostname.toLowerCase().replace(/^www\./, "");
+        let id = "";
+
+        if (host === "youtu.be") {
+            id = parsed.pathname.split("/").filter(Boolean)[0] || "";
+        } else if (["youtube.com", "m.youtube.com", "youtube-nocookie.com"].includes(host)) {
+            if (parsed.pathname === "/watch") {
+                id = parsed.searchParams.get("v") || "";
+            } else {
+                const match = parsed.pathname.match(/^\/(?:shorts|embed|live)\/([^/?]+)/i);
+                if (match) id = match[1];
+            }
+        }
+
+        return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : null;
+    } catch {
+        return null;
+    }
+}
 
 function initialiserApercuImageContenu() {
+    if (!cardPhoto) return;
 
-    if (!cardPhoto) {
-        return;
-    }
-
-    contentPhotoPreview =
-        $("contentPhotoPreview");
+    contentPhotoPreview = $("contentPhotoPreview");
 
     if (!contentPhotoPreview) {
-
-        contentPhotoPreview =
-            document.createElement("div");
-
-        contentPhotoPreview.id =
-            "contentPhotoPreview";
-
-        contentPhotoPreview.className =
-            "empty";
-
-        contentPhotoPreview.textContent =
-            "Aucune image";
-
+        contentPhotoPreview = document.createElement("div");
+        contentPhotoPreview.id = "contentPhotoPreview";
+        contentPhotoPreview.className = "empty";
+        contentPhotoPreview.textContent = "Aucun aperçu";
     }
 
-    const uploadRow =
-        $("contentPhotoUploadRow") || cardPhoto;
+    const uploadRow = $("contentPhotoUploadRow") || cardPhoto;
+    uploadRow.insertAdjacentElement("afterend", contentPhotoPreview);
 
-    uploadRow.insertAdjacentElement(
-        "afterend",
-        contentPhotoPreview
-    );
+    const actualiser = () => {
+        const url = String(cardPhoto.value || "").trim();
+        contentPhotoPreview.innerHTML = "";
+        contentPhotoPreview.className = "empty";
 
-    const actualiser =
-        () => {
+        if (!url) {
+            contentPhotoPreview.textContent = "Aucun aperçu";
+            return;
+        }
 
-            const url =
-                String(
-                    cardPhoto.value || ""
-                ).trim();
+        const youtubeId = extraireIdYouTube(url);
 
-            contentPhotoPreview.innerHTML =
-                "";
+        if (youtubeId) {
+            const image = document.createElement("img");
+            image.alt = "Miniature de la vidéo YouTube";
+            image.onerror = () => {
+                contentPhotoPreview.className = "error";
+                contentPhotoPreview.textContent = "Miniature YouTube indisponible pour cette vidéo.";
+            };
 
-            contentPhotoPreview.className =
-                "empty";
+            const indicateur = document.createElement("span");
+            indicateur.className = "content-youtube-preview-label";
+            indicateur.textContent = "APERÇU YOUTUBE";
 
-            if (!url) {
+            contentPhotoPreview.className = "youtube-preview";
+            image.src = "https://img.youtube.com/vi/" + youtubeId + "/hqdefault.jpg";
+            contentPhotoPreview.append(image, indicateur);
+            return;
+        }
 
-                contentPhotoPreview.textContent =
-                    "Aucune image";
-
-                return;
-
-            }
-
-            const image =
-                document.createElement("img");
-
-            image.alt =
-                "Aperçu de l'image";
-
-            image.onload =
-                () => {
-
-                    contentPhotoPreview.className =
-                        "";
-
-                };
-
-            image.onerror =
-                () => {
-
-                    contentPhotoPreview.className =
-                        "error";
-
-                    contentPhotoPreview.textContent =
-                        "Impossible de charger cette image.";
-
-                };
-
-            image.src =
-                url;
-
-            contentPhotoPreview.appendChild(
-                image
-            );
-
+        const image = document.createElement("img");
+        image.alt = "Aperçu de l’image ou du GIF";
+        image.onload = () => {
+            contentPhotoPreview.className = "";
         };
+        image.onerror = () => {
+            contentPhotoPreview.className = "error";
+            contentPhotoPreview.textContent = "Impossible de charger cette image ou ce GIF. Vérifiez le lien.";
+        };
+        image.src = url;
+        contentPhotoPreview.appendChild(image);
+    };
 
-    cardPhoto.addEventListener(
-        "input",
-        actualiser
-    );
-
-    cardPhoto.addEventListener(
-        "change",
-        actualiser
-    );
-
+    cardPhoto.addEventListener("input", actualiser);
+    cardPhoto.addEventListener("change", actualiser);
     actualiser();
-
-}
-
-
-/* =========================================================
-   IMPORT IMAGE — SUPABASE STORAGE
-========================================================= */
-
-async function importerImageContenu(file) {
-
-    if (!file) return;
-
-    const typesAutorises = [
-        "image/jpeg",
-        "image/png",
-        "image/webp",
-        "image/gif"
-    ];
-
-    if (!typesAutorises.includes(file.type)) {
-        showMessage("Format refusé. Utilisez JPG, PNG, WebP ou GIF.", "error");
-        return;
-    }
-
-    if (file.size > 8 * 1024 * 1024) {
-        showMessage("Image trop volumineuse : 8 Mo maximum.", "error");
-        return;
-    }
-
-    const button = $("uploadContentPhotoButton");
-    const fileInput = $("contentPhotoFileInput");
-
-    if (button) button.disabled = true;
-
-    try {
-
-        const extensionParType = {
-            "image/jpeg": "jpg",
-            "image/png": "png",
-            "image/webp": "webp",
-            "image/gif": "gif"
-        };
-
-        const extension = extensionParType[file.type];
-        const identifiant = (
-            typeof crypto !== "undefined" && crypto.randomUUID
-                ? crypto.randomUUID()
-                : Date.now() + "-" + Math.random().toString(36).slice(2)
-        );
-
-        const chemin = [
-            contentMode,
-            String(editorId || "nouveau"),
-            identifiant + "." + extension
-        ].join("/");
-
-        const { data, error } = await supabase
-            .storage
-            .from("content-images")
-            .upload(chemin, file, {
-                cacheControl: "31536000",
-                contentType: file.type,
-                upsert: false
-            });
-
-        if (error) throw error;
-
-        const { data: publicData } = supabase
-            .storage
-            .from("content-images")
-            .getPublicUrl(data.path);
-
-        if (!publicData?.publicUrl) {
-            throw new Error("Impossible de récupérer l'URL publique de l'image.");
-        }
-
-        if (cardPhoto) {
-            cardPhoto.value = publicData.publicUrl;
-            cardPhoto.dispatchEvent(new Event("input", { bubbles: true }));
-            cardPhoto.dispatchEvent(new Event("change", { bubbles: true }));
-        }
-
-        showMessage("Image hébergée. Enregistrez le contenu pour valider son URL.");
-
-    }
-    catch (error) {
-
-        console.error("Import image contenu :", error);
-
-        showMessage(
-            "Impossible d'héberger l'image : " + (error?.message || "erreur inconnue"),
-            "error"
-        );
-
-    }
-    finally {
-
-        if (button) button.disabled = false;
-        if (fileInput) fileInput.value = "";
-
-    }
-
-}
-
-
-function initialiserImportImageContenu() {
-
-    const button = $("uploadContentPhotoButton");
-    const fileInput = $("contentPhotoFileInput");
-
-    if (!button || !fileInput || button.dataset.initialized === "true") return;
-
-    button.dataset.initialized = "true";
-
-    button.addEventListener("click", () => fileInput.click());
-
-    fileInput.addEventListener("change", () => {
-        const file = fileInput.files?.[0];
-        if (file) importerImageContenu(file);
-    });
-
 }
 
 
@@ -5729,7 +5590,6 @@ async function initialiser() {
     initialiserEvenementClavier();
 
     initialiserApercuImageContenu();
-    initialiserImportImageContenu();
 
     initialiserListePriorite();
 
