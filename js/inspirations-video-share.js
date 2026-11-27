@@ -97,11 +97,7 @@ export async function prepareYouTubeDownload(youtubeUrl, onProgress = () => {}) 
   const quality = f => Number((String(f.label || "").match(/(\\d{3,4})p?/i) || [])[1] || 0);
   videos.sort((a,b) => quality(b)-quality(a));
   const format = videos[0];
-  return {
-    url: new URL(format.url, "https://gendownload.com").href,
-    // Nom stable : le titre YouTube n'est pas repris dans le fichier téléchargé.
-    filename: "Avantgarde-Video-source.mp4"
-  };
+  return { url: new URL(format.url, "https://gendownload.com").href };
 }
 
 async function probeNativePlayback(url) {
@@ -135,7 +131,33 @@ async function probeNativePlayback(url) {
   }
 }
 
-async function exportVideoAwaitingDecodedFrames({ compositionElement, onProgress }) {
+function sampleCanvas(canvas) {
+  const sample = document.createElement("canvas");
+  sample.width = 32;
+  sample.height = 32;
+  const context = sample.getContext("2d", { willReadFrequently: true });
+  context.drawImage(canvas, 0, 0, sample.width, sample.height);
+  return context.getImageData(0, 0, 32, 32).data;
+}
+
+function compareCanvasSamples(first, second) {
+  let changed = 0;
+  let totalDifference = 0;
+  for (let i = 0; i < first.length; i += 4) {
+    const difference = Math.abs(first[i] - second[i]) +
+      Math.abs(first[i + 1] - second[i + 1]) +
+      Math.abs(first[i + 2] - second[i + 2]);
+    if (difference > 24) changed++;
+    totalDifference += difference;
+  }
+  return {
+    changedPixels: changed,
+    changedPercent: Math.round(changed / (first.length / 4) * 100),
+    averageDifference: Math.round(totalDifference / (first.length / 4) / 3)
+  };
+}
+
+async function exportVideoAwaitingDecodedFrames({ compositionElement, onProgress })
   // Utiliser l'export officiel du module elements de WebMotion.
   // Il installe StageLayerPlanner : les <w-video> sont capturés comme calques
   // vivants via wmLiveCanvas(), après wmAwaitFrame(), et non comme DOM statique.
@@ -359,15 +381,35 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     if (firstFramePixels[3] === 0) {
       throw new Error("WebMotion a créé son canvas, mais n'a pas peint la première image du MP4.");
     }
+    const firstFrameSample = sampleCanvas(liveVideoCanvas);
 
-    const diagnosticFrame = Math.min(30, durationFrames - 1);
+    const diagnosticFrame = Math.min(FPS, durationFrames - 1);
+    let frameDifference = { changedPixels: 0, changedPercent: 0, averageDifference: 0 };
     if (diagnosticFrame > 0) {
       await composition.seek(diagnosticFrame);
       await videoLayer.wmAwaitFrame();
+      frameDifference = compareCanvasSamples(firstFrameSample, sampleCanvas(liveVideoCanvas));
+    }
+    console.info("[Inspirations vidéo] Diagnostic des images WebMotion :", {
+      nativePlaybackAdvancedSeconds: Number(nativeProbe.advanced.toFixed(2)),
+      nativeVideoWidth: nativeProbe.width,
+      nativeVideoHeight: nativeProbe.height,
+      webMotionCanvasWidth: liveVideoCanvas.width,
+      webMotionCanvasHeight: liveVideoCanvas.height,
+      comparedFrame: diagnosticFrame,
+      ...frameDifference
+    });
+    if (diagnosticFrame > 0 && frameDifference.changedPixels === 0) {
+      throw new Error(
+        "Le MP4 se lit bien dans le navigateur (" + nativeProbe.advanced.toFixed(2) +
+        " s), mais WebMotion ne transmet aucune image animée à son canvas après " +
+        diagnosticFrame + " images. L'export est interrompu pour éviter de produire une vidéo figée. " +
+        "Les mesures techniques ont été enregistrées dans la console du navigateur."
+      );
     }
     await composition.seek(0);
     await videoLayer.wmAwaitFrame();
-    onProgress("Décodage WebMotion validé. Vérification de la composition…");
+    onProgress("Images animées vérifiées. Vérification de la composition…");
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
     onProgress("Encodage MP4 : démarrage…");
