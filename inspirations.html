@@ -1007,7 +1007,7 @@ button?.addEventListener("click",async()=>{
   const videoUrl=videoWrap?.dataset.inspirationMediaUrl||"";
   if(videoUrl){
    const videoShare=await import("./js/inspirations-video-share.js?v=20261127-25");
-   const isYoutube=/(?:youtube\\.com|youtu\\.be)/i.test(new URL(videoUrl,location.href).hostname);
+   const isYoutube=/(?:youtube\.com|youtu\.be)/i.test(new URL(videoUrl,location.href).hostname);
    let sourceFile=null;
    if(isYoutube){
     if(pendingYoutubeDownload?.mediaUrl===videoUrl){
@@ -1035,7 +1035,7 @@ button?.addEventListener("click",async()=>{
    }
    const blob=await videoShare.generateVideoShare({
     source,mediaUrl:videoUrl,sourceFile,
-    onProgress:message=>{if(label)label.textContent=message}
+    onProgress:message=>{if(label){const pct=message.startsWith("Encodage MP4 : démarrage")?"Création 0 %…":message.startsWith("Création du MP4 ")?message.replace("Création du MP4 ","Création "):message.startsWith("Analyse")?"Vidéo 15 %…":message.startsWith("Vérification")?"Vidéo 25 %…":message.startsWith("Chargement")?"Vidéo 35 %…":message.startsWith("Préparation")?"Vidéo 45 %…":message.startsWith("Images animées")?"Vidéo 60 %…":message;label.textContent=pct}}
    });
    download(blob,document.getElementById("projectModalTitle")?.textContent?.trim()||"inspiration");
    pendingYoutubeDownload=null;
