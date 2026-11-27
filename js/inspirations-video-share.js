@@ -231,22 +231,11 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
       composition.stage.insertBefore(videoLayer, composition.stage.firstChild);
     }
 
-    // Le moteur appelle normalement wmApplyFrame pendant renderFrameAt.
-    // On le relie explicitement au frame clock de l'export également : l'appel
-    // est idempotent (WebMotion ignore les timestamps déjà affichés), et le
-    // renderer attend ensuite wmAwaitFrame avant de capturer le canvas.
-    const nativeRenderFrameAt = composition.renderFrameAt.bind(composition);
-    composition.renderFrameAt = frame => {
-      nativeRenderFrameAt(frame);
-      videoLayer.wmApplyFrame({
-        frame,
-        globalFrame: frame,
-        fps: FPS,
-        width: WIDTH,
-        height: HEIGHT
-      });
-    };
-
+    // Ne pas surcharger renderFrameAt ni appeler wmApplyFrame manuellement.
+    // WebMotion 0.18.2 pilote lui-même le décodage frame-exact de <w-video>
+    // pendant composition.export(). Le calque doit simplement rester un enfant
+    // direct de stage (contrat documenté de WebMotion pour les vidéos).
+    
     // WebMotion prépare le MP4 source (démultiplexage MP4Box + premier décodage)
     // avant de pouvoir encoder la première image. Ne pas afficher 0 % pendant
     // cette phase : elle peut durer sur un fichier local volumineux.
