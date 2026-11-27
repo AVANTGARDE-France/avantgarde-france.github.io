@@ -830,6 +830,13 @@ jamais une boîte de hauteur fixe qui coupe le texte. */
   :is(#projectGrid,#projectModalFront) .inspiration-card-brand .brand-principles{font-size:5px!important;letter-spacing:.1px!important}
 }
 
+/* Recentrage vertical de la signature : seul le nom et les devises remontent,
+   sans déplacer le séparateur doré ni le liseré tricolore. */
+:is(#projectGrid,#projectModalFront) .inspiration-card-brand .brand-name,
+:is(#projectGrid,#projectModalFront) .inspiration-card-brand .brand-principles{
+  transform:translateY(-3px)!important;
+}
+
 </style>
 <script type="importmap">
 {"imports":{"mp4box":"https://esm.sh/mp4box@2.4.1?bundle"}}
