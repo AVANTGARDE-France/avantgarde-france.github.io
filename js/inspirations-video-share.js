@@ -272,9 +272,9 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     if (!liveVideoCanvas || !liveVideoCanvas.width || !liveVideoCanvas.height) {
       throw new Error("WebMotion n'a pas créé le calque vidéo animé. Vérifie que le MP4 est compatible H.264.");
     }
-    // DIAGNOSTIC CIBLÉ : vérifier que le canvas du <w-video> change réellement
-    // entre deux instants de la source, avant de lancer l'encodeur MP4.
-    // On utilise le FrameContext exact attendu par WebMotion 0.18.2.
+    // DIAGNOSTIC CIBLÉ : utiliser l'API publique de navigation par frame
+    // de WebMotion (composition.seek), puis attendre le décodage de <w-video>.
+    // renderFrameAt() n'est pas l'API documentée pour piloter cette scène.
     const readVideoCanvasSignature = () => {
       const canvas = videoLayer.wmLiveCanvas();
       if (!canvas || !canvas.width || !canvas.height) {
@@ -294,29 +294,22 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
       }
       return signature >>> 0;
     };
-    const frameContext = frame => ({
-      frame,
-      globalFrame: frame,
-      fps: FPS,
-      width: WIDTH,
-      height: HEIGHT
-    });
-    composition.renderFrameAt(0);
+    await composition.seek(0);
     await videoLayer.wmAwaitFrame();
     const firstVideoSignature = readVideoCanvasSignature();
     const diagnosticFrame = Math.min(FPS, Math.max(1, durationFrames - 1));
-    composition.renderFrameAt(diagnosticFrame);
+    await composition.seek(diagnosticFrame);
     await videoLayer.wmAwaitFrame();
     const laterVideoSignature = readVideoCanvasSignature();
     if (firstVideoSignature === laterVideoSignature) {
       throw new Error(
-        "DIAGNOSTIC VIDÉO : le canvas <w-video> reste identique entre 0 s et " +
+        "DIAGNOSTIC VIDÉO : WebMotion n'a pas actualisé le canvas <w-video> entre 0 s et " +
         (diagnosticFrame / FPS).toFixed(1) +
-        " s. Le problème est dans le décodage/rafraîchissement de la source MP4, avant la composition HTML."
+        " s. Ce test ne permet pas de conclure que le fichier MP4 est défectueux."
       );
     }
     // Revenir au début : export() parcourt ensuite les frames depuis zéro.
-    composition.renderFrameAt(0);
+    await composition.seek(0);
     await videoLayer.wmAwaitFrame();
     onProgress("Diagnostic vidéo réussi : les images du MP4 changent. Vérification de la composition…");
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
