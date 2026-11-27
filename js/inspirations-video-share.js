@@ -245,7 +245,53 @@ export async function generateVideoShare({ source, mediaUrl, sourceFile = null, 
     if (!liveVideoCanvas || !liveVideoCanvas.width || !liveVideoCanvas.height) {
       throw new Error("WebMotion n'a pas créé le calque vidéo animé. Vérifie que le MP4 est compatible H.264.");
     }
-    onProgress("Vidéo décodée. Préparation de la piste audio et de l'encodage…");
+    // DIAGNOSTIC CIBLÉ : vérifier que le canvas du <w-video> change réellement
+    // entre deux instants de la source, avant de lancer l'encodeur MP4.
+    // On utilise le FrameContext exact attendu par WebMotion 0.18.2.
+    const readVideoCanvasSignature = () => {
+      const canvas = videoLayer.wmLiveCanvas();
+      if (!canvas || !canvas.width || !canvas.height) {
+        throw new Error("DIAGNOSTIC VIDÉO : canvas WebMotion absent ou vide.");
+      }
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (!ctx) throw new Error("DIAGNOSTIC VIDÉO : contexte 2D indisponible.");
+      const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      // Échantillonnage réparti sur toute l'image pour éviter de comparer
+      // uniquement une zone noire ou un aplat.
+      let signature = 2166136261;
+      const samples = 32 * 32;
+      for (let i = 0; i < samples; i++) {
+        const pixel = Math.floor(i * (data.length / 4 - 1) / (samples - 1)) * 4;
+        signature ^= data[pixel] | (data[pixel + 1] << 8) | (data[pixel + 2] << 16);
+        signature = Math.imul(signature, 16777619);
+      }
+      return signature >>> 0;
+    };
+    const frameContext = frame => ({
+      frame,
+      globalFrame: frame,
+      fps: FPS,
+      width: WIDTH,
+      height: HEIGHT
+    });
+    composition.renderFrameAt(0);
+    await videoLayer.wmAwaitFrame();
+    const firstVideoSignature = readVideoCanvasSignature();
+    const diagnosticFrame = Math.min(FPS, Math.max(1, durationFrames - 1));
+    composition.renderFrameAt(diagnosticFrame);
+    await videoLayer.wmAwaitFrame();
+    const laterVideoSignature = readVideoCanvasSignature();
+    if (firstVideoSignature === laterVideoSignature) {
+      throw new Error(
+        "DIAGNOSTIC VIDÉO : le canvas <w-video> reste identique entre 0 s et " +
+        (diagnosticFrame / FPS).toFixed(1) +
+        " s. Le problème est dans le décodage/rafraîchissement de la source MP4, avant la composition HTML."
+      );
+    }
+    // Revenir au début : export() parcourt ensuite les frames depuis zéro.
+    composition.renderFrameAt(0);
+    await videoLayer.wmAwaitFrame();
+    onProgress("Diagnostic vidéo réussi : les images du MP4 changent. Vérification de la composition…");
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
     onProgress("Encodage MP4 : démarrage…");
