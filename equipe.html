@@ -27,7 +27,7 @@
 
     <link
         rel="stylesheet"
-        href="css/equipe.css?v=signup-direct-20261106-1"
+        href="css/equipe.css?v=signup-two-step-20261127-1"
     >
 
   <link rel="canonical" href="https://avantgarde-france.github.io/equipe.html">
@@ -402,12 +402,7 @@
         </button>
 
 
-        <div class="form-kicker">
-            AVANT-GARDE
-        </div>
-
-
-        <h2
+<h2
             class="form-title"
             id="joinModalTitle"
         >
@@ -432,7 +427,7 @@
         >
 
 
-            <section class="signup-step" id="signupStep2" aria-label="Vos informations">
+            <section class="signup-step" id="signupStep1" aria-label="Présentation d’Avant-gardE">
             <div class="signup-conditions-content">
                     <p><strong>L’inscription à Avant-gardE est entièrement gratuite et sans engagement.</strong></p>
                     <h3>Qui sommes-nous?</h3>
@@ -450,6 +445,13 @@
                 </div>
 
                 
+                <div class="signup-navigation">
+                    <button type="button" class="signup-next-button" id="signupStep1Next">SUIVANT</button>
+                </div>
+            </section>
+
+            <section class="signup-step" id="signupStep2" aria-label="Vos informations" hidden>
+
             <!-- ================================================
                  TYPE D'INSCRIPTION
             ================================================= -->
@@ -756,7 +758,8 @@
             </div>
 
 
-                <div class="signup-navigation">
+                <div class="signup-navigation signup-navigation-dual">
+                    <button type="button" class="signup-back-button" id="signupStep2Back">PRÉCÉDENT</button>
                     <button type="button" class="signup-next-button" id="signupStep2Next">SUIVANT</button>
                 </div>
             </section>
@@ -839,7 +842,7 @@
 ========================================================= -->
 
 <script
-    src="js/equipe.js?v=signup-direct-20261106-1"
+    src="js/equipe.js?v=signup-two-step-20261127-1"
 ></script>
 
 <script
