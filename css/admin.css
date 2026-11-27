@@ -1200,6 +1200,22 @@ textarea{
 }
 
 
+#contentPhotoPreview.youtube-preview {
+  position:relative;
+}
+#contentPhotoPreview .content-youtube-preview-label {
+  position:absolute;
+  right:12px;
+  bottom:12px;
+  padding:5px 8px;
+  border-radius:3px;
+  background:rgba(7,21,45,.88);
+  color:#f0d58a;
+  font:700 9px Arial,sans-serif;
+  letter-spacing:.08em;
+}
+
+
 /* ---------------------------------------------------------
    ARBORESCENCE CONTENU
 --------------------------------------------------------- */
