@@ -4,14 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="description" content="Avant-gardE : un projet politique de rupture fondé sur la patrie, la souveraineté, la justice et la liberté. Découvrez son manifeste et ses propositions.">
+  <meta name="description" content="FAIS LE TEST. 6 questions. Tes convictions. L’IA vérifie le projet qui te correspond le mieux. Le seul test à ce jour, incluant la proposition d’Avant-gardE.">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="fr_FR">
   <meta property="og:site_name" content="Avant-gardE">
-  <meta property="og:title" content="Avant-gardE — Patrie, souveraineté, justice, liberté">
-  <meta property="og:description" content="Un projet politique de rupture fondé sur la patrie, la souveraineté, la justice et la liberté.">
+  <meta property="og:title" content="FAIS LE TEST.">
+  <meta property="og:description" content="6 questions. Tes convictions. L’IA vérifie le projet qui te correspond le mieux. Le seul test à ce jour, incluant la proposition d’Avant-gardE.">
   <meta property="og:url" content="https://avantgarde-france.github.io/">
+  <!-- IMAGE TEMPORAIRE DE PARTAGE : remplacer ce visuel quand la création définitive sera prête. -->
+  <meta property="og:image" content="https://avantgarde-france.github.io/image/Emblem%20with%20hexagona2.png">
+  <meta property="og:image:alt" content="Emblème Avant-gardE — Fais le test politique">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FAIS LE TEST.">
+  <meta name="twitter:description" content="6 questions. Tes convictions. L’IA vérifie le projet qui te correspond le mieux. Le seul test à ce jour, incluant la proposition d’Avant-gardE.">
+  <meta name="twitter:image" content="https://avantgarde-france.github.io/image/Emblem%20with%20hexagona2.png">
   <title>Avant-gardE — Patrie, souveraineté, justice, liberté</title>
   <link rel="stylesheet" href="css/style.css?v=sticky-compact-20261106">
   <style>
@@ -238,6 +245,17 @@
       letter-spacing:.16em;
     }
     
+
+    /* Partage discret superposé au fond animé, entre le questionnaire et les statistiques. */
+    #home-experience .quiz-share{position:absolute;z-index:4;right:clamp(18px,6vw,96px);bottom:14px;display:flex;align-items:center;gap:7px}
+    #home-experience .quiz-share a,#home-experience .quiz-share button{width:32px;height:32px;display:grid;place-items:center;padding:0;border:1px solid rgba(226,189,105,.38);border-radius:50%;background:rgba(5,13,25,.48);color:#e7eaf0;cursor:pointer;text-decoration:none;backdrop-filter:blur(5px);transition:background .18s,border-color .18s,color .18s}
+    #home-experience .quiz-share a:hover,#home-experience .quiz-share button:hover{background:#e2bd69;border-color:#e2bd69;color:#071321}
+    #home-experience .quiz-share svg{width:15px;height:15px;display:block;fill:currentColor}
+    #home-experience .quiz-share .share-status{position:absolute;right:0;bottom:39px;padding:5px 8px;background:#07152d;color:#f2d58a;border:1px solid #e2bd6959;font-size:10px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
+    #home-experience .quiz-share .share-status.is-visible{opacity:1}
+    @media(max-width:800px){#home-experience .quiz-share{right:18px;bottom:12px}}
+    @media(max-width:480px){#home-experience .quiz-share{gap:6px}#home-experience .quiz-share a,#home-experience .quiz-share button{width:30px;height:30px}}
+
 </style>
   <link rel="canonical" href="https://avantgarde-france.github.io/">
   <script type="application/ld+json">
@@ -306,6 +324,14 @@
       </div>
 
     </section>
+
+    <nav class="quiz-share" aria-label="Partager le questionnaire">
+      <a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Favantgarde-france.github.io%2F" target="_blank" rel="noopener noreferrer" aria-label="Partager sur Facebook" title="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V8c0-.9.3-1.5 1.6-1.5h1.7V3.7c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2H7.3V13h2.8v8h3.4z"/></svg></a>
+      <a href="https://wa.me/?text=FAIS%20LE%20TEST.%206%20questions.%20Tes%20convictions.%20https%3A%2F%2Favantgarde-france.github.io%2F" target="_blank" rel="noopener noreferrer" aria-label="Partager sur WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5A11.8 11.8 0 0 0 2 17.7L.5 23.5l6-1.6A11.8 11.8 0 0 0 20.5 3.5ZM12 21a9 9 0 0 1-4.6-1.3l-.3-.2-3.5.9.9-3.4-.2-.4A9 9 0 1 1 12 21Zm5-6.7c-.3-.2-1.7-.9-2-.9s-.5-.2-.7.2-.8.9-1 1.1-.4.2-.7.1a7.3 7.3 0 0 1-2.1-1.3 8 8 0 0 1-1.5-1.8c-.2-.3 0-.5.1-.6l.5-.6c.2-.2.2-.3.3-.5s0-.4 0-.5-.7-1.6-1-2.2c-.2-.5-.5-.4-.7-.4H7.6c-.2 0-.5.1-.8.4s-1 1-1 2.4 1 2.8 1.1 3c.2.2 2 3.1 4.8 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.2.2-1.4s-.2-.3-.5-.5Z"/></svg></a>
+      <a href="https://twitter.com/intent/tweet?text=FAIS%20LE%20TEST.%206%20questions.%20Tes%20convictions.&url=https%3A%2F%2Favantgarde-france.github.io%2F" target="_blank" rel="noopener noreferrer" aria-label="Partager sur X" title="X"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18.9 2H22l-6.8 7.8L23.2 22h-6.3L12 14.6 5.5 22H2.4l7.3-8.4L1.8 2h6.5l4.4 6.8L18.9 2Zm-1.1 18h1.7L7.3 3.9H5.5L17.8 20Z"/></svg></a>
+      <button type="button" class="quiz-share-copy" aria-label="Copier le lien du questionnaire" title="Copier le lien"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7Zm0 16H8V7h11v14Z"/></svg></button>
+      <span class="share-status" role="status" aria-live="polite">Lien copié</span>
+    </nav>
 
     <section class="quiz-stats-placeholder" aria-label="Fiscalité et prélèvements obligatoires">
       <div class="stats-marquee">
@@ -730,5 +756,33 @@
   });
 })();
 </script>
+
+<script>
+(() => {
+  const root = document.querySelector('#home-experience .quiz-share');
+  if (!root) return;
+  const copy = root.querySelector('.quiz-share-copy');
+  const status = root.querySelector('.share-status');
+  copy.addEventListener('click', async () => {
+    const url = 'https://avantgarde-france.github.io/';
+    try {
+      if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(url);
+      else {
+        const field = document.createElement('textarea');
+        field.value = url; field.style.position = 'fixed'; field.style.opacity = '0';
+        document.body.appendChild(field); field.select();
+        const ok = document.execCommand('copy'); field.remove();
+        if (!ok) throw new Error('Copie indisponible');
+      }
+      status.textContent = 'Lien copié'; status.classList.add('is-visible');
+      window.setTimeout(() => status.classList.remove('is-visible'), 1800);
+    } catch (error) {
+      status.textContent = 'Copie impossible'; status.classList.add('is-visible');
+      window.setTimeout(() => status.classList.remove('is-visible'), 2200);
+    }
+  });
+})();
+</script>
+
 </body>
 </html>
